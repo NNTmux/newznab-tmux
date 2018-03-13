@@ -984,7 +984,7 @@ class Movie
                         $ret = [
                             'title' => $resp->data->Title ?? '',
                             'cover' => $resp->data->Poster ?? '',
-                            'genre' => $resp->data->Genre ??'',
+                            'genre' => $resp->data->Genre ?? '',
                             'year' => $resp->data->Year ?? '',
                             'plot' => $resp->data->Plot ?? '',
                             'rating' => $resp->data->imdbRating ?? '',
