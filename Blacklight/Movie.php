@@ -11,7 +11,6 @@ use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Imdb\Exception\Http;
 use App\Models\MovieInfo;
 use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
@@ -203,8 +202,8 @@ class Movie
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
         $this->showPasswords = Releases::showPasswords();
 
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli') && $this->pdo->cli);
-        $this->imgSavePath = NN_COVERS.'movies'.DS;
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->imgSavePath = NN_COVERS.'movies/';
         $this->service = '';
     }
 
@@ -384,13 +383,13 @@ class Movie
         $browseBy = ' ';
         $browseByArr = ['title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb'];
         foreach ($browseByArr as $bb) {
-            if (isset($_REQUEST[$bb]) && ! empty($_REQUEST[$bb])) {
-                $bbv = stripslashes($_REQUEST[$bb]);
+            if (request()->has($bb) && ! empty(request()->input($bb))) {
+                $bbv = stripslashes(request()->input($bb));
                 if ($bb === 'rating') {
                     $bbv .= '.';
                 }
                 if ($bb === 'imdb') {
-                    $browseBy .= sprintf('AND m.%sid = %d', $bb, $bbv);
+                    $browseBy .= sprintf('AND m.imdbid = %d', $bbv);
                 } else {
                     $browseBy .= 'AND m.'.$bb.' '.$this->pdo->likeString($bbv, true, true);
                 }
@@ -744,7 +743,7 @@ class Movie
         if ($this->fanartapikey !== '') {
             $art = $this->fanart->getMovieFanart('tt'.$imdbId);
 
-            if (isset($art) && $art !== false) {
+            if ($art !== null && $art !== false) {
                 if (isset($art['status']) && $art['status'] === 'error') {
                     return false;
                 }
