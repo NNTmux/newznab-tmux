@@ -14,7 +14,10 @@ class CreateAudioDataTable extends Migration {
 	{
 		Schema::create('audio_data', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('releases_id')->unsigned()->comment('FK to releases.id');
 			$table->integer('audioid')->unsigned();
 			$table->string('audioformat', 50)->nullable();

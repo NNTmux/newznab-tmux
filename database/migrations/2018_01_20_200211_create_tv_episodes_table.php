@@ -14,7 +14,10 @@ class CreateTvEpisodesTable extends Migration {
 	{
 		Schema::create('tv_episodes', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('videos_id')->unsigned()->comment('FK to videos.id of the parent series.');
 			$table->smallInteger('series')->unsigned()->default(0)->comment('Number of series/season.');
 			$table->smallInteger('episode')->unsigned()->default(0)->comment('Number of episode within series');

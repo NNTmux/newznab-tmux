@@ -14,7 +14,10 @@ class CreateGroupsTable extends Migration {
 	{
 		Schema::create('groups', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('id', true);
 			$table->string('name', 255)->default('')->unique('ix_groups_name');
 			$table->integer('backfill_target')->default(1);
 			$table->bigInteger('first_record')->unsigned()->default(0);

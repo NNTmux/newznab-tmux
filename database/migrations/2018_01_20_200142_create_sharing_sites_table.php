@@ -14,7 +14,10 @@ class CreateSharingSitesTable extends Migration {
 	{
 		Schema::create('sharing_sites', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('site_name')->default('');
 			$table->string('site_guid', 40)->default('');
 			$table->dateTime('last_time')->nullable();

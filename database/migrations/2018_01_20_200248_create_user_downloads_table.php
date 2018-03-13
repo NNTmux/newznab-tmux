@@ -14,7 +14,10 @@ class CreateUserDownloadsTable extends Migration {
 	{
 		Schema::create('user_downloads', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('users_id')->unsigned()->index('userid');
 			$table->string('hosthash', 50)->default('');
 			$table->dateTime('timestamp')->index('timestamp');

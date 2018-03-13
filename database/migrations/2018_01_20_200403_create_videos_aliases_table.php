@@ -14,7 +14,10 @@ class CreateVideosAliasesTable extends Migration {
 	{
 		Schema::create('videos_aliases', function(Blueprint $table)
 		{
-			$table->integer('videos_id')->unsigned()->comment('FK to videos.id of the parent title.');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('videos_id')->unsigned()->comment('FK to videos.id of the parent title.');
 			$table->string('title', 180)->comment('AKA of the video.');
 			$table->primary(['videos_id','title']);
 		});

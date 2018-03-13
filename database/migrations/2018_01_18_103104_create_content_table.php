@@ -14,7 +14,10 @@ class CreateContentTable extends Migration {
 	{
 		Schema::create('content', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('id', true);
 			$table->string('title', 255);
 			$table->string('url', 2000)->nullable();
 			$table->text('body', 65535)->nullable();

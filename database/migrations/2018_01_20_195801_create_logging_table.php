@@ -14,7 +14,10 @@ class CreateLoggingTable extends Migration {
 	{
 		Schema::create('logging', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->dateTime('time')->nullable();
 			$table->string('username', 50)->nullable();
 			$table->string('host', 40)->nullable();

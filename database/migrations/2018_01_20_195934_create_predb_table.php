@@ -14,7 +14,10 @@ class CreatePredbTable extends Migration {
 	{
 		Schema::create('predb', function(Blueprint $table)
 		{
-			$table->increments('id')->comment('Primary key');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id')->comment('Primary key');
 			$table->string('title')->default('')->unique('ix_predb_title');
 			$table->string('nfo')->nullable()->index('ix_predb_nfo');
 			$table->string('size', 50)->nullable();

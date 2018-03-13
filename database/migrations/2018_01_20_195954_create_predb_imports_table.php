@@ -14,7 +14,10 @@ class CreatePredbImportsTable extends Migration {
 	{
 		Schema::create('predb_imports', function(Blueprint $table)
 		{
-			$table->string('title')->default('');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->string('title')->default('');
 			$table->string('nfo')->nullable();
 			$table->string('size', 50)->nullable();
 			$table->string('category')->nullable();

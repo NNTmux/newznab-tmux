@@ -14,7 +14,10 @@ class CreateXxxinfoTable extends Migration {
 	{
 		Schema::create('xxxinfo', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('title', 1024)->unique('ix_xxxinfo_title');
 			$table->string('tagline', 1024);
 			$table->binary('plot', 65535)->nullable();

@@ -14,7 +14,10 @@ class CreateCollectionsTable extends Migration {
 	{
 		Schema::create('collections', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('subject')->default('');
 			$table->string('fromname')->default('')->index('fromname');
 			$table->dateTime('date')->nullable()->index('date');

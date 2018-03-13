@@ -14,7 +14,10 @@ class CreateGenresTable extends Migration {
 	{
 		Schema::create('genres', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('id', true);
 			$table->string('title');
 			$table->integer('type')->nullable();
 			$table->boolean('disabled')->default(0);

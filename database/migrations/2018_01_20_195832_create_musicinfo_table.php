@@ -14,7 +14,10 @@ class CreateMusicinfoTable extends Migration {
 	{
 		Schema::create('musicinfo', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('title');
 			$table->string('asin', 128)->nullable()->unique('ix_musicinfo_asin');
 			$table->string('url', 1000)->nullable();

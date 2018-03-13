@@ -14,7 +14,10 @@ class CreateVideoDataTable extends Migration {
 	{
 		Schema::create('video_data', function(Blueprint $table)
 		{
-			$table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
 			$table->string('containerformat', 50)->nullable();
 			$table->string('overallbitrate', 20)->nullable();
 			$table->string('videoduration', 20)->nullable();

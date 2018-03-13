@@ -14,7 +14,10 @@ class CreateReleaseNfosTable extends Migration {
 	{
 		Schema::create('release_nfos', function(Blueprint $table)
 		{
-			$table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
 			$table->binary('nfo', 65535)->nullable();
             $table->foreign('releases_id', 'FK_rn_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});

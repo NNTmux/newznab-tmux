@@ -14,7 +14,10 @@ class CreatePredbHashesTable extends Migration {
 	{
 		Schema::create('predb_hashes', function(Blueprint $table)
 		{
-			$table->integer('predb_id')->unsigned()->default(0)->comment('id, of the predb entry, this hash belongs to');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('predb_id')->unsigned()->default(0)->comment('id, of the predb entry, this hash belongs to');
 		});
 
 		DB::unprepared('ALTER TABLE predb_hashes ADD COLUMN hash VARBINARY(40) DEFAULT ""');

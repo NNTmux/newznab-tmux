@@ -14,7 +14,10 @@ class CreateBookinfoTable extends Migration {
 	{
 		Schema::create('bookinfo', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('title');
 			$table->string('author');
 			$table->string('asin', 128)->nullable()->unique('ix_bookinfo_asin');

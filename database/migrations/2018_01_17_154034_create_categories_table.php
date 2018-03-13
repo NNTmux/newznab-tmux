@@ -14,7 +14,10 @@ class CreateCategoriesTable extends Migration {
 	{
 		Schema::create('categories', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('title');
 			$table->integer('parentid')->nullable()->index('ix_categories_parentid');
 			$table->integer('status')->default(1)->index('ix_categories_status');

@@ -14,7 +14,10 @@ class CreateTvInfoTable extends Migration {
 	{
 		Schema::create('tv_info', function(Blueprint $table)
 		{
-			$table->integer('videos_id')->unsigned()->default(0)->primary()->comment('FK to video.id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('videos_id')->unsigned()->default(0)->primary()->comment('FK to video.id');
 			$table->text('summary', 65535)->comment('Description/summary of the show.');
 			$table->string('publisher', 50)->comment('The channel/network of production/release (ABC, BBC, Showtime, etc.).');
 			$table->string('localzone', 50)->default('')->comment('The linux tz style identifier');
