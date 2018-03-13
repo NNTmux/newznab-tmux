@@ -1,4 +1,6 @@
 build:
+    environment:
+        mysql: 5.7
     dependencies:
         before:
         override:
@@ -12,17 +14,19 @@ build:
                     - php-scrutinizer-run
 filter:
     excluded_paths:
-      - "vendor/*"
       - "libs/*"
       - "resources/*"
       - "storage/*"
       - "resources/views/themes/*"
       - "public/plugins/*"
+      - "public/assets/*"
       - "database/*"
       - "config/*"
       - "bootstrap/*"
       - "docs/*"
       - "tests/*"
+    dependency_paths:
+      - "vendor/*"
 
 checks:
     php:
