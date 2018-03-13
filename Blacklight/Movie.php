@@ -982,18 +982,18 @@ class Movie
                     similar_text($this->currentYear, $resp->data->Year, $percent);
                     if ($percent >= self::YEAR_MATCH_PERCENT) {
                         $ret = [
-                            'title' => ! empty($resp->data->Title) ? $resp->data->Title : '',
-                            'cover' => ! empty($resp->data->Poster) ? $resp->data->Poster : '',
-                            'genre' => ! empty($resp->data->Genre) ? $resp->data->Genre : '',
-                            'year' => ! empty($resp->data->Year) ? $resp->data->Year : '',
-                            'plot' => ! empty($resp->data->Plot) ? $resp->data->Plot : '',
-                            'rating' => ! empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
-                            'rtRating' => ! empty($resp->data->Ratings[1]->Value) ? $resp->data->Ratings[1]->Value : '',
-                            'tagline' => ! empty($resp->data->Tagline) ? $resp->data->Tagline : '',
-                            'director' => ! empty($resp->data->Director) ? $resp->data->Director : '',
-                            'actors' => ! empty($resp->data->Actors) ? $resp->data->Actors : '',
-                            'language' => ! empty($resp->data->Language) ? $resp->data->Language : '',
-                            'boxOffice' => ! empty($resp->data->BoxOffice) ? $resp->data->BoxOffice : '',
+                            'title' => $resp->data->Title ?? '',
+                            'cover' => $resp->data->Poster ?? '',
+                            'genre' => $resp->data->Genre ??'',
+                            'year' => $resp->data->Year ?? '',
+                            'plot' => $resp->data->Plot ?? '',
+                            'rating' => $resp->data->imdbRating ?? '',
+                            'rtRating' => $resp->data->Ratings[1]->Value ?? '',
+                            'tagline' => $resp->data->Tagline ?? '',
+                            'director' => $resp->data->Director ?? '',
+                            'actors' => $resp->data->Actors ?? '',
+                            'language' => $resp->data->Language ?? '',
+                            'boxOffice' => $resp->data->BoxOffice ?? '',
                         ];
 
                         if ($this->echooutput) {
