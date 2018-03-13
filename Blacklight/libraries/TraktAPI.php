@@ -245,7 +245,7 @@ class TraktAPI
             default:
         }
 
-        $url = self::API_URL. 'search?id_type='. $type .'&id='.$id;
+        $url = self::API_URL.'search?id_type='.$type.'&id='.$id;
 
         return $this->getJsonArray($url, '');
     }
