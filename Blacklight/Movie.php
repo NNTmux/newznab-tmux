@@ -467,11 +467,6 @@ class Movie
         $cover = 0;
         if (is_file($this->imgSavePath.$imdbid).'-cover.jpg') {
             $cover = 1;
-        } else {
-            $link = $this->checkTraktValue($data['images']['poster']['thumb']);
-            if ($link) {
-                $cover = $this->releaseImage->saveImage($imdbid.'-cover', $link, $this->imgSavePath);
-            }
         }
 
         return $this->update([

@@ -1,4 +1,5 @@
 2018-03-13 DariusIII
+	* Chg: Update handling of data received from Trakt.tv in Movie class
 	* Chg: Update nesbot/carbon to latest version
 	* Chg: Update TraktAPI class, remove references to images, update functions to use str_slug function
 2018-03-12 DariusIII
