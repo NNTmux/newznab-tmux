@@ -21,8 +21,8 @@
 
 namespace Blacklight;
 
-use Blacklight\http\BasePage;
 use GuzzleHttp\Client;
+use Blacklight\http\BasePage;
 
 /**
  * Class CouchPotato.
