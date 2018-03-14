@@ -127,7 +127,7 @@ class Movie
     public $tmdbtoken;
 
     /**
-     * @var null|TraktTv
+     * @var \Blacklight\processing\tv\TraktTv
      */
     public $traktTv;
 
@@ -173,6 +173,7 @@ class Movie
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
         $this->client = new Client();
         $this->tmdbtoken = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
         $this->tmdbclient = new TmdbClient(
@@ -416,10 +417,6 @@ class Movie
         $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '!=', '')->first(['trailer']);
         if ($trailer !== null) {
             return $trailer['trailer'];
-        }
-
-        if ($this->traktTv === null) {
-            $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
         }
 
         $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
@@ -823,7 +820,7 @@ class Movie
             $ret['imdbid'] = $ImdbID;
             $vote = $tmdbLookup['vote_average'];
             if ($vote !== null) {
-                $ret['rating'] = ((int) $vote === 0) ? '' : $vote;
+                $ret['rating'] = (int) $vote === 0 ? '' : $vote;
             } else {
                 $ret['rating'] = '';
             }
@@ -928,9 +925,6 @@ class Movie
      */
     protected function fetchTraktTVProperties($imdbId)
     {
-        if ($this->traktTv === null) {
-            $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
-        }
         $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
         if ($resp !== false) {
             similar_text($this->currentTitle, $resp['title'], $percent);
@@ -1091,9 +1085,6 @@ class Movie
         $movieCount = \count($res);
 
         if ($movieCount > 0) {
-            if ($this->traktTv === null) {
-                $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
-            }
             if ($this->echooutput && $movieCount > 1) {
                 ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' movie releases.'), true);
             }
