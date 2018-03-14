@@ -1,4 +1,5 @@
 2018-03-14 DariusIII
+	* Chg: Update CouchPotato class
 	* Chg: Add coverage report to scrutinizer config
 2018-03-13 DariusIII
 	* Chg: Update migrations, add table engine, charset and collation definitions

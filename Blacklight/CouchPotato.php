@@ -21,6 +21,7 @@
 
 namespace Blacklight;
 
+use Blacklight\http\BasePage;
 use GuzzleHttp\Client;
 
 /**
@@ -47,11 +48,11 @@ class CouchPotato
     public $imdbid = '';
 
     /**
-     * Construct.
+     * CouchPotato constructor.
      *
-     * @param \BasePage $page
+     * @param \Blacklight\http\BasePage $page
      */
-    public function __construct(&$page)
+    public function __construct(BasePage $page)
     {
         $this->cpurl = ! empty($page->userdata['cp_url']) ? $page->userdata['cp_url'] : '';
         $this->cpapi = ! empty($page->userdata['cp_api']) ? $page->userdata['cp_api'] : '';
