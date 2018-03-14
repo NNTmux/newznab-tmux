@@ -13,9 +13,9 @@ build:
                 override:
                     - 'php-scrutinizer-run'
                     - 'vendor/bin/phpunit --coverage-clover=coverage'
-                    coverage:
-                        file: 'coverage'
-                        format: 'clover'
+                coverage:
+                    file: 'coverage'
+                    format: 'clover'
 filter:
     excluded_paths:
       - "libs/*"
