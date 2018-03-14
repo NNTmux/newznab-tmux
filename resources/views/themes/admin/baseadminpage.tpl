@@ -1,7 +1,17 @@
 <!DOCTYPE html>
-<html lang="{{App::getLocale()}}">
+<html>
 
 <head>
+	{literal}
+	<script>
+        /* <![CDATA[ */
+        var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+        var SERVERROOT = "{/literal}{$serverroot}{literal}";
+        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+        /* ]]> */
+	</script>
+	{/literal}
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<!-- Meta, title, CSS, favicons, etc. -->
 	<meta charset="utf-8">
@@ -11,20 +21,23 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
 	<!-- Bootstrap core CSS -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css")}}
+	<link href="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
+		  type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
+		  type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css" rel="stylesheet"
+		  type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
 	<!-- Normalize.css -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/normalize.css")}}
+	<link href="{$smarty.const.WWW_ASSETS}/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Custom styling plus plugins -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/custom.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/icheck/skins/flat/green.css")}}
+	<link href="{$smarty.const.WWW_ASSETS}/css/custom.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_ASSETS}/icheck/skins/flat/green.css" rel="stylesheet">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
-	{{Html::script("https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js")}}
-	{{Html::script("https://oss.maxcdn.com/respond/1.4.2/respond.min.js")}}
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 
 </head>
@@ -84,36 +97,36 @@
 
 </div>
 <!-- jQuery 3.1.0 -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-3.2.x/dist/jquery.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
+<script src="{$smarty.const.WWW_ASSETS}/jquery-3.2.x/dist/jquery.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js" type="text/javascript"></script>
 <!-- bootstrap progress js -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-progressbar/bootstrap-progressbar.min.js")}}
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
 <!-- bootstrap datepicker -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery.nicescroll/dist/jquery.nicescroll.min.js")}}
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
 <!-- tinymce editor -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js")}}
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 <!-- icheck -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js")}}
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js"></script>
 <!-- jQuery migrate script -->
-{{Html::script("https://code.jquery.com/jquery-migrate-1.4.0.min.js")}}
+<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.qtip.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/sorttable.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/utils-admin.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.multiselect.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.multifile.js")}}
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/utils-admin.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.multiselect.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.multifile.js"></script>
 <!-- Custom functions -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/custom.js")}}
+<script src="{$smarty.const.WWW_ASSETS}/js/functions.js" type="text/javascript"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/custom.js"></script>
 <!-- pace -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/pace/pace.min.js")}}
+<script src="{$smarty.const.WWW_ASSETS}/pace/pace.min.js"></script>
 <!--font-awesome-->
-{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js")}}
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
 
 </body>
 

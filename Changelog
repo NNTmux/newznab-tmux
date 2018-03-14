@@ -1,3 +1,5 @@
+2018-03-15 DariusIII
+	* Fix: Revert admin pages to old links/scripts format, fix category-list page
 2018-03-14 DariusIII
 	* Chg: Update laravel/framework to version 5.6.12
 	* Chg: Update themes to use laravelcollective/html
