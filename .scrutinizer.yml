@@ -12,7 +12,7 @@ build:
             tests:
                 override:
                    - php-scrutinizer-run
-                   - "vendor/bin/phpunit --coverage-clover=coverage"
+                   - vendor/bin/phpunit --coverage-clover=coverage
                     coverage:
                       file: 'coverage'
                       format: 'clover'
