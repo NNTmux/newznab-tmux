@@ -1,4 +1,5 @@
 2018-03-14 DariusIII
+	* Chg: Move $this_binaries to class constructor function in Backfill class
 	* Chg: Update CouchPotato class
 	* Chg: Add coverage report to scrutinizer config
 2018-03-13 DariusIII
