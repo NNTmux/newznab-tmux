@@ -11,10 +11,11 @@ build:
         analysis:
             tests:
                 override:
-                    command: 'vendor/bin/phpunit --coverage-clover=coverage'
-                    coverage:
-                      file: 'coverage'
-                      format: 'clover'
+                    -
+                        command: 'vendor/bin/phpunit --coverage-clover=coverage'
+                        coverage:
+                          file: 'coverage'
+                          format: 'clover'
 filter:
     excluded_paths:
       - "libs/*"
