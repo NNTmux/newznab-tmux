@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{App::getLocale()}}">
 
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -17,16 +17,15 @@
 {/if}
 
 {if $site->google_adsense_acc != ''}
-	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
+	{{Html::style("http://www.google.com/cse/api/branding.css")}}
 {/if}
-	<link href="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
-		  type="text/css" media="screen"/>
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/styles/extra.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/styles/jquery.pnotify.default.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/styles/bootstrap.cyborg.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/styles/bootstrap-fixes.css" rel="stylesheet" type="text/css" media="screen" />
+	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/styles/extra.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/styles/jquery.pnotify.default.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/styles/style.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/styles/bootstrap.cyborg.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/styles/bootstrap-fixes.css")}}
 
 	<!-- FAVICON -->
 	<link rel="search" type="application/opensearchdescription+xml" href="/opensearch" title="{$site->title|escape}" />
@@ -34,40 +33,30 @@
 
 	<!-- Javascripts -->
 	<!-- jQuery 3.1.0 -->
-	<script src="{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/js/sorttable.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js")}}
 	<!-- Added the Bootstrap JS -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
 	<!-- tinymce editor -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/scripts/utils.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/scripts/utils.js")}}
 	<!-- Pines Notify -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.pnotify.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.pnotify.js")}}
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	<script src="{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js"></script>
-	<script src="{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js")}}
 	<![endif]-->
 	<!--font-awesome-->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
-	{literal}
-	<script>
-		/* <![CDATA[ */
-		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
-		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
-		/* ]]> */
-	</script>
-	{/literal}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js")}}
+
 	{$page->head}
 </head>
 <body {$page->body}>

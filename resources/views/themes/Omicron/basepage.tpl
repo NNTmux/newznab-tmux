@@ -1,53 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{App::getLocale()}}">
 
 <head>
-	{literal}
-	<script>
-		/* <![CDATA[ */
-		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
-		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
-		/* ]]> */
-	</script>
-	{/literal}
 	<meta charset="UTF-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<meta name="csrf-token" content="{$csrf_token}">
 	<!-- Bootstrap 3.3.6 -->
-	<link href="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
-		  type="text/css"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css")}}
 	<!-- iCheck -->
-	<link href="{$smarty.const.WWW_ASSETS}/icheck/skins/square/blue.css" rel="stylesheet">
+	{{Html::style("{$smarty.const.WWW_ASSETS}/icheck/skins/square/blue.css")}}
 	<!-- flexboxgrid -->
-	<link href="{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
-		  type="text/css"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css")}}
 	<!-- Font Awesome Icons -->
-	<link href="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
-		  type="text/css"/>
-	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
-	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
+	{{Html::style("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css")}}
 	<!-- Qtip2 CSS -->
-	<link href="{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css" rel="stylesheet"
-		  type="text/css"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css")}}
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_ASSETS}/css/normalize.css" rel="stylesheet" type="text/css">
+	{{Html::style("{$smarty.const.WWW_ASSETS}/css/normalize.css")}}
 	<!-- Ionicons -->
-	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
+	{{Html::style("https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css")}}
 	<!-- Theme style -->
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/dist/css/AdminLTE.css" rel="stylesheet" type="text/css"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/dist/css/AdminLTE.css")}}
 	<!-- AdminLTE Skins. We have chosen the skin-blue for this starter
 		  page. However, you can choose any other skin. Make sure you
 		  apply the skin class to the body tag so the changes take effect.
 	-->
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/dist/css/skins/skin-blue.min.css")}}
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	<script src="{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js"></script>
-	<script src="{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js")}}
 	<![endif]-->
 </head>
 	<!--
@@ -266,46 +252,43 @@
 	<!-- ./wrapper -->
 	<!-- REQUIRED JS SCRIPTS -->
 	<!-- jQuery 3.1.0 -->
-	<script src="{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js")}}
 	<!-- Bootstrap 3.3.6 JS -->
-	<script src="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js"
-			type="text/javascript"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
 	<!-- icheck -->
-	<script src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js" type="text/javascript"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js")}}
 	<!-- Bootstrap hover on mouseover script -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js")}}
 	<!-- AdminLTE App -->
-	<script src="{$smarty.const.WWW_ASSETS}/{$theme}/dist/js/app.min.js" type="text/javascript"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/dist/js/app.min.js")}}
 	<!-- jQuery migrate script -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js")}}
 	<!-- SlimScroll script -->
-	<script src="{$smarty.const.WWW_ASSETS}/slimscroll/jquery.slimscroll.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/slimscroll/jquery.slimscroll.min.js")}}
 	<!-- Fastclick script -->
-	<script src="{$smarty.const.WWW_ASSETS}/fastclick/lib/fastclick.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/fastclick/lib/fastclick.js")}}
 	<!-- data table plugin -->
-	<script type="text/javascript"
-			src='{$smarty.const.WWW_ASSETS}/datatables/media/js/jquery.dataTables.min.js'></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/datatables/media/js/jquery.dataTables.min.js")}}
 	<!-- tinymce editor -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js")}}
 	<!-- newznab default scripts, needed for stuff to work -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/js/sorttable.js")}}
 	<!-- Custom functions -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/functions.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
 	<!-- PNotify -->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.animate.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.desktop.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.callbacks.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.buttons.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.confirm.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.nonblock.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.animate.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.desktop.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.callbacks.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.buttons.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.confirm.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.nonblock.js")}}
 	<!--font-awesome-->
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
+	{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js")}}
+	{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js")}}
 	<!-- Optionally, you can add Slimscroll and FastClick plugins.
 		  Both of these plugins are recommended to enhance the
 		  user experience. Slimscroll is required when using the

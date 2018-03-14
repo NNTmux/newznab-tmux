@@ -1,4 +1,5 @@
 2018-03-14 DariusIII
+	* Chg: Update themes to use laravelcollective/html
 	* Chg: Add laravelcollective/html package
 	* Chg: Move traktTv instantiation into class constructor in Movie class
 	* Chg: Move $this_binaries to class constructor function in Backfill class

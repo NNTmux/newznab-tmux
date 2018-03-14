@@ -1,17 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<html lang="{{App::getLocale()}}">
 
 <head>
-	{literal}
-	<script>
-		/* <![CDATA[ */
-        var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
-        var SERVERROOT = "{/literal}{$serverroot}{literal}";
-        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
-        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
-		/* ]]> */
-	</script>
-	{/literal}
 	<!--
 		===
 		This comment should NOT be removed.
@@ -28,33 +18,27 @@
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<meta name="csrf-token" content="{$csrf_token}">
 	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_ASSETS}/bootswatch/slate/bootstrap.min.css"
-		  rel="stylesheet">
-	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/css/charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_ASSETS}/chosen/chosen.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_ASSETS}/colorbox/example3/colorbox.css'
-		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.css'
-		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_ASSETS}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_ASSETS}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_ASSETS}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
-	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
-	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
+	{{Html::style("{$smarty.const.WWW_ASSETS}/bootswatch/slate/bootstrap.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/css/charisma-app.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/chosen/chosen.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/colorbox/example3/colorbox.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/css/elfinder.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/css/elfinder.theme.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/{$theme}/css/jquery.iphone.toggle.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css")}}
 	<!-- flexboxgrid -->
-	<link href="{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
-		  type="text/css"/>
-	<link href="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
-		  type="text/css"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css")}}
 	<!-- Material design Icons -->
-	<link href="{$smarty.const.WWW_ASSETS}/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet"
-		  type="text/css"/>
-	<link href="{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css" type="text/css" media="screen"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/material-design-iconic-font/dist/css/material-design-iconic-font.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css")}}
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_ASSETS}/css/normalize.css" rel="stylesheet" type="text/css">
-	<link href="{$smarty.const.WWW_ASSETS}/icheck/skins/square/blue.css" rel="stylesheet">
+	{{Html::style("{$smarty.const.WWW_ASSETS}/css/normalize.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/icheck/skins/square/blue.css")}}
 	<!-- Materializecss css -->
-	<link href="{$smarty.const.WWW_ASSETS}/materialize/dist/css/materialize.min.css" type="text/css" media="screen"/>
+	{{Html::style("{$smarty.const.WWW_ASSETS}/materialize/dist/css/materialize.min.css")}}
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_ASSETS}/images/favicon.ico">
 </head>
@@ -178,65 +162,57 @@
 <!-- Scripts-->
 <!-- jQuery -->
 <!-- jQuery 3.1.0 -->
-<script src="{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js")}}
 <!-- jQuery migrate script -->
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
 <!-- Bootstrap hover on mouseover script -->
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js")}}
 <!-- library for cookie management -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.cookie.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.cookie.js")}}
 <!-- data table plugin -->
-<script type="text/javascript"
-		src='{$smarty.const.WWW_ASSETS}/datatables/media/js/jquery.dataTables.min.js'></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/datatables/media/js/jquery.dataTables.min.js")}}
 <!-- select or dropdown enhancer -->
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/chosen/chosen.jquery.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/chosen/chosen.jquery.js")}}
 <!-- plugin for gallery image view -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
 <!-- library for making tables responsive -->
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.js")}}
 <!-- for iOS style toggle switch -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.iphone.toggle.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.iphone.toggle.js")}}
 <!-- icheck -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js")}}
 <!-- autogrowing textarea plugin -->
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.autogrow-textarea.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.autogrow-textarea.js")}}
 <!-- tinymce editor -->
-<script type="text/javascript"
-		src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js")}}
 <!-- history.js for cross-browser state change on ajax -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.history.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.history.js")}}
 <!-- Charisma functions -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/charisma.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/charisma.js")}}
 <!-- newznab default scripts, needed for stuff to work -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/functions.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/js/sorttable.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
-<script src="{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js"></script>
-<script src="{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js")}}
 <![endif]-->
 <!-- PNotify -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.animate.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.desktop.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.callbacks.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.buttons.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.confirm.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.nonblock.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.animate.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.desktop.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.callbacks.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.buttons.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.confirm.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.nonblock.js")}}
 <!-- materializecss js -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/materialize/dist/js/materialize.min.js"></script
+{{Html::script("{$smarty.const.WWW_ASSETS}/materialize/dist/js/materialize.min.js")}}
 <!--font-awesome-->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
+{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js")}}
 </body>
 </html>
