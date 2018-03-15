@@ -12,10 +12,6 @@ build:
             tests:
                 override:
                     -
-                        command: 'vendor/bin/phpunit --coverage-clover=coverage'
-                        coverage:
-                          file: 'coverage'
-                          format: 'clover'
                         command: 'php-scrutinizer-run'
 filter:
     excluded_paths:
