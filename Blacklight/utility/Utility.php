@@ -852,91 +852,16 @@ class Utility
         return Str::uuid()->toString();
     }
 
-    public static function responseXmlToObject($input)
+    /**
+     * @param $input
+     *
+     * @return \SimpleXMLElement
+     */
+    public static function responseXmlToObject($input): \SimpleXMLElement
     {
         $input = str_replace('<newznab:', '<', $input);
 
         return @simplexml_load_string($input);
-    }
-
-    /**
-     * @note: Convert non-UTF-8 characters into UTF-8
-     * Function taken from http://stackoverflow.com/a/19366999
-     *
-     * @param $data
-     *
-     * @return array|string
-     */
-    public static function encodeAsUTF8($data)
-    {
-        if (\is_array($data)) {
-            foreach ($data as $key => $value) {
-                $data[$key] = self::encodeAsUTF8($value);
-            }
-        } else {
-            if (\is_string($data)) {
-                return utf8_encode($data);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * This function turns a roman numeral into an integer.
-     *
-     * @param string $string
-     *
-     * @return int $e
-     */
-    public static function convertRomanToInt($string): int
-    {
-        switch (strtolower($string)) {
-            case 'i': $e = 1;
-                break;
-            case 'ii': $e = 2;
-                break;
-            case 'iii': $e = 3;
-                break;
-            case 'iv': $e = 4;
-                break;
-            case 'v': $e = 5;
-                break;
-            case 'vi': $e = 6;
-                break;
-            case 'vii': $e = 7;
-                break;
-            case 'viii': $e = 8;
-                break;
-            case 'ix': $e = 9;
-                break;
-            case 'x': $e = 10;
-                break;
-            case 'xi': $e = 11;
-                break;
-            case 'xii': $e = 12;
-                break;
-            case 'xiii': $e = 13;
-                break;
-            case 'xiv': $e = 14;
-                break;
-            case 'xv': $e = 15;
-                break;
-            case 'xvi': $e = 16;
-                break;
-            case 'xvii': $e = 17;
-                break;
-            case 'xviii': $e = 18;
-                break;
-            case 'xix': $e = 19;
-                break;
-            case 'xx': $e = 20;
-                break;
-            default:
-                $e = 0;
-        }
-
-        return $e;
     }
 
     /**
@@ -1024,7 +949,7 @@ class Utility
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
         header('Content-type: text/xml');
-        header('Content-Length: '.strlen($response));
+        header('Content-Length: '.\strlen($response));
         header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
         header($errorHeader);
 
@@ -1041,23 +966,6 @@ class Utility
     public static function htmlfmt($string): string
     {
         return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
-    }
-
-    /**
-     * Convert multi to single dimensional array
-     * Code taken from http://stackoverflow.com/a/12309103.
-     *
-     * @param $array
-     *
-     * @param $separator
-     *
-     * @return string
-     */
-    public static function convertMultiArray($array, $separator): string
-    {
-        return implode("$separator", array_map(function ($a) {
-            return implode(',', $a);
-        }, $array));
     }
 
     /**

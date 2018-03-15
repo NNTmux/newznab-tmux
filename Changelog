@@ -1,4 +1,5 @@
 2018-03-15 DariusIII
+	* Chg: Add wandersonwhcr/illuminate-romans and remove unused functions from Utility class
 	* Chg: Simplify some of the used code, remove unused functions
 	* Chg: Use colons in case statements in Categorize class
 	* Fix: Fix some of the issues in Forking class, pointed out by scrutinizer

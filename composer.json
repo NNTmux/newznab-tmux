@@ -153,6 +153,7 @@
     "smarty/smarty": "~3.1",
     "spatie/laravel-fractal": "^5.3",
     "vlucas/phpdotenv": "^2.4",
+    "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",
     "yab/laravel-scout-mysql-driver": "^2.0",
     "yadakhov/insert-on-duplicate-key": "^1.2",

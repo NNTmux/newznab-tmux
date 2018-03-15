@@ -597,8 +597,8 @@ abstract class TV extends Videos
         //The.Pacific.Pt.VI.HDTV.XviD-XII / Part.IV
         elseif (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9]([ivx]+)/i', $relname, $matches)) {
             $episodeArr['season'] = 1;
-            $epLow = strtolower($matches[2]);
-            $episodeArr['episode'] = Utility::convertRomanToInt($epLow);
+            $epLow = $matches[2];
+            $episodeArr['episode'] = roman_to_int($epLow);
         }
         // Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
         elseif (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $matches)) {
