@@ -2,6 +2,16 @@
 <html lang="{{App::getLocale()}}">
 
 <head>
+	{literal}
+	<script>
+        /* <![CDATA[ */
+        var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+        var SERVERROOT = "{/literal}{$serverroot}{literal}";
+        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+        /* ]]> */
+	</script>
+	{/literal}
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=9" />
 	<meta name="keywords" content="{$page->meta_keywords}{if $page->meta_keywords != "" && $site->metakeywords != ""},{/if}{$site->metakeywords}" />

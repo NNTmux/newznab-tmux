@@ -2,6 +2,16 @@
 <html lang="{{App::getLocale()}}">
 
 <head>
+	{literal}
+	<script>
+        /* <![CDATA[ */
+        var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+        var SERVERROOT = "{/literal}{$serverroot}{literal}";
+        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+        /* ]]> */
+	</script>
+	{/literal}
 	<meta charset="UTF-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
