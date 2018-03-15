@@ -1,4 +1,5 @@
 2018-03-15 DariusIII
+	* Chg: Update Binaries class, fix issues pointed out by scrutinizer
 	* Chg: Update Movie class, fix some of the issues pointed out by scrutinizer
 	* Chg: Add back js defining variables to themes
 	* Fix: Revert admin pages to old links/scripts format, fix category-list page

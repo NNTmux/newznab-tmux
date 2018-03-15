@@ -104,13 +104,6 @@ class Binaries
     protected $_partRepairLimit;
 
     /**
-     * Should we show dropped yEnc to CLI?
-     *
-     * @var bool
-     */
-    protected $_showDroppedYEncParts;
-
-    /**
      * Echo to cli?
      *
      * @var bool
@@ -256,7 +249,7 @@ class Binaries
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
         $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
 
-        $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
+        $this->messageBuffer = (int)Settings::settingValue('..maxmssgs') !== 0 ?
             (int) Settings::settingValue('..maxmssgs') : 20000;
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_partRepair = (int) Settings::settingValue('..partrepair') === 1;
@@ -265,7 +258,6 @@ class Binaries
         $this->_newGroupDaysToScan = Settings::settingValue('..newgroupdaystoscan') !== '' ? (int) Settings::settingValue('..newgroupdaystoscan') : 3;
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
-        $this->_showDroppedYEncParts = (int) Settings::settingValue('..showdroppedyencparts') === 1;
         $this->allAsMgr = (int) Settings::settingValue('..allasmgr') === 1;
 
         $this->blackList = $this->whiteList = [];
@@ -712,16 +704,6 @@ class Binaries
                 if (stripos($header['Subject'], 'yEnc') === false) {
                     $header['matches'][1] .= ' yEnc';
                 }
-            } else {
-                if ($this->_showDroppedYEncParts === true && strpos($header['Subject'], '"Usenet Index Post') !== 0) {
-                    file_put_contents(
-                        NN_LOGS.'not_yenc'.$this->groupMySQL['name'].'.dropped.log',
-                        $header['Subject'].PHP_EOL,
-                        FILE_APPEND
-                    );
-                }
-                $this->notYEnc++;
-                continue;
             }
 
             // Filter subject based on black/white list.
@@ -849,13 +831,6 @@ class Binaries
                 // Attempt to find the file count. If it is not found, set it to 0.
                 if (! $whitelistMatch && ! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
                     $fileCount[1] = $fileCount[3] = 0;
-                    if ($this->_showDroppedYEncParts === true) {
-                        file_put_contents(
-                            NN_LOGS.'no_files'.$this->groupMySQL['name'].'.log',
-                            $this->header['Subject'].PHP_EOL,
-                            FILE_APPEND
-                        );
-                    }
                 }
 
                 if ($this->multiGroup) {
@@ -1382,7 +1357,7 @@ class Binaries
         $wantedArticle = round(($data['last'] + $data['first']) / 2);
         $aMax = $data['last'];
         $aMin = $data['first'];
-        $reallyOldArticle = $oldArticle = $articleTime = null;
+        $oldArticle = $articleTime = null;
 
         while (true) {
             // Article exists outside of available range, this shouldn't happen
