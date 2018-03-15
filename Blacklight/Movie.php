@@ -710,7 +710,7 @@ class Movie
 
         if ($this->echooutput && $this->service !== '') {
             ColorCLI::doEcho(
-                ColorCLI::headerOver( 'Added/updated movie: ').
+                ColorCLI::headerOver('Added/updated movie: ').
                 ColorCLI::primary(
                     $mov['title'].
                     ' ('.
