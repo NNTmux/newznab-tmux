@@ -220,15 +220,15 @@ class Movie
     /**
      * Get movie releases with covers for movie browse page.
      *
+     *
      * @param       $cat
      * @param       $start
      * @param       $num
      * @param       $orderBy
-     * @param       $maxAge
+     * @param int   $maxAge
      * @param array $excludedCats
      *
-     * @return array|bool|\PDOStatement
-     * @throws \Exception
+     * @return array|bool
      */
     public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
@@ -276,7 +276,7 @@ class Movie
             Cache::put(md5($moviesSql), $movies, $expiresAt);
         }
 
-        $movieIDs = $releaseIDs = false;
+        $movieIDs = $releaseIDs = [];
 
         if (\is_array($movies['result'])) {
             foreach ($movies['result'] as $movie => $id) {
@@ -410,17 +410,13 @@ class Movie
      */
     public function getTrailer($imdbID)
     {
-        if (! is_numeric($imdbID)) {
-            return false;
-        }
-
         $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '!=', '')->first(['trailer']);
         if ($trailer !== null) {
             return $trailer['trailer'];
         }
 
         $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
-        if ($data) {
+        if ($data !== false) {
             $this->parseTraktTv($data);
             if (! empty($data['trailer'])) {
                 return $data['trailer'];
@@ -470,7 +466,7 @@ class Movie
             'imdbid'   => $this->checkTraktValue($imdbid),
             'language' => $this->checkTraktValue($data['language']),
             'plot'     => $this->checkTraktValue($data['overview']),
-            'rating'   => round($this->checkTraktValue($data['rating']), 1),
+            'rating'   => $this->checkTraktValue($data['rating']),
             'tagline'  => $this->checkTraktValue($data['tagline']),
             'title'    => $this->checkTraktValue($data['title']),
             'tmdbid'   => $this->checkTraktValue($data['ids']['tmdb']),
@@ -620,7 +616,7 @@ class Movie
 
         $mov = [];
 
-        $mov['cover'] = $mov['backdrop'] = $mov['banner'] = $movieID = 0;
+        $mov['cover'] = $mov['backdrop'] = $mov['banner'] = 0;
         $mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
         $mov['imdbid'] = $imdbId;
@@ -714,7 +710,7 @@ class Movie
 
         if ($this->echooutput && $this->service !== '') {
             ColorCLI::doEcho(
-                ColorCLI::headerOver(($movieID !== 0 ? 'Added/updated movie: ' : 'Nothing to update for movie: ')).
+                ColorCLI::headerOver( 'Added/updated movie: ').
                 ColorCLI::primary(
                     $mov['title'].
                     ' ('.
@@ -725,7 +721,7 @@ class Movie
             );
         }
 
-        return $movieID !== 0;
+        return (int) $movieID > 0;
     }
 
     /**
@@ -1100,7 +1096,7 @@ class Movie
                 $this->currentRelID = $arr['id'];
 
                 $movieName = $this->currentTitle;
-                if ($this->currentYear !== false) {
+                if ($this->currentYear !== '') {
                     $movieName .= ' ('.$this->currentYear.')';
                 }
 
@@ -1199,7 +1195,7 @@ class Movie
         $check = MovieInfo::query()
             ->where('title', 'LIKE', '%'.$this->currentTitle.'%');
 
-        if ($this->currentYear !== false) {
+        if ($this->currentYear !== '') {
             $start = Carbon::parse($this->currentYear)->subYears(2)->year;
             $end = Carbon::parse($this->currentYear)->addYears(2)->year;
             $check->whereBetween('year', [$start, $end]);
@@ -1249,7 +1245,7 @@ class Movie
             // Check if the name is long enough and not just numbers.
             if (\strlen($name) > 4 && ! preg_match('/^\d+$/', $name)) {
                 $this->currentTitle = $name;
-                $this->currentYear = ($year === '' ? false : $year);
+                $this->currentYear = $year;
 
                 return true;
             }
