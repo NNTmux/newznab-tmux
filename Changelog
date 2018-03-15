@@ -1,4 +1,5 @@
 2018-03-15 DariusIII
+	* Cgf: Remove code coverage from scrutinizer, it is handled from travis-ci
 	* Chg: Add bootstrap 4 for future usage
 	* Chg: Add wandersonwhcr/illuminate-romans and remove unused functions from Utility class
 	* Chg: Simplify some of the used code, remove unused functions
