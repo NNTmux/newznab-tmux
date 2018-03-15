@@ -433,7 +433,7 @@ class Forking extends \fork_daemon
         $backfilldays = '';
         if ((int) $backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = Carbon::now()->subDays((int)$days);
+            $backfilldays = Carbon::now()->subDays((int) $days);
         } elseif ((int) $backfill_days === 2) {
             $backfilldays = Settings::settingValue('..safebackfilldate');
         }
@@ -537,7 +537,7 @@ class Forking extends \fork_daemon
         $this->register_child_run([0 => $this, 1 => 'safeBinariesChildWorker']);
 
         $maxheaders = Settings::settingValue('..max_headers_iteration') !== null ? (int) Settings::settingValue('..max_headers_iteration') : 1000000;
-        $maxmssgs = (int)Settings::settingValue('..maxmssgs');
+        $maxmssgs = (int) Settings::settingValue('..maxmssgs');
         $threads = Settings::settingValue('..binarythreads');
 
         $groups = $this->pdo->query(
