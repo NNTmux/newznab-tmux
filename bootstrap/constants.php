@@ -20,9 +20,6 @@ define('NN_MISC', NN_ROOT.'misc/');
 // /misc/update/
 define('NN_UPDATE', NN_MISC.'update/');
 
-// /misc/update/multiprocessing
-define('NN_MULTI', NN_UPDATE.'multiprocessing/');
-
 // /misc/update/tmux/
 define('NN_TMUX', NN_UPDATE.'tmux/');
 

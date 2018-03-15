@@ -19,27 +19,15 @@
 if ((defined('NN_INSTALLER') && NN_INSTALLER !== false) || ! file_exists(NN_ROOT.'_install/install.lock')) {
     $adapter = 'Php';
 } else {
-    switch (true) {
-        case extension_loaded('yenc'):
-            if (method_exists('yenc\yEnc', 'version') &&
-                version_compare(
-                    yenc\yEnc::version(),
-                    '1.3.0',
-                    '>='
-                )
-            ) {
-                $adapter = 'NzedbYenc';
-                break;
-            }
-            trigger_error(
-                'Your version of the php-yenc extension is out of date and will be
-			ignored. Please update it to use the extension.',
-                E_USER_WARNING
-            );
-
-            // no break
-        default:
-            $adapter = 'Php';
+    if (extension_loaded('yenc') === true) {
+        if (method_exists('yenc\yEnc', 'version') && version_compare(yenc\yEnc::version(), '1.3.0', '>=')) {
+            $adapter = 'NzedbYenc';
+        }
+        trigger_error('Your version of the php-yenc extension is out of date and will be
+			ignored. Please update it to use the extension.', E_USER_WARNING);
+        $adapter = 'Php';
+    } else {
+        $adapter = 'Php';
     }
 }
 

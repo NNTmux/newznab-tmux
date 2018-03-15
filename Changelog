@@ -1,4 +1,5 @@
 2018-03-15 DariusIII
+	* Chg: Simplify some of the used code, remove unused functions
 	* Chg: Use colons in case statements in Categorize class
 	* Fix: Fix some of the issues in Forking class, pointed out by scrutinizer
 	* Fix: Fix wrong typecasting of database settings in Categorize class

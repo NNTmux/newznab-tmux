@@ -10,10 +10,6 @@ use Blacklight\utility\Utility;
 $dotenv = new Dotenv(dirname(__DIR__, 1));
 $dotenv->load();
 
-define('NNTMUX_START', microtime(true));
-
-define('NN_APP_PATH', app_path());
-
 if (! defined('HAS_WHICH')) {
     define('HAS_WHICH', Utility::hasWhich() ? true : false);
 }

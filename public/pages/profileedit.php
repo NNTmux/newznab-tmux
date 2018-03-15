@@ -78,7 +78,7 @@ switch ($action) {
                     request()->input('nzbgeturl') ?? '',
                     request()->input('nzbgetusername') ?? '',
                     request()->input('nzbgetpassword') ?? '',
-                    request()->has('saburl') ? Utility::trailingSlash(request()->input('saburl')) : '',
+                    request()->has('saburl') ? str_finish(request()->input('saburl'), '/') : '',
                     request()->input('sabapikey') ?? '',
                     request()->input('sabpriority') ?? '',
                     request()->input('sabapikeytype') ?? '',

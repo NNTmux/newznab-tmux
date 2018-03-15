@@ -317,20 +317,6 @@ class Utility
     }
 
     /**
-     * @param $path
-     *
-     * @return string
-     */
-    public static function trailingSlash($path): string
-    {
-        if (substr($path, \strlen($path) - 1) !== '/') {
-            $path .= '/';
-        }
-
-        return $path;
-    }
-
-    /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
      * @param string $filePath
@@ -339,12 +325,6 @@ class Utility
      */
     public static function unzipGzipFile($filePath)
     {
-        /* Potential issues with this, so commenting out.
-        $length = Utility::isGZipped($filePath);
-        if ($length === false || $length === null) {
-        	return false;
-        }*/
-
         $string = '';
         $gzFile = @gzopen($filePath, 'rb', 0);
         if ($gzFile) {
@@ -367,22 +347,19 @@ class Utility
     /**
      * @param $path
      */
-    public static function setCoversConstant($path)
+    public static function setCoversConstant($path): void
     {
         if (! \defined('NN_COVERS')) {
             switch (true) {
-                case substr($path, 0, 1) == '/' ||
-                    substr($path, 1, 1) == ':' ||
-                    substr($path, 0, 1) == '\\':
-                    \define('NN_COVERS', self::trailingSlash($path));
+                case $path[0] === '/' || $path[1] === ':' || $path[0] === '\\':
+                    \define('NN_COVERS', str_finish($path, '/'));
                     break;
-                case strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
-                    substr($path, 0, 1) != '\\':
-                    \define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
+                case \strlen($path) > 0 && $path[0] !== '/' && $path[1] !== ':' && $path[0] !== '\\':
+                    \define('NN_COVERS', realpath(NN_ROOT.str_finish($path, '/')));
                     break;
                 case empty($path): // Default to resources location.
                 default:
-                    \define('NN_COVERS', NN_RES.'covers'.DS);
+                    \define('NN_COVERS', NN_RES.'covers/');
             }
         }
     }
@@ -711,8 +688,8 @@ class Utility
     public static function fileInfo($path)
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
-        if (self::hasCommand('file') && (! self::isWin() || ! empty($magicPath))) {
-            $magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
+        if (self::hasCommand('file') && (! self::isWin() || $magicPath !== null)) {
+            $magicSwitch = $magicPath === null ? '' : " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
 
             if (\is_array($output)) {
@@ -731,7 +708,7 @@ class Utility
                 $output = '';
             }
         } else {
-            $fileInfo = empty($magicPath) ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
+            $fileInfo = $magicPath === null ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
 
             $output = finfo_file($fileInfo, $path);
             if (empty($output)) {
@@ -775,10 +752,8 @@ class Utility
     public static function imdb_trailers($imdbID): string
     {
         $xml = self::getUrl(['url' => 'http://api.traileraddict.com/?imdb='.$imdbID]);
-        if ($xml !== false) {
-            if (preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
-                return 'https://'.$html[1];
-            }
+        if ($xml !== false && preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
+            return 'https://'.$html[1];
         }
 
         return '';

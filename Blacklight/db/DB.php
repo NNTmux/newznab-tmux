@@ -995,7 +995,7 @@ class DB extends \PDO
         $fields += $defaults;    // Make sure keys exist to avoid error notices.
         ksort($fields);
         // Validate settings
-        $fields['nzbpath'] = Utility::trailingSlash($fields['nzbpath']);
+        $fields['nzbpath'] = str_finish($fields['nzbpath'], '/');
         $error = null;
         switch (true) {
             case $fields['mediainfopath'] !== '' && ! is_file($fields['mediainfopath']):
