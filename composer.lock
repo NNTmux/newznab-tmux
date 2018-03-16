@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "164ae6d176d994c07a4d7a815fbd75d7",
+    "content-hash": "63638fbf58769d6efc91e9c9bc495707",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -975,34 +975,6 @@
                 "library"
             ],
             "time": "2018-01-20T17:26:57+00:00"
-        },
-        {
-            "name": "bower-asset/jquery-bootswatch",
-            "version": "v0.0.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sergeyt/jquery-bootswatch.git",
-                "reference": "bd119fed777dcb9f9306b295102314ac7a6a249e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sergeyt/jquery-bootswatch/zipball/bd119fed777dcb9f9306b295102314ac7a6a249e",
-                "reference": "bd119fed777dcb9f9306b295102314ac7a6a249e",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.11"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "jquery.bootswatch.js",
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "node_modules",
-                    "components"
-                ]
-            },
-            "time": "2014-09-22T14:17:52+00:00"
         },
         {
             "name": "bower-asset/jquery-goup",

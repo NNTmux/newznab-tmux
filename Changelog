@@ -1,3 +1,5 @@
+2018-03-16 DariusIII
+	* Chg: Remove jquery-bootswatch
 2018-03-15 DariusIII
 	* Cgf: Remove code coverage from scrutinizer, it is handled from travis-ci
 	* Chg: Add bootstrap 4 for future usage
