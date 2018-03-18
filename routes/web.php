@@ -17,11 +17,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/browse', function () {
-    redirect('/browse');
-});
+Route::get('/browse/{category?}/{subcatefory?}', 'BrowseController@index');
 
-Route::get('/browsegroup', function () {
+Route::get('/browse/{group}', function () {
     redirect('/browsegroup');
 });
 
@@ -30,11 +28,19 @@ Route::get('/cart', function () {
 });
 
 Route::get('/logout', function () {
-    redirect('/logout');
+    auth()->logout();
 });
 
 Route::get('/forum', function () {
     redirect('/forum');
 });
 
+Route::get('/profile', function () {
+    redirect('/profile');
+});
+
+Route::get('/movies/{category}/{subcategory}', function () {
+    redirect('/movies');
+
+});
 
