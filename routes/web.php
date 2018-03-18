@@ -41,6 +41,4 @@ Route::get('/profile', function () {
 
 Route::get('/movies/{category}/{subcategory}', function () {
     redirect('/movies');
-
 });
-

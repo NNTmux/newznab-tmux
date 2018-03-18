@@ -8,8 +8,6 @@ use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Ytake\LaravelSmarty\Smarty;
 use App\Models\RoleExcludedCategory;
 
