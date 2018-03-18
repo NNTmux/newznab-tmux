@@ -1,3 +1,5 @@
+2018-03-18 DariusIII
+	* Chg: Revert changes in Binaries class (messageBuffer)
 2018-03-16 DariusIII
 	* Chg: Remove bootstrap 4
 	* Chg: Remove jquery-bootswatch
