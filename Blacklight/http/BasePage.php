@@ -9,6 +9,7 @@ use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Ytake\LaravelSmarty\Smarty;
 use App\Models\RoleExcludedCategory;
 
@@ -102,24 +103,6 @@ class BasePage
      */
     public function __construct()
     {
-        if (session_id() === '') {
-            session_start();
-
-            $lifetime = Carbon::now()->addMinutes(config('session.lifetime'))->timestamp;
-            $domain = config('session.domain');
-            $http_only = config('session.http_only');
-            $secure = request()->secure();
-
-            if (empty($_SESSION['_token'])) {
-                $_SESSION['_token'] = sodium_bin2hex(random_bytes(32));
-            }
-            setcookie('XSRF-TOKEN', $_SESSION['_token'], $lifetime, '/', $domain, $secure, false);
-            setcookie(config('session.cookie'), $_SESSION['_token'], $lifetime, '/', $domain, $secure, $http_only);
-        }
-
-        if (config('nntmux.flood_check')) {
-            $this->floodCheck();
-        }
 
         // Buffer settings/DB connection.
         $this->settings = new Settings();
@@ -145,8 +128,6 @@ class BasePage
             $this->smarty->assign('serverroot', $this->serverurl);
         }
 
-        $this->smarty->assign('csrf_token', $_SESSION['_token']);
-
         $this->page = request()->input('page') ?? 'content';
 
         if (User::isLoggedIn()) {
@@ -165,40 +146,6 @@ class BasePage
         $this->smarty->assign('theme', $this->theme);
         $this->smarty->assign('site', $this->settings);
         $this->smarty->assign('page', $this);
-    }
-
-    /**
-     * Check if the user is flooding.
-     */
-    public function floodCheck(): void
-    {
-        $waitTime = (config('nntmux.flood_wait_time') < 1 ? 5 : config('nntmux.flood_wait_time'));
-        // Check if this is not from CLI.
-        if (empty($argc)) {
-            // If flood wait set, the user must wait x seconds until they can access a page.
-            if (isset($_SESSION['flood_wait_until']) && $_SESSION['flood_wait_until'] > microtime(true)) {
-                $this->showFloodWarning($waitTime);
-            } else {
-                // If user not an admin, they are allowed three requests in FLOOD_THREE_REQUESTS_WITHIN_X_SECONDS seconds.
-                if (! isset($_SESSION['flood_check_hits'])) {
-                    $_SESSION['flood_check_hits'] = 1;
-                    $_SESSION['flood_check_time'] = microtime(true);
-                } else {
-                    if ($_SESSION['flood_check_hits'] >= (config('nntmux.flood_max_requests_per_second') < 1 ? 5 : config('nntmux.flood_max_requests_per_second'))) {
-                        if ($_SESSION['flood_check_time'] + 1 > microtime(true)) {
-                            $_SESSION['flood_wait_until'] = microtime(true) + $waitTime;
-                            unset($_SESSION['flood_check_hits']);
-                            $this->showFloodWarning($waitTime);
-                        } else {
-                            $_SESSION['flood_check_hits'] = 1;
-                            $_SESSION['flood_check_time'] = microtime(true);
-                        }
-                    } else {
-                        $_SESSION['flood_check_hits']++;
-                    }
-                }
-            }
-        }
     }
 
     /**

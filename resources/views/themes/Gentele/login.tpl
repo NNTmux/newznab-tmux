@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card">
 	{if isset($error) && $error != ''}
 		<div class="alert alert-danger">{$error}</div>
 	{/if}
@@ -11,8 +11,8 @@
 		</div><!-- /.login-logo -->
 		<div class="login-box-body">
 			<p class="login-box-msg">Please sign in to access the site</p>
-			<form action="login" method="post">
-				<input type="hidden" name="_token" value="{$csrf_token}">
+			<form action="{{route('login')}}" method="post">
+				@csrf
 				{if isset($redirect)}
 					<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}"/>
 				{/if}
@@ -43,7 +43,7 @@
 			</form>
 
 			<a href="{$smarty.const.WWW_TOP}/forgottenpassword" class="text-center">I forgot my password</a><br>
-			<a href="{$smarty.const.WWW_TOP}/register" class="text-center">Register a new membership</a>
+			<a href="{{route('register')}}" class="text-center">Register a new membership</a>
 			<!-- iCheck -->
 			<script src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js" type="text/javascript"></script>
 			<script>

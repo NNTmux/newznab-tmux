@@ -28,7 +28,7 @@ class Menu extends Model
      */
     public static function getMenu($role, $serverurl): array
     {
-        $sql = self::query()->where('role', '<=', $role)->orderBy('ordinal');
+        $sql = self::query()->where('role', '=<', $role)->orderBy('ordinal');
 
         if ($role !== User::ROLE_ADMIN) {
             $sql->where('role', '!=', User::ROLE_ADMIN);

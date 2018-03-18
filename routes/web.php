@@ -12,5 +12,29 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    redirect('/');
 });
+
+Auth::routes();
+
+Route::get('/browse', function () {
+    redirect('/browse');
+});
+
+Route::get('/browsegroup', function () {
+    redirect('/browsegroup');
+});
+
+Route::get('/cart', function () {
+    redirect('/cart');
+});
+
+Route::get('/logout', function () {
+    redirect('/logout');
+});
+
+Route::get('/forum', function () {
+    redirect('/forum');
+});
+
+

@@ -17,7 +17,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="csrf-token" content="{$csrf_token}">
+	<meta name="csrf-token" content="{{csrf_token()}}">
 
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
@@ -103,7 +103,7 @@
 								</li>
 							{/if}
 							<div class="clearfix"></div>
-							{if $loggedin == "true"}
+							{if {{Auth::check()}} == true}
 							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
 
 								<ul class="nav child_menu" style="display: none">
@@ -118,10 +118,10 @@
 												API</a></li>
 								</ul>
 								<div class="clearfix"></div>
-							<li><a href="{$smarty.const.WWW_TOP}/logout"><i
+							<li><a href="{{route('logout')}}"><i
 											class="fa fa-unlock"></i><span> Sign Out</span></a></li>
 							{else}
-							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
+							<li><a href="{{route('login')}}"><i class="fa fa-lock"></i><span> Sign In</span></a>
 							</li>
 							{/if}
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
