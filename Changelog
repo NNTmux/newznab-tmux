@@ -1,9 +1,5 @@
 2018-03-18 DariusIII
-<<<<<<< HEAD
-	* Chg: Revert maxmessages line in Binaries class
-=======
 	* Chg: Revert changes in Binaries class (messageBuffer)
->>>>>>> dev
 2018-03-16 DariusIII
 	* Chg: Remove bootstrap 4
 	* Chg: Remove jquery-bootswatch
