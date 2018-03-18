@@ -248,8 +248,8 @@ class Binaries
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
         $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
-
-        $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ? (int) Settings::settingValue('..maxmssgs') : 20000;
+        $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
+            (int) Settings::settingValue('..maxmssgs') : 20000;
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_partRepair = (int) Settings::settingValue('..partrepair') === 1;
         $this->_newGroupScanByDays = (int) Settings::settingValue('..newgroupscanmethod') === 1;
