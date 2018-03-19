@@ -704,6 +704,9 @@ class Binaries
                 if (stripos($header['Subject'], 'yEnc') === false) {
                     $header['matches'][1] .= ' yEnc';
                 }
+            } else {
+                $this->notYEnc++;
+                continue;
             }
 
             // Filter subject based on black/white list.
@@ -715,7 +718,6 @@ class Binaries
             if (! isset($header['Bytes'])) {
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
-            $header['Bytes'] = (int) $header['Bytes'];
 
             if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
                 $mgrHeaders[] = $header;
@@ -801,12 +803,13 @@ class Binaries
     /**
      * Parse headers into collections/binaries and store header data as parts.
      *
-     * @param array $headers    The retrieved headers
-     * @param bool  $multiGroup Is this task being run in MGR mode?
+     *
+     * @param array $headers
+     * @param bool  $multiGroup
      *
      * @throws \Exception
      */
-    protected function storeHeaders(array $headers, $multiGroup): void
+    protected function storeHeaders(array $headers = [], $multiGroup = false): void
     {
         $this->multiGroup = $multiGroup;
         $binariesUpdate = $collectionIDs = $articles = [];

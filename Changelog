@@ -1,4 +1,5 @@
 2018-03-19 DariusIII
+	* Chg: Update Binaries class
 	* Chg: Update laravel/scout to version 4.0.3
 	* Chg: Revert changes in Forking class
 2018-03-18 DariusIII
