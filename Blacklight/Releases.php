@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use function GuzzleHttp\Promise\iter_for;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
@@ -82,7 +83,7 @@ class Releases
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      * @throws \Exception
      */
-    public function getBrowseRange($cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
+    public function getBrowseRange($cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
