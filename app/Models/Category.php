@@ -246,6 +246,7 @@ class Category extends Model
                 }
                 break;
         }
+
         return $catsrch;
     }
 

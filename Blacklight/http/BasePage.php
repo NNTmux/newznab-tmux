@@ -4,12 +4,12 @@ namespace Blacklight\http;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
 use Ytake\LaravelSmarty\Smarty;
+use App\Http\Controllers\Controller;
 use App\Models\RoleExcludedCategory;
 
 class BasePage extends Controller
@@ -102,7 +102,7 @@ class BasePage extends Controller
      */
     public function __construct()
     {
-         $this->middleware('auth');
+        $this->middleware('auth');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
@@ -261,9 +261,6 @@ class BasePage extends Controller
         die();
     }
 
-    /**
-     *
-     */
     public function render()
     {
         $this->smarty->display($this->page_template);

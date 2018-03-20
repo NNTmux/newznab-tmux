@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Group;
 
 $grouplist = Group::getGroupsRange(false, false, '', true);
