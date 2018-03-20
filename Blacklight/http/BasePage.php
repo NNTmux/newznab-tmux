@@ -4,16 +4,15 @@ namespace Blacklight\http;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Ytake\LaravelSmarty\Smarty;
 use App\Models\RoleExcludedCategory;
 
-class BasePage
+class BasePage extends Controller
 {
     /**
      * @var \App\Models\Settings|null
@@ -103,7 +102,7 @@ class BasePage
      */
     public function __construct()
     {
-
+         $this->middleware('auth');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
@@ -130,7 +129,7 @@ class BasePage
 
         $this->page = request()->input('page') ?? 'content';
 
-        if (User::isLoggedIn()) {
+        if (auth()->check()) {
             $this->setUserPreferences();
         } else {
             $this->theme = $this->getSettingValue('site.main.style');
@@ -146,17 +145,6 @@ class BasePage
         $this->smarty->assign('theme', $this->theme);
         $this->smarty->assign('site', $this->settings);
         $this->smarty->assign('page', $this);
-    }
-
-    /**
-     * Done in html here to reduce any smarty processing burden if a large flood is underway.
-     *
-     * @param int $seconds
-     */
-    public function showFloodWarning($seconds = 5): void
-    {
-        header('Retry-After: '.$seconds);
-        $this->show503();
     }
 
     /**
@@ -273,6 +261,9 @@ class BasePage
         die();
     }
 
+    /**
+     *
+     */
     public function render()
     {
         $this->smarty->display($this->page_template);
@@ -283,7 +274,7 @@ class BasePage
      */
     protected function setUserPreferences(): void
     {
-        $this->userdata = User::find(User::currentUserId());
+        $this->userdata = User::find(auth()->id());
         $this->userdata['categoryexclusions'] = User::getCategoryExclusion(User::currentUserId());
         $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
 

@@ -17,9 +17,11 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/browse/{category?}/{subcatefory?}', 'BrowseController@index');
+Route::get('/browse', function () {
+    redirect('/browse');
+});
 
-Route::get('/browse/{group}', function () {
+Route::get('/browsegroup}', function () {
     redirect('/browsegroup');
 });
 
@@ -39,8 +41,12 @@ Route::get('/profile', function () {
     redirect('/profile');
 });
 
-Route::get('/movies/{category}/{subcategory}', function () {
+Route::get('/movies', function () {
     redirect('/movies');
 
 });
 
+
+
+
+Route::get('/home', 'HomeController@index')->name('home');

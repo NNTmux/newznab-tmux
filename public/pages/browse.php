@@ -31,11 +31,12 @@ $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, f
 
 $results = $releases->getBrowseRange($catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 
-$browsecount = $results[0]['_totalcount'] ?? 0;
+dd($results->total());
+
 
 $page->smarty->assign(
     [
-        'pagertotalitems' => $browsecount,
+        'pagertotalitems' => $results->total(),
         'pageroffset'=> $offset,
         'pageritemsperpage'=> config('nntmux.items_per_page'),
         'pagerquerybase' => WWW_TOP.'/browse?t='.$category.'&amp;g='.$grp.'&amp;ob='.$orderby.'&amp;offset=',
