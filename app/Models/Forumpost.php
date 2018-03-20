@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -110,26 +111,12 @@ class Forumpost extends Model
     }
 
     /**
-     * Get count of posts for parent forum.
-     *
-     * @return int
-     */
-    public static function getBrowseCount(): int
-    {
-        $res = self::query()->count('id');
-
-        return $res ?? 0;
-    }
-
-    /**
      * Get browse range for forum.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getBrowseRange($start, $num)
+    public static function getBrowseRange(): LengthAwarePaginator
     {
         $range = self::query()
             ->where('forumpost.parentid', '=', 0)
@@ -137,11 +124,8 @@ class Forumpost extends Model
             ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
             ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
             ->orderBy('forumpost.updated_at', 'desc');
-        if ($start !== false) {
-            $range->limit($num)->offset($start);
-        }
 
-        return $range->get();
+        return $range->paginate(config('nntmux.items_per_page'));
     }
 
     /**

@@ -8,7 +8,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! empty(request()->input('addMessage')) && ! empty(request()->input('addSubject')) && $page->isPostBack()) {
+if ($page->isPostBack() && request()->has('addMessage') && request()->has('addSubject')) {
     Forumpost::add(0, User::currentUserId(), request()->input('addSubject'), request()->input('addMessage'));
     header('Location:'.WWW_TOP.'/forum');
     die();
@@ -16,11 +16,11 @@ if (! empty(request()->input('addMessage')) && ! empty(request()->input('addSubj
 
 $lock = $unlock = null;
 
-if (! empty(request()->input('lock'))) {
+if (request()->has('lock')) {
     $lock = request()->input('lock');
 }
 
-if (! empty(request()->input('unlock'))) {
+if (request()->has('unlock')) {
     $unlock = request()->input('unlock');
 }
 
@@ -36,13 +36,11 @@ if ($unlock !== null) {
     die();
 }
 
-$browsecount = Forumpost::getBrowseCount();
-
 $offset = request()->has('offset') && ctype_digit(request()->input('offset')) ? request()->input('offset') : 0;
 
-$results = Forumpost::getBrowseRange($offset, config('nntmux.items_per_page'));
+$results = Forumpost::getBrowseRange();
 
-$page->smarty->assign('pagertotalitems', $browsecount);
+$page->smarty->assign('pagertotalitems', $results->total());
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/forum?offset=');
