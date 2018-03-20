@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
@@ -191,13 +192,13 @@ class Category extends Model
     }
 
     /**
-     * Parse category search constraints.
-     *
      * @param array $cat
+     * @param       $query
+     * @param bool  $builder
      *
-     * @return string $catsrch
+     * @return string
      */
-    public static function getCategorySearch(array $cat = []): string
+    public static function getCategorySearch(array $cat = [], $query, $builder = false)
     {
         $categories = [];
 
@@ -227,15 +228,27 @@ class Category extends Model
         switch ($catCount) {
             //No category constraint
             case 0:
-                $catsrch = ' AND 1=1 ';
+                if ($builder === false) {
+                    $catsrch = 'AND 1=1';
+                } else {
+                    $catsrch = '';
+                }
                 break;
             // One category constraint
             case 1:
-                $catsrch = $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '';
+                if ($builder === false) {
+                    $catsrch = $categories[0] !== -1 ? '  AND releases.categories_id = '.$categories[0] : '';
+                } else {
+                    $catsrch = $query->where('r.categories_id', '=', $categories[0]);
+                }
                 break;
             // Multiple category constraints
             default:
-                $catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
+                if ($builder === false) {
+                    $catsrch = ' AND releases.categories_id IN ('.implode(', ', $categories).') ';
+                } else {
+                    $catsrch = $query->whereIn('r.categories_id', $categories);
+                }
                 break;
         }
 

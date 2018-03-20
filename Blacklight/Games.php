@@ -232,7 +232,7 @@ class Games
 
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat, '', false);
         }
 
         if ($maxAge > 0) {

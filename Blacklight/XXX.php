@@ -129,7 +129,7 @@ class XXX
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat, '', false);
         }
 
         $order = $this->getXXXOrder($orderBy);

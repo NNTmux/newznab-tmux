@@ -153,7 +153,7 @@ class Music
 
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat, '', false);
         }
 
         $exccatlist = '';

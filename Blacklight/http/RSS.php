@@ -58,7 +58,7 @@ class RSS extends Capabilities
                     $userID
                 );
             } elseif ((int) $cat[0] !== -1) {
-                $catSearch = Category::getCategorySearch($cat);
+                $catSearch = Category::getCategorySearch($cat, '', false);
             }
         }
 

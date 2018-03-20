@@ -7,6 +7,7 @@ use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
+use function GuzzleHttp\Promise\iter_for;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
@@ -66,112 +67,79 @@ class Releases
     }
 
     /**
-     * Used for pager on browse page.
-     *
-     * @param array  $cat
-     * @param int    $maxAge
-     * @param array  $excludedCats
-     * @param string|int $groupName
-     *
-     * @return int
-     */
-    public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = ''): int
-    {
-        $sql = sprintf(
-                'SELECT COUNT(r.id) AS count
-				FROM releases r
-				%s
-				WHERE r.nzbstatus = %d
-				AND r.passwordstatus %s
-				%s %s %s %s',
-                ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
-                NZB::NZB_ADDED,
-                $this->showPasswords,
-                ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
-                Category::getCategorySearch($cat),
-                ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-                (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
-        );
-        $count = Cache::get(md5($sql));
-        if ($count !== null) {
-            return $count;
-        }
-        $count = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count[0]['count'], $expiresAt);
-
-        return $count[0]['count'] ?? 0;
-    }
-
-    /**
      * Used for browse results.
      *
-     * @param array  $cat
-     * @param        $start
-     * @param        $num
-     * @param string|array $orderBy
-     * @param int    $maxAge
-     * @param array  $excludedCats
-     * @param string|int $groupName
-     * @param int    $minSize
      *
-     * @return array
+     *
+     *
+     * @param       $cat
+     * @param       $start
+     * @param       $num
+     * @param       $orderBy
+     * @param int   $maxAge
+     * @param array $excludedCats
+     * @param int   $groupName
+     * @param int   $minSize
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @throws \Exception
      */
-    public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): array
+    public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
-        $qry = sprintf(
-            "SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
-				df.failed AS failed,
-				rn.releases_id AS nfoid,
-				re.releases_id AS reid,
-				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.title, tve.firstaired
-			FROM
-			(
-				SELECT r.*, g.name AS group_name
-				FROM releases r
-				LEFT JOIN groups g ON g.id = r.groups_id
-				WHERE r.nzbstatus = %d
-				AND r.passwordstatus %s
-				%s %s %s %s %s
-				ORDER BY %s %s %s
-			) r
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			GROUP BY r.id
-			ORDER BY %8\$s %9\$s",
-            NZB::NZB_ADDED,
-            $this->showPasswords,
-            Category::getCategorySearch($cat),
-            ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            $orderBy[0],
-            $orderBy[1],
-            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
+        $qry = Release::query()
+            ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy, $start, $num) {
+                $query->select(['releases.*', 'g.name as group_name'])
+                    ->from('releases')
+                    ->where('releases.nzbstatus', NZB::NZB_ADDED);
 
-        $releases = Cache::get(md5($qry));
+                self::showPasswords($query, true);
+                Category::getCategorySearch($cat, $query, true);
+                $query->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id');
+                if ($maxAge > 0) {
+                    $query->where('releases.postdate', '>', Carbon::now()->subDays($maxAge));
+                }
+
+                if (\count($excludedCats) > 0) {
+                    $query->whereNotIn('releases.categories_id', $excludedCats);
+                }
+                if ($groupName !== -1) {
+                    $query->where('g.name', $groupName);
+                }
+
+                if ($minSize > 0) {
+                    $query->where('releases.size', '>=', $minSize);
+                }
+
+                $query->orderBy($orderBy[0], $orderBy[1]);
+                if ($start !== false) {
+                    $query->limit($num)
+                        ->offset($start);
+                }
+            }, 'r')
+            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired'])
+            ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")
+            ->selectRaw("CONCAT(cp.id, ',', c.id) AS category_ids")
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
+            ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
+            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
+            ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+            ->groupBy('r.id')
+            ->orderBy($orderBy[0], $orderBy[1]);
+
+
+        $releases = Cache::get(md5(implode('.', $cat).$start.$num.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize));
         if ($releases !== null) {
             return $releases;
         }
-        $sql = $this->pdo->query($qry);
-        if (\count($sql) > 0) {
-            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
-            $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
-        }
+        $sql = $qry->paginate($num);
+
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($qry), $sql, $expiresAt);
+        Cache::put(md5(implode('.', $cat).$start.$num.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize), $sql, $expiresAt);
 
         return $sql;
     }
@@ -179,24 +147,43 @@ class Releases
     /**
      * Return site setting for hiding/showing passworded releases.
      *
+     *
+     * @param string $query
+     * @param bool   $builder
+     *
      * @return string
      * @throws \Exception
      */
-    public static function showPasswords(): ?string
+    public static function showPasswords($query = '', $builder = false)
     {
         $setting = Settings::settingValue('..showpasswordedrelease', true);
         $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
 
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-                return '='.self::PASSWD_NONE;
+                if ($builder === false) {
+                    return '='.self::PASSWD_NONE;
+                }
+
+                return $query->where('releases.passwordstatus', self::PASSWD_NONE);
+
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
-                return '<= '.self::PASSWD_POTENTIAL;
+                if ($builder === false) {
+                    return '<= '.self::PASSWD_POTENTIAL;
+                }
+
+                return $query->where('releases.passwordstatus', '=<',self::PASSWD_POTENTIAL);
             case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
-                return '<= '.self::PASSWD_NONE;
+                if ($builder === false) {
+                    return '<= '.self::PASSWD_NONE;
+                }
+                return $query->where('releases.passwordstatus', '=<',self::PASSWD_NONE);
             case 10: // Shows everything.
             default:
+            if ($builder === false) {
                 return '<= '.self::PASSWD_RAR;
+            }
+            return $query->where('releases.passwordstatus', '=<',self::PASSWD_RAR);
         }
     }
 
@@ -682,7 +669,7 @@ class Releases
 
         $catQuery = '';
         if ($type === 'basic') {
-            $catQuery = Category::getCategorySearch($cat);
+            $catQuery = Category::getCategorySearch($cat, '', false);
         } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
@@ -857,7 +844,7 @@ class Releases
             $this->showPasswords,
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, '', false),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
@@ -934,7 +921,7 @@ class Releases
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, '', false),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
 
@@ -1004,7 +991,7 @@ class Releases
             $this->showPasswords,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             (($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, '', false),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
