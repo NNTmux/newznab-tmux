@@ -7,12 +7,11 @@ use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use function GuzzleHttp\Promise\iter_for;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Releases.
@@ -127,7 +126,6 @@ class Releases
             ->groupBy('r.id')
             ->orderBy($orderBy[0], $orderBy[1]);
 
-
         $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize));
         if ($releases !== null) {
             return $releases;
@@ -169,18 +167,20 @@ class Releases
                     return '<= '.self::PASSWD_POTENTIAL;
                 }
 
-                return $query->where('releases.passwordstatus', '=<',self::PASSWD_POTENTIAL);
+                return $query->where('releases.passwordstatus', '=<', self::PASSWD_POTENTIAL);
             case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
                 if ($builder === false) {
                     return '<= '.self::PASSWD_NONE;
                 }
-                return $query->where('releases.passwordstatus', '=<',self::PASSWD_NONE);
+
+                return $query->where('releases.passwordstatus', '=<', self::PASSWD_NONE);
             case 10: // Shows everything.
             default:
             if ($builder === false) {
                 return '<= '.self::PASSWD_RAR;
             }
-            return $query->where('releases.passwordstatus', '=<',self::PASSWD_RAR);
+
+            return $query->where('releases.passwordstatus', '=<', self::PASSWD_RAR);
         }
     }
 

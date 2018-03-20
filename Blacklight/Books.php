@@ -171,7 +171,6 @@ class Books
         $booksql->groupBy('bookinfo.id')
             ->orderBy($order[0], $order[1]);
 
-
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         $bookscache = Cache::get(md5($cat.$orderby.implode('.', $excludedcats)));
         if ($bookscache !== null) {
@@ -224,7 +223,6 @@ class Books
             $return[0]['_totalcount'] = $books->total();
         }
         Cache::put(md5($cat.$orderby.implode('.', $excludedcats), $return, $expiresAt));
-
 
         return $return;
     }
