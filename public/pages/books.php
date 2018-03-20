@@ -31,7 +31,7 @@ $ordering = $book->getBookOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $books = [];
-$results = $book->getBookRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $page->userdata['categoryexclusions']);
+$results = $book->getBookRange($catarray, $orderby, $page->userdata['categoryexclusions']);
 
 $maxwords = 50;
 foreach ($results as $result) {
