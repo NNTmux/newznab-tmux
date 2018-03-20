@@ -7,9 +7,7 @@ use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use function GuzzleHttp\Promise\iter_for;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
@@ -141,17 +139,13 @@ class Releases
     }
 
     /**
-     * Return site setting for hiding/showing passworded releases.
+     * @param null $query
+     * @param bool $builder
      *
-     *
-     *
-     * @param \Illuminate\Database\Query\Builder|null $query
-     * @param bool                                    $builder
-     *
-     * @return $this|string
+     * @return string
      * @throws \Exception
      */
-    public static function showPasswords(Builder $query = null, $builder = false)
+    public static function showPasswords($query = null, $builder = false)
     {
         $setting = Settings::settingValue('..showpasswordedrelease', true);
         $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
