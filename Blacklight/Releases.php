@@ -108,10 +108,6 @@ class Releases
                 }
 
                 $query->orderBy($orderBy[0], $orderBy[1]);
-
-                if ($start !== false) {
-                    $query->offset($start)->limit($num);
-                }
             }, 'r')
             ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")

@@ -6,8 +6,8 @@ use Blacklight\Releases;
 
 $releases = new Releases(['Settings' => $page->settings]);
 
-if (! User::isLoggedIn()) {
-    $page->show403();
+if (! auth()->check()) {
+    redirect('/login');
 }
 
 $category = -1;
@@ -16,8 +16,8 @@ if (request()->has('t')) {
 }
 
 $grp = -1;
-if (request()->has('g')) {
-    $grp = is_numeric(request()->input('g')) ? -1 : request()->input('g');
+if (request()->has('group')) {
+    $grp = is_numeric(request()->input('group')) ? -1 : request()->input('group');
 }
 
 $catarray = [];
@@ -30,9 +30,6 @@ $ordering = $releases->getBrowseOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $results = $releases->getBrowseRange($catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
-
-dd($results->total());
-
 
 $page->smarty->assign(
     [

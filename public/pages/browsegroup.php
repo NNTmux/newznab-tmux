@@ -3,10 +3,6 @@
 use App\Models\User;
 use App\Models\Group;
 
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
-
 $grouplist = Group::getGroupsRange(false, false, '', true);
 $page->smarty->assign('results', $grouplist);
 

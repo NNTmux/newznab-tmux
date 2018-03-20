@@ -29,7 +29,7 @@
 									<tr>
 										<td>
 											<a title="Browse releases from {$result.name|replace:"alt.binaries":"a.b"}"
-											   href="{$smarty.const.WWW_TOP}/browse?g={$result.name}">{$result.name|replace:"alt.binaries":"a.b"}</a>
+											   href="{$smarty.const.WWW_TOP}/browse/{$result.name}">{$result.name|replace:"alt.binaries":"a.b"}</a>
 										</td>
 										<td>{$result.description}</td>
 										<td>{$result.last_updated|timeago} ago</td>

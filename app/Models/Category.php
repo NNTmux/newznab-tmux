@@ -191,16 +191,15 @@ class Category extends Model
     }
 
     /**
-     * Parse category search constraints.
-     *
      * @param array $cat
+     * @param       $query
+     * @param bool  $builder
      *
-     * @return string $catsrch
+     * @return string
      */
-    public static function getCategorySearch(array $cat = []): string
+    public static function getCategorySearch(array $cat = [], $query, $builder = false)
     {
         $categories = [];
-
         // If multiple categories were sent in a single array position, slice and add them
         if (strpos($cat[0], ',') !== false) {
             $tmpcats = explode(',', $cat[0]);
@@ -211,7 +210,6 @@ class Category extends Model
                 $cat[] = $tmpcat;
             }
         }
-
         foreach ($cat as $category) {
             if ($category !== -1 && self::isParent($category)) {
                 foreach (self::getChildren($category) as $child) {
@@ -221,24 +219,33 @@ class Category extends Model
                 $categories[] = $category;
             }
         }
-
         $catCount = \count($categories);
-
         switch ($catCount) {
             //No category constraint
             case 0:
-                $catsrch = ' AND 1=1 ';
+                if ($builder === false) {
+                    $catsrch = 'AND 1=1';
+                } else {
+                    $catsrch = '';
+                }
                 break;
             // One category constraint
             case 1:
-                $catsrch = $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '';
+                if ($builder === false) {
+                    $catsrch = $categories[0] !== -1 ? '  AND releases.categories_id = '.$categories[0] : '';
+                } else {
+                    $catsrch = $query->where('releases.categories_id', '=', $categories[0]);
+                }
                 break;
             // Multiple category constraints
             default:
-                $catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
+                if ($builder === false) {
+                    $catsrch = ' AND releases.categories_id IN ('.implode(', ', $categories).') ';
+                } else {
+                    $catsrch = $query->whereIn('releases.categories_id', $categories);
+                }
                 break;
         }
-
         return $catsrch;
     }
 

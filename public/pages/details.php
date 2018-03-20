@@ -20,10 +20,6 @@ use App\Models\ReleaseRegex;
 use Blacklight\ReleaseExtra;
 use App\Models\ReleaseComment;
 
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
-
 if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;

@@ -11,17 +11,21 @@
 |
 */
 
+Auth::routes();
+
 Route::get('/', function () {
     redirect('/');
 });
-
-Auth::routes();
 
 Route::get('/browse', function () {
     redirect('/browse');
 });
 
-Route::get('/browsegroup}', function () {
+Route::get('/browse/{$group}', function () {
+    redirect('/browse');
+});
+
+Route::get('/browsegroup', function () {
     redirect('/browsegroup');
 });
 
@@ -43,7 +47,10 @@ Route::get('/profile', function () {
 
 Route::get('/movies', function () {
     redirect('/movies');
+});
 
+Route::get('/details/{id}', function () {
+    redirect('/details');
 });
 
 

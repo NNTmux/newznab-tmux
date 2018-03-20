@@ -4,6 +4,14 @@ use Blacklight\http\Page;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
+
 $page = new Page;
 
 if ($app->isDownForMaintenance()) {
@@ -50,6 +58,7 @@ switch ($page->page) {
     case 'mymoviesedit':
     case 'nfo':
     case 'nzbgetqueuedata':
+    case 'password':
     case 'post_edit':
     case 'profile':
     case 'profileedit':
