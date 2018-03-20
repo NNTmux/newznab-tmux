@@ -29,7 +29,7 @@ $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) 
 $ordering = $releases->getBrowseOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-$results = $releases->getBrowseRange($catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
+$results = $releases->getBrowseRange($catarray, $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 
 $page->smarty->assign(
     [

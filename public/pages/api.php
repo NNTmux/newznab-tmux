@@ -133,8 +133,6 @@ switch ($function) {
         } else {
             $relData = $releases->getBrowseRange(
                 $categoryID,
-                $offset,
-                $limit,
                 '',
                 $maxAge,
                 $catExclusions,

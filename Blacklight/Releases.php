@@ -73,8 +73,6 @@ class Releases
      *
      *
      * @param       $cat
-     * @param       $start
-     * @param       $num
      * @param       $orderBy
      * @param int   $maxAge
      * @param array $excludedCats
@@ -84,12 +82,12 @@ class Releases
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      * @throws \Exception
      */
-    public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
+    public function getBrowseRange($cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = Release::query()
-            ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy, $start, $num) {
+            ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
                 $query->select(['releases.*', 'g.name as group_name'])
                     ->from('releases')
                     ->where('releases.nzbstatus', NZB::NZB_ADDED);
@@ -113,10 +111,6 @@ class Releases
                 }
 
                 $query->orderBy($orderBy[0], $orderBy[1]);
-                if ($start !== false) {
-                    $query->limit($num)
-                        ->offset($start);
-                }
             }, 'r')
             ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")
@@ -132,14 +126,14 @@ class Releases
             ->orderBy($orderBy[0], $orderBy[1]);
 
 
-        $releases = Cache::get(md5(implode('.', $cat).$start.$num.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize));
+        $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize));
         if ($releases !== null) {
             return $releases;
         }
-        $sql = $qry->paginate($num);
+        $sql = $qry->paginate(config('nntmux.items_per_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode('.', $cat).$start.$num.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize), $sql, $expiresAt);
+        Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize), $sql, $expiresAt);
 
         return $sql;
     }
