@@ -7,10 +7,10 @@ use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Releases.

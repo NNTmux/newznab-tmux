@@ -217,7 +217,6 @@ class Books
             $sql->whereIn('releases.id', $releaseIDs);
         }
 
-
         $sql->groupBy('boo.id')
             ->orderBy($order[0], $order[1]);
 
