@@ -53,7 +53,5 @@ Route::get('/details/{id}', function () {
     redirect('/details');
 });
 
-
-
-
 Route::get('/home', 'HomeController@index')->name('home');
+

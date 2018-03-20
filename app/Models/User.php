@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
