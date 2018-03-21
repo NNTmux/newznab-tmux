@@ -38,6 +38,7 @@ class UsersRelease extends Model
     /**
      * @param $uid
      * @param $releaseid
+     *
      * @return int
      */
     public static function addCart($uid, $releaseid): int
