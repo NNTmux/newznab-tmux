@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class UsersRelease extends Model
 {
@@ -45,6 +46,8 @@ class UsersRelease extends Model
             [
                 'users_id' => $uid,
                 'releases_id' => $releaseid,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]
         );
     }

@@ -52,7 +52,7 @@
 											   href="{$smarty.const.WWW_TOP}/details/{$result->release->guid}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 										</td>
 										<td class="less"
-											title="Added on {$result.created_at}">{$result.created_at|date_format}</td>
+											title="Added on {$result.created_at}">{$result.created_at}</td>
 										<td><a title="Delete from your cart" href="?delete={$result->release->guid}"
 											   class="btn btn-danger btn-sm" style="padding-bottom:2px;">Delete</a></td>
 									</tr>
