@@ -1,4 +1,5 @@
 2018-03-21 DariusIII
+	* Chg: Update Forumpost model getBrowseRange query
 	* Chg: Remove non-existent jquery-qtip2.css from Gentele theme
 	* Chg: Update forum page
 	* Fix: Fix my download basket added date display

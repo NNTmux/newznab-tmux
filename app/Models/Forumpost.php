@@ -126,22 +126,19 @@ class Forumpost extends Model
      *
      *
      * @param $start
-     * @param $num
+     *
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public static function getBrowseRange($start, $num)
+    public static function getBrowseRange($start)
     {
-        $range = self::query()
+        return self::query()
             ->where('forumpost.parentid', '=', 0)
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
             ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
             ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
-            ->orderBy('forumpost.updated_at', 'desc');
-        if ($start !== false) {
-            $range->limit($num)->offset($start);
-        }
-
-        return $range->get();
+            ->orderBy('forumpost.updated_at', 'desc')
+            ->limit(config('nntmux.items_per_page'))->offset($start)
+            ->get();
     }
 
     /**
