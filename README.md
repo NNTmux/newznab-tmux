@@ -7,6 +7,7 @@
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/license.svg" alt="License"></a>
     <a href="https://styleci.io/repos/22602573"><img src="https://styleci.io/repos/22602573/shield?branch=dev" alt="StyleCI"></a>
     <a href='https://coveralls.io/github/NNTmux/newznab-tmux?branch=0.x'><img src='https://coveralls.io/repos/github/NNTmux/newznab-tmux/badge.svg?branch=dev' alt='Coverage Status' /></a>
+    <a href="https://www.patreon.com/bePatron?u=6160908" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
 </p>
 
 
