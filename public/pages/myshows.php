@@ -116,7 +116,7 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Browse Your Shows';
 
-        $shows = UserSerie::getShows(User::currentUserId());
+        $shows = UserSerie::getShows(Auth::id());
 
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getShowsCount($shows, -1, $page->userdata['categoryexclusions']);
@@ -163,7 +163,7 @@ switch ($action) {
             $categories[$c['id']] = $c['title'];
         }
 
-        $shows = UserSerie::getShows(User::currentUserId());
+        $shows = UserSerie::getShows(Auth::id());
         $results = [];
         foreach ($shows as $showk => $show) {
             $showcats = explode('|', $show['categories']);

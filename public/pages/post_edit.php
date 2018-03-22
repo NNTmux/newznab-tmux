@@ -12,7 +12,7 @@ $id = request()->input('id') + 0;
 
 if (isset($id) && ! empty(request()->input('addMessage'))) {
     $parent = Forumpost::getPost($id);
-    Forumpost::editPost($id, request()->input('addMessage'), User::currentUserId());
+    Forumpost::editPost($id, request()->input('addMessage'), Auth::id());
     if ((int) $parent['parentid'] !== 0) {
         request()->header('/forumpost/'.$parent['parentid'].'#last');
     } else {

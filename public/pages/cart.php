@@ -29,21 +29,19 @@ if (request()->has('add')) {
         $ids = request()->input('delete');
     }
 
-    if ($ids !== null && UsersRelease::delCartByGuid($ids, User::currentUserId())) {
-        header('Location: '.WWW_TOP.'/cart');
+    if ($ids !== null && UsersRelease::delCartByGuid($ids, Auth::id())) {
+        redirect('/cart');
     }
 
     if (! request()->has('delete')) {
-        header('Location: '.WWW_TOP.'/cart');
+        redirect('/cart');
     }
-
-    exit();
 } else {
     $page->meta_title = 'My Download Basket';
     $page->meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
     $page->meta_description = 'Manage Your Download Basket';
 
-    $results = UsersRelease::getCart(User::currentUserId());
+    $results = UsersRelease::getCart(Auth::id());
     $page->smarty->assign('results', $results);
 
     $page->content = $page->smarty->fetch('cart.tpl');

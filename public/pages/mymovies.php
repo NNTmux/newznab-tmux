@@ -118,7 +118,7 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Browse Your Shows';
 
-        $movies = UserMovie::getMovies(User::currentUserId());
+        $movies = UserMovie::getMovies(Auth::id());
 
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getMovieCount($movies, -1, $page->userdata['categoryexclusions']);
@@ -165,7 +165,7 @@ switch ($action) {
             $categories[$c['id']] = $c['title'];
         }
 
-        $movies = UserMovie::getMovies(User::currentUserId());
+        $movies = UserMovie::getMovies(Auth::id());
         $results = [];
         foreach ($movies as $moviek => $movie) {
             $showcats = explode('|', $movie['categories']);

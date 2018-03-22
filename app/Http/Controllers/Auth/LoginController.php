@@ -39,6 +39,11 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return $this|\Illuminate\Http\RedirectResponse
+     *
+     */
     public function login(Request $request)
     {
         $this->validate($request, [
@@ -65,5 +70,10 @@ class LoginController extends Controller
             ->withErrors([
                 'login' => 'These credentials do not match our records.',
             ]);
+    }
+
+    public function logout()
+    {
+       Auth::logout();
     }
 }
