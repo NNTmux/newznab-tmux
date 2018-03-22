@@ -8,7 +8,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $book = new Books(['Settings' => $page->settings]);
 
 $boocats = Category::getChildren(Category::BOOKS_ROOT);

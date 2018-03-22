@@ -8,10 +8,9 @@ use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Ytake\LaravelSmarty\Smarty;
 use App\Models\RoleExcludedCategory;
+use Illuminate\Support\Facades\Auth;
 
 class BasePage
 {
@@ -197,7 +196,6 @@ class BasePage
 
     /**
      * Show 403 page.
-     *
      */
     public function show403(): void
     {

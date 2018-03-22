@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Settings;
 use App\Models\Forumpost;
 use Illuminate\Support\Facades\Auth;
@@ -8,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $id = request()->input('id') + 0;
 

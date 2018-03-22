@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Games;
 use Blacklight\Genres;
 use App\Models\Category;
@@ -9,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $games = new Games(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);

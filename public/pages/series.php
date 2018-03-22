@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Video;
 use Blacklight\Releases;
 use App\Models\UserSerie;
@@ -9,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $releases = new Releases(['Settings' => $page->settings]);
 

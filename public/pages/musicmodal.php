@@ -1,11 +1,8 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Music;
 
 $music = new Music;
-
-
 
 if (request()->has('id') && ctype_digit(request()->input('id'))) {
     $mus = $music->getMusicInfo(request()->input('id'));

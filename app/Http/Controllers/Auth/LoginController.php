@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
 {
@@ -48,12 +48,12 @@ class LoginController extends Controller
 
         $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
-        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL )
+        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL)
             ? 'email'
             : 'username';
 
         $request->merge([
-            $login_type => $request->input('username')
+            $login_type => $request->input('username'),
         ]);
 
         if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
@@ -66,5 +66,4 @@ class LoginController extends Controller
                 'login' => 'These credentials do not match our records.',
             ]);
     }
-
 }

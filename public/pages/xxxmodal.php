@@ -1,13 +1,11 @@
 <?php
 
 use Blacklight\XXX;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 if (request()->has('modal') && request()->has('id') && ctype_digit(request()->input('id'))) {
     $movie = new XXX(['Settings' => $page->settings]);

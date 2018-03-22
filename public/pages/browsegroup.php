@@ -7,7 +7,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $grouplist = Group::getGroupsRange(false, false, '', true);
 $page->smarty->assign('results', $grouplist);
 

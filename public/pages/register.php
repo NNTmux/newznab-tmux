@@ -6,7 +6,6 @@ use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\Invitation;
 use Blacklight\utility\Utility;
-
 use Illuminate\Support\Facades\Auth;
 
 if (Auth::check()) {

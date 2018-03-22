@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Group;
 use App\Models\Category;
 use Blacklight\Releases;
@@ -9,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $releases = new Releases(['Groups' => null, 'Settings' => $page->settings]);
 

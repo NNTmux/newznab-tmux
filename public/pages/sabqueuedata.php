@@ -1,13 +1,11 @@
 <?php
 
-use App\Models\User;
 use Blacklight\SABnzbd;
 use Illuminate\Support\Facades\Auth;
 
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $sab = new SABnzbd($page);
 

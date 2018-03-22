@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Music;
 use Blacklight\Genres;
 use App\Models\Category;
@@ -9,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $music = new Music(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);

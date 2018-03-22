@@ -12,7 +12,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $action = request()->input('id') ?? '';
 $videoId = request()->input('subpage') ?? '';
 
