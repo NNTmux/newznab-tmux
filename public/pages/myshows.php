@@ -6,10 +6,12 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\Releases;
 use App\Models\UserSerie;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 $action = request()->input('id') ?? '';
 $videoId = request()->input('subpage') ?? '';
@@ -22,22 +24,22 @@ if (request()->has('from')) {
 
 switch ($action) {
     case 'delete':
-        $show = UserSerie::getShow(User::currentUserId(), $videoId);
+        $show = UserSerie::getShow(Auth::id(), $videoId);
         if (request()->has('from')) {
             header('Location:'.WWW_TOP.request()->input('from'));
         } else {
-            header('Location:'.WWW_TOP.'/myshows');
+            redirect('/myshows');
         }
         if (! $show) {
             $page->show404('Not subscribed');
         } else {
-            UserSerie::delShow(User::currentUserId(), $videoId);
+            UserSerie::delShow(Auth::id(), $videoId);
         }
 
         break;
     case 'add':
     case 'doadd':
-        $show = UserSerie::getShow(User::currentUserId(), $videoId);
+        $show = UserSerie::getShow(Auth::id(), $videoId);
         if ($show) {
             $page->show404('Already subscribed');
         } else {
@@ -49,11 +51,11 @@ switch ($action) {
 
         if ($action === 'doadd') {
             $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
-            UserSerie::addShow(User::currentUserId(), $videoId, $category);
+            UserSerie::addShow(Auth::id(), $videoId, $category);
             if (request()->has('from')) {
                 header('Location:'.WWW_TOP.request()->input('from'));
             } else {
-                header('Location:'.WWW_TOP.'/myshows');
+                redirect('/myshows');
             }
         } else {
             $tmpcats = Category::getChildren(Category::TV_ROOT);
@@ -77,7 +79,7 @@ switch ($action) {
         break;
     case 'edit':
     case 'doedit':
-        $show = UserSerie::getShow(User::currentUserId(), $videoId);
+        $show = UserSerie::getShow(Auth::id(), $videoId);
 
         if (! $show) {
             $page->show404();
@@ -85,11 +87,11 @@ switch ($action) {
 
         if ($action === 'doedit') {
             $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
-            UserSerie::updateShow(User::currentUserId(), $videoId, $category);
+            UserSerie::updateShow(Auth::id(), $videoId, $category);
             if (request()->has('from')) {
-                header('Location:'.WWW_TOP.request()->input('from'));
+                redirect(request()->input('from'));
             } else {
-                header('Location:'.WWW_TOP.'/myshows');
+                redirect('/myshows');
             }
         } else {
             $tmpcats = Category::getChildren(Category::TV_ROOT);

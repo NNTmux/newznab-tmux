@@ -4,12 +4,14 @@ use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
-$userData = User::find(User::currentUserId());
+
+$userData = User::find(Auth::id());
 if (! $userData) {
     $page->show404();
 }

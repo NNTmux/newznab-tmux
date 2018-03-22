@@ -1,14 +1,14 @@
 <?php
 
-use App\Models\User;
 use App\Models\Category;
 use Blacklight\Releases;
+use Illuminate\Support\Facades\Auth;
 
-$releases = new Releases(['Settings' => $page->settings]);
-
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
+$releases = new Releases(['Settings' => $page->settings]);
 
 $category = -1;
 if (request()->has('t')) {

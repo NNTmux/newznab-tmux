@@ -1,13 +1,14 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Genres;
 use Blacklight\Console;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 $console = new Console(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);

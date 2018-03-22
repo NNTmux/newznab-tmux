@@ -2,13 +2,13 @@
 
 use App\Models\User;
 use App\Models\Release;
-
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
-
 use Blacklight\Releases;
 use App\Models\UsersRelease;
+use Illuminate\Support\Facades\Auth;
+
+if (! Auth::check()) {
+    $page->show403();
+}
 
 if (request()->has('add')) {
     $releases = new Releases(['Settings' => $page->settings]);
@@ -20,7 +20,7 @@ if (request()->has('add')) {
     }
 
     foreach ($data as $d) {
-        UsersRelease::addCart(User::currentUserId(), $d['id']);
+        UsersRelease::addCart(Auth::id(), $d['id']);
     }
 } elseif (request()->has('delete')) {
     if (request()->has('delete') && ! empty(request()->input('delete'))) {

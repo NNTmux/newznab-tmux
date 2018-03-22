@@ -12,5 +12,119 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    redirect('/');
+});
+
+Route::get('/login', function () {
+    redirect('/login');
+});
+
+Route::post('/login', 'Auth\LoginController@login');
+
+Route::get('/browse', function () {
+    redirect('/browse');
+});
+
+Route::get('/console', function () {
+    redirect('/console');
+});
+
+Route::get('/details/{id}', function () {
+    redirect('/details');
+});
+
+Route::get('/games', function () {
+    redirect('/games');
+});
+
+Route::get('/movies', function () {
+    redirect('/movies');
+});
+
+Route::get('/browsegroup', function () {
+    redirect('/browsegroup');
+});
+
+Route::get('/pc', function () {
+    redirect('/pc');
+});
+
+Route::get('/music', function () {
+    redirect('/music');
+});
+
+Route::get('/xxx', function () {
+    redirect('/xxx');
+});
+
+Route::get('/admin/{page}', function () {
+    redirect('/admin');
+});
+
+Route::get('/books', function () {
+    redirect('/books');
+});
+
+Route::get('/contact-us', function () {
+    redirect('/contact-us');
+});
+
+Route::get('/forum', function () {
+    redirect('/forum');
+});
+
+Route::post('/forum', function () {
+    redirect('/forum');
+});
+
+Route::get('/forumpost', function () {
+    redirect('/forumpost');
+});
+
+Route::post('/forumpost', function () {
+    redirect('/forumpost');
+});
+
+Route::get('/profileedit', function () {
+    redirect('/profileedit');
+});
+
+Route::post('/profileedit', function () {
+    redirect('/profileedit');
+});
+
+Route::get('/profile', function () {
+    redirect('/profile');
+});
+
+Route::get('/apihelp', function () {
+    redirect('/apihelp');
+});
+
+Route::get('/api', function () {
+    redirect('/api');
+});
+
+Route::post('/api', function () {
+    redirect('/api');
+});
+
+Route::get('/search', function () {
+    redirect('/search');
+});
+
+Route::post('/search/{id}', function () {
+    redirect('/search');
+});
+
+Route::get('/rss', function () {
+    redirect('/rss');
+});
+
+Route::post('/rss', function () {
+    redirect('/rss');
+});
+
+Route::get('/logout', function () {
+    return Auth::logout();
 });

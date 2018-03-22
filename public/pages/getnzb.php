@@ -8,12 +8,13 @@ use Blacklight\Releases;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
-if (User::isLoggedIn()) {
-    $uid = User::currentUserId();
+if (Auth::check()) {
+    $uid = Auth::id();
     $maxDownloads = $page->userdata->role->downloadrequests;
     $rssToken = $page->userdata['rsstoken'];
     if (User::isDisabled($page->userdata['username'])) {

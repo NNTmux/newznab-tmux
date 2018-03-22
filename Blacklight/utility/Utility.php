@@ -948,10 +948,10 @@ class Utility
         $response =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
-        header('Content-type: text/xml');
-        header('Content-Length: '.\strlen($response));
-        header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
-        header($errorHeader);
+        request()->header('Content-type: text/xml');
+        request()->header('Content-Length: '.\strlen($response));
+        request()->header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
+        request()->header($errorHeader);
 
         exit($response);
     }

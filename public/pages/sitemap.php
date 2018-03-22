@@ -11,7 +11,7 @@ $arPages = [];
 $arPages[] = buildURL('Home', 'Home Page', '/', 'daily', '1.0');
 
 $role = 0;
-if ($page->userdata != null) {
+if ($page->userdata !== null) {
     $role = $page->userdata['role'];
 }
 

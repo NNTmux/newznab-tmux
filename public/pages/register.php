@@ -7,8 +7,10 @@ use App\Models\UserRole;
 use App\Models\Invitation;
 use Blacklight\utility\Utility;
 
-if (User::isLoggedIn()) {
-    header('Location: '.WWW_TOP.'/');
+use Illuminate\Support\Facades\Auth;
+
+if (Auth::check()) {
+    redirect('/');
 }
 
 $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';

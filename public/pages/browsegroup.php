@@ -1,11 +1,12 @@
 <?php
 
-use App\Models\User;
 use App\Models\Group;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 $grouplist = Group::getGroupsRange(false, false, '', true);
 $page->smarty->assign('results', $grouplist);

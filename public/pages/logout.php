@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
-User::logout();
+Auth::logout();
 
-header('Location: '.WWW_TOP.'/login');
+redirect('/login');

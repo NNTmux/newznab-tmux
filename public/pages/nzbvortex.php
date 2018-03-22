@@ -2,9 +2,7 @@
 
 use App\Models\User;
 
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
+
 use Blacklight\NZBVortex;
 
 try {

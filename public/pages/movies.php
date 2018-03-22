@@ -4,10 +4,12 @@ use App\Models\User;
 use Blacklight\Movie;
 use App\Models\Category;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 $movie = new Movie(['Settings' => $page->settings]);
 
@@ -22,14 +24,14 @@ if (request()->has('t') && array_key_exists(request()->input('t'), $mtmp)) {
     $category = request()->input('t') + 0;
 }
 
-$user = User::find(User::currentUserId());
+$user = User::find(Auth::id());
 $cpapi = $user['cp_api'];
 $cpurl = $user['cp_url'];
 $page->smarty->assign('cpapi', $cpapi);
 $page->smarty->assign('cpurl', $cpurl);
 
 $catarray = [];
-if ($category != -1) {
+if ((int) $category !== -1) {
     $catarray[] = $category;
 }
 

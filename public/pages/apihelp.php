@@ -1,4 +1,9 @@
 <?php
+use Illuminate\Support\Facades\Auth;
+
+if (! Auth::check()) {
+    $page->show403();
+}
 
 $page->title = 'Api';
 $page->meta_title = 'Api Help Topics';

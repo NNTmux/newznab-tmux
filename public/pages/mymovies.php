@@ -6,10 +6,12 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\Releases;
 use App\Models\UserMovie;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 $mv = new Movie(['Settings' => $page->settings]);
 
@@ -24,22 +26,22 @@ if (request()->has('from')) {
 
 switch ($action) {
     case 'delete':
-        $movie = UserMovie::getMovie(User::currentUserId(), $imdbid);
+        $movie = UserMovie::getMovie(Auth::id(), $imdbid);
         if (request()->has('from')) {
             header('Location:'.WWW_TOP.request()->input('from'));
         } else {
-            header('Location:'.WWW_TOP.'/mymovies');
+            rredirect('/mymovies');
         }
         if (! $movie) {
             $page->show404('Not subscribed');
         } else {
-            UserMovie::delMovie(User::currentUserId(), $imdbid);
+            UserMovie::delMovie(Auth::id(), $imdbid);
         }
 
         break;
     case 'add':
     case 'doadd':
-        $movie = UserMovie::getMovie(User::currentUserId(), $imdbid);
+        $movie = UserMovie::getMovie(Auth::id(), $imdbid);
         if ($movie) {
             $page->show404('Already subscribed');
         } else {
@@ -51,11 +53,11 @@ switch ($action) {
 
         if ($action === 'doadd') {
             $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
-            UserMovie::addMovie(User::currentUserId(), $imdbid, $category);
+            UserMovie::addMovie(Auth::id(), $imdbid, $category);
             if (request()->has('from')) {
                 header('Location:'.WWW_TOP.request()->input('from'));
             } else {
-                header('Location:'.WWW_TOP.'/mymovies');
+                rredirect('/mymovies');
             }
         } else {
             $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
@@ -79,7 +81,7 @@ switch ($action) {
         break;
     case 'edit':
     case 'doedit':
-        $movie = UserMovie::getMovie(User::currentUserId(), $imdbid);
+        $movie = UserMovie::getMovie(Auth::id(), $imdbid);
 
         if (! $movie) {
             $page->show404();
@@ -87,11 +89,11 @@ switch ($action) {
 
         if ($action === 'doedit') {
             $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
-            UserMovie::updateMovie(User::currentUserId(), $imdbid, $category);
+            UserMovie::updateMovie(Auth::id(), $imdbid, $category);
             if (request()->has('from')) {
-                header('Location:'.WWW_TOP.request()->input('from'));
+                redirect(request()->input('from'));
             } else {
-                header('Location:'.WWW_TOP.'/mymovies');
+                rredirect('/mymovies');
             }
         } else {
             $tmpcats = Category::getChildren(Category::MOVIE_ROOT);

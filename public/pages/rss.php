@@ -6,6 +6,11 @@ use App\Models\Settings;
 use Blacklight\http\RSS;
 use App\Models\UserRequest;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
+
+if (! Auth::check()) {
+    $page->show403();
+}
 
 $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
@@ -13,9 +18,6 @@ $offset = 0;
 // If no content id provided then show user the rss selection page.
 if (! request()->has('t') && ! request()->has('show') && ! request()->has('anidb')) {
     // User has to either be logged in, or using rsskey.
-    if (! User::isLoggedIn()) {
-        header('Location: '.Settings::settingValue('site.main.code'));
-    }
 
     $page->title = 'Rss Info';
     $page->meta_title = 'Rss Nzb Info';
@@ -49,8 +51,8 @@ if (! request()->has('t') && ! request()->has('show') && ! request()->has('anidb
 } else {
     $rssToken = $uid = -1;
     // User requested a feed, ensure either logged in or passing a valid token.
-    if (User::isLoggedIn()) {
-        $uid = $page->userdata['id'];
+    if (Auth::check()) {
+        $uid = Auth::id();
         $rssToken = $page->userdata['rsstoken'];
         $maxRequests = $page->userdata->role->apirequests;
     } else {

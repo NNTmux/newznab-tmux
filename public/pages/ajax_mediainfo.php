@@ -1,11 +1,12 @@
 <?php
 
-use App\Models\User;
 use Blacklight\ReleaseExtra;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 if (! request()->has('id')) {
     $page->show404();
 }

@@ -6,6 +6,7 @@ use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class SABnzbd.
@@ -91,15 +92,15 @@ class SABnzbd
     private $client;
 
     /**
-     * Construct.
+     * SABnzbd constructor.
      *
-     * @param \BasePage $page
+     * @param $page
      *
      * @throws \Exception
      */
     public function __construct(&$page)
     {
-        $this->uid = User::currentUserId();
+        $this->uid = Auth::id();
         $this->rsstoken = $page->userdata['rsstoken'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);

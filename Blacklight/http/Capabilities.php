@@ -84,7 +84,7 @@ abstract class Capabilities
         $response = (new XML_Response($options))->returnXML();
 
         if ($xml) {
-            header('Content-type: text/xml');
+            request()->header('Content-type: text/xml');
         } else {
             // JSON encode the XMLWriter response
             $response = json_encode(
@@ -102,12 +102,12 @@ abstract class Capabilities
                 ['rss']['channel'],
                 JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES
             );
-            header('Content-type: application/json');
+            request()->header('Content-type: application/json');
         }
         if ($response === false) {
             Utility::showApiError(201);
         } else {
-            header('Content-Length: '.\strlen($response));
+            request()->header('Content-Length: '.\strlen($response));
             echo $response;
         }
     }

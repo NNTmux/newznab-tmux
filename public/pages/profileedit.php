@@ -7,17 +7,20 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
 use App\Models\UserExcludedCategory;
+use Illuminate\Support\Facades\Auth;
+
+if (! Auth::check()) {
+    $page->show403();
+}
 
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
+
 
 $action = request()->input('action') ?? 'view';
 
-$userid = User::currentUserId();
+$userid = Auth::id();
 $data = User::find($userid);
 if (! $data) {
     $page->show404();
@@ -28,11 +31,11 @@ $errorStr = '';
 switch ($action) {
     case 'newapikey':
         User::updateRssKey($userid);
-        header('Location: profileedit');
+        redirect('/profileedit');
         break;
     case 'clearcookies':
         $sab->unsetCookie();
-        header('Location: profileedit');
+        redirect('/profileedit');
         break;
     case 'submit':
 
@@ -96,8 +99,7 @@ switch ($action) {
                     User::updatePassword($userid, request()->input('password'));
                 }
 
-                header('Location:'.WWW_TOP.'/profile');
-                die();
+                redirect('/profile');
             }
         }
         break;

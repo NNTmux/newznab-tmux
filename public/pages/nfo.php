@@ -4,10 +4,12 @@ use App\Models\User;
 use App\Models\Release;
 use App\Models\ReleaseNfo;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 if (request()->has('id')) {
     $rel = Release::getByGuid(request()->input('id'));

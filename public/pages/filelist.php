@@ -8,9 +8,7 @@ use App\Models\Release;
 $pdo = new DB();
 $nzb = new NZB();
 
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
+
 
 if (request()->has('id')) {
     $rel = Release::getByGuid(request()->input('id'));

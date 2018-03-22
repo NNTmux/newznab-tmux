@@ -1,13 +1,14 @@
 <?php
 
-use App\Models\User;
 use Blacklight\AniDB;
 use App\Models\Category;
 use Blacklight\Releases;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 
 $releases = new Releases(['Settings' => $page->settings]);
 $aniDB = new AniDB(['Settings' => $page->settings]);

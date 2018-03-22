@@ -5,9 +5,7 @@ use Blacklight\Music;
 
 $music = new Music;
 
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
+
 
 if (request()->has('id') && ctype_digit(request()->input('id'))) {
     $mus = $music->getMusicInfo(request()->input('id'));
