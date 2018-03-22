@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Movie;
 use App\Models\Category;
 use App\Models\Settings;
