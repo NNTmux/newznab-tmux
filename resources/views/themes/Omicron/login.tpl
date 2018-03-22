@@ -19,7 +19,7 @@
       <div class="login-box-body">
         <p class="login-box-msg">Please sign in to access the site</p>
         <form action="login" method="post">
-          <input type="hidden" name="_token" value="{$csrf_token}">
+			{{csrf_field()}}
           {if isset($redirect)}
           <input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
           {/if}

@@ -5,6 +5,7 @@
 		</div>
 		<div class="body">
 			<form id="forum-post-edit" class="form-horizontal" action="" method="POST">
+				{{csrf_field()}}
 				<div class="control-group">
 					<label class="control-label" for="addMessage">Edit Post</label>
 					<div class="controls">

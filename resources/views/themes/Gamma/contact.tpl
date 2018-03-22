@@ -12,6 +12,7 @@
 	{/if}
 	<h2>Contact form</h2>
 	<form method="post" action="contact-us">
+		{{csrf_field()}}
 		<table>
 			<tr>
 				<td width="100px">Your name: </td>

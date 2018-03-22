@@ -13,6 +13,7 @@ border: 1px solid #e1e1e8;
 	{if isset($confirmed) && $confirmed == '' && isset($sent) && $sent == ''}
 	<p>
 		<form class="form-horizontal" action="forgottenpassword?action=submit" method="post">
+		{{csrf_field()}}
 			<table class="data">
 			{if isset($error) && $error != ''}
 				<div class="alert alert-error">

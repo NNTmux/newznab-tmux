@@ -84,6 +84,7 @@
 	</div>
 	<div class="body">
 		<form id="new-forum-thread" class="form-horizontal" action="" method="post">
+			{{csrf_field()}}
 			<div class="control-group">
 				<label class="control-label" for="addSubject">Subject</label>
 				<div class="controls">

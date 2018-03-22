@@ -57,8 +57,8 @@ Route::get('/xxx', function () {
     redirect('/xxx');
 });
 
-Route::get('/admin/{page}', function () {
-    redirect('/admin');
+Route::get('/admin/', function () {
+    redirect('/admin/');
 });
 
 Route::get('/books', function () {
@@ -66,6 +66,14 @@ Route::get('/books', function () {
 });
 
 Route::get('/contact-us', function () {
+    redirect('/contact-us');
+});
+
+Route::get('/getnzb/{id}', function () {
+    redirect('/getnzb');
+});
+
+Route::post('/contact-us', function () {
     redirect('/contact-us');
 });
 
@@ -91,6 +99,10 @@ Route::get('/profileedit', function () {
 
 Route::post('/profileedit', function () {
     redirect('/profileedit');
+});
+
+Route::get('/profile_delete', function () {
+    redirect('/profile_delete');
 });
 
 Route::get('/profile', function () {
@@ -126,5 +138,5 @@ Route::post('/rss', function () {
 });
 
 Route::get('/logout', function () {
-    return Auth::logout();
+    Auth::logout();
 });

@@ -27,6 +27,7 @@
 							<div class="row m-b-30">
 								<div class="col-sm-6">
 									<form method="POST" action="{$smarty.const.WWW_TOP}/contact-us">
+										{{csrf_field()}}
 										<div class="row">
 											<div class="col-sm-6">
 												<label for="username" class="h6">Name</label>

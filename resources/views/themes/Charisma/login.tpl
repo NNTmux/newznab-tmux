@@ -40,7 +40,7 @@
 					Please login with your Username and Password.
 				</div>
 				<form class="form-horizontal" method="post" action="login">
-					<input type="hidden" name="_token" value="{$csrf_token}">
+					{{csrf_field()}}
 					{if isset($redirect)}
 						<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
 					{/if}
