@@ -7,7 +7,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 if (! request()->has('id')) {
     $page->show404();
 }

@@ -9,7 +9,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $releases = new Releases(['Settings' => $page->settings]);
 $aniDB = new AniDB(['Settings' => $page->settings]);
 

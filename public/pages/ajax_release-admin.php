@@ -2,8 +2,8 @@
 
 use App\Models\Release;
 use App\Models\Category;
-use Blacklight\http\AdminPage;
 use Blacklight\Releases;
+use Blacklight\http\AdminPage;
 use Illuminate\Support\Facades\Auth;
 
 if (! Auth::check()) {

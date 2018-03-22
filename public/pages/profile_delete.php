@@ -10,7 +10,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $userId = request()->input('id');
 
 if ($userId !== null && $page->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === Auth::id()) {

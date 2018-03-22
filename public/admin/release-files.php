@@ -3,7 +3,6 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\NZB;
-use App\Models\User;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
@@ -12,8 +11,6 @@ use Blacklight\http\AdminPage;
 $page = new AdminPage;
 $pdo = new DB();
 $nzb = new NZB();
-
-
 
 if (request()->has('id')) {
     $rel = Release::getByGuid(request()->input('id'));

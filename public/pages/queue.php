@@ -10,7 +10,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $userData = User::find(Auth::id());
 if (! $userData) {
     $page->show404();

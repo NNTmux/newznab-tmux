@@ -16,8 +16,6 @@ if (! Auth::check()) {
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 
-
-
 $action = request()->input('action') ?? 'view';
 
 $userid = Auth::id();

@@ -1,14 +1,12 @@
 <?php
 
 use Blacklight\XXX;
-use App\Models\User;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 
 if (! Auth::check()) {
     $page->show403();
 }
-
 
 $movie = new XXX();
 

@@ -7,7 +7,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 if (request()->has('modal') && request()->has('id') && ctype_digit(request()->input('id'))) {
     $movie = new Movie(['Settings' => $page->settings]);
     $mov = $movie->getMovieInfo(request()->input('id'));

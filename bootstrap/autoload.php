@@ -16,4 +16,3 @@ if (! defined('HAS_WHICH')) {
 }
 
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-

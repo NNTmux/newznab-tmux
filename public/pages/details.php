@@ -25,7 +25,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;

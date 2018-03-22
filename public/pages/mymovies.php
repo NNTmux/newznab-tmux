@@ -12,7 +12,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $mv = new Movie(['Settings' => $page->settings]);
 
 $action = request()->input('id') ?? '';

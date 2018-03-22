@@ -9,7 +9,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $console = new Console(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
 

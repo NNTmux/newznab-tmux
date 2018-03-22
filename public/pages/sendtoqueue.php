@@ -9,7 +9,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 if (empty(request()->input('id'))) {
     $page->show404();
 }

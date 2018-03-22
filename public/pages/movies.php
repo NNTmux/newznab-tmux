@@ -10,7 +10,6 @@ if (! Auth::check()) {
     $page->show403();
 }
 
-
 $movie = new Movie(['Settings' => $page->settings]);
 
 $moviecats = Category::getChildren(Category::MOVIE_ROOT);
