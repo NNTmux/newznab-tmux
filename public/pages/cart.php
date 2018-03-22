@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Release;
 use Blacklight\Releases;
 use App\Models\UsersRelease;

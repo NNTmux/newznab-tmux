@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Video;
 use App\Models\Category;
 use App\Models\Settings;

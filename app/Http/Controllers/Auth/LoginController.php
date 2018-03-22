@@ -42,7 +42,6 @@ class LoginController extends Controller
     /**
      * @param \Illuminate\Http\Request $request
      * @return $this|\Illuminate\Http\RedirectResponse
-     *
      */
     public function login(Request $request)
     {
@@ -74,6 +73,6 @@ class LoginController extends Controller
 
     public function logout()
     {
-       Auth::logout();
+        Auth::logout();
     }
 }
