@@ -575,7 +575,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate a stron password.
+     * Generate a strong password.
      *
      *
      * @param int $length
@@ -758,52 +758,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Verify if the user is logged in.
-     *
-     * @return bool
-     * @throws \Exception
-     */
-    public static function isLoggedIn(): bool
-    {
-        if (isset($_SESSION['uid'])) {
-            return true;
-        }
-        if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
-            $u = self::find($_COOKIE['uid']);
-
-            if ((int) $u['user_roles_id'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'].$_COOKIE['uid'])) {
-                self::login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
-            }
-        }
-
-        return isset($_SESSION['uid']);
-    }
-
-    /**
-     * Log in a user.
-     *
-     * @param int    $userID   ID of the user.
-     * @param string $host
-     * @param bool $remember Save the user in cookies to keep them logged in.
-     *
-     * @throws \Exception
-     */
-    public static function login($userID, $host = '', $remember = false): void
-    {
-        $_SESSION['uid'] = $userID;
-
-        if ((int) Settings::settingValue('..storeuserips') !== 1) {
-            $host = '';
-        }
-
-        self::updateSiteAccessed($userID, $host);
-
-        if ($remember === true) {
-            self::setCookies($userID);
-        }
-    }
-
-    /**
      * When a user logs in, update the last time they logged in.
      *
      * @param int    $userID ID of the user.
@@ -817,41 +771,6 @@ class User extends Authenticatable
                 'host' => $host,
             ]
         );
-    }
-
-    /**
-     * Set up cookies for a user.
-     *
-     * @param int $userID
-     */
-    public static function setCookies($userID): void
-    {
-        $user = self::find($userID);
-        $secure_cookie = request()->secure();
-        setcookie('uid', $userID, time() + 2592000, '/', null, $secure_cookie, true);
-        setcookie('idh', self::hashSHA1($user['userseed'].$userID), time() + 2592000, '/', null, $secure_cookie, true);
-    }
-
-    /**
-     * Return the User ID of the user.
-     *
-     * @return int
-     */
-    public static function currentUserId(): int
-    {
-        return $_SESSION['uid'] ?? -1;
-    }
-
-    /**
-     * Logout the user, destroying his cookies and session.
-     */
-    public static function logout(): void
-    {
-        session_unset();
-        session_destroy();
-        $secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? '1' : '0');
-        setcookie('uid', null, -1, '/', null, $secure_cookie, true);
-        setcookie('idh', null, -1, '/', null, $secure_cookie, true);
     }
 
     /**

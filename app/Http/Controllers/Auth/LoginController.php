@@ -70,9 +70,4 @@ class LoginController extends Controller
                 'login' => 'These credentials do not match our records.',
             ]);
     }
-
-    public function logout()
-    {
-        Auth::logout();
-    }
 }

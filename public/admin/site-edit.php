@@ -8,8 +8,13 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\http\AdminPage;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 
 $page = new AdminPage();
+
+if (! Auth::check()) {
+    $page->show403(true);
+}
 
 $sites = new Sites();
 $id = 0;
@@ -19,7 +24,6 @@ $action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-
         if (! request()->has('book_reqids')) {
             request()->merge(['book_reqids' => []]);
         }
@@ -48,7 +52,7 @@ switch ($action) {
         if ($error === '') {
             $site = $ret;
             $returnid = $site['id'];
-            header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
+            request()->header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
         } else {
             $page->smarty->assign('error', $error);
             $site = $sites->row2Object(request()->all());

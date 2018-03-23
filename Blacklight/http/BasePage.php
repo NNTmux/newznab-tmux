@@ -129,6 +129,7 @@ class BasePage
         $this->page = request()->input('page') ?? 'content';
 
         if (Auth::check()) {
+            $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
         } else {
             $this->theme = $this->getSettingValue('site.main.style');
@@ -196,10 +197,19 @@ class BasePage
 
     /**
      * Show 403 page.
+     *
+     *
+     * @param bool $from_admin
      */
-    public function show403(): void
+    public function show403($from_admin = false): void
     {
-        die(view('errors.403'));
+        header(
+            'Location: '.
+            ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
+            '/login?redirect='.
+            urlencode(request()->getRequestUri())
+        );
+        exit();
     }
 
     /**
@@ -273,7 +283,6 @@ class BasePage
      */
     protected function setUserPreferences(): void
     {
-        $this->userdata = User::find(Auth::id());
         $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
         $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
 

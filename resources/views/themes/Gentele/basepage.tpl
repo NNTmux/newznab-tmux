@@ -117,8 +117,10 @@
 												API</a></li>
 								</ul>
 								<div class="clearfix"></div>
-							<li><a href="{$smarty.const.WWW_TOP}/logout"><i
-											class="fa fa-unlock"></i><span> Sign Out</span></a></li>
+							<li><a href="{{route('logout')}}" onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
+									<i class="fa fa-unlock"></i><span> Sign Out</span>
+								</a>
+							</li>
 							{else}
 							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
 							</li>
@@ -227,6 +229,10 @@
 		});
     });
 </script>
+
+<form id="frm-logout" action="{{route('logout')}}" method="post" style="display: none;">
+	{{csrf_field()}}
+</form>
 
 </body>
 

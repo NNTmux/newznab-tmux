@@ -4,6 +4,7 @@ namespace Blacklight\http;
 
 use App\Models\User;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.
@@ -28,7 +29,7 @@ class AdminPage extends BasePage
             ]
         );
 
-        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== User::ROLE_ADMIN || ! User::isLoggedIn()) {
+        if (! Auth::check()) {
             $this->show403(true);
         }
 

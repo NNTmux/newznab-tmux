@@ -36,23 +36,22 @@ if ($showRegister === 1) {
     switch ($action) {
         case 'submit':
             if ($captcha->getError() === false) {
-                if (Utility::checkCSRFToken() === true) {
-                    $userName = request()->input('username');
-                    $password = request()->input('password');
-                    $confirmPassword = request()->input('confirmpassword');
-                    $email = request()->input('email');
-                    if (! empty(request()->input('invitecode'))) {
-                        $inviteCode = request()->input('invitecode');
-                    }
+                $userName = request()->input('username');
+                $password = request()->input('password');
+                $confirmPassword = request()->input('confirmpassword');
+                $email = request()->input('email');
+                if (! empty(request()->input('invitecode'))) {
+                    $inviteCode = request()->input('invitecode');
+                }
 
-                    // Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
-                    if ($password !== $confirmPassword) {
-                        $error = 'Password Mismatch';
-                    } else {
-                        // Get the default user role.
-                        $userDefault = UserRole::getDefaultRole();
+                // Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
+                if ($password !== $confirmPassword) {
+                    $error = 'Password Mismatch';
+                } else {
+                    // Get the default user role.
+                    $userDefault = UserRole::getDefaultRole();
 
-                        $ret = User::signup(
+                    $ret = User::signup(
                             $userName,
                             $password,
                             $email,
@@ -63,11 +62,11 @@ if ($showRegister === 1) {
                             $inviteCode
                         );
 
-                        if ($ret > 0) {
-                            User::login($ret, request()->ip());
-                            header('Location: '.WWW_TOP.'/');
-                        } else {
-                            switch ($ret) {
+                    if ($ret > 0) {
+                        session()->flash('You are already a member!');
+                        redirect('/');
+                    } else {
+                        switch ($ret) {
                                 case User::ERR_SIGNUP_BADUNAME:
                                     $error = 'Your username must be at least five characters.';
                                     break;
@@ -90,10 +89,7 @@ if ($showRegister === 1) {
                                     $error = 'Failed to register.';
                                     break;
                             }
-                        }
                     }
-                } else {
-                    $page->showTokenError();
                 }
             }
             break;
