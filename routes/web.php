@@ -31,7 +31,6 @@ Route::post('/register', function () {
     redirect('/register');
 })->middleware('guest');
 
-
 Route::get('/browse', function () {
     redirect('/browse');
 })->middleware('auth');
@@ -156,4 +155,4 @@ Route::post('/rss', function () {
     redirect('/rss');
 })->middleware('auth', 'api');
 
-Route::get('/logout', 'Auth\LoginController@logout')->name('logout' );
+Route::get('/logout', 'Auth\LoginController@logout')->name('logout');
