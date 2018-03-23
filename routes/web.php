@@ -15,11 +15,22 @@ Route::get('/', function () {
     redirect('/');
 });
 
+Auth::routes();
+
 Route::get('/login', function () {
     redirect('/login');
 })->middleware('guest');
 
 Route::post('/login', 'Auth\LoginController@login');
+
+Route::get('/register', function () {
+    redirect('/register');
+})->middleware('guest');
+
+Route::post('/register', function () {
+    redirect('/register');
+})->middleware('guest');
+
 
 Route::get('/browse', function () {
     redirect('/browse');
@@ -101,6 +112,10 @@ Route::get('/profile_delete', function () {
     redirect('/profile_delete');
 })->middleware('auth');
 
+Route::post('/profile_delete', function () {
+    redirect('/profile_delete');
+})->middleware('auth');
+
 Route::get('/profile', function () {
     redirect('/profile');
 })->middleware('auth');
@@ -141,4 +156,4 @@ Route::post('/rss', function () {
     redirect('/rss');
 })->middleware('auth', 'api');
 
-Route::get('/logout', 'Auth\LoginController@logout')->middleware('guest');
+Route::get('/logout', 'Auth\LoginController@logout')->name('logout' );
