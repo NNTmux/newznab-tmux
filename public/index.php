@@ -48,7 +48,6 @@ switch ($page->page) {
     case 'forumpost':
     case 'games':
     case 'getimage':
-    case 'logout':
     case 'movies':
     case 'movie':
     case 'music':
