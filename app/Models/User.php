@@ -48,6 +48,8 @@ class User extends Authenticatable
      */
     protected $dateFormat = false;
 
+    protected $hidden = ['remember_token', 'password'];
+
     /**
      * @var array
      */
