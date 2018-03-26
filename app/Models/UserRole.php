@@ -89,10 +89,6 @@ class UserRole extends Model
      */
     public static function updateRole($request): int
     {
-        if ((int) $request['isdefault'] === 1) {
-            self::query()->update(['isdefault' => 0]);
-        }
-
         return self::query()->where('id', $request['id'])->update(
             [
                 'name' => $request['name'],
