@@ -1,6 +1,6 @@
 <div class="well well-sm">
 	<h1>{$page->title}</h1>
-<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/content-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/content-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
 	<form action="{$SCRIPT_NAME}?action=submit" method="post">
 		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
@@ -8,13 +8,15 @@
 				<td><label for="title">Title:</label></td>
 				<td>
 					<input type="hidden" name="id" {if isset($content)}value="{$content->id}"{else}{/if}"/>
-					<input id="title" class="long" name="title" type="text" {if isset($content)}value="{$content->title}"{else}{/if}/>
+					<input id="title" class="long" name="title" type="text"
+						   {if isset($content)}value="{$content->title}"{else}{/if}/>
 				</td>
 			</tr>
 			<tr>
 				<td><label for="url">Url:</label></td>
 				<td>
-					<input id="url" class="long" name="url" type="text" {if isset($content)}value="{$content->url}"{else}{/if}/>
+					<input id="url" class="long" name="url" type="text"
+						   {if isset($content)}value="{$content->url}"{else}{/if}/>
 				</td>
 			</tr>
 			<tr>
@@ -26,13 +28,15 @@
 			<tr>
 				<td><label for="metadescription">Meta Description:</label></td>
 				<td>
-					<textarea id="metadescription" name="metadescription">{if isset($content)}{$content->metadescription}{else}{/if}</textarea>
+					<textarea id="metadescription"
+							  name="metadescription">{if isset($content)}{$content->metadescription}{else}{/if}</textarea>
 				</td>
 			</tr>
 			<tr>
 				<td><label for="metakeywords">Meta Keywords:</label></td>
 				<td>
-					<textarea id="metakeywords" name="metakeywords">{if isset($content)}{$content->metakeywords}{else}{/if}</textarea>
+					<textarea id="metakeywords"
+							  name="metakeywords">{if isset($content)}{$content->metakeywords}{else}{/if}</textarea>
 				</td>
 			</tr>
 			<tr>
@@ -63,7 +67,8 @@
 			<tr>
 				<td><label for="ordinal">Ordinal:</label></td>
 				<td>
-					<input id="ordinal" name="ordinal" type="text" {if isset($content)}value="{$content->ordinal}"{else}{/if}/>
+					<input id="ordinal" name="ordinal" type="text"
+						   {if isset($content)}value="{$content->ordinal}"{else}{/if}/>
 					<div class="hint">If you set the ordinal = 1, then a all ordinals greater than 0 will be renumbered.
 						This allows new content to be at the top without having to renumber all previous content.<br/>If
 						you set ordinal = 0, it will be at the top, sorted by ID(order added)
