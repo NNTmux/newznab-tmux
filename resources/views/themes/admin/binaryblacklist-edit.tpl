@@ -4,6 +4,7 @@
 {/if}
 <div class="well well-sm">
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	{{csrf_field()}}
 	<table class="input">
 		<tr>
 			<td>Group:</td>

@@ -3,6 +3,7 @@
 {if $tvshowlist}
 	<div style="float:right;">
 		<form name="showsearch" action="">
+			{{csrf_field()}}
 			<label for="showname">Title</label>
 			<input id="showname" type="text" name="showname" value="{$showname}" size="15" />
 			&nbsp;&nbsp;

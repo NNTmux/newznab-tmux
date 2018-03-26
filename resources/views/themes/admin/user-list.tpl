@@ -4,6 +4,7 @@
 	<div style="float:right;">
 
 		<form name="usersearch" action="">
+			{{csrf_field()}}
 			<label for="username">username</label>
 			<input id="username" type="text" name="username" value="{$username}" size="10"/>
 			&nbsp;&nbsp;

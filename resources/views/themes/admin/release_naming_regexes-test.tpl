@@ -6,6 +6,7 @@
 </p>
 
 <form name="search" action="" method="post" style="margin-bottom:5px;">
+	{{csrf_field()}}
 	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td><label for="group" style="padding-right:1px">Group:</label>

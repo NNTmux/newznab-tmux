@@ -15,6 +15,7 @@
 <fieldset>
 	<legend>Import From Directory</legend>
 	<form action="{$SCRIPT_NAME}#results" method="POST">
+		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:100px;"><label for="folder">Folder:</label></td>
@@ -49,6 +50,7 @@
 <fieldset>
 	<legend>Import From Browser</legend>
 	<form action="{$SCRIPT_NAME}#results" method="POST" enctype="multipart/form-data">
+		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:100px;"><label for="uploadedfiles[]">File:</label></td>

@@ -6,6 +6,7 @@
 <div id="message"></div>
 
 <form name="groupsearch" action="" style="margin-bottom:5px;">
+	{{csrf_field()}}
 	<label for="group">Search a group:</label>
 	<input id="group" type="text" name="group" value="{$group}" size="15" />
 	&nbsp;&nbsp;

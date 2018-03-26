@@ -6,6 +6,7 @@
 	{if $grouplist}
 		<div style="position:relative;margin-bottom:5px;">
 			<form name="groupsearch" action="" style="margin-bottom:5px;">
+				{{csrf_field()}}
 				<label for="groupname">Group</label>
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 				&nbsp;&nbsp;
@@ -66,6 +67,7 @@
 			</div>
 			<div style="text-align:center;">
 				<form name="groupsearch" action="" style="margin-bottom:5px;">
+					{{csrf_field()}}
 					<label for="groupname">Group</label>
 					<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 					&nbsp;&nbsp;

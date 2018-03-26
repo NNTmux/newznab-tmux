@@ -2,6 +2,7 @@
 <h1>{$page->title}</h1>
 
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
+	{{csrf_field()}}
 
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>

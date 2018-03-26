@@ -15,6 +15,16 @@ Route::get('/', function () {
     redirect('/');
 });
 
+/*
+|
+| We need to allow the post route to '/'
+| as admin area needs the permission
+|
+*/
+Route::post('/', function () {
+    redirect('/');
+})->middleware('auth');
+
 Auth::routes();
 
 Route::get('/login', function () {

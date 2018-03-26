@@ -5,6 +5,7 @@
 {/if}
 <a class="btn btn-success" href="{$smarty.const.WWW_TOP}/release_naming_regexes-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	{{csrf_field()}}
 	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td><label for="group_regex">Group:</label></td>

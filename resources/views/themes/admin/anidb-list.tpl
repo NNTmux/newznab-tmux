@@ -6,6 +6,7 @@
 <div style="float:right;">
 
 	<form name="anidbsearch" action="">
+		{{csrf_field()}}
 		<label for="animetitle">Title</label>
 		<input id="animetitle" type="text" name="animetitle" value="{$animetitle}" size="15" />
 		&nbsp;&nbsp;

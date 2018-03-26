@@ -211,7 +211,7 @@ class BasePage
      */
     public function show403($from_admin = false): void
     {
-        header(
+        request()->header(
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.

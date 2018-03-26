@@ -3,6 +3,7 @@
 <p>This page is used for testing regex for grouping usenet collections.<br />Enter the group name to test and a regex. Limit is how many collections to show max on the page, 0 for no limit(slow).</p>
 
 <form name="search" action="" method="post" style="margin-bottom:5px;">
+	{{csrf_field()}}
 	<label for="group" style="padding-right:1px">Group:</label>
 	<input id="group" type="text" name="group" value="{$group|htmlentities}" size="20" /><br />
 	<label for="regex" style="padding-right:1px">Regex:</label>

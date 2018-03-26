@@ -4,6 +4,7 @@
 <div class="well well-sm">
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="POST">
+	{{csrf_field()}}
 
 <input type="hidden" name="from" value="{$smarty.get.from}" />
 

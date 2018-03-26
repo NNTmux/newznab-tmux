@@ -19,6 +19,7 @@
 		</script>
 	{/literal}
 		<form id="release" action="{$smarty.const.WWW_TOP}/ajax_release-admin/?action=doedit" method="get">
+			{{csrf_field()}}
 			{foreach from=$idArr item=id}
 				<input type="hidden" name="id[]" value="{$id}" />
 			{/foreach}

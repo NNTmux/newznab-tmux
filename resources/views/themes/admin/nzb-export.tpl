@@ -13,6 +13,7 @@ If you are exporting a large number of nzb files, run this script from the comma
 
 
 <form action="{$SCRIPT_NAME}" method="POST">
+	{{csrf_field()}}
 
 <table class="input data table table-striped responsive-utilities jambo-table">
 
