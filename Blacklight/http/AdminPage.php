@@ -2,8 +2,8 @@
 
 namespace Blacklight\http;
 
-use App\Models\User;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -29,7 +29,7 @@ class AdminPage extends BasePage
             ]
         );
 
-        if (! Auth::check()) {
+        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== User::ROLE_ADMIN || ! Auth::check()) {
             $this->show403(true);
         }
 

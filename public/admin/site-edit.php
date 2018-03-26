@@ -8,13 +8,8 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\http\AdminPage;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\Auth;
 
 $page = new AdminPage();
-
-if (! Auth::check()) {
-    $page->show403(true);
-}
 
 $sites = new Sites();
 $id = 0;

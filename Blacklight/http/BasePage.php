@@ -102,6 +102,14 @@ class BasePage
      */
     public function __construct()
     {
+        $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
+
+        $response = $kernel->handle(
+            $request = \Illuminate\Http\Request::capture()
+        );
+        $response->send();
+        $kernel->terminate($request, $response);
+
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
