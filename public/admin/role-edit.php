@@ -36,7 +36,7 @@ switch (request()->input('action') ?? 'view') {
     case 'submit':
         if (request()->has('id')) {
             $role = UserRole::addRole(request()->all());
-            /*header('Location:'.WWW_TOP.'/role-list.php');*/
+        /*header('Location:'.WWW_TOP.'/role-list.php');*/
         } else {
             $role = UserRole::updateRole(request()->all());
             //dd($role);
