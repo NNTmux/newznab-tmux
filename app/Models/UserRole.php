@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class UserRole extends Model
 {
@@ -61,62 +62,48 @@ class UserRole extends Model
     }
 
     /**
-     * @param $name
-     * @param $apirequests
-     * @param $downloadrequests
-     * @param $defaultinvites
-     * @param $canpreview
-     * @param $hideads
-     * @param $donation
-     * @param $addYear
+     * @param $request
+     *
      * @return int
      */
-    public static function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads, $donation, $addYear): int
+    public static function addRole($request): int
     {
-        return self::create(
+        return self::query()->insertGetId(
             [
-                'name' => $name,
-                'apirequests' => $apirequests,
-                'downloadrequests' => $downloadrequests,
-                'defaultinvites' => $defaultinvites,
-                'canpreview' => $canpreview,
-                'hideads' => $hideads,
-                'donation' => $donation,
-                'addyears' => $addYear,
+                'name' => $request['name'],
+                'apirequests' => $request['apirequests'],
+                'downloadrequests' => $request['name'],
+                'defaultinvites' => $request['defaultinvites'],
+                'canpreview' => $request['canpreview'],
+                'hideads' => $request['hideads'],
+                'donation' => $request['donation'],
+                'addyears' => $request['addyears'],
             ]
-        )->id;
+        );
     }
 
     /**
-     * @param $id
-     * @param $name
-     * @param $apirequests
-     * @param $downloadrequests
-     * @param $defaultinvites
-     * @param $isdefault
-     * @param $canpreview
-     * @param $hideads
-     * @param $donation
-     * @param $addYear
+     * @param $request
+     *
      * @return int
      */
-    public static function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads, $donation, $addYear): int
+    public static function updateRole($request): int
     {
-        if ((int) $isdefault === 1) {
+        if ((int) $request['isdefault'] === 1) {
             self::query()->update(['isdefault' => 0]);
         }
 
-        return self::query()->where('id', $id)->update(
+        return self::query()->where('id', $request['id'])->update(
             [
-                'name' => $name,
-                'apirequests' => $apirequests,
-                'downloadrequests' => $downloadrequests,
-                'defaultinvites' => $defaultinvites,
-                'isdefault' => $isdefault,
-                'canpreview' => $canpreview,
-                'hideads' => $hideads,
-                'donation' => $donation,
-                'addyears' => $addYear,
+                'name' => $request['name'],
+                'apirequests' => $request['apirequests'],
+                'isdefault' => $request['isdefault'],
+                'downloadrequests' => $request['name'],
+                'defaultinvites' => $request['defaultinvites'],
+                'canpreview' => $request['canpreview'],
+                'hideads' => $request['hideads'],
+                'donation' => $request['donation'],
+                'addyears' => $request['addyears'],
             ]
         );
     }

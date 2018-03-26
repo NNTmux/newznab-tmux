@@ -34,31 +34,12 @@ switch (request()->input('action') ?? 'view') {
         break;
 
     case 'submit':
-        if (request()->input('id') === '') {
-            $role = UserRole::addRole(
-                request()->input('name'),
-                request()->input('apirequests'),
-                request()->input('downloadrequests'),
-                request()->input('defaultinvites'),
-                request()->input('canpreview'),
-                request()->input('hideads'),
-                request()->input('donation'),
-                request()->input('addyears')
-            );
-            header('Location:'.WWW_TOP.'/role-list.php');
+        if (request()->has('id')) {
+            $role = UserRole::addRole(request()->all());
+            /*header('Location:'.WWW_TOP.'/role-list.php');*/
         } else {
-            $role = UserRole::updateRole(
-                request()->input('id'),
-                request()->input('name'),
-                request()->input('apirequests'),
-                request()->input('downloadrequests'),
-                request()->input('defaultinvites'),
-                request()->input('isdefault'),
-                request()->input('canpreview'),
-                request()->input('hideads'),
-                request()->input('donation'),
-                request()->input('addyears')
-            );
+            $role = UserRole::updateRole(request()->all());
+            //dd($role);
             header('Location:'.WWW_TOP.'/role-list.php');
 
             request()->merge(['exccat' => (! request()->has('exccat') || ! is_array(request()->input('exccat'))) ? [] : request()->input('exccat')]);

@@ -16,7 +16,7 @@ if ($userId !== null && $page->userdata->role->id !== User::ROLE_ADMIN && (int) 
     Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
     Auth::logout();
     User::deleteUser($userId);
-    redirect(WWW_TOP.'/');
+    header('Location:'.WWW_TOP.'/login');
 } elseif ($page->userdata->role->id === User::ROLE_ADMIN) {
     redirect(WWW_TOP.'profile');
 } else {

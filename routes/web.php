@@ -130,8 +130,8 @@ Route::get('/profile_delete', function () {
 })->middleware('auth');
 
 Route::post('/profile_delete', function () {
-    redirect('/profile_delete');
-})->middleware('auth');
+    redirect('/login');
+})->middleware('guest');
 
 Route::get('/profile', function () {
     redirect('/profile');

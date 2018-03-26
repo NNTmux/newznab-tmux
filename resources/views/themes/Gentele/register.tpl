@@ -15,7 +15,7 @@
 			</div>
 			<div class="register-box-body">
 				<p class="login-box-msg">Register a new membership</p>
-				<form method="post" action="register?action=submit{$invite_code_query}">
+				<form action="register?action=submit{$invite_code_query}" method="post">
 					{{csrf_field()}}
 					<div class="form-group has-feedback">
 						<input autocomplete="off" id="username" name="username" value="{$username}" type="text"

@@ -2,7 +2,7 @@
 	<h1>{$page->title}</h1>
 
 	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/role-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
-	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<form action="{$SCRIPT_NAME}?action=submit" method="post">
 		{{csrf_field()}}
 
 		<table class="input data table table-striped responsive-utilities jambo-table">
@@ -70,25 +70,23 @@
 					<input name="addyears" type="text" value="{$role.addyears}"/>
 				</td>
 			</tr>
+			<tr>
+				<td>Is Default Role:</td>
+				<td>
+					{html_radios id="role" name='isdefault' values=$yesno_ids output=$yesno_names selected=$role.isdefault separator='<br />'}
+					<div class="hint">Make this the default role for new users</div>
+				</td>
+			</tr>
+			<tr>
+				<td>Excluded Categories</td>
+				<td>
+					{html_options style="height:105px;" multiple=multiple name="exccat[]" options=$catlist selected=$roleexccat}
+					<div class="hint">Use Ctrl and click to exclude multiple categories. This will prevent users
+						with this role from <br/>seeing these categories in the menu or search results.
+					</div>
+				</td>
+			</tr>
 
-			{if $role.id != ''}
-				<tr>
-					<td>Is Default Role:</td>
-					<td>
-						{html_radios id="role" name='isdefault' values=$yesno_ids output=$yesno_names selected=$role.isdefault separator='<br />'}
-						<div class="hint">Make this the default role for new users</div>
-					</td>
-				</tr>
-				<tr>
-					<td>Excluded Categories</td>
-					<td>
-						{html_options style="height:105px;" multiple=multiple name="exccat[]" options=$catlist selected=$roleexccat}
-						<div class="hint">Use Ctrl and click to exclude multiple categories. This will prevent users
-							with this role from <br/>seeing these categories in the menu or search results.
-						</div>
-					</td>
-				</tr>
-			{/if}
 
 			<tr>
 				<td></td>
