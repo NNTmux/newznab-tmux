@@ -41,6 +41,14 @@ Route::post('/register', function () {
     redirect('/register');
 })->middleware('guest');
 
+Route::get('/forgottenpassword', function () {
+    redirect('/forgottenpassword');
+})->middleware('guest');
+
+Route::post('/forgottenpassword', function () {
+    redirect('/forgottenpassword');
+})->middleware('guest');
+
 Route::get('/browse', function () {
     redirect('/browse');
 })->middleware('auth');
