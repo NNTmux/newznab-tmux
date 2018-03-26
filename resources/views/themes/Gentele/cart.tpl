@@ -16,6 +16,7 @@
 	</div>
 	{if $results|@count > 0}
 		<form id="nzb_multi_operations_form" action="get">
+			{{csrf_field()}}
 			<div class="nzb_multi_operations">
 				<small>With Selected:</small>
 				<div class="btn-group">
@@ -27,6 +28,7 @@
 					<input type="button" class="nzb_multi_operations_download_cart btn btn-sm btn-success" value="Download"/>
 				</div>
 			</div>
+		</form>
 			<div class="row">
 				<div class="col-lg-12 portlets">
 					<div class="panel panel-default">
@@ -63,7 +65,6 @@
 						</div>
 					</div>
 				</div>
-		</form>
 	{else}
 		<div class="alert alert-danger" role="alert">There are no NZBs in your download basket.</div>
 	{/if}

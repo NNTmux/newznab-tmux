@@ -43,6 +43,7 @@
 						cannot remember your email, or no longer have access to it, please <a href="{$smarty.const.WWW_TOP}/contact-us">contact
 							us</a>.</p>
 					<form class="form-horizontal" method="post" action="forgottenpassword?action=submit">
+						{{csrf_field()}}
 						<fieldset>
 							<div class="input-group input-group-lg">
 								<span class="input-group-addon"><i class="glyphicon glyphicon-envelope red"></i></span>

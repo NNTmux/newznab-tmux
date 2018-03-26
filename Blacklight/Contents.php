@@ -199,6 +199,7 @@ class Contents
 
     /**
      * @param $content
+     *
      * @return int
      */
     public function data_update($content): int

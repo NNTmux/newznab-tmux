@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\User;
 use App\Models\Video;
 use Blacklight\Releases;
 use App\Models\UserSerie;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
@@ -28,7 +28,7 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
     } elseif (! $rel) {
         $page->smarty->assign('nodata', 'No releases for this series.');
     } else {
-        $myshows = UserSerie::getShow(User::currentUserId(), $show['id']);
+        $myshows = UserSerie::getShow(Auth::id(), $show['id']);
 
         // Sort releases by season, episode, date posted.
         $series = $episode = $posted = [];
@@ -89,7 +89,7 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
         $letter = '';
     }
 
-    $masterserieslist = Video::getSeriesList(User::currentUserId(), $letter, $showname);
+    $masterserieslist = Video::getSeriesList(Auth::id(), $letter, $showname);
 
     $page->title = 'Series List';
     $page->meta_title = 'View Series List';

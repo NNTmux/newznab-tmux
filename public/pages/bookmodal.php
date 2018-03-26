@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Books;
+use Illuminate\Support\Facades\Auth;
 
-$b = new Books;
-
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
+$b = new Books;
 
 if (request()->has('id') && ctype_digit(request()->input('id'))) {
     $book = $b->getBookInfo(request()->input('id'));

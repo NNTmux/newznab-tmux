@@ -12,6 +12,7 @@
 		<div class="panel panel-default">
 			<div class="panel-body pagination2">
 				<form method="get" action="{$serverroot}searchraw">
+					{{csrf_field()}}
 					<div style="text-align:center;">
 						<label for="search" style="display:none;">Search</label>
 						<input id="search" name="search" value="{$search|escape:'htmlall'}" type="text"/>

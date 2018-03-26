@@ -45,7 +45,7 @@ switch ($action) {
             $content = $contents->update(request()->all());
             $returnid = $content['id'];
         }
-        header('Location:content-add.php?id='.$returnid);
+        header('Location:'.WWW_TOP.'/content-add.php?id='.$returnid);
         break;
 
     case 'view':

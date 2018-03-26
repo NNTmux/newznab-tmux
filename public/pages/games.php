@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Games;
 use Blacklight\Genres;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
@@ -33,7 +33,7 @@ $ordering = $games->getGamesOrdering();
 
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-$results = $games2 = [];
+$games2 = [];
 $results = $games->getGamesRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', $page->userdata['categoryexclusions']);
 $maxwords = 50;
 foreach ($results as $result) {

@@ -1,20 +1,21 @@
 <?php
 
-use App\Models\User;
 use App\Models\Forumpost;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
 $id = request()->input('id') + 0;
 
 if (isset($id) && ! empty(request()->input('addMessage'))) {
     $parent = Forumpost::getPost($id);
-    Forumpost::editPost($id, request()->input('addMessage'), User::currentUserId());
+    Forumpost::editPost($id, request()->input('addMessage'), Auth::id());
     if ((int) $parent['parentid'] !== 0) {
-        header('Location:'.WWW_TOP.'/forumpost/'.$parent['parentid'].'#last');
+        request()->header('/forumpost/'.$parent['parentid'].'#last');
     } else {
-        header('Location:'.WWW_TOP.'/forumpost/'.$id);
+        request()->header('/forumpost/'.$id);
     }
 }
 

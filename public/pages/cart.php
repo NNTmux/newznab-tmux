@@ -1,14 +1,13 @@
 <?php
 
-use App\Models\User;
 use App\Models\Release;
-
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
-
 use Blacklight\Releases;
 use App\Models\UsersRelease;
+use Illuminate\Support\Facades\Auth;
+
+if (! Auth::check()) {
+    $page->show403();
+}
 
 if (request()->has('add')) {
     $releases = new Releases(['Settings' => $page->settings]);
@@ -20,7 +19,7 @@ if (request()->has('add')) {
     }
 
     foreach ($data as $d) {
-        UsersRelease::addCart(User::currentUserId(), $d['id']);
+        UsersRelease::addCart(Auth::id(), $d['id']);
     }
 } elseif (request()->has('delete')) {
     if (request()->has('delete') && ! empty(request()->input('delete'))) {
@@ -29,21 +28,19 @@ if (request()->has('add')) {
         $ids = request()->input('delete');
     }
 
-    if ($ids !== null && UsersRelease::delCartByGuid($ids, User::currentUserId())) {
-        header('Location: '.WWW_TOP.'/cart');
+    if ($ids !== null && UsersRelease::delCartByGuid($ids, Auth::id())) {
+        redirect('/cart');
     }
 
     if (! request()->has('delete')) {
-        header('Location: '.WWW_TOP.'/cart');
+        redirect('/cart');
     }
-
-    exit();
 } else {
     $page->meta_title = 'My Download Basket';
     $page->meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
     $page->meta_description = 'Manage Your Download Basket';
 
-    $results = UsersRelease::getCart(User::currentUserId());
+    $results = UsersRelease::getCart(Auth::id());
     $page->smarty->assign('results', $results);
 
     $page->content = $page->smarty->fetch('cart.tpl');

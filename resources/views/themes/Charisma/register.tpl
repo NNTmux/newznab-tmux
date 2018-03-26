@@ -41,7 +41,7 @@
 						Register for a new account
 					</div>
 					<form class="form-horizontal" method="post" action="register?action=submit{$invite_code_query}">
-						<input type="hidden" name="_token" value="{$csrf_token}">
+						{{csrf_field()}}
 						<fieldset>
 							<div class="input-group input-group-lg">
 								<span class="input-group-addon"><i class="glyphicon glyphicon-user red"></i></span>

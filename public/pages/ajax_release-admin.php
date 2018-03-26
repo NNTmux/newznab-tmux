@@ -3,7 +3,12 @@
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
+use Blacklight\http\AdminPage;
+use Illuminate\Support\Facades\Auth;
 
+if (! Auth::check()) {
+    $page->show403();
+}
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
 

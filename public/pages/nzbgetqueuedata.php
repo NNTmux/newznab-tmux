@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 

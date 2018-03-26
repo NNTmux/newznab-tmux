@@ -26,6 +26,7 @@
 	<div style="text-align: center">{$search_description}<div>
 			<br>
 	<form method="get" action="{$smarty.const.WWW_TOP}/search">
+		{{csrf_field()}}
 		<div id="sbasic" class="row" style="text-align:center;{if $sadvanced} display:none;{/if}">
 			<div class="col-md-6">
 				<input id="search" class="form-control" maxlength="500" name="search" value="{$search|escape:'htmlall'}"
@@ -40,6 +41,7 @@
 	</form>
 </div>
 <form method="get" action="{$smarty.const.WWW_TOP}/search">
+	{{csrf_field()}}
 	<div id="sadvanced" {if not $sadvanced}style="display:none"{/if}>
 		<div style="text-align: center;">
 			<table class="data table table-striped table-condensed table-responsive">

@@ -3,8 +3,9 @@
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
@@ -12,7 +13,7 @@ if (empty(request()->input('id'))) {
     $page->show404();
 }
 
-$user = User::find(User::currentUserId());
+$user = User::find(Auth::id());
 if ((int) $user['queuetype'] !== 2) {
     $sab = new SABnzbd($page);
     if (empty($sab->url)) {

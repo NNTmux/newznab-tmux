@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Movie;
+use Illuminate\Support\Facades\Auth;
 
-$movie = new Movie;
-
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
+
+$movie = new Movie;
 
 if (request()->has('id') && ctype_digit(request()->input('id'))) {
     $mov = $movie->getMovieInfo(request()->input('id'));

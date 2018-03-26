@@ -1,9 +1,9 @@
 <?php
 
 use Blacklight\XXX;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 

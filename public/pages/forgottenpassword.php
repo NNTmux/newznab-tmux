@@ -4,10 +4,11 @@ use App\Models\User;
 use Blacklight\Captcha;
 use App\Mail\PasswordReset;
 use App\Mail\ForgottenPassword;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
-if (User::isLoggedIn()) {
-    header('Location: '.WWW_TOP.'/');
+if (Auth::check()) {
+    redirect('/');
 }
 
 $action = request()->input('action') ?? 'view';

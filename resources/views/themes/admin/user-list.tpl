@@ -4,6 +4,7 @@
 	<div style="float:right;">
 
 		<form name="usersearch" action="">
+			{{csrf_field()}}
 			<label for="username">username</label>
 			<input id="username" type="text" name="username" value="{$username}" size="10"/>
 			&nbsp;&nbsp;
@@ -94,7 +95,8 @@
 				<td>{$user->role->name}</td>
 				<td>{if !empty($user.rolechangedate)}{$user.rolechangedate}{/if}</td>
 				<td>{if $user.user_roles_id !="2"}<a class="confirm_action"
-										   href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">delete</a>{/if}
+													 href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">
+							delete</a>{/if}
 				</td>
 			</tr>
 		{/foreach}

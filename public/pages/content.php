@@ -2,11 +2,12 @@
 
 use App\Models\User;
 use Blacklight\Contents;
+use Illuminate\Support\Facades\Auth;
 
 $contents = new Contents();
 
 $role = 0;
-if (! empty($page->userdata) && User::isLoggedIn()) {
+if (! empty($page->userdata) && Auth::check()) {
     $role = $page->userdata['role'];
 }
 

@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\User;
 use App\Models\Predb;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 

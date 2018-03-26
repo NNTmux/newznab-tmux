@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\User;
 use Blacklight\Music;
 use Blacklight\Genres;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
@@ -32,7 +32,7 @@ $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) 
 $ordering = $music->getMusicOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering) ? request()->input('ob') : '';
 
-$results = $musics = [];
+$musics = [];
 $results = $music->getMusicRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $page->userdata['categoryexclusions']);
 
 $artist = (request()->has('artist') && ! empty(request()->input('artist'))) ? stripslashes(request()->input('artist')) : '';
@@ -56,15 +56,15 @@ $genre = (request()->has('genre') && array_key_exists(request()->input('genre'),
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
-$years = range(1950, (date('Y') + 1));
+$years = range(1950, date('Y') + 1);
 rsort($years);
-$year = (request()->has('year') && in_array(request()->input('year'), $years)) ? request()->input('year') : '';
+$year = (request()->has('year') && in_array(request()->input('year'), $years, false)) ? request()->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 
 $browseby_link = '&amp;title='.$title.'&amp;artist='.$artist.'&amp;genre='.$genre.'&amp;year='.$year;
 
-$page->smarty->assign('pagertotalitems', isset($results[0]['_totalcount']) ? $results[0]['_totalcount'] : 0);
+$page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/music?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');

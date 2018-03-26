@@ -8,9 +8,9 @@ use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use Ytake\LaravelSmarty\Smarty;
 use App\Models\RoleExcludedCategory;
+use Illuminate\Support\Facades\Auth;
 
 class BasePage
 {
@@ -102,24 +102,13 @@ class BasePage
      */
     public function __construct()
     {
-        if (session_id() === '') {
-            session_start();
+        $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
 
-            $lifetime = Carbon::now()->addMinutes(config('session.lifetime'))->timestamp;
-            $domain = config('session.domain');
-            $http_only = config('session.http_only');
-            $secure = request()->secure();
-
-            if (empty($_SESSION['_token'])) {
-                $_SESSION['_token'] = sodium_bin2hex(random_bytes(32));
-            }
-            setcookie('XSRF-TOKEN', $_SESSION['_token'], $lifetime, '/', $domain, $secure, false);
-            setcookie(config('session.cookie'), $_SESSION['_token'], $lifetime, '/', $domain, $secure, $http_only);
-        }
-
-        if (config('nntmux.flood_check')) {
-            $this->floodCheck();
-        }
+        $response = $kernel->handle(
+            $request = \Illuminate\Http\Request::capture()
+        );
+        $response->send();
+        $kernel->terminate($request, $response);
 
         // Buffer settings/DB connection.
         $this->settings = new Settings();
@@ -145,11 +134,10 @@ class BasePage
             $this->smarty->assign('serverroot', $this->serverurl);
         }
 
-        $this->smarty->assign('csrf_token', $_SESSION['_token']);
-
         $this->page = request()->input('page') ?? 'content';
 
-        if (User::isLoggedIn()) {
+        if (Auth::check()) {
+            $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
         } else {
             $this->theme = $this->getSettingValue('site.main.style');
@@ -168,47 +156,13 @@ class BasePage
     }
 
     /**
-     * Check if the user is flooding.
-     */
-    public function floodCheck(): void
-    {
-        $waitTime = (config('nntmux.flood_wait_time') < 1 ? 5 : config('nntmux.flood_wait_time'));
-        // Check if this is not from CLI.
-        if (empty($argc)) {
-            // If flood wait set, the user must wait x seconds until they can access a page.
-            if (isset($_SESSION['flood_wait_until']) && $_SESSION['flood_wait_until'] > microtime(true)) {
-                $this->showFloodWarning($waitTime);
-            } else {
-                // If user not an admin, they are allowed three requests in FLOOD_THREE_REQUESTS_WITHIN_X_SECONDS seconds.
-                if (! isset($_SESSION['flood_check_hits'])) {
-                    $_SESSION['flood_check_hits'] = 1;
-                    $_SESSION['flood_check_time'] = microtime(true);
-                } else {
-                    if ($_SESSION['flood_check_hits'] >= (config('nntmux.flood_max_requests_per_second') < 1 ? 5 : config('nntmux.flood_max_requests_per_second'))) {
-                        if ($_SESSION['flood_check_time'] + 1 > microtime(true)) {
-                            $_SESSION['flood_wait_until'] = microtime(true) + $waitTime;
-                            unset($_SESSION['flood_check_hits']);
-                            $this->showFloodWarning($waitTime);
-                        } else {
-                            $_SESSION['flood_check_hits'] = 1;
-                            $_SESSION['flood_check_time'] = microtime(true);
-                        }
-                    } else {
-                        $_SESSION['flood_check_hits']++;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Done in html here to reduce any smarty processing burden if a large flood is underway.
      *
      * @param int $seconds
      */
     public function showFloodWarning($seconds = 5): void
     {
-        header('Retry-After: '.$seconds);
+        request()->header('Retry-After: '.$seconds);
         $this->show503();
     }
 
@@ -245,18 +199,19 @@ class BasePage
      */
     public function show404(): void
     {
-        header('HTTP/1.1 404 Not Found');
+        request()->header('HTTP/1.1 404 Not Found');
         die(view('errors.404'));
     }
 
     /**
      * Show 403 page.
      *
+     *
      * @param bool $from_admin
      */
     public function show403($from_admin = false): void
     {
-        header(
+        request()->header(
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.
@@ -270,7 +225,7 @@ class BasePage
      */
     public function show503(): void
     {
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
+        request()->header('HTTP/1.1 503 Service Temporarily Unavailable');
         die(view('errors.503'));
     }
 
@@ -287,7 +242,7 @@ class BasePage
      */
     public function showMaintenance(): void
     {
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
+        request()->header('HTTP/1.1 503 Service Temporarily Unavailable');
         die(view('errors.maintenance'));
     }
 
@@ -296,7 +251,7 @@ class BasePage
      */
     public function showTokenError(): void
     {
-        header('HTTP/1.1 419 Token Mismatch Error');
+        request()->header('HTTP/1.1 419 Token Mismatch Error');
         die(view('errors.tokenError'));
     }
 
@@ -305,9 +260,9 @@ class BasePage
      */
     public function show429($retry = ''): void
     {
-        header('HTTP/1.1 429 Too Many Requests');
+        request()->header('HTTP/1.1 429 Too Many Requests');
         if ($retry !== '') {
-            header('Retry-After: '.$retry);
+            request()->header('Retry-After: '.$retry);
         }
 
         echo '
@@ -336,8 +291,7 @@ class BasePage
      */
     protected function setUserPreferences(): void
     {
-        $this->userdata = User::find(User::currentUserId());
-        $this->userdata['categoryexclusions'] = User::getCategoryExclusion(User::currentUserId());
+        $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
         $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.

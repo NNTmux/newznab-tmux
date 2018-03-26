@@ -8,15 +8,16 @@ use App\Models\UserRequest;
 use App\Models\UserDownload;
 use App\Models\ReleaseComment;
 use App\Models\UserExcludedCategory;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
 $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
-$userID = User::currentUserId();
+$userID = Auth::id();
 $privileged = User::isAdmin($userID) || User::isModerator($userID);
 $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
 $publicView = false;

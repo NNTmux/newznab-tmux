@@ -19,8 +19,9 @@ use App\Models\ReleaseFile;
 use App\Models\ReleaseRegex;
 use Blacklight\ReleaseExtra;
 use App\Models\ReleaseComment;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
@@ -28,7 +29,7 @@ if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;
     $data = Release::getByGuid(request()->input('id'));
-    $user = User::find(User::currentUserId());
+    $user = User::find(Auth::id());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
     $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
@@ -38,7 +39,7 @@ if (request()->has('id')) {
     }
 
     if ($page->isPostBack()) {
-        ReleaseComment::addComment($data['id'], $data['gid'], request()->input('txtAddComment'), User::currentUserId(), request()->id());
+        ReleaseComment::addComment($data['id'], $data['gid'], request()->input('txtAddComment'), Auth::id(), request()->id());
     }
 
     $nfo = ReleaseNfo::getReleaseNfo($data['id']);

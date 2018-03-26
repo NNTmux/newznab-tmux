@@ -20,6 +20,7 @@
 						href="{$smarty.const.WWW_TOP}/contact-us">contact
 					us</a>.</p>
 			<form action="forgottenpassword?action=submit" method="post">
+				{{csrf_field()}}
 				<div class="form-group has-feedback">
 					<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control"
 						   placeholder="Email"/>

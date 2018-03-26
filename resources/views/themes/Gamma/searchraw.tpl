@@ -5,6 +5,7 @@
 <div class="navbar">
 	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/searchraw">
+			{{csrf_field()}}
 			<div class="input-group">
 
 				<input id="search" class="input-xlarge" name="search" value="{$search|escape:'htmlall'}" type="text" placeholder="Search text" />

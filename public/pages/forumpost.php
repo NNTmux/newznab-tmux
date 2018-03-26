@@ -1,24 +1,24 @@
 <?php
 
-use App\Models\User;
 use App\Models\Settings;
 use App\Models\Forumpost;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
 $id = request()->input('id') + 0;
 
 if (! empty(request()->input('addMessage')) && $page->isPostBack()) {
-    Forumpost::add($id, User::currentUserId(), '', request()->input('addMessage'));
-    header('Location:'.WWW_TOP.'/forumpost/'.$id.'#last');
+    Forumpost::add($id, Auth::id(), '', request()->input('addMessage'));
+    request()->header('/forumpost/'.$id.'#last');
     die();
 }
 
 $results = Forumpost::getPosts($id);
 if (count($results) === 0) {
-    header('Location:'.WWW_TOP.'/forum');
+    request()->header('/forum');
     die();
 }
 

@@ -15,7 +15,8 @@
 					<li><a href="{$smarty.const.WWW_TOP}/content-list.php">Edit Content</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-chevron-circle-down"></i><span> Menu</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-chevron-circle-down"></i><span> Menu</span><span
+							class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/menu-list.php">View Menu Items</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/menu-edit.php?action=add">Add Menu Items</a></li>
@@ -35,21 +36,27 @@
 			</li>
 			<li><a><i class="fa fa-registered"></i><span> Regexes</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?action=add">Add Category Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?action=add">Add Category Regexes</a>
+					</li>
 					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-list.php">View Category Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-edit.php?action=add">Add Collection Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-test.php?action=add">Test Collection Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-edit.php?action=add">Add Collection
+							Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-test.php?action=add">Test Collection
+							Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-list.php">View Collection Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-edit.php?action=add">Add Release Naming Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-test.php?action=add">Test Release Naming Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-list.php">View Release Naming Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-edit.php?action=add">Add Release Naming
+							Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-test.php?action=add">Test Release Naming
+							Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-list.php">View Release Naming
+							Regexes</a></li>
 				</ul>
 			</li>
 			<li><a><i class="fa fa-stop"></i><span> Blacklist</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/binaryblacklist-list.php">View Blacklist</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?action=add">Add Blacklist</a></li>
-					</ul>
+				</ul>
 			</li>
 			<li><a><i class="fa fa-recycle"></i><span> Releases</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
@@ -63,9 +70,10 @@
 					<li><a href="{$smarty.const.WWW_TOP}/music-list.php">View Music List</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/console-list.php">View Console List</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/book-list.php">View Book List</a></li>
-					</ul>
+				</ul>
 			</li>
-			<li><a><i class="fa fa-object-group"></i><span> Multi Group</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-object-group"></i><span> Multi Group</span><span
+							class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/posters-edit.php">Add MultiGroup Poster</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/posters-list.php">MultiGroup Posters List</a></li>
@@ -75,16 +83,18 @@
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/nzb-import.php">Import NZBs</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/nzb-export.php">Export NZBs</a></li>
-					</ul>
+				</ul>
 			</li>
 
-			<li><a><i class="fa fa-hourglass-start"></i><span> Stats & Logs</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-hourglass-start"></i><span> Stats & Logs</span><span
+							class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/opcachestats.php">Opcache Statistics</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/site-stats.php">Site Stats</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-comments"></i><span> Comments & Sharing</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-comments"></i><span> Comments & Sharing</span><span
+							class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/comments-list.php">View Comments</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/sharing.php">Comment Sharing Settings</a></li>

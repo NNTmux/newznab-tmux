@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\User;
 use App\Models\Video;
 use App\Models\Release;
-use Blacklight\Releases;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
@@ -13,7 +12,6 @@ if (! request()->has('id')) {
     $page->show404();
 }
 
-$r = new Releases();
 $rel = Release::getByGuid(request()->input('id'));
 
 if (! $rel) {

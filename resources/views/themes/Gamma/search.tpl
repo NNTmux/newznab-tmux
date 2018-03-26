@@ -15,6 +15,7 @@
 <div class="navbar">
 	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/search">
+			{{csrf_field()}}
 			<div id="sbasic" style="text-align:center;{if $sadvanced} display:none;{/if}">
 				<div class="input-group">
 				<input id="search" class="input-large" name="search" value="{$search|escape:'html'}" type="text" placeholder="Search" />

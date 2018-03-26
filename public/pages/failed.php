@@ -2,22 +2,23 @@
 
 use App\Models\User;
 use App\Models\Release;
+use Illuminate\Support\Facades\Auth;
 
 // Page is accessible only by the rss token, or logged in users.
-if (User::isLoggedIn()) {
-    $uid = User::currentUserId();
+if (Auth::check()) {
+    $uid = Auth::id();
     $rssToken = $page->userdata['rsstoken'];
 } else {
     if (! request()->has('userid') || ! request()->has('rsstoken')) {
-        header('X-DNZB-RCode: 400');
-        header('X-DNZB-RText: Bad request, please supply all parameters!');
+        request()->header('X-DNZB-RCode: 400');
+        request()->header('X-DNZB-RText: Bad request, please supply all parameters!');
         $page->show403();
     } else {
         $res = User::getByIdAndRssToken(request()->input('userid'), request()->input('rsstoken'));
     }
     if (! isset($res)) {
-        header('X-DNZB-RCode: 401');
-        header('X-DNZB-RText: Unauthorised, wrong user ID or rss key!');
+        request()->header('X-DNZB-RCode: 401');
+        request()->header('X-DNZB-RText: Unauthorised, wrong user ID or rss key!');
         $page->show403();
     } else {
         $uid = $res['id'];
@@ -28,10 +29,10 @@ if (User::isLoggedIn()) {
 if (isset($uid, $rssToken) && is_numeric($uid) && request()->has('guid')) {
     $alt = Release::getAlternate(request()->input('guid'), $uid);
     if ($alt === null) {
-        header('X-DNZB-RCode: 404');
-        header('X-DNZB-RText: No NZB found for alternate match.');
+        request()->header('X-DNZB-RCode: 404');
+        request()->header('X-DNZB-RText: No NZB found for alternate match.');
         $page->show404();
     } else {
-        header('Location: '.$page->serverurl.'getnzb/'.$alt['guid'].'&i='.$uid.'&r='.$rssToken);
+        request()->header('Location: '.$page->serverurl.'getnzb/'.$alt['guid'].'&i='.$uid.'&r='.$rssToken);
     }
 }

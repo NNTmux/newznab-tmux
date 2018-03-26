@@ -1,17 +1,16 @@
 <?php
 
-use App\Models\User;
 use App\Models\Settings;
 use App\Models\Forumpost;
+use Illuminate\Support\Facades\Auth;
 
-if (! User::isLoggedIn()) {
+if (! Auth::check()) {
     $page->show403();
 }
 
 if ($page->isPostBack() && request()->has('addMessage') && request()->has('addSubject')) {
-    Forumpost::add(0, User::currentUserId(), request()->input('addSubject'), request()->input('addMessage'));
-    header('Location:'.WWW_TOP.'/forum');
-    die();
+    Forumpost::add(0, Auth::id(), request()->input('addSubject'), request()->input('addMessage'));
+    request()->header('/forum');
 }
 
 $lock = $unlock = null;
@@ -26,13 +25,13 @@ if (request()->has('unlock')) {
 
 if ($lock !== null) {
     Forumpost::lockUnlockTopic($lock, 1);
-    header('Location:'.WWW_TOP.'/forum');
+    request()->header('/forum');
     die();
 }
 
 if ($unlock !== null) {
     Forumpost::lockUnlockTopic($unlock, 0);
-    header('Location:'.WWW_TOP.'/forum');
+    request()->header('/forum');
     die();
 }
 

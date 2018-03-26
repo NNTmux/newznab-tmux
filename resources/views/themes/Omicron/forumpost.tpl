@@ -55,6 +55,7 @@
 			</div>
 			<div class="body">
 				<form id="forum-post-reply" class="form-horizontal" action="" method="post">
+					{{csrf_field()}}
 					<div class="control-group">
 						<label class="control-label" for="addMessage">Message</label>
 						<div class="controls">

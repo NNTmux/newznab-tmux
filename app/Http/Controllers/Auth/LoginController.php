@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -35,5 +37,37 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return $this|\Illuminate\Http\RedirectResponse
+     */
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'username'    => 'required',
+            'password' => 'required',
+        ]);
+
+        $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
+
+        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL)
+            ? 'email'
+            : 'username';
+
+        $request->merge([
+            $login_type => $request->input('username'),
+        ]);
+
+        if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
+            return redirect()->intended($this->redirectPath());
+        }
+
+        return redirect()->back()
+            ->withInput()
+            ->withErrors([
+                'login' => 'These credentials do not match our records.',
+            ]);
     }
 }

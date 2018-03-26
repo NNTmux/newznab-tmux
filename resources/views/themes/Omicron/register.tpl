@@ -23,7 +23,7 @@
       <div class="register-box-body">
         <p class="login-box-msg">Register a new membership</p>
         <form method="post" action="register?action=submit{$invite_code_query}">
-          <input type="hidden" name="_token" value="{$csrf_token}">
+			{{csrf_field()}}
           <div class="form-group has-feedback">
             <input autocomplete="off" id="username" name="username" value="{$username}" type="text" class="form-control" placeholder="Username"/>
             <span class="glyphicon glyphicon-user form-control-feedback"></span>
