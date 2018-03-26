@@ -249,7 +249,7 @@ class DbUpdate
 
                     // Skip comments.
                     if (preg_match('!^\s*(#|--|//)\s*(.+?)\s*$!', $line, $matches)) {
-                        echo ColorCLI::info('COMMENT: '.$matches[2]). PHP_EOL;
+                        echo ColorCLI::info('COMMENT: '.$matches[2]).PHP_EOL;
                         continue;
                     }
 
