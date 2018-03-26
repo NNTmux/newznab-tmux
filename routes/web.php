@@ -165,6 +165,10 @@ Route::post('/search/{id}', function () {
     redirect('/search');
 })->middleware('auth', 'api');
 
+Route::get('/filelist/{id}', function () {
+    redirect('/filelist');
+})->middleware('auth');
+
 Route::get('/rss', function () {
     redirect('/rss');
 })->middleware('auth', 'api');
