@@ -1,5 +1,6 @@
 2018-03-26 DariusIII
-	* Chg: Update laravvel/framework to version 5.6.13, guzzlehttp/guzzle and phpunit to latest versions
+	* Chg: Fix RSS feeds for logged out users
+	* Chg: Update laravel/framework to version 5.6.13, guzzlehttp/guzzle and phpunit to latest versions
 	* Chg: Add missing filelist route
 	* Chg: Add newline after Info comment message in DbUpdate class
 	* Chg: Update laravelcollective/html and guzzlehttp/guzzle top latest versions

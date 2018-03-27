@@ -2,15 +2,11 @@
 
 use App\Models\User;
 use App\Models\Category;
-use App\Models\Settings;
 use Blacklight\http\RSS;
 use App\Models\UserRequest;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 
-if (! Auth::check()) {
-    $page->show403();
-}
 
 $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;

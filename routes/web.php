@@ -143,11 +143,11 @@ Route::get('/apihelp', function () {
 
 Route::get('/api', function () {
     redirect('/api');
-})->middleware('auth', 'api');
+})->middleware('api');
 
 Route::post('/api', function () {
     redirect('/api');
-})->middleware('auth', 'api');
+})->middleware('api');
 
 Route::get('/search', function () {
     redirect('/search');
@@ -169,12 +169,28 @@ Route::get('/filelist/{id}', function () {
     redirect('/filelist');
 })->middleware('auth');
 
+Route::get('/btc_payment', function () {
+    redirect('/btc_payment');
+})->middleware('auth');
+
+Route::post('/btc_payment', function () {
+    redirect('/btc_payment');
+})->middleware('auth');
+
+Route::get('/btc_payment_callback', function () {
+    redirect('/btc_payment_callback');
+});
+
+Route::post('/btc_payment_callback', function () {
+    redirect('/btc_payment_callback');
+});
+
 Route::get('/rss', function () {
     redirect('/rss');
-})->middleware('auth', 'api');
+})->middleware('api');
 
 Route::post('/rss', function () {
     redirect('/rss');
-})->middleware('auth', 'api');
+})->middleware('api');
 
 Route::get('/logout', 'Auth\LoginController@logout')->name('logout');
