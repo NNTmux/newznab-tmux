@@ -6,6 +6,11 @@ RewriteRule \.(css|eot|gif|gz|ico|inc|jpe?g|js|ogg|png|svg|ttf|txt|woff|woff2|xm
 
 # Leave /admin static
 RewriteRule ^(admin) - [L]
+
+# Handle Authorization Header
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Redirect Trailing Slashes If Not A Folder...
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
