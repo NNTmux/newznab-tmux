@@ -124,7 +124,6 @@ class BasePage
 
         $this->smarty->assign('serverroot', url('/'));
 
-
         $this->page = request()->input('page') ?? 'content';
 
         if (Auth::check()) {
