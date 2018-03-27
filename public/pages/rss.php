@@ -7,7 +7,6 @@ use App\Models\UserRequest;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 
-
 $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
 
