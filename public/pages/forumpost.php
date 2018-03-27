@@ -12,14 +12,12 @@ $id = request()->input('id') + 0;
 
 if (! empty(request()->input('addMessage')) && $page->isPostBack()) {
     Forumpost::add($id, Auth::id(), '', request()->input('addMessage'));
-    request()->header('/forumpost/'.$id.'#last');
-    die();
+    header('/forumpost/'.$id.'#last');
 }
 
 $results = Forumpost::getPosts($id);
 if (count($results) === 0) {
-    request()->header('/forum');
-    die();
+    header('/forum');
 }
 
 $page->meta_title = 'Forum Post';

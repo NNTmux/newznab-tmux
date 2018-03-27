@@ -109,11 +109,11 @@ Route::post('/forum', function () {
     redirect('/forum');
 })->middleware('auth');
 
-Route::get('/forumpost', function () {
+Route::get('/forumpost/{id}', function () {
     redirect('/forumpost');
 })->middleware('auth');
 
-Route::post('/forumpost', function () {
+Route::post('/forumpost/{id}', function () {
     redirect('/forumpost');
 })->middleware('auth');
 
