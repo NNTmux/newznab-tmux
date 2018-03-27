@@ -32,7 +32,6 @@ class BasePage
     public $meta_title = '';
     public $meta_description = '';
     public $secure_connection = false;
-    public $show_desktop_mode = false;
 
     /**
      * Current page the user is browsing. ie browse.
@@ -123,16 +122,8 @@ class BasePage
         }
         $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
-        $this->https = request()->secure();
+        $this->smarty->assign('serverroot', url('/'));
 
-        if (request()->server('SERVER_NAME')) {
-            $this->serverurl = (
-                ($this->https === true ? 'https://' : 'http://').request()->server('SERVER_NAME').
-                (((int) request()->server('SERVER_PORT') !== 80 && (int) request()->server('SERVER_PORT') !== 443) ? ':'.request()->server('SERVER_PORT') : '').
-                WWW_TOP.'/'
-            );
-            $this->smarty->assign('serverroot', $this->serverurl);
-        }
 
         $this->page = request()->input('page') ?? 'content';
 
@@ -162,7 +153,7 @@ class BasePage
      */
     public function showFloodWarning($seconds = 5): void
     {
-        request()->header('Retry-After: '.$seconds);
+        header('Retry-After: '.$seconds);
         $this->show503();
     }
 
@@ -199,7 +190,7 @@ class BasePage
      */
     public function show404(): void
     {
-        request()->header('HTTP/1.1 404 Not Found');
+        header('HTTP/1.1 404 Not Found');
         die(view('errors.404'));
     }
 
@@ -211,7 +202,7 @@ class BasePage
      */
     public function show403($from_admin = false): void
     {
-        request()->header(
+        header(
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.
@@ -225,7 +216,7 @@ class BasePage
      */
     public function show503(): void
     {
-        request()->header('HTTP/1.1 503 Service Temporarily Unavailable');
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
         die(view('errors.503'));
     }
 
@@ -242,7 +233,7 @@ class BasePage
      */
     public function showMaintenance(): void
     {
-        request()->header('HTTP/1.1 503 Service Temporarily Unavailable');
+        header('HTTP/1.1 503 Service Temporarily Unavailable');
         die(view('errors.maintenance'));
     }
 
@@ -251,7 +242,7 @@ class BasePage
      */
     public function showTokenError(): void
     {
-        request()->header('HTTP/1.1 419 Token Mismatch Error');
+        header('HTTP/1.1 419 Token Mismatch Error');
         die(view('errors.tokenError'));
     }
 
@@ -260,9 +251,9 @@ class BasePage
      */
     public function show429($retry = ''): void
     {
-        request()->header('HTTP/1.1 429 Too Many Requests');
+        header('HTTP/1.1 429 Too Many Requests');
         if ($retry !== '') {
-            request()->header('Retry-After: '.$retry);
+            header('Retry-After: '.$retry);
         }
 
         echo '

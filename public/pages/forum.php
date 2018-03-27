@@ -10,7 +10,7 @@ if (! Auth::check()) {
 
 if ($page->isPostBack() && request()->has('addMessage') && request()->has('addSubject')) {
     Forumpost::add(0, Auth::id(), request()->input('addSubject'), request()->input('addMessage'));
-    request()->header('/forum');
+    header('/forum');
 }
 
 $lock = $unlock = null;
@@ -25,13 +25,13 @@ if (request()->has('unlock')) {
 
 if ($lock !== null) {
     Forumpost::lockUnlockTopic($lock, 1);
-    request()->header('/forum');
+    header('/forum');
     die();
 }
 
 if ($unlock !== null) {
     Forumpost::lockUnlockTopic($unlock, 0);
-    request()->header('/forum');
+    header('/forum');
     die();
 }
 

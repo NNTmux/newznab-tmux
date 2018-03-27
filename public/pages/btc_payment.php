@@ -37,7 +37,7 @@ switch ($action) {
         if ($order->payment_id) {
             // Redirect to a payment gateway
             $url = 'https://gateway.gear.mycelium.com/pay/'.$order->payment_id;
-            request()->header('Location: '.$url);
+            header('Location: '.$url);
             die();
         }
         break;

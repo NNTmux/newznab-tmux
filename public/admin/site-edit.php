@@ -47,7 +47,7 @@ switch ($action) {
         if ($error === '') {
             $site = $ret;
             $returnid = $site['id'];
-            request()->header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
+            header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
         } else {
             $page->smarty->assign('error', $error);
             $site = $sites->row2Object(request()->all());

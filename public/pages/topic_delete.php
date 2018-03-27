@@ -11,5 +11,5 @@ $id = request()->input('id') + 0;
 
 if (isset($id)) {
     Forumpost::deleteParent($id);
-    request()->header('/forum');
+    header('/forum');
 }
