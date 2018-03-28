@@ -3,12 +3,12 @@
 namespace Blacklight;
 
 use ReCaptcha\ReCaptcha;
-use Blacklight\http\Page;
+use Blacklight\http\BasePage;
 
 class Captcha
 {
     /**
-     * @var \Blacklight\http\Page
+     * @var \Blacklight\http\BasePage
      */
     private $page;
 
@@ -72,7 +72,7 @@ class Captcha
      */
     public function __construct(&$page)
     {
-        if (! $page instanceof Page) {
+        if (! $page instanceof BasePage) {
             throw new \InvalidArgumentException('Invalid Page variable provided');
         }
         $this->page = $page;

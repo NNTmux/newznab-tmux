@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
