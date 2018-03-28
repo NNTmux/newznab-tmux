@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Blacklight\Captcha;
 use App\Mail\PasswordReset;
 use App\Mail\ForgottenPassword;
 use Illuminate\Support\Facades\Auth;

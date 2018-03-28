@@ -1,10 +1,5 @@
 <?php
 
-use App\Models\User;
-use Blacklight\Captcha;
-use App\Models\Settings;
-use App\Models\UserRole;
-use App\Models\Invitation;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +9,6 @@ if (Auth::check()) {
 
 $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
 $showRegister = 1;
-
 
 $page->smarty->assign(
     [
