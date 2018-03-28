@@ -95,4 +95,4 @@ $page->meta_keywords = 'browse,nzb,albums,description,details';
 $page->meta_description = 'Browse for Albums';
 
 $page->content = $page->smarty->fetch('music.tpl');
-$page->render();
+$page->pagerender();

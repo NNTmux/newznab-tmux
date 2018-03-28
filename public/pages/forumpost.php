@@ -28,4 +28,4 @@ $page->smarty->assign('results', $results);
 $page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
 
 $page->content = $page->smarty->fetch('forumpost.tpl');
-$page->render();
+$page->pagerender();

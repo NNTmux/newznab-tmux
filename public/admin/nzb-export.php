@@ -4,14 +4,15 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Releases;
 use Blacklight\NZBExport;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 if (\Blacklight\utility\Utility::isCLI()) {
     exit('This script is only for exporting from the web, use the script in misc/testing'.
         PHP_EOL);
 }
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $rel = new Releases(['Settings' => $page->pdo]);
 
 if ($page->isPostBack()) {
@@ -68,4 +69,4 @@ $page->smarty->assign(
     ]
 );
 $page->content = $page->smarty->fetch('nzb-export.tpl');
-$page->render();
+$page->adminrender();

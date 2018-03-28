@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Release;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $success = false;
 
@@ -18,4 +19,4 @@ $page->smarty->assign('success', $success);
 
 $page->title = 'Remove Video and Episode IDs from Releases';
 $page->content = $page->smarty->fetch('show-remove.tpl');
-$page->render();
+$page->adminrender();

@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Regexes;
 use App\Models\Category;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'category_regexes']);
 
 // Set the current action.
@@ -83,4 +84,4 @@ $page->smarty->assign('category_names', $categories['category_names']);
 $page->smarty->assign('category_ids', $categories['category_ids']);
 
 $page->content = $page->smarty->fetch('category_regexes-edit.tpl');
-$page->render();
+$page->adminrender();

@@ -6,9 +6,10 @@ use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\UserRole;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'Site Stats';
 
@@ -33,4 +34,4 @@ $page->smarty->assign('totusers', 0);
 $page->smarty->assign('totrusers', 0);
 
 $page->content = $page->smarty->fetch('site-stats.tpl');
-$page->render();
+$page->adminrender();

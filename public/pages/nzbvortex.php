@@ -72,4 +72,4 @@ try {
 $page->title = 'NZBVortex';
 
 $page->content = $page->smarty->fetch('nzbvortex.tpl');
-$page->render();
+$page->pagerender();

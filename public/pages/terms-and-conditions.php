@@ -9,4 +9,4 @@ $page->meta_description = 'Terms and Conditions for '.Settings::settingValue('si
 
 $page->content = $page->smarty->fetch('terms.tpl');
 
-$page->render();
+$page->pagerender();

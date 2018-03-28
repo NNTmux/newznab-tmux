@@ -52,4 +52,4 @@ $page->meta_title = 'Become a supporter';
 $page->meta_description = 'Become a supporter';
 
 $page->content = $page->smarty->fetch('btc_payment.tpl');
-$page->render();
+$page->pagerender();

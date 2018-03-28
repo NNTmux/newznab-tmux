@@ -15,4 +15,4 @@ $page->meta_keywords = 'browse,groups,description,details';
 $page->meta_description = 'Browse groups';
 
 $page->content = $page->smarty->fetch('browsegroup.tpl');
-$page->render();
+$page->pagerender();

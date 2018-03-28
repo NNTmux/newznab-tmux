@@ -88,4 +88,4 @@ if (request()->has('id')) {
 } else {
     $page->content = $page->smarty->fetch('xxx.tpl');
 }
-$page->render();
+$page->pagerender();

@@ -3,10 +3,11 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Music;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Blacklight\utility\Utility;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $music = new Music();
 
 $page->title = 'Music List';
@@ -31,4 +32,4 @@ $musicList = Utility::getRange('musicinfo', $offset, config('nntmux.items_per_pa
 $page->smarty->assign('musiclist', $musicList);
 
 $page->content = $page->smarty->fetch('music-list.tpl');
-$page->render();
+$page->adminrender();

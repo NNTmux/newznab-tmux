@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use App\Models\Menu;
 use App\Models\UserRole;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $id = 0;
 
@@ -53,4 +54,4 @@ $page->smarty->assign('role_ids', array_keys($roles));
 $page->smarty->assign('role_names', $roles);
 
 $page->content = $page->smarty->fetch('menu-edit.tpl');
-$page->render();
+$page->adminrender();

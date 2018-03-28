@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Movie;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $movie = new Movie(['Settings' => $page->pdo]);
 $id = 0;
 
@@ -24,4 +25,4 @@ if (request()->has('id') && ctype_digit(request()->input('id')) && strlen(reques
 }
 
 $page->content = $page->smarty->fetch('movie-add.tpl');
-$page->render();
+$page->adminrender();

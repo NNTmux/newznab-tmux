@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']);
 
 $page->title = 'Release Naming Regex List';
@@ -29,4 +30,4 @@ $page->smarty->assign('pagerquerybase', WWW_TOP.'/release_naming_regexes-list.ph
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 
 $page->content = $page->smarty->fetch('release_naming_regexes-list.tpl');
-$page->render();
+$page->adminrender();

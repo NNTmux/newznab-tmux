@@ -79,7 +79,7 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
         $page->smarty->assign('nodata', '');
     }
     $page->content = $page->smarty->fetch('viewseries.tpl');
-    $page->render();
+    $page->pagerender();
 } else {
     $letter = (request()->has('id') && preg_match('/^(0\-9|[A-Z])$/i', request()->input('id'))) ? request()->input('id') : '0-9';
 
@@ -114,5 +114,5 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
     $page->smarty->assign('showname', $showname);
 
     $page->content = $page->smarty->fetch('viewserieslist.tpl');
-    $page->render();
+    $page->pagerender();
 }

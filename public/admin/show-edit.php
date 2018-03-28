@@ -1,12 +1,13 @@
 <?php
 
 use App\Models\Video;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 require_once NN_WWW.'pages/smartyTV.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $tv = new smartyTV(['Settings' => $page->pdo]);
 
 switch (request()->input('action') ?? 'view') {
@@ -35,4 +36,4 @@ $page->smarty->assign('show', $show);
 
 $page->title = 'Edit TV Show Data';
 $page->content = $page->smarty->fetch('show-edit.tpl');
-$page->render();
+$page->adminrender();

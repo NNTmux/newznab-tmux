@@ -3,10 +3,11 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Movie;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Blacklight\utility\Utility;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $movie = new Movie(['Settings' => $page->pdo]);
 
@@ -30,4 +31,4 @@ $movieList = Utility::getRange('movieinfo', $offset, config('nntmux.items_per_pa
 $page->smarty->assign('movielist', $movieList);
 
 $page->content = $page->smarty->fetch('movie-list.tpl');
-$page->render();
+$page->adminrender();

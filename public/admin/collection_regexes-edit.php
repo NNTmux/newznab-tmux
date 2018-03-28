@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Regexes;
 use App\Models\Category;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_regexes']);
 $error = '';
 $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
@@ -59,4 +60,4 @@ $page->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_I
 $page->smarty->assign('status_names', ['Yes', 'No']);
 
 $page->content = $page->smarty->fetch('collection_regexes-edit.tpl');
-$page->render();
+$page->adminrender();

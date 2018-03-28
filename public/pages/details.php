@@ -165,5 +165,5 @@ if (request()->has('id')) {
     $page->meta_description = 'View NZB for'.$data['searchname'];
 
     $page->content = $page->smarty->fetch('viewnzb.tpl');
-    $page->render();
+    $page->pagerender();
 }

@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use App\Models\Category;
 use Blacklight\Binaries;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $bin = new Binaries(['Settings' => $page->pdo]);
 $error = '';
 $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
@@ -77,4 +78,4 @@ $page->smarty->assign(
 );
 
 $page->content = $page->smarty->fetch('binaryblacklist-edit.tpl');
-$page->render();
+$page->adminrender();

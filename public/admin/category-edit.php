@@ -1,11 +1,12 @@
 <?php
 
 use App\Models\Category;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $id = 0;
 
 // set the current action
@@ -38,4 +39,4 @@ $page->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_I
 $page->smarty->assign('status_names', ['Yes', 'No']);
 
 $page->content = $page->smarty->fetch('category-edit.tpl');
-$page->render();
+$page->adminrender();

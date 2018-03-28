@@ -2,10 +2,12 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 use Blacklight\AniDB;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
+
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $AniDB = new AniDB();
-$page = new AdminPage();
 $page->title = 'AniDB List';
 
 $aname = '';
@@ -31,4 +33,4 @@ $anidblist = $AniDB->getAnimeRange($offset, config('nntmux.items_per_page'), $an
 $page->smarty->assign('anidblist', $anidblist);
 
 $page->content = $page->smarty->fetch('anidb-list.tpl');
-$page->render();
+$page->adminrender();

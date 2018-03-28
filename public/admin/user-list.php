@@ -2,11 +2,12 @@
 
 use App\Models\User;
 use App\Models\UserRole;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'User List';
 
@@ -58,7 +59,7 @@ foreach ($ordering as $orderType) {
 
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 $page->content = $page->smarty->fetch('user-list.tpl');
-$page->render();
+$page->adminrender();
 
 function checkREQUEST($param)
 {

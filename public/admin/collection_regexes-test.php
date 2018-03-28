@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $page->title = 'Collections Regex Test';
 
 $group = trim(request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '');
@@ -18,4 +19,4 @@ if ($group && $regex) {
 }
 
 $page->content = $page->smarty->fetch('collection_regexes-test.tpl');
-$page->render();
+$page->adminrender();

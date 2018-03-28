@@ -76,7 +76,7 @@ if (request()->has('type') && request()->input('type') === 'xml') {
     $page->meta_keywords = 'sitemap,site,map';
     $page->meta_description = Settings::settingValue('site.main.title').' site map shows all our pages.';
     $page->content = $page->smarty->fetch('sitemap.tpl');
-    $page->render();
+    $page->pagerender();
 }
 
 function buildURL($type, $name, $url, $freq = 'daily', $p = '1.0')

@@ -4,10 +4,11 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use App\Models\Category;
 use App\Models\UserRole;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use App\Models\RoleExcludedCategory;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 // Get the user roles.
 $userRoles = UserRole::getRoles();
@@ -64,4 +65,4 @@ $page->smarty->assign('yesno_names', ['Yes', 'No']);
 $page->smarty->assign('catlist', Category::getForSelect(false));
 
 $page->content = $page->smarty->fetch('role-edit.tpl');
-$page->render();
+$page->adminrender();

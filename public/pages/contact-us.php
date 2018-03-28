@@ -33,4 +33,4 @@ $page->meta_description = 'Contact us at '.Settings::settingValue('site.main.tit
 
 $page->content = $page->smarty->fetch('contact.tpl');
 
-$page->render();
+$page->pagerender();

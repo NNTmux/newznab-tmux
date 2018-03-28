@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Release;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'Release List';
 
@@ -28,4 +29,4 @@ $releaselist = Release::getReleasesRange($offset, config('nntmux.items_per_page'
 $page->smarty->assign('releaselist', $releaselist);
 
 $page->content = $page->smarty->fetch('release-list.tpl');
-$page->render();
+$page->adminrender();

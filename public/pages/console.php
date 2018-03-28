@@ -95,4 +95,4 @@ $page->meta_keywords = 'browse,nzb,console,games,description,details';
 $page->meta_description = 'Browse for Console Games';
 
 $page->content = $page->smarty->fetch('console.tpl');
-$page->render();
+$page->pagerender();

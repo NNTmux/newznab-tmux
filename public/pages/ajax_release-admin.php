@@ -3,13 +3,13 @@
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Illuminate\Support\Facades\Auth;
 
 if (! Auth::check()) {
     $page->show403();
 }
-$page = new AdminPage();
+$page = new BasePage();
 $releases = new Releases(['Settings' => $page->settings]);
 
 // Set the current action.

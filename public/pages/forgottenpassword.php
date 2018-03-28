@@ -92,4 +92,4 @@ $page->meta_keywords = 'forgotten,password,signup,registration';
 $page->meta_description = 'Forgotten Password';
 
 $page->content = $page->smarty->fetch('forgottenpassword.tpl');
-$page->render();
+$page->pagerender();

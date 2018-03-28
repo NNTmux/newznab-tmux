@@ -74,7 +74,7 @@ switch ($action) {
             $page->smarty->assign('imdbid', $imdbid);
             $page->smarty->assign('movie', $movie);
             $page->content = $page->smarty->fetch('mymovies-add.tpl');
-            $page->render();
+            $page->pagerender();
         }
         break;
     case 'edit':
@@ -107,7 +107,7 @@ switch ($action) {
             $page->smarty->assign('imdbid', $imdbid);
             $page->smarty->assign('movie', $movie);
             $page->content = $page->smarty->fetch('mymovies-add.tpl');
-            $page->render();
+            $page->pagerender();
         }
         break;
     case 'browse':
@@ -149,7 +149,7 @@ switch ($action) {
         $page->smarty->assign('movies', true);
 
         $page->content = $page->smarty->fetch('browse.tpl');
-        $page->render();
+        $page->pagerender();
         break;
     default:
 
@@ -185,6 +185,6 @@ switch ($action) {
         $page->smarty->assign('movies', $results);
 
         $page->content = $page->smarty->fetch('mymovies.tpl');
-        $page->render();
+        $page->pagerender();
         break;
 }

@@ -1,11 +1,12 @@
 <?php
 
 use App\Models\ReleaseComment;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'Comments List';
 
@@ -24,4 +25,4 @@ $commentslist = ReleaseComment::getCommentsRange($offset, config('nntmux.items_p
 $page->smarty->assign('commentslist', $commentslist);
 
 $page->content = $page->smarty->fetch('comments-list.tpl');
-$page->render();
+$page->adminrender();

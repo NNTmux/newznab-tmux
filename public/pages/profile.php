@@ -99,4 +99,4 @@ $page->meta_keywords = 'view,profile,user,details';
 $page->meta_description = 'View User Profile for '.$data['username'];
 
 $page->content = $page->smarty->fetch('profile.tpl');
-$page->render();
+$page->pagerender();

@@ -6,10 +6,11 @@ use Blacklight\Sites;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Blacklight\utility\Utility;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $sites = new Sites();
 $id = 0;
@@ -166,4 +167,4 @@ if (strpos(env('NNTP_SERVER'), 'astra') === false) {
 }
 
 $page->content = $page->smarty->fetch('site-edit.tpl');
-$page->render();
+$page->adminrender();

@@ -3,11 +3,12 @@
 
 /* #newznab-tmux */
 
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $NNURL = $page->serverurl;
 

@@ -33,8 +33,8 @@ if (request()->has('modal') && request()->has('id') && ctype_digit(request()->in
         echo $page->content;
     } else {
         $page->content = $page->smarty->fetch('viewmoviefull.tpl');
-        $page->render();
+        $page->pagerender();
     }
 } else {
-    $page->render();
+    $page->pagerender();
 }

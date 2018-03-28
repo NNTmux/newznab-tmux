@@ -158,4 +158,4 @@ $page->smarty->assign('cp_api_selected', $data['cp_api']);
 $page->smarty->assign('catlist', Category::getForSelect(false));
 
 $page->content = $page->smarty->fetch('profileedit.tpl');
-$page->render();
+$page->pagerender();

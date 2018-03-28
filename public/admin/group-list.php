@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Group;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $groupName = request()->input('groupname') ?? '';
 $offset = request()->input('offset') ?? 0;
@@ -25,4 +26,4 @@ $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 
 $page->title = 'Group List';
 $page->content = $page->smarty->fetch('group-list.tpl');
-$page->render();
+$page->adminrender();

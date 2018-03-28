@@ -53,7 +53,7 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
         $page->meta_description = 'View '.$aniDbInfo['title'].' Anime';
     }
     $page->content = $page->smarty->fetch('viewanime.tpl');
-    $page->render();
+    $page->pagerender();
 } else {
     $letter = (request()->has('id') && preg_match('/^(0\-9|[A-Z])$/i', request()->input('id'))) ?
         request()->input('id') :
@@ -92,5 +92,5 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
     $page->smarty->assign('animetitle', $animeTitle);
 
     $page->content = $page->smarty->fetch('viewanimelist.tpl');
-    $page->render();
+    $page->pagerender();
 }

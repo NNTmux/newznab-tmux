@@ -35,6 +35,6 @@ if (request()->has('id') && ctype_digit(request()->input('id'))) {
     if ($modal) {
         echo $page->content;
     } else {
-        $page->render();
+        $page->pagerender();
     }
 }

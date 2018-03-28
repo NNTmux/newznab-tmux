@@ -8,9 +8,10 @@ if (PHP_SAPI === 'cli') {
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\NZBImport;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $filesToProcess = [];
 if ($page->isPostBack()) {
@@ -57,4 +58,4 @@ if ($page->isPostBack()) {
 
 $page->title = 'Import Nzbs';
 $page->content = $page->smarty->fetch('nzb-import.tpl');
-$page->render();
+$page->adminrender();

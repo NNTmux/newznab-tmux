@@ -1,10 +1,12 @@
 <?php
 
-use Blacklight\http\Page;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new Page;
+$page = new BasePage();
+
+$page->setUserPrefs();
 
 if ($app->isDownForMaintenance()) {
     $page->showMaintenance();

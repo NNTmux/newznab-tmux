@@ -85,4 +85,4 @@ $page->meta_title = 'View'.$queueType.' Queue';
 $page->meta_keywords = 'view,'.strtolower($queueType).',queue';
 $page->meta_description = 'View'.$queueType.' Queue';
 $page->content = $page->smarty->fetch('viewqueue.tpl');
-$page->render();
+$page->pagerender();

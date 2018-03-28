@@ -72,7 +72,7 @@ switch ($action) {
             $page->smarty->assign('video', $videoId);
             $page->smarty->assign('show', $show);
             $page->content = $page->smarty->fetch('myshows-add.tpl');
-            $page->render();
+            $page->pagerender();
         }
         break;
     case 'edit':
@@ -105,7 +105,7 @@ switch ($action) {
             $page->smarty->assign('video', $videoId);
             $page->smarty->assign('show', $show);
             $page->content = $page->smarty->fetch('myshows-add.tpl');
-            $page->render();
+            $page->pagerender();
         }
         break;
     case 'browse':
@@ -147,7 +147,7 @@ switch ($action) {
         $page->smarty->assign('shows', true);
 
         $page->content = $page->smarty->fetch('browse.tpl');
-        $page->render();
+        $page->pagerender();
         break;
     default:
 
@@ -183,6 +183,6 @@ switch ($action) {
         $page->smarty->assign('shows', $results);
 
         $page->content = $page->smarty->fetch('myshows.tpl');
-        $page->render();
+        $page->pagerender();
         break;
 }

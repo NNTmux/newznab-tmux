@@ -3,10 +3,11 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Console;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Blacklight\utility\Utility;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $con = new Console(['Settings' => $page->pdo]);
 
 $page->title = 'Console List';
@@ -31,4 +32,4 @@ $consoleList = Utility::getRange('consoleinfo', $offset, config('nntmux.items_pe
 $page->smarty->assign('consolelist', $consoleList);
 
 $page->content = $page->smarty->fetch('console-list.tpl');
-$page->render();
+$page->adminrender();

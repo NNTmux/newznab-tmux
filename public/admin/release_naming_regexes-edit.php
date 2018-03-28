@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Regexes;
 use App\Models\Category;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']);
 
 // Set the current action.
@@ -60,4 +61,4 @@ $page->smarty->assign('status_names', ['Yes', 'No']);
 $page->smarty->assign('regex', $regex);
 
 $page->content = $page->smarty->fetch('release_naming_regexes-edit.tpl');
-$page->render();
+$page->adminrender();

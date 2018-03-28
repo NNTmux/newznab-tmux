@@ -4,10 +4,9 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Regexes;
 use Blacklight\Binaries;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-// Login Check
-$page = new AdminPage;
+$page = new BasePage();
 
 if (! request()->has('action')) {
     exit();

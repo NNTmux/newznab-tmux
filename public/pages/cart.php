@@ -44,5 +44,5 @@ if (request()->has('add')) {
     $page->smarty->assign('results', $results);
 
     $page->content = $page->smarty->fetch('cart.tpl');
-    $page->render();
+    $page->pagerender();
 }

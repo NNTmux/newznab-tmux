@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Tmux;
 use App\Models\Settings;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $tmux = new Tmux();
 $id = 0;
 
@@ -59,4 +60,4 @@ $page->smarty->assign('predb_ids', [0, 1]);
 $page->smarty->assign('predb_names', ['Disabled', 'Enabled']);
 
 $page->content = $page->smarty->fetch('tmux-edit.tpl');
-$page->render();
+$page->adminrender();

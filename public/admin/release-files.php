@@ -6,9 +6,12 @@ use Blacklight\NZB;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage;
+$page = new BasePage();
+$page->setAdminPrefs();
+
+
 $pdo = new DB();
 $nzb = new NZB();
 
@@ -40,5 +43,5 @@ if (request()->has('id')) {
     $page->meta_description = 'View Nzb File List';
 
     $page->content = $page->smarty->fetch('release-files.tpl');
-    $page->render();
+    $page->adminrender();
 }

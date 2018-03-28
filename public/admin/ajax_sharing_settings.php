@@ -5,10 +5,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 use Blacklight\db\DB;
 use Blacklight\Sharing;
 use App\Models\ReleaseComment;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-// Login check.
-$page = new AdminPage;
+$page = new BasePage();
+
 $db = new DB();
 
 if (request()->has('site_ID') && request()->has('site_status')) {

@@ -28,4 +28,4 @@ $page->meta_description = 'Edit forum post';
 $page->smarty->assign('result', $result);
 
 $page->content = $page->smarty->fetch('post_edit.tpl');
-$page->render();
+$page->pagerender();

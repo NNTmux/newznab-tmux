@@ -84,4 +84,4 @@ $page->meta_keywords = 'browse,nzb,books,description,details';
 $page->meta_description = 'Browse for Books';
 
 $page->content = $page->smarty->fetch('books.tpl');
-$page->render();
+$page->pagerender();

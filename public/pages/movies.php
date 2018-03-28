@@ -114,4 +114,4 @@ if (request()->has('imdb')) {
 } else {
     $page->content = $page->smarty->fetch('movies.tpl');
 }
-$page->render();
+$page->pagerender();

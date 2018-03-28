@@ -5,9 +5,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $releases = new Releases(['Settings' => $page->pdo]);
 $id = 0;
 
@@ -53,4 +54,4 @@ $page->smarty->assign('yesno_names', ['Yes', 'No']);
 $page->smarty->assign('catlist', Category::getForSelect(false));
 
 $page->content = $page->smarty->fetch('release-edit.tpl');
-$page->render();
+$page->adminrender();

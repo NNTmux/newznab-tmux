@@ -2,10 +2,11 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use App\Models\MultigroupPoster;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $posters = MultigroupPoster::all('id', 'poster')->sortBy('poster');
 
@@ -23,4 +24,4 @@ $page->smarty->assign(
 
 $page->title = 'MultiGroup Posters List';
 $page->content = $page->smarty->fetch('posters-list.tpl');
-$page->render();
+$page->adminrender();

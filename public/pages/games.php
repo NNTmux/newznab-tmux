@@ -103,4 +103,4 @@ $page->meta_keywords = 'browse,nzb,games,description,details';
 $page->meta_description = 'Browse for Games';
 
 $page->content = $page->smarty->fetch('games.tpl');
-$page->render();
+$page->pagerender();

@@ -38,6 +38,6 @@ if (request()->has('id')) {
     if ($modal) {
         echo $page->content;
     } else {
-        $page->render();
+        $page->pagerender();
     }
 }

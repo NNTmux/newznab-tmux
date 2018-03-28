@@ -189,4 +189,4 @@ $page->smarty->assign(
 );
 
 $page->content = $page->smarty->fetch('search.tpl');
-$page->render();
+$page->pagerender();

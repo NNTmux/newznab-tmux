@@ -42,7 +42,7 @@ if (! request()->has('t') && ! request()->has('show') && ! request()->has('anidb
     );
 
     $page->content = $page->smarty->fetch('rssdesc.tpl');
-    $page->render();
+    $page->pagerender();
 } else {
     $rssToken = $uid = -1;
     // User requested a feed, ensure either logged in or passing a valid token.

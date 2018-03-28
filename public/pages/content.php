@@ -63,4 +63,4 @@ if (empty($content)) {
 $page->smarty->assign('content', $content);
 
 $page->content = $page->smarty->fetch('content.tpl');
-$page->render();
+$page->pagerender();

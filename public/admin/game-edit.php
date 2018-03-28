@@ -4,10 +4,11 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Games;
 use Blacklight\Genres;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Illuminate\Support\Carbon;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $games = new Games(['Settings' => $page->pdo]);
 $gen = new Genres(['Settings' => $page->pdo]);
 $id = 0;
@@ -54,4 +55,4 @@ if (request()->has('id')) {
 }
 
 $page->content = $page->smarty->fetch('game-edit.tpl');
-$page->render();
+$page->adminrender();

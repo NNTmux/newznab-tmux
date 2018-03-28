@@ -1,11 +1,12 @@
 <?php
 
 use App\Models\Video;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'TV Shows List';
 
@@ -27,4 +28,4 @@ $page->smarty->assign(
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 
 $page->content = $page->smarty->fetch('show-list.tpl');
-$page->render();
+$page->adminrender();

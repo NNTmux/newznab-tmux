@@ -3,10 +3,12 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\AniDB;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
+
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $AniDB = new AniDB(['Settings' => $page->pdo]);
-$page = new AdminPage();
 $id = 0;
 
 // Set the current action.
@@ -52,4 +54,4 @@ switch ($action) {
 
 $page->title = 'Edit AniDB Data';
 $page->content = $page->smarty->fetch('anidb-edit.tpl');
-$page->render();
+$page->adminrender();

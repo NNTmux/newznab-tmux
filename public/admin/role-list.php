@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\UserRole;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'User Role List';
 
@@ -15,4 +16,4 @@ $userroles = UserRole::getRoles();
 $page->smarty->assign('userroles', $userroles);
 
 $page->content = $page->smarty->fetch('role-list.tpl');
-$page->render();
+$page->adminrender();

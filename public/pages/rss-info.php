@@ -25,4 +25,4 @@ if (isset($firstAni['anidbid'])) {
 }
 
 $page->content = $page->smarty->fetch('rssdesc.tpl');
-$page->render();
+$page->pagerender();

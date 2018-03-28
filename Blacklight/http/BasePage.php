@@ -4,7 +4,11 @@ namespace Blacklight\http;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
+use App\Models\Category;
+use App\Models\Forumpost;
+use App\Models\Menu;
 use App\Models\User;
+use Blacklight\Contents;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
@@ -25,12 +29,19 @@ class BasePage
     public $smarty;
 
     public $title = '';
+
     public $content = '';
+
     public $head = '';
+
     public $body = '';
+
     public $meta_keywords = '';
+
     public $meta_title = '';
+
     public $meta_description = '';
+
     public $secure_connection = false;
 
     /**
@@ -103,9 +114,7 @@ class BasePage
     {
         $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
 
-        $response = $kernel->handle(
-            $request = \Illuminate\Http\Request::capture()
-        );
+        $response = $kernel->handle($request = \Illuminate\Http\Request::capture());
         $response->send();
         $kernel->terminate($request, $response);
 
@@ -120,7 +129,7 @@ class BasePage
         foreach (array_get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
             $this->smarty->addPluginsDir($plugins);
         }
-        $this->smarty->error_reporting = E_ALL - E_NOTICE;
+        $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
 
         $this->smarty->assign('serverroot', url('/'));
 
@@ -201,12 +210,7 @@ class BasePage
      */
     public function show403($from_admin = false): void
     {
-        header(
-            'Location: '.
-            ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
-            '/login?redirect='.
-            urlencode(request()->getRequestUri())
-        );
+        header('Location: '.($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).'/login?redirect='.urlencode(request()->getRequestUri()));
         exit();
     }
 
@@ -295,9 +299,7 @@ class BasePage
         }
 
         // Update last login every 15 mins.
-        if ((strtotime($this->userdata['now']) - 900) >
-            strtotime($this->userdata['lastlogin'])
-        ) {
+        if ((strtotime($this->userdata['now']) - 900) > strtotime($this->userdata['lastlogin'])) {
             User::updateSiteAccessed($this->userdata['id']);
         }
 
@@ -338,10 +340,7 @@ class BasePage
     public function getSetting($setting)
     {
         if (strpos($setting, '.') === false) {
-            trigger_error(
-                'You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.',
-                E_USER_WARNING
-            );
+            trigger_error('You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.', E_USER_WARNING);
         } else {
             return $this->getSettingValue($setting);
         }
@@ -358,5 +357,106 @@ class BasePage
     public function getSettingValue($setting): ?string
     {
         return Settings::settingValue($setting);
+    }
+
+    /**
+     * Setup user preferences
+     *
+     *
+     * @throws \Exception
+     * @throws \SmartyException
+     */
+    public function setUserPrefs()
+    {
+        // Tell Smarty which directories to use for templates
+        $this->smarty->setTemplateDir([
+            'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
+            'shared' => config('ytake-laravel-smarty.template_path').'/shared',
+            'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
+        ]);
+
+        $role = User::ROLE_USER;
+        if (! empty($this->userdata)) {
+            $role = $this->userdata['user_roles_id'];
+        }
+
+        $content = new Contents();
+        $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
+        $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
+        $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
+        if ($this->userdata !== null) {
+            $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
+        }
+
+        $this->smarty->assign('main_menu', $this->smarty->fetch('mainmenu.tpl'));
+        $this->smarty->assign('useful_menu', $this->smarty->fetch('usefullinksmenu.tpl'));
+        $this->smarty->assign('article_menu', $this->smarty->fetch('articlesmenu.tpl'));
+
+        if (! empty($this->userdata)) {
+            $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
+        } else {
+            $parentcatlist = Category::getForMenu();
+        }
+
+        $this->smarty->assign('parentcatlist', $parentcatlist);
+        $this->smarty->assign('catClass', Category::class);
+        $searchStr = '';
+        if ($this->page === 'search' && request()->has('id')) {
+            $searchStr = request()->input('id');
+        }
+        $this->smarty->assign('header_menu_search', $searchStr);
+
+        if (request()->has('t')) {
+            $this->smarty->assign('header_menu_cat', request()->input('t'));
+        } else {
+            $this->smarty->assign('header_menu_cat', '');
+        }
+        $header_menu = $this->smarty->fetch('headermenu.tpl');
+        $this->smarty->assign('header_menu', $header_menu);
+    }
+
+    /**
+     *
+     */
+    public function setAdminPrefs()
+    {
+        // Tell Smarty which directories to use for templates
+        $this->smarty->setTemplateDir(
+            [
+                'admin'    => config('ytake-laravel-smarty.template_path').'/admin',
+                'shared'    => config('ytake-laravel-smarty.template_path').'/shared',
+                'default'    => config('ytake-laravel-smarty.template_path').'/admin',
+            ]
+        );
+
+        $this->smarty->assign('catClass', Category::class);
+    }
+
+    /**
+     * Output the page.
+     */
+    public function pagerender(): void
+    {
+        $this->smarty->assign('page', $this);
+        $this->page_template = 'basepage.tpl';
+
+        $this->render();
+    }
+
+    /**
+     * Output a page using the admin template.
+     *
+     * @throws \Exception
+     */
+    public function adminrender(): void
+    {
+        $this->smarty->assign('page', $this);
+
+        $admin_menu = $this->smarty->fetch('adminmenu.tpl');
+        $this->smarty->assign('admin_menu', $admin_menu);
+
+        $this->page_template = 'baseadminpage.tpl';
+
+        $this->render();
     }
 }

@@ -126,4 +126,4 @@ $page->meta_keywords = 'register,signup,registration';
 $page->meta_description = 'Register';
 
 $page->content = $page->smarty->fetch('register.tpl');
-$page->render();
+$page->pagerender();

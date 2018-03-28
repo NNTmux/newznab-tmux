@@ -6,10 +6,11 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Illuminate\Support\Facades\Mail;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $user = [
     'id' => '',
@@ -131,4 +132,4 @@ $page->smarty->assign('role_names', $roles);
 $page->smarty->assign('user', $user);
 
 $page->content = $page->smarty->fetch('user-edit.tpl');
-$page->render();
+$page->adminrender();

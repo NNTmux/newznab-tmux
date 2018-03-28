@@ -1,11 +1,12 @@
 <?php
 
 use App\Models\Predb;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 
@@ -33,4 +34,4 @@ $page->meta_keywords = 'view,predb,info,description,details';
 $page->meta_description = 'View PreDb info';
 
 $page->content = $page->smarty->fetch('predb.tpl');
-$page->render();
+$page->adminrender();

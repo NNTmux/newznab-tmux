@@ -4,9 +4,10 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use App\Models\User;
 use Blacklight\Contents;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $contents = new Contents();
 $id = 0;
 
@@ -74,4 +75,4 @@ $rolelist = ['0' => 'Everyone', '1' => 'Logged in Users', '2' => 'Admins'];
 $page->smarty->assign('rolelist', $rolelist);
 
 $page->content = $page->smarty->fetch('content-add.tpl');
-$page->render();
+$page->adminrender();

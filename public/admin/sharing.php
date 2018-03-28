@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\db\DB;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 
 $page->title = 'Sharing Settings';
 
@@ -68,4 +69,4 @@ $page->smarty->assign('pager', $pager);
 $page->smarty->assign(['local' => $ourSite, 'sites' => $allSites]);
 
 $page->content = $page->smarty->fetch('sharing.tpl');
-$page->render();
+$page->adminrender();

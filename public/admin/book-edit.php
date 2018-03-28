@@ -4,10 +4,11 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\Books;
 use Blacklight\Genres;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Illuminate\Support\Carbon;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $book = new Books();
 $gen = new Genres();
 $id = 0;
@@ -51,4 +52,4 @@ if (request()->has('id')) {
 }
 
 $page->content = $page->smarty->fetch('book-edit.tpl');
-$page->render();
+$page->adminrender();

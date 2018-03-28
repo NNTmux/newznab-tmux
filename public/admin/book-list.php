@@ -3,10 +3,11 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Books;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
 use Blacklight\utility\Utility;
 
-$page = new AdminPage();
+$page = new BasePage();
+$page->setAdminPrefs();
 $book = new Books();
 
 $page->title = 'Book List';
@@ -31,4 +32,4 @@ $bookList = Utility::getRange('bookinfo', $offset, config('nntmux.items_per_page
 $page->smarty->assign('booklist', $bookList);
 
 $page->content = $page->smarty->fetch('book-list.tpl');
-$page->render();
+$page->adminrender();

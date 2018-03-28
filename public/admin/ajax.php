@@ -6,7 +6,9 @@ use Blacklight\Regexes;
 use Blacklight\Sharing;
 use Blacklight\Binaries;
 use App\Models\ReleaseComment;
-use Blacklight\http\AdminPage;
+use Blacklight\http\BasePage;
+
+$page = new BasePage();
 
 // This script waits for ajax queries from the web.
 
@@ -14,7 +16,6 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 // Make sure the user is an admin and logged in.
 $pdo = new DB();
-$page = new AdminPage();
 
 if (! request()->has('action')) {
     exit();
