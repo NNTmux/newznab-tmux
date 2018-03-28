@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\Invitation;
-use App\Models\Settings;
 use App\Models\User;
+use App\Models\Settings;
 use App\Models\UserRole;
-use Blacklight\http\BasePage;
+use App\Models\Invitation;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
@@ -59,7 +58,7 @@ class RegisterController extends Controller
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'g-recaptcha-response' => 'required|captcha'
+            'g-recaptcha-response' => 'required|captcha',
         ]);
     }
 
@@ -71,7 +70,6 @@ class RegisterController extends Controller
      */
     protected function create(array $data): User
     {
-
         return User::create([
             'username' => $data['username'],
             'email' => $data['email'],
@@ -172,6 +170,7 @@ class RegisterController extends Controller
 
                         if ($ret->id > 0) {
                             Auth::loginUsingId($ret->id);
+
                             return redirect()->intended($this->redirectPath());
                         }
                     }
