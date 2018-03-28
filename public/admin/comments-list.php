@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\ReleaseComment;
 use Blacklight\http\BasePage;
+use App\Models\ReleaseComment;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 

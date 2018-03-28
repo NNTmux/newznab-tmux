@@ -4,14 +4,14 @@ namespace Blacklight\http;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
-use App\Models\Category;
-use App\Models\Forumpost;
 use App\Models\Menu;
 use App\Models\User;
-use Blacklight\Contents;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
+use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\Contents;
+use App\Models\Forumpost;
 use Ytake\LaravelSmarty\Smarty;
 use App\Models\RoleExcludedCategory;
 use Illuminate\Support\Facades\Auth;
@@ -360,7 +360,7 @@ class BasePage
     }
 
     /**
-     * Setup user preferences
+     * Setup user preferences.
      *
      *
      * @throws \Exception
@@ -415,9 +415,6 @@ class BasePage
         $this->smarty->assign('header_menu', $header_menu);
     }
 
-    /**
-     *
-     */
     public function setAdminPrefs()
     {
         // Tell Smarty which directories to use for templates

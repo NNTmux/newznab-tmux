@@ -5,8 +5,8 @@ use Blacklight\db\DB;
 use Blacklight\Regexes;
 use Blacklight\Sharing;
 use Blacklight\Binaries;
-use App\Models\ReleaseComment;
 use Blacklight\http\BasePage;
+use App\Models\ReleaseComment;
 
 $page = new BasePage();
 

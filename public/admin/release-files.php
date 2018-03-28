@@ -11,7 +11,6 @@ use Blacklight\http\BasePage;
 $page = new BasePage();
 $page->setAdminPrefs();
 
-
 $pdo = new DB();
 $nzb = new NZB();
 
