@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/sma
 
 use Blacklight\db\DB;
 use Blacklight\Sharing;
-use App\Models\ReleaseComment;
 use Blacklight\http\BasePage;
+use App\Models\ReleaseComment;
 
 $page = new BasePage();
 
