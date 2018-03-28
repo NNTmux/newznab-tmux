@@ -13,7 +13,6 @@ if (Auth::check()) {
 
 $action = request()->input('action') ?? 'view';
 
-$captcha = new Captcha($page);
 $email = $rssToken = $sent = $confirmed = '';
 
 switch ($action) {
@@ -45,8 +44,6 @@ switch ($action) {
 
         break;
     case 'submit':
-
-        if ($captcha->getError() === false) {
             $email = request()->input('email') ?? '';
             $rssToken = request()->input('apikey') ?? '';
             if (empty($email) && empty($rssToken)) {
@@ -75,7 +72,6 @@ switch ($action) {
                 break;
             }
             break;
-        }
 }
 $page->smarty->assign(
     [

@@ -37,9 +37,7 @@ Route::get('/register', function () {
     redirect('/register');
 })->middleware('guest');
 
-Route::post('/register', function () {
-    redirect('/register');
-})->middleware('guest');
+Route::post('/register', 'Auth\RegisterController@register');
 
 Route::get('/forgottenpassword', function () {
     redirect('/forgottenpassword');

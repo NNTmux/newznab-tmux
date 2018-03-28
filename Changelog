@@ -1,4 +1,5 @@
 2018-03-28 DariusIII
+	* Chg: Change login/register pages
 	* Chg: Change from Page to BasePage in Captcha class, remove unused use statement in SABNzbd class
 	* Chg: Remove Page and AdminPage classes, adjust pages accordingly
 	* Chg: Update font-awesome to version 5.0.9
