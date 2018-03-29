@@ -41,7 +41,6 @@ Route::post('/resetpassword', 'Auth\ResetPasswordController@reset');
 
 Route::get('/profile', 'ProfileController@show')->middleware('auth');
 
-
 Route::get('/browse', function () {
     redirect('/browse');
 })->middleware('auth');

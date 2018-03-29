@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Mail\PasswordReset;
-use App\Models\Settings;
 use App\Models\User;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use App\Models\Settings;
+use App\Mail\PasswordReset;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Auth\ResetsPasswords;
 
 class ResetPasswordController extends Controller
 {

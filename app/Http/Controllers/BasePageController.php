@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Forumpost;
 use App\Models\Menu;
-use App\Models\RoleExcludedCategory;
-use App\Models\Settings;
 use App\Models\User;
-use Blacklight\Contents;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
+use App\Models\Category;
+use App\Models\Settings;
+use Blacklight\Contents;
+use App\Models\Forumpost;
 use Illuminate\Http\Request;
+use App\Models\RoleExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 
 class BasePageController extends Controller
@@ -53,8 +53,6 @@ class BasePageController extends Controller
      * @var string
      */
     public $serverurl = '';
-
-
 
     /**
      * Public access to Captcha object for error checking.
@@ -106,7 +104,6 @@ class BasePageController extends Controller
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
 
         $this->smarty->assign('serverroot', url('/'));
-
     }
 
     /**
@@ -158,7 +155,7 @@ class BasePageController extends Controller
      */
     public function show404(): void
     {
-       abort(404);
+        abort(404);
     }
 
     /**
