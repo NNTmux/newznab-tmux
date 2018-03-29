@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>This page lists regex used for categorizing releases.<br/>
 		You can recategorize all releases by running misc/update/update_releases.php 6 true
 	</p>

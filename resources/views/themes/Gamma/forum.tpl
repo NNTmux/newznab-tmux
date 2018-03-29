@@ -1,4 +1,4 @@
-<h2>{if $page->title !=''}{$page->title}{else}Forum{/if}</h2>
+<h2>{if $title !=''}{$title}{else}Forum{/if}</h2>
 {if $results|@count > 0}
 <div class=".pagination pagination-centered">
 	{$pager}

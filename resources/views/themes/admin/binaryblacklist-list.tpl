@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
 	<p>
 		Binaries can be prevented from being added to the index at all if they match a regex provided in the blacklist.

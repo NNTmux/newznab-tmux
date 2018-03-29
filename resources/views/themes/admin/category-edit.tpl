@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>

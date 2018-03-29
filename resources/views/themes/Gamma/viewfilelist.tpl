@@ -1,4 +1,4 @@
-<h2>{$page->title} </h2>
+<h2>{$title} </h2>
 
 <h4>For <a href="{$smarty.const.WWW_TOP}/details/{$rel.guid}">{$rel.searchname|escape:'htmlall'}</a></h4>
 <br/>

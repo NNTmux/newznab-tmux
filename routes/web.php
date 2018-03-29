@@ -33,13 +33,9 @@ Route::post('/login', 'Auth\LoginController@login');
 Route::get('/register', 'Auth\RegisterController@showRegistrationForm');
 Route::post('/register', 'Auth\RegisterController@register');
 
-Route::get('/forgottenpassword', function () {
-    redirect('/forgottenpassword');
-})->middleware('guest');
+Route::get('/forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+Route::post('/forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 
-Route::post('/forgottenpassword', function () {
-    redirect('/forgottenpassword');
-})->middleware('guest');
 
 Route::get('/browse', function () {
     redirect('/browse');

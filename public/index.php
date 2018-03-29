@@ -37,7 +37,6 @@ switch ($page->page) {
     case 'content':
     case 'details':
     case 'filelist':
-    case 'forgottenpassword':
     case 'forum':
     case 'forumpost':
     case 'games':

@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1 xmlns="http://www.w3.org/1999/html">{$page->title}</h1>
+	<h1 xmlns="http://www.w3.org/1999/html">{$title}</h1>
 	{if isset($error) && $error != ''}
 		<div class="error">{$error}</div>
 	{/if}

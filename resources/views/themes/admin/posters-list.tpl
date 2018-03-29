@@ -1,5 +1,5 @@
 <div class="well well-sm" id="group_list">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	{if !empty($check)}
 		<p>
 			Below is a list of MultiGroup posters

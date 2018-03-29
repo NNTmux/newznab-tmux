@@ -8,11 +8,11 @@
 <body class="skin-blue layout-boxed">
 <div class="wrapper">
 	<div class="header">
-		<h2>View > <strong>{$page->title}</strong></h2>
+		<h2>View > <strong>{$title}</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
 				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-				/ {$page->title}
+				/ {$title}
 			</ol>
 		</div>
 	</div>

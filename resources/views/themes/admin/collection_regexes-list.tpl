@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
 	<p>This page lists regex used for grouping usenet collections.</p>
 	<div id="message"></div>

@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 <div class="well well-small">
 	<form action="site-edit.php?action=submit" method="post">

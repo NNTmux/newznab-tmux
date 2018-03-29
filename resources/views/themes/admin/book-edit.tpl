@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 <div class="well well-sm">
 	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">

@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<table class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th style="width:60px;">ordinal</th>

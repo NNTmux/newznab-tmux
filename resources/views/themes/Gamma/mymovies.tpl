@@ -1,4 +1,4 @@
-<h2>{$page->title}</h2>
+<h2>{$title}</h2>
 <div style="text-align: center;">
 	<div class="btn-group">
 		<a class="btn btn-sm" title="View available Movies" href="{$smarty.const.WWW_TOP}/movies" >Movies List</a>

@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>
 		Import NZB's from a folder or via the browser into the system. Specify the full file path to a folder containing
 		NZB's.

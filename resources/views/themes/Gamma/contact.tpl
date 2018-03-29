@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <h2>Getting in touch</h2>
 {$msg}{* This is a message that appears if a email is sent. *}
 {if $msg == ""}

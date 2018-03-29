@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
 	<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/predb.php" id="custom-search-form"
 			{{csrf_field()}}

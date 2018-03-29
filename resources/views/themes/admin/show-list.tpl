@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	{if $tvshowlist}
 		<div style="float:right;">
 			<form name="showsearch" action="">

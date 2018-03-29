@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>This page is used for testing regex for getting release names from usenet subject.
 		<br/>Maximum releases to display will limit the amount of results displayed on the page. 0 for no limit.
 		<br/>Query limit will limit the amount of releases to select from MySQL (setting this high can be very slow). 0

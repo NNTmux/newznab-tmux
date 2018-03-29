@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
 	<p>This page is used for testing regex for grouping usenet collections.<br/>Enter the group name to test and a
 		regex. Limit is how many collections to show max on the page, 0 for no limit(slow).</p>

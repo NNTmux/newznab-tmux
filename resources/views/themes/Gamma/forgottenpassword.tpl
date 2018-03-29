@@ -6,7 +6,7 @@ border: 1px solid #e1e1e8;
      -moz-border-radius: 4px;
           border-radius: 4px;
 ">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>
 		Please enter the email address you used to register and we will send an email to reset your password. If you cannot remember your email, or no longer have access to it, please <a href="{$smarty.const.WWW_TOP}/contact-us">contact us</a>.
 	</p>

@@ -1,5 +1,5 @@
 <div class="well wellsm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
 	<label for="previewcat"> Select Category :
 		<select id="previewcat" name="previewcat">

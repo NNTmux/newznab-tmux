@@ -1,5 +1,5 @@
 <div class="well well-sm">
-<h3>{$page->title}</h3>
+<h3>{$title}</h3>
 <p>Here lives the documentation for the api for accessing nzb and index data. Api functions can be called by either logged in users, or by providing an apikey.</p>
 <br>
 {if $loggedin=="true"}
