@@ -1,28 +1,33 @@
+<IfModule mod_rewrite.c>
 RewriteEngine on
 #RewriteBase /
 
-# Do not process images or CSS files further
-RewriteRule \.(css|eot|gif|gz|ico|inc|jpe?g|js|ogg|png|svg|ttf|txt|woff|woff2|xml)$ - [L]
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
 
-# Leave /admin static
-RewriteRule ^(admin) - [L]
+    RewriteEngine On
+    # Do not process images or CSS files further
+    RewriteRule \.(css|eot|gif|gz|ico|inc|jpe?g|js|ogg|png|svg|ttf|txt|woff|woff2|xml)$ - [L]
 
-# Handle Authorization Header
-RewriteCond %{HTTP:Authorization} .
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    # Leave /admin static
+    RewriteRule ^(admin) - [L]
 
-# Redirect Trailing Slashes If Not A Folder...
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/$ /$1 [L,R=301]
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-# Handle Front Controller...
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
 
-# Rewrite web pages to one master page
-RewriteRule ^([^/\.]+)/?$ index.php?page=$1 [QSA,L]
-RewriteRule ^([^/\.]+)/([^/]+)/?$ index.php?page=$1&id=$2 [QSA,L]
-RewriteRule ^([^/\.]+)/([^/]+)/([^/]+)/? index.php?page=$1&id=$2&subpage=$3 [QSA,L]
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+
 
 # Block MySQL injections, RFI, base64, etc.
 #RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
@@ -55,3 +60,4 @@ RewriteRule ^([^/\.]+)/([^/]+)/([^/]+)/? index.php?page=$1&id=$2&subpage=$3 [QSA
 #RewriteCond %{QUERY_STRING} (;|<|>|'|"|\)|%0A|%0D|%22|%27|%3C|%3E|%00).*(/\*|union|select|insert|drop|delete|update|cast|create|char|convert|alter|declare|order|script|set|md5|benchmark|encode) [NC,OR]
 #RewriteCond %{QUERY_STRING} (sp_executesql) [NC]
 #RewriteRule ^(.*)$ - [F,L]
+</IfModule>

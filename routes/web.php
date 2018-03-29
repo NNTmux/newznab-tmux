@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    redirect('/');
+    return view('themes.Gentele.basepage');
 });
 
 /*
@@ -35,6 +35,11 @@ Route::post('/register', 'Auth\RegisterController@register');
 
 Route::get('/forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 Route::post('/forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+
+Route::get('/resetpassword', 'Auth\ResetPasswordController@reset');
+Route::post('/resetpassword', 'Auth\ResetPasswordController@reset');
+
+Route::get('/profile', 'ProfileController@show')->middleware('auth');
 
 
 Route::get('/browse', function () {
@@ -121,9 +126,7 @@ Route::post('/profile_delete', function () {
     redirect('/login');
 })->middleware('guest');
 
-Route::get('/profile', function () {
-    redirect('/profile');
-})->middleware('auth');
+Route::get('/profile', 'ProfileController@show')->middleware('auth');
 
 Route::get('/apihelp', function () {
     redirect('/apihelp');

@@ -7,8 +7,8 @@
         /* <![CDATA[ */
         var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
         var SERVERROOT = "{/literal}{$serverroot}{literal}";
-        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
-        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+        var UID = "{/literal}{if Auth::check()}{$userdata.id}{else}{/if}{literal}";
+        var RSSTOKEN = "{/literal}{if Auth::check()}{$userdata.rsstoken}{else}{/if}{literal}";
         /* ]]> */
 	</script>
 	{/literal}
@@ -53,7 +53,7 @@
 				</div>
 				<div class="clearfix"></div>
 				<!-- menu profile quick info -->
-				{if $loggedin == "true"}
+				{if Auth::check()}
 				<div class="profile">
 
 						<div class="profile_pic">
@@ -74,7 +74,7 @@
 					<div class="menu_section">
 						<h3>Main</h3>
 						<ul class="nav side-menu">
-							{if $loggedin == "true"}
+							{if Auth::check()}
 								<li><a><i class="fa fa-home"></i><span> Browse</span> <span
 												class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
@@ -102,7 +102,7 @@
 								</li>
 							{/if}
 							<div class="clearfix"></div>
-							{if $loggedin == "true"}
+							{if Auth::check()}
 							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
 
 								<ul class="nav child_menu" style="display: none">
@@ -134,7 +134,7 @@
 			</div>
 		</div>
 		<!-- top navigation -->
-		{if $loggedin == "true"}
+		{if Auth::check()}
 		<div class="top_nav">
 			<div class="nav_menu">
 				<nav class="" role="navigation">
