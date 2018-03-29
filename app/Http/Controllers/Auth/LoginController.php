@@ -67,6 +67,7 @@ class LoginController extends Controller
         }
 
         app('smarty.view')->assign('error', 'These credentials do not match our records.');
+
         return redirect()->back()
             ->withInput()
             ->withErrors([

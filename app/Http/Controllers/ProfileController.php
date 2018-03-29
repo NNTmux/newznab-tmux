@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ReleaseComment;
-use App\Models\Settings;
 use App\Models\User;
-use App\Models\UserDownload;
-use App\Models\UserExcludedCategory;
-use App\Models\UserRequest;
 use Blacklight\SABnzbd;
+use App\Models\Settings;
+use App\Models\UserRequest;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
+use App\Models\ReleaseComment;
+use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends BasePageController
@@ -33,7 +33,6 @@ class ProfileController extends BasePageController
      */
     public function show(Request $request)
     {
-
         $sab = new SABnzbd();
 
         $userID = Auth::id();
@@ -101,7 +100,7 @@ class ProfileController extends BasePageController
         ];
         $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 
-// Pager must be fetched after the variables are assigned to smarty.
+        // Pager must be fetched after the variables are assigned to smarty.
         $this->smarty->assign(
             [
                 'pager'         => $this->smarty->fetch($theme.'/pager.tpl'),
@@ -129,6 +128,6 @@ class ProfileController extends BasePageController
                 'meta_description' => $meta_description,
             ]
         );
-       $this->pagerender();
+        $this->pagerender();
     }
 }

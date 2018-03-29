@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Mail\ForgottenPassword;
-use App\Models\Settings;
 use App\Models\User;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use App\Models\Settings;
+use App\Mail\ForgottenPassword;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
 class ForgotPasswordController extends Controller
 {
@@ -36,7 +36,6 @@ class ForgotPasswordController extends Controller
 
     public function showLinkRequestForm()
     {
-
         $sent = '';
         $email = request()->input('email') ?? '';
         $rssToken = request()->input('apikey') ?? '';
@@ -63,7 +62,6 @@ class ForgotPasswordController extends Controller
             Mail::to($ret['email'])->send(new ForgottenPassword($resetLink));
             $sent = true;
         }
-
 
         $theme = Settings::settingValue('site.main.style');
 
