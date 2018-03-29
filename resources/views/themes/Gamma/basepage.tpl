@@ -14,11 +14,11 @@
 	{/literal}
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=9" />
-	<meta name="keywords" content="{$page->meta_keywords}{if $page->meta_keywords != "" && $site->metakeywords != ""},{/if}{$site->metakeywords}" />
-	<meta name="description" content="{$page->meta_description}{if $page->meta_description != "" && $site->metadescription != ""} - {/if}{$site->metadescription}" />
+	<meta name="keywords" content="{$meta_keywords}{if $meta_keywords != "" && $site->metakeywords != ""},{/if}{$site->metakeywords}" />
+	<meta name="description" content="{$meta_description}{if $meta_description != "" && $site->metadescription != ""} - {/if}{$site->metadescription}" />
 	<meta name="robots" content="noindex,nofollow"/>
 	<meta name="application-name" content="newznab-{$site->version}" />
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<meta name="csrf-token" content="{$csrf_token}">
 
@@ -125,7 +125,7 @@
 					</ul>
 				</div>
 				<div class="col-md-10">
-					{$page->content}
+					{$content}
 				</div>
 			</div>
 		</div>

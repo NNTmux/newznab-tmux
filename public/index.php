@@ -56,7 +56,6 @@ switch ($page->page) {
     case 'profileedit':
     case 'profile_delete':
     case 'queue':
-    case 'register':
     case 'sabqueuedata':
     case 'search':
     case 'sendtocouch':
@@ -70,7 +69,6 @@ switch ($page->page) {
     case 'api':
     case 'failed':
     case 'getnzb':
-    case 'login':
     case 'rss':
         include NN_WWW.'pages/'.$page->page.'.php';
         break;

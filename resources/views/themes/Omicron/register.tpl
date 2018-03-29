@@ -11,7 +11,7 @@
 {/if}
   <head>
     <meta charset="UTF-8">
-    <title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle} | Registration Page</title>
+    <title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle} | Registration Page</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
   </head>
 {if $showregister != "0"}
@@ -55,7 +55,7 @@
             </div><!-- /.col -->
             <hr>
             <div style="text-align: center;">
-            {$page->smarty->fetch('captcha.tpl')}
+            {NoCaptcha::display()}{NoCaptcha::renderJs()}
             </div>
           </div>
 			<a href="{$serverroot}login" class="text-center">I already have a membership</a>

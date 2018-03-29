@@ -24,7 +24,7 @@
 		===
 	-->
 	<meta charset="utf-8">
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<meta name="csrf-token" content="{$csrf_token}">
 	<!-- The styles -->
@@ -146,7 +146,7 @@
 					<div class="box col-md-12">
 						<div class="box-content">
 							<!-- put your content here -->
-							{$page->content}
+							{$content}
 						</div>
 					</div>
 				</div>

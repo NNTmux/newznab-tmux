@@ -85,7 +85,7 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-        $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
+        $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
         $showRegister = 1;
 
         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
@@ -118,41 +118,41 @@ class RegisterController extends Controller
 
                         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
                             if ($inviteCode === '') {
-                                echo 'Sorry, the invite code is old or has been used.';
+                                $error = 'Sorry, the invite code is old or has been used.';
                                 break;
                             }
 
                             $invitedBy = User::checkAndUseInvite($inviteCode);
                             if ($invitedBy < 0) {
-                                echo 'Sorry, the invite code is old or has been used.';
+                                $error = 'Sorry, the invite code is old or has been used.';
                                 break;
                             }
                         }
 
                         if (! User::isValidUsername($userName)) {
-                            echo 'Your username must be at least five characters.';
+                            $error = 'Your username must be at least five characters.';
                             break;
                         }
 
                         if (! User::isValidPassword($password)) {
-                            echo 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
+                            $error = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
                             break;
                         }
 
                         if (! User::isValidEmail($email)) {
-                            echo 'Your email is not a valid format.';
+                            $error = 'Your email is not a valid format.';
                             break;
                         }
 
                         $res = User::getByUsername($userName);
                         if ($res) {
-                            echo 'Sorry, the username is already taken.';
+                            $error = 'Sorry, the username is already taken.';
                             break;
                         }
 
                         $res = User::getByEmail($email);
                         if ($res) {
-                            echo 'Sorry, the email is already in use.';
+                            $error = 'Sorry, the email is already in use.';
                             break;
                         }
 
@@ -181,7 +181,7 @@ class RegisterController extends Controller
                         // See if it is a valid invite.
                         $invite = Invitation::getInvite($inviteCode);
                         if (! $invite) {
-                            echo sprintf('Bad or invite code older than %d days.', Invitation::DEFAULT_INVITE_EXPIRY_DAYS);
+                            $error = sprintf('Bad or invite code older than %d days.', Invitation::DEFAULT_INVITE_EXPIRY_DAYS);
                             $showRegister = 0;
                         } else {
                             $inviteCode = $invite['guid'];
@@ -191,5 +191,40 @@ class RegisterController extends Controller
                 }
             }
         }
+        app('smarty.view')->assign(
+            [
+                'username'          => Utility::htmlfmt($userName),
+                'password'          => Utility::htmlfmt($password),
+                'confirmpassword'   => Utility::htmlfmt($confirmPassword),
+                'email'             => Utility::htmlfmt($email),
+                'invitecode'        => Utility::htmlfmt($inviteCode),
+                'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
+                'showregister'      => $showRegister,
+                'error'             => $error,
+            ]
+        );
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function showRegistrationForm()
+    {
+        $theme = Settings::settingValue('site.main.style');
+
+        $meta_title = 'Register';
+        $meta_keywords = 'register,signup,registration';
+        $meta_description = 'Register';
+
+        $content = app('smarty.view')->fetch($theme.'/register.tpl');
+        app('smarty.view')->assign(
+            [
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]
+        );
+        app('smarty.view')->display($theme.'/basepage.tpl');
     }
 }

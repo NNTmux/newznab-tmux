@@ -27,16 +27,10 @@ Route::post('/', function () {
 
 Auth::routes();
 
-Route::get('/login', function () {
-    redirect('/login');
-})->middleware('guest');
-
+Route::get('/login', 'Auth\LoginController@showLoginForm');
 Route::post('/login', 'Auth\LoginController@login');
 
-Route::get('/register', function () {
-    redirect('/register');
-})->middleware('guest');
-
+Route::get('/register', 'Auth\RegisterController@showRegistrationForm');
 Route::post('/register', 'Auth\RegisterController@register');
 
 Route::get('/forgottenpassword', function () {

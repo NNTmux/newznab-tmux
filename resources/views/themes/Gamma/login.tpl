@@ -19,7 +19,7 @@
 		<input id="rememberme" {if $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"/> <span class="help-inline" style="vertical-align:sub;">Remember me </span>
 			<div class="pull-right"><a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a></div>
 			<div>
-			{$page->smarty->fetch('captcha.tpl')}
+			{NoCaptcha::display()}{NoCaptcha::renderJs()}
 			</div>
 		<button type="submit" class="btn btn-success pull-right">Login</button>
 		</table>

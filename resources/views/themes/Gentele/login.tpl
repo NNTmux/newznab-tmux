@@ -29,7 +29,8 @@
 									   name="rememberme" type="checkbox"> Remember Me
 							</label>
 							<hr>
-							{$page->smarty->fetch('captcha.tpl')}
+							{NoCaptcha::display()}
+							{NoCaptcha::renderJs()}
 						</div>
 					</div><!-- /.col -->
 					<div class="col-xs-4">

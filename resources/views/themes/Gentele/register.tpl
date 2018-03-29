@@ -55,7 +55,8 @@
 						</div><!-- /.col -->
 						<hr>
 						<div style="text-align: center;">
-							{$page->smarty->fetch('captcha.tpl')}
+							{NoCaptcha::display()}
+							{NoCaptcha::renderJs()}
 						</div>
 					</div>
 					<a href="{$serverroot}login" class="text-center">I already have a membership</a>

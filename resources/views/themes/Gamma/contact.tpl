@@ -35,7 +35,7 @@
 			<tr>
 				<td></td>
 				<td>
-					{$page->smarty->fetch('captcha.tpl')}
+					{NoCaptcha::display()}{NoCaptcha::renderJs()}
 					<input type="submit" value="Submit" />
 				</td>
 			</tr>

@@ -25,7 +25,7 @@
 		<input id="invitecode" name="invitecode" type="hidden" value="{$invitecode|escape:html_all}" />
 		<input class="input-block-level" autocomplete="off" id="confirmpassword" name="confirmpassword" value="{$confirmpassword}" type="password" placeholder="Confim password" style="margin-bottom:5px;"/>
 		<input class="input-block-level" autocomplete="off" id="email" name="email" value="{$email}" type="text" placeholder="Email" style="margin-bottom:20px;"/>
-			{$page->smarty->fetch('captcha.tpl')}
+			{NoCaptcha::display()}{NoCaptcha::renderJs()}
 			<button type="submit" class="btn btn-success pull-right">Register</button>
 		</table>
 	</form>

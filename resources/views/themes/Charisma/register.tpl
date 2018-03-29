@@ -68,7 +68,7 @@
 							<div class="clearfix"></div>
 							<p class="center col-md-5">
 							<p class="center col-md-5">
-								{$page->smarty->fetch('captcha.tpl')}
+								{NoCaptcha::display()}{NoCaptcha::renderJs()}
 							</p>
 							<button type="submit" class="btn btn-primary">Register</button>
 						</fieldset>

@@ -33,7 +33,7 @@
 				</div>
 				<div class="row">
 					<div class="col-xs-6">
-						{$page->smarty->fetch('captcha.tpl')}
+						{NoCaptcha::display()}{NoCaptcha::renderJs()}
 					</div><!-- /.col -->
 					<hr>
 					<div class="col-xs-12">

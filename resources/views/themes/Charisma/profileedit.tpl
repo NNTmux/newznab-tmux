@@ -146,7 +146,7 @@
 														</tr>
 														<tr>
 															<td>
-																{if $page->getSettingValue('site.main.userselstyle') == 1}
+																{if{{Setting::settingValue('site.main.userselstyle')}} == 1}
 																	{html_options style="color: black;" id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 																{/if}
 															</td>
@@ -171,7 +171,7 @@
 														function.
 													</div>
 													<br>
-													{if $page->getSettingValue('apps.sabnzbplus.integrationtype') != 1}
+													{if {{Setting::settingValue('apps.sabnzbplus.integrationtype')}} != 1}
 														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-aqua-active">
@@ -190,7 +190,7 @@
 															</tbody>
 														</table>
 													{/if}
-													{if $user.queuetype == 1 && $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2}
+													{if $user.queuetype == 1 && {{Setting::settingValue('apps.sabnzbplus.integrationtype')}} == 2}
 														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-aqua-active">
@@ -240,7 +240,7 @@
 															</tbody>
 														</table>
 													{/if}
-													{if $user.queuetype == 2 && ($page->getSettingValue('apps.sabnzbplus.integrationtype') == 0 || $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2)}
+													{if $user.queuetype == 2 && ({{Setting::settingValue('apps.sabnzbplus.integrationtype')}} == 0 || {{Setting::settingValue('apps.sabnzbplus.integrationtype')}} == 2)}
 														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-aqua-active">

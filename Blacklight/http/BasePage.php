@@ -121,17 +121,16 @@ class BasePage
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
-        $this->smarty = new Smarty();
 
-        $this->smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
-        $this->smarty->setConfigDir(array_get(config('ytake-laravel-smarty'), 'config_paths'));
-        $this->smarty->setCacheDir(config('ytake-laravel-smarty.cache_path'));
+        app('smarty.view')->setCompileDir(config('ytake-laravel-smarty.compile_path'));
+        app('smarty.view')->setConfigDir(array_get(config('ytake-laravel-smarty'), 'config_paths'));
+        app('smarty.view')->setCacheDir(config('ytake-laravel-smarty.cache_path'));
         foreach (array_get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
-            $this->smarty->addPluginsDir($plugins);
+            app('smarty.view')->addPluginsDir($plugins);
         }
-        $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
+        app('smarty.view')->error_reporting = E_ALL & ~E_NOTICE;
 
-        $this->smarty->assign('serverroot', url('/'));
+        app('smarty.view')->assign('serverroot', url('/'));
 
         $this->page = request()->input('page') ?? 'content';
 
@@ -141,17 +140,17 @@ class BasePage
         } else {
             $this->theme = $this->getSettingValue('site.main.style');
 
-            $this->smarty->assign('isadmin', 'false');
-            $this->smarty->assign('ismod', 'false');
-            $this->smarty->assign('loggedin', 'false');
+            app('smarty.view')->assign('isadmin', 'false');
+            app('smarty.view')->assign('ismod', 'false');
+            app('smarty.view')->assign('loggedin', 'false');
         }
         if ($this->theme === 'None') {
             $this->theme = Settings::settingValue('site.main.style');
         }
 
-        $this->smarty->assign('theme', $this->theme);
-        $this->smarty->assign('site', $this->settings);
-        $this->smarty->assign('page', $this);
+        app('smarty.view')->assign('theme', $this->theme);
+        app('smarty.view')->assign('site', $this->settings);
+        app('smarty.view')->assign('page', $this);
     }
 
     /**
@@ -163,26 +162,6 @@ class BasePage
     {
         header('Retry-After: '.$seconds);
         $this->show503();
-    }
-
-    /**
-     * Inject content into the html head.
-     *
-     * @param $headcontent
-     */
-    public function addToHead($headcontent): void
-    {
-        $this->head = $this->head."\n".$headcontent;
-    }
-
-    /**
-     * Inject js/attributes into the html body tag.
-     *
-     * @param $attr
-     */
-    public function addToBody($attr): void
-    {
-        $this->body = $this->body.' '.$attr;
     }
 
     /**
@@ -277,7 +256,7 @@ class BasePage
 
     public function render()
     {
-        $this->smarty->display($this->page_template);
+        app('smarty.view')->display($this->page_template);
     }
 
     /**
@@ -303,60 +282,27 @@ class BasePage
             User::updateSiteAccessed($this->userdata['id']);
         }
 
-        $this->smarty->assign('userdata', $this->userdata);
-        $this->smarty->assign('loggedin', 'true');
+        app('smarty.view')->assign('userdata', $this->userdata);
+        app('smarty.view')->assign('loggedin', 'true');
 
         if ($this->userdata['nzbvortex_api_key'] !== '' && $this->userdata['nzbvortex_server_url'] !== '') {
-            $this->smarty->assign('weHasVortex', true);
+            app('smarty.view')->assign('weHasVortex', true);
         } else {
-            $this->smarty->assign('weHasVortex', false);
+            app('smarty.view')->assign('weHasVortex', false);
         }
 
         $sab = new SABnzbd($this);
-        $this->smarty->assign('sabintegrated', $sab->integratedBool);
+        app('smarty.view')->assign('sabintegrated', $sab->integratedBool);
         if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
-            $this->smarty->assign('sabapikeytype', $sab->apikeytype);
+            app('smarty.view')->assign('sabapikeytype', $sab->apikeytype);
         }
         switch ((int) $this->userdata['user_roles_id']) {
             case User::ROLE_ADMIN:
-                $this->smarty->assign('isadmin', 'true');
+                app('smarty.view')->assign('isadmin', 'true');
                 break;
             case User::ROLE_MODERATOR:
-                $this->smarty->assign('ismod', 'true');
+                app('smarty.view')->assign('ismod', 'true');
         }
-    }
-
-    /**
-     * Allows to fetch a value from the settings table.
-     *
-     * This method is deprecated, as the column it uses to select the data is due to be removed
-     * from the table *soon*.
-     *
-     * @param $setting
-     *
-     * @return array|bool|mixed|null|string
-     * @throws \Exception
-     */
-    public function getSetting($setting)
-    {
-        if (strpos($setting, '.') === false) {
-            trigger_error('You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.', E_USER_WARNING);
-        } else {
-            return $this->getSettingValue($setting);
-        }
-
-        return $this->settings->$setting;
-    }
-
-    /**
-     * @param $setting
-     *
-     * @return null|string
-     * @throws \Exception
-     */
-    public function getSettingValue($setting): ?string
-    {
-        return Settings::settingValue($setting);
     }
 
     /**
@@ -364,12 +310,11 @@ class BasePage
      *
      *
      * @throws \Exception
-     * @throws \SmartyException
      */
     public function setUserPrefs()
     {
         // Tell Smarty which directories to use for templates
-        $this->smarty->setTemplateDir([
+        app('smarty.view')->setTemplateDir([
             'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
             'shared' => config('ytake-laravel-smarty.template_path').'/shared',
             'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
@@ -381,16 +326,16 @@ class BasePage
         }
 
         $content = new Contents();
-        $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
-        $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
-        $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
+        app('smarty.view')->assign('menulist', Menu::getMenu($role, $this->serverurl));
+        app('smarty.view')->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
+        app('smarty.view')->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
         if ($this->userdata !== null) {
-            $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
+            app('smarty.view')->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
-        $this->smarty->assign('main_menu', $this->smarty->fetch('mainmenu.tpl'));
-        $this->smarty->assign('useful_menu', $this->smarty->fetch('usefullinksmenu.tpl'));
-        $this->smarty->assign('article_menu', $this->smarty->fetch('articlesmenu.tpl'));
+        app('smarty.view')->assign('main_menu', app('smarty.view')->fetch('mainmenu.tpl'));
+        app('smarty.view')->assign('useful_menu', app('smarty.view')->fetch('usefullinksmenu.tpl'));
+        app('smarty.view')->assign('article_menu', app('smarty.view')->fetch('articlesmenu.tpl'));
 
         if (! empty($this->userdata)) {
             $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
@@ -398,27 +343,27 @@ class BasePage
             $parentcatlist = Category::getForMenu();
         }
 
-        $this->smarty->assign('parentcatlist', $parentcatlist);
-        $this->smarty->assign('catClass', Category::class);
+        app('smarty.view')->assign('parentcatlist', $parentcatlist);
+        app('smarty.view')->assign('catClass', Category::class);
         $searchStr = '';
         if ($this->page === 'search' && request()->has('id')) {
             $searchStr = request()->input('id');
         }
-        $this->smarty->assign('header_menu_search', $searchStr);
+        app('smarty.view')->assign('header_menu_search', $searchStr);
 
         if (request()->has('t')) {
-            $this->smarty->assign('header_menu_cat', request()->input('t'));
+            app('smarty.view')->assign('header_menu_cat', request()->input('t'));
         } else {
-            $this->smarty->assign('header_menu_cat', '');
+            app('smarty.view')->assign('header_menu_cat', '');
         }
-        $header_menu = $this->smarty->fetch('headermenu.tpl');
-        $this->smarty->assign('header_menu', $header_menu);
+        $header_menu = app('smarty.view')->fetch('headermenu.tpl');
+        app('smarty.view')->assign('header_menu', $header_menu);
     }
 
     public function setAdminPrefs()
     {
         // Tell Smarty which directories to use for templates
-        $this->smarty->setTemplateDir(
+        app('smarty.view')->setTemplateDir(
             [
                 'admin'    => config('ytake-laravel-smarty.template_path').'/admin',
                 'shared'    => config('ytake-laravel-smarty.template_path').'/shared',
@@ -426,7 +371,7 @@ class BasePage
             ]
         );
 
-        $this->smarty->assign('catClass', Category::class);
+        app('smarty.view')->assign('catClass', Category::class);
     }
 
     /**
@@ -434,7 +379,7 @@ class BasePage
      */
     public function pagerender(): void
     {
-        $this->smarty->assign('page', $this);
+        app('smarty.view')->assign('page', $this);
         $this->page_template = 'basepage.tpl';
 
         $this->render();
@@ -447,10 +392,10 @@ class BasePage
      */
     public function adminrender(): void
     {
-        $this->smarty->assign('page', $this);
+        app('smarty.view')->assign('page', $this);
 
-        $admin_menu = $this->smarty->fetch('adminmenu.tpl');
-        $this->smarty->assign('admin_menu', $admin_menu);
+        $admin_menu = app('smarty.view')->fetch('adminmenu.tpl');
+        app('smarty.view')->assign('admin_menu', $admin_menu);
 
         $this->page_template = 'baseadminpage.tpl';
 

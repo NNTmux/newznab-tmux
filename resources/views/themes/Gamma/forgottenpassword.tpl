@@ -26,7 +26,7 @@ border: 1px solid #e1e1e8;
 			<input class="input-block-level" autocomplete="off"  type="text" id="username prependedInput" value="{$apikey}" name="apikey" placeholder="Apikey" style="margin-bottom:5px;">
 
 				<div>
-				{$page->smarty->fetch('captcha.tpl')}
+				{NoCaptcha::display()}{NoCaptcha::renderJs()}
 			</div>
 			<br>
 				<button type="submit" class="btn btn-success pull-warning">Request password reset</button>
