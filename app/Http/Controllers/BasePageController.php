@@ -109,7 +109,7 @@ class BasePageController extends Controller
     /**
      * @throws \Exception
      */
-    public function setPrefs()
+    protected function setPrefs()
     {
         if (Auth::check()) {
             $this->userdata = Auth::user();
@@ -166,7 +166,7 @@ class BasePageController extends Controller
      */
     public function show403($from_admin = false): void
     {
-        header('Location: '.($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).'/login?redirect='.urlencode($request->getRequestUri()));
+        header('Location: '.($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).'/login?redirect='.urlencode(\request()->getRequestUri()));
         exit();
     }
 

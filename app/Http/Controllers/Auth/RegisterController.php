@@ -145,13 +145,13 @@ class RegisterController extends Controller
                         }
 
                         $res = User::getByUsername($userName);
-                        if ($res) {
+                        if ($res !== null) {
                             $error = 'Sorry, the username is already taken.';
                             break;
                         }
 
                         $res = User::getByEmail($email);
-                        if ($res) {
+                        if ($res !== null) {
                             $error = 'Sorry, the email is already in use.';
                             break;
                         }

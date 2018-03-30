@@ -1,3 +1,5 @@
+2018-03-30 DariusIII
+	* Chg: Add initial BrowseController
 2018-03-29 DariusIII
 	* Chg: Update themes, BasePage and Profile controllers
 	* Chg: Update themes and use ForgottenPasswordController

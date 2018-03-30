@@ -24,6 +24,7 @@ class ProfileController extends BasePageController
     public function __construct(Request $request)
     {
         parent::__construct($request);
+        $this->middleware('auth');
     }
 
     /**
@@ -33,6 +34,7 @@ class ProfileController extends BasePageController
      */
     public function show(Request $request)
     {
+        $this->setPrefs();
         $sab = new SABnzbd();
 
         $userID = Auth::id();
