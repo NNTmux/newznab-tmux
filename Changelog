@@ -1,3 +1,5 @@
+2018-03-31 DariusIII
+	* Chg: Add barryvdh/laravel-debugbar as dev requirement
 2018-03-30 DariusIII
 	* Chg: Add initial BrowseController
 2018-03-29 DariusIII
