@@ -1,3 +1,5 @@
+2018-04-01 DariusIII
+	* Chg: Allow disabling of captcha on login page
 2018-03-31 DariusIII
 	* Chg: Add barryvdh/laravel-debugbar as dev requirement
 2018-03-30 DariusIII

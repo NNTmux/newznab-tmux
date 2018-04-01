@@ -49,8 +49,13 @@ class LoginController extends Controller
         $this->validate($request, [
             'username'    => 'required',
             'password' => 'required',
-            'g-recaptcha-response' => 'required|captcha',
         ]);
+
+        if (env('NOCAPTCHA_ENABLED') === true) {
+            $this->validate($request, [
+                'g-recaptcha-response' => 'required|captcha',
+            ]);
+        }
 
         $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
