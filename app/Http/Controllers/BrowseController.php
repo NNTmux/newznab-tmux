@@ -64,6 +64,7 @@ class BrowseController extends BasePageController
         $this->meta_description = 'Browse for Nzbs';
 
         $this->content = $this->smarty->fetch('browse.tpl');
+        $this->smarty->assign('content', $this->content);
         $this->pagerender();
     }
 }

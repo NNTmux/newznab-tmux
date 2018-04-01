@@ -322,7 +322,7 @@ class BasePageController extends Controller
     public function pagerender(): void
     {
         $this->smarty->assign('page', $this);
-        $this->page_template = $this->theme.'/basepage.tpl';
+        $this->page_template = 'basepage.tpl';
 
         $this->render();
     }
