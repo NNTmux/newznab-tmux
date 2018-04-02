@@ -7,10 +7,10 @@ use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Releases.
@@ -161,8 +161,10 @@ class Releases
         $sql = $qry->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize), $sql, $expiresAt);
+
         return $sql;
     }
+
     /**
      * @param null $query
      * @param bool $builder
@@ -179,22 +181,26 @@ class Releases
                 if ($builder === false) {
                     return '='.self::PASSWD_NONE;
                 }
+
                 return $query->where('releases.passwordstatus', self::PASSWD_NONE);
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
                 if ($builder === false) {
                     return '<= '.self::PASSWD_POTENTIAL;
                 }
+
                 return $query->where('releases.passwordstatus', '=<', self::PASSWD_POTENTIAL);
             case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
                 if ($builder === false) {
                     return '<= '.self::PASSWD_NONE;
                 }
+
                 return $query->where('releases.passwordstatus', '=<', self::PASSWD_NONE);
             case 10: // Shows everything.
             default:
                 if ($builder === false) {
                     return '<= '.self::PASSWD_RAR;
                 }
+
                 return $query->where('releases.passwordstatus', '=<', self::PASSWD_RAR);
         }
     }
