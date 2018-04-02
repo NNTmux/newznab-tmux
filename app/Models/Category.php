@@ -246,9 +246,9 @@ class Category extends Model
                 }
                 break;
         }
+
         return $catsrch;
     }
-
 
     /**
      * Returns a concatenated list of other categories.

@@ -74,7 +74,6 @@ class BrowseController extends BasePageController
 
         $results = $releases->getBrowseRange($catarray, $orderby, -1, $this->userdata['categoryexclusions'], $grp);
 
-
         $covgroup = '';
         $this->smarty->assign('catname', $id);
 
@@ -82,7 +81,7 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('results', $results);
 
-        $this->meta_title = 'Browse Movies > ' . $id;
+        $this->meta_title = 'Browse Movies > '.$id;
         $this->meta_keywords = 'browse,nzb,description,details';
         $this->meta_description = 'Browse for Nzbs';
 
