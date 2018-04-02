@@ -41,7 +41,10 @@ Route::post('/resetpassword', 'Auth\ResetPasswordController@reset');
 
 Route::get('/profile', 'ProfileController@show');
 
-Route::get('/browse', 'BrowseController@index');
+Route::prefix('browse')->group(function () {
+    Route::get('all', 'BrowseController@index');
+    Route::get('movies/{id}', 'BrowseController@showMovies');
+});
 
 Route::get('/console', function () {
     redirect('/console');
