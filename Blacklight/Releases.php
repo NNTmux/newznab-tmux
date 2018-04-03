@@ -105,28 +105,29 @@ class Releases
     }
 
     /**
-     * @param $cat
-     * @param $start
-     * @param $num
-     * @param $orderBy
-     * @param int $maxAge
+     * @param array $cat
+     * @param       $orderBy
+     * @param int   $maxAge
      * @param array $excludedCats
-     * @param int $groupName
-     * @param int $minSize
+     * @param int   $groupName
+     * @param int   $minSize
+     *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public function getBrowseRange($cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
+    public function getBrowseRange(array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $qry = Release::query()
             ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
                 $query->select(['releases.*', 'g.name as group_name'])
                     ->from('releases')
-                    ->where('releases.nzbstatus', NZB::NZB_ADDED)
-                ->where('releases.categories_id', $cat);
+                    ->where('releases.nzbstatus', NZB::NZB_ADDED);
                 self::showPasswords($query, true);
+                if ($cat !== [-1]) {
+                    Category::getCategorySearch($cat, $query, true);
+                }
                 $query->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id');
                 if ($maxAge > 0) {
                     $query->where('releases.postdate', '>', Carbon::now()->subDays($maxAge));

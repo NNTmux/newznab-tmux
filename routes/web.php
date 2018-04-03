@@ -27,24 +27,26 @@ Route::post('/', function () {
 
 Auth::routes();
 
-Route::get('/login', 'Auth\LoginController@showLoginForm');
-Route::post('/login', 'Auth\LoginController@login');
+Route::get('login', 'Auth\LoginController@showLoginForm');
+Route::post('login', 'Auth\LoginController@login');
 
-Route::get('/register', 'Auth\RegisterController@showRegistrationForm');
-Route::post('/register', 'Auth\RegisterController@register');
+Route::get('register', 'Auth\RegisterController@showRegistrationForm');
+Route::post('register', 'Auth\RegisterController@register');
 
-Route::get('/forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
-Route::post('/forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 
-Route::get('/resetpassword', 'Auth\ResetPasswordController@reset');
-Route::post('/resetpassword', 'Auth\ResetPasswordController@reset');
+Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
+Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
 
-Route::get('/profile', 'ProfileController@show');
+Route::get('profile', 'ProfileController@show');
 
 Route::prefix('browse')->group(function () {
     Route::get('all', 'BrowseController@index');
-    Route::get('movies/{id}', 'BrowseController@showMovies');
+    Route::get('{parentCategory}/{id?}', 'BrowseController@show');
 });
+
+Route::get('anime/{id?}', 'AnimeController@index');
 
 Route::get('/console', function () {
     redirect('/console');

@@ -11,7 +11,6 @@ class BrowseController extends BasePageController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('auth');
     }
 
     /**
@@ -22,46 +21,54 @@ class BrowseController extends BasePageController
         $this->setPrefs();
         $releases = new Releases(['Settings' => $this->settings]);
 
-        $category = -1;
+        $this->smarty->assign('category', -1);
 
-        $grp = -1;
-
-        $catarray = [];
-        $catarray[] = $category;
-
-        $this->smarty->assign('category', $category);
-
-        $offset = 0;
         $orderby = '';
 
-        $results = $releases->getBrowseRange($catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], $grp);
+        $results = $releases->getBrowseRange([-1], $orderby, -1, $this->userdata['categoryexclusions'], -1);
 
-        $covgroup = '';
         $this->smarty->assign('catname', 'All');
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
 
         $this->smarty->assign('results', $results);
 
-        $this->meta_title = 'Browse Nzbs';
-        $this->meta_keywords = 'browse,nzb,description,details';
-        $this->meta_description = 'Browse for Nzbs';
+        $meta_title = 'Browse Nzbs';
+        $meta_keywords = 'browse,nzb,description,details';
+        $meta_description = 'Browse for Nzbs';
 
-        $this->content = $this->smarty->fetch('browse.tpl');
-        $this->smarty->assign('content', $this->content);
+        $content = $this->smarty->fetch('browse.tpl');
+        $this->smarty->assign(
+            [
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]
+        );
         $this->pagerender();
     }
 
     /**
+     * @param $parentCategory
      * @param $id
+     *
      * @throws \Exception
      */
-    public function showMovies($id)
+    public function show($parentCategory, $id = 'all')
     {
         $this->setPrefs();
         $releases = new Releases(['Settings' => $this->settings]);
 
-        $category = Category::query()->where('title', $id)->where('parentid', '2000')->first(['id']);
+        $parentId = Category::query()->where('title', $parentCategory)->first(['id']);
+
+        $query = Category::query();
+        if ($id !== 'all') {
+            $query->where('title', $id)->where('parentid', $parentId['id']);
+        } else {
+            $query->where('id', $parentId['id']);
+        }
+        $category = $query->first(['id']);
 
         $grp = -1;
 
@@ -74,7 +81,6 @@ class BrowseController extends BasePageController
 
         $results = $releases->getBrowseRange($catarray, $orderby, -1, $this->userdata['categoryexclusions'], $grp);
 
-        $covgroup = '';
         $this->smarty->assign('catname', $id);
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
