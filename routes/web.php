@@ -50,6 +50,14 @@ Route::get('anime/{id?}', 'AnimeController@index');
 
 Route::get('books/{id?}', 'BooksController@index');
 
+Route::prefix('cart')->group(function () {
+    Route::get('index', 'CartController@index');
+    Route::get('add/{id}', 'CartController@store');
+    Route::post('add/{id}', 'CartController@store');
+    Route::get('delete/{id}', 'CartController@destroy');
+    Route::post('delete/{id}', 'CartController@destroy');
+});
+
 Route::get('/console', function () {
     redirect('/console');
 })->middleware('auth');
