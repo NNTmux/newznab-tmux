@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use Blacklight\Books;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class BooksController extends BasePageController
@@ -37,7 +37,7 @@ class BooksController extends BasePageController
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $books = [];
-        $results = $book->getBookRange($catarray,  $orderby, $this->userdata['categoryexclusions']);
+        $results = $book->getBookRange($catarray, $orderby, $this->userdata['categoryexclusions']);
 
         $maxwords = 50;
         foreach ($results as $result) {
