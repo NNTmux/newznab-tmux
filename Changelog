@@ -1,4 +1,5 @@
 2018-04-03 DariusIII
+	* Chg: Update BrowseController
 	* Fix: Fix return value of Category model getCategorySearch function
 	* Chg: Add BooksController and update Category getCategorySearch function
 	* Chg: Add AnimeController
