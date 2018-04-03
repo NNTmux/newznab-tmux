@@ -14,15 +14,15 @@ class CartController extends BasePageController
      */
     public function index()
     {
-          $this->setPrefs();
-            $meta_title = 'My Download Basket';
-            $meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
-            $meta_description = 'Manage Your Download Basket';
+        $this->setPrefs();
+        $meta_title = 'My Download Basket';
+        $meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
+        $meta_description = 'Manage Your Download Basket';
 
-            $results = UsersRelease::getCart(Auth::id());
-            $this->smarty->assign('results', $results);
+        $results = UsersRelease::getCart(Auth::id());
+        $this->smarty->assign('results', $results);
 
-            $content = $this->smarty->fetch('cart.tpl');
+        $content = $this->smarty->fetch('cart.tpl');
         $this->smarty->assign(
             [
                 'content' => $content,
@@ -31,9 +31,8 @@ class CartController extends BasePageController
                 'meta_description' => $meta_description,
             ]
         );
-            $this->pagerender();
+        $this->pagerender();
     }
-
 
     /**
      * @param \Illuminate\Http\Request $request
@@ -64,7 +63,7 @@ class CartController extends BasePageController
     {
         $this->setPrefs();
         $ids = null;
-        if (!empty($id)) {
+        if (! empty($id)) {
             $ids = (array) $id;
         } elseif (\is_array($id)) {
             $ids = $id;

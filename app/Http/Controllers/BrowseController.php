@@ -62,7 +62,7 @@ class BrowseController extends BasePageController
         $parentId = Category::query()->where('title', $parentCategory)->first(['id']);
 
         $query = Category::query();
-        if ( $id !== 'all') {
+        if ($id !== 'all') {
             $query->where('title', $id)->where('parentid', $parentId['id']);
         } else {
             $query->where('id', $parentId['id']);
@@ -86,7 +86,7 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('results', $results);
 
-        $meta_title = 'Browse '.$parentCategory.' > '. $id;
+        $meta_title = 'Browse '.$parentCategory.' > '.$id;
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';
 
