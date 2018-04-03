@@ -1,4 +1,5 @@
 2018-04-03 DariusIII
+	* Chg: Add BooksController and update Category getCategorySearch function
 	* Chg: Add AnimeController
 	* Chg: Update BrowseController, enable non-cover view browsing of categories and subcategories
 2018-04-02 DariusIII

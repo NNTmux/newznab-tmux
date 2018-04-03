@@ -143,14 +143,12 @@ class Books
 
     /**
      * @param $cat
-     * @param $start
-     * @param $num
      * @param $orderby
-     * @param array $excludedcats
+     * @param array $excludedCats
      * @return array
      * @throws \Exception
      */
-    public function getBookRange($cat, $start, $num, $orderby, array $excludedcats = []): array
+    public function getBookRange(array $cat, $orderby, array $excludedCats = []): array
     {
         $browseby = $this->getBrowseBy();
 
@@ -161,7 +159,7 @@ class Books
 
         $exccatlist = '';
         if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
 
         $order = $this->getBookOrder($orderby);
@@ -184,8 +182,7 @@ class Books
                         $catsrch,
                         $exccatlist,
                         $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+                        $order[1]
         );
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         $bookscache = Cache::get(md5($booksql));

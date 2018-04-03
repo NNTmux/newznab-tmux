@@ -48,6 +48,8 @@ Route::prefix('browse')->group(function () {
 
 Route::get('anime/{id?}', 'AnimeController@index');
 
+Route::get('books/{id?}', 'BooksController@index');
+
 Route::get('/console', function () {
     redirect('/console');
 })->middleware('auth');

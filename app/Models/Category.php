@@ -197,7 +197,7 @@ class Category extends Model
      *
      * @return string
      */
-    public static function getCategorySearch(array $cat = [], $query, $builder = false)
+    public static function getCategorySearch(array $cat = [], $query = null, $builder = false): string
     {
         $categories = [];
         // If multiple categories were sent in a single array position, slice and add them
