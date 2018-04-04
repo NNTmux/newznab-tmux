@@ -78,9 +78,6 @@ Route::get('/xxx', function () {
     redirect('/xxx');
 })->middleware('auth');
 
-Route::get('/books', function () {
-    redirect('/books');
-})->middleware('auth');
 
 Route::get('/contact-us', function () {
     redirect('/contact-us');
@@ -144,14 +141,6 @@ Route::get('/search', function () {
     redirect('/search');
 })->middleware('auth');
 
-Route::get('/cart', function () {
-    redirect('/cart');
-})->middleware('auth');
-
-Route::post('/cart', function () {
-    redirect('/cart');
-})->middleware('auth');
-
 Route::post('/search/{id}', function () {
     redirect('/search');
 })->middleware('auth', 'api');
@@ -184,4 +173,4 @@ Route::post('/rss', function () {
     redirect('/rss');
 })->middleware('api');
 
-Route::get('/logout', 'Auth\LoginController@logout')->name('logout');
+Route::get('/logout', 'Auth\LoginController@logout');
