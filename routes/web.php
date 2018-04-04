@@ -16,7 +16,7 @@ Route::get('/', 'BasePageController@index');
 Auth::routes();
 
 Route::get('login', 'Auth\LoginController@showLoginForm');
-Route::post('login', ['as' => 'login', 'uses' => 'Auth\LoginController@login']);
+Route::post('login', 'Auth\LoginController@login')->name('login');
 
 Route::get('register', 'Auth\RegisterController@showRegistrationForm');
 Route::post('register', 'Auth\RegisterController@register');
@@ -53,9 +53,8 @@ Route::get('/console', function () {
     redirect('/console');
 })->middleware('auth');
 
-Route::get('/details/{id}', function () {
-    redirect('/details');
-})->middleware('auth');
+Route::get('/details/{guid}', 'DetailsController@show');
+Route::post('/details/{guid}', 'DetailsController@show');
 
 Route::get('/games', function () {
     redirect('/games');

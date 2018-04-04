@@ -145,9 +145,9 @@ class BasePageController extends Controller
      *
      * @return bool
      */
-    public function isPostBack(Request $request)
+    public function isPostBack()
     {
-        return $request->isMethod('POST');
+        return \request()->isMethod('POST');
     }
 
     /**

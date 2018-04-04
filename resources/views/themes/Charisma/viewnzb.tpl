@@ -650,7 +650,8 @@
 												No comments yet...
 											</div>
 										{/if}
-										<form action="" method="post">
+										<form action="/details" method="post">
+											{{csrf_field()}}
 											<label for="txtAddComment">Add Comment:</label><br/>
 											<textarea id="txtAddComment" name="txtAddComment" rows="6" cols="60"></textarea>
 											<br/>
