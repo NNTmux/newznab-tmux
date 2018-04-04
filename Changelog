@@ -1,4 +1,5 @@
 2018-04-04 DariusIII
+	* Chg: Add Api\ApiController, update routes/web.php
 	* Chg: Add ApiHelp controller
 	* Chg: Update links in themes for new routes
 	* Chg: Update functions.js to include csrf-token

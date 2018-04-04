@@ -16,7 +16,7 @@ Route::get('/', 'BasePageController@index');
 Auth::routes();
 
 Route::get('login', 'Auth\LoginController@showLoginForm');
-Route::post('login', 'Auth\LoginController@login');
+Route::post('login', ['as' => 'login', 'uses' => 'Auth\LoginController@login']);
 
 Route::get('register', 'Auth\RegisterController@showRegistrationForm');
 Route::post('register', 'Auth\RegisterController@register');
@@ -45,6 +45,9 @@ Route::prefix('cart')->group(function () {
     Route::get('delete/{id}', 'CartController@destroy');
     Route::post('delete/{id}', 'CartController@destroy');
 });
+
+Route::get('/api', 'Api\ApiController@api')->middleware('api');
+Route::post('/api', 'Api\ApiController@api')->middleware('api');
 
 Route::get('/console', function () {
     redirect('/console');
@@ -126,14 +129,6 @@ Route::post('/profile_delete', function () {
 Route::get('/profile', 'ProfileController@show')->middleware('auth');
 
 Route::get('/apihelp', 'ApiHelpController@index');
-
-Route::get('/api', function () {
-    redirect('/api');
-})->middleware('api');
-
-Route::post('/api', function () {
-    redirect('/api');
-})->middleware('api');
 
 Route::get('/search', function () {
     redirect('/search');
