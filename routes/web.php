@@ -81,7 +81,6 @@ Route::get('/xxx', function () {
     redirect('/xxx');
 })->middleware('auth');
 
-
 Route::get('/contact-us', function () {
     redirect('/contact-us');
 })->middleware('guest');
