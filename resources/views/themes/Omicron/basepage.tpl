@@ -111,7 +111,7 @@
 								<!-- Menu Body -->
 								<li class="user-body">
 									<div class="col-xs-12 text-center">
-										<a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
+										<a href="{$smarty.const.WWW_TOP}/cart/index"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
 									</div>
 									<div class="col-xs-12 text-center">
 										<a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-list-alt"></i> My Queue</a>

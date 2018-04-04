@@ -221,7 +221,7 @@
 				</button>
 				<ul class="dropdown-menu">
 					<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="zmdi zmdi-account"></i><span> My Profile</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="zmdi zmdi-shopping-basket"></i><span> My Download Basket</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/cart/index"><i class="zmdi zmdi-shopping-basket"></i><span> My Download Basket</span></a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="zmdi zmdi-cloud-download"></i><span> My Queue</span></a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="zmdi zmdi-movie-alt"></i><span> My movies</span></a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="zmdi zmdi-tv-play"></i> My Shows</a></li>

@@ -40,7 +40,7 @@
 			/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 	</li>
 	<li>
-		<a href="{$smarty.const.WWW_TOP}/cart">My cart</a> feed<br/>
+		<a href="{$smarty.const.WWW_TOP}/cart/index">My cart</a> feed<br/>
 		<a href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1">{$smarty.const.WWW_TOP}
 			/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1</a>
 	</li>

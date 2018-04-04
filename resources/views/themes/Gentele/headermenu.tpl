@@ -250,7 +250,7 @@
 						<span class=" fa fa-angle-down"></span>
 					</a>
 					<ul class="dropdown-menu dropdown-usermenu navbar-right">
-						<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i> My
+						<li><a href="{$smarty.const.WWW_TOP}/cart/index"><i class="fa fa-shopping-basket"></i> My
 								Download Basket</a>
 						</li>
 						<li>
