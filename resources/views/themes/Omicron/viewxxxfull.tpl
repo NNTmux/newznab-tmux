@@ -139,7 +139,7 @@
 											<td class="less right">{$msize[$m@index]|fsize_format:"MB"}</td>
 											<td class="icons">
 												<a title="Download NZB"
-												   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+												   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
 												<a href="#" id="guid{$mguid[$m@index]}" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
 																							title="Send to my Download Basket"></i></a>

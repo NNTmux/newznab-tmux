@@ -326,7 +326,7 @@
 						<br>{$result.grabs} grab{if $result.grabs != 1}s{/if}
 					</td>
 					<td class="icon_nzb"><a
-								href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
+								href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
 									class="zmdi zmdi-cloud-download text-muted"
 									title="Download NZB"></i></a>
 						<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i

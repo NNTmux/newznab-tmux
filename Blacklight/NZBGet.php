@@ -171,7 +171,7 @@ class NZBGet
 						<value>
 							<string>'.
             $this->serverurl.
-            'getnzb/'.
+            'getnzb?id='.
             $guid.
             '%26i%3D'.
             $this->uid.

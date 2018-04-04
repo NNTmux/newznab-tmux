@@ -169,7 +169,7 @@ class SABnzbd
                     '&name='.
                     urlencode(
                         $this->serverurl.
-                        'getnzb/'.
+                        'getnzb?id='.
                         $guid.
                         '&i='.
                         $this->uid.

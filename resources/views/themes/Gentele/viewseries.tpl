@@ -212,7 +212,7 @@
 																{$result.size|fsize_format:"MB"}
 															</td>
 															<td>
-																<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}" class="icon_nzb text-muted"><i
+																<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}" class="icon_nzb text-muted"><i
 																			class="fa fa-cloud-download text-muted"
 																			data-toggle="tooltip" data-placement="top" title
 																			data-original-title="Download NZB"></i></a>

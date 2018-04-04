@@ -378,7 +378,7 @@ class XML_Response
         $this->xml->endElement();
         $this->xml->writeElement(
             'link',
-            "{$this->server['server']['url']}getnzb/{$this->release['guid']}.nzb".
+            "{$this->server['server']['url']}getnzb?id={$this->release['guid']}.nzb".
             "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
@@ -394,7 +394,7 @@ class XML_Response
             $this->xml->startElement('enclosure');
             $this->xml->writeAttribute(
                 'url',
-                "{$this->server['server']['url']}getnzb/{$this->release['guid']}.nzb".
+                "{$this->server['server']['url']}getnzb?id={$this->release['guid']}.nzb".
                 "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );

@@ -204,7 +204,7 @@
 														</td>
 														<td class="icons" style='width:100px;'>
 															<a title="Download Nzb"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
 																		class="fa fa-cloud-download text-muted"></i></a>
 															<a class="fa fa-shopping-basket icon_cart text-muted"
 															   href="#"

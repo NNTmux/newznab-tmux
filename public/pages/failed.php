@@ -33,6 +33,6 @@ if (isset($uid, $rssToken) && is_numeric($uid) && request()->has('guid')) {
         header('X-DNZB-RText: No NZB found for alternate match.');
         $page->show404();
     } else {
-        header('Location: '.$page->serverurl.'getnzb/'.$alt['guid'].'&i='.$uid.'&r='.$rssToken);
+        header('Location: '.$page->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken);
     }
 }

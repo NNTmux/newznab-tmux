@@ -52,6 +52,18 @@ Route::post('api', 'Api\ApiController@api')->middleware('api');
 Route::get('details/{guid}', 'DetailsController@show');
 Route::post('details/{guid}', 'DetailsController@show');
 
+Route::get('getnzb', 'GetNzbController@getNzb');
+
+Route::get('rss', 'RssController@rss');
+
+Route::post('rss', 'RssController@rss');
+
+Route::get('profile', 'ProfileController@show');
+
+Route::get('apihelp', 'ApiHelpController@index');
+
+Route::get('logout', 'Auth\LoginController@logout')->name('logout');
+
 Route::get('/console', function () {
     redirect('/console');
 })->middleware('auth');
@@ -83,14 +95,6 @@ Route::get('/xxx', function () {
 Route::get('/contact-us', function () {
     redirect('/contact-us');
 })->middleware('guest');
-
-Route::get('getnzb/{id}', 'GetNzbController@getNzb');
-
-Route::get('rss', 'RssController@rss');
-
-Route::post('rss', 'RssController@rss');
-
-Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::post('/contact-us', function () {
     redirect('/contact-us');
@@ -128,9 +132,6 @@ Route::post('/profile_delete', function () {
     redirect('/login');
 })->middleware('guest');
 
-Route::get('/profile', 'ProfileController@show')->middleware('auth');
-
-Route::get('/apihelp', 'ApiHelpController@index');
 
 Route::get('/search', function () {
     redirect('/search');

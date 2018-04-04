@@ -172,7 +172,7 @@
 														</div>
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
 																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
@@ -322,7 +322,7 @@
 														</div>
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
 																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
