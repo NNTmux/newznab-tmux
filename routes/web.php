@@ -84,9 +84,7 @@ Route::get('/contact-us', function () {
     redirect('/contact-us');
 })->middleware('guest');
 
-Route::get('/getnzb/{id}', function () {
-    redirect('/getnzb');
-})->middleware('auth', 'api');
+Route::get('getnzb/{id}', 'GetNzbController@getNzb');
 
 Route::post('/contact-us', function () {
     redirect('/contact-us');
