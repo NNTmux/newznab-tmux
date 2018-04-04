@@ -64,9 +64,7 @@ Route::get('apihelp', 'ApiHelpController@index');
 
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::get('/console', function () {
-    redirect('/console');
-})->middleware('auth');
+Route::get('console', 'ConsoleController@show');
 
 Route::get('/games', function () {
     redirect('/games');

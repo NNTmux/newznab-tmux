@@ -21,7 +21,7 @@
 								<div class="col-md-8">
 									<div class="nzb_multi_operations">
 										View: <strong>Covers</strong> | <a
-												href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+												href="{$smarty.const.WWW_TOP}/browse/{$category->title}">List</a><br/>
 										With Selected:
 										<div class="btn-group">
 											<button type="button"
@@ -200,7 +200,7 @@
 									<form id="nzb_multi_operations_form" action="get">
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
-													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+													href="{$smarty.const.WWW_TOP}/browse/{$category->title}">List</a><br/>
 											With Selected:
 											<div class="btn-group">
 												<button type="button"

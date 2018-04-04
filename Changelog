@@ -1,4 +1,5 @@
 2018-04-05 DariusIII
+	* Chg: Add ConsoleController
 	* Chg: Update handling of requests for nzb files
 2018-04-04 DariusIII
 	* Chg: Add RSS controller and route
