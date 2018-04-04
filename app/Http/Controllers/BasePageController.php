@@ -343,4 +343,13 @@ class BasePageController extends Controller
 
         $this->render();
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function index()
+    {
+        $this->setPrefs();
+        $this->pagerender();
+    }
 }

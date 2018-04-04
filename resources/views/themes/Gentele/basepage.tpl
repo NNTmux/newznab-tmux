@@ -55,7 +55,6 @@
 				<!-- menu profile quick info -->
 				{if Auth::check()}
 				<div class="profile">
-
 						<div class="profile_pic">
 							<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png" alt="User Image"
 								 class="img-circle profile_img">
@@ -92,7 +91,7 @@
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/browse"><i
+										<li><a href="{$smarty.const.WWW_TOP}/browse/all"><i
 														class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i
@@ -175,7 +174,7 @@
 	</div>
 
 </div>
-<!-- jQuery 3.1.0 -->
+<!-- jQuery 3.2.0 -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/jquery-3.2.x/dist/jquery.min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
 <!-- bootstrap progress js -->

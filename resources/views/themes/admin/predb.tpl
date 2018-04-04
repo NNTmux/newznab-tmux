@@ -55,7 +55,7 @@
 					{* Movies *}
 					{if in_array($result.category, array('Movies'))}
 						<a class="title" title="View category Movies"
-						   href="{$smarty.const.WWW_TOP}/../browse?t={$catClass::MOVIE_ROOT}">Movies</a>
+						   href="{$smarty.const.WWW_TOP}/../browse/{$parentcat.title}">Movies</a>
 					{/if}
 					{* SD *}
 					{if in_array($result.category, array('movies-sd', 'Movies: STD', 'XVid'))}
@@ -150,7 +150,7 @@
 					{* XXX *}
 					{if in_array($result.category, array('XXX'))}
 						<a class="title" title="View category XXX"
-						   href="{$smarty.const.WWW_TOP}/../browse?t={$catClass::XXX_ROOT}">XXX</a>
+						   href="{$smarty.const.WWW_TOP}/../browse/{$parentcat.title}">XXX</a>
 					{/if}
 					{* DVD *}
 					{if in_array($result.category, array('XXX: DVD'))}
@@ -185,7 +185,7 @@
 					{* Books *}
 					{if in_array($result.category, array('EBOOK'))}
 						<a class="title" title="View category Books"
-						   href="{$smarty.const.WWW_TOP}/../browse?t={$catClass::BOOKS_ROOT}">Ebooks</a>
+						   href="{$smarty.const.WWW_TOP}/../browse/{$parentcat.title}">Ebooks</a>
 					{/if}
 					{* Other *}
 					{if in_array($result.category, array('Other: E-Books'))}
