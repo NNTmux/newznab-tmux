@@ -46,15 +46,15 @@ Route::prefix('cart')->group(function () {
     Route::post('delete/{id}', 'CartController@destroy');
 });
 
-Route::get('/api', 'Api\ApiController@api')->middleware('api');
-Route::post('/api', 'Api\ApiController@api')->middleware('api');
+Route::get('api', 'Api\ApiController@api')->middleware('api');
+Route::post('api', 'Api\ApiController@api')->middleware('api');
+
+Route::get('details/{guid}', 'DetailsController@show');
+Route::post('details/{guid}', 'DetailsController@show');
 
 Route::get('/console', function () {
     redirect('/console');
 })->middleware('auth');
-
-Route::get('/details/{guid}', 'DetailsController@show');
-Route::post('/details/{guid}', 'DetailsController@show');
 
 Route::get('/games', function () {
     redirect('/games');
@@ -85,6 +85,12 @@ Route::get('/contact-us', function () {
 })->middleware('guest');
 
 Route::get('getnzb/{id}', 'GetNzbController@getNzb');
+
+Route::get('rss', 'RssController@rss');
+
+Route::post('rss', 'RssController@rss');
+
+Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::post('/contact-us', function () {
     redirect('/contact-us');
@@ -154,12 +160,4 @@ Route::post('/btc_payment_callback', function () {
     redirect('/btc_payment_callback');
 });
 
-Route::get('/rss', function () {
-    redirect('/rss');
-})->middleware('api');
 
-Route::post('/rss', function () {
-    redirect('/rss');
-})->middleware('api');
-
-Route::get('/logout', 'Auth\LoginController@logout');

@@ -92,7 +92,7 @@ class BasePageController extends Controller
      */
     public function __construct(Request $request)
     {
-        $this->middleware('auth')->except('api');
+        $this->middleware('auth')->except('api', 'rss');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
