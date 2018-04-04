@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Blacklight\NZB;
+use App\Models\User;
 use App\Models\Release;
 use App\Models\Settings;
-use App\Models\User;
+use Blacklight\Releases;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
-use Blacklight\NZB;
-use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 
 class GetNzbController extends BasePageController
