@@ -130,7 +130,6 @@ Route::post('/profile_delete', function () {
     redirect('/login');
 })->middleware('guest');
 
-
 Route::get('/search', function () {
     redirect('/search');
 })->middleware('auth');
@@ -158,5 +157,3 @@ Route::get('/btc_payment_callback', function () {
 Route::post('/btc_payment_callback', function () {
     redirect('/btc_payment_callback');
 });
-
-
