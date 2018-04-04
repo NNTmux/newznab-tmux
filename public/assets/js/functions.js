@@ -21,7 +21,12 @@ jQuery(function($){
     $('.cartadd').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(".guid").attr('id').substring(4);
-        $.post( SERVERROOT + "cart?add=" + guid, function(resp){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.post( SERVERROOT + "/cart/add/" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
             PNotify.desktop.permission();
@@ -226,7 +231,12 @@ jQuery(function($){
     $('.icon_cart').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(this).attr('id').substring(4);
-        $.post( SERVERROOT + "cart?add=" + guid, function(resp){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.post( SERVERROOT + "/cart/add/" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
             PNotify.desktop.permission();
@@ -539,7 +549,7 @@ jQuery(function($){
         });
         var guidstring = guids.toString();
         // alert (guidstring); // This is just for testing shit
-        $.post( SERVERROOT + "cart?add=" + guidstring);
+        $.post( SERVERROOT + "/cart/add/" + guidstring);
     }));
     $('button.nzb_multi_operations_sab').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
@@ -685,7 +695,7 @@ jQuery(function($){
                     history: false
                 }
             })).get().on('pnotify.confirm', function() {
-                $.post( SERVERROOT + "cart?delete", { 'delete': ids }, function(resp){
+                $.post( SERVERROOT + "/cart/delete/", { 'delete': ids }, function(resp){
                     location.reload(true);
                 });
             }).on('pnotify.cancel', function() {
