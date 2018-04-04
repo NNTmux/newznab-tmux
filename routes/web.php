@@ -125,9 +125,7 @@ Route::post('/profile_delete', function () {
 
 Route::get('/profile', 'ProfileController@show')->middleware('auth');
 
-Route::get('/apihelp', function () {
-    redirect('/apihelp');
-})->middleware('auth');
+Route::get('/apihelp', 'ApiHelpController@index');
 
 Route::get('/api', function () {
     redirect('/api');
