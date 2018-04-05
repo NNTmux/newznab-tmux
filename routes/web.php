@@ -80,8 +80,6 @@ Route::get('/movies', function () {
     redirect('/movies');
 })->middleware('auth');
 
-
-
 Route::get('/pc', function () {
     redirect('/pc');
 })->middleware('auth');
