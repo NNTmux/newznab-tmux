@@ -19,7 +19,7 @@ class ContactUsController extends BasePageController
         $this->setPrefs();
         $this->validate($request, [
             'useremail' => 'required',
-            'username' => 'required'
+            'username' => 'required',
         ]);
 
         if (env('NOCAPTCHA_ENABLED') === true) {
@@ -37,7 +37,7 @@ class ContactUsController extends BasePageController
 
             foreach ($request->all() as $key => $value) {
                 if ($key !== 'submit' && $key !== '_token') {
-                    $mailBody .= "$key : $value" . PHP_EOL;
+                    $mailBody .= "$key : $value".PHP_EOL;
                 }
             }
 
