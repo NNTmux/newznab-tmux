@@ -90,9 +90,8 @@ Route::get('/xxx', function () {
     redirect('/xxx');
 })->middleware('auth');
 
-Route::get('/contact-us', function () {
-    redirect('/contact-us');
-})->middleware('guest');
+Route::get('contact-us', 'ContactUsController@showContactForm');
+Route::post('contact-us', 'ContactUsController@showContactForm');
 
 Route::post('/contact-us', function () {
     redirect('/contact-us');

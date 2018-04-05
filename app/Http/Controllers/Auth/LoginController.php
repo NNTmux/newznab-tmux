@@ -71,8 +71,6 @@ class LoginController extends Controller
             return redirect()->intended($this->redirectPath());
         }
 
-        app('smarty.view')->assign('error', 'These credentials do not match our records.');
-
         return redirect()->back()
             ->withInput()
             ->withErrors([
@@ -87,6 +85,7 @@ class LoginController extends Controller
     {
         $theme = Settings::settingValue('site.main.style');
         app('smarty.view')->assign(['error' => '', 'username' => '', 'rememberme' => '']);
+        $nocaptcha = env('NOCAPTCHA_ENABLED');
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';
@@ -95,6 +94,7 @@ class LoginController extends Controller
         app('smarty.view')->assign(
             [
                 'error' => 'These credentials do not match our records.',
+                'nocaptcha'=> $nocaptcha,
                 'content' => $content,
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,

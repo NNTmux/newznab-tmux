@@ -1,4 +1,5 @@
 2018-04-05 DariusIII
+	* Fix: Fix NOCAPTCHA on login pages
 	* Chg: Add ConsoleController
 	* Chg: Update handling of requests for nzb files
 2018-04-04 DariusIII

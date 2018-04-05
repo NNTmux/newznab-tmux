@@ -38,7 +38,9 @@
                   <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
                 </label>
                 <hr>
-                {NoCaptcha::display()}{NoCaptcha::renderJs()}
+                {if $nocaptcha != false}
+                  {NoCaptcha::display()}{NoCaptcha::renderJs()}
+                {/if}
               </div>
             </div><!-- /.col -->
             <div class="col-xs-4">
