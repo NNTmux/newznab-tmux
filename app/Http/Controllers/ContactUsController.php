@@ -2,25 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
 use App\Mail\ContactUs;
 use App\Models\Settings;
 use Illuminate\Http\Request;
-use App\Notifications\InboxMessage;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Requests\ContactFormRequest;
 
-class ContactUsController extends Controller
+class ContactUsController extends BasePageController
 {
-    /**
-     * @param mixed $ability
-     * @param array $arguments
-     *
-     * @return bool|\Illuminate\Auth\Access\Response
-     */
-    public function authorize($ability, $arguments = [])
+    public function __construct(Request $request)
     {
-        return true;
+        parent::__construct($request);
+        $this->middleware('guest');
     }
 
     /**
@@ -28,7 +20,7 @@ class ContactUsController extends Controller
      *
      * @throws \Exception
      */
-    public function contact(Request $request)
+    public function showContactForm(Request $request)
     {
         $this->validate($request, [
             'useremail' => 'required',
@@ -58,46 +50,24 @@ class ContactUsController extends Controller
             }
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }
-        app('smarty.view')->assign('message', $msg);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function show()
-    {
-        $theme = Settings::settingValue('site.main.style');
+        $this->smarty->assign('msg', $msg);
         $title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_keywords = 'contact us,contact,get in touch,email';
         $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
 
-        $content = app('smarty.view')->fetch($theme.'/contact.tpl');
+        $content = $this->smarty->fetch('contact.tpl');
 
-        app('smarty.view')->assign(
+        $this->smarty->assign(
             [
                 'title' => $title,
                 'content' => $content,
-                'nocaptcha' => env('NOCAPTCHA_ENABLED'),
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
                 'meta_description' => $meta_description,
             ]
         );
 
-        app('smarty.view')->display($theme.'/basepage.tpl');
-    }
-
-    /**
-     * @param \App\Http\Requests\ContactFormRequest $message
-     * @param \App\Models\Admin                     $admin
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function mailToAdmin(ContactFormRequest $message, Admin $admin)
-    {        //send the admin an notification
-        $admin->notify(new InboxMessage($message));
-        // redirect the user back
-        return redirect()->back()->with('message', 'Thanks for the message! We will get back to you soon!');
+        $this->pagerender();
     }
 }
