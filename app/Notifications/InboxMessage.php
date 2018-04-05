@@ -3,15 +3,13 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use App\Http\Requests\ContactFormRequest;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class InboxMessage extends Notification
 {
     use Queueable;
-
 
     protected $message;
 
@@ -24,6 +22,7 @@ class InboxMessage extends Notification
     {
         $this->message = $message;
     }
+
     /**
      * Get the notification's delivery channels.
      *
@@ -44,7 +43,7 @@ class InboxMessage extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(env('ADMIN_USER') .', you got a new message!')
+            ->subject(env('ADMIN_USER').', you got a new message!')
             ->greeting(' ')
             ->salutation(' ')
             ->from($this->message->email, $this->message->name)
