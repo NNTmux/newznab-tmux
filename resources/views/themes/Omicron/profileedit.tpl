@@ -56,8 +56,8 @@
 														<tr>
 															<th width="200">Confirm password</th>
 															<td>
-																<input autocomplete="off" id="confirmpassword"
-																	   name="confirmpassword" type="password"
+																<input autocomplete="off" id="password_confirmation"
+																	   name="password_confirmation" type="password"
 																	   class="form-control" value="">
 															</td>
 														</tr>

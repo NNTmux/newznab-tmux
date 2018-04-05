@@ -11,7 +11,6 @@ use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
@@ -47,22 +46,6 @@ class RegisterController extends Controller
     }
 
     /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'username' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'g-recaptcha-response' => 'required|captcha',
-        ]);
-    }
-
-    /**
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
@@ -83,10 +66,27 @@ class RegisterController extends Controller
         ]);
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
     public function register(Request $request)
     {
         $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
         $showRegister = 1;
+
+        $this->validate($request, [
+            'username' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (env('NOCAPTCHA_ENABLED') === true) {
+            $this->validate($request, [
+                'g-recaptcha-response' => 'required|captcha',
+            ]);
+        }
 
         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
             session()->flash('status', 'Registrations are currently disabled.');
@@ -103,16 +103,12 @@ class RegisterController extends Controller
                 case 'submit':
                     $userName = $request->input('username');
                     $password = $request->input('password');
-                    $confirmPassword = $request->input('confirmpassword');
+                    $confirmPassword = $request->input('password_confirmation');
                     $email = $request->input('email');
-                    if (! empty($request->input('invitecode'))) {
+                    if ($request->has('invitecode')) {
                         $inviteCode = $request->input('invitecode');
                     }
 
-                    // Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
-                    if ($password !== $confirmPassword) {
-                        session()->flash('status', 'Password Mismatch');
-                    } else {
                         // Get the default user role.
                         $userDefault = UserRole::getDefaultRole();
 
@@ -173,7 +169,6 @@ class RegisterController extends Controller
 
                             return redirect()->intended($this->redirectPath());
                         }
-                    }
                     break;
                 case 'view': {
                     $inviteCode = $request->input('invitecode') ?? null;
@@ -195,7 +190,7 @@ class RegisterController extends Controller
             [
                 'username'          => Utility::htmlfmt($userName),
                 'password'          => Utility::htmlfmt($password),
-                'confirmpassword'   => Utility::htmlfmt($confirmPassword),
+                'password_confirmation'   => Utility::htmlfmt($confirmPassword),
                 'email'             => Utility::htmlfmt($email),
                 'invitecode'        => Utility::htmlfmt($inviteCode),
                 'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
@@ -212,6 +207,8 @@ class RegisterController extends Controller
     {
         $theme = Settings::settingValue('site.main.style');
 
+        $nocaptcha = env('NOCAPTCHA_ENABLED');
+
         $meta_title = 'Register';
         $meta_keywords = 'register,signup,registration';
         $meta_description = 'Register';
@@ -223,6 +220,7 @@ class RegisterController extends Controller
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
                 'meta_description' => $meta_description,
+                'nocaptcha' => $nocaptcha,
             ]
         );
         app('smarty.view')->display($theme.'/basepage.tpl');

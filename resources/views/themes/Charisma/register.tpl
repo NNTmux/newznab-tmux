@@ -63,12 +63,14 @@
 							<div class="clearfix"></div>
 							<div class="input-group input-group-lg">
 								<span class="input-group-addon"><i class="glyphicon glyphicon-lock red"></i></span>
-								<input autocomplete="off" id="confirmpassword" name="confirmpassword" value="{$confirmpassword}" type="password" class="form-control" placeholder="Retype password"/>
+								<input autocomplete="off" id="password_confirmation" name="password_confirmation" value="{$confirmpassword}" type="password" class="form-control" placeholder="Retype password"/>
 							</div>
 							<div class="clearfix"></div>
 							<p class="center col-md-5">
 							<p class="center col-md-5">
-								{NoCaptcha::display()}{NoCaptcha::renderJs()}
+								{if $nocaptcha != false}
+									{NoCaptcha::display()}{NoCaptcha::renderJs()}
+								{/if}
 							</p>
 							<button type="submit" class="btn btn-primary">Register</button>
 						</fieldset>

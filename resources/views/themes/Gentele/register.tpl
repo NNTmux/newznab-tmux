@@ -36,7 +36,7 @@
 						<div class="hint">Should be at least six characters long.</div>
 					</div>
 					<div class="form-group has-feedback">
-						<input autocomplete="off" id="confirmpassword" name="confirmpassword" value="{$confirmpassword}"
+						<input autocomplete="off" id="password_confirmation" name="password_confirmation" value="{$confirmpassword}"
 							   type="password" class="form-control" placeholder="Retype password"/>
 						<span class="glyphicon glyphicon-log-in form-control-feedback"></span>
 					</div>
@@ -55,8 +55,9 @@
 						</div><!-- /.col -->
 						<hr>
 						<div style="text-align: center;">
-							{NoCaptcha::display()}
-							{NoCaptcha::renderJs()}
+							{if $nocaptcha != false}
+								{NoCaptcha::display()}{NoCaptcha::renderJs()}
+							{/if}
 						</div>
 					</div>
 					<a href="{$serverroot}login" class="text-center">I already have a membership</a>

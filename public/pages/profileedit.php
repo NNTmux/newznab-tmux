@@ -42,7 +42,7 @@ switch ($action) {
             request()->merge(['saburl' => request()->input('saburl').'/']);
         }
 
-        if (request()->input('password') !== null && request()->input('password') !== request()->input('confirmpassword')) {
+        if (request()->input('password') !== null && request()->input('password') !== request()->input('password_confirmation')) {
             $errorStr = 'Password Mismatch';
         } elseif (request()->input('password') !== null && ! User::isValidPassword(request()->input('password'))) {
             $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
