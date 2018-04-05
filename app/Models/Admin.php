@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use App\Http\Requests\ContactFormRequest;
 
 class Admin extends Model
 {
@@ -18,7 +17,8 @@ class Admin extends Model
      *
      * @throws \Exception
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->admin = env('ADMIN_USER');
         $this->email = Settings::settingValue('site.main.email');
     }

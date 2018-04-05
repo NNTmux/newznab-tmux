@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ContactFormRequest;
-use App\Mail\ContactUs;
 use App\Models\Admin;
+use App\Mail\ContactUs;
 use App\Models\Settings;
-use App\Notifications\InboxMessage;
 use Illuminate\Http\Request;
+use App\Notifications\InboxMessage;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\ContactFormRequest;
 
 class ContactUsController extends Controller
 {
-
     /**
      * @param mixed $ability
      * @param array $arguments

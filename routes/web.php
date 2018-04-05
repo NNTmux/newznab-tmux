@@ -91,7 +91,7 @@ Route::get('/xxx', function () {
 })->middleware('auth');
 
 Route::get('/contact-us', 'ContactUsController@show');
-Route::post('/contact-us',  'ContactUsController@mailToAdmin');
+Route::post('/contact-us', 'ContactUsController@mailToAdmin');
 
 Route::post('/contact-us', function () {
     redirect('/contact-us');
