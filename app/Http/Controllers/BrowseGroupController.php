@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
-use Blacklight\Releases;
-use Illuminate\Http\Request;
 
 class BrowseGroupController extends BasePageController
 {
