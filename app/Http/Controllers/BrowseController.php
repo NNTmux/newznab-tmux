@@ -101,4 +101,34 @@ class BrowseController extends BasePageController
         );
         $this->pagerender();
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @throws \Exception
+     */
+    public function group(Request $request)
+    {
+        $this->setPrefs();
+        $releases = new Releases();
+        if ($request->has('g')) {
+            $group = $request->input('g');
+            $results = $releases->getBrowseRange([-1], '', -1, $this->userdata['categoryexclusions'], $group);
+            $this->smarty->assign('results', $results);
+            $meta_title = 'Browse Groups';
+            $meta_keywords = 'browse,nzb,description,details';
+            $meta_description = 'Browse Groups';
+            $content = $this->smarty->fetch('browse.tpl');
+
+            $this->smarty->assign(
+                [
+                    'content' => $content,
+                    'meta_title' => $meta_title,
+                    'meta_keywords' => $meta_keywords,
+                    'meta_description' => $meta_description,
+                ]
+            );
+
+            $this->pagerender();
+        }
+    }
 }

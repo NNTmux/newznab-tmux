@@ -1,4 +1,5 @@
 2018-04-05 DariusIII
+	* Chg: Add BrowseGroupController
 	* Chg: Update contact form
 	* Chg: Update and improve registration page
 	* Fix: Fix NOCAPTCHA on login pages

@@ -155,13 +155,13 @@ class Releases
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->groupBy('r.id')
             ->orderBy($orderBy[0], $orderBy[1]);
-        $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize));
+        $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName));
         if ($releases !== null) {
             return $releases;
         }
         $sql = $qry->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize), $sql, $expiresAt);
+        Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName), $sql, $expiresAt);
 
         return $sql;
     }

@@ -29,7 +29,10 @@ Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
 
 Route::get('profile', 'ProfileController@show');
 
+Route::get('browse', 'BrowseController@group');
+
 Route::prefix('browse')->group(function () {
+    Route::get('group', 'BrowseController@group');
     Route::get('all', 'BrowseController@index');
     Route::get('{parentCategory}/{id?}', 'BrowseController@show');
 });
@@ -53,6 +56,7 @@ Route::get('details/{guid}', 'DetailsController@show');
 Route::post('details/{guid}', 'DetailsController@show');
 
 Route::get('getnzb', 'GetNzbController@getNzb');
+Route::post('getnzb', 'GetNzbController@getNzb');
 
 Route::get('rss', 'RssController@rss');
 
@@ -66,6 +70,8 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('console', 'ConsoleController@show');
 
+Route::get('browsegroup', 'BrowseGroupController@show');
+
 Route::get('/games', function () {
     redirect('/games');
 })->middleware('auth');
@@ -74,9 +80,7 @@ Route::get('/movies', function () {
     redirect('/movies');
 })->middleware('auth');
 
-Route::get('/browsegroup', function () {
-    redirect('/browsegroup');
-})->middleware('auth');
+
 
 Route::get('/pc', function () {
     redirect('/pc');
