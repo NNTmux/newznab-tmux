@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-</head>
 <body class="skin-blue layout-boxed">
 <div class="wrapper">
 	<div class="header">
@@ -35,9 +28,14 @@
 													happy to help you.</h2>
 											</div>
 										</div>
+										{if {(session('message'))}}
+										<div class='alert alert-success'>
+											{{session('message')}}
+										</div>
+										{/if}
 										<div class="row m-b-30">
 											<div class="col-sm-6">
-												<form method="POST" action="{$smarty.const.WWW_TOP}contact-us">
+												<form method="POST" action="contact-us">
 													{{csrf_field()}}
 													<div class="row">
 														<div class="col-sm-6">
@@ -51,10 +49,12 @@
 																   class="form-control form-white">
 														</div>
 													</div>
-													<label for="comment" class="h6">Message</label>
-										<textarea rows="7" name="comment" id="comment"
+													<label for="message" class="h6">Message</label>
+										<textarea rows="7" name="message" id="message"
 												  class="form-control form-white"></textarea>
+													{if $nocaptcha != false}
 													{NoCaptcha::display()}{NoCaptcha::renderJs()}
+													{/if}
 													<button type="submit"  class="btn btn-primary m-t-20">
 														Send message
 													</button>
@@ -73,4 +73,3 @@
 	</div>
 </div>
 </body>
-</html>
