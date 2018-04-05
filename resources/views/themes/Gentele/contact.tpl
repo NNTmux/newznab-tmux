@@ -54,7 +54,9 @@
 													<label for="comment" class="h6">Message</label>
 										<textarea rows="7" name="comment" id="comment"
 												  class="form-control form-white"></textarea>
+													{if $nocaptcha != false}
 													{NoCaptcha::display()}{NoCaptcha::renderJs()}
+													{/if}
 													<button type="submit"  class="btn btn-primary m-t-20">
 														Send message
 													</button>

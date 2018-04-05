@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    {{ $mailBody }}
+    {!! nl2br(e($mailBody)) !!}
 @endsection

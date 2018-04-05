@@ -92,7 +92,7 @@ class BasePageController extends Controller
      */
     public function __construct(Request $request)
     {
-        $this->middleware('auth')->except('api', 'rss', 'contact-us');
+        $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
@@ -121,6 +121,7 @@ class BasePageController extends Controller
             $this->smarty->assign('ismod', 'false');
             $this->smarty->assign('loggedin', 'false');
         }
+
         if ($this->theme === 'None') {
             $this->theme = Settings::settingValue('site.main.style');
         }
@@ -141,8 +142,6 @@ class BasePageController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
      * @return bool
      */
     public function isPostBack()

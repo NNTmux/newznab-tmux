@@ -9,21 +9,17 @@ use Illuminate\Support\Facades\Mail;
 
 class ContactUsController extends BasePageController
 {
-    public function __construct(Request $request)
-    {
-        parent::__construct($request);
-        $this->middleware('guest');
-    }
-
     /**
      * @param \Illuminate\Http\Request $request
      *
      * @throws \Exception
      */
-    public function showContactForm(Request $request)
+    public function contact(Request $request)
     {
+        $this->setPrefs();
         $this->validate($request, [
             'useremail' => 'required',
+            'username' => 'required'
         ]);
 
         if (env('NOCAPTCHA_ENABLED') === true) {
@@ -37,11 +33,11 @@ class ContactUsController extends BasePageController
         if ($request->has('useremail')) {
             $email = $request->input('useremail');
             $mailTo = Settings::settingValue('site.main.email');
-            $mailBody = "Values submitted from contact form:\n";
+            $mailBody = 'Values submitted from contact form: ';
 
             foreach ($request->all() as $key => $value) {
-                if ($key !== 'submit') {
-                    $mailBody .= "$key : $value<br />\r\n";
+                if ($key !== 'submit' && $key !== '_token') {
+                    $mailBody .= "$key : $value" . PHP_EOL;
                 }
             }
 
@@ -51,12 +47,21 @@ class ContactUsController extends BasePageController
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }
         $this->smarty->assign('msg', $msg);
+
+        redirect('/');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function showContactForm()
+    {
+        $this->setPrefs();
         $title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_keywords = 'contact us,contact,get in touch,email';
         $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
-
-        $content = $this->smarty->fetch('contact.tpl');
+        $content = $this->smarty->fetch($this->theme.'/contact.tpl');
 
         $this->smarty->assign(
             [
@@ -65,9 +70,10 @@ class ContactUsController extends BasePageController
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
                 'meta_description' => $meta_description,
+                'nocaptcha' => env('NOCAPTCHA_ENABLED'),
             ]
         );
 
-        $this->pagerender();
+        $this->smarty->display($this->theme.'/basepage.tpl');
     }
 }
