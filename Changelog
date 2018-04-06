@@ -1,3 +1,5 @@
+2018-04-06 DariusIII
+	* Fix: Fix pager on browse pages
 2018-04-05 DariusIII
 	* Chg: Update themes for new group browse route
 	* Chg: Add BrowseGroupController

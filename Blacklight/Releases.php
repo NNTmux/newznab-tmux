@@ -106,17 +106,15 @@ class Releases
 
     /**
      * @param array $cat
-     * @param       $orderBy
-     * @param int   $maxAge
+     * @param $orderBy
+     * @param int $maxAge
      * @param array $excludedCats
-     * @param int   $groupName
-     * @param int   $minSize
-     *
+     * @param int $groupName
+     * @param int $minSize
+     * @param int $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     * @throws \Exception
-     * @throws \InvalidArgumentException
      */
-    public function getBrowseRange(array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
+    public function getBrowseRange($page, array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $qry = Release::query()
@@ -155,13 +153,13 @@ class Releases
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->groupBy('r.id')
             ->orderBy($orderBy[0], $orderBy[1]);
-        $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName));
+        $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page));
         if ($releases !== null) {
             return $releases;
         }
         $sql = $qry->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName), $sql, $expiresAt);
+        Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page), $sql, $expiresAt);
 
         return $sql;
     }

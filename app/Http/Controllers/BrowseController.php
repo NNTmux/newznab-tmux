@@ -24,8 +24,9 @@ class BrowseController extends BasePageController
         $this->smarty->assign('category', -1);
 
         $orderby = '';
+        $page = \request()->has('page') ? \request()->input('page') : 1;
 
-        $results = $releases->getBrowseRange([-1], $orderby, -1, $this->userdata['categoryexclusions'], -1);
+        $results = $releases->getBrowseRange($page, [-1], $orderby, -1, $this->userdata['categoryexclusions'], -1);
 
         $this->smarty->assign('catname', 'All');
 
@@ -51,7 +52,7 @@ class BrowseController extends BasePageController
 
     /**
      * @param string $parentCategory
-     * @param $id
+     * @param string $id
      * @throws \Exception
      */
     public function show(string $parentCategory, string $id = 'all')
@@ -77,8 +78,9 @@ class BrowseController extends BasePageController
         $this->smarty->assign('category', $category);
 
         $orderby = '';
+        $page = \request()->has('page') ? \request()->input('page') : 1;
 
-        $results = $releases->getBrowseRange($catarray, $orderby, -1, $this->userdata['categoryexclusions'], $grp);
+        $results = $releases->getBrowseRange($page, $catarray, $orderby, -1, $this->userdata['categoryexclusions'], $grp);
 
         $this->smarty->assign('catname', $id);
 
@@ -111,8 +113,9 @@ class BrowseController extends BasePageController
         $this->setPrefs();
         $releases = new Releases();
         if ($request->has('g')) {
+            $page = $request->has('page') ? $request->input('page') : 1;
             $group = $request->input('g');
-            $results = $releases->getBrowseRange([-1], '', -1, $this->userdata['categoryexclusions'], $group);
+            $results = $releases->getBrowseRange($page, [-1], '', -1, $this->userdata['categoryexclusions'], $group);
             $this->smarty->assign('results', $results);
             $meta_title = 'Browse Groups';
             $meta_keywords = 'browse,nzb,description,details';
