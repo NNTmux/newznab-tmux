@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserRole;
-use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Blacklight\libraries\Geary;
 use Illuminate\Support\Facades\Auth;
 
 class BtcPaymentController extends BasePageController
@@ -71,7 +71,7 @@ class BtcPaymentController extends BasePageController
     }
 
     /**
-     * Callback data from Mycelium Gear
+     * Callback data from Mycelium Gear.
      */
     public function callback()
     {
