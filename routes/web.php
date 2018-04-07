@@ -139,18 +139,10 @@ Route::get('/filelist/{id}', function () {
     redirect('/filelist');
 })->middleware('auth');
 
-Route::get('/btc_payment', function () {
-    redirect('/btc_payment');
-})->middleware('auth');
+Route::get('btc_payment', 'BtcPaymentController@show');
 
-Route::post('/btc_payment', function () {
-    redirect('/btc_payment');
-})->middleware('auth');
+Route::post('btc_payment', 'BtcPaymentController@show');
 
-Route::get('/btc_payment_callback', function () {
-    redirect('/btc_payment_callback');
-});
+Route::get('btc_payment_callback', 'BtcPaymentController@callback');
 
-Route::post('/btc_payment_callback', function () {
-    redirect('/btc_payment_callback');
-});
+Route::post('btc_payment_callback', 'BtcPaymentController@callback');
