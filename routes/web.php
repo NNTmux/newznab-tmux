@@ -143,9 +143,9 @@ Route::post('/search/{id}', function () {
     redirect('/search');
 })->middleware('auth', 'api');
 
-Route::get('/filelist/{id}', function () {
-    redirect('/filelist');
-})->middleware('auth');
+Route::get('filelist/{guid}', 'FileListController@show');
+
+Route::post('filelist/{guid}', 'FileListController@show');
 
 Route::get('btc_payment', 'BtcPaymentController@show');
 
