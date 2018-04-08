@@ -72,6 +72,10 @@ Route::get('console', 'ConsoleController@show');
 
 Route::get('browsegroup', 'BrowseGroupController@show');
 
+Route::get('content', 'ContentController@show');
+
+Route::post('content', 'ContentController@show');
+
 Route::get('/games', function () {
     redirect('/games');
 })->middleware('auth');
