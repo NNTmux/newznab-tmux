@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Release;
 use Blacklight\NZB;
+use App\Models\Release;
 
 class FileListController extends BasePageController
 {
@@ -44,7 +44,6 @@ class FileListController extends BasePageController
             $meta_description = 'View Nzb File List';
 
             $content = $this->smarty->fetch('viewfilelist.tpl');
-
 
             $this->smarty->assign(
                     [
