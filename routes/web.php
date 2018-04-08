@@ -76,6 +76,10 @@ Route::get('content', 'ContentController@show');
 
 Route::post('content', 'ContentController@show');
 
+Route::get('failed', 'FailedReleasesController@show');
+
+Route::post('failed', 'FailedReleasesController@show');
+
 Route::get('/games', function () {
     redirect('/games');
 })->middleware('auth');

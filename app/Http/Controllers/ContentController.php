@@ -10,6 +10,7 @@ class ContentController extends BasePageController
 {
     public function show(Request $request)
     {
+        $this->setPrefs();
         $contents = new Contents();
 
         $role = 0;

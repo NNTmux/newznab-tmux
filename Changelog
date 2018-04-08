@@ -1,4 +1,5 @@
 2018-04-08 DariusIII
+	* Chg: Add FailedReleasesController and routes
 	* Chg: Add ContentController and route
 2018-04-07 DariusIII
 	* Chg: Add BtcPaymentController
