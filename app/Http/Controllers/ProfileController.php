@@ -101,7 +101,7 @@ class ProfileController extends BasePageController
         $meta_keywords = 'view,profile,user,details';
         $meta_description = 'View User Profile for '.$data['username'];
 
-        $content = $this->smarty->fetch($this->theme.'/profile.tpl');
+        $content = $this->smarty->fetch('profile.tpl');
 
         $this->smarty->assign(
             [
