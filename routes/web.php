@@ -103,21 +103,13 @@ Route::get('/xxx', function () {
 Route::get('contact-us', 'ContactUsController@showContactForm');
 Route::post('contact-us', 'ContactUsController@contact');
 
-Route::get('/forum', function () {
-    redirect('/forum');
-})->middleware('auth');
+Route::get('forum', 'ForumController@forum');
 
-Route::post('/forum', function () {
-    redirect('/forum');
-})->middleware('auth');
+Route::post('forum', 'ForumController@forum');
 
-Route::get('/forumpost/{id}', function () {
-    redirect('/forumpost');
-})->middleware('auth');
+Route::get('forumpost/{id}', 'ForumController@getPosts');
 
-Route::post('/forumpost/{id}', function () {
-    redirect('/forumpost');
-})->middleware('auth');
+Route::post('forumpost/{id}', 'ForumController@getPosts');
 
 Route::get('/profileedit', function () {
     redirect('/profileedit');

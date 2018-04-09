@@ -110,26 +110,14 @@ class Forumpost extends Model
     }
 
     /**
-     * Get count of posts for parent forum.
-     *
-     * @return int
-     */
-    public static function getBrowseCount(): int
-    {
-        $res = self::query()->count('id');
-
-        return $res ?? 0;
-    }
-
-    /**
      * Get browse range for forum.
      *
      *
      * @param $start
      *
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getBrowseRange($start)
+    public static function getBrowseRange()
     {
         return self::query()
             ->where('forumpost.parentid', '=', 0)
@@ -137,8 +125,7 @@ class Forumpost extends Model
             ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
             ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
             ->orderBy('forumpost.updated_at', 'desc')
-            ->limit(config('nntmux.items_per_page'))->offset($start)
-            ->get();
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
