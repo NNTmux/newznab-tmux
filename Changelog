@@ -1,4 +1,5 @@
 2018-04-09 DariusIII
+	* Chg: Use laravel pagination in forum
 	* Chg: Add ForumController and routes
 2018-04-08 DariusIII
 	* Chg: Add FileListController and routes
