@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends BasePageController
 {
-
     /**
      * @param \Illuminate\Http\Request $request
      *
