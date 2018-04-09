@@ -14,18 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends BasePageController
 {
-    /**
-     * ProfileController constructor.
-     *
-     * @param \Illuminate\Http\Request $request
-     *
-     * @throws \Exception
-     */
-    public function __construct(Request $request)
-    {
-        parent::__construct($request);
-        $this->middleware('auth');
-    }
 
     /**
      * @param \Illuminate\Http\Request $request
@@ -84,11 +72,6 @@ class ProfileController extends BasePageController
                 'privateprofiles'   => $privateProfiles,
                 'publicview'        => $publicView,
                 'privileged'        => $privileged,
-                'pagertotalitems'   => ReleaseComment::getCommentCountForUser($userID),
-                'pageroffset'       => $offset,
-                'pageritemsperpage' => config('nntmux.items_per_page'),
-                'pagerquerybase'    => '/profile?id='.$userID.'&offset=',
-                'pagerquerysuffix'  => '#comments',
             ]
         );
 
@@ -105,7 +88,6 @@ class ProfileController extends BasePageController
         // Pager must be fetched after the variables are assigned to smarty.
         $this->smarty->assign(
             [
-                'pager'         => $this->smarty->fetch($theme.'/pager.tpl'),
                 'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, config('nntmux.items_per_page')),
                 'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
                 'saburl'        => $sab->url,

@@ -1,4 +1,5 @@
 2018-04-09 DariusIII
+	* Chg: Remove pager from profile
 	* Chg: Use laravel pagination in forum
 	* Chg: Add ForumController and routes
 2018-04-08 DariusIII
