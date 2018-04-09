@@ -88,7 +88,7 @@ class ProfileController extends BasePageController
         // Pager must be fetched after the variables are assigned to smarty.
         $this->smarty->assign(
             [
-                'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, config('nntmux.items_per_page')),
+                'commentslist'  => ReleaseComment::getCommentsForUserRange($userID),
                 'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
                 'saburl'        => $sab->url,
                 'sabapikey'     => $sab->apikey,
