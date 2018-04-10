@@ -36,6 +36,8 @@ class CartController extends BasePageController
 
     /**
      * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function store(Request $request)
@@ -52,11 +54,13 @@ class CartController extends BasePageController
             UsersRelease::addCart(Auth::id(), $d['id']);
         }
 
-        redirect('/cart/index');
+        return redirect('/cart/index');
     }
 
     /**
      * @param $id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function destroy($id)
@@ -70,11 +74,13 @@ class CartController extends BasePageController
         }
 
         if ($ids !== null && UsersRelease::delCartByGuid($ids, Auth::id())) {
-            redirect('/cart/index');
+            return redirect('/cart/index');
         }
 
         if (! $id) {
-            redirect('/cart/index');
+            return redirect('/cart/index');
         }
+
+        return redirect('/cart/index');
     }
 }

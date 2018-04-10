@@ -1,3 +1,5 @@
+2018-04-10 DariusIIi
+	* Chg: Use response helper for headers in Cart, ContactUs and FailedReleases controllers
 2018-04-09 DariusIII
 	* Chg: Update comments handling in user profile page
 	* Chg: Remove pager from profile

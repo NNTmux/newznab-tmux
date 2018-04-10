@@ -12,6 +12,7 @@ class ContactUsController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function contact(Request $request)
@@ -48,7 +49,7 @@ class ContactUsController extends BasePageController
         }
         $this->smarty->assign('msg', $msg);
 
-        redirect('/');
+        return redirect('/');
     }
 
     /**
