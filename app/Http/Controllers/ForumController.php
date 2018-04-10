@@ -19,6 +19,7 @@ class ForumController extends BasePageController
         $this->setPrefs();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
             Forumpost::add(0, Auth::id(), $request->input('addSubject'), $request->input('addMessage'));
+
             return redirect('forum');
         }
 
@@ -34,11 +35,13 @@ class ForumController extends BasePageController
 
         if ($lock !== null) {
             Forumpost::lockUnlockTopic($lock, 1);
+
             return redirect('forum');
         }
 
         if ($unlock !== null) {
             Forumpost::lockUnlockTopic($unlock, 0);
+
             return redirect('forum');
         }
 
@@ -77,6 +80,7 @@ class ForumController extends BasePageController
 
         if ($request->has('addMessage') && $this->isPostBack()) {
             Forumpost::add($id, Auth::id(), '', $request->input('addMessage'));
+
             return redirect('forumpost/'.$id.'#last');
         }
 
