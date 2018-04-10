@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7417d7ede30bf37ab38b30c6c0998ccb",
+    "content-hash": "cc6d1b861446c6eb8b7e3be5c4278713",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -715,16 +715,16 @@
         },
         {
             "name": "bower-asset/fancybox",
-            "version": "v3.3.1",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fancyapps/fancybox.git",
-                "reference": "c7a249e2ed0d98d51fdc89fdb3cccb86daf397c9"
+                "reference": "75abe74c47829810bd52b5ec0dbf48d34339b07c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/c7a249e2ed0d98d51fdc89fdb3cccb86daf397c9",
-                "reference": "c7a249e2ed0d98d51fdc89fdb3cccb86daf397c9",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/75abe74c47829810bd52b5ec0dbf48d34339b07c",
+                "reference": "75abe74c47829810bd52b5ec0dbf48d34339b07c",
                 "shasum": ""
             },
             "require": {
@@ -750,7 +750,7 @@
                 "responsive",
                 "touch"
             ],
-            "time": "2018-04-05T13:15:25+00:00"
+            "time": "2018-04-09T12:55:25+00:00"
         },
         {
             "name": "bower-asset/fastclick",
@@ -1428,16 +1428,16 @@
         },
         {
             "name": "bower-asset/tinymce-builded",
-            "version": "4.4.3",
+            "version": "4.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artursmirnov/tinymce_builded.git",
-                "reference": "b6c9e915a1f0e415725c7cad901165f016eb58f0"
+                "reference": "d898919bea45c6ef2d08a8b29989577dc38dcf15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artursmirnov/tinymce_builded/zipball/b6c9e915a1f0e415725c7cad901165f016eb58f0",
-                "reference": "b6c9e915a1f0e415725c7cad901165f016eb58f0",
+                "url": "https://api.github.com/repos/artursmirnov/tinymce_builded/zipball/d898919bea45c6ef2d08a8b29989577dc38dcf15",
+                "reference": "d898919bea45c6ef2d08a8b29989577dc38dcf15",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1451,7 +1451,8 @@
                 "rich",
                 "tinymce",
                 "wysiwyg"
-            ]
+            ],
+            "time": "2018-02-13T14:36:01+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -1911,16 +1912,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.7.0",
+            "version": "v2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "f76bf5ef631cec551a86c2291fc749534febebf1"
+                "reference": "11037b4352c008373561dc6fc836834eed80c3b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/f76bf5ef631cec551a86c2291fc749534febebf1",
-                "reference": "f76bf5ef631cec551a86c2291fc749534febebf1",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/11037b4352c008373561dc6fc836834eed80c3b5",
+                "reference": "11037b4352c008373561dc6fc836834eed80c3b5",
                 "shasum": ""
             },
             "require": {
@@ -1982,7 +1983,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2018-04-01T23:33:17+00:00"
+            "time": "2018-04-07T18:44:18+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -2750,26 +2751,28 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v5.2.6",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "31fe404098688fa5a089dd9420667d9d8beeb1c4"
+                "reference": "4c06767762d4fe24ee54452bc941401f1f52c294"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/31fe404098688fa5a089dd9420667d9d8beeb1c4",
-                "reference": "31fe404098688fa5a089dd9420667d9d8beeb1c4",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/4c06767762d4fe24ee54452bc941401f1f52c294",
+                "reference": "4c06767762d4fe24ee54452bc941401f1f52c294",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
-                "php": ">5.3",
-                "psr/log": "~1.0"
+                "php": ">=5.6",
+                "psr/log": "~1.0",
+                "psr/simple-cache": "^1.0"
             },
             "require-dev": {
+                "cache/array-adapter": "^1.0",
                 "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~3.7"
+                "phpunit/phpunit": "5.4.8"
             },
             "type": "library",
             "autoload": {
@@ -2782,7 +2785,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-02-24T16:10:40+00:00"
+            "time": "2018-02-26T00:42:22+00:00"
         },
         {
             "name": "intervention/image",
@@ -3249,16 +3252,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.6.15",
+            "version": "v5.6.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "baa42cf6bdd942523fafece21ec16a1843c6db0f"
+                "reference": "fcdbc791bc3e113ada38ab0a1147141fb9ec2b16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/baa42cf6bdd942523fafece21ec16a1843c6db0f",
-                "reference": "baa42cf6bdd942523fafece21ec16a1843c6db0f",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/fcdbc791bc3e113ada38ab0a1147141fb9ec2b16",
+                "reference": "fcdbc791bc3e113ada38ab0a1147141fb9ec2b16",
                 "shasum": ""
             },
             "require": {
@@ -3323,6 +3326,7 @@
                 "aws/aws-sdk-php": "~3.0",
                 "doctrine/dbal": "~2.6",
                 "filp/whoops": "^2.1.4",
+                "league/flysystem-cached-adapter": "~1.0",
                 "mockery/mockery": "~1.0",
                 "moontoast/math": "^1.1",
                 "orchestra/testbench-core": "3.6.*",
@@ -3341,7 +3345,7 @@
                 "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~6.0).",
                 "laravel/tinker": "Required to use the tinker console command (~1.0).",
                 "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
-                "league/flysystem-cached-adapter": "Required to use Flysystem caching (~1.0).",
+                "league/flysystem-cached-adapter": "Required to use the Flysystem cache (~1.0).",
                 "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
                 "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (~1.0).",
                 "nexmo/client": "Required to use the Nexmo transport (~1.0).",
@@ -3383,7 +3387,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2018-03-30T13:29:58+00:00"
+            "time": "2018-04-09T16:07:04+00:00"
         },
         {
             "name": "laravel/scout",
@@ -3515,16 +3519,16 @@
         },
         {
             "name": "laravelcollective/html",
-            "version": "v5.6.5",
+            "version": "v5.6.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LaravelCollective/html.git",
-                "reference": "623a150c91e2d3f92eeee9f9eda58a841e3cb548"
+                "reference": "b3a10245c791a211e5f8ec37117f4549cd22aabe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/623a150c91e2d3f92eeee9f9eda58a841e3cb548",
-                "reference": "623a150c91e2d3f92eeee9f9eda58a841e3cb548",
+                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/b3a10245c791a211e5f8ec37117f4549cd22aabe",
+                "reference": "b3a10245c791a211e5f8ec37117f4549cd22aabe",
                 "shasum": ""
             },
             "require": {
@@ -3579,7 +3583,7 @@
             ],
             "description": "HTML and Form Builders for the Laravel Framework",
             "homepage": "https://laravelcollective.com",
-            "time": "2018-03-16T16:57:31+00:00"
+            "time": "2018-04-09T14:09:32+00:00"
         },
         {
             "name": "league/csv",
@@ -8022,16 +8026,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.1.1",
+            "version": "7.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "f7fe5127889519e421600fe0feeb113a5e210f20"
+                "reference": "6a17c170fb92845896e1b3b00fcb462cd4b3c017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f7fe5127889519e421600fe0feeb113a5e210f20",
-                "reference": "f7fe5127889519e421600fe0feeb113a5e210f20",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6a17c170fb92845896e1b3b00fcb462cd4b3c017",
+                "reference": "6a17c170fb92845896e1b3b00fcb462cd4b3c017",
                 "shasum": ""
             },
             "require": {
@@ -8098,7 +8102,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-04-06T12:39:30+00:00"
+            "time": "2018-04-10T11:40:22+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
