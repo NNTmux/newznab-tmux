@@ -11,6 +11,7 @@ class ForumController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function forum(Request $request)
@@ -18,7 +19,7 @@ class ForumController extends BasePageController
         $this->setPrefs();
         if ($this->isPostBack() && $request->has('addMessage') && $request->has('addSubject')) {
             Forumpost::add(0, Auth::id(), $request->input('addSubject'), $request->input('addMessage'));
-            header('/forum');
+            return redirect('forum');
         }
 
         $lock = $unlock = null;
@@ -33,14 +34,12 @@ class ForumController extends BasePageController
 
         if ($lock !== null) {
             Forumpost::lockUnlockTopic($lock, 1);
-            header('/forum');
-            die();
+            return redirect('forum');
         }
 
         if ($unlock !== null) {
             Forumpost::lockUnlockTopic($unlock, 0);
-            header('/forum');
-            die();
+            return redirect('forum');
         }
 
         $results = Forumpost::getBrowseRange();
@@ -67,22 +66,23 @@ class ForumController extends BasePageController
     }
 
     /**
+     * @param $id
      * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
-    public function getPosts(Request $request)
+    public function getPosts($id, Request $request)
     {
         $this->setPrefs();
-        $id = $request->input('id') + 0;
 
-        if (! empty($request->input('addMessage')) && $this->isPostBack()) {
+        if ($request->has('addMessage') && $this->isPostBack()) {
             Forumpost::add($id, Auth::id(), '', $request->input('addMessage'));
-            header('/forumpost/'.$id.'#last');
+            return redirect('forumpost/'.$id.'#last');
         }
 
         $results = Forumpost::getPosts($id);
         if (\count($results) === 0) {
-            header('/forum');
+            return redirect('forum');
         }
 
         $meta_title = 'Forum Post';

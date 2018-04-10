@@ -39,10 +39,10 @@ class FailedReleasesController extends BasePageController
         if (isset($uid, $rssToken) && is_numeric($uid) && $request->has('guid')) {
             $alt = Release::getAlternate($request->input('guid'), $uid);
             if ($alt === null) {
-                return response('Error!', 401)->headers(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
+                return response('Error!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
             }
 
-            return response()->headers(['Location' => $this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
+            return response('Success', 200)->header('Location:'.$this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken);
         }
     }
 }
