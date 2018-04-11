@@ -35,7 +35,7 @@ class CartController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param $id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception

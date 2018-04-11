@@ -148,76 +148,17 @@ class Console
     }
 
     /**
+     * @param       $page
      * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
      * @param array $excludedcats
      *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getConsoleRange($cat, $start, $num, $orderBy, array $excludedcats = []): array
+    public function getConsoleRange($page, $cat, array $excludedcats = [])
     {
-        $browseBy = $this->getBrowseBy();
 
-        $catsrch = '';
-        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
-        }
-
-        $exccatlist = '';
-        if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
-        }
-
-        $order = $this->getConsoleOrder($orderBy);
-
-        $calcSql = sprintf(
-                    "
-					SELECT SQL_CALC_FOUND_ROWS
-						con.id,
-						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-					FROM consoleinfo con
-					LEFT JOIN releases r ON con.id = r.consoleinfo_id
-					WHERE r.nzbstatus = 1
-					AND con.title != ''
-					AND con.cover = 1
-					AND r.passwordstatus %s
-					%s %s %s
-					GROUP BY con.id
-					ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseBy,
-                        $catsrch,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                );
-
-        $cached = Cache::get(md5($calcSql));
-        if ($cached !== null) {
-            $consoles = $cached;
-        } else {
-            $consoles = $this->pdo->queryCalc($calcSql);
-            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-            Cache::put(md5($calcSql), $consoles, $expiresAt);
-        }
-
-        $consoleIDs = $releaseIDs = false;
-
-        if (\is_array($consoles['result'])) {
-            foreach ($consoles['result'] as $console => $id) {
-                $consoleIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
-            }
-        }
-
-        $sql = sprintf(
-                    "
-				SELECT
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
 					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
@@ -230,42 +171,45 @@ class Console
 					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				con.*,
-				r.consoleinfo_id,
-				g.name AS group_name,
-				genres.title AS genre,
-				rn.releases_id AS nfoid
-				FROM releases r
-				LEFT OUTER JOIN groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-				INNER JOIN consoleinfo con ON con.id = r.consoleinfo_id
-				INNER JOIN genres ON con.genres_id = genres.id
-				WHERE con.id IN (%s)
-				AND r.id IN (%s)
-				%s
-				GROUP BY con.id
-				ORDER BY %s %s",
-                        (\is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
-                        (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                        $catsrch,
-                        $order[0],
-                        $order[1]
-                );
+					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
+            ->select(
+                [
+                    'con.*',
+                    'releases.consoleinfo_id',
+                    'g.name as group_name',
+                    'gn.title as genre',
+                    'rn.releases_id as nfoid',
+                ]
+            )
+            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
+            ->join('consoleinfo as con', 'con.id', '=', 'releases.consoleinfo_id')
+            ->join('genres as gn', 'con.genres_id', '=', 'gn.id')
+            ->where('releases.nzbstatus', '=', 1)
+            ->where('con.title', '!=', '')
+            ->where('con.cover', '=', 1);
+            Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('releases.categories_id', $excludedcats);
+        }
 
-        $return = Cache::get(md5($sql));
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+
+        $sql->groupBy('con.id')
+            ->orderBy('releases.postdate', 'desc');
+
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {
             return $return;
         }
 
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $consoles['total'] ?? 0;
-        }
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($sql), $return, $expiresAt);
+        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
     }

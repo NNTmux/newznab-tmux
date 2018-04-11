@@ -80,9 +80,7 @@ Route::get('failed', 'FailedReleasesController@show');
 
 Route::post('failed', 'FailedReleasesController@show');
 
-Route::get('/games', function () {
-    redirect('/games');
-})->middleware('auth');
+Route::get('games', 'GamesController@show');
 
 Route::get('/movies', function () {
     redirect('/movies');

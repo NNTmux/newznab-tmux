@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Genre;
+use App\Models\Release;
 use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\Settings;
@@ -216,83 +217,17 @@ class Games
     }
 
     /**
-     * @param        $cat
-     * @param        $start
-     * @param        $num
-     * @param string|array $orderBy
-     * @param string $maxAge
-     * @param array $excludedCats
+     * @param       $page
+     * @param       $cat
+     * @param array $excludedcats
      *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getGamesRange($cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
+    public function getGamesRange($page, $cat, array $excludedcats = [])
     {
-        $browseBy = $this->getBrowseBy();
 
-        $catsrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
-        }
-
-        if ($maxAge > 0) {
-            $maxAge = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge);
-        }
-
-        $exccatlist = '';
-        if (\count($excludedCats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
-        }
-
-        $order = $this->getGamesOrder($orderBy);
-
-        $gamesSql =
-                sprintf(
-                    "
-				SELECT SQL_CALC_FOUND_ROWS gi.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM gamesinfo gi
-				LEFT JOIN releases r ON gi.id = r.gamesinfo_id
-				WHERE r.nzbstatus = 1
-				AND gi.title != ''
-				AND gi.cover = 1
-				AND r.passwordstatus %s
-				%s %s %s %s
-				GROUP BY gi.id
-				ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseBy,
-                        $catsrch,
-                        $maxAge,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        $gamesCache = Cache::get(md5($gamesSql));
-        if ($gamesCache !== null) {
-            $games = $gamesCache;
-        } else {
-            $games = $this->pdo->queryCalc($gamesSql);
-            Cache::put(md5($gamesSql), $games, $expiresAt);
-        }
-
-        $gameIDs = $releaseIDs = false;
-
-        if (\is_array($games['result'])) {
-            foreach ($games['result'] as $game => $id) {
-                $gameIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
-            }
-        }
-
-        $returnSql =
-                sprintf(
-                    "
-				SELECT
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
 					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
@@ -305,35 +240,45 @@ class Games
 					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id, g.name AS group_name,
-				rn.releases_id AS nfoid
-				FROM releases r
-				LEFT OUTER JOIN groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-				INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id
-				WHERE gi.id IN (%s)
-				AND r.id IN (%s)
-				%s
-				GROUP BY gi.id
-				ORDER BY %s %s",
-                        (\is_array($gameIDs) ? implode(',', $gameIDs) : -1),
-                        (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                        $catsrch,
-                        $order[0],
-                        $order[1]
-                );
-        $return = Cache::get(md5($returnSql));
+					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
+            ->select(
+                [
+                    'gi.*',
+                    'releases.gamesinfo_id',
+                    'g.name as group_name',
+                    'gn.title as genre',
+                    'rn.releases_id as nfoid',
+                ]
+            )
+            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
+            ->join('gamesinfo as gi', 'gi.id', '=', 'releases.gamesinfo_id')
+            ->join('genres as gn', 'gi.genres_id', '=', 'gn.id')
+            ->where('releases.nzbstatus', '=', 1)
+            ->where('gi.title', '!=', '')
+            ->where('gi.cover', '=', 1);
+        Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('releases.categories_id', $excludedcats);
+        }
+
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+
+        $sql->groupBy('gi.id')
+            ->orderBy('releases.postdate', 'desc');
+
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {
             return $return;
         }
 
-        $return = $this->pdo->query($returnSql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $games['total'] ?? 0;
-        }
-        Cache::put(md5($returnSql), $return, $expiresAt);
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
+
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
     }

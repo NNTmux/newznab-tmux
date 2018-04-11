@@ -1,4 +1,5 @@
 2018-04-11 DariusIII
+	* Chg: Add GamesController, adjust themes and classes
 	* Chg: Update CartController
 	* Chg: Update returned response in FailedReleasesController
 	* Fix: Fix contact-us page

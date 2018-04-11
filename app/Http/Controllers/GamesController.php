@@ -2,86 +2,98 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\Genres;
-use Blacklight\Console;
 use App\Models\Category;
+use Blacklight\Games;
+use Blacklight\Genres;
 use Illuminate\Http\Request;
 
-class ConsoleController extends BasePageController
+class GamesController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     *
      * @throws \Exception
      */
     public function show(Request $request)
     {
         $this->setPrefs();
-        $console = new Console(['Settings' => $this->settings]);
+        $games = new Games(['Settings' => $this->settings]);
         $gen = new Genres(['Settings' => $this->settings]);
 
-        $concats = Category::getChildren(Category::GAME_ROOT);
+        $concats = Category::getChildren(Category::PC_ROOT);
         $ctmp = [];
         foreach ($concats as $ccat) {
             $ctmp[$ccat['id']] = $ccat;
         }
-        $category = Category::query()->where('id', '=', Category::GAME_ROOT)->first();
+        $category = Category::PC_GAMES;
+        if ($request->has('t') && array_key_exists($request->input('t'), $ctmp)) {
+            $category = $request->input('t') + 0;
+        }
 
         $catarray = [];
         $catarray[] = $category;
 
         $this->smarty->assign('catlist', $ctmp);
-        $this->smarty->assign('category', $category->title);
+        $this->smarty->assign('category', $category);
 
         $page = \request()->has('page') ? \request()->input('page') : 1;
 
-        $consoles = [];
-        $results = $console->getConsoleRange($page, $catarray, $this->userdata['categoryexclusions']);
-
+        $games2 = [];
+        $results = $games->getGamesRange($page, $catarray, $this->userdata['categoryexclusions']);
         $maxwords = 50;
         foreach ($results as $result) {
             if (! empty($result['review'])) {
+                // remove "Overview" from start of review if present
+                if (0 === strpos($result['review'], 'Overview')) {
+                    $result['review'] = substr($result['review'], 8);
+                }
                 $words = explode(' ', $result['review']);
                 if (\count($words) > $maxwords) {
                     $newwords = \array_slice($words, 0, $maxwords);
                     $result['review'] = implode(' ', $newwords).'...';
                 }
             }
-            $consoles[] = $result;
+            $games2[] = $result;
         }
-
-        $platform = ($request->has('platform') && ! empty($request->input('platform'))) ? stripslashes($request->input('platform')) : '';
-        $this->smarty->assign('platform', $platform);
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
         $this->smarty->assign('title', $title);
 
-        $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
+        $genres = $gen->getGenres(Genres::GAME_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
             $tmpgnr[$gn['id']] = $gn['title'];
         }
+
+        $years = range(1903, date('Y') + 1);
+        rsort($years);
+        $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
+        $this->smarty->assign('years', $years);
+        $this->smarty->assign('year', $year);
+
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
         $this->smarty->assign('genres', $genres);
         $this->smarty->assign('genre', $genre);
 
-        if ($category === -1) {
+        if ((int) $category === -1) {
             $this->smarty->assign('catname', 'All');
         } else {
             $cdata = Category::find($category);
+
             if ($cdata) {
-                $this->smarty->assign('catname', array_first($cdata)->parent !== null ? array_first($cdata)->parent->title.' > '.array_first($cdata)->title : array_first($cdata)->title);
+                $this->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
             } else {
                 $this->show404();
             }
         }
 
-        $this->smarty->assign('results', $consoles);
+        $this->smarty->assign('results', $games2);
 
-        $meta_title = 'Browse Console';
-        $meta_keywords = 'browse,nzb,console,games,description,details';
-        $meta_description = 'Browse for Console Games';
-        $content = $this->smarty->fetch('console.tpl');
+        $meta_title = 'Browse Games';
+        $meta_keywords = 'browse,nzb,games,description,details';
+        $meta_description = 'Browse for Games';
 
+        $content = $this->smarty->fetch('games.tpl');
         $this->smarty->assign(
             [
                 'content' => $content,
@@ -90,7 +102,6 @@ class ConsoleController extends BasePageController
                 'meta_description' => $meta_description,
             ]
         );
-
         $this->pagerender();
     }
 }
