@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Group;
+use App\Models\Category;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
@@ -41,14 +41,14 @@ class SearchController extends BasePageController
             ]
         );
 
-        if ($searchType === 'basic' && ! $request->has('searchadvr') && (!empty($id) || $request->has('subject'))) {
+        if ($searchType === 'basic' && ! $request->has('searchadvr') && (! empty($id) || $request->has('subject'))) {
             $searchString = '';
             switch (true) {
                 case $request->has('subject'):
                     $searchString = (string) $request->input('subject');
                     $this->smarty->assign('subject', $searchString);
                     break;
-                case !empty($id):
+                case ! empty($id):
                     $searchString = (string) $id;
                     $this->smarty->assign('search', $searchString);
                     break;
@@ -119,7 +119,7 @@ class SearchController extends BasePageController
             $this->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
         }
 
-        if ($searchType !== 'basic' && empty($id) && $request->has('searchadvr') &&  ! $request->has('subject')) {
+        if ($searchType !== 'basic' && empty($id) && $request->has('searchadvr') && ! $request->has('subject')) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
                 $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);
