@@ -24,12 +24,12 @@ class FailedReleasesController extends BasePageController
             $rssToken = $this->userdata['rsstoken'];
         } else {
             if (! $request->has('userid') || ! $request->has('rsstoken')) {
-                return response('Error!', 400)->headers(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
+                return response('Error!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
             }
 
             $res = User::getByIdAndRssToken($request->input('userid'), $request->input('rsstoken'));
             if ($res === null) {
-                return response('Error!', 401)->headers(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong user ID or rss key!']);
+                return response('Error!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong user ID or rss key!']);
             }
 
             $uid = $res['id'];
