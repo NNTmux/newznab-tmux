@@ -49,7 +49,7 @@ class ContactUsController extends BasePageController
         }
         $this->smarty->assign('msg', $msg);
 
-        return redirect('/');
+        return redirect('contact-us');
     }
 
     /**
@@ -62,7 +62,7 @@ class ContactUsController extends BasePageController
         $meta_title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_keywords = 'contact us,contact,get in touch,email';
         $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
-        $content = $this->smarty->fetch($this->theme.'/contact.tpl');
+        $content = $this->smarty->fetch('contact.tpl');
 
         $this->smarty->assign(
             [
@@ -75,6 +75,6 @@ class ContactUsController extends BasePageController
             ]
         );
 
-        $this->smarty->display($this->theme.'/basepage.tpl');
+        $this->smarty->display('basepage.tpl');
     }
 }
