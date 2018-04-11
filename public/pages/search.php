@@ -33,7 +33,7 @@ $page->smarty->assign(
     ]
 );
 
-if ((request()->has('id') || request()->has('subject')) && ! request()->has('searchadvr') && $searchType === 'basic') {
+if ($searchType === 'basic' && ! request()->has('searchadvr') && (request()->has('id') || request()->has('subject'))) {
     $searchString = '';
     switch (true) {
         case request()->has('subject'):
@@ -111,7 +111,7 @@ foreach ($searchVars as $searchVarKey => $searchVar) {
     $page->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
 }
 
-if (request()->has('searchadvr') && ! request()->has('id') && ! request()->has('subject') && $searchType !== 'basic') {
+if ($searchType !== 'basic' && request()->has('searchadvr') && ! request()->has('id') && ! request()->has('subject')) {
     $orderByString = '';
     foreach ($searchVars as $searchVarKey => $searchVar) {
         $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

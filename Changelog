@@ -1,4 +1,5 @@
 2018-04-11 DariusIII
+	* Chg: Add SearchController
 	* Chg: Add MusicController
 	* Chg: Fix missing release_flag from smarty, update themes
 	* Chg: Add MovieController

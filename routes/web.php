@@ -133,13 +133,9 @@ Route::post('/profile_delete', function () {
     redirect('/login');
 })->middleware('guest');
 
-Route::get('/search', function () {
-    redirect('/search');
-})->middleware('auth');
+Route::get('search/{id}', 'SearchController@search');
 
-Route::post('/search/{id}', function () {
-    redirect('/search');
-})->middleware('auth', 'api');
+Route::post('search/{id}', 'SearchController@search');
 
 Route::get('filelist/{guid}', 'FileListController@show');
 
