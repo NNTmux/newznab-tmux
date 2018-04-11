@@ -217,7 +217,6 @@ class Movie
         return MovieInfo::query()->where('imdbid', $imdbId)->first();
     }
 
-
     /**
      * @param       $page
      * @param       $cat
@@ -228,7 +227,6 @@ class Movie
      */
     public function getMovieRange($page, $cat, array $excludedcats = [])
     {
-
         $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
