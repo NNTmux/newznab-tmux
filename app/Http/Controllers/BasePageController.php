@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+require_once NN_LIB.'utility/SmartyUtils.php';
+
 use App\Models\Menu;
 use App\Models\User;
 use Blacklight\db\DB;
