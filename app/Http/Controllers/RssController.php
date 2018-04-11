@@ -26,10 +26,10 @@ class RssController extends BasePageController
         if (! $request->has('t') && ! $request->has('show') && ! $request->has('anidb')) {
             // User has to either be logged in, or using rsskey.
 
-            $this->title = 'Rss Info';
-            $this->meta_title = 'Rss Nzb Info';
-            $this->meta_keywords = 'view,nzb,description,details,rss,atom';
-            $this->meta_description = 'View information about Newznab Tmux RSS Feeds.';
+            $title = 'Rss Info';
+            $meta_title = 'Rss Nzb Info';
+            $meta_keywords = 'view,nzb,description,details,rss,atom';
+            $meta_description = 'View information about Newznab Tmux RSS Feeds.';
 
             $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
             $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
@@ -54,7 +54,15 @@ class RssController extends BasePageController
             );
 
             $content = $this->smarty->fetch('rssdesc.tpl');
-            $this->smarty->assign('content', $content);
+            $this->smarty->assign(
+                [
+                    'content' => $content,
+                    'title' => $title,
+                    'meta_title' => $meta_title,
+                    'meta_keywords' => $meta_keywords,
+                    'meta_description' => $meta_description,
+                ]
+            );
             $this->pagerender();
         } else {
             $rssToken = $uid = -1;
