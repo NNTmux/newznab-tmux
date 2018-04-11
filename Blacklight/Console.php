@@ -157,7 +157,6 @@ class Console
      */
     public function getConsoleRange($page, $cat, array $excludedcats = [])
     {
-
         $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
@@ -189,7 +188,7 @@ class Console
             ->where('releases.nzbstatus', '=', 1)
             ->where('con.title', '!=', '')
             ->where('con.cover', '=', 1);
-            Releases::showPasswords($sql, true);
+        Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
             $sql->whereNotIn('releases.categories_id', $excludedcats);
         }

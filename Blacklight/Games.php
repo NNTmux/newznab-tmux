@@ -3,8 +3,8 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use App\Models\Release;
 use Blacklight\db\DB;
+use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\GamesInfo;
@@ -226,7 +226,6 @@ class Games
      */
     public function getGamesRange($page, $cat, array $excludedcats = [])
     {
-
         $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
