@@ -98,9 +98,9 @@ Route::get('/pc', function () {
     redirect('/pc');
 })->middleware('auth');
 
-Route::get('/music', function () {
-    redirect('/music');
-})->middleware('auth');
+Route::get('music', 'MusicController@show');
+
+Route::post('music', 'MusicController@show');
 
 Route::get('/xxx', function () {
     redirect('/xxx');

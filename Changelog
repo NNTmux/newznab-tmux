@@ -1,5 +1,6 @@
 2018-04-11 DariusIII
-	* Chg: Fix missing release_flag frtom smarty, update themes
+	* Chg: Add MusicController
+	* Chg: Fix missing release_flag from smarty, update themes
 	* Chg: Add MovieController
 	* Chg: Add GamesController, adjust themes and classes
 	* Chg: Update CartController

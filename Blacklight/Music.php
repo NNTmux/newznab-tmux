@@ -138,119 +138,67 @@ class Music
     }
 
     /**
+     * @param       $page
      * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderby
      * @param array $excludedcats
      *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getMusicRange($cat, $start, $num, $orderby, array $excludedcats = [])
+    public function getMusicRange($page, $cat, array $excludedcats = [])
     {
-        $browseby = $this->getBrowseBy();
-
-        $catsrch = '';
-        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
-        }
-
-        $exccatlist = '';
+        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
+					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
+            ->select(
+                [
+                    'm.*',
+                    'releases.musicinfo_id',
+                    'g.name as group_name',
+                    'gn.title as genre',
+                    'rn.releases_id as nfoid',
+                ]
+            )
+            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
+            ->join('musicinfo as m', 'm.id', '=', 'releases.musicinfo_id')
+            ->join('genres as gn', 'm.genres_id', '=', 'gn.id')
+            ->where('releases.nzbstatus', '=', 1)
+            ->where('m.title', '!=', '')
+            ->where('m.cover', '=', 1);
+        Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+            $sql->whereNotIn('releases.categories_id', $excludedcats);
         }
 
-        $order = $this->getMusicOrder($orderby);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-
-        $musicSql =
-                sprintf(
-                    "
-				SELECT SQL_CALC_FOUND_ROWS
-					m.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM musicinfo m
-				LEFT JOIN releases r ON r.musicinfo_id = m.id
-				WHERE r.nzbstatus = 1
-				AND m.title != ''
-				AND m.cover = 1
-				AND r.passwordstatus %s
-				%s %s %s
-				GROUP BY m.id
-				ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseby,
-                        $catsrch,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                );
-        $musicCache = Cache::get(md5($musicSql));
-        if ($musicCache !== null) {
-            $music = $musicCache;
-        } else {
-            $music = $this->pdo->queryCalc($musicSql);
-            Cache::put(md5($musicSql), $music, $expiresAt);
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
         }
 
-        $musicIDs = $releaseIDs = false;
+        $sql->groupBy('m.id')
+            ->orderBy('releases.postdate', 'desc');
 
-        if (\is_array($music['result'])) {
-            foreach ($music['result'] as $mus => $id) {
-                $musicIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
-            }
-        }
-
-        $sql = sprintf(
-            "
-			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				m.*,
-				r.musicinfo_id, r.haspreview,
-				g.name AS group_name,
-				rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			INNER JOIN musicinfo m ON m.id = r.musicinfo_id
-			WHERE m.id IN (%s)
-			AND r.id IN (%s)
-			%s
-			GROUP BY m.id
-			ORDER BY %s %s",
-                (\is_array($musicIDs) ? implode(',', $musicIDs) : -1),
-                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                $catsrch,
-                $order[0],
-                $order[1]
-        );
-
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {
             return $return;
         }
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $music['total'] ?? 0;
-        }
-        Cache::put(md5($sql), $return, $expiresAt);
+
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
+
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
     }
