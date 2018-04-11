@@ -1,4 +1,5 @@
 2018-04-11 DariusIII
+	* Chg: Update CartController
 	* Chg: Update returned response in FailedReleasesController
 	* Fix: Fix contact-us page
 2018-04-10 DariusIII

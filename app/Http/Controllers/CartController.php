@@ -40,10 +40,10 @@ class CartController extends BasePageController
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
-    public function store(Request $request)
+    public function store($id)
     {
         $this->setPrefs();
-        $guids = explode(',', $request->input('id'));
+        $guids = explode(',', $id);
         $data = Release::getByGuid($guids);
 
         if (! $data) {
