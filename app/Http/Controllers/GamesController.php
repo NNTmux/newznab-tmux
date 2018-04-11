@@ -36,7 +36,7 @@ class GamesController extends BasePageController
         $this->smarty->assign('catlist', $ctmp);
         $this->smarty->assign('category', $category);
 
-        $page = \request()->has('page') ? \request()->input('page') : 1;
+        $page = $request->has('page') ? $request->input('page') : 1;
 
         $games2 = [];
         $results = $games->getGamesRange($page, $catarray, $this->userdata['categoryexclusions']);

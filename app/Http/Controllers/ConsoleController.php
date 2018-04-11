@@ -32,7 +32,7 @@ class ConsoleController extends BasePageController
         $this->smarty->assign('catlist', $ctmp);
         $this->smarty->assign('category', $category->title);
 
-        $page = \request()->has('page') ? \request()->input('page') : 1;
+        $page = $request->has('page') ? $request->input('page') : 1;
 
         $consoles = [];
         $results = $console->getConsoleRange($page, $catarray, $this->userdata['categoryexclusions']);

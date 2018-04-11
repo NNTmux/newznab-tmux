@@ -82,9 +82,17 @@ Route::post('failed', 'FailedReleasesController@show');
 
 Route::get('games', 'GamesController@show');
 
-Route::get('/movies', function () {
-    redirect('/movies');
-})->middleware('auth');
+Route::get('movies', 'MovieController@showMovies');
+
+Route::get('movie', 'MovieController@showMovie');
+
+Route::get('movietrailers', 'MovieController@showTrailer');
+
+Route::post('movies', 'MovieController@showMovies');
+
+Route::post('movie', 'MovieController@showMovie');
+
+Route::post('movietrailers', 'MovieController@showTrailer');
 
 Route::get('/pc', function () {
     redirect('/pc');
