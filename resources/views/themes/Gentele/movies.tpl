@@ -20,7 +20,7 @@
 						<div class="col-md-8">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/{$category->title}">List</a><br/>
+										href="{$smarty.const.WWW_TOP}/browse/movies/{$category->title}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
@@ -52,9 +52,11 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
-							{$pager}
-						</div>
+						{if count($results) > 0}
+							<div class="col-md-4">
+								{$results->links()}
+							</div>
+						{/if}
 					</div>
 					<hr>
 					{foreach $results as $result}
@@ -386,9 +388,11 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
-							{$pager}
-						</div>
+						{if count($results) > 0}
+							<div class="col-md-4">
+								{$results->links()}
+							</div>
+						{/if}
 					</div>
 				</div>
 			</div>
