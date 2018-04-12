@@ -648,10 +648,10 @@ class Releases
 
         $sql = Release::query()
             ->fromSub(function ($query) use ($maxAge, $groupName, $sizeFrom, $sizeRange, $sizeTo, $hasNfo, $hasComments, $cat, $excludedCats, $type, $daysNew, $daysOld, $searchOptions, $minSize) {
-            $query->select(['r.*', 'r.categories_id AS category_ids', 'df.failed as failed', 'g.name as group_name', 'rn.releases_id as nfoid', 're.releases_id as reid', 'cp.id as categoryparentid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.firstaired'])
+                $query->select(['r.*', 'r.categories_id AS category_ids', 'df.failed as failed', 'g.name as group_name', 'rn.releases_id as nfoid', 're.releases_id as reid', 'cp.id as categoryparentid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.firstaired'])
                 ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")
                 ->from('releases as r')
-                ->leftJoin('video_data as re','re.releases_id', '=', 'r.id')
+                ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
                 ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
                 ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
                 ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
@@ -660,68 +660,66 @@ class Releases
                 ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
                 ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
                 ->join('releases_se as rse', 'rse.id', '=', 'r.id');
-            //self::showPasswords($query, true);
-            $query->where('r.nzbstatus', '=', NZB::NZB_ADDED);
+                //self::showPasswords($query, true);
+                $query->where('r.nzbstatus', '=', NZB::NZB_ADDED);
 
-            if ($maxAge > 0) {
-                $query->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
-            }
+                if ($maxAge > 0) {
+                    $query->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
+                }
 
-            if ((int) $groupName !== -1) {
-                $query->where('r.groups_id', '=', Group::getIDByName($groupName));
-            }
+                if ((int) $groupName !== -1) {
+                    $query->where('r.groups_id', '=', Group::getIDByName($groupName));
+                }
 
-            if (array_key_exists($sizeFrom, $sizeRange)) {
-                $query->where('r.size', '<', (string) (104857600 * (int) $sizeRange[$sizeTo]));
-            }
+                if (array_key_exists($sizeFrom, $sizeRange)) {
+                    $query->where('r.size', '<', (string) (104857600 * (int) $sizeRange[$sizeTo]));
+                }
 
-            if ((int) $hasNfo !== 0) {
-               $query->where('r.nfostatus', '=', 1);
-            }
+                if ((int) $hasNfo !== 0) {
+                    $query->where('r.nfostatus', '=', 1);
+                }
 
-            if ((int) $hasComments !== 0) {
-                $query->where('r.comments', '>', 0);
-            }
+                if ((int) $hasComments !== 0) {
+                    $query->where('r.comments', '>', 0);
+                }
 
-            if ($type === 'basic') {
-                Category::getCategorySearch($cat, $query, true);
-            } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
-                $query->where('r.categories_id', '=', $cat[0]);
-            }
+                if ($type === 'basic') {
+                    Category::getCategorySearch($cat, $query, true);
+                } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
+                    $query->where('r.categories_id', '=', $cat[0]);
+                }
 
-            if ((int) $daysNew !== -1) {
-                $query->where('r.postdate', '<', Carbon::now()->subDays($daysNew));
-            }
+                if ((int) $daysNew !== -1) {
+                    $query->where('r.postdate', '<', Carbon::now()->subDays($daysNew));
+                }
 
-            if ((int) $daysOld !== -1) {
-                $query->where('r.postdate', '>', Carbon::now()->subDays($daysOld));
-            }
+                if ((int) $daysOld !== -1) {
+                    $query->where('r.postdate', '>', Carbon::now()->subDays($daysOld));
+                }
 
-            if (\count($excludedCats) > 0) {
-                $query->whereNotIn('r.categories_id', $excludedCats);
-            }
+                if (\count($excludedCats) > 0) {
+                    $query->whereNotIn('r.categories_id', $excludedCats);
+                }
 
-            if (\count($searchOptions) > 0) {
-                $this->releaseSearch->getSearchSQL($searchOptions, false, $query, true);
-            }
+                if (\count($searchOptions) > 0) {
+                    $this->releaseSearch->getSearchSQL($searchOptions, false, $query, true);
+                }
 
-            if ($minSize > 0) {
-                $query->where('r.size', '>=', $minSize);
-            }
-        }, 'r')
+                if ($minSize > 0) {
+                    $query->where('r.size', '>=', $minSize);
+                }
+            }, 'r')
             ->orderBy('r.'.$orderBy[0], $orderBy[1]);
 
-
-        $releases = Cache::get(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge. implode('.',$excludedCats).$type.implode('.',$cat).$minSize));
+        $releases = Cache::get(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$type.implode('.', $cat).$minSize));
         if ($releases !== null) {
             return $releases;
         }
 
         $releases = $sql->paginate(config('nntmux.items_per_page'));
 
-
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge. implode('.',$excludedCats).$type.implode('.',$cat).$minSize), $releases, $expiresAt);
+        Cache::put(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$type.implode('.', $cat).$minSize), $releases, $expiresAt);
 
         return $releases;
     }
