@@ -2,7 +2,7 @@
 
 <div class="well well-sm">
 	{if $consolelist}
-		{$pager}
+		{$results->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -24,7 +24,7 @@
 
 		</table>
 		<br/>
-		{$pager}
+		{$results->links()}
 	{else}
 		<p>No games available.</p>
 	{/if}

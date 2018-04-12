@@ -52,9 +52,11 @@ class ReleaseSearch
      * @param array $options   Array where keys are the column name, and value is the search string.
      * @param bool  $forceLike Force a "like" search on the column.
      *
-     * @return string
+     * @param null  $query
+     * @param bool  $builder
+     *
      */
-    public function getSearchSQL(array $options = [], $forceLike = false): string
+    public function getSearchSQL(array $options = [], $forceLike = false, $query = null, $builder = false)
     {
         $this->searchOptions = $options;
 
@@ -62,7 +64,7 @@ class ReleaseSearch
             return $this->likeSQL();
         }
 
-        return $this->sphinxSQL();
+        return $this->sphinxSQL($query, $builder);
     }
 
     /**
@@ -104,11 +106,12 @@ class ReleaseSearch
     }
 
     /**
-     * Create SQL sub-query using sphinx full text search.
+     * @param null $query
+     * @param bool $builder
      *
      * @return string
      */
-    private function sphinxSQL(): string
+    private function sphinxSQL($query = null, $builder = false)
     {
         $searchQuery = $fullReturn = '';
 
@@ -131,6 +134,10 @@ class ReleaseSearch
             }
         }
         if ($searchQuery !== '') {
+            if ($builder === true) {
+                return $query->whereRaw("(rse.query = '@@relaxed ?')", [trim($searchQuery).$this->sphinxQueryOpt]);
+            }
+
             $fullReturn = sprintf("AND (rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt);
         } else {
             $fullReturn = $this->likeSQL();

@@ -24,7 +24,7 @@
 		</form>
 	</div>
 
-	{$pager}
+	{$results->links()}
 
 	<br/><br/>
 

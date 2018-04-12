@@ -124,7 +124,6 @@ class ApiController extends BasePageController
                $groupName = $api->group();
                UserRequest::addApiRequest($uid, $request->getRequestUri());
                $categoryID = $api->categoryID();
-               $limit = $api->limit();
 
                if ($request->has('q')) {
                    $relData = $releases->search(
@@ -139,8 +138,6 @@ class ApiController extends BasePageController
                        0,
                        -1,
                        -1,
-                       $offset,
-                       $limit,
                        '',
                        $maxAge,
                        $catExclusions,
@@ -149,7 +146,9 @@ class ApiController extends BasePageController
                        $minSize
                    );
                } else {
+                   $page = $request->has('page') ? $request->input('page') : 1;
                    $relData = $releases->getBrowseRange(
+                       $page,
                        $categoryID,
                        '',
                        $maxAge,

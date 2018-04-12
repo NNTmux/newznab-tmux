@@ -14,7 +14,7 @@
 				<input class="btn btn-default" type="submit" value="Go"/>
 			</form>
 			<div style="position:absolute;">
-				{$pager}
+				{$results->links()}
 			</div>
 			<div style="text-align:center;">
 				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"
@@ -83,7 +83,7 @@
 		</table>
 		<div style="position:relative;margin-top:5px;">
 			<div style="position:absolute;">
-				{$pager}
+				{$results->links()}
 			</div>
 			<div style="text-align:center;">
 				<form name="groupsearch" action="" style="margin-bottom:5px;">

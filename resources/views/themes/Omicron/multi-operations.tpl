@@ -1,5 +1,5 @@
 <div class="container nzb_multi_operations">
-	{$pager}
+	{$results->links()}
 	<div class="pull-right">
 		With Selected:
 		<button type="button" class="btn btn-info btn-sm nzb_multi_operations_download">Download NZBs</button>

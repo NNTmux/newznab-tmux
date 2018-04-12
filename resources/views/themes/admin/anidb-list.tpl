@@ -14,7 +14,7 @@
 		</form>
 	</div>
 
-	{$pager}
+	{$results->links()}
 
 	<br/><br/>
 
@@ -44,7 +44,7 @@
 	</table>
 
 	<br/>
-	{$pager}
+	{$results->links()}
 	{else}
 	<p>No AniDB episodes available.</p>
 	{/if}

@@ -13,7 +13,7 @@
 		</span>
 		</div>
 	</form>
-	{$pager}
+	{$results->links()}
 	<table class="data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<th> Date</th>
@@ -365,6 +365,6 @@
 	</table>
 	<hr>
 	<div style="padding-bottom:10px;">
-		{$pager}
+		{$results->links()}
 	</div>
 </div>

@@ -197,7 +197,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								{$pager}
+								{$results->links()}
 							</div>
 						</div>
 						<hr>
@@ -429,7 +429,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								{$pager}
+								{$results->links()}
 							</div>
 						</div>
 						<br><br><br>

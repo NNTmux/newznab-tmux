@@ -190,7 +190,7 @@
 
 		{if $sites}
 			<div style="margin-bottom:5px;">These are the remote websites we have seen so far:</div>
-			{$pager}
+			{$results->links()}
 			<div style="float:right;">
 				<a href="javascript:ajax_sharing_toggle_all(1);" onclick="setTimeout('history.go(0);',700);"
 				   class="sharing_toggle_all">[Enable All]</a>
@@ -231,7 +231,7 @@
 					</tr>
 				{/foreach}
 			</table>
-			{$pager}
+			{$results->links()}
 		{else}
 			<p>No remote sites found in your database.</p>
 		{/if}

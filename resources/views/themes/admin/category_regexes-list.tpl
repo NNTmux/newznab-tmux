@@ -13,7 +13,7 @@
 		<input class="btn btn-default" type="submit" value="Go"/>
 	</form>
 	{if $regex}
-		<div>{$pager}</div>
+		<div>{$results->links()}</div>
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th style="width:20px;">id</th>
@@ -49,6 +49,6 @@
 				</tr>
 			{/foreach}
 		</table>
-		<div style="margin-top: 15px">{$pager}</div>
+		<div style="margin-top: 15px">{$results->links()}</div>
 	{/if}
 </div>

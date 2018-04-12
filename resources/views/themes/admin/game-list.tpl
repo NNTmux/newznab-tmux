@@ -1,7 +1,7 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
 	{if $gamelist}
-		{$pager}
+		{$results->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th>ID</th>

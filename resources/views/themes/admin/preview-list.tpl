@@ -18,7 +18,7 @@
 	<br/><br/>
 
 	{if $releaselist}
-		{$pager}
+		{$results->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 
 			<tr>
@@ -39,7 +39,7 @@
 
 		</table>
 		<br/>
-		{$pager}
+		{$results->links()}
 	{else}
 		<p>No results.</p>
 	{/if}

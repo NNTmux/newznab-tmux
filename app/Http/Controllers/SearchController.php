@@ -17,6 +17,7 @@ class SearchController extends BasePageController
     public function search(Request $request)
     {
         $this->setPrefs();
+        dump($request->all());
         $releases = new Releases(['Groups' => null, 'Settings' => $this->settings]);
 
         $meta_title = 'Search Nzbs';
@@ -32,12 +33,10 @@ class SearchController extends BasePageController
 
         $ordering = $releases->getBrowseOrdering();
         $orderBy = ($request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '');
-        $offset = ($request->has('offset') && ctype_digit($request->input('offset'))) ? $request->input('offset') : 0;
 
         $this->smarty->assign(
             [
-                'subject' => '', 'search' => '', 'category' => [0], 'pagertotalitems' => 0,
-                'pageritemsperpage' => 1, 'pageroffset' => 1, 'covgroup' => '',
+                'subject' => '', 'search' => '', 'category' => [0], 'covgroup' => '',
             ]
         );
 
@@ -61,7 +60,7 @@ class SearchController extends BasePageController
             foreach ($releases->getBrowseOrdering() as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search/'.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.implode(',', $categoryID).'&amp;ob='.$orderType
+                    WWW_TOP.'/search?id='.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.implode(',', $categoryID).'&amp;ob='.$orderType
                 );
             }
 
@@ -77,8 +76,6 @@ class SearchController extends BasePageController
                 0,
                 -1,
                 -1,
-                $offset,
-                config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata['categoryexclusions'],
@@ -86,15 +83,12 @@ class SearchController extends BasePageController
                 $categoryID
             );
 
+            dump($results->total());
+
+
             $this->smarty->assign(
                 [
                     'lastvisit' => $this->userdata['lastlogin'],
-                    'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
-                    'pageroffset' => $offset,
-                    'pageritemsperpage' => config('nntmux.items_per_page'),
-                    'pagerquerysuffix' => '#results',
-                    'pagerquerybase' => WWW_TOP.'/search/'.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.
-                        implode(',', $categoryID).'&amp;ob='.$orderBy.'&amp;offset=',
                     'category' => $categoryID,
                 ]
             );
@@ -145,8 +139,6 @@ class SearchController extends BasePageController
                 $searchVars['searchadvhascomments'],
                 ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
                 ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
-                $offset,
-                config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata['categoryexclusions'],
@@ -154,14 +146,12 @@ class SearchController extends BasePageController
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
 
+            dump($results->total());
+
+
             $this->smarty->assign(
                 [
                     'lastvisit' => $this->userdata['lastlogin'],
-                    'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
-                    'pageroffset' => $offset,
-                    'pageritemsperpage' => config('nntmux.items_per_page'),
-                    'pagerquerysuffix' => '#results',
-                    'pagerquerybase' => WWW_TOP.'/search?'.$orderByString.'&search_type=adv&ob='.$orderBy.'&offset=',
                 ]
             );
         }
@@ -192,7 +182,6 @@ You can combine some of these rules, but not all.<br />';
                 'grouplist' => Group::getGroupsForSelect(),
                 'catlist' => Category::getForSelect(),
                 'search_description' => $search_description,
-                'pager' => $this->smarty->fetch('pager.tpl'),
             ]
         );
 
