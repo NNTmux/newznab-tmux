@@ -1,4 +1,5 @@
 2018-04-12 DariusIII
+	* Fix: Fix a bug in group model getGroupsForSelect function
 	* Chg: Update search
 	* Fix: Fix missing = in search query
 	* Chg: Update headermenu search

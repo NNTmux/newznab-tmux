@@ -71,15 +71,14 @@ class Group extends Model
     public static function getGroupsForSelect(): array
     {
         $groups = self::getActive();
-        $temp_array = [];
 
+        $temp_array = [];
         $temp_array[-1] = '--Please Select--';
 
-        $grouped = $groups->mapToGroups(function ($group, $key) {
-            return [$group['name']];
-        });
 
-        $temp_array += array_collapse($grouped->toArray());
+            foreach ($groups as $group) {
+                $temp_array[$group['name']] = $group['name'];
+            }
 
         return $temp_array;
     }
