@@ -14,7 +14,7 @@ class SearchController extends BasePageController
      * @param \Illuminate\Http\Request $request
      * @throws \Exception
      */
-    public function search($id, Request $request)
+    public function search(Request $request)
     {
         $this->setPrefs();
         $releases = new Releases(['Groups' => null, 'Settings' => $this->settings]);
@@ -41,15 +41,15 @@ class SearchController extends BasePageController
             ]
         );
 
-        if ($searchType === 'basic' && ! $request->has('searchadvr') && (! empty($id) || $request->has('subject'))) {
+        if ($searchType === 'basic' && ! $request->has('searchadvr') && ($request->has('id') || $request->has('subject'))) {
             $searchString = '';
             switch (true) {
                 case $request->has('subject'):
                     $searchString = (string) $request->input('subject');
                     $this->smarty->assign('subject', $searchString);
                     break;
-                case ! empty($id):
-                    $searchString = (string) $id;
+                case $request->has('id'):
+                    $searchString = (string) $request->input('id');
                     $this->smarty->assign('search', $searchString);
                     break;
             }
@@ -119,7 +119,7 @@ class SearchController extends BasePageController
             $this->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
         }
 
-        if ($searchType !== 'basic' && empty($id) && $request->has('searchadvr') && ! $request->has('subject')) {
+        if ($searchType !== 'basic' && ! $request->has('id') && $request->has('searchadvr') && ! $request->has('subject')) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
                 $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

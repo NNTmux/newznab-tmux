@@ -217,7 +217,7 @@
 		{/if}
 		<ul class="nav navbar-left">
 			<li class="">
-				<form class="navbar-form" id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/"
+				<form class="navbar-form" id="headsearch_form" action="{$smarty.const.WWW_TOP}/search?id="
 					  method="get">
 					<select class="form-control" id="headcat" name="t">
 						<option class="grouping" value="-1">All</option>

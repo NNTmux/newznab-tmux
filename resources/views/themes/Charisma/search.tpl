@@ -293,7 +293,7 @@
 					</td>
 					<td class="category">
 						<a title="Browse {$result.category_name}"
-						   href="{$smarty.const.WWW_TOP}/browse?t={$result.categories_id}">{$result.category_name}</a>
+						   href="{$smarty.const.WWW_TOP}/browse/{$result.category_name}">{$result.category_name}</a>
 					</td>
 					<td class="posted" title="{$result.postdate}">
 						{$result.postdate|timeago}
