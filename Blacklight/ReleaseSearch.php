@@ -54,7 +54,6 @@ class ReleaseSearch
      *
      * @param null  $query
      * @param bool  $builder
-     *
      */
     public function getSearchSQL(array $options = [], $forceLike = false, $query = null, $builder = false)
     {

@@ -85,7 +85,6 @@ class SearchController extends BasePageController
 
             dump($results->total());
 
-
             $this->smarty->assign(
                 [
                     'lastvisit' => $this->userdata['lastlogin'],
@@ -147,7 +146,6 @@ class SearchController extends BasePageController
             );
 
             dump($results->total());
-
 
             $this->smarty->assign(
                 [
