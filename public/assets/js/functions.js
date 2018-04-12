@@ -744,7 +744,7 @@ jQuery(function($){
 
             var sText = $('#headsearch').val();
             var sCat = ($("#headcat").val()!=-1 ? "?t="+$("#headcat").val() : "");
-            document.location= WWW_TOP + "/search?id" +  sText + sCat;
+            document.location= WWW_TOP + "/search?id=" +  sText + sCat;
         }
     });
 
