@@ -294,7 +294,7 @@ jQuery(function ($) {
     });
     $('#headsearch_go').click(function () {
         if ($('#headsearch').val() && $('#headsearch').val() != 'Enter keywords') {
-            document.location = WWW_TOP + "/search/" + $('#headsearch').val() + ($("#headcat").val() != -1 ? "?t=" + $("#headcat").val() : "");
+            document.location = WWW_TOP + "/search?id" + $('#headsearch').val() + ($("#headcat").val() != -1 ? "?t=" + $("#headcat").val() : "");
         }
     });
 
