@@ -75,10 +75,9 @@ class Group extends Model
         $temp_array = [];
         $temp_array[-1] = '--Please Select--';
 
-
-            foreach ($groups as $group) {
-                $temp_array[$group['name']] = $group['name'];
-            }
+        foreach ($groups as $group) {
+            $temp_array[$group['name']] = $group['name'];
+        }
 
         return $temp_array;
     }
