@@ -143,7 +143,7 @@ class ProfileController extends BasePageController
             case 'newapikey':
                 User::updateRssKey($userid);
 
-                return redirect('profileedit');
+                return redirect('profile');
                 break;
             case 'clearcookies':
                 $sab->unsetCookie();
