@@ -117,13 +117,9 @@ Route::get('forumpost/{id}', 'ForumController@getPosts');
 
 Route::post('forumpost/{id}', 'ForumController@getPosts');
 
-Route::get('/profileedit', function () {
-    redirect('/profileedit');
-})->middleware('auth');
+Route::get('profileedit', 'ProfileController@edit');
 
-Route::post('/profileedit', function () {
-    redirect('/profileedit');
-})->middleware('auth');
+Route::post('profileedit', 'ProfileController@edit');
 
 Route::get('/profile_delete', function () {
     redirect('/profile_delete');
