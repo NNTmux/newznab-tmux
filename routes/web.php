@@ -137,6 +137,10 @@ Route::get('search', 'SearchController@search');
 
 Route::post('search', 'SearchController@search');
 
+Route::get('mymovies', 'MyMoviesController@show');
+
+Route::post('mymovies', 'MymoviesController@show');
+
 Route::get('filelist/{guid}', 'FileListController@show');
 
 Route::post('filelist/{guid}', 'FileListController@show');

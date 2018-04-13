@@ -1045,13 +1045,13 @@ class Releases
     /**
      * @param       $currentID
      * @param       $name
-     * @param int $limit
+
      * @param array $excludedCats
      *
      * @return array
      * @throws \Exception
      */
-    public function searchSimilar($currentID, $name, $limit = 6, array $excludedCats = []): array
+    public function searchSimilar($currentID, $name, array $excludedCats = []): array
     {
         // Get the category for the parent of this release.
         $currRow = Release::getCatByRelId($currentID);

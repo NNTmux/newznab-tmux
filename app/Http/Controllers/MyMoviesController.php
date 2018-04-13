@@ -1,0 +1,208 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Category;
+use App\Models\Settings;
+use App\Models\UserMovie;
+use Blacklight\Movie;
+use Blacklight\Releases;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class MyMoviesController extends BasePageController
+{
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
+    public function show(Request $request)
+    {
+        $this->setPrefs();
+        $mv = new Movie(['Settings' => $this->settings]);
+
+        $action = $request->input('id') ?? '';
+        $imdbid = $request->input('subpage') ?? '';
+
+        if ($request->has('from')) {
+            $this->smarty->assign('from', WWW_TOP.$request->input('from'));
+        } else {
+            $this->smarty->assign('from', WWW_TOP.'/mymovies');
+        }
+
+        switch ($action) {
+            case 'delete':
+                $movie = UserMovie::getMovie(Auth::id(), $imdbid);
+                if ($request->has('from')) {
+                    header('Location:'.WWW_TOP.$request->input('from'));
+                } else {
+                    return redirect('/mymovies');
+                }
+                if (! $movie) {
+                    $this->show404();
+                } else {
+                    UserMovie::delMovie(Auth::id(), $imdbid);
+                }
+
+                break;
+            case 'add':
+            case 'doadd':
+                $movie = UserMovie::getMovie(Auth::id(), $imdbid);
+                if ($movie) {
+                    $this->show404();
+                } else {
+                    $movie = $mv->getMovieInfo($imdbid);
+                    if (! $movie) {
+                        $this->show404();
+                    }
+                }
+
+                if ($action === 'doadd') {
+                    $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
+                    UserMovie::addMovie(Auth::id(), $imdbid, $category);
+                    if ($request->has('from')) {
+                        header('Location:'.WWW_TOP.$request->input('from'));
+                    } else {
+                        return redirect('/mymovies');
+                    }
+                } else {
+                    $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
+                    $categories = [];
+                    foreach ($tmpcats as $c) {
+                        // If MOVIE WEB-DL categorization is disabled, don't include it as an option
+                        if ((int) $c['id'] === Category::MOVIE_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                            continue;
+                        }
+                        $categories[$c['id']] = $c['title'];
+                    }
+                    $this->smarty->assign('type', 'add');
+                    $this->smarty->assign('cat_ids', array_keys($categories));
+                    $this->smarty->assign('cat_names', $categories);
+                    $this->smarty->assign('cat_selected', []);
+                    $this->smarty->assign('imdbid', $imdbid);
+                    $this->smarty->assign('movie', $movie);
+                    $content = $this->smarty->fetch('mymovies-add.tpl');
+                    $this->smarty->assign('content', $content);
+                    $this->pagerender();
+                }
+                break;
+            case 'edit':
+            case 'doedit':
+                $movie = UserMovie::getMovie(Auth::id(), $imdbid);
+
+                if (! $movie) {
+                    $this->show404();
+                }
+
+                if ($action === 'doedit') {
+                    $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
+                    UserMovie::updateMovie(Auth::id(), $imdbid, $category);
+                    if ($request->has('from')) {
+                        redirect($request->input('from'));
+                    } else {
+                        return redirect('mymovies');
+                    }
+                } else {
+                    $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
+                    $categories = [];
+                    foreach ($tmpcats as $c) {
+                        $categories[$c['id']] = $c['title'];
+                    }
+
+                    $this->smarty->assign('type', 'edit');
+                    $this->smarty->assign('cat_ids', array_keys($categories));
+                    $this->smarty->assign('cat_names', $categories);
+                    $this->smarty->assign('cat_selected', explode('|', $movie['categories']));
+                    $this->smarty->assign('imdbid', $imdbid);
+                    $this->smarty->assign('movie', $movie);
+                    $content = $this->smarty->fetch('mymovies-add.tpl');
+                    $this->smarty->assign('content', $content);
+                    $this->pagerender();
+                }
+                break;
+            case 'browse':
+
+                $title = 'Browse My Movies';
+                $meta_title = 'My Movies';
+                $meta_keywords = 'search,add,to,cart,nzb,description,details';
+                $meta_description = 'Browse Your Movies';
+
+                $movies = UserMovie::getMovies(Auth::id());
+
+                $releases = new Releases(['Settings' => $this->settings]);
+
+                $ordering = $releases->getBrowseOrdering();
+
+                $page = $request->has('page') ? $request->input('page') : 1;
+
+                $results = $mv->getMovieRange($page, $movies, $this->userdata['categoryexclusions']);
+
+                $this->smarty->assign('covgroup', '');
+
+                foreach ($ordering as $ordertype) {
+                    $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/mymovies/browse?ob='.$ordertype.'&amp;offset=0');
+                }
+
+                $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
+
+                $this->smarty->assign('results', $results);
+
+                $this->smarty->assign('movies', true);
+
+                $content = $this->smarty->fetch('browse.tpl');
+                $this->smarty->assign([
+                        'content' => $content,
+                        'title' => $title,
+                        'meta_title' => $meta_title,
+                        'meta_keywords' => $meta_keywords,
+                        'meta_description' => $meta_description,
+                    ]);
+                $this->pagerender();
+                break;
+            default:
+
+                $title = 'My Movies';
+                $meta_title = 'My Movies';
+                $meta_keywords = 'search,add,to,cart,nzb,description,details';
+                $meta_description = 'Manage Your Movies';
+
+                $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
+                $categories = [];
+                foreach ($tmpcats as $c) {
+                    $categories[$c['id']] = $c['title'];
+                }
+
+                $movies = UserMovie::getMovies(Auth::id());
+                $results = [];
+                foreach ($movies as $moviek => $movie) {
+                    $showcats = explode('|', $movie['categories']);
+                    if (\is_array($showcats) && \count($showcats) > 0) {
+                        $catarr = [];
+                        foreach ($showcats as $scat) {
+                            if (! empty($scat)) {
+                                $catarr[] = $categories[$scat];
+                            }
+                        }
+                        $movie['categoryNames'] = implode(', ', $catarr);
+                    } else {
+                        $movie['categoryNames'] = '';
+                    }
+
+                    $results[$moviek] = $movie;
+                }
+                $this->smarty->assign('movies', $results);
+
+                $content = $this->smarty->fetch('mymovies.tpl');
+                $this->smarty->assign([
+                        'content' => $content,
+                        'title' => $title,
+                        'meta_title' => $meta_title,
+                        'meta_keywords' => $meta_keywords,
+                        'meta_description' => $meta_description,
+                    ]);
+                $this->pagerender();
+                break;
+        }
+    }
+}
