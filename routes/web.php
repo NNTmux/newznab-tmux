@@ -98,6 +98,10 @@ Route::get('music', 'MusicController@show');
 
 Route::post('music', 'MusicController@show');
 
+Route::get('nfo', 'NfoController@showNfo');
+
+Route::post('nfo', 'NfoController@showNfo');
+
 Route::get('xxx', 'AdultController@show');
 
 Route::post('xxx', 'AdultController@show');
