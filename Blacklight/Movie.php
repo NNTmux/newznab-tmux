@@ -245,23 +245,24 @@ class Movie
             ->select(
                 [
                     'm.*',
-                    'releases.movieinfo_id',
+                    'r.movieinfo_id',
                     'g.name as group_name',
                     'rn.releases_id as nfoid',
                 ]
             )
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
-            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->from('releases as r')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->join('movieinfo as m', 'm.imdbid', '=', 'releases.imdbid')
-            ->where('releases.nzbstatus', '=', 1)
+            ->join('movieinfo as m', 'm.imdbid', '=', 'r.imdbid')
+            ->where('r.nzbstatus', '=', 1)
             ->where('m.title', '!=', '')
             ->where('m.imdbid', '!=', '0000000');
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('releases.categories_id', $excludedcats);
+            $sql->whereNotIn('r.categories_id', $excludedcats);
         }
 
         if (\count($cat) > 0 && $cat[0] !== -1) {
@@ -269,7 +270,7 @@ class Movie
         }
 
         $sql->groupBy('m.imdbid')
-            ->orderBy('releases.postdate', 'desc');
+            ->orderBy('r.postdate', 'desc');
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {

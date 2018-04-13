@@ -170,17 +170,18 @@ class Music
                     'rn.releases_id as nfoid',
                 ]
             )
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
-            ->join('musicinfo as m', 'm.id', '=', 'releases.musicinfo_id')
+            ->from('releases as r')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+            ->join('musicinfo as m', 'm.id', '=', 'r.musicinfo_id')
             ->join('genres as gn', 'm.genres_id', '=', 'gn.id')
-            ->where('releases.nzbstatus', '=', 1)
+            ->where('r.nzbstatus', '=', 1)
             ->where('m.title', '!=', '')
             ->where('m.cover', '=', 1);
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('releases.categories_id', $excludedcats);
+            $sql->whereNotIn('r.categories_id', $excludedcats);
         }
 
         if (\count($cat) > 0 && $cat[0] !== -1) {
@@ -188,7 +189,7 @@ class Music
         }
 
         $sql->groupBy('m.id')
-            ->orderBy('releases.postdate', 'desc');
+            ->orderBy('r.postdate', 'desc');
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {

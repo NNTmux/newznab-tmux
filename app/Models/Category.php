@@ -234,7 +234,7 @@ class Category extends Model
                 if ($builder === false) {
                     $catsrch = $categories[0] !== -1 ? '  AND releases.categories_id = '.$categories[0] : '';
                 } else {
-                    $catsrch = $query->where('releases.categories_id', '=', $categories[0]);
+                    $catsrch = $query->where('r.categories_id', '=', $categories[0]);
                 }
                 break;
             // Multiple category constraints
@@ -242,7 +242,7 @@ class Category extends Model
                 if ($builder === false) {
                     $catsrch = ' AND releases.categories_id IN ('.implode(', ', $categories).') ';
                 } else {
-                    $catsrch = $query->whereIn('releases.categories_id', $categories);
+                    $catsrch = $query->whereIn('r.categories_id', $categories);
                 }
                 break;
         }
