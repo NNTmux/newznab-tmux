@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use App\Models\UserDownload;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
+use Blacklight\utility\Utility;
 use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 
@@ -142,10 +142,12 @@ class ProfileController extends BasePageController
         switch ($action) {
             case 'newapikey':
                 User::updateRssKey($userid);
+
                 return redirect('profileedit');
                 break;
             case 'clearcookies':
                 $sab->unsetCookie();
+
                 return redirect('profileedit');
                 break;
             case 'submit':
