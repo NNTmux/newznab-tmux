@@ -159,7 +159,7 @@ class ProfileController extends BasePageController
 
                 if ($request->has('password') && $request->input('password') !== $request->input('password_confirmation')) {
                     $errorStr = 'Password Mismatch';
-                } elseif ($request->has('password') && !empty($request->input('password')) && ! User::isValidPassword($request->input('password'))) {
+                } elseif ($request->has('password') && ! empty($request->input('password')) && ! User::isValidPassword($request->input('password'))) {
                     $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
                 } elseif (! empty($request->input('nzbgeturl')) && $nzbGet->verifyURL($request->input('nzbgeturl')) === false) {
                     $errorStr = 'The NZBGet URL you entered is invalid!';
