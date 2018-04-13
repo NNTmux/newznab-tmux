@@ -153,13 +153,13 @@ class ProfileController extends BasePageController
             case 'submit':
 
                 $data['email'] = $request->input('email');
-                if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && strlen(trim($request->input('saburl'))) > 0) {
+                if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && \strlen(trim($request->input('saburl'))) > 0) {
                     $request->merge(['saburl' => $request->input('saburl').'/']);
                 }
 
                 if ($request->has('password') && $request->input('password') !== $request->input('password_confirmation')) {
                     $errorStr = 'Password Mismatch';
-                } elseif ($request->has('password') && ! User::isValidPassword($request->input('password'))) {
+                } elseif ($request->has('password') && !empty($request->input('password')) && ! User::isValidPassword($request->input('password'))) {
                     $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
                 } elseif (! empty($request->input('nzbgeturl')) && $nzbGet->verifyURL($request->input('nzbgeturl')) === false) {
                     $errorStr = 'The NZBGet URL you entered is invalid!';
@@ -208,11 +208,11 @@ class ProfileController extends BasePageController
                         $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
                         UserExcludedCategory::addCategoryExclusions($userid, $request->input('exccat'));
 
-                        if ($request->has('password')) {
+                        if ($request->has('password') && ! empty($request->input('password'))) {
                             User::updatePassword($userid, $request->input('password'));
                         }
 
-                        redirect('/profile');
+                        return redirect('profile');
                     }
                 }
                 break;
