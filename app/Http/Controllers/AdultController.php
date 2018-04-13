@@ -33,12 +33,12 @@ class AdultController extends BasePageController
         $this->smarty->assign('catlist', $mtmp);
         $this->smarty->assign('category', $category);
 
-        $offset = ($request->has('offset') && ctype_digit($request->input('offset'))) ? $request->input('offset') : 0;
         $ordering = $adult->getXXXOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $movies = [];
-        $results = $adult->getXXXRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $page = $request->has('page') ? $request->input('page') : 1;
+        $results = $adult->getXXXRange($page, $catarray, $orderby, $this->userdata['categoryexclusions']);
         foreach ($results as $result) {
             $result['genre'] = makeFieldLinks($result, 'genre', 'xxx');
             $result['actors'] = makeFieldLinks($result, 'actors', 'xxx');
@@ -60,12 +60,6 @@ class AdultController extends BasePageController
         $this->smarty->assign('genre', $genre);
 
         $browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$director.'&amp;genre='.$genre;
-
-        $this->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
-        $this->smarty->assign('pageroffset', $offset);
-        $this->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
-        $this->smarty->assign('pagerquerybase', WWW_TOP.'/xxx?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
-        $this->smarty->assign('pagerquerysuffix', '#results');
 
         $pager = $this->smarty->fetch('pager.tpl');
         $this->smarty->assign('pager', $pager);

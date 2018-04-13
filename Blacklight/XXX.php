@@ -115,137 +115,79 @@ class XXX
     /**
      * Get XXX releases with covers for xxx browse page.
      *
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderBy
-     * @param       $maxAge
-     * @param array $excludedCats
      *
-     * @return array
+     * @param       $page
+     * @param       $cat
+     * @param       $orderBy
+     * @param array $excludedcats
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getXXXRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
+    public function getXXXRange($page, $cat, $orderBy, array $excludedcats = [])
     {
-        $catsrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
-        }
-
         $order = $this->getXXXOrder($orderBy);
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-
-        $xxxmoviesSql =
-            sprintf(
-                "
-				SELECT SQL_CALC_FOUND_ROWS
-					xxx.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM xxxinfo xxx
-				LEFT JOIN releases r ON xxx.id = r.xxxinfo_id
-				WHERE r.nzbstatus = 1
-				AND xxx.title != ''
-				AND r.passwordstatus %s
-				%s %s %s %s
-				GROUP BY xxx.id
-				ORDER BY %s %s %s",
-                $this->showPasswords,
-                $this->getBrowseBy(),
-                $catsrch,
-                (
-                    $maxAge > 0
-                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                    : ''
-                ),
-                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                $order[0],
-                $order[1],
-                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-           );
-
-        $xxxmoviesCache = Cache::get(md5($xxxmoviesSql));
-        if ($xxxmoviesCache !== null) {
-            $xxxmovies = $xxxmoviesCache;
-        } else {
-            $xxxmovies = $this->pdo->queryCalc($xxxmoviesSql);
-            Cache::put(md5($xxxmoviesSql), $xxxmovies, $expiresAt);
+        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
+					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+                    GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname")
+            ->select(
+                [
+                    'xxx.*',
+                    \Illuminate\Support\Facades\DB::raw('UNCOMPRESS(xxx.plot) AS plot'),
+                    'r.movieinfo_id',
+                    'g.name as group_name',
+                    'rn.releases_id as nfoid',
+                ]
+            )
+            ->from('releases as r')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->join('xxxinfo as xxx', 'xxx.id', '=', 'r.xxxinfo_id')
+            ->where('r.nzbstatus', '=', 1)
+            ->where('xxx.title', '!=', '');
+        Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedcats);
         }
 
-        $xxxIDs = $releaseIDs = false;
-
-        if (\is_array($xxxmovies['result'])) {
-            foreach ($xxxmovies['result'] as $xxx => $id) {
-                $xxxIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
-            }
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
         }
 
-        $sql = sprintf(
-            "
-			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
-			xxx.*, UNCOMPRESS(xxx.plot) AS plot,
-			g.name AS group_name,
-			rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
-			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
-			WHERE r.nzbstatus = 1
-			AND xxx.id IN (%s)
-			AND xxx.title != ''
-			AND r.passwordstatus %s
-			%s %s %s %s
-			GROUP BY xxx.id
-			ORDER BY %s %s",
-            (\is_array($xxxIDs) ? implode(',', $xxxIDs) : -1),
-            $this->showPasswords,
-            $this->getBrowseBy(),
-            $catsrch,
-            (
-                $maxAge > 0
-                ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                : ''
-            ),
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            $order[0],
-            $order[1]
-        );
-        $return = Cache::get(md5($sql));
+        $sql->groupBy('xxx.id')
+            ->orderBy($order[0], $order[1]);
+
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {
             return $return;
         }
 
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $xxxmovies['total'] ?? 0;
-        }
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
-        Cache::put(md5($sql), $return, $expiresAt);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
     }
 
     /**
-     * Get the order type the user requested on the movies page.
+     * Get the order type the user requested on the xxx page.
      *
      * @param $orderBy
      *
