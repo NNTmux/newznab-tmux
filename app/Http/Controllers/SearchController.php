@@ -17,7 +17,6 @@ class SearchController extends BasePageController
     public function search(Request $request)
     {
         $this->setPrefs();
-        dump($request->all());
         $releases = new Releases(['Groups' => null, 'Settings' => $this->settings]);
 
         $meta_title = 'Search Nzbs';
@@ -83,8 +82,6 @@ class SearchController extends BasePageController
                 $categoryID
             );
 
-            dump($results->total());
-
             $this->smarty->assign(
                 [
                     'lastvisit' => $this->userdata['lastlogin'],
@@ -144,8 +141,6 @@ class SearchController extends BasePageController
                 'advanced',
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
-
-            dump($results->total());
 
             $this->smarty->assign(
                 [

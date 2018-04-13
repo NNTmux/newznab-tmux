@@ -626,8 +626,8 @@ class Releases
 
         if ($orderBy === '') {
             $orderBy = [];
-            $orderBy[0] = 'postdate ';
-            $orderBy[1] = 'desc ';
+            $orderBy[0] = 'postdate';
+            $orderBy[1] = 'desc';
         } else {
             $orderBy = $this->getBrowseOrder($orderBy);
         }

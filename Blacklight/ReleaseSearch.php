@@ -134,7 +134,7 @@ class ReleaseSearch
         }
         if ($searchQuery !== '') {
             if ($builder === true) {
-                return $query->whereRaw("(rse.query = '@@relaxed ?')", [trim($searchQuery).$this->sphinxQueryOpt]);
+                return $query->whereRaw(sprintf("(rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt));
             }
 
             $fullReturn = sprintf("AND (rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt);

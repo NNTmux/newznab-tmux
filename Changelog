@@ -1,3 +1,5 @@
+2018-04-13 DariusIII
+	* Fix: Fix search
 2018-04-12 DariusIII
 	* Fix: Fix a bug in group model getGroupsForSelect function
 	* Chg: Update search
