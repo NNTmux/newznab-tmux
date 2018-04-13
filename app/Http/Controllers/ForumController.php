@@ -108,4 +108,19 @@ class ForumController extends BasePageController
         );
         $this->pagerender();
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function deleteTopic(Request $request)
+    {
+        $id = $request->input('id') + 0;
+
+        if ($id !== null) {
+            Forumpost::deleteParent($id);
+            return redirect('forum');
+        }
+        return redirect('forum');
+    }
 }
