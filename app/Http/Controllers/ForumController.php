@@ -119,8 +119,10 @@ class ForumController extends BasePageController
 
         if ($id !== null) {
             Forumpost::deleteParent($id);
+
             return redirect('forum');
         }
+
         return redirect('forum');
     }
 }
