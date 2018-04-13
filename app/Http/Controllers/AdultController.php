@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use Blacklight\XXX;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class AdultController extends BasePageController
@@ -103,6 +103,5 @@ class AdultController extends BasePageController
             'meta_description' => $meta_description,
         ]);
         $this->pagerender();
-
     }
 }
