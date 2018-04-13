@@ -61,9 +61,6 @@ class AdultController extends BasePageController
 
         $browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$director.'&amp;genre='.$genre;
 
-        $pager = $this->smarty->fetch('pager.tpl');
-        $this->smarty->assign('pager', $pager);
-
         if ((int) $category === -1) {
             $this->smarty->assign('catname', 'All');
         } else {
