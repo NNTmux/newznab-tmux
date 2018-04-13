@@ -144,9 +144,9 @@ class MovieController extends BasePageController
 
         $this->smarty->assign('results', $movies);
 
-        $meta_title = 'Browse Nzbs';
+        $meta_title = 'Browse Movies';
         $meta_keywords = 'browse,nzb,description,details';
-        $meta_description = 'Browse for Nzbs';
+        $meta_description = 'Browse for Movies';
 
         if ($request->has('imdb')) {
             $content = $this->smarty->fetch('viewmoviefull.tpl');
