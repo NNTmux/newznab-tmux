@@ -102,9 +102,9 @@ Route::get('music', 'MusicController@show');
 
 Route::post('music', 'MusicController@show');
 
-Route::get('/xxx', function () {
-    redirect('/xxx');
-})->middleware('auth');
+Route::get('xxx', 'AdultController@show');
+
+Route::post('xxx', 'AdultController@show');
 
 Route::get('contact-us', 'ContactUsController@showContactForm');
 Route::post('contact-us', 'ContactUsController@contact');
