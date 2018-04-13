@@ -996,7 +996,7 @@ class Releases
     /**
      * @param       $currentID
      * @param       $name
-
+     *
      * @param array $excludedCats
      *
      * @return array
