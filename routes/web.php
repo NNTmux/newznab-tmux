@@ -94,10 +94,6 @@ Route::post('movie', 'MovieController@showMovie');
 
 Route::post('movietrailers', 'MovieController@showTrailer');
 
-Route::get('/pc', function () {
-    redirect('/pc');
-})->middleware('auth');
-
 Route::get('music', 'MusicController@show');
 
 Route::post('music', 'MusicController@show');
