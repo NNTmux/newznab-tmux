@@ -370,118 +370,69 @@ class Releases
     /**
      * Get TV for my shows page.
      *
-     * @param          $userShows
-     * @param int|bool $offset
-     * @param int      $limit
-     * @param string|array   $orderBy
-     * @param int      $maxAge
-     * @param array    $excludedCats
      *
-     * @return array
+     * @param       $userShows
+     * @param       $orderBy
+     * @param int   $maxAge
+     * @param array $excludedCats
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @throws \Exception
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = []): array
+    public function getShowsRange($userShows, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
-        $sql = sprintf(
-                "SELECT r.*,
-					CONCAT(cp.title, '-', c.title) AS category_name,
-					%s AS category_ids,
-					g.name AS group_name,
-					rn.releases_id AS nfoid, re.releases_id AS reid,
-					tve.firstaired,
-					(SELECT df.failed) AS failed
-				FROM releases r
-				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				LEFT JOIN groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
-				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN categories cp ON cp.id = c.parentid
-				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-				WHERE r.categories_id BETWEEN 5000 AND 5999 %s %s
-				AND r.nzbstatus = %d
-				AND r.passwordstatus %s
-				%s
-				GROUP BY r.id
-				ORDER BY %s %s %s",
-                $this->getConcatenatedCategoryIDs(),
-                $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
-                $this->showPasswords,
-                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-                $orderBy[0],
-                $orderBy[1],
-                ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
-            );
-        $releases = Cache::get(md5($sql));
+        $sql = Release::query()
+            ->with('group as g', 'nfo as rn', 'category as c', 'failed as df', 'episode as tve')
+            ->select(
+                [
+                    'r.*',
+                    \Illuminate\Support\Facades\DB::raw("CONCAT(cp.title, '-', c.title) AS category_name"),
+                    'g.name as group_name',
+                    'rn.releases_id as nfoid',
+                    're.releases_id as reid',
+                    'tve.firstaired',
+                    'df.failed as failed',
+                    ]
+            )
+            ->leftJoin('video_date as re', 're.releases_id', '=', 'releases.id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->whereBetween('releases.categories_id', [5000, 5999])
+            ->where('releases.nzbstatus', NZB::NZB_ADDED);
+        self::showPasswords($sql, true);
+        foreach ($userShows as $query) {
+            $sql->orWhere('releases.videos_id', '=', $query['videos_id']);
+            if ($query['categories'] !== '') {
+                $catsArr = explode('|', $query['categories']);
+                if (\count($catsArr) > 1) {
+                    $sql->whereIn('releases.categories_id', $catsArr);
+                } else {
+                    $sql->where('releases.categories_id', $catsArr[0]);
+                }
+            }
+        }
+
+        if (\count($excludedCats) > 0) {
+            $sql->whereNotIn('releases.categories_id', $excludedCats);
+        }
+
+        if ($maxAge > 0) {
+            $sql->where('releases.postdate', '>', Carbon::now()->subDays($maxAge));
+        }
+
+        $sql->orderBy($orderBy[0], $orderBy[1]);
+        $releases = Cache::get(md5(implode('.', $userShows).implode('.', $orderBy).$maxAge.implode('.', $excludedCats)));
         if ($releases !== null) {
             return $releases;
         }
 
-        $releases = $this->pdo->query($sql);
+        $releases = $sql->paginate(config('nntmux.items_per_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put(md5(implode('.', $userShows).implode('.', $orderBy).$maxAge.implode('.', $excludedCats)), $releases, $expiresAt);
 
         return $releases;
-    }
-
-    /**
-     * Get count for my shows page pagination.
-     *
-     * @param       $userShows
-     * @param int   $maxAge
-     * @param array $excludedCats
-     *
-     * @return int
-     */
-    public function getShowsCount($userShows, $maxAge = -1, array $excludedCats = []): int
-    {
-        return $this->getPagerCount(
-            sprintf(
-                'SELECT r.id
-				FROM releases r
-				WHERE r.categories_id BETWEEN 5000 AND 5999 %s %s
-				AND r.nzbstatus = %d
-				AND r.passwordstatus %s
-				%s',
-                $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
-                $this->showPasswords,
-                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
-            )
-        );
-    }
-
-    /**
-     * Get count for my shows page pagination.
-     *
-     * @param       $userMovies
-     * @param int   $maxAge
-     * @param array $excludedCats
-     *
-     * @return int
-     */
-    public function getMovieCount($userMovies, $maxAge = -1, array $excludedCats = []): int
-    {
-        return $this->getPagerCount(
-            sprintf(
-                'SELECT r.id
-				FROM releases r
-				WHERE r.categories_id BETWEEN 3000 AND 3999 %s %s
-				AND r.nzbstatus = %d
-				AND r.passwordstatus %s
-				%s',
-                $this->uSQL($userMovies, 'imdbid'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
-                $this->showPasswords,
-                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
-            )
-        );
     }
 
     /**

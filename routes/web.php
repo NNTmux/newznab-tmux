@@ -139,7 +139,11 @@ Route::post('search', 'SearchController@search');
 
 Route::get('mymovies', 'MyMoviesController@show');
 
-Route::post('mymovies', 'MymoviesController@show');
+Route::post('mymovies', 'MyMoviesController@show');
+
+Route::get('myshows', 'MyShowsController@show');
+
+Route::post('myshows', 'MyShowsController@show');
 
 Route::get('filelist/{guid}', 'FileListController@show');
 

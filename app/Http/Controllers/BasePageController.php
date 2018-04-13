@@ -153,10 +153,18 @@ class BasePageController extends Controller
 
     /**
      * Show 404 page.
+     *
+     * @param $message
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show404(): void
+    public function show404($message = null)
     {
-        abort(404);
+        if ($message !== null) {
+            return view('errors.404')->with('Message', $message);
+        }
+
+        return view('errors.404');
     }
 
     /**
