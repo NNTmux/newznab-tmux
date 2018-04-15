@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\AccountDeleted;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
+use App\Mail\AccountDeleted;
 use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
@@ -301,6 +301,7 @@ class ProfileController extends BasePageController
             Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
             Auth::logout();
             User::deleteUser($userId);
+
             return redirect('login');
         }
 
