@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AccountDeleted;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
@@ -14,6 +15,7 @@ use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ProfileController extends BasePageController
 {
@@ -283,5 +285,29 @@ class ProfileController extends BasePageController
             ]
         );
         $this->pagerender();
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Exception
+     */
+    public function destroy(Request $request)
+    {
+        $this->setPrefs();
+        $userId = $request->input('id');
+
+        if ($userId !== null && $this->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === Auth::id()) {
+            Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
+            Auth::logout();
+            User::deleteUser($userId);
+            return redirect('login');
+        }
+
+        if ($this->userdata->role->id === User::ROLE_ADMIN) {
+            return redirect('profile');
+        }
+
+        return view('errors.badboy');
     }
 }

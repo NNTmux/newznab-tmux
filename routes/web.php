@@ -125,13 +125,9 @@ Route::get('profileedit', 'ProfileController@edit');
 
 Route::post('profileedit', 'ProfileController@edit');
 
-Route::get('/profile_delete', function () {
-    redirect('/profile_delete');
-})->middleware('auth');
+Route::get('/profile_delete', 'ProfileController@destroy');
 
-Route::post('/profile_delete', function () {
-    redirect('/login');
-})->middleware('guest');
+Route::post('/profile_delete', 'ProfileController@destroy');
 
 Route::get('search', 'SearchController@search');
 

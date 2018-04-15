@@ -125,4 +125,38 @@ class ForumController extends BasePageController
 
         return redirect('forum');
     }
+
+    public function edit(Request $request)
+    {
+        $this->setPrefs();
+
+        if ($request->has('id') && ! empty($request->input('addMessage'))) {
+            $parent = Forumpost::getPost($request->input('id'));
+            Forumpost::editPost($request->input('id'), $request->input('addMessage'), Auth::id());
+            if ((int) $parent['parentid'] !== 0) {
+                header('/forumpost/'.$parent['parentid'].'#last');
+            } else {
+                header('/forumpost/'.$request->input('id'));
+            }
+        }
+
+        $result = Forumpost::getPost($request->input('id'));
+
+        $meta_title = 'Edit forum Post';
+        $meta_keywords = 'edit, view,forum,post,thread';
+        $meta_description = 'Edit forum post';
+
+        $this->smarty->assign('result', $result);
+
+        $content = $this->smarty->fetch('post_edit.tpl');
+        $this->smarty->assign(
+            [
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]
+        );
+        $this->pagerender();
+    }
 }
