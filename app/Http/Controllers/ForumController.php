@@ -126,6 +126,10 @@ class ForumController extends BasePageController
         return redirect('forum');
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @throws \Exception
+     */
     public function edit(Request $request)
     {
         $this->setPrefs();

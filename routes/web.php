@@ -121,6 +121,10 @@ Route::get('topic_delete', 'ForumController@deleteTopic');
 
 Route::post('topic_delete', 'ForumController@deleteTopic');
 
+Route::get('post_edit', 'ForumController@edit');
+
+Route::post('post_edit', 'ForumController@edit');
+
 Route::get('profileedit', 'ProfileController@edit');
 
 Route::post('profileedit', 'ProfileController@edit');

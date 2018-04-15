@@ -1,4 +1,5 @@
 2018-04-15 DariusIII
+	* Chg: Update the routes
 	* Chg: Update Profile and Forum controllers
 2018-04-13 DariusIII
 	* Chg: Add deleteTopic route and function
