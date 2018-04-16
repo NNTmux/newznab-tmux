@@ -28,7 +28,7 @@
 					</td>
 					<td width="50%">
 						<div style="text-align: center;">
-							{$pager}
+							{{$results->links()}}
 						</div>
 					</td>
 					<td width="20%">
@@ -216,7 +216,7 @@
 				</td>
 				<td width="50%">
 					<div style="text-align: center;">
-						{$pager}
+						{{$results->links()}}
 					</div>
 				</td>
 				<td width="20%">

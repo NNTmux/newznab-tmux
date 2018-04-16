@@ -2,7 +2,11 @@
 
 <div class="well well-sm">
 	{if $booklist}
-		{$results->links()}
+		{if $booklist->count() > 0}
+			<div class="col-md-4">
+				{$booklist->links()}
+			</div>
+		{/if}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -24,7 +28,11 @@
 
 		</table>
 		<br/>
-		{$results->links()}
+		{if $booklist->count() > 0}
+			<div class="col-md-4">
+				{$booklist->links()}
+			</div>
+		{/if}
 	{else}
 		<p>No books available.</p>
 	{/if}

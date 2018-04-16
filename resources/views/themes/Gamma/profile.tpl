@@ -166,7 +166,7 @@
 <div style="padding-top:20px;">
 	<a id="comments"></a>
 	<h3>Comments</h3>
-	{$pager}
+	{{$results->links()}}
 	<table style="margin-top:10px;" class="data Sortable table">
 		<tr>
 			<th>date</th>

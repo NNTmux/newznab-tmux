@@ -24,7 +24,7 @@
 		</form>
 	</div>
 
-	{$results->links()}
+	{$userlist->links()}
 
 	<br/><br/>
 

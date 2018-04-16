@@ -1,7 +1,7 @@
 <h2>{if $page->title !=''}{$page->title}{else}Forum{/if}</h2>
 {if $results|@count > 0}
 <div class=".pagination pagination-centered">
-	{$pager}
+	{{$results->links()}}
 </div>
 <a id="top"></a>
 <table style="width:100%;" class="data highlight table" id="forumtable">
@@ -69,7 +69,7 @@
 <div style="float:right;margin-top:5px;"><a class="btn btn-small" href="#top">Top</a></div>
 <br/>
 <div class=".pagination pagination-centered">
-	{$pager}
+	{{$results->links()}}
 </div>
 {/if}
 <div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">

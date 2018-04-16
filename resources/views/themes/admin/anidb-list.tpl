@@ -14,7 +14,9 @@
 		</form>
 	</div>
 
-	{$results->links()}
+	{if $results->count() > 0}
+			{$results->links()}
+	{/if}
 
 	<br/><br/>
 
@@ -44,7 +46,9 @@
 	</table>
 
 	<br/>
-	{$results->links()}
+	{if $results->count() > 0}
+			{$results->links()}
+	{/if}
 	{else}
 	<p>No AniDB episodes available.</p>
 	{/if}

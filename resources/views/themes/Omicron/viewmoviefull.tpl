@@ -193,9 +193,11 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-4">
-											{$results->links()}
-										</div>
+										{if	$results->count() > 0}
+											<div class="col-md-4">
+												{$results->links()}
+											</div>
+										{/if}
 									</div>
 								{/if}
 							</div>

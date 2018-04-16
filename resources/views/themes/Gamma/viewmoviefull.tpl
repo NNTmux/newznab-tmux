@@ -141,7 +141,7 @@
 	</table>
 	</div>
 	<br/>
-	{$pager}
+	{{$results->links()}}
 	{if $results|@count > 10}
 		<div class="well well-sm">
 			<div class="nzb_multi_operations">

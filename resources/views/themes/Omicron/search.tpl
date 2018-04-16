@@ -196,9 +196,11 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-4">
-								{$results->links()}
-							</div>
+							{if	$results->count() > 0}
+								<div class="col-md-4">
+									{$results->links()}
+								</div>
+							{/if}
 						</div>
 						<hr>
 						<table class="data table table-striped responsive-utilities jambo-table" id="browsetable">
@@ -428,9 +430,11 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-4">
-								{$results->links()}
-							</div>
+							{if	$results->count() > 0}
+								<div class="col-md-4">
+									{$results->links()}
+								</div>
+							{/if}
 						</div>
 						<br><br><br>
 					</form>

@@ -180,9 +180,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">
-				{$results->links()}
-			</div>
+			{if	$results->count() > 0}
+				<div class="col-md-4">
+					{$results->links()}
+				</div>
+			{/if}
 		</div>
 		<hr>
 		<table class="data table table-condensed table-striped table-responsive table-hover" id="browsetable">
@@ -375,9 +377,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">
-				{$results->links()}
-			</div>
+			{if	$results->count() > 0}
+				<div class="col-md-4">
+					{$results->links()}
+				</div>
+			{/if}
 		</div>
 		<br><br><br>
 	</form>

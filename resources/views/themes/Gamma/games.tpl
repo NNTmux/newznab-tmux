@@ -23,7 +23,7 @@
 						</td>
 						<td width="50%">
 							<div style="text-align: center;">
-								{$pager}
+								{{$results->links()}}
 							</div>
 						</td>
 						<td width="20%">
@@ -234,7 +234,7 @@
 			{/foreach}
 		</table>
 		<br/>
-		{$pager}
+		{{$results->links()}}
 		{if $results|@count > 10}
 			<div class="well well-sm">
 				<div class="nzb_multi_operations">
@@ -252,7 +252,7 @@
 							</td>
 							<td width="50%">
 								<div style="text-align: center;">
-									{$pager}
+									{{$results->links()}}
 								</div>
 							</td>
 							<td width="20%">

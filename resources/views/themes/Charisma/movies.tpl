@@ -46,7 +46,7 @@
 								</div>
 							</div>
 						</div>
-						{if count($results) > 0}
+						{if	$results->count() > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
@@ -347,10 +347,10 @@
 								</div>
 							</div>
 						</div>
-						{if count($results) > 0}
-						<div class="col-md-4">
-							{$results->links()}
-						</div>
+						{if	$results->count() > 0}
+							<div class="col-md-4">
+								{$results->links()}
+							</div>
 						{/if}
 					</div>
 				</div>

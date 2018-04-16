@@ -10,7 +10,7 @@
 				<input class="btn btn-default" type="submit" value="Go"/>
 			</form>
 		</div>
-		{$results->links()}
+		{$tvshowlist->links()}
 		<br/>
 		<br/>
 		<table style="width:100%;margin-top:10px;"

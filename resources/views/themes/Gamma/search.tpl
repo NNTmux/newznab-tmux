@@ -136,7 +136,7 @@
 						</td>
 						<td width="33%">
 							<div style="text-align: center;">
-								{$pager}
+								{{$results->links()}}
 							</div>
 						</td>
 						<td width="33%">
@@ -310,7 +310,7 @@
 				</td>
 				<td width="33%">
 					<div style="text-align: center;">
-						{$pager}
+						{{$results->links()}}
 					</div>
 				</td>
 				<td width="33%">

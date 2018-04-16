@@ -1,4 +1,5 @@
 2018-04-16 DariusIII
+	* Chg: Use laravel pager in all themes
 	* Chg: Update Books class getBookRange function and BooksController
 	* Chg: Rename BasePageController index function to basePage
 2018-04-15 DariusIII
