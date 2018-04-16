@@ -150,7 +150,7 @@ class Books
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getBookRange($page, $cat, $orderBy, array $excludedCats = [])
+    public function getBookRange($page, $cat, $orderBy = '', array $excludedCats = [])
     {
         $order = $this->getBookOrder($orderBy);
 
@@ -196,7 +196,7 @@ class Books
         $sql->groupBy('b.id')
             ->orderBy($order[0], $order[1]);
 
-        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $orderBy).implode('.', $excludedCats)));
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)));
         if ($return !== null) {
             return $return;
         }
@@ -204,7 +204,7 @@ class Books
         $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($page.implode('.', $cat).implode('.', $orderBy).implode('.', $excludedCats)), $return, $expiresAt);
+        Cache::put(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)), $return, $expiresAt);
 
         return $return;
     }
@@ -216,14 +216,14 @@ class Books
      */
     public function getBookOrder($orderby): array
     {
-        $order = ($orderby === '') ? 'r.postdate' : $orderby;
+        $order = $orderby === '' ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'title':
-                $orderfield = 'b..title';
+                $orderfield = 'b.title';
                 break;
             case 'author':
-                $orderfield = 'b..author';
+                $orderfield = 'b.author';
                 break;
             case 'publishdate':
                 $orderfield = 'b.publishdate';
@@ -284,11 +284,10 @@ class Books
     public function getBrowseBy(): string
     {
         $browseby = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseby .= 'AND boo.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                $browseby .= 'AND b.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
             }
         }
 

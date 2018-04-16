@@ -32,7 +32,6 @@ class BooksController extends BasePageController
         $this->smarty->assign('catlist', $btmp);
         $this->smarty->assign('category', $category);
 
-        $offset = ($request->has('offset') && ctype_digit($request->input('offset'))) ? $request->input('offset') : 0;
         $ordering = $book->getBookOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
