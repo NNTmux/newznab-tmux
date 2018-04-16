@@ -1,4 +1,5 @@
 2018-04-16 DariusIII
+	* Chg: Add NZBGetController and route
 	* Chg: Update headermenu.tpl in all themes
 	* Chg: Use laravel pager in all themes
 	* Chg: Update Books class getBookRange function and BooksController

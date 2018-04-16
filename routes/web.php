@@ -156,3 +156,5 @@ Route::post('btc_payment', 'BtcPaymentController@show');
 Route::get('btc_payment_callback', 'BtcPaymentController@callback');
 
 Route::post('btc_payment_callback', 'BtcPaymentController@callback');
+
+Route::get('nzbgetqueuedata', 'NZBGetController@queue');
