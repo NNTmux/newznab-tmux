@@ -257,7 +257,7 @@ class BasePageController extends Controller
             $this->smarty->assign('weHasVortex', false);
         }
 
-        $sab = new SABnzbd();
+        $sab = new SABnzbd($this);
         $this->smarty->assign('sabintegrated', $sab->integratedBool);
         if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
