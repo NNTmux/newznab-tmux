@@ -16,7 +16,7 @@
 							<li><a href="{$smarty.const.WWW_TOP}/anime">Anime Series</a></li>
 							<hr>
 							{foreach $parentcat.subcatlist as $subcat}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/tv/{$subcat.title}">{$subcat.title}</a></li>
 							{/foreach}
 						</ul>
 					</li>
@@ -42,7 +42,7 @@
 								{/foreach}
 							{elseif $userdata.movieview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/movies/{$subcat.title}">{$subcat.title}</a></li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -68,7 +68,7 @@
 								{/foreach}
 							{elseif $userdata.consoleview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/console/{$subcat.title}">{$subcat.title}</a></li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -93,13 +93,13 @@
 										<li><a href="{$smarty.const.WWW_TOP}/games">{$subcat.title}</a>
 										</li>
 									{else}
-										<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a>
+										<li><a href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{/if}
 								{/foreach}
 							{elseif $userdata.gameview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a></li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -124,7 +124,7 @@
 								{/foreach}
 							{elseif $userdata.musicview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a></li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -144,7 +144,7 @@
 							{/if}
 							<hr>
 							{foreach $parentcat.subcatlist as $subcat}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/books/{$subcat.title}">{$subcat.title}</a></li>
 							{/foreach}
 						</ul>
 					</li>
@@ -168,13 +168,13 @@
 										<li><a href="{$smarty.const.WWW_TOP}/xxx/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{else}
-										<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a>
+										<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{/if}
 								{/foreach}
 							{elseif $userdata.xxxview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a></li>
 								{/foreach}
 							{/if}
 						</ul>

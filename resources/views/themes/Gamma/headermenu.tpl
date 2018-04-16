@@ -9,13 +9,13 @@
 				<li><a href="{$smarty.const.WWW_TOP}/console">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
-					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/console?t={$subcat.id}">{$subcat.title}</a></li>
+					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/console/{$subcat.title}">{$subcat.title}</a></li>
 				{/foreach}
 			{else}
 				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::GAME_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
-					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/console/{$subcat.title}">{$subcat.title}</a></li>
 				{/foreach}
 			{/if}
 		</ul>
@@ -29,13 +29,13 @@
 				<li><a href="{$smarty.const.WWW_TOP}/movies">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 			{foreach $parentcat.subcatlist as $subcat}
-				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/movies?t={$subcat.id}">{$subcat.title}</a></li>
+				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/movies/{$subcat.title}">{$subcat.title}</a></li>
 			{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::MOVIE_ROOT}">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
-					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/movies/{$subcat.title}">{$subcat.title}</a></li>
 				{/foreach}
 			{/if}
 		</ul>
@@ -50,16 +50,16 @@
 			<li class="divider"></li>
 			{foreach $parentcat.subcatlist as $subcat}
 			{if $subcat.id == {$catClass::MUSIC_AUDIOBOOK}}
-			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a></li>
 			{else}
-			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/music?t={$subcat.id}">{$subcat.title}</a></li>
+			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/music/{$subcat.title}">{$subcat.title}</a></li>
 			{/if}
 			{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::MUSIC_ROOT}">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
-						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a></li>
 				{/foreach}
 			{/if}
 		</ul>
@@ -74,15 +74,15 @@
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 					{if $subcat.id != {$catClass::PC_GAMES}}
-						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a></li>
 					{else}
-						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/games?t={$subcat.id}">{$subcat.title}</a></li>
+						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/games/{$subcat.title}">{$subcat.title}</a></li>
 					{/if}
 				{/foreach}
 				{else}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::PC_ROOT}">{$parentcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 					{foreach $parentcat.subcatlist as $subcat}
-							<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+							<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a></li>
 					{/foreach}
 				{/if}
 			</ul>
@@ -92,10 +92,10 @@
 	<li class="dropdown">
 		<a id="drop{$parentcat.id}" class="dropdown-hover" data-hover="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
-			<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">{$parentcat.title}</a></li>
+			<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 			<li class="divider"></li>
 			{foreach $parentcat.subcatlist as $subcat}
-				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse/tv/{$subcat.title}">{$subcat.title}</a></li>
 			{/foreach}
 		</ul>
 	</li>
@@ -112,22 +112,22 @@
 				{if $userdata.xxxview == "1"}
 					<li><a href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}</a></li>
 				{else}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::XXX_ROOT}">{$parentcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 				{/if}
 				<hr>
 				{if $userdata.xxxview == "1"}
 					{foreach $parentcat.subcatlist as $subcat}
 						{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
-							<li><a href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.id}">{$subcat.title}</a>
+							<li><a href="{$smarty.const.WWW_TOP}/xxx/{$subcat.id}">{$subcat.title}</a>
 							</li>
 						{else}
-							<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
+							<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a>
 							</li>
 						{/if}
 					{/foreach}
 				{else}
 					{foreach $parentcat.subcatlist as $subcat}
-						<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+						<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a></li>
 					{/foreach}
 				{/if}
 			</ul>
@@ -145,11 +145,11 @@
 				{if $userdata.bookview == "1"}
 					<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
 				{else}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::BOOKS_ROOT}">{$parentcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 				{/if}
 				<hr>
 				{foreach $parentcat.subcatlist as $subcat}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse/books/{$subcat.title}">{$subcat.title}</a></li>
 				{/foreach}
 			</ul>
 		</li>
@@ -158,10 +158,10 @@
 			<li class="dropdown">
 				<a id="dropOther" class="dropdown-hover" data-hover="dropdown" href="#">Other <b class="caret"></b></a>
 				<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
-					<li><a href="/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
+					<li><a href="/browse/other">Other</a></li>
 					<hr>
-					<li><a href="/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
-					<li><a href="/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
+					<li><a href="/browse/other/misc">Misc</a></li>
+					<li><a href="/browse/other/hashed">Hashed</a></li>
 				</ul>
 			</li>
 		{/if}
