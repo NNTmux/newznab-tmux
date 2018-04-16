@@ -184,3 +184,7 @@ Route::post('sendtoqueue', 'SendReleaseController@queue');
 Route::get('sendtocouch', 'SendReleaseController@couchPotato');
 
 Route::post('sendtocouch', 'SendReleaseController@couchPotato');
+
+Route::get('series', 'SeriesController@index');
+
+Route::post('series', 'SeriesController@index');
