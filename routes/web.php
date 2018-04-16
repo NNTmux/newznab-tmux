@@ -165,6 +165,22 @@ Route::get('nzbgetqueuedata', 'QueueController@nzbget');
 
 Route::post('nzbgetqueuedata', 'QueueController@nzbget');
 
-Route::get('sabnzbdqueuedata', 'QueueController@sabnzbd');
+Route::get('sabqueuedata', 'QueueController@sabnzbd');
 
-Route::post('sabnzbdqueuedata', 'QueueController@sabnzbd');
+Route::post('sabqueuedata', 'QueueController@sabnzbd');
+
+Route::get('sendtosab', 'SendReleaseController@sabNzbd');
+
+Route::post('sendtosab', 'SendReleaseController@sabNzbd');
+
+Route::get('sendtonzbget', 'SendReleaseController@nzbGet');
+
+Route::post('sendtonzbget', 'SendReleaseController@nzbGet');
+
+Route::get('sendtoqueue', 'SendReleaseController@queue');
+
+Route::post('sendtoqueue', 'SendReleaseController@queue');
+
+Route::get('sendtocouch', 'SendReleaseController@couchPotato');
+
+Route::post('sendtocouch', 'SendReleaseController@couchPotato');

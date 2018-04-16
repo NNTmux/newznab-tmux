@@ -1,4 +1,5 @@
 2018-04-16 DariusIII
+	* Chg: Add controller for send to functions
 	* Chg: Optimize queue controller
 	* Chg: Add NZBGetController and route
 	* Chg: Update headermenu.tpl in all themes

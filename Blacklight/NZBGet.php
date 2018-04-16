@@ -76,7 +76,7 @@ class NZBGet
      * Construct.
      * Set up full URL.
      *
-     * @var \BasePage
+     * @var \App\Http\Controllers\BasePageController
      * @throws \Exception
      */
     public function __construct(&$page)

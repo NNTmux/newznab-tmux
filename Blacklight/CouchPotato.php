@@ -50,9 +50,9 @@ class CouchPotato
     /**
      * CouchPotato constructor.
      *
-     * @param \Blacklight\http\BasePage $page
+     * @param \App\Http\Controllers\BasePageController $page
      */
-    public function __construct(BasePage $page)
+    public function __construct($page)
     {
         $this->cpurl = ! empty($page->userdata['cp_url']) ? $page->userdata['cp_url'] : '';
         $this->cpapi = ! empty($page->userdata['cp_api']) ? $page->userdata['cp_api'] : '';

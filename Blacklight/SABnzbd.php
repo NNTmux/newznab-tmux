@@ -93,14 +93,15 @@ class SABnzbd
     /**
      * SABnzbd constructor.
      *
+     * @param \App\Http\Controllers\BasePageController $page
+     *
      * @throws \Exception
      */
-    public function __construct()
+    public function __construct($page)
     {
-        $user = Auth::user();
-        $this->uid = Auth::id();
-        $this->rsstoken = $user['rsstoken'];
-        $this->serverurl = url('/');
+        $this->uid = $page->userdata['id'];
+        $this->rsstoken = $page->userdata['rsstoken'];
+        $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);
 
         // Set up properties.
@@ -111,14 +112,14 @@ class SABnzbd
                     $this->apikey = $_COOKIE['sabnzbd_'.$this->uid.'__apikey'];
                     $this->priority = $_COOKIE['sabnzbd_'.$this->uid.'__priority'] ?? 0;
                     $this->apikeytype = $_COOKIE['sabnzbd_'.$this->uid.'__apitype'] ?? 1;
-                } elseif (! empty($user['sabapikey']) && ! empty($user['saburl'])) {
-                    $this->url = $user['saburl'];
-                    $this->apikey = $user['sabapikey'];
-                    $this->priority = $user['sabpriority'];
-                    $this->apikeytype = $user['sabapikeytype'];
+                } elseif (! empty($page->userdata['sabapikey']) && ! empty($page->userdata['saburl'])) {
+                    $this->url = $page->userdata['saburl'];
+                    $this->apikey = $page->userdata['sabapikey'];
+                    $this->priority = $page->userdata['sabpriority'];
+                    $this->apikeytype = $page->userdata['sabapikeytype'];
                 }
                 $this->integrated = self::INTEGRATION_TYPE_USER;
-                switch ((int) $user['queuetype']) {
+                switch ((int) $page->userdata['queuetype']) {
                     case 1:
                     case 2:
                         $this->integratedBool = true;
@@ -132,7 +133,7 @@ class SABnzbd
             case self::INTEGRATION_TYPE_NONE:
                 $this->integrated = self::INTEGRATION_TYPE_NONE;
                 // This is for nzbget.
-                if ($user['queuetype'] === 2) {
+                if ($page->userdata['queuetype'] === 2) {
                     $this->integratedBool = true;
                 }
                 break;
