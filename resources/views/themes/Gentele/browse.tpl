@@ -128,7 +128,7 @@
 															class="label label-primary"
 															rel="preview">Preview</a></span>{/if}
 												{if $result.videos_id > 0}<span><a
-															href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}"
+															href="{$smarty.const.WWW_TOP}/series?id={$result.videos_id}"
 															class="label label-primary" rel="series">View TV</a>
 													</span>{/if}
 												{if !empty($result.firstaired)}<span

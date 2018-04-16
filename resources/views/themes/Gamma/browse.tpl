@@ -143,7 +143,7 @@
 						<a href="#" name="name{$result.bookinfo_id}" title="View book info" class="modal_book badge badge-success halffade" rel="console" >Cover</a>
 						{/if}
 						{if $result.videos_id > 0}
-						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}">View Series</a>
+						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/series?id={$result.videos_id}">View Series</a>
 						{/if}
 						{if $result.anidbid > 0}
 						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View Anime</a>

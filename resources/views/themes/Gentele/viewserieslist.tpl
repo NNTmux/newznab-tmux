@@ -11,10 +11,10 @@
 	<p>
 		<b>Jump to</b>:
 		&nbsp;[ {if $seriesletter == '0-9'}<b><u>{/if}<a
-						href="{$smarty.const.WWW_TOP}/series/0-9">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
+						href="{$smarty.const.WWW_TOP}/series?id=0-9">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
 		{foreach $seriesrange as $range}
 		{if $range == $seriesletter}<b><u>{/if}<a
-		href="{$smarty.const.WWW_TOP}/series/{$range}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
+		href="{$smarty.const.WWW_TOP}/series?id={$range}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
 		{/foreach}]
 	</p>
 	<div class="btn-group">
@@ -68,7 +68,7 @@
 				{foreach $series as $s}
 					<tr>
 						<td><a class="title" title="View series"
-							   href="{$smarty.const.WWW_TOP}/series/{$s.id}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
+							   href="{$smarty.const.WWW_TOP}/series?id={$s.id}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
 						<br/><span class="label label-info">Last: {$s.previnfo|escape:"htmlall"}
 							aired {$s.prevdate|date_format}</span>{/if}</td>
 						<td>{$s.publisher|escape:"htmlall"}</td>
@@ -89,7 +89,7 @@
 							{/if}
 						</td>
 						<td class="mid">
-							<a title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.id}">Series</a><br/>
+							<a title="View series" href="{$smarty.const.WWW_TOP}/series?id={$s.id}">Series</a><br/>
 							{if $s.id > 0}
 								{if $s.tvdb > 0}
 									<a title="View at TVDB" target="_blank"

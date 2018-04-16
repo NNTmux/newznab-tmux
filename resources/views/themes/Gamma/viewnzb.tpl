@@ -69,7 +69,7 @@
 				{/if}
 			</dl>
 			<div style="margin-left:180px; margin-bottom:5px;">
-				<a class="label" title="View all episodes from this series" href="{$smarty.const.WWW_TOP}/series/{$show.id}">All Episodes</a>
+				<a class="label" title="View all episodes from this series" href="{$smarty.const.WWW_TOP}/series?id={$show.id}">All Episodes</a>
 				{if $show.trakt > 0}<a class="label label-info" target="_blank" href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}" title="View on Trakt">Trakt</a>{/if}
 				{if $show.tvdb > 0}<a class="label" target="_blank" href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}" title="View at TheTVDB">TheTVDB</a>{/if}
 			</div>

@@ -296,7 +296,7 @@
 												{/if}
 												{if $result.videos_id > 0}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}"
+													   href="{$smarty.const.WWW_TOP}/series?id={$result.videos_id}"
 													   title="View all episodes">View
 														Series</a>
 												{/if}
