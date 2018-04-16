@@ -157,4 +157,14 @@ Route::get('btc_payment_callback', 'BtcPaymentController@callback');
 
 Route::post('btc_payment_callback', 'BtcPaymentController@callback');
 
-Route::get('nzbgetqueuedata', 'NZBGetController@queue');
+Route::get('queue', 'QueueController@index');
+
+Route::post('queue', 'QueueController@index');
+
+Route::get('nzbgetqueuedata', 'QueueController@nzbget');
+
+Route::post('nzbgetqueuedata', 'QueueController@nzbget');
+
+Route::get('sabnzbdqueuedata', 'QueueController@sabnzbd');
+
+Route::post('sabnzbdqueuedata', 'QueueController@sabnzbd');
