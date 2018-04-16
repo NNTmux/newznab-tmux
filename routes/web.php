@@ -188,3 +188,9 @@ Route::post('sendtocouch', 'SendReleaseController@couchPotato');
 Route::get('series', 'SeriesController@index');
 
 Route::post('series', 'SeriesController@index');
+
+Route::get('terms-and-conditions', 'TermsController@index');
+
+Route::get('nzbvortex', 'QueueController@nzbvortex');
+
+Route::post('nzbvortex', 'QueueController@nzbvortex');

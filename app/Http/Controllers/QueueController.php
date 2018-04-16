@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Blacklight\NZBGet;
+use Blacklight\NZBVortex;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
+use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,7 +40,7 @@ class QueueController extends BasePageController
                 switch ((int) $userData['queuetype']) {
                     case 1:
                         $queueType = 'Sabnzbd';
-                        $queue = new SABnzbd();
+                        $queue = new SABnzbd($this);
                         break;
                     case 2:
                         $queueType = 'NZBGet';
@@ -183,7 +185,7 @@ class QueueController extends BasePageController
     public function sabnzbd()
     {
         $this->setPrefs();
-        $sab = new SABnzbd();
+        $sab = new SABnzbd($this);
 
         $output = '';
 
@@ -250,5 +252,92 @@ class QueueController extends BasePageController
         }
 
         echo $output;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function nzbVortex()
+    {
+        $this->setPrefs();
+        try {
+            if (isset($_GET['isAjax'])) {
+                $vortex = new NZBVortex;
+
+                // I guess we Ajax this way.
+                if (isset($_GET['getOverview'])) {
+                    $overview = $vortex->getOverview();
+                    $this->smarty->assign('overview', $overview);
+                    $content = $this->smarty->fetch('nzbvortex-ajax.tpl');
+                    echo $content;
+                    exit;
+                }
+
+                if (isset($_GET['addQueue'])) {
+                    $nzb = $_GET['addQueue'];
+                    $vortex->addQueue($nzb);
+                    exit;
+                }
+
+                if (isset($_GET['resume'])) {
+                    $vortex->resume((int) $_GET['resume']);
+                    exit;
+                }
+
+                if (isset($_GET['pause'])) {
+                    $vortex->pause((int) $_GET['pause']);
+                    exit;
+                }
+
+                if (isset($_GET['moveup'])) {
+                    $vortex->moveUp((int) $_GET['moveup']);
+                    exit;
+                }
+
+                if (isset($_GET['movedown'])) {
+                    $vortex->moveDown((int) $_GET['movedown']);
+                    exit;
+                }
+
+                if (isset($_GET['movetop'])) {
+                    $vortex->moveTop((int) $_GET['movetop']);
+                    exit;
+                }
+
+                if (isset($_GET['movebottom'])) {
+                    $vortex->moveBottom((int) $_GET['movebottom']);
+                    exit;
+                }
+
+                if (isset($_GET['delete'])) {
+                    $vortex->delete((int) $_GET['delete']);
+                    exit;
+                }
+
+                if (isset($_GET['filelist'])) {
+                    $response = $vortex->getFilelist((int) $_GET['filelist']);
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+        } catch (\Exception $e) {
+            header('HTTP/1.1 500 Internal Server Error');
+            printf($e->getMessage());
+            exit;
+        }
+
+        $title = 'NZBVortex';
+
+        $content = $this->smarty->fetch('nzbvortex.tpl');
+
+        $this->smarty->assign(
+            [
+                'title' => $title,
+                'content' => $content,
+            ]
+        );
+
+        $this->pagerender();
+
     }
 }
