@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Settings;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
+use App\Models\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
