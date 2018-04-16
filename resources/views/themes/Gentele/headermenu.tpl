@@ -267,7 +267,7 @@
 						</li>
 						{if isset($isadmin)}
 							<li>
-								<a href="{$smarty.const.WWW_TOP}/admin"><i class="fa fa-cogs fa-spin"></i> Admin</a>
+								<a href="{$smarty.const.WWW_TOP}/admin/index"><i class="fa fa-cogs fa-spin"></i> Admin</a>
 							</li>
 						{/if}
 						<li>

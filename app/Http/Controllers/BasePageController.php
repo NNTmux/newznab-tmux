@@ -361,4 +361,13 @@ class BasePageController extends Controller
         $this->setPrefs();
         $this->pagerender();
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function adminBasePage()
+    {
+        $this->setAdminPrefs();
+        $this->adminrender();
+    }
 }

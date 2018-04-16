@@ -228,7 +228,7 @@
 					<li><a href="{$smarty.const.WWW_TOP}/profileedit"><i class="zmdi zmdi-coffee"></i><span> Account Settings</span></a>
 					</li>
 					{if isset($isadmin)}
-						<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="zmdi zmdi-settings"></i><span> Admin</span></a></li>
+						<li><a href="{$smarty.const.WWW_TOP}/admin/index"><i class="zmdi zmdi-settings"></i><span> Admin</span></a></li>
 					{/if}
 					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="zmdi zmdi-lock-open"></i><span> Logout</span></a></li>
 				</ul>

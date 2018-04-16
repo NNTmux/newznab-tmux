@@ -194,3 +194,11 @@ Route::get('terms-and-conditions', 'TermsController@index');
 Route::get('nzbvortex', 'QueueController@nzbvortex');
 
 Route::post('nzbvortex', 'QueueController@nzbvortex');
+
+Route::prefix('admin')->group(function () {
+    Route::get('index', 'Admin\AdminPageController@index');
+    Route::get('add/{id}', 'CartController@store');
+    Route::post('add/{id}', 'CartController@store');
+    Route::get('delete/{id}', 'CartController@destroy');
+    Route::post('delete/{id}', 'CartController@destroy');
+});

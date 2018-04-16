@@ -94,7 +94,7 @@
 									{if isset($isadmin)}
 											<li class="divider"></li>
 											<li>
-													<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="icon-cog icon-white"></i> Admin</a></li>
+													<li><a href="{$smarty.const.WWW_TOP}/admin/index"><i class="icon-cog icon-white"></i> Admin</a></li>
 											</li>
 									{/if}
 										<li class="divider"></li>
