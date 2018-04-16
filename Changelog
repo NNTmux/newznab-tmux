@@ -1,4 +1,5 @@
 2018-04-16 DariusIII
+	* Chg: Update nesbot/carbon to latest version
 	* Chg: Start adding admin routes and controllers
 	* Chg: Add TermsController and add nzbvortex to queue controller
 	* Chg: Update themes for series
