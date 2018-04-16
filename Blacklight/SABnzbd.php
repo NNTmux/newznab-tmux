@@ -5,7 +5,6 @@ namespace Blacklight;
 use GuzzleHttp\Client;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Class SABnzbd.
