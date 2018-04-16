@@ -14,7 +14,7 @@
 		</form>
 	</div>
 
-	{if $results->count() > 0}
+	{if count($results) > 0}
 			{$results->links()}
 	{/if}
 
@@ -46,7 +46,7 @@
 	</table>
 
 	<br/>
-	{if $results->count() > 0}
+	{if count($results) > 0}
 			{$results->links()}
 	{/if}
 	{else}

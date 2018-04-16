@@ -1,6 +1,6 @@
 <div class="well well-sm">
 	<h2>{if $title !=''}{$title}{else}Forum{/if}</h2>
-	{if $results->count() > 0}
+	{if count($results) > 0}
 		<div class=".pagination pagination-centered">
 			{$results->links()}
 		</div>

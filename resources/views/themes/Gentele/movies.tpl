@@ -52,7 +52,7 @@
 								</div>
 							</div>
 						</div>
-						{if $results->count() > 0}
+						{if count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
@@ -388,7 +388,7 @@
 								</div>
 							</div>
 						</div>
-						{if $results->count() > 0}
+						{if count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
