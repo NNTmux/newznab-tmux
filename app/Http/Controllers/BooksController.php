@@ -37,7 +37,8 @@ class BooksController extends BasePageController
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $books = [];
-        $results = $book->getBookRange($catarray, $orderby, $this->userdata['categoryexclusions']);
+        $page = $request->has('page') ? $request->input('page') : 1;
+        $results = $book->getBookRange($page, $catarray, $orderby, $this->userdata['categoryexclusions']);
 
         $maxwords = 50;
         foreach ($results as $result) {
@@ -58,15 +59,6 @@ class BooksController extends BasePageController
         $this->smarty->assign('title', $title);
 
         $browseby_link = '&amp;title='.$title.'&amp;author='.$author;
-
-        $this->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
-        $this->smarty->assign('pageroffset', $offset);
-        $this->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
-        $this->smarty->assign('pagerquerybase', WWW_TOP.'/books?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
-        $this->smarty->assign('pagerquerysuffix', '#results');
-
-        $pager = $this->smarty->fetch('pager.tpl');
-        $this->smarty->assign('pager', $pager);
 
         if ((int) $category === -1) {
             $this->smarty->assign('catname', 'All');
