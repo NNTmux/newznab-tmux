@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', 'BasePageController@index');
+Route::get('/', 'BasePageController@basePage');
 
 Auth::routes();
 

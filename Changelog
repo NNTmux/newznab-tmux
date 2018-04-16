@@ -1,3 +1,5 @@
+2018-04-16 DariusIII
+	* Chg: Rename BasePageController index function to basePage
 2018-04-15 DariusIII
 	* Chg: Update the routes
 	* Chg: Update Profile and Forum controllers

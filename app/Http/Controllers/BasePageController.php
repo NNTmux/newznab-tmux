@@ -356,7 +356,7 @@ class BasePageController extends Controller
     /**
      * @throws \Exception
      */
-    public function index()
+    public function basePage()
     {
         $this->setPrefs();
         $this->pagerender();
