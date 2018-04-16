@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Blacklight\NZBGet;
-use Blacklight\NZBVortex;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Blacklight\utility\Utility;
+use Blacklight\NZBVortex;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 
 class QueueController extends BasePageController
@@ -338,6 +338,5 @@ class QueueController extends BasePageController
         );
 
         $this->pagerender();
-
     }
 }
