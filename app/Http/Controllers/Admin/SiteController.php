@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\Category;
-use App\Models\Release;
-use App\Models\Settings;
 use App\Models\User;
-use App\Models\UserRole;
-use Blacklight\SABnzbd;
 use Blacklight\Sites;
-use Blacklight\utility\Utility;
+use App\Models\Release;
+use Blacklight\SABnzbd;
+use App\Models\Category;
+use App\Models\Settings;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class SiteController extends BasePageController
 {
@@ -59,6 +59,7 @@ class SiteController extends BasePageController
                 if ($error === '') {
                     $site = $ret;
                     $returnid = $site['id'];
+
                     return redirect('site-edit.php?id='.$returnid);
                 }
 
