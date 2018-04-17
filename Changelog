@@ -1,3 +1,5 @@
+2018-04-17 DariusIII
+	* Chg: Add admin anidb and blacklist controllers
 2018-04-16 DariusIII
 	* Chg: Update nesbot/carbon to latest version
 	* Chg: Start adding admin routes and controllers

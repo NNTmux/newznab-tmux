@@ -197,4 +197,14 @@ Route::post('nzbvortex', 'QueueController@nzbvortex');
 
 Route::prefix('admin')->group(function () {
     Route::get('index', 'Admin\AdminPageController@index');
+    Route::get('anidb-delete/{id}', 'Admin\AnidbController@destroy');
+    Route::post('anidb-delete/{id}', 'Admin\AnidbController@destroy');
+    Route::get('anidb-edit/{id}', 'Admin\AnidbController@edit');
+    Route::post('anidb-edit/{id}', 'Admin\AnidbController@edit');
+    Route::get('anidb-list', 'Admin\AnidbController@index');
+    Route::post('anidb-list', 'Admin\AnidbController@index');
+    Route::get('binaryblacklist-list', 'Admin\BlacklistController@index');
+    Route::post('binaryblacklist-list', 'Admin\BlacklistController@index');
+    Route::get('binaryblacklist-edit', 'Admin\BlacklistController@edit');
+    Route::post('binaryblacklist-edit', 'Admin\BlacklistController@edit');
 });
