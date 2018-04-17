@@ -237,5 +237,4 @@ Route::prefix('admin')->group(function () {
     Route::post('content-add', 'Admin\ContentController@create');
     Route::get('content-delete', 'Admin\ContentController@destroy');
     Route::post('content-delete', 'Admin\ContentController@destroy');
-
 });

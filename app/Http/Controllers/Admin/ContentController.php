@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use Blacklight\Contents;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class ContentController extends BasePageController
 {
@@ -77,6 +77,7 @@ class ContentController extends BasePageController
                     $content = $contents->update($request->all());
                     $returnid = $content['id'];
                 }
+
                 return redirect('content-add.php?id='.$returnid);
                 break;
 
@@ -130,6 +131,7 @@ class ContentController extends BasePageController
         }
 
         $referrer = $request->server('HTTP_REFERER');
+
         return redirect($referrer);
     }
 }
