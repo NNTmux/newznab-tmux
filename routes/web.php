@@ -231,4 +231,11 @@ Route::prefix('admin')->group(function () {
     Route::post('role-edit', 'Admin\RoleController@edit');
     Route::get('role-delete', 'Admin\RoleController@destroy');
     Route::post('role-delete', 'Admin\RoleController@destroy');
+    Route::get('content-list', 'Admin\ContentController@index');
+    Route::post('content-list', 'Admin\ContentController@index');
+    Route::get('content-add', 'Admin\ContentController@create');
+    Route::post('content-add', 'Admin\ContentController@create');
+    Route::get('content-delete', 'Admin\ContentController@destroy');
+    Route::post('content-delete', 'Admin\ContentController@destroy');
+
 });
