@@ -8,7 +8,7 @@
 		path as the first argument. e.g. php scriptname outputpath from(optional) to(optional) groups_id(optional use
 		-1) categories_id(optional)<br/>
 		<span style="font-family:courier;display:block;padding:5px 0 15px 0;">
-	php admin/nzb-export.php /path/to/export/into 01/01/2008 01/01/2010 -1 1050
+	php admin/nzb-export /path/to/export/into 01/01/2008 01/01/2010 -1 1050
 </span>
 
 	</p>

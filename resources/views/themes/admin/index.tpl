@@ -7,13 +7,13 @@
 		</p>
 
 		<ol style="list-style-type:decimal; line-height: 180%;">
-			<li style="margin-bottom: 15px;">Configure your <a href="{$smarty.const.WWW_TOP}/site-edit.php">site
+			<li style="margin-bottom: 15px;">Configure your <a href="{$smarty.const.WWW_TOP}/site-edit">site
 					options</a>. The defaults will work fine.
 			</li>
 			<li style="margin-bottom: 15px;">There is a default list of usenet groups provided. To get started, you will
-				need to <a href="{$smarty.const.WWW_TOP}/group-list.php">activate some groups</a>. <u>Do not</u>
+				need to <a href="{$smarty.const.WWW_TOP}/group-list">activate some groups</a>. <u>Do not</u>
 				activate every group if its your first time setting this up. Try one or two first.
-				You can also <a href="{$smarty.const.WWW_TOP}/group-edit.php">add your own groups</a> manually.
+				You can also <a href="{$smarty.const.WWW_TOP}/group-edit">add your own groups</a> manually.
 			</li>
 			<li style="margin-bottom: 15px;">If you intend to keep using NNTmux, it is best to sign up for your own api
 				keys from <a href="http://www.themoviedb.org/account/signup">TMDB</a> and <a

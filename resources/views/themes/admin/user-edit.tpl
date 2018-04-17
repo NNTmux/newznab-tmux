@@ -3,7 +3,7 @@
 	{if isset($error) && $error != ''}
 		<div class="error">{$error}</div>
 	{/if}
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/user-list.php">Go back</a>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/user-list">Go back</a>
 	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
@@ -107,7 +107,7 @@
 				<td>
 					<input class="btn btn-primary" type="submit" value="Save"/>
 					{if !empty($user.id) && $user->role->id != 2}<a class="confirm_action btn btn-danger"
-																	href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">
+																	href="{$smarty.const.WWW_TOP}/user-delete?id={$user.id}">
 							Delete user</a>{/if}
 				</td>
 			</tr>

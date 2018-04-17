@@ -1,7 +1,7 @@
 <h1>{$title}</h1>
 
 <div class="well well-small">
-	<form action="site-edit.php?action=submit" method="post">
+	<form action="site-edit?action=submit" method="post">
 		{{csrf_field()}}
 
 		{if isset ($error) && $error != ''}
@@ -365,7 +365,7 @@
 					<td><label for="lamepath">Lame Path</label>:</td>
 					<td>
 						<input id="lamepath" class="long" name="lamepath" type="text" value="{$site->lamepath}"/>
-						<div class="hint">The path to the <a href="http://lame.sourceforge.net/download.php">lame</a>
+						<div class="hint">The path to the <a href="http://lame.sourceforge.net/download">lame</a>
 							binary. Used for audio manipulation.
 							<br/>Use forward slashes in windows <span
 									style="font-family:courier;">c:/path/to/lame.exe</span></div>
@@ -450,7 +450,7 @@
 						<input id="nzbsplitlevel" class="short" name="nzbsplitlevel" type="text"
 							   value="{$site->nzbsplitlevel}"/>
 						<div class="hint">Levels deep to store the nzb Files.
-							<br/><strong>If you change this you must run the misc/testing/DB/nzb-reorg.php
+							<br/><strong>If you change this you must run the misc/testing/DB/nzb-reorg
 								script!</strong>
 						</div>
 					</td>
@@ -1335,7 +1335,7 @@
 						{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$site->alternate_nntp separator='<br />'}
 						<div class="hint">This sets Postproccessing Additional/Nfo to use the alternate NNTP provider as
 							set in
-							config.php.
+							config.
 						</div>
 					</td>
 				</tr>

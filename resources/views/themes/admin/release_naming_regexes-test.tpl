@@ -27,7 +27,7 @@
 					<div class="hint">
 						The regex to use when trying to name a release using the usenet subject.<br/>
 						The regex delimiters are not added, you MUST add them. See <a
-								href="http://php.net/manual/en/regexp.reference.delimiters.php">this</a> page.<br/>
+								href="http://php.net/manual/en/regexp.reference.delimiters">this</a> page.<br/>
 						To make the regex case insensitive, add i after the last delimiter.<br/>
 						You MUST include at least one regex capture group.<br/>
 						You MUST name your regex capture groups (the ones you want included).<br/>

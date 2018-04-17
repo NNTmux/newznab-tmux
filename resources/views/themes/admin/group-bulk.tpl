@@ -17,7 +17,7 @@
 			{/foreach}
 
 		</table>
-		<p>View <a href="group-list.php">all groups</a>.</p>
+		<p>View <a href="group-list">all groups</a>.</p>
 	{else}
 		<p>Regex of groups to add to the site.</p>
 		<form action="{$SCRIPT_NAME}?action=submit" method="POST">

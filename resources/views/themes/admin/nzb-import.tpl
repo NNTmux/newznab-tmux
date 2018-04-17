@@ -7,7 +7,7 @@
 		Importing will add the release to your database, compress the NZB and store it in the nzbfiles/ folder.
 	</p>
 	<ul>
-		<li>If you are importing a large number of NZB files, run the nzb-import.php script in misc/testing/ from the
+		<li>If you are importing a large number of NZB files, run the nzb-import script in misc/testing/ from the
 			command line and pass in the folder path as the first argument.
 		</li>
 		<li>If you are running the script in misc/testing/ from the command line you can pass "true" (no quotes) as the

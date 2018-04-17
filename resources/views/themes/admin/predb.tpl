@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 <div class="well well-sm">
-	<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/predb.php" id="custom-search-form"
+	<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/predb" id="custom-search-form"
 			{{csrf_field()}}
 		  class="form-inline form-horizontal col-4 col-lg-4 pull-right">
 		<div id="search" class="input-group col-12 col-lg-12">
@@ -209,7 +209,7 @@
 					{/if}
 					{if in_array($result.source, array('abErotica', 'abMooVee', 'abTeeVee', 'abForeign'))}
 						<a title="Visit allfilled $result.source"
-						   href="{$site->dereferrer_link}http://$result.source.allfilled.com/search.php?q={$result.title}&Search=Search"
+						   href="{$site->dereferrer_link}http://$result.source.allfilled.com/search?q={$result.title}&Search=Search"
 						   target="_blank">
 							$result.source
 						</a>
@@ -223,7 +223,7 @@
 					{/if}
 					{if $result.source == omgwtfnzbs}
 						<a title="Visit omgwtfnzbs"
-						   href="{$site->dereferrer_link}http://rss.omgwtfnzbs.org/rss-info.php"
+						   href="{$site->dereferrer_link}http://rss.omgwtfnzbs.org/rss-info"
 						   target="_blank">
 							omgwtfnzbs
 						</a>

@@ -12,7 +12,7 @@
 			{foreach from=$gamelist item=game}
 				<tr class="{cycle values=",alt"}">
 					<td class="less">{$game.id}</td>
-					<td><a title="Edit" href="{$smarty.const.WWW_TOP}/game-edit.php?id={$game.id}">{$game.title}</a>
+					<td><a title="Edit" href="{$smarty.const.WWW_TOP}/game-edit?id={$game.id}">{$game.title}</a>
 					</td>
 					<td>{$game.genretitle}</td>
 					<td>{$game.created_at|date_format}</td>

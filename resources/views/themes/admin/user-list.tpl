@@ -77,7 +77,7 @@
 
 		{foreach $userlist as $user}
 			<tr class="{cycle values=",alt"}">
-				<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}">{$user.username}</a>
+				<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/user-edit?id={$user.id}">{$user.username}</a>
 				</td>
 				<td><a title="View profile" href="{$smarty.const.WWW_TOP}/../profile?id={$user.id}">{$user.email}</a>
 				</td>
@@ -89,13 +89,13 @@
 				<td class="mid">{$user.grabs}</td>
 				<td class="mid">{$user.invites}</td>
 				<td class="mid"><a title="{if $user.notes|count_characters > 0}View{else}Add{/if} Notes"
-								   href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}#notes"><img
+								   href="{$smarty.const.WWW_TOP}/user-edit?id={$user.id}#notes"><img
 								src="{$smarty.const.WWW_TOP}/../shared/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
 								alt=""/></a></td>
 				<td>{$user->role->name}</td>
 				<td>{if !empty($user.rolechangedate)}{$user.rolechangedate}{/if}</td>
 				<td>{if $user.user_roles_id !="2"}<a class="confirm_action"
-													 href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">
+													 href="{$smarty.const.WWW_TOP}/user-delete?id={$user.id}">
 							delete</a>{/if}
 				</td>
 			</tr>

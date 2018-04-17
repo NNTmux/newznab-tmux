@@ -3,7 +3,7 @@
 	<div class="error">{$error}</div>
 {/if}
 <div class="well well-sm">
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/category_regexes-list.php"><i class="fa fa-arrow-left"></i>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/category_regexes-list"><i class="fa fa-arrow-left"></i>
 		Go back</a>
 	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
 		{{csrf_field()}}
@@ -28,7 +28,7 @@
 					<div class="hint">
 						Regex to use when categorizing releases.<br/>
 						The regex delimiters are not added, you MUST add them. See <a
-								href="http://php.net/manual/en/regexp.reference.delimiters.php">this</a> page.<br/>
+								href="http://php.net/manual/en/regexp.reference.delimiters">this</a> page.<br/>
 						To make the regex case insensitive, add i after the last delimiter.<br/>
 					</div>
 				</td>

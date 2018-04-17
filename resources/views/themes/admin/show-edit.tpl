@@ -1,6 +1,6 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/show-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/show-list"><i class="fa fa-arrow-left"></i> Go back</a>
 	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="POST">
 		{{csrf_field()}}
 		<input type="hidden" name="from" value="{$smarty.get.from}"/>
