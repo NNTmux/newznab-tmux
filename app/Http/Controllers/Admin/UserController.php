@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Mail\AccountChange;
-use App\Models\Invitation;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Models\Invitation;
+use App\Mail\AccountChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\BasePageController;
 
 class UserController extends BasePageController
 {
@@ -70,7 +70,6 @@ class UserController extends BasePageController
 
         $this->adminrender();
     }
-
 
     /**
      * @param \Illuminate\Http\Request $request
