@@ -1,4 +1,5 @@
 2018-04-17 DariusIII
+	* Chg: Add BookController and edit Blacklist/Anidb class
 	* Chg: Add admin CategoryController
 	* Chg: Add admin anidb and blacklist controllers
 2018-04-16 DariusIII

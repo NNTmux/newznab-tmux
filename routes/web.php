@@ -207,6 +207,10 @@ Route::prefix('admin')->group(function () {
     Route::post('binaryblacklist-list', 'Admin\BlacklistController@index');
     Route::get('binaryblacklist-edit', 'Admin\BlacklistController@edit');
     Route::post('binaryblacklist-edit', 'Admin\BlacklistController@edit');
+    Route::get('book-list', 'Admin\BookController@index');
+    Route::post('book-list', 'Admin\BookController@index');
+    Route::get('book-edit', 'Admin\BookController@edit');
+    Route::post('book-edit', 'Admin\BookController@edit');
     Route::get('category-list', 'Admin\CategoryController@index');
     Route::post('category-list', 'Admin\CategoryController@index');
     Route::get('category-edit', 'Admin\CategoryController@edit');
