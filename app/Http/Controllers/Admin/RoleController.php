@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\Category;
-use App\Models\RoleExcludedCategory;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
+use App\Models\RoleExcludedCategory;
+use App\Http\Controllers\BasePageController;
 
 class RoleController extends BasePageController
 {
@@ -72,7 +72,7 @@ class RoleController extends BasePageController
             case 'submit':
                 if ($request->has('id')) {
                     $role = UserRole::addRole($request->all());
-                    /*header('Location:'.WWW_TOP.'/role-list.php');*/
+                /*header('Location:'.WWW_TOP.'/role-list.php');*/
                 } else {
                     $role = UserRole::updateRole($request->all());
                     //dd($role);
