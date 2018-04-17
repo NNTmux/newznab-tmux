@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class GroupController extends BasePageController
 {
@@ -118,7 +118,7 @@ class GroupController extends BasePageController
     {
         $this->setAdminPrefs();
 
-    // Set the current action.
+        // Set the current action.
         $action = $request->input('action') ?? 'view';
 
         $group = [
@@ -146,6 +146,7 @@ class GroupController extends BasePageController
                     // Update an existing group.
                     Group::updateGroup($request->all());
                 }
+
                 return redirect('group-list');
                 break;
 
