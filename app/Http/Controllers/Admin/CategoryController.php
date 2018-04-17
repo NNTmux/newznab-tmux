@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class CategoryController extends BasePageController
 {
@@ -54,6 +54,7 @@ class CategoryController extends BasePageController
                     $request->input('minsizetoformrelease'),
                     $request->input('maxsizetoformrelease')
                 );
+
                 return redirect('category-list');
                 break;
             case 'view':
