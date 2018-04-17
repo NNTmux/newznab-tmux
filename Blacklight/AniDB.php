@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\AnidbTitle;
 use Blacklight\db\DB;
 use App\Models\Category;
+use App\Models\AnidbTitle;
 
 class AniDB
 {

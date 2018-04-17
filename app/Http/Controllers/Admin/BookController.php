@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\BookInfo;
 use Blacklight\Books;
+use App\Models\BookInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Http\Controllers\BasePageController;
 
 class BookController extends BasePageController
 {
