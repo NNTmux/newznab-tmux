@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\Release;
 use Blacklight\AniDB;
+use App\Models\Release;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class AnidbController extends BasePageController
 {
@@ -23,7 +23,6 @@ class AnidbController extends BasePageController
         if (request()->has('animetitle') && ! empty(request()->input('animetitle'))) {
             $aname = request()->input('animetitle');
         }
-
 
         $this->smarty->assign('animetitle', $aname);
 
