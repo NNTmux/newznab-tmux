@@ -225,4 +225,10 @@ Route::prefix('admin')->group(function () {
     Route::post('site-edit', 'Admin\SiteController@edit');
     Route::get('site-stats', 'Admin\SiteController@stats');
     Route::post('site-stats', 'Admin\SiteController@stats');
+    Route::get('role-list', 'Admin\RoleController@index');
+    Route::post('role-list', 'Admin\RoleController@index');
+    Route::get('role-edit', 'Admin\RoleController@edit');
+    Route::post('role-edit', 'Admin\RoleController@edit');
+    Route::get('role-delete', 'Admin\RoleController@destroy');
+    Route::post('role-delete', 'Admin\RoleController@destroy');
 });
