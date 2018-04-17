@@ -215,4 +215,14 @@ Route::prefix('admin')->group(function () {
     Route::post('category-list', 'Admin\CategoryController@index');
     Route::get('category-edit', 'Admin\CategoryController@edit');
     Route::post('category-edit', 'Admin\CategoryController@edit');
+    Route::get('user-list', 'Admin\UserController@index');
+    Route::post('user-list', 'Admin\UserController@index');
+    Route::get('user-edit', 'Admin\UserController@edit');
+    Route::post('user-edit', 'Admin\UserController@edit');
+    Route::get('user-delete', 'Admin\UserController@destroy');
+    Route::post('user-delete', 'Admin\UserController@destroy');
+    Route::get('site-edit', 'Admin\SiteController@edit');
+    Route::post('site-edit', 'Admin\SiteController@edit');
+    Route::get('site-stats', 'Admin\SiteController@stats');
+    Route::post('site-stats', 'Admin\SiteController@stats');
 });

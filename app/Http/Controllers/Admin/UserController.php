@@ -15,7 +15,7 @@ class UserController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->setAdminPrefs();
 
