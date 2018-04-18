@@ -1,4 +1,5 @@
 2018-04-18 DariusIII
+	* Chg: Add and use admin middleware
 	* Chg: Update Regexes class getRegex function
 	* Chg: Add ReleasesController
 	* Chg: Add MgrPosterController
