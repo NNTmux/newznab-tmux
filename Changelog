@@ -1,4 +1,5 @@
 2018-04-18 DariusIII
+	* Chg: Use api/v1 for api
 	* Chg: Add CollectionRegexesController
 	* Chg: Update routes
 	* Chg: Add CategoryRegexesController
