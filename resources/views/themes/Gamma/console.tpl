@@ -179,10 +179,10 @@
 											   title="View similar nzbs">Similar</a>
 											{if isset($isadmin)}
 												<a class="rndbtn btn btn-mini btn-warning"
-												   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.releases_id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+												   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.releases_id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 												   title="Edit Release">Edit</a>
 												<a class="rndbtn confirm_action btn btn-mini btn-danger"
-												   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.releases_id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+												   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$result.releases_id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 												   title="Delete Release">Delete</a>
 											{/if}
 											<br/>

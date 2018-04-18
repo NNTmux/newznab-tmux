@@ -268,5 +268,11 @@ Route::prefix('admin')->group(function () {
         Route::post('posters-edit', 'MgrPosterController@edit');
         Route::get('poster-delete/{id}', 'MgrPosterController@destroy');
         Route::post('poster-delete/{id}', 'MgrPosterController@destroy');
+        Route::get('release-list', 'ReleasesController@index');
+        Route::post('release-list', 'ReleasesController@index');
+        Route::get('release-edit', 'ReleasesController@edit');
+        Route::post('release-edit', 'ReleasesController@edit');
+        Route::get('release-delete/{id}', 'ReleasesController@destroy');
+        Route::post('release-delete/{id}', 'ReleasesController@destroy');
     });
 });

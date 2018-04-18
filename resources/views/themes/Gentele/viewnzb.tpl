@@ -19,10 +19,10 @@
 						{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 				{if isset($isadmin)}
 					<a class="label label-warning"
-					   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.guid}"
+					   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}"
 					   title="Edit release">Edit</a>
 					<a class="label label-danger"
-					   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.guid}"
+					   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$release.guid}"
 					   title="Delete release">Delete</a>
 				{/if}
 				{if $movie && $release.videos_id <= 0 }

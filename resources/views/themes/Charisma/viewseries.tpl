@@ -219,10 +219,10 @@
 															{if isset($isadmin)}
 																<br/>
 																<a class="label label-warning"
-																   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																   title="Edit Release">Edit</a>
 																<a class="label label-danger"
-																   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																   title="Delete Release">Delete</a>
 															{/if}
 														</td>

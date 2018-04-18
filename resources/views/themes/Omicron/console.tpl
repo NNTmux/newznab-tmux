@@ -137,7 +137,7 @@
 																		{if isset($isadmin)}
 																		<a
 																				class="label label-warning"
-																				href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI}"
+																				href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI}"
 																				title="Edit release">
 																				Edit</a>{/if}
 																		<br/>
