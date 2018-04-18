@@ -1,4 +1,5 @@
 2018-04-18 DariusIII
+	* Chg: Add CollectionRegexesController
 	* Chg: Update routes
 	* Chg: Add CategoryRegexesController
 2018-04-17 DariusIII

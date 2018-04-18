@@ -242,5 +242,11 @@ Route::prefix('admin')->group(function () {
         Route::post('category_regexes-list', 'CategoryRegexesController@index');
         Route::get('category_regexes-edit', 'CategoryRegexesController@edit');
         Route::post('category_regexes-edit', 'CategoryRegexesController@edit');
+        Route::get('collection_regexes-list', 'CollectionRegexesController@index');
+        Route::post('collection_regexes-list', 'CollectionRegexesController@index');
+        Route::get('collection_regexes-edit', 'CollectionRegexesController@edit');
+        Route::post('collection_regexes-edit', 'CollectionRegexesController@edit');
+        Route::get('collection_regexes-test', 'CollectionRegexesController@testRegex');
+        Route::post('collection_regexes-test', 'CollectionRegexesController@testRegex');
     });
 });
