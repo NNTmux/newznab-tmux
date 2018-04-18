@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\Category;
 use App\Models\Release;
+use App\Models\Category;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class ReleasesController extends BasePageController
 {
@@ -48,7 +48,7 @@ class ReleasesController extends BasePageController
     {
         $this->setAdminPrefs();
 
-// Set the current action.
+        // Set the current action.
         $action = ($request->input('action') ?? 'view');
 
         switch ($action) {
