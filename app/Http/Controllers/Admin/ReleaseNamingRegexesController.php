@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\Category;
 use Blacklight\Regexes;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class ReleaseNamingRegexesController extends BasePageController
 {
@@ -48,7 +48,7 @@ class ReleaseNamingRegexesController extends BasePageController
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
 
-// Set the current action.
+        // Set the current action.
         $action = $request->input('action') ?? 'view';
 
         switch ($action) {
