@@ -2,12 +2,12 @@
 
 namespace Blacklight;
 
-use App\Models\CategoryRegex;
 use App\Models\Group;
-use App\Models\ReleaseNamingRegex;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
+use App\Models\CategoryRegex;
+use App\Models\ReleaseNamingRegex;
 
 class Regexes
 {
@@ -134,9 +134,8 @@ class Regexes
             $result->where('group_regex', 'LIKE', '%'.$group_regex.'%');
         }
         $result->orderBy('id');
+
         return $result->paginate(config('nntmux.items_per_page'));
-
-
     }
 
     /**
