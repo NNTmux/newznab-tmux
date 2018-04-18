@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Models\CollectionRegex;
 use App\Models\Group;
 use Blacklight\db\DB;
 use App\Models\Release;
