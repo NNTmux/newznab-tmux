@@ -199,7 +199,7 @@ Route::get('nzbvortex', 'QueueController@nzbvortex');
 
 Route::post('nzbvortex', 'QueueController@nzbvortex');
 
-Route::prefix('admin')->group(function () {
+Route::middleware('admin')->prefix('admin')->group(function () {
     Route::namespace('Admin')->group(function () {
         Route::get('index', 'AdminPageController@index');
         Route::get('anidb-delete/{id}', 'AnidbController@destroy');
@@ -274,5 +274,5 @@ Route::prefix('admin')->group(function () {
         Route::post('release-edit', 'ReleasesController@edit');
         Route::get('release-delete/{id}', 'ReleasesController@destroy');
         Route::post('release-delete/{id}', 'ReleasesController@destroy');
-    })->middleware('admin');
+    });
 });
