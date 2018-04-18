@@ -252,5 +252,11 @@ Route::prefix('admin')->group(function () {
         Route::post('collection_regexes-edit', 'CollectionRegexesController@edit');
         Route::get('collection_regexes-test', 'CollectionRegexesController@testRegex');
         Route::post('collection_regexes-test', 'CollectionRegexesController@testRegex');
+        Route::get('release_naming_regexes-list', 'ReleaseNamingRegexesController@index');
+        Route::post('release_naming_regexes-list', 'ReleaseNamingRegexesController@index');
+        Route::get('release_naming_regexes-edit', 'ReleaseNamingRegexesController@edit');
+        Route::post('release_naming_regexes-edit', 'ReleaseNamingRegexesController@edit');
+        Route::get('release_naming_regexes-test', 'ReleaseNamingRegexesController@testRegex');
+        Route::post('release_naming_regexes-test', 'ReleaseNamingRegexesController@testRegex');
     });
 });
