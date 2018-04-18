@@ -11,11 +11,11 @@
 			{foreach from=$posters item=$poster}
 				<tr class="{cycle values=",alt"}">
 					<td>
-						<a href="{$smarty.const.WWW_TOP}/posters-edit?id={$poster->id}&poster={$poster->poster}">{$poster->poster}</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/posters-edit?id={$poster->id}&poster={$poster->poster}">{$poster->poster}</a>
 					</td>
 					<td>
 						<a class="confirm_action btn btn-sm btn-danger"
-						   href="{$smarty.const.WWW_TOP}/poster-delete?id={$poster->id} from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   href="{$smarty.const.WWW_TOP}/admin/poster-delete/{$poster->id}"
 						   title="Delete Poster">Delete poster</a>
 					</td>
 				</tr>

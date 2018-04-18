@@ -1,4 +1,5 @@
 2018-04-18 DariusIII
+	* Chg: Add MgrPosterController
 	* Chg: Add TmuxController
 	* Chg: Add AjaxController, update utils-admin.js
 	* Chg: Add ReleaseNamingRegexesController

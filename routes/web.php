@@ -262,5 +262,11 @@ Route::prefix('admin')->group(function () {
         Route::post('ajax', 'AjaxController@ajaxAction');
         Route::get('tmux-edit', 'TmuxController@edit');
         Route::post('tmux-edit', 'TmuxController@edit');
+        Route::get('posters-list', 'MgrPosterController@index');
+        Route::post('posters-list', 'MgrPosterController@index');
+        Route::get('posters-edit', 'MgrPosterController@edit');
+        Route::post('posters-edit', 'MgrPosterController@edit');
+        Route::get('poster-delete/{id}', 'MgrPosterController@destroy');
+        Route::post('poster-delete/{id}', 'MgrPosterController@destroy');
     });
 });
