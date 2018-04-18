@@ -30,8 +30,6 @@ class CollectionRegexesController extends BasePageController
             ]
         );
 
-        $this->smarty->assign('pager', $this->smarty->fetch('pager.tpl'));
-
         $content = $this->smarty->fetch('collection_regexes-list.tpl');
 
         $this->smarty->assign(
