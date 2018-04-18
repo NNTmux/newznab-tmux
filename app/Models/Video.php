@@ -66,12 +66,10 @@ class Video extends Model
      * Retrieves a range of all shows for the show-edit admin list.
      *
      *
-     * @param $start
-     * @param $num
      * @param string $showname
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getRange($start, $num, $showname = ''): array
+    public static function getRange($showname = '')
     {
         $sql = self::query()
             ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
@@ -81,11 +79,7 @@ class Video extends Model
             $sql->where('videos.title', 'like', '%'.$showname.'%');
         }
 
-        if ($start !== false) {
-            $sql->limit($num)->offset($start);
-        }
-
-        return $sql->get()->toArray();
+        return $sql->paginate(config('nntmux.items_per_page'));
     }
 
     /**
