@@ -258,5 +258,7 @@ Route::prefix('admin')->group(function () {
         Route::post('release_naming_regexes-edit', 'ReleaseNamingRegexesController@edit');
         Route::get('release_naming_regexes-test', 'ReleaseNamingRegexesController@testRegex');
         Route::post('release_naming_regexes-test', 'ReleaseNamingRegexesController@testRegex');
+        Route::get('ajax', 'AjaxController@ajaxAction');
+        Route::post('ajax', 'AjaxController@ajaxAction');
     });
 });
