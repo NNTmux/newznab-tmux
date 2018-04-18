@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\Settings;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class TmuxController extends BasePageController
 {
@@ -17,7 +17,7 @@ class TmuxController extends BasePageController
     {
         $this->setAdminPrefs();
 
-// Set the current action.
+        // Set the current action.
         $action = $request->input('action') ?? 'view';
 
         switch ($action) {
