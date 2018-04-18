@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\MultigroupPoster;
-use Blacklight\processing\ProcessReleasesMultiGroup;
 use Illuminate\Http\Request;
+use App\Models\MultigroupPoster;
+use App\Http\Controllers\BasePageController;
 
 class MgrPosterController extends BasePageController
 {
@@ -55,7 +54,7 @@ class MgrPosterController extends BasePageController
     {
         $this->setAdminPrefs();
 
-// Set the current action.
+        // Set the current action.
         $action = $request->input('action') ?? 'view';
 
         switch ($action) {
@@ -68,6 +67,7 @@ class MgrPosterController extends BasePageController
                     $poster = MultigroupPoster::query()->where('id', '=', $request->input('id'))->update(['poster' => $request->input('poster')]);
                 }
                 $this->smarty->assign('poster', $poster);
+
                 return redirect('posters-list');
                 break;
 
@@ -83,7 +83,6 @@ class MgrPosterController extends BasePageController
                 $this->smarty->assign('poster', $poster);
                 break;
         }
-
 
         $content = $this->smarty->fetch('posters-edit.tpl');
 
