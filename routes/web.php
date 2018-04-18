@@ -238,7 +238,7 @@ Route::prefix('admin')->group(function () {
         Route::post('content-add', 'ContentController@create');
         Route::get('content-delete', 'ContentController@destroy');
         Route::post('content-delete', 'ContentController@destroy');
-        oute::get('category_regexes-list', 'CategoryRegexesController@index');
+        Route::get('category_regexes-list', 'CategoryRegexesController@index');
         Route::post('category_regexes-list', 'CategoryRegexesController@index');
         Route::get('category_regexes-edit', 'CategoryRegexesController@edit');
         Route::post('category_regexes-edit', 'CategoryRegexesController@edit');
