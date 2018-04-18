@@ -274,5 +274,5 @@ Route::prefix('admin')->group(function () {
         Route::post('release-edit', 'ReleasesController@edit');
         Route::get('release-delete/{id}', 'ReleasesController@destroy');
         Route::post('release-delete/{id}', 'ReleasesController@destroy');
-    });
-})->middleware('admin');
+    })->middleware('admin');
+});
