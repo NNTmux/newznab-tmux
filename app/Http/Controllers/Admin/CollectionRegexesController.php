@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\Category;
 use Blacklight\Regexes;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class CollectionRegexesController extends BasePageController
 {
@@ -145,6 +145,5 @@ class CollectionRegexesController extends BasePageController
         );
 
         $this->adminrender();
-
     }
 }
