@@ -260,5 +260,7 @@ Route::prefix('admin')->group(function () {
         Route::post('release_naming_regexes-test', 'ReleaseNamingRegexesController@testRegex');
         Route::get('ajax', 'AjaxController@ajaxAction');
         Route::post('ajax', 'AjaxController@ajaxAction');
+        Route::get('tmux-edit', 'TmuxController@edit');
+        Route::post('tmux-edit', 'TmuxController@edit');
     });
 });
