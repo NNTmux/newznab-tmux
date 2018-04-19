@@ -12,7 +12,7 @@
 			{foreach from=$topgrabs item=result}
 				<tr class="{cycle values=",alt"}">
 					<td width="75%"><a
-								href="{$smarty.const.WWW_TOP}/user-edit?id={$result.id}">{$result.username}</a></td>
+								href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$result.id}">{$result.username}</a></td>
 					<td>{$result.grabs}</td>
 				</tr>
 			{/foreach}
@@ -82,8 +82,8 @@
 			{foreach from=$topdownloads item=result}
 				<tr class="{cycle values=",alt"}">
 					<td width="75%"><a
-								href="{$smarty.const.WWW_TOP}/../details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
-						{if isset($isadmin)}<a href="{$smarty.const.WWW_TOP}/release-edit?id={$result.id}">
+								href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+						{if isset($isadmin)}<a href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.id}">
 								[Edit]</a>{/if}</td>
 					<td>{$result.grabs}</td>
 					<td>{$result.adddate|timeago}</td>
@@ -126,7 +126,7 @@
 			{foreach from=$topcomments item=result}
 				<tr class="{cycle values=",alt"}">
 					<td width="75%"><a
-								href="{$smarty.const.WWW_TOP}/../details/{$result.guid}/#comments">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+								href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 					</td>
 					<td>{$result.comments}</td>
 					<td>{$result.adddate|timeago}</td>

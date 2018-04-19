@@ -14,7 +14,7 @@
 	</p>
 
 
-	<form action="{$SCRIPT_NAME}" method="POST">
+	<form action="nzb-export" method="POST">
 		{{csrf_field()}}
 
 		<table class="input data table table-striped responsive-utilities jambo-table">

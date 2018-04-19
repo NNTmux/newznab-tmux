@@ -19,7 +19,7 @@
 			{foreach from=$releaselist item=release}
 				<tr class="{cycle values=",alt"}">
 					<td title="{$release.name}"><a
-								href="{$smarty.const.WWW_TOP}/release-edit?id={$release.guid}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+								href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 					</td>
 					<td class="less">{$release.category_name}</td>
 					<td class="less right">{$release.size|fsize_format:"MB"}</td>

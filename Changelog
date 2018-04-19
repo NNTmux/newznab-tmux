@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Update actions in admin theme
 	* Fix: Fix group list pagination
 	* Fix: Add missing group routes
 	* Fix: Fix bugs in redirects

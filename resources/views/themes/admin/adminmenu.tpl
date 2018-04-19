@@ -18,8 +18,8 @@
 			<li><a><i class="fa fa-chevron-circle-down"></i><span> Menu</span><span
 							class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/menu-list">View Menu Items</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/menu-edit?action=add">Add Menu Items</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/admin/menu-list">View Menu Items</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/admin/menu-edit?action=add">Add Menu Items</a></li>
 				</ul>
 			</li>
 			<li><a><i class="fa fa-tint"></i><span> Categories</span><span class="fa fa-chevron-down"></span></a>

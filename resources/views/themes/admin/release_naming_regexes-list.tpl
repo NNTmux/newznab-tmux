@@ -28,7 +28,7 @@
 					<td>{$row.id}</td>
 					<td>{$row.group_regex}</td>
 					<td title="Edit this regex"><a
-								href="{$smarty.const.WWW_TOP}/release_naming_regexes-edit?id={$row.id}">Edit</a>
+								href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?id={$row.id}">Edit</a>
 					</td>
 					<td>{$row.description|truncate:50:"...":true}</td>
 					<td title="Delete this regex"><a href="javascript:ajax_release_naming_regex_delete({$row.id})"
@@ -41,7 +41,7 @@
 						<td style="color:#FF0000">Disabled</td>
 					{/if}
 					<td title="Edit this regex"><a
-								href="{$smarty.const.WWW_TOP}/release_naming_regexes-edit?id={$row.id}">{$row.regex|escape:html|truncate:50:"...":true}</a>
+								href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?id={$row.id}">{$row.regex|escape:html|truncate:50:"...":true}</a>
 					</td>
 				</tr>
 			{/foreach}

@@ -1,8 +1,8 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/group-list"><i class="fa fa-arrow-left"></i> Go
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/group-list"><i class="fa fa-arrow-left"></i> Go
 		back</a>
-	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<form action="group-edit?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>

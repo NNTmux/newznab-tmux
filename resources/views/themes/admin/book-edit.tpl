@@ -1,7 +1,7 @@
 <h1>{$title}</h1>
 
 <div class="well well-sm">
-	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
+	<form enctype="multipart/form-data" action="book-edit?action=submit" method="post">
 		{{csrf_field()}}
 
 		<input type="hidden" name="id" value="{$book.id}"/>
@@ -58,7 +58,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $book.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/../covers/book/{$book.id}.jpg" alt=""/>
+							 src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" alt=""/>
 					{/if}
 				</td>
 			</tr>

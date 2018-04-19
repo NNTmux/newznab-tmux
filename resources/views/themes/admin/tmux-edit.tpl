@@ -1,7 +1,7 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
 
-	<form action="{$SCRIPT_NAME}?action=submit" method="post">
+	<form action="tmux-edit?action=submit" method="post">
 		{{csrf_field()}}
 
 		{if isset($error) && $error != ''}

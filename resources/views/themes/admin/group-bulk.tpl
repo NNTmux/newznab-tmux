@@ -20,7 +20,7 @@
 		<p>View <a href="group-list">all groups</a>.</p>
 	{else}
 		<p>Regex of groups to add to the site.</p>
-		<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+		<form action="group-bulk?action=submit" method="POST">
 			{{csrf_field()}}
 			<table class="input">
 

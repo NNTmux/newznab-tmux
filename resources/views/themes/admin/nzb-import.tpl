@@ -19,7 +19,7 @@
 	</ul>
 	<fieldset>
 		<legend>Import From Directory</legend>
-		<form action="{$SCRIPT_NAME}#results" method="POST">
+		<form action="nzb-import#results" method="POST">
 			{{csrf_field()}}
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
@@ -57,7 +57,7 @@
 	</fieldset>
 	<fieldset>
 		<legend>Import From Browser</legend>
-		<form action="{$SCRIPT_NAME}#results" method="POST" enctype="multipart/form-data">
+		<form action="nzb-import#results" method="POST" enctype="multipart/form-data">
 			{{csrf_field()}}
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>

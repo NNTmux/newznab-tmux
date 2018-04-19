@@ -1,7 +1,7 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/game-list"><i class="fa fa-arrow-left"></i> Go back</a>
-	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/game-list"><i class="fa fa-arrow-left"></i> Go back</a>
+	<form enctype="multipart/form-data" action="game-edit?action=submit" method="post">
 		{{csrf_field()}}
 		<input type="hidden" name="id" value="{$game.id}"/>
 		<table class="input data table table-striped responsive-utilities jambo-table">
@@ -69,7 +69,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $game.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/../covers/games/{$game.id}.jpg" alt=""/>
+							 src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" alt=""/>
 					{/if}
 				</td>
 			</tr>

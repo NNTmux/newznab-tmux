@@ -10,7 +10,7 @@
 		<br/>
 		<div id="message" style="width:717px;">msg</div>
 		{if $local}
-			<form action="{$SCRIPT_NAME}" method="post">
+			<form action="sharing" method="post">
 				{{csrf_field()}}
 				<fieldset style="width:717px;">
 					<legend>Local sharing settings.</legend>

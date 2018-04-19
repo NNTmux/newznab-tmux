@@ -25,10 +25,10 @@
 				   onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge
 					all</a><br/>
 				<a title="List all groups Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-active">Active Groups</a> |
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-active">Active Groups</a> |
 				<a title="List all groups NOT Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-inactive">Inactive Groups</a> |
-				<a title="List all groups" href="{$smarty.const.WWW_TOP}/group-list">All Groups</a>
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-inactive">Inactive Groups</a> |
+				<a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
 			</div>
 		</div>
 		<div id="message">msg</div>
@@ -49,7 +49,7 @@
 			{foreach from=$grouplist item=group}
 				<tr id="grouprow-{$group.id}" class="{cycle values=",alt"}">
 					<td>
-						<a href="{$smarty.const.WWW_TOP}/group-edit?id={$group.id}">{$group.name|replace:"alt.binaries":"a.b"}</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/group-edit?id={$group.id}">{$group.name|replace:"alt.binaries":"a.b"}</a>
 						<div class="hint">{$group.description}</div>
 					</td>
 					<td class="less">{$group.first_record_postdate}<br/>{$group.first_record_postdate|timeago}</td>
@@ -101,10 +101,10 @@
 				   onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge
 					all</a><br/>
 				<a title="List all groups Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-active">Active Groups</a> |
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-active">Active Groups</a> |
 				<a title="List all groups NOT Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-inactive">Inactive Groups</a> |
-				<a title="List all groups" href="{$smarty.const.WWW_TOP}/group-list">All Groups</a>
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-inactive">Inactive Groups</a> |
+				<a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
 			</div>
 		</div>
 	{else}
