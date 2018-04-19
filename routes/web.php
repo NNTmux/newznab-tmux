@@ -291,5 +291,9 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('console-edit', 'ConsoleController@edit');
         Route::post('console-edit', 'ConsoleController@edit');
         Route::get('failrel-list', 'FailedReleasesController@index');
+        Route::get('game-list', 'GameController@index');
+        Route::post('game-list', 'GameController@index');
+        Route::get('game-edit', 'GameController@edit');
+        Route::post('game-edit', 'GameController@edit');
     });
 });

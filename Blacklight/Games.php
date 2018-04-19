@@ -191,19 +191,18 @@ class Games
     }
 
     /**
-     * @param $start
-     * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @throws \InvalidArgumentException
      */
-    public function getRange($start, $num): array
+    public function getRange()
     {
-        return $this->pdo->query(
-            sprintf(
-                'SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY created_at DESC %s',
-                ($start === false ? '' : 'LIMIT '.$num.' OFFSET '.$start)
-            )
-        );
+
+        return GamesInfo::query()
+            ->select(['gi.*', 'g.title as genretitle'])
+            ->from('gamesinfo as gi')
+            ->join('genres as g', 'gi.genres_id', '=', 'g.id')
+            ->orderByDesc('created_at')
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
