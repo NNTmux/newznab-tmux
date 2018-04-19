@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Add CommentsController
 	* Chg: Update used libraries to their latest versions
 	* Fix: Fix install.lock file generation on install
 	* Chg: Add option to .env.example to decide if session should be encrypted or not
