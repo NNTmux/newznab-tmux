@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use Blacklight\Movie;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class MovieController extends BasePageController
 {
@@ -80,7 +80,7 @@ class MovieController extends BasePageController
 
         $movie = new Movie();
 
-// set the current action
+        // set the current action
         $action = $request->input('action') ?? 'view';
 
         if ($request->has('id')) {

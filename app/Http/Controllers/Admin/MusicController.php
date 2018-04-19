@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use Blacklight\Genres;
 use Blacklight\Music;
-use Blacklight\utility\Utility;
+use Blacklight\Genres;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class MusicController extends BasePageController
 {

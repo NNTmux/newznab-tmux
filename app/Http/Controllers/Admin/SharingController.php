@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\Sharing;
 use App\Models\SharingSite;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class SharingController extends BasePageController
 {

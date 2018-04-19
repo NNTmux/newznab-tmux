@@ -196,7 +196,6 @@ class Games
      */
     public function getRange()
     {
-
         return GamesInfo::query()
             ->select(['gi.*', 'g.title as genretitle'])
             ->from('gamesinfo as gi')

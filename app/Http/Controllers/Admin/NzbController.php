@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
+use Blacklight\Releases;
 use Blacklight\NZBExport;
 use Blacklight\NZBImport;
-use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use App\Http\Controllers\BasePageController;
 
 class NzbController extends BasePageController
 {
@@ -90,7 +90,6 @@ class NzbController extends BasePageController
         $rel = new Releases(['Settings' => $this->pdo]);
 
         if ($this->isPostBack()) {
-
             $path = $request->input('folder');
             $postFrom = ($request->input('postfrom') ?? '');
             $postTo = ($request->input('postto') ?? '');
