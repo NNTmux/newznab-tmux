@@ -321,5 +321,15 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('predb', 'PredbController@index');
         Route::get('sharing', 'SharingController@index');
         Route::post('sharing', 'SharingController@index');
+        Route::get('group-list', 'GroupController@index');
+        Route::post('group-list', 'GroupController@index');
+        Route::get('group-edit', 'GroupController@edit');
+        Route::post('group-edit', 'GroupController@edit');
+        Route::get('group-bulk', 'GroupController@createBulk');
+        Route::post('group-bulk', 'GroupController@createBulk');
+        Route::get('group-list-active', 'GroupController@active');
+        Route::post('group-list-active', 'GroupController@active');
+        Route::get('group-list-inactive', 'GroupControllerin@active');
+        Route::post('group-list-inactive', 'GroupController@inactive');
     });
 });
