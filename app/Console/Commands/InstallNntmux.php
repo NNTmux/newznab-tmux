@@ -171,13 +171,14 @@ class InstallNntmux extends Command
 
     /**
      * @return array|bool
+     * @throws \Exception
      * @throws \RuntimeException
      */
     protected function updatePaths()
     {
-        $covers_path = base_path().'resources/covers/';
-        $nzb_path = base_path().'resources/nzb/';
-        $tmp_path = base_path().'resources/tmp/';
+        $covers_path = base_path().'/resources/covers/';
+        $nzb_path = base_path().'/resources/nzb/';
+        $tmp_path = base_path().'/resources/tmp/';
         $unrar_path = $tmp_path.'unrar/';
 
         $nzbPathCheck = is_writable($nzb_path);
