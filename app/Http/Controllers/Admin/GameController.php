@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use Blacklight\Games;
 use Blacklight\Genres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Http\Controllers\BasePageController;
 
 class GameController extends BasePageController
 {
@@ -48,7 +48,7 @@ class GameController extends BasePageController
         $games = new Games(['Settings' => $this->pdo]);
         $gen = new Genres(['Settings' => $this->pdo]);
 
-// Set the current action.
+        // Set the current action.
         $action = $request->input('action') ?? 'view';
 
         if ($request->has('id')) {

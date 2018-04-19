@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\Menu;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class MenuController extends BasePageController
 {

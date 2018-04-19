@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Release;
 use App\Models\Video;
+use App\Models\Release;
 use Illuminate\Http\Request;
 use Blacklight\processing\tv\TV;
 use App\Http\Controllers\BasePageController;
