@@ -423,11 +423,9 @@ class Release extends Model
      * Get a range of releases. used in admin manage list.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getFailedRange($start, $num)
+    public static function getFailedRange()
     {
         $failedList = self::query()
             ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
@@ -435,11 +433,8 @@ class Release extends Model
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->orderBy('postdate', 'desc');
-        if ($start !== false) {
-            $failedList->limit($num)->offset($start);
-        }
 
-        return $failedList->get();
+        return $failedList->paginate(config('nntmux.items_per_page'));
     }
 
     /**

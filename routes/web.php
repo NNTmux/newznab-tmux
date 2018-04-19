@@ -286,5 +286,6 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('console-list', 'ConsoleController@index');
         Route::get('console-edit', 'ConsoleController@edit');
         Route::post('console-edit', 'ConsoleController@edit');
+        Route::get('failrel-list', 'FailedReleasesController@index');
     });
 });

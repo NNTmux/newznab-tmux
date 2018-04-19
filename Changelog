@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Add FailedReleasesController
 	* Chg: Add ConsoleController
 	* Chg: Add CommentsController
 	* Chg: Update used libraries to their latest versions
