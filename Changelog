@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Fix: Fix install.lock file generation on install
 	* Chg: Add option to .env.example to decide if session should be encrypted or not
 2018-04-18 DariusIII
 	* Chg: Add ShowsController
