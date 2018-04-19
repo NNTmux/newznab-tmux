@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Add NzbController
 	* Chg: Add MusicController
 	* Chg: Add MovieController
 	* Chg: Add MenuController

@@ -311,5 +311,9 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('music-list', 'MusicController@index');
         Route::get('music-edit', 'MusicController@edit');
         Route::post('music-edit', 'MusicController@edit');
+        Route::get('nzb-import', 'NzbController@import');
+        Route::post('nzb-import', 'NzbController@import');
+        Route::get('nzb-export', 'NzbController@export');
+        Route::post('nzb-export', 'NzbController@export');
     });
 });
