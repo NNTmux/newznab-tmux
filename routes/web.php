@@ -295,5 +295,11 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('game-list', 'GameController@index');
         Route::get('game-edit', 'GameController@edit');
         Route::post('game-edit', 'GameController@edit');
+        Route::get('menu-list', 'MenuController@index');
+        Route::post('menu-list', 'MenuController@index');
+        Route::get('menu-edit', 'MenuController@edit');
+        Route::post('menu-edit', 'MenuController@edit');
+        Route::get('menu-delete/{id}', 'MenuController@destroy');
+        Route::post('menu-delete/{id}', 'MenuController@destroy');
     });
 });

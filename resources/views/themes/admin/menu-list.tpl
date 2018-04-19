@@ -24,7 +24,7 @@
 					<td>{if $menu.role == 0}Guests{elseif $menu.role == 1}Users{elseif $menu.role == 2}Admin{else}Other{/if}</td>
 					<td class="mid">{$menu.ordinal}</td>
 					<td class="mid">{if $menu.newwindow == 1}Yes{else}No{/if}</td>
-					<td><a href="{$smarty.const.WWW_TOP}/menu-delete?id={$menu.id}">delete</a></td>
+					<td><a href="{$smarty.const.WWW_TOP}/menu-delete/{$menu.id}">delete</a></td>
 				</tr>
 			{/foreach}
 
