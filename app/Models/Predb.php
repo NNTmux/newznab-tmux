@@ -146,42 +146,18 @@ class Predb extends Model
      * Get all PRE's in the DB.
      *
      *
-     * @param $offset
-     * @param $offset2
      * @param string|array $search
      * @return array
      */
-    public static function getAll($offset, $offset2, $search = ''): array
+    public static function getAll($search = ''): array
     {
         if ($search !== '') {
             $search = explode(' ', trim($search));
         }
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        if ($search === '') {
-            $check = Cache::get('predbcount');
-            if ($check !== null) {
-                $count = $check;
-            } else {
-                $count = self::count();
-                Cache::put('predbcount', $count, $expiresAt);
-            }
-        } else {
-            $sql = self::query()->where(function ($query) use ($search) {
-                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->where('title', 'like', '%'.$search[$i].'%');
-                }
-            });
-            $check = Cache::get(md5(implode(',', $search)));
-            if ($check !== null) {
-                $count = $check;
-            } else {
-                $count = $sql->count('id');
-                Cache::put(md5(implode(',', $search)), $count, $expiresAt);
-            }
-        }
 
-        $sql = self::query()->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')->orderBy('predb.predate', 'desc')->limit($offset2)->offset($offset);
+        $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if ($search !== '') {
             $sql->where(function ($query) use ($search) {
                 for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
@@ -190,15 +166,15 @@ class Predb extends Model
             });
         }
         $search = $search !== '' ? implode(',', $search) : '';
-        $check = Cache::get(md5($offset.$offset2.$search));
+        $check = Cache::get(md5($search));
         if ($check !== null) {
             $parr = $check;
         } else {
-            $parr = $sql->get();
-            Cache::put(md5($offset.$offset2.$search), $parr, $expiresAt);
+            $parr = $sql->paginate(config('nntmux.items_per_page'));
+            Cache::put(md5($search), $parr, $expiresAt);
         }
 
-        return ['arr' => $parr, 'count' => $count ?? 0];
+        return $parr;
     }
 
     /**
