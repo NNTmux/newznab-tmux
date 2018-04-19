@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Fix: Fix link on content addition
 	* Chg: Change redirect route on site edit submit action
 	* Chg: Update admin redirects
 	* Chg: Update ProfileController, fix Sabnzbd constructor call

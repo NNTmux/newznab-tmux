@@ -17,7 +17,7 @@
 			<tr class="{cycle values=",alt"}">
 				<td>{$content->ordinal}</td>
 				<td>{$content->id}</td>
-				<td><a href="{$smarty.const.WWW_TOP}/content-add?id={$content->id}"
+				<td><a href="{$smarty.const.WWW_TOP}/admin/content-add?id={$content->id}"
 					   title="Edit {$content->title}">{$content->title}</a></td>
 				<td><a title="Preview in new window" href="{$smarty.const.WWW_TOP}/{$content->url}c{$content->id}"
 					   target="null">{$content->url}c{$content->id}</a></td>
