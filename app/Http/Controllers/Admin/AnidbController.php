@@ -114,7 +114,7 @@ class AnidbController extends BasePageController
                     return redirect(request()->input('from'));
                 }
 
-                return redirect('anidb-list');
+                return redirect('admin/anidb-list');
                 break;
 
             case 'view':

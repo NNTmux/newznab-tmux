@@ -73,7 +73,7 @@ class BookController extends BasePageController
                     $request->merge(['publishdate' => (empty($request->input('publishdate')) || ! strtotime($request->input('publishdate'))) ? $con['publishdate'] : Carbon::parse($request->input('publishdate'))->timestamp]);
                     $book->update($id, $request->input('title'), $request->input('asin'), $request->input('url'), $request->input('author'), $request->input('publisher'), $request->input('publishdate'), $request->input('cover'));
 
-                    return redirect('book-list');
+                    return redirect('admin/book-list');
                     break;
                 case 'view':
                 default:

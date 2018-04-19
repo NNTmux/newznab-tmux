@@ -146,7 +146,7 @@ class UserController extends BasePageController
                 }
 
                 if ($ret >= 0) {
-                    return redirect('user-list');
+                    return redirect('admin/user-list');
                 }
 
                 switch ($ret) {

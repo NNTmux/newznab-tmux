@@ -60,7 +60,7 @@ class SiteController extends BasePageController
                     $site = $ret;
                     $returnid = $site['id'];
 
-                    return redirect('site-edit.php?id='.$returnid);
+                    return redirect('admin/site-edit.php?id='.$returnid);
                 }
 
                 $this->smarty->assign('error', $error);

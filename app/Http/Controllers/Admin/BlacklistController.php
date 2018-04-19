@@ -96,7 +96,7 @@ class BlacklistController extends BasePageController
                     $binaries->updateBlacklist($request->all());
                 }
 
-                return redirect('binaryblacklist-list');
+                return redirect('admin/binaryblacklist-list');
                 break;
 
             case 'addtest':

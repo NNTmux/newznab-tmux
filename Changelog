@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Update admin redirects
 	* Chg: Update ProfileController, fix Sabnzbd constructor call
 	* Chg: Add SharingController
 	* Chg: Update ShowsController add show-remove option

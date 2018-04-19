@@ -68,7 +68,7 @@ class MgrPosterController extends BasePageController
                 }
                 $this->smarty->assign('poster', $poster);
 
-                return redirect('posters-list');
+                return redirect('admin/posters-list');
                 break;
 
             case 'view':
@@ -107,6 +107,6 @@ class MgrPosterController extends BasePageController
             MultigroupPoster::query()->where('id', '=', $id)->delete();
         }
 
-        return redirect('posters-list');
+        return redirect('admin/posters-list');
     }
 }

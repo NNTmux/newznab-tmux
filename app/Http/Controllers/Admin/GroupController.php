@@ -147,7 +147,7 @@ class GroupController extends BasePageController
                     Group::updateGroup($request->all());
                 }
 
-                return redirect('group-list');
+                return redirect('admin/group-list');
                 break;
 
             case 'view':

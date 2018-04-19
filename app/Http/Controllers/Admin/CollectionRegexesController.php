@@ -82,7 +82,7 @@ class CollectionRegexesController extends BasePageController
                     $regexes->updateRegex($request->all());
                 }
 
-                return redirect('collection_regexes-list');
+                return redirect('admin/collection_regexes-list');
                 break;
 
             case 'view':
