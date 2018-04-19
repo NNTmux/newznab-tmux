@@ -27,7 +27,7 @@ class ProfileController extends BasePageController
     public function show(Request $request)
     {
         $this->setPrefs();
-        $sab = new SABnzbd();
+        $sab = new SABnzbd($this);
 
         $userID = Auth::id();
         $privileged = User::isAdmin($userID) || User::isModerator($userID);
@@ -56,17 +56,13 @@ class ProfileController extends BasePageController
 
         $data = User::find($userID);
         if ($data === null) {
-            abort(404);
+            $this->show404('No such user!');
         }
-
-        $theme = $this->theme;
 
         // Check if the user selected a theme.
         if (! isset($data['style']) || $data['style'] === 'None') {
             $data['style'] = 'Using the admin selected theme.';
         }
-
-        $offset = $request->input('offset') ?? 0;
         $this->smarty->assign(
             [
                 'apirequests'       => UserRequest::getApiRequests($userID),
@@ -128,7 +124,7 @@ class ProfileController extends BasePageController
     public function edit(Request $request)
     {
         $this->setPrefs();
-        $sab = new SABnzbd();
+        $sab = new SABnzbd($this);
         $nzbGet = new NZBGet($this);
 
         $action = $request->input('action') ?? 'view';
@@ -136,7 +132,7 @@ class ProfileController extends BasePageController
         $userid = Auth::id();
         $data = User::find($userid);
         if (! $data) {
-            $this->show404();
+            $this->show404('No such user!');
         }
 
         $errorStr = '';
@@ -309,6 +305,6 @@ class ProfileController extends BasePageController
             return redirect('profile');
         }
 
-        return view('errors.badboy');
+        return view('errors.badboy')->with('Message', 'Dont try to delete another user account!');
     }
 }
