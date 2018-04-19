@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Add MovieController
 	* Chg: Add MenuController
 	* Chg: Add GameController
 	* Chg: Update ForumController and routes for deleting forum

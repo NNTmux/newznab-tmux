@@ -301,5 +301,11 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('menu-edit', 'MenuController@edit');
         Route::get('menu-delete/{id}', 'MenuController@destroy');
         Route::post('menu-delete/{id}', 'MenuController@destroy');
+        Route::get('movie-list', 'MovieController@index');
+        Route::post('movie-list', 'MovieController@index');
+        Route::get('movie-edit', 'MovieController@edit');
+        Route::post('movie-edit', 'MovieController@edit');
+        Route::get('movie-add', 'MovieController@create');
+        Route::post('movie-add', 'MovieController@create');
     });
 });
