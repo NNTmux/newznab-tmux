@@ -58,9 +58,8 @@ class SiteController extends BasePageController
 
                 if ($error === '') {
                     $site = $ret;
-                    $returnid = $site['id'];
 
-                    return redirect('admin/site-edit.php?id='.$returnid);
+                    return redirect('admin/site-edit');
                 }
 
                 $this->smarty->assign('error', $error);
