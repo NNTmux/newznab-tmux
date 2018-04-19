@@ -329,7 +329,7 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('group-bulk', 'GroupController@createBulk');
         Route::get('group-list-active', 'GroupController@active');
         Route::post('group-list-active', 'GroupController@active');
-        Route::get('group-list-inactive', 'GroupControllerin@active');
+        Route::get('group-list-inactive', 'GroupController@inactive');
         Route::post('group-list-inactive', 'GroupController@inactive');
     });
 });
