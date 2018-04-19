@@ -2,9 +2,10 @@
 
 namespace Blacklight\utility;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
 
@@ -970,45 +971,29 @@ class Utility
 
     /**
      * @param $tableName
-     * @param $start
-     * @param $num
      *
-     * @return array
-     * @throws \Exception
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getRange($tableName, $start, $num): array
+    public static function getRange($tableName): LengthAwarePaginator
     {
-        $pdo = new DB();
+        $range = DB::table($tableName);
+        if ($tableName === 'xxxinfo') {
+            $range->selectRaw('UNCOMPRESS(plot) AS plot');
+        }
 
-        return $pdo->query(
-            sprintf(
-                'SELECT * %s FROM %s ORDER BY created_at DESC %s',
-                ($tableName === 'xxxinfo' ? ', UNCOMPRESS(plot) AS plot' : ''),
-                $tableName,
-                ($start === false ? '' : ('LIMIT '.$num.' OFFSET '.$start))
-            )
-        );
+        return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
     }
 
     /**
      * @param $tableName
      *
      * @return int
-     * @throws \Exception
      */
     public static function getCount($tableName): int
     {
-        $pdo = new DB();
-        $res = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM %s', $tableName));
 
-        return $res === false ? 0 : $res['num'];
-    }
+        $res = DB::table($tableName)->count('id');
 
-    /**
-     * @return bool
-     */
-    public static function checkCSRFToken(): bool
-    {
-        return request()->has('_token') && hash_equals($_SESSION['_token'], request()->input('_token'));
+        return $res === false ? 0 : $res;
     }
 }

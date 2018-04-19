@@ -282,5 +282,9 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('comments-list', 'CommentsController@index');
         Route::get('comments-delete/{id}', 'CommentsController@destroy');
         Route::post('comments-delete/{id}', 'CommentsController@destroy');
+        Route::get('console-list', 'ConsoleController@index');
+        Route::post('console-list', 'ConsoleController@index');
+        Route::get('console-edit', 'ConsoleController@edit');
+        Route::post('console-edit', 'ConsoleController@edit');
     });
 });
