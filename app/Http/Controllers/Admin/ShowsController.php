@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Release;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Blacklight\processing\tv\TV;
@@ -69,6 +70,35 @@ class ShowsController extends BasePageController
 
         $title = 'Edit TV Show Data';
         $content = $this->smarty->fetch('show-edit.tpl');
+        $this->smarty->assign(
+            [
+                'title' => $title,
+                'content' => $content,
+            ]
+        );
+        $this->adminrender();
+    }
+
+    /**
+     * @param $id
+     *
+     * @throws \Exception
+     */
+    public function destroy($id)
+    {
+        $this->setAdminPrefs();
+
+        $success = false;
+
+        if ($id) {
+            $success = Release::removeVideoIdFromReleases($id);
+            $this->smarty->assign('videoid', $id);
+        }
+
+        $this->smarty->assign('success', $success);
+
+        $title = 'Remove Video and Episode IDs from Releases';
+        $content = $this->smarty->fetch('show-remove.tpl');
         $this->smarty->assign(
             [
                 'title' => $title,

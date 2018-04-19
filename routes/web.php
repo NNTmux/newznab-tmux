@@ -282,6 +282,8 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('show-list', 'ShowsController@index');
         Route::get('show-edit', 'ShowsController@edit');
         Route::post('show-edit', 'ShowsController@edit');
+        Route::get('show-remove', 'ShowsController@destroy');
+        Route::post('show-remove', 'ShowsController@destroy');
         Route::get('comments-list', 'CommentsController@index');
         Route::post('comments-list', 'CommentsController@index');
         Route::get('comments-delete/{id}', 'CommentsController@destroy');
