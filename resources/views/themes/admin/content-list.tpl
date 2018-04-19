@@ -55,7 +55,7 @@
 				</td>
 				<td title="{$content->body|escape:'htmlall'}">{$content->body|truncate:100|escape:'htmlall'}</td>
 				<td><a class="confirm_action"
-					   href="{$smarty.const.WWW_TOP}/content-delete?id={$content->id}">delete</a></td>
+					   href="{$smarty.const.WWW_TOP}/admin/content-delete?id={$content->id}">delete</a></td>
 			</tr>
 		{/foreach}
 	</table>

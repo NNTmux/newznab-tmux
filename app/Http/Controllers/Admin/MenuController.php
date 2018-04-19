@@ -58,7 +58,7 @@ class MenuController extends BasePageController
                     Menu::updateMenu($request->all());
                 }
 
-                header('Location:'.WWW_TOP.'/menu-list.php');
+                return redirect('admin//menu-list');
                 break;
 
             case 'view':

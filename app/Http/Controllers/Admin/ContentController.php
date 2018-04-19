@@ -78,7 +78,7 @@ class ContentController extends BasePageController
                     $returnid = $content['id'];
                 }
 
-                return redirect('admin/content-add.php?id='.$returnid);
+                return redirect('admin/content-add?id='.$returnid);
                 break;
 
             case 'view':

@@ -75,8 +75,7 @@ class RoleController extends BasePageController
                 /*header('Location:'.WWW_TOP.'/role-list.php');*/
                 } else {
                     $role = UserRole::updateRole($request->all());
-                    //dd($role);
-                    header('Location:'.WWW_TOP.'/role-list.php');
+                    header('Location:'.WWW_TOP.'admin/role-list');
 
                     $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
                     RoleExcludedCategory::addRoleCategoryExclusions($request->input('id'), $request->input('exccat'));

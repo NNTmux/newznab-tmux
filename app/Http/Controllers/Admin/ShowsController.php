@@ -54,7 +54,7 @@ class ShowsController extends BasePageController
                     exit;
                 }
 
-                header('Location:'.WWW_TOP.'/show-list.php');
+                header('Location:'.WWW_TOP.'admin/show-list');
                 break;
 
             case 'view':
