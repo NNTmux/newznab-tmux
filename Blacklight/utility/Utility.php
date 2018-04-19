@@ -4,10 +4,10 @@ namespace Blacklight\utility;
 
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Utility.
@@ -991,7 +991,6 @@ class Utility
      */
     public static function getCount($tableName): int
     {
-
         $res = DB::table($tableName)->count('id');
 
         return $res === false ? 0 : $res;
