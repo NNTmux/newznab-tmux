@@ -163,4 +163,21 @@ class ForumController extends BasePageController
         );
         $this->pagerender();
     }
+
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
+    public function destroy($id)
+    {
+        $this->setPrefs();
+
+        if ($id) {
+            Forumpost::deletePost($id);
+        }
+
+        return redirect()->back();
+    }
 }

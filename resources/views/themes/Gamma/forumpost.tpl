@@ -34,7 +34,7 @@
 				{if isset($isadmin)}
 				<br/>
 				<div>
-					<a class="rndbtn confirm_action btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id} from={$smarty.server.REQUEST_URI|escape:"url"}" title="Delete Post">Delete</a>
+					<a class="rndbtn confirm_action btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/admin/forum-delete/{$result.id}" title="Delete Post">Delete</a>
 				</div>
 				{/if}
 			</td>

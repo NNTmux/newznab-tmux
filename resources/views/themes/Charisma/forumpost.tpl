@@ -35,7 +35,7 @@
 					<br/>
 					<div>
 						<a class="confirm_action btn btn-sm btn-danger"
-						   href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id} from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   href="{$smarty.const.WWW_TOP}/admin/forum-delete/{$result.id}"
 						   title="Delete Post">Delete</a>
 					</div>
 				{/if}

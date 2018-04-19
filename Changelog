@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Update ForumController and routes for deleting forum
 	* Chg: Add FailedReleasesController
 	* Chg: Add ConsoleController
 	* Chg: Add CommentsController

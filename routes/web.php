@@ -129,6 +129,10 @@ Route::get('post_edit', 'ForumController@edit');
 
 Route::post('post_edit', 'ForumController@edit');
 
+Route::get('forum-delete/{id}', 'ForumController@destroy')->middleware('isAdmin');
+
+Route::post('forum-delete/{id}', 'ForumController@destroy')->middleware('isAdmin');
+
 Route::get('profileedit', 'ProfileController@edit');
 
 Route::post('profileedit', 'ProfileController@edit');
