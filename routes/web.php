@@ -319,5 +319,7 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('nzb-export', 'NzbController@export');
         Route::get('predb', 'PredbController@index');
         Route::post('predb', 'PredbController@index');
+        Route::get('sharing', 'SharingController@index');
+        Route::post('sharing', 'SharingController@index');
     });
 });

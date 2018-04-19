@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Chg: Add SharingController
 	* Chg: Update ShowsController add show-remove option
 	* Chg: Add PredbController
 	* Chg: Add NzbController
