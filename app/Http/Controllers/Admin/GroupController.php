@@ -22,7 +22,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'groupname' => $groupName,
-                'grouplist' => Group::getGroupsRange(config('nntmux.items_per_page'), $groupName),
+                'grouplist' => Group::getGroupsRange($groupName),
             ]
         );
 

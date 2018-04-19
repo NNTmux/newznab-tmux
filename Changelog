@@ -1,4 +1,5 @@
 2018-04-19 DariusIII
+	* Fix: Fix group list pagination
 	* Fix: Add missing group routes
 	* Fix: Fix bugs in redirects
 	* Fix: Fix link on content addition
