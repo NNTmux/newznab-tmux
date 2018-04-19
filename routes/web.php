@@ -307,5 +307,9 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('movie-edit', 'MovieController@edit');
         Route::get('movie-add', 'MovieController@create');
         Route::post('movie-add', 'MovieController@create');
+        Route::get('music-list', 'MusicController@index');
+        Route::post('music-list', 'MusicController@index');
+        Route::get('music-edit', 'MusicController@edit');
+        Route::post('music-edit', 'MusicController@edit');
     });
 });
