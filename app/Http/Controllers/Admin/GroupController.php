@@ -164,9 +164,7 @@ class GroupController extends BasePageController
 
         $this->smarty->assign('groupname', $groupname);
 
-        $page = $request->has('page') ? $request->input('page') : 1;
-
-        $grouplist = Group::getGroupsRange($page, $gname, true);
+        $grouplist = Group::getGroupsRange($gname, true);
 
         $this->smarty->assign('grouplist', $grouplist);
 
@@ -201,9 +199,7 @@ class GroupController extends BasePageController
 
         $this->smarty->assign('groupname', $groupname);
 
-        $page = $request->has('page') ? $request->input('page') : 1;
-
-        $grouplist = Group::getGroupsRange($page, $gname, false);
+        $grouplist = Group::getGroupsRange($gname, false);
 
         $this->smarty->assign('grouplist', $grouplist);
 
