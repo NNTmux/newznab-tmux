@@ -368,20 +368,16 @@ class Releases
     }
 
     /**
-     * Get TV for my shows page.
-     *
-     *
-     * @param       $userShows
-     * @param       $orderBy
-     * @param int   $maxAge
-     * @param array $excludedCats
+     * @param        $userShows
+     * @param string $orderBy
+     * @param int    $maxAge
+     * @param array  $excludedCats
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getShowsRange($userShows, $orderBy, $maxAge = -1, array $excludedCats = [])
+    public function getShowsRange($userShows, $orderBy = '', $maxAge = -1, array $excludedCats = [])
     {
-        $orderBy = $this->getBrowseOrder($orderBy);
 
         $sql = Release::query()
             ->with('group as g', 'nfo as rn', 'category as c', 'failed as df', 'episode as tve')
@@ -396,43 +392,41 @@ class Releases
                     'df.failed as failed',
                     ]
             )
-            ->leftJoin('video_date as re', 're.releases_id', '=', 'releases.id')
+            -> from('releases as r')
+            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->whereBetween('releases.categories_id', [5000, 5999])
-            ->where('releases.nzbstatus', NZB::NZB_ADDED);
+            ->whereBetween('r.categories_id', [5000, 5999])
+            ->where('r.nzbstatus', NZB::NZB_ADDED);
         self::showPasswords($sql, true);
-        foreach ($userShows as $query) {
-            $sql->orWhere('releases.videos_id', '=', $query['videos_id']);
-            if ($query['categories'] !== '') {
-                $catsArr = explode('|', $query['categories']);
-                if (\count($catsArr) > 1) {
-                    $sql->whereIn('releases.categories_id', $catsArr);
-                } else {
-                    $sql->where('releases.categories_id', $catsArr[0]);
+        if (!empty($userShows)) {
+            foreach ($userShows as $query) {
+                $sql->orWhere('r.videos_id', '=', $query['videos_id']);
+                if ($query['categories'] !== '') {
+                    $catsArr = explode('|', $query['categories']);
+                    if (\count($catsArr) > 1) {
+                        $sql->whereIn('r.categories_id', $catsArr);
+                    } else {
+                        $sql->where('r.categories_id', $catsArr[0]);
+                    }
                 }
             }
         }
 
         if (\count($excludedCats) > 0) {
-            $sql->whereNotIn('releases.categories_id', $excludedCats);
+            $sql->whereNotIn('r.categories_id', $excludedCats);
         }
 
         if ($maxAge > 0) {
-            $sql->where('releases.postdate', '>', Carbon::now()->subDays($maxAge));
+            $sql->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
         }
 
-        $sql->orderBy($orderBy[0], $orderBy[1]);
-        $releases = Cache::get(md5(implode('.', $userShows).implode('.', $orderBy).$maxAge.implode('.', $excludedCats)));
-        if ($releases !== null) {
-            return $releases;
+        if ($orderBy !== '') {
+            $order = $this->getBrowseOrder($orderBy);
+            $sql->orderBy($order[0], $order[1]);
         }
 
-        $releases = $sql->paginate(config('nntmux.items_per_page'));
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode('.', $userShows).implode('.', $orderBy).$maxAge.implode('.', $excludedCats)), $releases, $expiresAt);
-
-        return $releases;
+        return $sql->paginate(config('nntmux.items_per_page'));
     }
 
     /**

@@ -189,7 +189,7 @@ class MyShowsController extends BasePageController
         $ordering = $releases->getBrowseOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
-        $results = $releases->getShowsRange($shows, $orderby, -1, $this->userdata['categoryexclusions']);
+        $results = $releases->getShowsRange($shows ?? [], $orderby, -1, $this->userdata['categoryexclusions']);
 
         $this->smarty->assign('covgroup', '');
 

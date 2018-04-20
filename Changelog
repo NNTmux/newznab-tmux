@@ -1,4 +1,5 @@
 2018-04-20 DariusIII
+	* Chg: Fix myshows/browse page
 	* Chg: Add browse route for myshows
 	* Fix: Fix active/inactive groups display
 	* Chg: Update error pages
