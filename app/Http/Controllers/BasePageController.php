@@ -184,7 +184,7 @@ class BasePageController extends Controller
      */
     public function show503(): void
     {
-        abort(503);
+        return view('errors.503')->with('Error', 'Service temporarily unavailable');
     }
 
     /**
@@ -198,18 +198,17 @@ class BasePageController extends Controller
     /**
      * Show maintenance page.
      */
-    public function showMaintenance(): void
+    public function showMaintenance()
     {
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
-        die(view('errors.maintenance'));
+        return view('errors.maintenance')->with('Message', 'Service Temporarily Unavailable');
     }
 
     /**
      * Show Security token mismatch page.
      */
-    public function showTokenError(): void
+    public function showTokenError()
     {
-        abort(419);
+        return view('errors.tokenError')->with('Error', 'Token mismatch');
     }
 
     /**
@@ -217,7 +216,7 @@ class BasePageController extends Controller
      */
     public function show429($retry = ''): void
     {
-        abort(429);
+        abort(429, $retry);
     }
 
     public function render()
