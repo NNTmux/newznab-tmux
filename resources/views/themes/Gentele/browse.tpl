@@ -1,11 +1,8 @@
 <div class="header">
-	{if isset($catname)}
-		{assign var="catsplit" value=">"|explode:$catname}
-	{/if}
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
+			/ <a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}audio{else}{$parentcat}{/if}">{$parentcat}</a> / {if ($catname !== '')} <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
 		</ol>
 	</div>
 </div>

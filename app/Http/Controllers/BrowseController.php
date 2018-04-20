@@ -75,6 +75,7 @@ class BrowseController extends BasePageController
         $catarray = [];
         $catarray[] = $category['id'];
 
+        $this->smarty->assign('parentcat', $parentCategory);
         $this->smarty->assign('category', $category);
 
         $orderby = '';

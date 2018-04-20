@@ -3,13 +3,13 @@
 		{assign var="catsplit" value=">"|explode:$catname}
 	{/if}
 	<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-	/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
+	/ <a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}audio{else}{$parentcat}{/if}">{$parentcat}</a> / {if ($catname !== '')} <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
 </ul>
 
 {$site->adbrowse}
 
 {if isset($shows)}
-<div style="text-align: center;">
+<div style="text-align: cenr=r;">
 <div class="btn-group">
 	<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/series" title="View available TV series">Series List</a> |
 	<a class="btn btn-small" title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">Manage My Shows</a> |

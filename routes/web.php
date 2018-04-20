@@ -29,8 +29,6 @@ Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
 
 Route::get('profile', 'ProfileController@show');
 
-Route::get('browse', 'BrowseController@group');
-
 Route::prefix('browse')->group(function () {
     Route::get('group', 'BrowseController@group');
     Route::get('all', 'BrowseController@index');
