@@ -26,7 +26,7 @@
 							</div>
 							<br>
 							View: <strong>Covers</strong> | <a
-									href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a>
+									href="{$smarty.const.WWW_TOP}/browse/console/{$categorytitle}">List</a>
 							<br/>
 						</td>
 						<td width="50%">

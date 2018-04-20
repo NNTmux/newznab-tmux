@@ -11,10 +11,11 @@ class MusicController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     * @param string                   $id
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request, $id = '')
     {
         $this->setPrefs();
         $music = new Music(['Settings' => $this->settings]);
@@ -23,11 +24,20 @@ class MusicController extends BasePageController
         $musiccats = Category::getChildren(Category::MUSIC_ROOT);
         $mtmp = [];
         foreach ($musiccats as $mcat) {
-            $mtmp[$mcat['id']] = $mcat;
+            $mtmp[] =
+                [
+                    'id' => $mcat->id,
+                    'title' => $mcat->title,
+                ];
         }
+
         $category = Category::MUSIC_ROOT;
-        if ($request->has('t') && array_key_exists($request->input('t'), $mtmp)) {
-            $category = $request->input('t') + 0;
+        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+            $cat = Category::query()
+                ->where('title', $id)
+                ->where('parentid', '=', Category::MUSIC_ROOT)
+                ->first(['id']);
+            $category = $cat !== null ? $cat['id'] : Category::MUSIC_ROOT;
         }
 
         $catarray = [];
@@ -35,6 +45,7 @@ class MusicController extends BasePageController
 
         $this->smarty->assign('catlist', $mtmp);
         $this->smarty->assign('category', $category);
+        $this->smarty->assign('categorytitle', $id);
 
         $page = $request->has('page') ? $request->input('page') : 1;
 

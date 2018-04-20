@@ -13,7 +13,7 @@ class BooksController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request, $id = '')
     {
         $this->setPrefs();
         $book = new Books(['Settings' => $this->settings]);
@@ -22,15 +22,27 @@ class BooksController extends BasePageController
 
         $btmp = [];
         foreach ($boocats as $bcat) {
-            $btmp[$bcat['id']] = $bcat;
+            $btmp[] =
+                [
+                    'id' => $bcat->id,
+                    'title' => $bcat->title,
+                ];
         }
         $category = Category::BOOKS_ROOT;
+        if ($id && \in_array($id, array_pluck($btmp, 'title'), false)) {
+            $cat = Category::query()
+                ->where('title', $id)
+                ->where('parentid', '=', Category::BOOKS_ROOT)
+                ->first(['id']);
+            $category = $cat !== null ? $cat['id'] : Category::BOOKS_ROOT;
+        }
 
         $catarray = [];
         $catarray[] = $category;
 
         $this->smarty->assign('catlist', $btmp);
         $this->smarty->assign('category', $category);
+        $this->smarty->assign('categorytitle', $id);
 
         $ordering = $book->getBookOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
@@ -64,7 +76,7 @@ class BooksController extends BasePageController
         } else {
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                $this->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
+                $this->smarty->assign('catname', $cdata->parentid !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
             } else {
                 $this->show404();
             }

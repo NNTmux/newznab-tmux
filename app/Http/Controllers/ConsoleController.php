@@ -11,9 +11,11 @@ class ConsoleController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     * @param string                   $id
+     *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request, $id = '')
     {
         $this->setPrefs();
         $console = new Console(['Settings' => $this->settings]);
@@ -22,15 +24,27 @@ class ConsoleController extends BasePageController
         $concats = Category::getChildren(Category::GAME_ROOT);
         $ctmp = [];
         foreach ($concats as $ccat) {
-            $ctmp[$ccat['id']] = $ccat;
+            $ctmp[] =
+                [
+                    'id' => $ccat->id,
+                    'title' => $ccat->title,
+                ];
         }
-        $category = Category::query()->where('id', '=', Category::GAME_ROOT)->first();
+        $category = Category::GAME_ROOT;
+        if ($id && \in_array($id, array_pluck($ctmp, 'title'), false)) {
+            $cat = Category::query()
+                ->where('title', $id)
+                ->where('parentid', '=', Category::GAME_ROOT)
+                ->first(['id']);
+            $category = $cat !== null ? $cat['id'] : Category::MUSIC_ROOT;
+        }
 
         $catarray = [];
         $catarray[] = $category;
 
         $this->smarty->assign('catlist', $ctmp);
-        $this->smarty->assign('category', $category->title);
+        $this->smarty->assign('category', $category);
+        $this->smarty->assign('categorytitle', $id);
 
         $page = $request->has('page') ? $request->input('page') : 1;
 
@@ -69,7 +83,7 @@ class ConsoleController extends BasePageController
         } else {
             $cdata = Category::find($category);
             if ($cdata) {
-                $this->smarty->assign('catname', array_first($cdata)->parent !== null ? array_first($cdata)->parent->title.' > '.array_first($cdata)->title : array_first($cdata)->title);
+                $this->smarty->assign('catname', $cdata->parentid !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
             } else {
                 $this->show404();
             }

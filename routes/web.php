@@ -38,6 +38,7 @@ Route::prefix('browse')->group(function () {
 Route::get('anime/{id?}', 'AnimeController@index');
 
 Route::get('books/{id?}', 'BooksController@index');
+Route::post('books/{id?}', 'BooksController@index');
 
 Route::prefix('cart')->group(function () {
     Route::get('index', 'CartController@index');
@@ -70,7 +71,9 @@ Route::get('apihelp', 'ApiHelpController@index');
 
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::get('console', 'ConsoleController@show');
+Route::get('console/{id?}', 'ConsoleController@show');
+
+Route::post('console/{id?}', 'ConsoleController@show');
 
 Route::get('browsegroup', 'BrowseGroupController@show');
 
@@ -84,21 +87,21 @@ Route::post('failed', 'FailedReleasesController@show');
 
 Route::get('games', 'GamesController@show');
 
-Route::get('movies', 'MovieController@showMovies');
+Route::get('movies/{id?}', 'MovieController@showMovies');
 
 Route::get('movie', 'MovieController@showMovie');
 
 Route::get('movietrailers', 'MovieController@showTrailer');
 
-Route::post('movies', 'MovieController@showMovies');
+Route::post('movies/{id?}', 'MovieController@showMovies');
 
 Route::post('movie', 'MovieController@showMovie');
 
 Route::post('movietrailers', 'MovieController@showTrailer');
 
-Route::get('music', 'MusicController@show');
+Route::get('music/{id?}', 'MusicController@show');
 
-Route::post('music', 'MusicController@show');
+Route::post('music/{id?}', 'MusicController@show');
 
 Route::get('nfo', 'NfoController@showNfo');
 

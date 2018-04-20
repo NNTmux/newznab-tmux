@@ -23,7 +23,7 @@
 								{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 							</div>
 							View: <strong>Covers</strong> | <a
-									href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+									href="{$smarty.const.WWW_TOP}/browse/movies/{$categorytitle}">List</a><br/>
 						</td>
 						<td width="50%">
 							<div style="text-align: center;">

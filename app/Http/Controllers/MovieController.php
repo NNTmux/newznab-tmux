@@ -60,10 +60,11 @@ class MovieController extends BasePageController
 
     /**
      * @param \Illuminate\Http\Request $request
+     * @param string                   $id
      *
      * @throws \Exception
      */
-    public function showMovies(Request $request)
+    public function showMovies(Request $request, $id = '')
     {
         $this->setPrefs();
         $movie = new Movie(['Settings' => $this->settings]);
@@ -71,12 +72,20 @@ class MovieController extends BasePageController
         $moviecats = Category::getChildren(Category::MOVIE_ROOT);
         $mtmp = [];
         foreach ($moviecats as $mcat) {
-            $mtmp[$mcat['id']] = $mcat;
+            $mtmp[] =
+                [
+                    'id' => $mcat->id,
+                    'title' => $mcat->title,
+                ];
         }
 
         $category = $request->has('imdb') ? -1 : Category::MOVIE_ROOT;
-        if ($request->has('t') && array_key_exists($request->input('t'), $mtmp)) {
-            $category = $request->input('t') + 0;
+        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+            $cat = Category::query()
+                ->where('title', $id)
+                ->where('parentid', '=', Category::MOVIE_ROOT)
+                ->first(['id']);
+            $category = $cat !== null ? $cat['id'] : Category::MOVIE_ROOT;
         }
 
         $user = User::find(Auth::id());
@@ -92,6 +101,7 @@ class MovieController extends BasePageController
 
         $this->smarty->assign('catlist', $mtmp);
         $this->smarty->assign('category', $category);
+        $this->smarty->assign('categorytitle', $id);
 
         $page = $request->has('page') ? $request->input('page') : 1;
 

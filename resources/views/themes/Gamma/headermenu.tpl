@@ -149,7 +149,7 @@
 				{/if}
 				<hr>
 				{foreach $parentcat.subcatlist as $subcat}
-					<li><a href="{$smarty.const.WWW_TOP}/browse/books/{$subcat.title}">{$subcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/books/{$subcat.title}">{$subcat.title}</a></li>
 				{/foreach}
 			</ul>
 		</li>
