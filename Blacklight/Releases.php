@@ -237,7 +237,7 @@ class Releases
     {
         return $this->pdo->query(
             sprintf(
-                "SELECT searchname, guid, groups.name AS gname, CONCAT(cp.title,'_',categories.title) AS catName
+                "SELECT searchname, guid, g.name AS gname, CONCAT(cp.title,'_',c.title) AS catName
 				FROM releases r
 				LEFT JOIN categories c ON r.categories_id = c.id
 				LEFT JOIN groups g ON r.groups_id = g.id
@@ -691,18 +691,8 @@ class Releases
      *
      * @return array
      */
-    public function tvSearch(
-        array $siteIdArr = [],
-        $series = '',
-        $episode = '',
-        $airdate = '',
-        $offset = 0,
-        $limit = 100,
-        $name = '',
-        array $cat = [-1],
-        $maxAge = -1,
-        $minSize = 0
-    ): array {
+    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    {
         $siteSQL = [];
         $showSql = '';
 
@@ -732,7 +722,7 @@ class Releases
             );
             $show = $this->pdo->queryOneRow($showQry);
             if ($show !== false) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && strlen((string) $show['episodes']) > 0) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen((string) $show['episodes']) > 0) {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
                 } elseif ((int) $show['video'] > 0) {
                     $showSql = 'AND r.videos_id = '.$show['video'];
