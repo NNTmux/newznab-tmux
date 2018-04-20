@@ -114,5 +114,5 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
 ### Support this project
 <a href="https://flattr.com/submit/auto?fid=jegg95&url=https%3A%2F%2Fgithub.com%2FNNTmux%2Fnewznab-tmux" target="_blank"><img src="http://button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
 
-<a href="https://www.patreon.com/DariusIII" target="_blank"><img src="https://github.com/discourse/discourse-patreon/blob/master/public/images/patreon-wordmark-navy.png" alt="Support us on Patreon" title="Support us on Patreon" border="0"></a>
+<a href="https://www.patreon.com/DariusIII" target="_blank"><img src="https://github.com/discourse/discourse-patreon/blob/master/public/images/patreon-wordmark-navy.png" alt="Support us on Patreon" title="Support us on Patreon" border="0" style="max-width:20%;"></a>
 
