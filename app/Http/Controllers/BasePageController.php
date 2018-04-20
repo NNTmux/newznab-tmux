@@ -168,21 +168,18 @@ class BasePageController extends Controller
     }
 
     /**
-     * Show 403 page.
-     *
-     *
-     * @param bool $from_admin
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show403($from_admin = false): void
+    public function show403()
     {
-        header('Location: '.($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).'/login?redirect='.urlencode(\request()->getRequestUri()));
-        exit();
+        return view('errors.403');
+
     }
 
     /**
      * Show 503 page.
      */
-    public function show503(): void
+    public function show503()
     {
         return view('errors.503')->with('Error', 'Service temporarily unavailable');
     }
@@ -214,7 +211,7 @@ class BasePageController extends Controller
     /**
      * @param string $retry
      */
-    public function show429($retry = ''): void
+    public function show429($retry = '')
     {
         abort(429, $retry);
     }
