@@ -4,7 +4,7 @@
 
 &nbsp;[ {if $animeletter == '0-9'}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime/0-9">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
 {foreach $animerange as $range}
-{if $range == $animeletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime/{$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
+{if $range == $animeletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime?id={$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
 {/foreach}]
 </p>
 <form class="form pull-right" style="margin-top:-35px;">
@@ -32,7 +32,7 @@
 	{foreach $animelist as $aletter => $anime}
 		{foreach $anime as $a}
 			<tr class="{cycle values=",alt"}">
-				<td width="40%"><a align="" class="title" title="View anime" href="{$smarty.const.WWW_TOP}/anime/{$a.anidbid}"><img class="shadow" width="35%" src="{$smarty.const.WWW_TOP}/covers/anime/{$a.anidbid}.jpg" />  {$a.title|escape:"htmlall"}</a></td>
+				<td width="40%"><a align="" class="title" title="View anime" href="{$smarty.const.WWW_TOP}/anime?id={$a.anidbid}"><img class="shadow" width="35%" src="{$smarty.const.WWW_TOP}/covers/anime?id={$a.anidbid}.jpg" />  {$a.title|escape:"htmlall"}</a></td>
 				<td style="text-align: center;">{if {$a.type} != ''}{$a.type|escape:"htmlall"}{/if}</td>
 				<td width>{if {$a.categories} != ''}{$a.categories|escape:"htmlall"|replace:'|':', '}{/if}{if {$a.startdate} != ''}<br><br><b>Air date: {$a.startdate|date_format} - {/if}{if $a.enddate != ''}{$a.enddate|date_format}</b>{/if}</td>
 				<td style="text-align: center;">{if {$a.rating} != ''}{$a.rating}{/if}</td>

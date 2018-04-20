@@ -46,7 +46,7 @@
 					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
-					<a class="label label-primary" href="{$serverroot}anime/{$release.anidbid}"
+					<a class="label label-primary" href="{$serverroot}anime?id={$release.anidbid}"
 					   title="View all releases from this anime">View all episodes</a>
 					<a class="label label-primary"
 					   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"

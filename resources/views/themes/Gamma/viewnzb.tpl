@@ -29,7 +29,7 @@
 		<div class="tab-pane active" id="info">
 			{if $show && $release.videos_id > 0 && $show.image != '0'}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/tvshows/{$release.videos_id}.jpg" width="180" alt="{$show.title|escape:"htmlall"}" />{/if}
 			{if $movie && $release.videos_id == 0 && $movie.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="180" alt="{$movie.title|escape:"htmlall"}" />{/if}
-			{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg" width="180" alt="{$anidb.title|escape:"htmlall"}" />{/if}
+			{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/anime?id={$anidb.anidbid}.jpg" width="180" alt="{$anidb.title|escape:"htmlall"}" />{/if}
 			{if $con && $con.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}" />{/if}
 			{if $music && $music.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg" width="160" alt="{$music.title|escape:"htmlall"}" />{/if}
 			{if $book && $book.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" width="160" alt="{$book.title|escape:"htmlall"}" />{/if}
@@ -128,7 +128,7 @@
 						<dd>{$release.tvairdate|date_format}</dd>
 					{/if}
 					<div style="margin-left: 180px;">
-						<a class="rndbtn badge" title="View all episodes from this anime" href="{$smarty.const.WWW_TOP}/anime/{$release.anidbid}">All Episodes</a>
+						<a class="rndbtn badge" title="View all episodes from this anime" href="{$smarty.const.WWW_TOP}/anime?id={$release.anidbid}">All Episodes</a>
 						<a class="rndbtn badge badge-inverse" target="_blank" href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}" title="View at AniDB">AniDB</a>
 						{if $release.tvdbid > 0}<a class="rndbtn badge" target="_blank" href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbid}&lid=7" title="View at TheTVDB">TheTVDB</a>{/if}
 						<a class="rndbtn badge badge-info" href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" title="RSS feed for this anime">Anime RSS Feed</a>

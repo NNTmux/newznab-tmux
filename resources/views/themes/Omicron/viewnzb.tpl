@@ -40,7 +40,7 @@
 						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}" title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}
-						<a class="label label-default" href="{$serverroot}anime/{$release.anidbid}"
+						<a class="label label-default" href="{$serverroot}anime?id={$release.anidbid}"
 						   title="View all releases from this anime">View all episodes</a>
 						<a class="label label-default"
 						   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"

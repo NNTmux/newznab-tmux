@@ -275,7 +275,7 @@
 								{/if}
 								{if $result.anidbid > 0}
 									<a class="label label-default"
-									   href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View
+									   href="{$smarty.const.WWW_TOP}/anime?id={$result.anidbid}" title="View all episodes">View
 										Anime</a>
 								{/if}
 								{if isset($result.firstaired) && $result.firstaired != ''}

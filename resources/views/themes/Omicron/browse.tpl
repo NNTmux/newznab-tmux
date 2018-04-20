@@ -122,7 +122,7 @@
 												class="seriesinfo label label-default" title="{$result.guid}">
 												Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 											{if $result.anidbid > 0}<span class="label label-default"><a
-														href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a>
+														href="{$smarty.const.WWW_TOP}/anime?id={$result.anidbid}">View Anime</a>
 												</span>{/if}
 											{if !empty($result.failed)}<span class="label label-default">
 												<i class="fa fa-thumbs-o-up"></i>

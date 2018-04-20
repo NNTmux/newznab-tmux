@@ -146,7 +146,7 @@
 						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/series?id={$result.videos_id}">View Series</a>
 						{/if}
 						{if $result.anidbid > 0}
-						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View Anime</a>
+						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/anime?id={$result.anidbid}" title="View all episodes">View Anime</a>
 						{/if}
 						{if !empty($result.firstaired)}
 							<span class="seriesinfo badge badge-success halffade" title="{$result.guid}"> Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>
