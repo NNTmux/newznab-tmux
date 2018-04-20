@@ -21,9 +21,6 @@ class ReleasesController extends BasePageController
 
         $title = 'Release List';
 
-        $pager = $this->smarty->fetch('pager.tpl');
-        $this->smarty->assign('pager', $pager);
-
         $releaseList = Release::getReleasesRange();
         $this->smarty->assign('releaselist', $releaseList);
 
