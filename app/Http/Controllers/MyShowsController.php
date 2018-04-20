@@ -57,7 +57,7 @@ class MyShowsController extends BasePageController
                 }
 
                 if ($action === 'doadd') {
-                    $category = ($request->has('category') && is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
+                    $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
                     UserSerie::addShow(Auth::id(), $videoId, $category);
                     if ($request->has('from')) {
                         header('Location:'.WWW_TOP.$request->input('from'));
@@ -123,44 +123,6 @@ class MyShowsController extends BasePageController
             ]);
             $this->pagerender();
             break;
-            case 'browse':
-
-                $title = 'Browse My Shows';
-                $meta_title = 'My Shows';
-                $meta_keywords = 'search,add,to,cart,nzb,description,details';
-                $meta_description = 'Browse Your Shows';
-
-                $shows = UserSerie::getShows(Auth::id());
-
-                $releases = new Releases(['Settings' => $this->settings]);
-
-                $ordering = $releases->getBrowseOrdering();
-                $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
-
-                $results = $releases->getShowsRange($shows, $orderby, -1, $this->userdata['categoryexclusions']);
-
-                $this->smarty->assign('covgroup', '');
-
-                foreach ($ordering as $ordertype) {
-                    $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/myshows/browse?ob='.$ordertype.'&amp;offset=0');
-                }
-
-                $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
-
-                $this->smarty->assign('results', $results);
-
-                $this->smarty->assign('shows', true);
-
-                $content = $this->smarty->fetch('browse.tpl');
-                $this->smarty->assign([
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]);
-                $this->pagerender();
-                break;
             default:
 
                 $title = 'My Shows';
@@ -205,5 +167,50 @@ class MyShowsController extends BasePageController
                 $this->pagerender();
                 break;
         }
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
+    public function browse(Request $request)
+    {
+        $this->setPrefs();
+        $title = 'Browse My Shows';
+        $meta_title = 'My Shows';
+        $meta_keywords = 'search,add,to,cart,nzb,description,details';
+        $meta_description = 'Browse Your Shows';
+
+        $shows = UserSerie::getShows(Auth::id());
+
+        $releases = new Releases(['Settings' => $this->settings]);
+
+        $ordering = $releases->getBrowseOrdering();
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+
+        $results = $releases->getShowsRange($shows, $orderby, -1, $this->userdata['categoryexclusions']);
+
+        $this->smarty->assign('covgroup', '');
+
+        foreach ($ordering as $ordertype) {
+            $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/myshows/browse?ob='.$ordertype.'&amp;offset=0');
+        }
+
+        $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
+
+        $this->smarty->assign('results', $results);
+
+        $this->smarty->assign('shows', true);
+
+        $content = $this->smarty->fetch('browse.tpl');
+        $this->smarty->assign([
+            'content' => $content,
+            'title' => $title,
+            'meta_title' => $meta_title,
+            'meta_keywords' => $meta_keywords,
+            'meta_description' => $meta_description,
+        ]);
+        $this->pagerender();
     }
 }

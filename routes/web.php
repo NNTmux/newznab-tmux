@@ -153,6 +153,10 @@ Route::get('myshows', 'MyShowsController@show');
 
 Route::post('myshows', 'MyShowsController@show');
 
+Route::get('myshows/browse', 'MyShowsController@browse');
+
+Route::post('myshows/browse', 'MyShowsController@browse');
+
 Route::get('filelist/{guid}', 'FileListController@show');
 
 Route::post('filelist/{guid}', 'FileListController@show');
