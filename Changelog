@@ -1,4 +1,5 @@
 2018-04-20 DariusIII
+	* Chg: Update imdbphp/imdbphp to version 6.0.1
 	* Chg: Update Readme.md
 	* Fix: Fix numerous category browsing issues
 	* Chg: Update browsing per category
