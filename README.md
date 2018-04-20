@@ -41,9 +41,8 @@ The overall speed of NNTmux is largely governed by performance of the database. 
 
 ### Software
 
-	PHP 5.6+ (and various modules)
+	PHP 7.2+ (and various modules)
 	MySQL 5.6+ (Postgres is not supported)
-	Python 2.7 or 3.0 (and various modules)(Optional. Most useful on Windows.)
 The installation guides have more detailed software requirements.
 
 ### Database
@@ -55,22 +54,6 @@ As a general rule of thumb the database will need a minimum of 1-2G buffer RAM f
 - innodb_buffer_pool_size	(InnoDB)
 
 Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommendations for these and other important tuner parameters. Also refer to the nZEDb project's wiki page: https://github.com/nZEDb/nZEDb/wiki/Database-tuning. This is particularly important before you start any large imports or backfills.
-
-MySQL is normally shipped using MyISAM tables by default. This is fine for running with one or a few threads and is a good way to start using NNTmux. You should migrate to the InnoDB table format if NNTmux is configured to use one of the following:
-
-	thread counts > 5
-	TPG (Table Per Group) mode
-	tmux mode
-
-This conversion script is helpful:
-
-	misc/testing/DB/convert_mysql_tables.php
-
-Before converting to InnoDB be sure to set:
-
-	innodb_file_per_table
-
-<br>
 
 
 ## Installation
@@ -89,9 +72,9 @@ Before converting to InnoDB be sure to set:
 
 ### Licenses
 
- nZEDb is GPL v3. See /docs/LICENSE.txt for the full license.
+ NNTmux is GPL v3. See /docs/LICENSE.txt for the full license.
 
- Other licenses by various software used by nZEDb:
+ Other licenses by various software used by NNTmux:
 
  Git.php => MIT and GPL v3
 
@@ -130,4 +113,6 @@ Before converting to InnoDB be sure to set:
  
 ### Support this project
 <a href="https://flattr.com/submit/auto?fid=jegg95&url=https%3A%2F%2Fgithub.com%2FNNTmux%2Fnewznab-tmux" target="_blank"><img src="http://button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+
+<a href="https://www.patreon.com/DariusIII" target="_blank"><img src="https://github.com/discourse/discourse-patreon/blob/master/public/images/patreon-wordmark-navy.png" alt="Support us on Patreon" title="Support us on Patreon" border="0"></a>
 
