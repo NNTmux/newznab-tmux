@@ -378,7 +378,6 @@ class Releases
      */
     public function getShowsRange($userShows, $orderBy = '', $maxAge = -1, array $excludedCats = [])
     {
-
         $sql = Release::query()
             ->with('group as g', 'nfo as rn', 'category as c', 'failed as df', 'episode as tve')
             ->select(
@@ -392,14 +391,14 @@ class Releases
                     'df.failed as failed',
                     ]
             )
-            -> from('releases as r')
+            ->from('releases as r')
             ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->whereBetween('r.categories_id', [5000, 5999])
             ->where('r.nzbstatus', NZB::NZB_ADDED);
         self::showPasswords($sql, true);
-        if (!empty($userShows)) {
+        if (! empty($userShows)) {
             foreach ($userShows as $query) {
                 $sql->orWhere('r.videos_id', '=', $query['videos_id']);
                 if ($query['categories'] !== '') {
