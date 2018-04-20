@@ -173,7 +173,6 @@ class BasePageController extends Controller
     public function show403()
     {
         return view('errors.403');
-
     }
 
     /**
