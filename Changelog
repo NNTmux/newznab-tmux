@@ -1,3 +1,5 @@
+2018-04-21 DariusIII
+	* Fix: Fix admin movie-list page
 2018-04-20 DariusIII
 	* Fix: Remove unused pager from ReleasesController
 	* Chg: Update imdbphp/imdbphp to version 6.0.1
