@@ -273,8 +273,8 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         Route::post('tmux-edit', 'TmuxController@edit');
         Route::get('posters-list', 'MgrPosterController@index');
         Route::post('posters-list', 'MgrPosterController@index');
-        Route::get('posters-edit', 'MgrPosterController@edit');
-        Route::post('posters-edit', 'MgrPosterController@edit');
+        Route::get('posters-edit/{id?}', 'MgrPosterController@edit');
+        Route::post('posters-edit{id?}', 'MgrPosterController@edit');
         Route::get('poster-delete/{id}', 'MgrPosterController@destroy');
         Route::post('poster-delete/{id}', 'MgrPosterController@destroy');
         Route::get('release-list', 'ReleasesController@index');

@@ -45,12 +45,13 @@ class MgrPosterController extends BasePageController
     }
 
     /**
+     * @param string                   $id
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit($id = '', Request $request)
     {
         $this->setAdminPrefs();
 
@@ -59,12 +60,12 @@ class MgrPosterController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                if ($request->input('id') === '') {
+                if ($id === '') {
                     // Add a new mg poster.
-                    $poster = MultigroupPoster::query()->create(['poster' => $request->input('poster')]);
+                    $poster = MultigroupPoster::query()->insertGetId(['poster' => $request->input('poster')]);
                 } else {
                     // Update an existing mg poster.
-                    $poster = MultigroupPoster::query()->where('id', '=', $request->input('id'))->update(['poster' => $request->input('poster')]);
+                    $poster = MultigroupPoster::query()->where('id', '=', $id)->update(['poster' => $request->input('poster')]);
                 }
                 $this->smarty->assign('poster', $poster);
 
@@ -73,9 +74,9 @@ class MgrPosterController extends BasePageController
 
             case 'view':
             default:
-                if (! empty($request->input('id'))) {
+                if (! empty($id)) {
                     $title = 'MultiGroup Poster Edit';
-                    $poster = MultigroupPoster::query()->where('id', '=', $request->input('id'))->firstOrFail();
+                    $poster = MultigroupPoster::query()->where('id', '=', $id)->firstOrFail();
                 } else {
                     $title = 'MultiGroup Poster Add';
                     $poster = '';

@@ -1,4 +1,5 @@
 2018-04-23 DariusIII
+	* Fix: Fix adding mgr posters
 	* Chg: Remove opcache statistics page from admin
 	* Fix: Fix bad logic in RoleController
 	* Fix: Fix Sharing and SharingSite models definitions
