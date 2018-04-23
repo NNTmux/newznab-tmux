@@ -35,7 +35,7 @@
 							{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 						</div>
 						{if isset($covgroup) && $covgroup != ''}View:
-							<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers
+							<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers
 							</a>
 							|
 							<b>List</b>

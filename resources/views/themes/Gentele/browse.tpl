@@ -29,7 +29,7 @@
 									{/if}
 									<div class="nzb_multi_operations">
 										{if isset($covgroup) && $covgroup != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers
 											</a>
 											|
 											<b>List</b>
