@@ -29,7 +29,9 @@ class SeriesController extends BasePageController
             $catarray = [];
             $catarray[] = $category;
 
-            $rel = $releases->tvSearch(['id' => $request->input('id')], '', '', '', 0, 1000, '', $catarray, -1);
+            $page = $request->has('page') ? $request->input('page') : 1;
+
+            $rel = $releases->tvSearch($page, ['id' => $request->input('id')], '', '', '', 1000, '', $catarray, -1);
             $show = Video::getByVideoID($request->input('id'));
 
             if (! $show) {

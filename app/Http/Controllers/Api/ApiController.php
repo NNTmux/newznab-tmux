@@ -194,11 +194,11 @@ class ApiController extends BasePageController
                }
 
                $relData = $releases->tvSearch(
+                   1,
                    $siteIdArr,
                    $series,
                    $episode,
                    $airdate ?? '',
-                   $offset,
                    $api->limit(),
                    $request->input('q') ?? '',
                    $api->categoryID(),
