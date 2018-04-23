@@ -58,7 +58,7 @@
 				{if $show && $release.videos_id > 0}
 					<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 					   class="label label-success">Add to My Shows</a>
-					<a class="label label-primary" href="{$serverroot}series?id={$release.videos_id}"
+					<a class="label label-primary" href="{$serverroot}series/{$release.videos_id}"
 					   title="View all releases for this series">View all episodes</a>
 					{if $show.tvdb > 0}
 						<a class="label label-primary" target="_blank"

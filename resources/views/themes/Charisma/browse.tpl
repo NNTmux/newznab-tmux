@@ -113,7 +113,7 @@
 														name="name{$result.guid}" class="modal_prev label label-default"
 														rel="preview">Preview</a></span>{/if}
 											{if $result.videos_id > 0}<span class="label label-default"><a
-														href="{$smarty.const.WWW_TOP}/series?id={$result.videos_id}">View TV</a>
+														href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}">View TV</a>
 												</span>{/if}
 											{if isset($result.firstaired) && $result.firstaired != ""}<span
 												class="seriesinfo label label-default" title="{$result.guid}">

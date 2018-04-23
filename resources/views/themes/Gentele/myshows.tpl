@@ -35,7 +35,7 @@
 									<tr>
 										<td>
 											<a title="View details"
-											   href="{$smarty.const.WWW_TOP}/series?id={$show.videos_id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+											   href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 										</td>
 										<td>
 											<span class="label label-primary">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>

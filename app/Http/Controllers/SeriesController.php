@@ -11,16 +11,17 @@ use Illuminate\Support\Facades\Auth;
 class SeriesController extends BasePageController
 {
     /**
+     * @param string                   $id
      * @param \Illuminate\Http\Request $request
      *
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index($id = '', Request $request)
     {
         $this->setPrefs();
         $releases = new Releases(['Settings' => $this->settings]);
 
-        if ($request->has('id') && ctype_digit($request->input('id'))) {
+        if ($id && ctype_digit($id)) {
             $category = -1;
             if ($request->has('t') && ctype_digit($request->input('t'))) {
                 $category = $request->input('t');
@@ -31,7 +32,7 @@ class SeriesController extends BasePageController
 
             $page = $request->has('page') ? $request->input('page') : 1;
 
-            $rel = $releases->tvSearch($page, ['id' => $request->input('id')], '', '', '', 1000, '', $catarray, -1);
+            $rel = $releases->tvSearch($page, ['id' => $id], '', '', '', 1000, '', $catarray, -1);
             $show = Video::getByVideoID($request->input('id'));
 
             if (! $show) {
@@ -99,11 +100,11 @@ class SeriesController extends BasePageController
             ]);
             $this->pagerender();
         } else {
-            $letter = ($request->has('id') && preg_match('/^(0\-9|[A-Z])$/i', $request->input('id'))) ? $request->input('id') : '0-9';
+            $letter = ($id && preg_match('/^(0\-9|[A-Z])$/i', $id)) ? $id : '0-9';
 
             $showname = ($request->has('title') && ! empty($request->input('title'))) ? $request->input('title') : '';
 
-            if ($showname !== '' && ! $request->has('id')) {
+            if ($showname !== '' && ! $id) {
                 $letter = '';
             }
 

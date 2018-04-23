@@ -198,9 +198,9 @@ Route::get('sendtocouch', 'SendReleaseController@couchPotato');
 
 Route::post('sendtocouch', 'SendReleaseController@couchPotato');
 
-Route::get('series', 'SeriesController@index');
+Route::get('series/{id?}', 'SeriesController@index');
 
-Route::post('series', 'SeriesController@index');
+Route::post('series/{id?}', 'SeriesController@index');
 
 Route::get('terms-and-conditions', 'TermsController@index');
 

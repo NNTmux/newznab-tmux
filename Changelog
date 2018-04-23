@@ -1,4 +1,5 @@
 2018-04-23 DariusIII
+	* Chg: Update series page range and category handling
 	* Chg: Use query builder for tvSearch
 	* Chg: Remove static admin from .htaccess
 	* Chg: Update BrowseController and themes browse pages
