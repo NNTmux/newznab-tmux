@@ -701,7 +701,7 @@ class Releases
                 }
             })->from('videos as v')->leftJoin('tv_episodes as tve', 'v.id', '=', 'tve.videos_id')->select([
                     'v.id as video',
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes")
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes"),
                 ]);
 
             if ($series !== '') {
@@ -719,7 +719,6 @@ class Releases
             $show = $showQry->first();
         }
 
-
         // If $name is set it is a fallback search, add available SxxExx/airdate info to the query
         if (! empty($name) && $showSql === '') {
             if (! empty($series) && (int) $series < 1900) {
@@ -735,7 +734,7 @@ class Releases
         $query = Release::query()
             ->join('releases_se as rse', 'rse.id', '=', 'r.id')
             ->where('r.nzbstatus', NZB::NZB_ADDED);
-            self::showPasswords($query, true);
+        self::showPasswords($query, true);
         if ($show !== null) {
             if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen((string) $show['episodes']) > 0) {
                 $query->whereIn('r.tv_episodes_id', $show['episodes']);
@@ -802,17 +801,15 @@ class Releases
             ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id');
 
-
-
         $sql = $query->orderByDesc('r.postdate')->limit($limit);
-        $releases = Cache::get(md5($page.implode('.', $siteIdArr).$series .$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge .$minSize));
+        $releases = Cache::get(md5($page.implode('.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize));
         if ($releases !== null) {
             return $releases;
         }
 
         $releases = $sql->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode($page.'.', $siteIdArr).$series .$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge .$minSize), $releases, $expiresAt);
+        Cache::put(md5(implode($page.'.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
 
         return $releases;
     }
