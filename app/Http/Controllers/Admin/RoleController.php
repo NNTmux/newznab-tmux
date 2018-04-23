@@ -45,6 +45,8 @@ class RoleController extends BasePageController
     {
         $this->setAdminPrefs();
 
+        $title = 'User Roles';
+
         // Get the user roles.
         $userRoles = UserRole::getRoles();
         $roles = [];
@@ -70,17 +72,17 @@ class RoleController extends BasePageController
                 break;
 
             case 'submit':
-                if ($request->has('id')) {
+                if (! $request->has('id')) {
                     $role = UserRole::addRole($request->all());
-                /*header('Location:'.WWW_TOP.'/role-list.php');*/
                 } else {
+                    $title = 'Update User Role';
                     $role = UserRole::updateRole($request->all());
-                    header('Location:'.WWW_TOP.'admin/role-list');
 
                     $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
                     RoleExcludedCategory::addRoleCategoryExclusions($request->input('id'), $request->input('exccat'));
                 }
                 $this->smarty->assign('role', $role);
+                redirect()->to('admin/role-list')->sendHeaders();
                 break;
 
             case 'view':

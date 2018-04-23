@@ -1,5 +1,6 @@
 2018-04-23 DariusIII
-	* Chg: Fix Sharing and SharingSite models definitions
+	* Fix: Fix bad logic in RoleController
+	* Fix: Fix Sharing and SharingSite models definitions
 2018-04-22 DariusIII
 	* Chg: Update guzzlehttp/guzzle to version 6.3.3
 2018-04-21 DariusIII
