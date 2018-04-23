@@ -89,7 +89,6 @@
 			<li><a><i class="fa fa-hourglass-start"></i><span> Stats & Logs</span><span
 							class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/admin/opcachestats">Opcache Statistics</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/site-stats">Site Stats</a></li>
 				</ul>
 			</li>

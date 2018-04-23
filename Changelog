@@ -1,4 +1,5 @@
 2018-04-23 DariusIII
+	* Chg: Remove opcache statistics page from admin
 	* Fix: Fix bad logic in RoleController
 	* Fix: Fix Sharing and SharingSite models definitions
 2018-04-22 DariusIII
