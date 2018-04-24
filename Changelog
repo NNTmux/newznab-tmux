@@ -1,4 +1,5 @@
 2018-04-24 DariusIII
+	* Chg: Add cache table migration for users that want to use database for caching
 	* Chg: Change paths in themes browse templates
 	* Chg: Adjust controllers for changed functions
 	* Chg: Use query builder for animeSearch, movieSearch, export functions
