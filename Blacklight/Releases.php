@@ -9,9 +9,9 @@ use App\Models\Category;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Releases.
@@ -251,15 +251,14 @@ class Releases
         if ($postFrom !== '') {
             $dateParts = explode('/', $postFrom);
             if (\count($dateParts) === 3) {
-                $query->where('r.postdate', '>', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0]. '00:00:00');
+                $query->where('r.postdate', '>', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0].'00:00:00');
             }
         }
 
         if ($postTo !== '') {
             $dateParts = explode('/', $postTo);
             if (\count($dateParts) === 3) {
-
-                $query->where('r.postdate', '<', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0]. '23:59:59');
+                $query->where('r.postdate', '<', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0].'23:59:59');
             }
         }
 
