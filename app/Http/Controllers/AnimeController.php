@@ -28,7 +28,7 @@ class AnimeController extends BasePageController
         if ($request->has('id') && ctype_digit($request->input('id'))) {
 
             // force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
-            $aniDbReleases = $releases->animeSearch($request->input('id'), 0, 1000, '', [Category::TV_ANIME], -1);
+            $aniDbReleases = $releases->animeSearch($request->input('id'), 1000, '', [Category::TV_ANIME], -1);
             $aniDbInfo = $aniDB->getAnimeInfo($request->input('id'));
 
             if (! $releases && ! $aniDbInfo) {

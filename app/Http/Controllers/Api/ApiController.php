@@ -221,7 +221,6 @@ class ApiController extends BasePageController
 
                $relData = $releases->moviesSearch(
                    $imdbId,
-                   $offset,
                    $api->limit(),
                    $request->input('q') ?? '',
                    $api->categoryID(),
