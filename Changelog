@@ -1,3 +1,5 @@
+2018-04-24 DariusIII
+	* Chg: Use query builder for animeSearch, movieSearch, export functions
 2018-04-23 DariusIII
 	* Chg: Update series page range and category handling
 	* Chg: Use query builder for tvSearch

@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Video;
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
@@ -12,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Releases.
@@ -61,9 +61,8 @@ class Releases
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->sphinxSearch = new SphinxSearch();
-        $this->releaseSearch = new ReleaseSearch($this->pdo);
+        $this->releaseSearch = new ReleaseSearch();
         $this->showPasswords = self::showPasswords();
     }
 
@@ -131,7 +130,7 @@ class Releases
      * @param null $query
      * @param bool $builder
      *
-     * @return string
+     * @return string|\Illuminate\Database\Query\Builder
      * @throws \Exception
      */
     public static function showPasswords($query = null, $builder = false)
@@ -228,56 +227,43 @@ class Releases
     /**
      * Get list of releases available for export.
      *
-     * @param string $postFrom (optional) Date in this format : 01/01/2014
-     * @param string $postTo   (optional) Date in this format : 01/01/2014
-     * @param string|int $groupID  (optional) Group ID.
      *
-     * @return array
+     * @param string $postFrom
+     * @param string $postTo
+     * @param string $groupID
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getForExport($postFrom = '', $postTo = '', $groupID = ''): array
+    public function getForExport($postFrom = '', $postTo = '', $groupID = '')
     {
-        return $this->pdo->query(
-            sprintf(
-                "SELECT searchname, guid, g.name AS gname, CONCAT(cp.title,'_',c.title) AS catName
-				FROM releases r
-				LEFT JOIN categories c ON r.categories_id = c.id
-				LEFT JOIN groups g ON r.groups_id = g.id
-				LEFT JOIN categories cp ON cp.id = c.parentid
-				WHERE r.nzbstatus = %d
-				%s %s %s",
-                NZB::NZB_ADDED,
-                $this->exportDateString($postFrom),
-                $this->exportDateString($postTo, false),
-                $groupID !== '' && $groupID !== -1 ? sprintf(' AND r.groups_id = %d ', $groupID) : ''
-            )
-        );
-    }
+        $query = Release::query()
+            ->where('r.nzbstatus', NZB::NZB_ADDED)
+            ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
+            ->from('releases as r')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id');
 
-    /**
-     * Create a date query string for exporting.
-     *
-     * @param string $date
-     * @param bool   $from
-     *
-     * @return string
-     */
-    private function exportDateString($date = '', $from = true): string
-    {
-        if ($date !== '') {
-            $dateParts = explode('/', $date);
+        if ($groupID !== '') {
+            $query->where('r.groups_id', $groupID);
+        }
+
+        if ($postFrom !== '') {
+            $dateParts = explode('/', $postFrom);
             if (\count($dateParts) === 3) {
-                $date = sprintf(
-                    ' AND postdate %s %s ',
-                    ($from ? '>' : '<'),
-                    $this->pdo->escapeString(
-                        $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0].
-                        ($from ? ' 00:00:00' : ' 23:59:59')
-                    )
-                );
+                $query->where('r.postdate', '>', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0]. '00:00:00');
             }
         }
 
-        return $date;
+        if ($postTo !== '') {
+            $dateParts = explode('/', $postTo);
+            if (\count($dateParts) === 3) {
+
+                $query->where('r.postdate', '<', $dateParts[2].'-'.$dateParts[1].'-'.$dateParts[0]. '23:59:59');
+            }
+        }
+
+        return $query->get();
     }
 
     /**
@@ -384,7 +370,7 @@ class Releases
             ->select(
                 [
                     'r.*',
-                    \Illuminate\Support\Facades\DB::raw("CONCAT(cp.title, '-', c.title) AS category_name"),
+                    DB::raw("CONCAT(cp.title, '-', c.title) AS category_name"),
                     'g.name as group_name',
                     'rn.releases_id as nfoid',
                     're.releases_id as reid',
@@ -647,7 +633,7 @@ class Releases
                 }
 
                 if (\count($searchOptions) > 0) {
-                    $this->releaseSearch->getSearchSQL($searchOptions, false, $query, true);
+                    $this->releaseSearch->getSearchSQL($searchOptions, $query, true);
                 }
 
                 if ($minSize > 0) {
@@ -701,7 +687,7 @@ class Releases
                 }
             })->from('videos as v')->leftJoin('tv_episodes as tve', 'v.id', '=', 'tve.videos_id')->select([
                     'v.id as video',
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes"),
+                    DB::raw("GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes"),
                 ]);
 
             if ($series !== '') {
@@ -748,7 +734,7 @@ class Releases
         }
 
         if ($name !== '') {
-            $this->releaseSearch->getSearchSQL(['searchname' => $name], false, $query, true);
+            $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
         }
 
         Category::getCategorySearch($cat, $query, true);
@@ -782,7 +768,7 @@ class Releases
                 'tve.title',
                 'tve.firstaired',
                 'tve.summary',
-                \Illuminate\Support\Facades\DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"),
+                DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"),
                 'g.name as group_name',
                 'rn.releases_id as nfoid',
                 're.releases_id as reid',
@@ -816,168 +802,125 @@ class Releases
 
     /**
      * @param        $aniDbID
-     * @param int    $offset
      * @param int    $limit
      * @param string $name
      * @param array  $cat
      * @param int    $maxAge
      *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @throws \Exception
      */
-    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
+    public function animeSearch($aniDbID, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1)
     {
-        $whereSql = sprintf(
-            '%s
-			WHERE r.passwordstatus %s
-			AND r.nzbstatus = %d
-			%s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-            $this->showPasswords,
-            NZB::NZB_ADDED,
-            ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            Category::getCategorySearch($cat),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
-        );
+        $query = Release::query()->where('r.nzbstatus', NZB::NZB_ADDED);
+        if ($name !== '') {
+            $query->join('releases_se as rse', 'rse.id', '=', 'r.id');
+            $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
+        }
 
-        $baseSql = sprintf(
-            "SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
-				g.name AS group_name,
-				rn.releases_id AS nfoid,
-				re.releases_id AS reid
-			FROM releases r
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
-			%s",
-            $this->getConcatenatedCategoryIDs(),
-            $whereSql
-        );
+        if ($aniDbID > -1) {
+            $query->where('r.anidbid', $aniDbID);
+        }
 
-        $sql = sprintf(
-            '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
-            $baseSql,
-            $limit,
-            $offset
-        );
-        $releases = Cache::get(md5($sql));
+        self::showPasswords($query, true);
+        Category::getCategorySearch($cat, $query, true);
+
+        if ($maxAge > 0) {
+            $query->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
+        }
+
+        $query->select(
+            [
+                'r.*',
+                DB::raw("CONCAT(cp.title, ' > ', c.title) as category_name"),
+                'g.name as group_name',
+                'rn.releases_id as nfoid',
+                're.releases_id as reid',
+            ]
+        )
+            ->from('releases as r')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->leftJoin('releaseextrafull as re', 're.releases_id', '=', 'r.id')
+            ->orderByDesc('r.postdate')
+            ->limit($limit);
+
+        $releases = Cache::get(md5($aniDbID.$limit.$name.implode('.', $cat).$maxAge));
         if ($releases !== null) {
             return $releases;
         }
 
-        $releases = $this->pdo->query($sql);
-
-        if (! empty($releases) && \count($releases)) {
-            $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
-        }
+        $releases = $query->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put(md5($aniDbID.$limit.$name.implode('.', $cat).$maxAge), $releases, $expiresAt);
 
         return $releases;
     }
 
     /**
-     * @param int $imDbId
-     * @param int $offset
-     * @param int $limit
+     * @param        $imDbId
+     * @param int    $limit
      * @param string $name
-     * @param array $cat
-     * @param int $maxAge
-     * @param int $minSize
+     * @param array  $cat
+     * @param int    $maxAge
+     * @param int    $minSize
      *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @throws \Exception
      */
-    public function moviesSearch($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    public function moviesSearch($imDbId, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0)
     {
-        $whereSql = sprintf(
-            '%s
-            WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
-			AND r.nzbstatus = %d
-			AND r.passwordstatus %s
-			%s %s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-            NZB::NZB_ADDED,
-            $this->showPasswords,
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            (($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
-            Category::getCategorySearch($cat),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
-        );
+        $query = Release::query()->where('r.nzbstatus', NZB::NZB_ADDED)
+        ->whereBetween('r.categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER]);
+        if ($name !== '') {
+            $query->join('releases_se as rse', 'rse.id', '=', 'r.id');
+            $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
+        }
 
-        $baseSql = sprintf(
-            "SELECT r.*,
-				concat(cp.title, ' > ', c.title) AS category_name,
-				%s AS category_ids,
-				g.name AS group_name,
-				rn.releases_id AS nfoid
-			FROM releases r
-			LEFT JOIN groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
-            $this->getConcatenatedCategoryIDs(),
-            $whereSql
-        );
+        if ($imDbId !== -1) {
+            $query->where('r.imdbid', str_pad($imDbId, 7, '0', STR_PAD_LEFT));
+        }
 
-        $sql = sprintf(
-            '%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d',
-            $baseSql,
-            $limit,
-            $offset
-        );
+        self::showPasswords($query, true);
+        Category::getCategorySearch($cat, $query, true);
 
-        $releases = Cache::get(md5($sql));
+        if ($maxAge > 0) {
+            $query->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
+        }
+
+        if ($minSize > 0) {
+            $query->where('r.size', '>=', $minSize);
+        }
+
+        $query->select(
+            [
+                'r.*',
+                DB::raw("CONCAT(cp.title, ' > ', c.title) as category_name"),
+                'g.name as group_name',
+                'rn.releases_id as nfoid',
+            ]
+        )
+            ->from('releases as r')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->orderByDesc('r.postdate')
+            ->limit($limit);
+
+        $releases = Cache::get(md5($imDbId.$limit.$name.implode('.', $cat).$maxAge.$minSize));
         if ($releases !== null) {
             return $releases;
         }
 
-        $releases = $this->pdo->query($sql);
+        $releases = $query->paginate(config('nntmux.items_per_page'));
 
-        if (! empty($releases) && \count($releases)) {
-            $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
-        }
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put(md5($imDbId.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
 
         return $releases;
-    }
-
-    /**
-     * Get count of releases for pager.
-     *
-     * @param string $query The query to get the count from.
-     *
-     * @return int
-     */
-    private function getPagerCount($query): int
-    {
-        $sql = sprintf(
-                        'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
-                        preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-                        config('nntmux.max_pager_results')
-        );
-
-        $count = Cache::get(md5($sql));
-        if ($count !== null) {
-            return $count;
-        }
-
-        $count = $this->pdo->query($sql);
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
-        Cache::put(md5($sql), $count[0]['count'], $expiresAt);
-
-        return $count[0]['count'] ?? 0;
     }
 
     /**
