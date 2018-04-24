@@ -171,8 +171,8 @@
 							<div class="row">
 								<div class="col-md-8">
 									<div class="nzb_multi_operations">
-										{if isset($section) && $section != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+										{if isset($covgroup) && $cobgroup != ''}View:
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
 											|
 											<b>List</b>
 											<br/>

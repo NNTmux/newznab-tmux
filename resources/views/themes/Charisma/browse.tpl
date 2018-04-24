@@ -172,7 +172,7 @@
 								<div class="col-md-8">
 									<div class="nzb_multi_operations">
 										{if isset($section) && $section != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
 											|
 											<b>List</b>
 											<br/>

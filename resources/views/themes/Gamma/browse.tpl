@@ -237,7 +237,7 @@
 							{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 						</div>
 						{if isset($section) && $section != ''}View:
-							<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+							<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
 							|
 							<b>List</b>
 							<br/>
