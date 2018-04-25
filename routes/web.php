@@ -107,9 +107,9 @@ Route::get('nfo', 'NfoController@showNfo');
 
 Route::post('nfo', 'NfoController@showNfo');
 
-Route::get('xxx', 'AdultController@show');
+Route::get('xxx/{id?}', 'AdultController@show');
 
-Route::post('xxx', 'AdultController@show');
+Route::post('xxx/{id?}', 'AdultController@show');
 
 Route::get('contact-us', 'ContactUsController@showContactForm');
 Route::post('contact-us', 'ContactUsController@contact');

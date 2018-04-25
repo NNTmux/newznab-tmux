@@ -10,10 +10,11 @@ class AdultController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     * @param string                   $id
      *
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request, $id = '')
     {
         $this->setPrefs();
         $adult = new XXX();
@@ -21,17 +22,26 @@ class AdultController extends BasePageController
         $moviecats = Category::getChildren(Category::XXX_ROOT);
         $mtmp = [];
         foreach ($moviecats as $mcat) {
-            $mtmp[$mcat['id']] = $mcat;
+            $mtmp[] =
+                [
+                    'id' => $mcat->id,
+                    'title' => $mcat->title,
+                ];
         }
         $category = Category::XXX_ROOT;
-        if ($request->has('t') && array_key_exists($request->input('t'), $mtmp)) {
-            $category = $request->input('t') + 0;
+        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+            $cat = Category::query()
+                ->where('title', $id)
+                ->where('parentid', '=', Category::XXX_ROOT)
+                ->first(['id']);
+            $category = $cat !== null ? $cat['id'] : Category::XXX_ROOT;
         }
         $catarray = [];
         $catarray[] = $category;
 
         $this->smarty->assign('catlist', $mtmp);
         $this->smarty->assign('category', $category);
+        $this->smarty->assign('categorytitle', $id);
 
         $ordering = $adult->getXXXOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
