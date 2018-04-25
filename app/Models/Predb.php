@@ -143,7 +143,7 @@ class Predb extends Model
     }
 
     /**
-     * @param string $search
+     * @param string|array $search
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
