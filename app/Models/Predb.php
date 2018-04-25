@@ -143,13 +143,11 @@ class Predb extends Model
     }
 
     /**
-     * Get all PRE's in the DB.
+     * @param string $search
      *
-     *
-     * @param string|array $search
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public static function getAll($search = ''): array
+    public static function getAll($search = '')
     {
         if ($search !== '') {
             $search = explode(' ', trim($search));
