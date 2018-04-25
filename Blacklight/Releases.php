@@ -778,7 +778,7 @@ class Releases
                 $query->on('r.videos_id', '=', 'v.id')
                     ->where('v.type', '=', 0);
             })
-            ->leftJoin('tv_info as tvi', 'tvi.id', '=', 'r.tv_episodes_id')
+            ->leftJoin('tv_info as tvi', 'tvi.videos_id', '=', 'r.tv_episodes_id')
             ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
