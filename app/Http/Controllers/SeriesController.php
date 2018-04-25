@@ -48,14 +48,14 @@ class SeriesController extends BasePageController
 
                 // Sort releases by season, episode, date posted.
                 $series = $episode = $posted = [];
-                foreach ($rel as $rlk => $rlv) {
-                    $series[$rlk] = $rlv['series'];
-                    $episode[$rlk] = $rlv['episode'];
-                    $posted[$rlk] = $rlv['postdate'];
+                foreach ($rel as $key => $value) {
+                    $series[$key] = $value['series'];
+                    $episode[$key] = $value['episode'];
+                    $posted[$key] = $value['postdate'];
                 }
-                array_multisort($series, SORT_DESC, $episode, SORT_DESC, $posted, SORT_DESC, $rel);
+                //array_multisort($series, SORT_DESC, $episode, SORT_DESC, $posted, SORT_DESC, $rel);
+                $series = collect($series)->sortByDesc($episode)->sortByDesc($posted)->sortByDesc($rel)->toArray();
 
-                $series = [];
                 foreach ($rel as $r) {
                     $series[$r['series']][$r['episode']][] = $r;
                 }

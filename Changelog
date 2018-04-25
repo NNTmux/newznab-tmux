@@ -1,4 +1,5 @@
 2018-04-25 DariusIII
+	* Chg: Update SeriesController
 	* Chg: Possible fix for missing series when series are selected
 	* Fix: Fix undefined index title on series view
 	* Chg: Update query in getVideoById function in Video class
