@@ -37,7 +37,7 @@ class SeriesController extends BasePageController
             $page = $request->has('page') ? $request->input('page') : 1;
 
             $rel = $releases->tvSearch($page, ['id' => $id], '', '', '', 1000, '', $catarray, -1);
-            $show = Video::getByVideoID($request->input('id'));
+            $show = Video::getByVideoID($id);
 
             if (! $show) {
                 $this->smarty->assign('nodata', 'No video information for this series.');
