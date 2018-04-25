@@ -20,6 +20,10 @@ class SeriesController extends BasePageController
     {
         $this->setPrefs();
         $releases = new Releases(['Settings' => $this->settings]);
+        $title = 'Series';
+        $meta_title = 'View TV Series';
+        $meta_keywords = 'view,series,tv,show,description,details';
+        $meta_description = 'View TV Series';
 
         if ($id && ctype_digit($id)) {
             $category = -1;
