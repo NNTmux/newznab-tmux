@@ -51,15 +51,16 @@ class Video extends Model
      *
      *
      * @param $id
-     * @return array
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
-    public static function getByVideoID($id): array
+    public static function getByVideoID($id)
     {
         return self::query()
+            ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
             ->where('videos.id', $id)
             ->join('tv_info', 'videos.id', '=', 'tv_info.videos_id')
-            ->first(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
-            ->toArray();
+            ->first();
     }
 
     /**
