@@ -56,13 +56,14 @@ class RoleController extends BasePageController
 
         switch ($request->input('action') ?? 'view') {
             case 'add':
-                $title = 'User Roles Add';
+                $title = 'Add User Role';
                 $role = [
                     'id'               => '',
                     'name'             => '',
                     'apirequests'      => '',
                     'downloadrequests' => '',
                     'defaultinvites'   => '',
+                    'isdefault'        => 0,
                     'canpreview'       => 0,
                     'hideads'          => 0,
                     'donation'         => 0,
@@ -72,7 +73,8 @@ class RoleController extends BasePageController
                 break;
 
             case 'submit':
-                if (! $request->has('id')) {
+                if (empty($request->input('id'))) {
+                    $title = 'Add User Role';
                     $role = UserRole::addRole($request->all());
                 } else {
                     $title = 'Update User Role';
