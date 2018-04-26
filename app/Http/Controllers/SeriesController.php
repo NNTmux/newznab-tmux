@@ -37,6 +37,7 @@ class SeriesController extends BasePageController
             $page = $request->has('page') ? $request->input('page') : 1;
 
             $rel = $releases->tvSearch($page, ['id' => $id], '', '', '', 1000, '', $catarray, -1);
+
             $show = Video::getByVideoID($id);
 
             if (! $show) {
@@ -46,17 +47,10 @@ class SeriesController extends BasePageController
             } else {
                 $myshows = UserSerie::getShow(Auth::id(), $show['id']);
 
-                // Sort releases by season, episode, date posted.
-                $series = $episode = $posted = [];
-                foreach ($rel as $key => $value) {
-                    $series[$key] = $value['series'];
-                    $episode[$key] = $value['episode'];
-                    $posted[$key] = $value['postdate'];
-                }
-                //array_multisort($series, SORT_DESC, $episode, SORT_DESC, $posted, SORT_DESC, $rel);
-                $series = collect($series)->sortByDesc($episode)->sortByDesc($posted)->sortByDesc($rel)->toArray();
+                $sorted = array_sort(array_sort($rel)['data']);
 
-                foreach ($rel as $r) {
+                $series = [];
+                foreach ($sorted as $r) {
                     $series[$r['series']][$r['episode']][] = $r;
                 }
 
