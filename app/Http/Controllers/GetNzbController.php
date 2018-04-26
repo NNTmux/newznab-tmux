@@ -95,9 +95,7 @@ class GetNzbController extends BasePageController
                     }
                 }
 
-                header('Content-type: application/octet-stream');
-                header('Content-disposition: attachment; filename='.date('Ymdhis').'.nzb.zip');
-                exit($zip);
+                return response()->streamDownload(function () use ($zip) {echo $zip;},date('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
             }
 
             $this->show404();
