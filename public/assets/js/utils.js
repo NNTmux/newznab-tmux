@@ -54,7 +54,7 @@ jQuery(function ($) {
     $('.icon_cart').click(function (e) {
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(this).parent().parent().attr('id').substring(4);
-        $.post(SERVERROOT + "cart?add=" + guid, function (resp) {
+        $.post(SERVERROOT + "/cart/add/" + guid, function (resp) {
             $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
             createGrowl('Added to Cart');
         });
@@ -165,7 +165,7 @@ jQuery(function ($) {
         });
         ids = ids.substring(0,ids.length-1);
         if (ids)
-            window.location = SERVERROOT + "getnzb?id=zip=1&id="+ids;
+            window.location = SERVERROOT + "/getnzb?id=zip=1&id="+ids;
     });
     $('button.nzb_multi_operations_cart').click(function(){
         var guids = new Array();

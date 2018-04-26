@@ -66,7 +66,7 @@ jQuery(function($){
     $('.icon_cart').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(this).parent().parent().parent().parent().attr('id').substring(4);
-        $.post( SERVERROOT + "cart?add=" + guid, function(resp){
+        $.post( SERVERROOT + "/cart/add/" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             $.pnotify({
                 title: 'ADDED TO YOUR DOWNLOAD BASKET!',
@@ -81,7 +81,7 @@ jQuery(function($){
     $('.icon_cartNZBinfo').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(this).attr('id').substring(4);
-        $.post( SERVERROOT + "cart?add=" + guid, function(resp){
+        $.post( SERVERROOT + "/cart/add/" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             $.pnotify({
                 title: 'ADDED TO YOUR DOWNLOAD BASKET!',
@@ -378,7 +378,7 @@ jQuery(function($){
         });
         ids = ids.substring(0,ids.length-1);
         if (ids)
-            window.location = SERVERROOT + "getnzb?id=zip=1&id="+ids;
+            window.location = SERVERROOT + "/getnzb?id=zip=1&id="+ids;
     });
 
     $('input.nzb_multi_operations_download_cart').click(function () {
@@ -390,7 +390,7 @@ jQuery(function($){
         ids = ids.substring(0,ids.length-1);
         if (ids)
         {
-            window.location = SERVERROOT + "getnzb?id=zip=1&id="+ids;
+            window.location = SERVERROOT + "/getnzb?id=zip=1&id="+ids;
         }
     });
 
@@ -415,7 +415,7 @@ jQuery(function($){
         });
         var guidstring = guids.toString();
         // alert (guidstring); // This is just for testing shit
-        $.post( SERVERROOT + "cart?add=" + guidstring);
+        $.post( SERVERROOT + "/cart/add/" + guidstring);
     });
 
     $('input.nzb_multi_operations_sab').click(function(){
