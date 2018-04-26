@@ -1,4 +1,5 @@
 2018-04-26 DariusIII
+	* Chg: Update laravel/framework to version 5.6.18
 	* Fix: Fix wrong usage of id parameter before zip
 	* Chg: Update paths in utils and functions.js
 	* Fix: Fix series view
