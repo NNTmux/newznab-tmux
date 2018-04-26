@@ -165,7 +165,7 @@ jQuery(function ($) {
         });
         ids = ids.substring(0,ids.length-1);
         if (ids)
-            window.location = SERVERROOT + "/getnzb?id=zip=1&id="+ids;
+            window.location = SERVERROOT + "/getnzb?zip=1&id="+ids;
     });
     $('button.nzb_multi_operations_cart').click(function(){
         var guids = new Array();
