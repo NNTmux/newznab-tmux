@@ -1,3 +1,5 @@
+2018-04-26 DariusIII
+	* Chg: Fix typo in tvSearch query
 2018-04-25 DariusIII
 	* Chg: Update SeriesController
 	* Chg: Possible fix for missing series when series are selected

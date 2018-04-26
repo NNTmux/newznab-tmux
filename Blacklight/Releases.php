@@ -761,7 +761,7 @@ class Releases
                 'tvi.summary',
                 'tvi.publisher',
                 'tvi.image',
-                'tve.sesries',
+                'tve.series',
                 'tve.episode',
                 'tve.se_complete',
                 'tve.title',
@@ -794,7 +794,7 @@ class Releases
 
         $releases = $sql->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode($page.'.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
+        Cache::put(md5($page.implode('.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
 
         return $releases;
     }
