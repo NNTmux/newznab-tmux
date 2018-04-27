@@ -1,4 +1,5 @@
 2018-04-27 DariusIII
+	* Chg: Update getNzb PHPDOC block
 	* Chg: Use laravel's response for nzb downloads
 2018-04-26 DariusIII
 	* Fix: Fix zipped downloads
