@@ -10,8 +10,8 @@ use Blacklight\Releases;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Illuminate\Http\Request;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
