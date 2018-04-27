@@ -10,12 +10,17 @@ use Blacklight\utility\Utility;
 class NfoController extends BasePageController
 {
     /**
+     * @param string                   $id
      * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
      */
-    public function showNfo(Request $request)
+    public function showNfo($id = '', Request $request)
     {
-        if ($request->has('id')) {
-            $rel = Release::getByGuid($request->input('id'));
+        $this->setPrefs();
+
+        if ($id) {
+            $rel = Release::getByGuid($id);
 
             if (! $rel) {
                 $this->show404();

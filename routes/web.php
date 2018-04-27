@@ -103,9 +103,9 @@ Route::get('music/{id?}', 'MusicController@show');
 
 Route::post('music/{id?}', 'MusicController@show');
 
-Route::get('nfo', 'NfoController@showNfo');
+Route::get('nfo/{id?}', 'NfoController@showNfo');
 
-Route::post('nfo', 'NfoController@showNfo');
+Route::post('nfo/{id?}', 'NfoController@showNfo');
 
 Route::get('xxx/{id?}', 'AdultController@show');
 

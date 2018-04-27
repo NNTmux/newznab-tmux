@@ -34,7 +34,7 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('results', $results);
 
-        $meta_title = 'Browse Nzbs';
+        $meta_title = 'Browse All Releases';
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';
 
