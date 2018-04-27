@@ -121,36 +121,31 @@ class GetNzbController extends BasePageController
             Utility::showApiError(300, 'Release not found!');
         }
 
-        // Start reading output buffer.
-        ob_start();
-        // De-gzip the NZB and store it in the output buffer.
-        readgzfile($nzbPath);
-
         $cleanName = str_replace([',', ' ', '/'], '_', $relData['searchname']);
 
-        // Set the NZB file name.
-        header('Content-Disposition: attachment; filename='.$cleanName.'.nzb');
-        // Get the size of the NZB file.
-        header('Content-Length: '.ob_get_length());
-        header('Content-Type: application/x-nzb');
-        header('Expires: '.date('r', time() + 31536000));
-        // Set X-DNZB header data.
-        header('X-DNZB-Failure: '.$this->serverurl.'failed/'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken);
-        header('X-DNZB-Category: '.$relData['category_name']);
-        header('X-DNZB-Details: '.$this->serverurl.'details/'.$request->input('id'));
-        if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
-            header('X-DNZB-MoreInfo: http://www.imdb.com/title/tt'.$relData['imdbid']);
-        } elseif (! empty($relData['tvdb']) && $relData['tvdb'] > 0) {
-            header('X-DNZB-MoreInfo: http://www.thetvdb.com/?tab=series&id='.$relData['tvdb']);
-        }
-        header('X-DNZB-Name: '.$cleanName);
-        if ((int) $relData['nfostatus'] === 1) {
-            header('X-DNZB-NFO: '.$this->serverurl.'nfo/'.$request->input('id'));
-        }
-        header('X-DNZB-RCode: 200');
-        header('X-DNZB-RText: OK, NZB content follows.');
+        $headers[] = [
+            'Content-Disposition:' => 'attachment; filename='.$cleanName.'.nzb',
+            'Content-Type:' => 'application/x-nzb',
+            'Expires:' => date('r', time() + 31536000),
+            'X-DNZB-Failure:' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
+            'X-DNZB-Category:' => $relData['category_name'],
+            'X-DNZB-Details:' => $this->serverurl.'details/'.$request->input('id'),
+        ];
 
-        // Print buffer and flush it.
-        ob_end_flush();
+        if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
+            $headers += ['X-DNZB-MoreInfo:' => 'http://www.imdb.com/title/tt'.$relData['imdbid']];
+        } elseif (! empty($relData['tvdb']) && $relData['tvdb'] > 0) {
+            $headers += ['X-DNZB-MoreInfo' => 'http://www.thetvdb.com/?tab=series&id='.$relData['tvdb']];
+        }
+
+        if ((int) $relData['nfostatus'] === 1) {
+            $headers += ['X-DNZB-NFO: ' => $this->serverurl.'nfo/'.$request->input('id')];
+        }
+
+        $headers += ['X-DNZB-RCode:' => '200',
+            'X-DNZB-RText:' => 'OK, NZB content follows.'];
+
+
+        return response()->streamDownload(function () use($nzbPath) {readgzfile($nzbPath);}, $cleanName, $headers);
     }
 }
