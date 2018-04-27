@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\UsersRelease;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends BasePageController
@@ -34,15 +35,14 @@ class CartController extends BasePageController
     }
 
     /**
-     * @param $id
-     *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
-    public function store($id)
+    public function store(Request $request)
     {
         $this->setPrefs();
-        $guids = explode(',', $id);
+        $guids = explode(',', $request->input('id'));
 
         $data = Release::getByGuid($guids);
 

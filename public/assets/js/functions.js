@@ -26,7 +26,7 @@ jQuery(function($){
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        $.post( SERVERROOT + "/cart/add/" + guid, function(resp){
+        $.post( SERVERROOT + "/cart/add?id=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
             PNotify.desktop.permission();
@@ -236,7 +236,7 @@ jQuery(function($){
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        $.post( SERVERROOT + "/cart/add/" + guid, function(resp){
+        $.post( SERVERROOT + "/cart/add?id=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
             PNotify.desktop.permission();
@@ -549,7 +549,7 @@ jQuery(function($){
         });
         var guidstring = guids.toString();
         // alert (guidstring); // This is just for testing shit
-        $.post( SERVERROOT + "/cart/add/" + guidstring);
+        $.post( SERVERROOT + "/cart/add?id=" + guidstring);
     }));
     $('button.nzb_multi_operations_sab').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {

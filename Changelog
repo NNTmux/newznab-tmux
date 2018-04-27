@@ -1,4 +1,5 @@
 2018-04-27 DariusIII
+	* Chg: Try to fix multiple cart additions by changing to requests
 	* Chg: Update NfoController and add missing route to web.php
 	* Chg: Update CartController, use redirect instead of 404 page when no data is found on store function
 	* Chg: Update getNzb PHPDOC block

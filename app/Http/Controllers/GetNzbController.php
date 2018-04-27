@@ -11,6 +11,7 @@ use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
@@ -99,7 +100,7 @@ class GetNzbController extends BasePageController
 
                 return response()->streamDownload(function () use ($zip) {
                     echo $zip;
-                }, date('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
+                }, Carbon::now()->format('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
             }
 
             $this->show404();
