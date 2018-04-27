@@ -43,10 +43,11 @@ class CartController extends BasePageController
     {
         $this->setPrefs();
         $guids = explode(',', $id);
+
         $data = Release::getByGuid($guids);
 
         if (! $data) {
-            $this->show404();
+            return redirect('/cart/index');
         }
 
         foreach ($data as $d) {
