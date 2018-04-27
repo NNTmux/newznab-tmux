@@ -95,7 +95,9 @@ class GetNzbController extends BasePageController
                     }
                 }
 
-                return response()->streamDownload(function () use ($zip) {echo $zip;},date('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
+                return response()->streamDownload(function () use ($zip) {
+                    echo $zip;
+                }, date('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
             }
 
             $this->show404();
