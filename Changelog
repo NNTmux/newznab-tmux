@@ -1,4 +1,5 @@
 2018-04-29 DariusIII
+	* Chg: Use find command for userId check in Mail
 	* Chg: Update phpunit and php-code-coverage to latest versions
 2018-04-27 DariusIII
 	* Chg: Try to fix multiple cart additions by changing to requests

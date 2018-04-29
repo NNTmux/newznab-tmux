@@ -20,10 +20,11 @@ class SendInvite extends Mailable
      * Create a new message instance.
      *
      * @param $userId
+     * @param $invite
      */
     public function __construct($userId, $invite)
     {
-        $this->user = User::query()->where('id', $userId)->first();
+        $this->user = User::find($userId);
         $this->invite = $invite;
     }
 
