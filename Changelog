@@ -1,3 +1,5 @@
+2018-04-29 DariusIII
+	* Chg: Update phpunit and php-code-coverage to latest versions
 2018-04-27 DariusIII
 	* Chg: Try to fix multiple cart additions by changing to requests
 	* Chg: Update NfoController and add missing route to web.php
