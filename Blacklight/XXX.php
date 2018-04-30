@@ -20,7 +20,6 @@ use Blacklight\processing\adult\Hotmovies;
  */
 class XXX
 {
-
     /**
      * What scraper class did we use -- used for template and trailer information.
      *
