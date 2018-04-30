@@ -1,4 +1,5 @@
 2018-04-30 DariusIII
+	* Fix: Fix games cover page
 	* Chg: Update getBrowseBy function in XXX class
 	* Fix: Fix XXX ordering
 	* Fix: Fix column and table names used in Games, Music and XXX get range functions

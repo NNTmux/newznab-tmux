@@ -224,20 +224,7 @@ class Games
      */
     public function getGamesRange($page, $cat, array $excludedcats = [])
     {
-        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
+        $sql = Release::query()
             ->select(
                 [
                     'gi.*',
@@ -245,6 +232,20 @@ class Games
                     'g.name as group_name',
                     'gn.title as genre',
                     'rn.releases_id as nfoid',
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed"),
                 ]
             )
             ->from('releases as r')
@@ -340,25 +341,22 @@ class Games
     }
 
     /**
-     * @return string
+     * @param $query
+     *
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function getBrowseBy(): string
+    public function getBrowseBy($query)
     {
-        $browseBy = ' ';
-        $browseByArr = $this->getBrowseByOptions();
-
-        foreach ($browseByArr as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
-                $bbs = stripslashes($_REQUEST[$bbk]);
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
+            if (request()->has($bbk) && request()->input($bbk) !== null) {
+                $bbs = stripslashes(request()->input($bbk));
                 if ($bbk === 'year') {
-                    $browseBy .= 'AND YEAR (gi.releasedate) '.$this->pdo->likeString($bbs, true, true);
-                } else {
-                    $browseBy .= 'AND gi.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                    return $query->where('gi.releasedate', 'LIKE', '%'.$bbs.'%');
                 }
+
+                return $query->where('gi.'.$bbv, 'LIKE', '%'.$bbs.'%');
             }
         }
-
-        return $browseBy;
     }
 
     /**

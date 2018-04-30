@@ -38,23 +38,7 @@ class GamesController extends BasePageController
 
         $page = $request->has('page') ? $request->input('page') : 1;
 
-        $games2 = [];
         $results = $games->getGamesRange($page, $catarray, $this->userdata['categoryexclusions']);
-        $maxwords = 50;
-        foreach ($results as $result) {
-            if (! empty($result['review'])) {
-                // remove "Overview" from start of review if present
-                if (0 === strpos($result['review'], 'Overview')) {
-                    $result['review'] = substr($result['review'], 8);
-                }
-                $words = explode(' ', $result['review']);
-                if (\count($words) > $maxwords) {
-                    $newwords = \array_slice($words, 0, $maxwords);
-                    $result['review'] = implode(' ', $newwords).'...';
-                }
-            }
-            $games2[] = $result;
-        }
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
         $this->smarty->assign('title', $title);
@@ -87,7 +71,7 @@ class GamesController extends BasePageController
             }
         }
 
-        $this->smarty->assign('results', $games2);
+        $this->smarty->assign('results', $results);
 
         $meta_title = 'Browse Games';
         $meta_keywords = 'browse,nzb,games,description,details';
