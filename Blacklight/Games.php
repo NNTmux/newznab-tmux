@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
@@ -12,6 +11,7 @@ use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Games
 {
@@ -46,11 +46,6 @@ class Games
      * @var bool
      */
     public $maxHitRequest;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
 
     /**
      * @var array|bool|string
@@ -122,8 +117,6 @@ class Games
         ];
         $options += $defaults;
         $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $this->publicKey = Settings::settingValue('APIs..giantbombkey');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
@@ -232,20 +225,20 @@ class Games
                     'g.name as group_name',
                     'gn.title as genre',
                     'rn.releases_id as nfoid',
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed"),
+                    DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id"),
+                    DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
+                    DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview"),
+                    DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password"),
+                    DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid"),
+                    DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid"),
+                    DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname"),
+                    DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name"),
+                    DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate"),
+                    DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size"),
+                    DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts"),
+                    DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments"),
+                    DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs"),
+                    DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed"),
                 ]
             )
             ->from('releases as r')
@@ -406,7 +399,7 @@ class Games
     {
         //wait 10 seconds before proceeding (steam api limit)
         sleep(10);
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $gen = new Genres(['Settings' => null]);
         $ri = new ReleaseImage();
 
         $game = [];
@@ -414,7 +407,7 @@ class Games
         // Process Steam first before GiantBomb as Steam has more details
         $this->_gameResults = false;
         $genreName = '';
-        $this->_getGame = new Steam(['DB' => $this->pdo]);
+        $this->_getGame = new Steam(['DB' => null]);
         $this->_classUsed = 'Steam';
 
         $steamGameID = $this->_getGame->search($gameInfo['title']);
@@ -668,24 +661,22 @@ class Games
      */
     public function processGamesReleases(): void
     {
-        $res = $this->pdo->queryDirect(
-            sprintf(
-                '
-				SELECT searchname, id
-				FROM releases
-				WHERE nzbstatus = 1 %s
-				AND gamesinfo_id = 0 %s
-				ORDER BY postdate DESC
-				LIMIT %d',
-                $this->renamed,
-                $this->catWhere,
-                $this->gameQty
-            )
-        );
+        $query = Release::query()
+            ->where('nzbstatus', '=', 1)
+            ->where('gamesinfo_id', '=', 0)
+            ->where('categories_id', '=', Category::PC_GAMES);
+        if ((int) Settings::settingValue('..lookupgames') === 2) {
+            $query->where('isrenamed', '=', 1);
+        }
+        $query->select(['searchname', 'id'])
+            ->orderByDesc('postdate')
+            ->limit($this->gameQty);
 
-        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+        $res = $query->get();
+
+        if ($res->count() > 0) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->rowCount().' games release(s).'), true);
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->count().' games release(s).'), true);
             }
 
             foreach ($res as $arr) {
@@ -719,10 +710,10 @@ class Games
                         $gameId = $gameCheck['id'];
                     }
                     // Update release.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d %s', $gameId, $arr['id'], $this->catWhere));
+                    Release::query()->where('id', '=', $arr['id'])->where('categories_id', '=', Category::PC_GAMES)->update(['gamesinfo_id' => $gameId]);
                 } else {
                     // Could not parse release title.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d %s', -2, $arr['id'], $this->catWhere));
+                    Release::query()->where('id', '=', $arr['id'])->where('categories_id', '=', Category::PC_GAMES)->update(['gamesinfo_id' => -2]);
 
                     if ($this->echoOutput) {
                         echo '.';
