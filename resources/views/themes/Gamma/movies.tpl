@@ -155,7 +155,7 @@
 												<li width="50px"><a title="View comments" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments">{$mcomments[$m@index]}</a> <i class="fa fa-comments-o"></i></li>
 												<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download"></i></li>
 												<li width="50px">{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo fa fa-info-sign" rel="nfo"></a>{/if}</li>
-												<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}" class="fa fa-group"></a></li>
+												<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}" class="fa fa-group"></a></li>
 												<li width="80px">{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot" class="modal_prev label" rel="preview">Preview</a>{/if}</li>
 												<li width="80px">{if $mhaspreview[$m@index]}<a href="#" onclick="return false;" class="mediainfo label" title="{$mguid[$m@index]}">Media</a>{/if}</li>
 											</ul>

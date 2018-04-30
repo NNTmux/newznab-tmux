@@ -202,7 +202,7 @@
 													   class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>
 												{/if}
 												<a class="rndbtn badge"
-												   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+												   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 												   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
 											</ul>
 										</td>

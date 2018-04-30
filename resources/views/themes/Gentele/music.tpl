@@ -99,7 +99,7 @@
 													title="View NFO" class="label label-primary" rel="nfo">
 														NFO</a>{/if}
 												<a class="label label-primary"
-												   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
+												   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}"
 												   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if !empty($mfailed[$m@index])}
 													<span class="btn btn-default btn-xs"

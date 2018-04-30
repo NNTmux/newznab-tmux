@@ -143,7 +143,7 @@
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
 														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -293,7 +293,7 @@
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
 														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">

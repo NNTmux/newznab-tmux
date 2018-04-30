@@ -16,7 +16,7 @@
 	{foreach $results as $result}
 		<tr class="{cycle values=",alt"}">
 			<td>
-				<a title="Browse releases from {$result.name|replace:"alt.binaries":"a.b"}" href="{$smarty.const.WWW_TOP}/browse?g={$result.name}">{$result.name|replace:"alt.binaries":"a.b"}</a>
+				<a title="Browse releases from {$result.name|replace:"alt.binaries":"a.b"}" href="{$smarty.const.WWW_TOP}/browse/group?g={$result.name}">{$result.name|replace:"alt.binaries":"a.b"}</a>
 			</td>
 			<td>
 					{$result.description}

@@ -217,7 +217,7 @@
 															rel="nfo"></a></li>{/if}
 												<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download"></i></li>
 												<li width="50px"><a
-															href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+															href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 															title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}"
 															class="fa fa-group"></a></li>
 												{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}

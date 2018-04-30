@@ -279,14 +279,14 @@
 						<dd>
 							{foreach $groupname as $grp}
 								<a title="Browse {$grp}"
-								   href="{$smarty.const.WWW_TOP}/browse?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
+								   href="{$smarty.const.WWW_TOP}/browse/group?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
 								<br/>
 							{/foreach}
 						</dd>
 					{else}
 						<dd>
 							<a title="Browse {$release.group_name}"
-							   href="{$smarty.const.WWW_TOP}/browse?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
+							   href="{$smarty.const.WWW_TOP}/browse/group?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
 						</dd>
 					{/if}
 

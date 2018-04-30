@@ -119,7 +119,7 @@
 								<div style="text-align: center;">
 									{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>{/if}
 									{if $result.url != ""}<a class="rndbtn badge badge-amaz" target="_blank" href="{$site->dereferrer_link}{$result.url}" name="amazon{$result.musicinfo_id}" title="View amazon page">Amazon</a>{/if}
-									<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}" title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
+									<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}" title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
 								</div>
 							</div>
 						</div>
@@ -161,7 +161,7 @@
 												<li width="50px"><a title="View comments" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments">{$mcomments[$m@index]}</a> <i class="fa fa-comments-o"></i></li>
 												<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download"></i></li>
 												<li width="50px">{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo fa fa-info-sign" rel="nfo"></a>{/if}</li>
-												<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}" class="fa fa-group"></a></li>
+												<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}" class="fa fa-group"></a></li>
 											</ul>
 										</td>
 										<td class="icons" style='width:150px;'>

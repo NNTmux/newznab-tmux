@@ -92,7 +92,7 @@
 					<div class="movextra">
 						<div style="text-align: center;">
 						{if $result.url != ""}<a class="rndbtn badge badge-amaz" target="_blank" href="{$site->dereferrer_link}{$result.url}" name="amazon{$result.bookinfo_id}" title="View amazon page">Amazon</a>{/if}
-						<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}" title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
+						<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}" title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
 						</div>
 					</div>
 				</div>
@@ -152,7 +152,7 @@
 									{if isset($mpass[$m@index]) && $mpass[$m@index] == 1}
 									<li width="50px">Passworded, {elseif $mpass[$m@index] == 2}Potential Password</li>
 									{/if}
-									<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" class="badge" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a></li>
+									<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}" class="badge" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a></li>
 									{if isset($mhaspreview[$m@index]) && $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot of {$mname[$m@index]|escape:"htmlall"}" class="modal_prev badge" rel="preview">Preview</a></li>
 									{/if}

@@ -312,7 +312,7 @@
 												{/if}
 												{if $result.group_name != ""}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name|escape:"htmlall"}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name|escape:"htmlall"}"
 													   title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 												{/if}
 												{if !empty($result.failed)}<span class="label label-primary">

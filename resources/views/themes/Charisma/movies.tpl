@@ -104,7 +104,7 @@
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
@@ -230,7 +230,7 @@
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>

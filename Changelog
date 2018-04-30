@@ -1,4 +1,5 @@
 2018-04-30 DariusIII
+	* Fix: Fix group browsing links in all themes
 	* Fix: Fix games cover page
 	* Chg: Update getBrowseBy function in XXX class
 	* Fix: Fix XXX ordering

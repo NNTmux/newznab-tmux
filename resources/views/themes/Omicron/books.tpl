@@ -90,7 +90,7 @@
 															title="View Nfo" class="modal_nfo label label-default" rel="nfo">
 																NFO</a>{/if}
 														<a class="label label-default"
-														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+														   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 														   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 														{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0}
 														<span class="btn btn-hover btn-default btn-xs"><i class="fa fa-thumbs-o-down"></i><span

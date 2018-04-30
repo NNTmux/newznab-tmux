@@ -144,7 +144,7 @@
 																			title="View Steam page">
 												Steam</a>{/if}
 										{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>{/if}
-										<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
+										<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
 									</div>
 								</div>
 							</div>
