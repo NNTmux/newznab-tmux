@@ -147,7 +147,7 @@ class XXX
                 [
                     'xxx.*',
                     \Illuminate\Support\Facades\DB::raw('UNCOMPRESS(xxx.plot) AS plot'),
-                    'r.movieinfo_id',
+                    'r.xxxinfo_id',
                     'g.name as group_name',
                     'rn.releases_id as nfoid',
                 ]

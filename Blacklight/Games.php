@@ -241,7 +241,7 @@ class Games
             ->select(
                 [
                     'gi.*',
-                    'releases.gamesinfo_id',
+                    'r.gamesinfo_id',
                     'g.name as group_name',
                     'gn.title as genre',
                     'rn.releases_id as nfoid',

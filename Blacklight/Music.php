@@ -164,7 +164,7 @@ class Music
             ->select(
                 [
                     'm.*',
-                    'releases.musicinfo_id',
+                    'r.musicinfo_id',
                     'g.name as group_name',
                     'gn.title as genre',
                     'rn.releases_id as nfoid',
