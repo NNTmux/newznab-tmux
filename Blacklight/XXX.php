@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\XxxInfo;
 use App\Models\Category;
@@ -21,10 +20,6 @@ use Blacklight\processing\adult\Hotmovies;
  */
 class XXX
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
 
     /**
      * What scraper class did we use -- used for template and trailer information.
@@ -90,8 +85,6 @@ class XXX
             'Settings'     => null,
         ];
         $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
 
         $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
@@ -220,27 +213,25 @@ class XXX
     }
 
     /**
-     * @return string
+     * @param $query
+     *
+     * @return mixed
      */
-    protected function getBrowseBy(): string
+    protected function getBrowseBy($query)
     {
-        $browseBy = ' ';
-        $browseByArr = ['title', 'director', 'actors', 'genre', 'id'];
-        foreach ($browseByArr as $bb) {
-            if (isset($_REQUEST[$bb]) && ! empty($_REQUEST[$bb])) {
-                $bbv = stripslashes($_REQUEST[$bb]);
+        foreach (['title', 'director', 'actors', 'genre', 'id'] as $bb) {
+            if (request()->has($bb) && request()->input($bb) !== null) {
+                $bbv = stripslashes(request()->input($bb));
                 if ($bb === 'genre') {
                     $bbv = $this->getGenreID($bbv);
                 }
                 if ($bb === 'id') {
-                    $browseBy .= 'AND xxx.'.$bb.'='.$bbv;
-                } else {
-                    $browseBy .= 'AND xxx.'.$bb.' '.$this->pdo->likeString($bbv, true, true);
+                    return $query->where('xxx.'.$bb, '=', $bbv);
                 }
+
+                return $query->where('xxx.'.$bb, 'LIKE', '%'.$bbv.'%');
             }
         }
-
-        return $browseBy;
     }
 
     /**
