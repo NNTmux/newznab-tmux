@@ -195,14 +195,14 @@ class XXX
      */
     protected function getXXXOrder($orderBy): array
     {
-        $orderArr = explode('_', (($orderBy === '') ? 'MAX(r.postdate)' : $orderBy));
+        $orderArr = explode('_', (($orderBy === '') ? 'r.postdate' : $orderBy));
         switch ($orderArr[0]) {
             case 'title':
                 $orderField = 'xxx.title';
                 break;
             case 'posted':
             default:
-                $orderField = 'MAX(r.postdate)';
+                $orderField = 'r.postdate';
                 break;
         }
 

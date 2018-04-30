@@ -1,4 +1,5 @@
 2018-04-30 DariusIII
+	* Fix: Fix XXX ordering
 	* Fix: Fix column and table names used in Games, Music and XXX get range functions
 2018-04-29 DariusIII
 	* Chg: Use find command for userId check in Mail
