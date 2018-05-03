@@ -817,16 +817,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "5.0.11",
+            "version": "5.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "9cba21d36b7a09533992ecfd16e94163ea4ccd58"
+                "reference": "b60cbbecb438831419bbe83d838e33e6b7327b38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/9cba21d36b7a09533992ecfd16e94163ea4ccd58",
-                "reference": "9cba21d36b7a09533992ecfd16e94163ea4ccd58",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/b60cbbecb438831419bbe83d838e33e6b7327b38",
+                "reference": "b60cbbecb438831419bbe83d838e33e6b7327b38",
                 "shasum": ""
             },
             "type": "bower-asset-library"
@@ -4475,16 +4475,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "v2.1.14",
+            "version": "2.1.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "2a271343f6a25499f250638fbbd0b1eb79a87e2a"
+                "reference": "e2a56eee3c4db0fe7e5f48acfe0ae16111754339"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/2a271343f6a25499f250638fbbd0b1eb79a87e2a",
-                "reference": "2a271343f6a25499f250638fbbd0b1eb79a87e2a",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/e2a56eee3c4db0fe7e5f48acfe0ae16111754339",
+                "reference": "e2a56eee3c4db0fe7e5f48acfe0ae16111754339",
                 "shasum": ""
             },
             "require": {
@@ -4539,7 +4539,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2018-01-20T18:33:44+00:00"
+            "time": "2018-05-03T18:05:46+00:00"
         },
         {
             "name": "predis/predis",
