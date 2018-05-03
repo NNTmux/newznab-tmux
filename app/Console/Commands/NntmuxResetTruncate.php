@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Group;
 use App\Models\Release;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
