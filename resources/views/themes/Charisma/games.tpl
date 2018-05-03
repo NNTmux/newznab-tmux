@@ -67,32 +67,16 @@
 									{$results->links()}
 								</div>
 								{foreach $results as $result}
-									{assign var="msplits" value=","|explode:$result.grp_release_id}
-									{assign var="mguid" value=","|explode:$result.grp_release_guid}
-									{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
-									{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
-									{assign var="mname" value="#"|explode:$result.grp_release_name}
-									{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}
-									{assign var="msize" value=","|explode:$result.grp_release_size}
-									{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
-									{assign var="mcomments" value=","|explode:$result.grp_release_comments}
-									{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
-									{assign var="mfailed" value=","|explode:$result.grp_release_failed}
-									{assign var="mpass" value=","|explode:$result.grp_release_password}
-									{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
-									{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-									{foreach $msplits as $loop=>$m name="loop"}
-										{if $smarty.foreach.loop.first}
 											<div class="panel panel-default">
 												<div class="panel-body">
 													<div class="row">
 														<div class="col-md-2 small-gutter-left">
 															<a title="View details"
-															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
+															   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">
 																<img src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																	 class="img-responsive img-rounded"
 																	 width="140" border="0"
-																	 alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
+																	 alt="{$result.title|escape:"htmlall"}"/>{if !empty($result.grp_release_failed)}
 																<i class="fa fa-exclamation-circle" style="color: red"
 																   title="This release has failed to download for some users"></i>{/if}
 															</a>
@@ -111,37 +95,37 @@
 																title="View Steam page">
 																	Steam</a>{/if}
 															{if $result.nfoid > 0}<a
-																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+																href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
 																title="View NFO" class="modal_nfo label label-default"
 																rel="nfo">
 																	NFO</a>{/if}
 															<a class="label label-default"
 															   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}"
 															   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
-															{if !empty($mfailed[$m@index])}
+															{if !empty($result.grp_release_failed)}
 																<span class="btn btn-default btn-xs"
 																	  title="This release has failed to download for some users">
-														<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
-																	Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
-																			class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
-																	Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+														<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
+																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 															{/if}
 														</div>
 														<div class="col-md-10 small-gutter-left">
 															<h4><a title="View details"
-																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a>
+																   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.title|escape:"htmlall"}</a>
 															</h4>
 															<table class="data table table-responsive">
 																<tr>
-																	<td id="guid{$mguid[$m@index]}">
+																	<td id="guid{$result.grp_release_guid}">
 																		<label>
 																			<input type="checkbox"
 																				   class="square"
-																				   value="{$mguid[$m@index]}"
+																				   value="{$result.grp_release_guid}"
 																				   id="chksingle"/>
 																		</label>
-																		<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																		<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+																		<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
+																		<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
 																			ago</span>
 																		{if isset($isadmin)}<a
 																			class="label label-warning"
@@ -177,37 +161,37 @@
 																		<div>
 																			<a role="button"
 																			   class="btn btn-default btn-xs"
-																			   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+																			   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
 																						class="fa fa-cloud-download"></i><span
-																						class="badge"> {$mgrabs[$m@index]}
-																					Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																						class="badge"> {$result.grp_release_grabs}
+																					Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
 																			<a role="button"
 																			   class="btn btn-default btn-xs"
-																			   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																			   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
 																						class="fa fa-comment-o"></i><span
-																						class="badge"> {$mcomments[$m@index]}
-																					Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+																						class="badge"> {$result.grp_release_comments}
+																					Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
 																			<span
-																					id="guid{$mguid[$m@index]}"
+																					id="guid{$result.grp_release_guid}"
 																					class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																					title="Send to my Download Basket">
 																	<i class="fa fa-shopping-basket"></i>
 															</span>
 																			{if isset($sabintegrated) && $sabintegrated !=""}
 																				<span
-																						id="guid{$mguid[$m@index]}"
+																						id="guid{$result.grp_release_guid}"
 																						class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																						title="Send to my Queue">
 																		<i class="fa fa-share"></i>
 																</span>
 																			{/if}
-																			{if !empty($mfailed[$m@index])}
+																			{if !empty($result.grp_release_failed)}
 																				<span class="btn btn-default btn-xs"
 																					  title="This release has failed to download for some users">
-																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
-																					Grab{if {$mgrabs[$m@index]} != 1}s{/if}
-																					/ <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
-																					Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
+																					Grab{if {$result.grp_release_grabs} != 1}s{/if}
+																					/ <i class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+																					Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 																			{/if}
 																		</div>
 																	</td>
@@ -217,8 +201,6 @@
 													</div>
 												</div>
 											</div>
-										{/if}
-									{/foreach}
 								{/foreach}
 							{else}
 								No games with covers available!

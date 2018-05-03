@@ -101,34 +101,19 @@
 										<th>Size</th>
 										<th>Action</th>
 									</tr>
-									{assign var="msplits" value=","|explode:$result.grp_release_id}
-									{assign var="mguid" value=","|explode:$result.grp_release_guid}
-									{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
-									{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
-									{assign var="mname" value="#"|explode:$result.grp_release_name}
-									{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}
-									{assign var="msize" value=","|explode:$result.grp_release_size}
-									{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
-									{assign var="mcomments" value=","|explode:$result.grp_release_comments}
-									{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
-									{assign var="mpass" value=","|explode:$result.grp_release_password}
-									{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
-									{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-									{assign var="mcatname" value=","|explode:$result.grp_release_catname}
-									{foreach $msplits as $m}
-										<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
-											<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}"
+										<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
+											<td class="check"><input id="chk{$result.grp_release_guid|substr:0:7}"
 																	 type="checkbox"
 																	 class="square"
-																	 value="{$mguid[$m@index]}"/></td>
+																	 value="{$result.grp_release_guid}"/></td>
 											<td class="item">
 												<a title="View details"
-												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+												   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 												<br/>
-						<span class="label label-default">{$mgrabs[$m@index]}
-							grab{if $mgrabs[$m@index] != 1}s{/if}</span>
+						<span class="label label-default">{$result.grp_release_grabs}
+							grab{if $result.grp_release_grabs != 1}s{/if}</span>
 												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span class="label label-default"><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+															href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
 															class="text-muted">NFO</a>
 													</span>{/if}
 												{if $mpass[$m@index] == 2}
@@ -141,22 +126,21 @@
 														class="label label-default">{$mcatname[$m@index]}</span>
 											</td>
 											<td class="less mid"
-												title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
-											<td class="less right">{$msize[$m@index]|fsize_format:"MB"}</td>
+												title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
+											<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
 											<td class="icons">
 												<a title="Download NZB"
-												   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+												   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
 															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
-												<a href="#" id="guid{$mguid[$m@index]}" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
+												<a href="#" id="guid{$result.grp_release_guid}" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
 																							title="Send to my Download Basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
-													<a href="#" id="guid{$mguid[$m@index]}" class="icon icon_sab text-muted"
+													<a href="#" id="guid{$result.grp_release_guid}" class="icon icon_sab text-muted"
 														  title="Send to my Queue"><i
 																class="fa fa-share"></i></a>
 												{/if}
 											</td>
 										</tr>
-									{/foreach}
 								</table>
 								<hr>
 								{if $results|@count > 10}

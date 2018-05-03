@@ -70,27 +70,11 @@
 													{foreach $result.languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
-													{assign var="msplits" value=","|explode:$result.grp_release_id}
-													{assign var="mguid" value=","|explode:$result.grp_release_guid}
-													{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
-													{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
-													{assign var="mname" value="#"|explode:$result.grp_release_name}
-													{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}
-													{assign var="msize" value=","|explode:$result.grp_release_size}
-													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
-													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
-													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
-													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
-													{assign var="mpass" value=","|explode:$result.grp_release_password}
-													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
-													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-													{foreach $msplits as $loop=>$m name="loop"}
-													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
-																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed for some users"></i>{/if}</a>
+																alt="{$result.title|escape:"htmlall"}"/> {if !empty($result.grp_release_failed)} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -100,7 +84,7 @@
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-default" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
@@ -120,11 +104,11 @@
 													<div class="release-subtitle">{if $result.actors != ''}
 															<b>Starring: </b>
 															{$result.actors} {/if}</div>
-													<div id="guid{$mguid[$m@index]}">
+													<div id="guid{$result.grp_release_guid}">
 														<label>
 															<input type="checkbox"
 																   class="square"
-																   value="{$mguid[$m@index]}"
+																   value="{$result.grp_release_guid}"
 																   id="chksingle"/>
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
@@ -132,33 +116,33 @@
 														<span class="label label-default">{$result.year}</span>
 														<span class="label label-default">{if $result.rating != ''}{$result.rating}/10{/if}</span>
 														<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
-														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
+																	<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
 																		ago</span>
 														<br/><br/><br/>
 														<div class="release-name text-muted"><a
-																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																	href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
 																		class="zmdi zmdi-cloud-download"></i><span
-																		class="badge"> {$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																		class="badge"> {$result.grp_release_grabs}
+																	Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+															   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
 																		class="zmdi zmdi-comment-o"></i><span
-																		class="badge"> {$mcomments[$m@index]}
-																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+																		class="badge"> {$result.grp_release_comments}
+																	Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
 															<span
-																	id="guid{$mguid[$m@index]}"
+																	id="guid{$result.grp_release_guid}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket"><i
 																		class="zmdi zmdi-shopping-basket"></i>
 																		</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span
-																		id="guid{$mguid[$m@index]}"
+																		id="guid{$result.grp_release_guid}"
 																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																		title="Send to my Queue"><i
 																			class="zmdi zmdi-share"></i>
@@ -173,13 +157,11 @@
 																	<i class="zmdi zmdi-bed"></i>
 																</span>
 															{/if}
-															{if !empty($mfailed[$m@index])}
+															{if !empty($result.grp_release_failed)}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="zmdi zmdi-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>															{/if}
+																	<i class ="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed} Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>															{/if}
 														</div>
 													</div>
-													{/if}
-													{/foreach}
 												</div>
 											</div>
 										</div>
@@ -196,27 +178,11 @@
 													{foreach $result.languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
-													{assign var="msplits" value=","|explode:$result.grp_release_id}
-													{assign var="mguid" value=","|explode:$result.grp_release_guid}
-													{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
-													{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
-													{assign var="mname" value="#"|explode:$result.grp_release_name}
-													{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}
-													{assign var="msize" value=","|explode:$result.grp_release_size}
-													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
-													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
-													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
-													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
-													{assign var="mpass" value=","|explode:$result.grp_release_password}
-													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
-													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-													{foreach $msplits as $loop=>$m name="loop"}
-													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
-																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
+																alt="{$result.title|escape:"htmlall"}"/> {if !empty($result.grp_release_failed)} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -226,7 +192,7 @@
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-default" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
@@ -246,11 +212,11 @@
 													<div class="release-subtitle">{if $result.actors != ''}
 															<b>Starring: </b>
 															{$result.actors} {/if}</div>
-													<div id="guid{$mguid[$m@index]}">
+													<div id="guid{$result.grp_release_guid}">
 														<label>
 															<input type="checkbox"
 																   class="square"
-																   value="{$mguid[$m@index]}"
+																   value="{$result.grp_release_guid}"
 																   id="chksingle"/>
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
@@ -258,33 +224,33 @@
 														<span class="label label-default">{$result.year}</span>
 														<span class="label label-default">{if $result.rating != ''}{$result.rating}/10{/if}</span>
 														<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
-														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
+																	<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
 																		ago</span>
 														<br/><br/><br/>
 														<div class="release-name text-muted"><a
-																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																	href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
 																		class="zmdi zmdi-cloud-download"></i><span
-																		class="badge"> {$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																		class="badge"> {$result.grp_release_grabs}
+																	Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+															   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
 																		class="zmdi zmdi-comment-o"></i><span
-																		class="badge"> {$mcomments[$m@index]}
-																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+																		class="badge"> {$result.grp_release_comments}
+																	Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
 															<span
-																	id="guid{$mguid[$m@index]}"
+																	id="guid{$result.grp_release_guid}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket"><i
 																		class="zmdi zmdi-shopping-basket"></i>
 																		</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span
-																		id="guid{$mguid[$m@index]}"
+																		id="guid{$result.grp_release_guid}"
 																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																		title="Send to my Queue"><i
 																			class="zmdi zmdi-share"></i>
@@ -299,13 +265,11 @@
 																	<i class="zmdi zmdi-bed"></i>
 																</span>
 															{/if}
-															{if !empty($mfailed[$m@index])}
+															{if !empty($result.grp_release_failed)}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="zmdi zmdi-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>																{/if}
+																	<i class ="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed} Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>																{/if}
 														</div>
 													</div>
-													{/if}
-													{/foreach}
 												</div>
 											</div>
 										</div>

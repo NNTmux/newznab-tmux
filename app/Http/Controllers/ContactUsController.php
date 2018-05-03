@@ -75,6 +75,6 @@ class ContactUsController extends BasePageController
             ]
         );
 
-        $this->smarty->display('basepage.tpl');
+        $this->pagerender();
     }
 }
