@@ -51,7 +51,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
@@ -59,122 +59,122 @@
 					</div>
 					<hr>
 					{foreach $results as $result}
-								<div class="panel panel-default">
-									<div class="panel-body">
-										<div class="row">
-											<div class="col-md-2 small-gutter-left">
-												<a title="View details"
-												   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">
-													<img src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
-														 class="img-responsive img-rounded"
-														 width="140" border="0"
-														 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if !empty($result.grp_release_failed)}
-													<i class="fa fa-exclamation-circle" style="color: red"
-													   title="This release has failed to download for some users"></i>{/if}
-												</a>
-												{if $result.url != ""}<a class="label label-primary"
-																		 target="_blank"
-																		 href="{$site->dereferrer_link}{$result.url}"
-																		 name="amazon{$result.musicinfo_id}"
-																		 title="View Amazon page">
-														Amazon</a>{/if}
-												{if $result.nfoid > 0}<a
-													href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-													title="View NFO" class="label label-primary" rel="nfo">
-														NFO</a>{/if}
-												<a class="label label-primary"
-												   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}"
-												   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
-												{if !empty($result.grp_release_failed)}
-													<span class="btn btn-default btn-xs"
-														  title="This release has failed to download for some users">
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-2 small-gutter-left">
+										<a title="View details"
+										   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">
+											<img src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+												 class="img-responsive img-rounded"
+												 width="140" border="0"
+												 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if !empty($result.grp_release_failed)}
+											<i class="fa fa-exclamation-circle" style="color: red"
+											   title="This release has failed to download for some users"></i>{/if}
+										</a>
+										{if $result.url != ""}<a class="label label-primary"
+																 target="_blank"
+																 href="{$site->dereferrer_link}{$result.url}"
+																 name="amazon{$result.musicinfo_id}"
+																 title="View Amazon page">
+												Amazon</a>{/if}
+										{if $result.nfoid > 0}<a
+											href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+											title="View NFO" class="label label-primary" rel="nfo">
+												NFO</a>{/if}
+										<a class="label label-primary"
+										   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}"
+										   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
+										{if !empty($result.grp_release_failed)}
+											<span class="btn btn-default btn-xs"
+												  title="This release has failed to download for some users">
 														<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-														Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
-														Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
-												{/if}
-											</div>
-											<div class="col-md-10 small-gutter-left">
-												<h4><a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.artist|escape:"htmlall"}
-														- {$result.title|escape:"htmlall"}</a> (<a class="title"
-																								   title="{$result.year}"
-																								   href="{$smarty.const.WWW_TOP}/music?year={$result.year}">{$result.year}</a>)
-												</h4>
-												<table class="data table table-striped responsive-utilities jambo-table">
-													<tr>
-														<td id="guid{$result.grp_release_guid}">
-															<label>
-																<input type="checkbox"
-																	   class="flat"
-																	   value="{$result.grp_release_guid}" id="chksingle"/>
-															</label>
-															<span class="label label-primary">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-primary">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
-															{if isset($isadmin)}<a class="label label-warning"
-																				   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI}"
-																				   title="Edit release">
-																	Edit</a>{/if}
-															<br/>
-															{if $result.genre != ""}
-																<b>Genre:</b>
-																<a href="{$smarty.const.WWW_TOP}/music/?genre={$result.genres_id}">{$result.genre|escape:"htmlall"}</a>
-																<br/>
-															{/if}
-															{if $result.publisher != ""}
-																<b>Publisher:</b>
-																{$result.publisher|escape:"htmlall"}
-																<br/>
-															{/if}
-															{if $result.releasedate != ""}
-																<b>Released:</b>
-																{$result.releasedate|date_format}
-																<br/>
-															{/if}
-															<div>
-																<a role="button" class="btn btn-default btn-xs"
-																   data-toggle="tooltip" data-placement="top" title
-																   data-original-title="Download NZB"
-																   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
-																			class="fa fa-cloud-download"></i><span
-																			class="badge"> {$result.grp_release_grabs}
-																		Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
-																<a role="button" class="btn btn-default btn-xs"
-																   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
-																			class="fa fa-comment-o"></i><span
-																			class="badge"> {$result.grp_release_comments}
-																		Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																			  id="guid{$result.grp_release_guid}"
-																			  data-toggle="tooltip" data-placement="top"
-																			  title
-																			  data-original-title="Send to my download basket"><i
-																					class="fa fa-shopping-basket"></i></span>
-																{if isset($sabintegrated) && $sabintegrated !=""}
-																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																		  id="guid{$result.grp_release_guid}"
-																		  data-toggle="tooltip" data-placement="top"
-																		  title
-																		  data-original-title="Send to my Queue"><i
-																				class="fa fa-share"></i></span>
-																{/if}
-																{if !empty($result.grp_release_failed)}
-																	<span class="btn btn-default btn-xs"
-																		  title="This release has failed to download for some users">
+												Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+														class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+												Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+										{/if}
+									</div>
+									<div class="col-md-10 small-gutter-left">
+										<h4><a title="View details"
+											   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.artist|escape:"htmlall"}
+												- {$result.title|escape:"htmlall"}</a> (<a class="title"
+																						   title="{$result.year}"
+																						   href="{$smarty.const.WWW_TOP}/music?year={$result.year}">{$result.year}</a>)
+										</h4>
+										<table class="data table table-striped responsive-utilities jambo-table">
+											<tr>
+												<td id="guid{$result.grp_release_guid}">
+													<label>
+														<input type="checkbox"
+															   class="flat"
+															   value="{$result.grp_release_guid}" id="chksingle"/>
+													</label>
+													<span class="label label-primary">{$result.grp_release_size|fsize_format:"MB"}</span>
+													<span class="label label-primary">Posted {$result.grp_release_postdate|timeago}
+														ago</span>
+													{if isset($isadmin)}<a class="label label-warning"
+																		   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI}"
+																		   title="Edit release">
+															Edit</a>{/if}
+													<br/>
+													{if $result.genre != ""}
+														<b>Genre:</b>
+														<a href="{$smarty.const.WWW_TOP}/music/?genre={$result.genres_id}">{$result.genre|escape:"htmlall"}</a>
+														<br/>
+													{/if}
+													{if $result.publisher != ""}
+														<b>Publisher:</b>
+														{$result.publisher|escape:"htmlall"}
+														<br/>
+													{/if}
+													{if $result.releasedate != ""}
+														<b>Released:</b>
+														{$result.releasedate|date_format}
+														<br/>
+													{/if}
+													<div>
+														<a role="button" class="btn btn-default btn-xs"
+														   data-toggle="tooltip" data-placement="top" title
+														   data-original-title="Download NZB"
+														   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
+																	class="fa fa-cloud-download"></i><span
+																	class="badge"> {$result.grp_release_grabs}
+																Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
+														<a role="button" class="btn btn-default btn-xs"
+														   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
+																	class="fa fa-comment-o"></i><span
+																	class="badge"> {$result.grp_release_comments}
+																Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
+														<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+															  id="guid{$result.grp_release_guid}"
+															  data-toggle="tooltip" data-placement="top"
+															  title
+															  data-original-title="Send to my download basket"><i
+																	class="fa fa-shopping-basket"></i></span>
+														{if isset($sabintegrated) && $sabintegrated !=""}
+															<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																  id="guid{$result.grp_release_guid}"
+																  data-toggle="tooltip" data-placement="top"
+																  title
+																  data-original-title="Send to my Queue"><i
+																		class="fa fa-share"></i></span>
+														{/if}
+														{if !empty($result.grp_release_failed)}
+															<span class="btn btn-default btn-xs"
+																  title="This release has failed to download for some users">
 																		<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																		Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																				class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
-																		Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
-																{/if}
-															</div>
-														</td>
-													</tr>
-												</table>
-											</div>
-										</div>
+																Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																		class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+																Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+														{/if}
+													</div>
+												</td>
+											</tr>
+										</table>
 									</div>
 								</div>
+							</div>
+						</div>
 					{/foreach}
 					<hr>
 					<div class="row">
@@ -213,7 +213,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>

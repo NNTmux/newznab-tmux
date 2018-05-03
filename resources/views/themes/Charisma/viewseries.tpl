@@ -38,7 +38,8 @@
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="zmdi zmdi-rss"></i></a>
+		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+			for TV Show <i class="zmdi zmdi-rss"></i></a>
 		{if $show.tvdb > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"

@@ -20,16 +20,16 @@
 {else}
 	{foreach from=$content item=c}
 		{if $c->role == 0}
-		<div class="header">
-			<h2>Help > <strong>{$c->title}</strong></h2>
-			<div class="breadcrumb-wrapper">
-				<ol class="breadcrumb">
-					<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-					/ {$c->title}
-				</ol>
+			<div class="header">
+				<h2>Help > <strong>{$c->title}</strong></h2>
+				<div class="breadcrumb-wrapper">
+					<ol class="breadcrumb">
+						<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+						/ {$c->title}
+					</ol>
+				</div>
 			</div>
-		</div>
-		{$c->body}
+			{$c->body}
 		{/if}
 	{/foreach}
 {/if}

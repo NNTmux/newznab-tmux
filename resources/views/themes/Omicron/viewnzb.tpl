@@ -12,8 +12,12 @@
 		<div class="col-lg-12 col-sm-12 col-xs-12">
 			<div class="panel panel-default">
 				<div class="panel-body pagination2">
-					<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-							<i class ="fa fa-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
+					<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"
+																						 title="This release has failed to download for some users">
+							<i class="fa fa-thumbs-o-up"></i>
+							{$release.grabs} Grab{if $release.grabs != 1}s{/if} /
+							<i class="fa fa-thumbs-o-down"></i>
+							{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
 						   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}"
@@ -37,7 +41,8 @@
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 							   title="View at TMDb">TMDb</a>
 						{/if}
-						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}" title="View all versions">Movie View</a>
+						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}"
+						   title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}
 						<a class="label label-default" href="{$serverroot}anime?id={$release.anidbid}"
@@ -54,27 +59,27 @@
 						   class="label label-success">Add to My Shows</a>
 						<a class="label label-default" href="{$serverroot}series/{$release.videos_id}"
 						   title="View all releases for this series">View all episodes</a>
-							{if $show.tvdb > 0}
+						{if $show.tvdb > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
 							   title="View at TheTVDB">TheTVDB</a>
-							{/if}
-							{if $show.tvmaze > 0}
+						{/if}
+						{if $show.tvmaze > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 							   title="View at TVMaze">TVMaze</a>
-								{/if}
-							{if $show.trakt > 0}
+						{/if}
+						{if $show.trakt > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 							   title="View at TraktTv">Trakt</a>
-								{/if}
-							{if $show.tvrage > 0}
+						{/if}
+						{if $show.tvrage > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 							   title="View at TV Rage">TV Rage</a>
-								{/if}
-							{if $show.tmdb > 0}
+						{/if}
+						{if $show.tmdb > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
 							   title="View at TheMovieDB">TMDb</a>
@@ -160,7 +165,7 @@
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
 									{if isset($game.backdrop) && $game.backdrop == 1}
-									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
+										<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
 								<div class="tab-content">
@@ -248,10 +253,10 @@
 													{if !empty($movie.imdbid)}
 														{if !empty($cpurl) && !empty($cpapi)}
 															<button
-																type="button"
-																id="imdb{$movie.imdbid}"
-																href="javascript:;"
-																class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
+																	type="button"
+																	id="imdb{$movie.imdbid}"
+																	href="javascript:;"
+																	class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
 																<i class="fa fa-bed"></i>
 																Send to CouchPotato
 															</button>
@@ -345,12 +350,12 @@
 																			/10
 																		</td>
 																	</tr>
-																{if !empty($movie.rtrating)}
-																	<tr>
-																		<th width="140">RottenTomatoes score</th>
-																		<td>{$movie.rtrating}</td>
-																	</tr>
-																{/if}
+																	{if !empty($movie.rtrating)}
+																		<tr>
+																			<th width="140">RottenTomatoes score</th>
+																			<td>{$movie.rtrating}</td>
+																		</tr>
+																	{/if}
 																{/if}
 																{if $show && $release.videos_id > 0}
 																	{if $release.firstaired != ""}
@@ -499,11 +504,11 @@
 																		time{if $release.grabs == 1}{else}s{/if}</td>
 																</tr>
 																{if !empty($failed)}
-																<tr>
-																	<th width="140">Failed Download</th>
-																	<td>{$failed}
-																		time{if $failed == 1}{else}s{/if}</td>
-																</tr>
+																	<tr>
+																		<th width="140">Failed Download</th>
+																		<td>{$failed}
+																			time{if $failed == 1}{else}s{/if}</td>
+																	</tr>
 																{/if}
 																<tr>
 																	<th width="140">Password
@@ -549,7 +554,9 @@
 																</tr>
 																<tr>
 																	<th width="140">Poster</th>
-																	<td><a title="Find releases by this poster" href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv">{$release.fromname|escape:"htmlall"}</a></td>
+																	<td><a title="Find releases by this poster"
+																		   href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv">{$release.fromname|escape:"htmlall"}</a>
+																	</td>
 																</tr>
 																<tr>
 																	<th width="140">Posted</th>
@@ -607,21 +614,24 @@
 									</div>
 									<div id="pane4" class="tab-pane">
 										{if isset($similars) && $similars|@count > 1}
-							Similar:
-							<ul>
-							{foreach $similars as $similar}
-											<li>
-												<a title="View similar NZB details"
-												   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}">{$similar.searchname|escape:"htmlall"}</a>
-												<br/>
-											</li>
-										{/foreach}
-							</ul>
-								<br/>
-								<a title="Search for similar Nzbs" href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"htmlall"}">Search for similar NZBs...</a><br/>
-							</td>
-						</tr>
-						{/if}
+											Similar:
+											<ul>
+												{foreach $similars as $similar}
+													<li>
+														<a title="View similar NZB details"
+														   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}">{$similar.searchname|escape:"htmlall"}</a>
+														<br/>
+													</li>
+												{/foreach}
+											</ul>
+											<br/>
+											<a title="Search for similar Nzbs"
+											   href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"htmlall"}">Search
+												for similar NZBs...</a>
+											<br/>
+											</td>
+											</tr>
+										{/if}
 									</div>
 									<div id="comments" class="tab-pane">
 										{if $comments|@count > 0}
@@ -631,21 +641,22 @@
 													<th>Comment</th>
 												</tr>
 												{foreach $comments|@array_reverse:true as $comment}
-													<tr>
-														<td class="less" title="{$comment.created_at}">
-															{if !$privateprofiles || isset($isadmin) || isset($ismod)}
-																<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
-															{else}
-																{$comment.username}
-															{/if}
-															<br/>{$comment.created_at|daysago}
-														</td>
-														{if isset($comment.shared) && $comment.shared == 2}
-															<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
+												<tr>
+													<td class="less" title="{$comment.created_at}">
+														{if !$privateprofiles || isset($isadmin) || isset($ismod)}
+															<a title="View {$comment.username}'s profile"
+															   href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
 														{else}
-															<td>{$comment.text|escape:"htmlall"|nl2br}</td>
+															{$comment.username}
 														{/if}
-												{/foreach}
+														<br/>{$comment.created_at|daysago}
+													</td>
+													{if isset($comment.shared) && $comment.shared == 2}
+														<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
+													{else}
+														<td>{$comment.text|escape:"htmlall"|nl2br}</td>
+													{/if}
+													{/foreach}
 											</table>
 										{else}
 											<div class="alert alert-info" role="alert">
@@ -655,7 +666,8 @@
 										<form action="/details" method="post">
 											{{csrf_field()}}
 											<label for="txtAddComment">Add Comment:</label><br/>
-											<textarea id="txtAddComment" name="txtAddComment" rows="6" cols="60"></textarea>
+											<textarea id="txtAddComment" name="txtAddComment" rows="6"
+													  cols="60"></textarea>
 											<br/>
 											<input class="btn" type="submit" value="Submit"/>
 										</form>
@@ -832,7 +844,8 @@
 									{/if}
 									{if isset($game.backdrop) && $game.backdrop == 1}
 										<div id="pane10" class="tab-pane">
-											<img class="img-responsive" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+											<img class="img-responsive"
+												 src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
 												 width="500" border="0"
 												 alt="{$game.title|escape:"htmlall"}"
 												 data-toggle="modal"

@@ -106,64 +106,68 @@
 											<th>Size</th>
 											<th>Action</th>
 										</tr>
-											<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
-												<td><input id="guid{$result.grp_release_guid}"
-																		 type="checkbox"
-																		 class="flat"
-																		 value="{$result.grp_release_guid}"/></td>
-												<td class="item">
-													<a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.grp_release_name|escape:"htmlall"|replace:".":" "}</a>
-													<br/>
-						<span class="label label-primary">{$result.grp_release_grabs}
-							grab{if $result.grp_release_grabs != 1}s{/if}</span>
-													{if isset($result.grp_release_nfoid) && $result.grp_release_nfoid > 0}<span><a
-																href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-																class="modal_nfo label label-primary text-muted">NFO</a>
-														</span>{/if}
-													{if $result.grp_release_password == 2}
-														<i class="fa fa-icon-lock"></i>
-													{elseif $result.grp_release_password == 1}
-														<i class="fa fa-icon-lock"></i>
-													{/if}
-												</td>
-												<td class="less"><span
-															class="label label-primary">{$result.grp_release_catname}</span>
-												</td>
-												<td class="less mid"
-													title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
-												<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
-												<td>
-													<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}" class="icon_nzb text-muted"><i
-																class="fa fa-cloud-download text-muted"
-																data-toggle="tooltip" data-placement="top" title
-																data-original-title="Download NZB"></i></a>
-													<a href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
-																class="fa fa-comments-o text-muted"
-																data-toggle="tooltip" data-placement="top" title
-																data-original-title="Comments"></i></a>
-													<a href="#"><i
-																id="guid{$result.grp_release_guid}"
-																class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
-																data-placement="top" title
-																data-original-title="Send to my download basket"></i></a>
-													{if isset($sabintegrated) && $sabintegrated !=""}
-														<a href="#">
-															<i	id="guid{$result.grp_release_guid}"
-																  class="icon_sab text-muted fa fa-share"
-																  data-toggle="tooltip"
-																  data-placement="top" title
-																  data-original-title="Send to my Queue">
-															</i>
-														</a>
-													{/if}
-													{if $weHasVortex}
-														<a href="#" class="icon_vortex text-muted"><i
-																	class="fa fa-share" data-toggle="tooltip" data-placement="top"
-																	title data-original-title="Send to NZBVortex"></i></a>
-													{/if}
-												</td>
-											</tr>
+										<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
+											<td><input id="guid{$result.grp_release_guid}"
+													   type="checkbox"
+													   class="flat"
+													   value="{$result.grp_release_guid}"/></td>
+											<td class="item">
+												<a title="View details"
+												   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.grp_release_name|escape:"htmlall"|replace:".":" "}</a>
+												<br/>
+												<span class="label label-primary">{$result.grp_release_grabs}
+													grab{if $result.grp_release_grabs != 1}s{/if}</span>
+												{if isset($result.grp_release_nfoid) && $result.grp_release_nfoid > 0}
+													<span><a
+															href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+															class="modal_nfo label label-primary text-muted">NFO</a>
+													</span>{/if}
+												{if $result.grp_release_password == 2}
+													<i class="fa fa-icon-lock"></i>
+												{elseif $result.grp_release_password == 1}
+													<i class="fa fa-icon-lock"></i>
+												{/if}
+											</td>
+											<td class="less"><span
+														class="label label-primary">{$result.grp_release_catname}</span>
+											</td>
+											<td class="less mid"
+												title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
+											<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
+											<td>
+												<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"
+												   class="icon_nzb text-muted"><i
+															class="fa fa-cloud-download text-muted"
+															data-toggle="tooltip" data-placement="top" title
+															data-original-title="Download NZB"></i></a>
+												<a href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
+															class="fa fa-comments-o text-muted"
+															data-toggle="tooltip" data-placement="top" title
+															data-original-title="Comments"></i></a>
+												<a href="#"><i
+															id="guid{$result.grp_release_guid}"
+															class="icon_cart text-muted fa fa-shopping-basket"
+															data-toggle="tooltip"
+															data-placement="top" title
+															data-original-title="Send to my download basket"></i></a>
+												{if isset($sabintegrated) && $sabintegrated !=""}
+													<a href="#">
+														<i id="guid{$result.grp_release_guid}"
+														   class="icon_sab text-muted fa fa-share"
+														   data-toggle="tooltip"
+														   data-placement="top" title
+														   data-original-title="Send to my Queue">
+														</i>
+													</a>
+												{/if}
+												{if $weHasVortex}
+													<a href="#" class="icon_vortex text-muted"><i
+																class="fa fa-share" data-toggle="tooltip"
+																data-placement="top"
+																title data-original-title="Send to NZBVortex"></i></a>
+												{/if}
+											</td>
+										</tr>
 									</table>
 									<hr>
 									{if $results|@count > 10}
@@ -207,7 +211,7 @@
 													</div>
 												</div>
 											</div>
-											{if	count($results) > 0}
+											{if    count($results) > 0}
 												<div class="col-md-4">
 													{$results->links()}
 												</div>

@@ -3,7 +3,8 @@
 	<div class="error">{$error}</div>
 {/if}
 <div class="well well-sm">
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/category_regexes-list"><i class="fa fa-arrow-left"></i>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/category_regexes-list"><i
+				class="fa fa-arrow-left"></i>
 		Go back</a>
 	<form action="category_regexes-edit?action=submit" method="POST">
 		{{csrf_field()}}

@@ -36,7 +36,8 @@
 						{/if}
 					</td>
 					<td class="right"><a title="delete this show entry"
-										 href="{$smarty.const.WWW_TOP}/admin/show-delete?id={$tvshow.id}">delete</a> | <a
+										 href="{$smarty.const.WWW_TOP}/admin/show-delete?id={$tvshow.id}">delete</a> |
+						<a
 								title="remove this showid from all releases"
 								href="{$smarty.const.WWW_TOP}/admin/show-remove?id={$tvshow.id}">remove</a></td>
 				</tr>

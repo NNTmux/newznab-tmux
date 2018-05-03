@@ -77,7 +77,8 @@
 
 		{foreach $userlist as $user}
 			<tr class="{cycle values=",alt"}">
-				<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user.id}">{$user.username}</a>
+				<td><a title="Edit user"
+					   href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user.id}">{$user.username}</a>
 				</td>
 				<td><a title="View profile" href="{$smarty.const.WWW_TOP}/profile?id={$user.id}">{$user.email}</a>
 				</td>

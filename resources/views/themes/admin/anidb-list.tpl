@@ -15,7 +15,7 @@
 	</div>
 
 	{if count($results) > 0}
-			{$results->links()}
+		{$results->links()}
 	{/if}
 
 	<br/><br/>
@@ -47,7 +47,7 @@
 
 	<br/>
 	{if count($results) > 0}
-			{$results->links()}
+		{$results->links()}
 	{/if}
 	{else}
 	<p>No AniDB episodes available.</p>

@@ -18,14 +18,14 @@
 	</div>
 	<div class="box-body">
 		<div class="box-content"
-			<div class="row">
-				<div class="box col-md-12">
-					<div class="box-content">
-						<div class="row">
-							<div class="col-lg-12 col-sm-12 col-xs-12">
-								<div class="panel panel-default">
-									<div class="panel-body pagination2">
-										<div class="box-body">
+		<div class="row">
+			<div class="box col-md-12">
+				<div class="box-content">
+					<div class="row">
+						<div class="col-lg-12 col-sm-12 col-xs-12">
+							<div class="panel panel-default">
+								<div class="panel-body pagination2">
+									<div class="box-body">
 										<div class="row">
 											<div class="col-sm-8">
 												{$msg}
@@ -52,8 +52,8 @@
 														</div>
 													</div>
 													<label for="comment" class="h6">Message</label>
-										<textarea rows="7" name="comment" id="comment"
-												  class="form-control form-white"></textarea>
+													<textarea rows="7" name="comment" id="comment"
+															  class="form-control form-white"></textarea>
 													{NoCaptcha::display()}{NoCaptcha::renderJs()}
 													<button type="submit" value="submit" class="btn btn-primary m-t-20">
 														Send
@@ -67,11 +67,11 @@
 							</div>
 						</div>
 						{/if}
-							</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 </body>
 </html>

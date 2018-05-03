@@ -36,7 +36,8 @@
 			</li>
 			<li><a><i class="fa fa-registered"></i><span> Regexes</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/admin/category_regexes-edit?action=add">Add Category Regexes</a>
+					<li><a href="{$smarty.const.WWW_TOP}/admin/category_regexes-edit?action=add">Add Category
+							Regexes</a>
 					</li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/category_regexes-list">View Category Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/collection_regexes-edit?action=add">Add Collection
@@ -44,9 +45,11 @@
 					<li><a href="{$smarty.const.WWW_TOP}/admin/collection_regexes-test?action=add">Test Collection
 							Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/collection_regexes-list">View Collection Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?action=add">Add Release Naming
+					<li><a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?action=add">Add Release
+							Naming
 							Regexes</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-test?action=add">Test Release Naming
+					<li><a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-test?action=add">Test Release
+							Naming
 							Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-list">View Release Naming
 							Regexes</a></li>

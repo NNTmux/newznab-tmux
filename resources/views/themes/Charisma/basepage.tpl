@@ -97,13 +97,15 @@
 													class="zmdi zmdi-keyboard"></i><span> Games</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/series"><i
 													class="zmdi zmdi-tv-play"></i><span> TV</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i class="zmdi zmdi-male-female"></i><span> Adult</span></a>
+									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i
+													class="zmdi zmdi-male-female"></i><span> Adult</span></a>
 									</li>
 									<li><a href="{$smarty.const.WWW_TOP}/books"><i
 													class="zmdi zmdi-book"></i><span> Books</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/browse"><i class="zmdi zmdi-view-list-alt"></i><span> Browse All Releases</span></a>
 									</li>
-									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="zmdi zmdi-group"></i><span> Browse Groups</span></a>
+									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i
+													class="zmdi zmdi-group"></i><span> Browse Groups</span></a>
 									</li>
 								</ul>
 							</li>
@@ -118,8 +120,10 @@
 								</li>
 								<li><a href="{$smarty.const.WWW_TOP}/search"><i class="zmdi zmdi-search-for"></i> Search</a>
 								</li>
-								<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="zmdi zmdi-rss"></i> RSS Feeds</a></li>
-								<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="zmdi zmdi-cloud"></i> API</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="zmdi zmdi-rss"></i> RSS Feeds</a>
+								</li>
+								<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="zmdi zmdi-cloud"></i> API</a>
+								</li>
 							</ul>
 						</li>
 						<li><a href="{$smarty.const.WWW_TOP}/logout"><i

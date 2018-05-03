@@ -1,4 +1,5 @@
 2018-05-03 DariusIII
+	* Chg: Adjust code in template files
 	* Chg: Add nntmux:reset-truncate command to artisan console
 	* Chg: Update php-tmdb/api and font-awesome to latest versions
 	* Chg: Add theme patch

@@ -46,7 +46,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
@@ -130,8 +130,12 @@
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result.grp_release_failed)}
-														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+														<span class="btn btn-default btn-xs"
+															  title="This release has failed to download for some users">
+															<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
+															Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																	class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+															Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
@@ -149,8 +153,8 @@
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
+														<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+															ago</span>
 														<br/><br/><br/>
 
 														<div class="release-name text-muted"><a
@@ -182,8 +186,13 @@
 																</span>
 															{/if}
 															{if !empty($result.grp_release_failed)}
-																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.grp_release_failed} Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>															{/if}
+																<span class="btn btn-default btn-xs"
+																	  title="This release has failed to download for some users">
+																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
+																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+															{/if}
 														</div>
 													</div>
 												</div>
@@ -262,8 +271,12 @@
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result.grp_release_failed)}
-														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+														<span class="btn btn-default btn-xs"
+															  title="This release has failed to download for some users">
+															<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
+															Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																	class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+															Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
@@ -281,8 +294,8 @@
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
+														<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+															ago</span>
 														<br/><br/><br/>
 
 														<div class="release-name text-muted"><a
@@ -314,8 +327,13 @@
 																</span>
 															{/if}
 															{if !empty($result.grp_release_failed)}
-																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.grp_release_failed} Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>															{/if}
+																<span class="btn btn-default btn-xs"
+																	  title="This release has failed to download for some users">
+																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
+																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
+																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+															{/if}
 														</div>
 													</div>
 												</div>
@@ -359,7 +377,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>

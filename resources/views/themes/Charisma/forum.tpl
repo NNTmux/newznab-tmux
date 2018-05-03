@@ -29,7 +29,8 @@
 				</td>
 				<td>
 					<a title="View profile"
-					   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+					   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+							<strong>{$result.username}</strong></h5></a>
 					{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 						<span class="btn btn-success btn-xs">{$result.rolename}</span>
 					{elseif $result.rolename === 'Supporter'}

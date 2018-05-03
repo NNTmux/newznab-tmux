@@ -95,46 +95,49 @@
 										<th>Size</th>
 										<th>Action</th>
 									</tr>
-										<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
-											<td class="check"><input id="chk{$result.grp_release_guid|substr:0:7}"
-																	 type="checkbox"
-																	 class="square"
-																	 value="{$result.grp_release_guid}"/></td>
-											<td class="item">
-												<a title="View details"
-												   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
-												<br/>
-						<span class="label label-default">{$result.grp_release_grabs}
-							grab{if $result.grp_release_grabs != 1}s{/if}</span>
-												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span class="label label-default"><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-															class="text-muted">NFO</a>
-													</span>{/if}
-												{if $mpass[$m@index] == 2}
-													<i class="fa fa-lock"></i>
-												{elseif $mpass[$m@index] == 1}
-													<i class="fa fa-lock"></i>
-												{/if}
-											</td>
-											<td class="less"><span
-														class="label label-default">{$mcatname[$m@index]}</span>
-											</td>
-											<td class="less mid"
-												title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
-											<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
-											<td class="icons">
-												<a title="Download NZB"
-												   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
-															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
-												<a href="#" id="guid{$result.grp_release_guid}" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
-																							title="Send to my Download Basket"></i></a>
-												{if isset($sabintegrated) && $sabintegrated !=""}
-													<a href="#" id="guid{$result.grp_release_guid}" class="icon icon_sab text-muted"
-													   title="Send to my Queue"><i
-																class="fa fa-share"></i></a>
-												{/if}
-											</td>
-										</tr>
+									<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
+										<td class="check"><input id="chk{$result.grp_release_guid|substr:0:7}"
+																 type="checkbox"
+																 class="square"
+																 value="{$result.grp_release_guid}"/></td>
+										<td class="item">
+											<a title="View details"
+											   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+											<br/>
+											<span class="label label-default">{$result.grp_release_grabs}
+												grab{if $result.grp_release_grabs != 1}s{/if}</span>
+											{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span
+													class="label label-default"><a
+														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+														class="text-muted">NFO</a>
+												</span>{/if}
+											{if $mpass[$m@index] == 2}
+												<i class="fa fa-lock"></i>
+											{elseif $mpass[$m@index] == 1}
+												<i class="fa fa-lock"></i>
+											{/if}
+										</td>
+										<td class="less"><span
+													class="label label-default">{$mcatname[$m@index]}</span>
+										</td>
+										<td class="less mid"
+											title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
+										<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
+										<td class="icons">
+											<a title="Download NZB"
+											   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
+														class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
+											<a href="#" id="guid{$result.grp_release_guid}"
+											   class="icon_cart text-muted"><i class="fa fa-shopping-basket"
+																			   title="Send to my Download Basket"></i></a>
+											{if isset($sabintegrated) && $sabintegrated !=""}
+												<a href="#" id="guid{$result.grp_release_guid}"
+												   class="icon icon_sab text-muted"
+												   title="Send to my Queue"><i
+															class="fa fa-share"></i></a>
+											{/if}
+										</td>
+									</tr>
 								</table>
 								<hr>
 								{if $results|@count > 10}
@@ -171,7 +174,7 @@
 												</div>
 											</div>
 										</div>
-										{if	count($results) > 0}
+										{if    count($results) > 0}
 											<div class="col-md-4">
 												{$results->links()}
 											</div>

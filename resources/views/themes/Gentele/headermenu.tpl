@@ -44,7 +44,8 @@
 								{/foreach}
 							{elseif $userdata.movieview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/movies/{$subcat.title}">{$subcat.title}</a>
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/movies/{$subcat.title}">{$subcat.title}</a>
 									</li>
 								{/foreach}
 							{/if}
@@ -73,7 +74,8 @@
 								{/foreach}
 							{elseif $userdata.consoleview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/console/{$subcat.title}">{$subcat.title}</a>
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/console/{$subcat.title}">{$subcat.title}</a>
 									</li>
 								{/foreach}
 							{/if}
@@ -138,7 +140,8 @@
 								{/foreach}
 							{elseif $userdata.musicview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a>
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a>
 									</li>
 								{/foreach}
 							{/if}
@@ -267,7 +270,8 @@
 						</li>
 						{if isset($isadmin)}
 							<li>
-								<a href="{$smarty.const.WWW_TOP}/admin/index"><i class="fa fa-cogs fa-spin"></i> Admin</a>
+								<a href="{$smarty.const.WWW_TOP}/admin/index"><i class="fa fa-cogs fa-spin"></i>
+									Admin</a>
 							</li>
 						{/if}
 						<li>

@@ -19,7 +19,8 @@
 										title="View in IMDB">{$movie->imdbid}</a></td>
 					<td class="less"><a href="http://www.themoviedb.org/movie/{$movie->tmdbid}"
 										title="View in TMDb">{$movie->tmdbid}</a></td>
-					<td><a title="Edit" href="{$smarty.const.WWW_TOP}/admin/movie-edit?id={$movie->imdbid}">{$movie->title}
+					<td><a title="Edit"
+						   href="{$smarty.const.WWW_TOP}/admin/movie-edit?id={$movie->imdbid}">{$movie->title}
 							({$movie->year})</a></td>
 					<td class="less">{$movie->cover}</td>
 					<td class="less">{$movie->backdrop}</td>

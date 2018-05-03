@@ -1,6 +1,7 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/release-list"><i class="fa fa-arrow-left"></i> Go back</a>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/release-list"><i class="fa fa-arrow-left"></i> Go
+		back</a>
 	<form action="release-edit?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">

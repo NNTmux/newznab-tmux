@@ -60,11 +60,11 @@
 													title="relpart">{$result.relpart}</span>/<span>
 													title="reltotalpart">{$result.reltotalpart}</span></td>
 										<td class="less">{if $result.binnum < $result.totalParts}<span>
-													style="color:red;">{$result.binnum}
+												style="color:red;">{$result.binnum}
 												/{$result.totalParts}</span>{else}100%{/if}</td>
 									{/if}
 									<td class="less">{if $result.releases_id > 0}<a title="View Nzb details"
-																				  href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
+																					href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 												Yes</a>{/if}</td>
 								</tr>
 							{/foreach}

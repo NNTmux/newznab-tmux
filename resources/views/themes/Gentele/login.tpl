@@ -14,7 +14,8 @@
 			<form action="login" method="post">
 				{{csrf_field()}}
 				<div class="form-group has-feedback">
-					<input id="username" name="username" type="text" class="form-control" placeholder="Username or email"/>
+					<input id="username" name="username" type="text" class="form-control"
+						   placeholder="Username or email"/>
 					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
@@ -46,13 +47,13 @@
 			<!-- iCheck -->
 			<script src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js" type="text/javascript"></script>
 			<script>
-				$(function () {
-					$('input').iCheck({
-						checkboxClass: 'icheckbox_flat-green',
-						radioClass: 'iradio_flat-green',
-						increaseArea: '20%' // optional
-					});
-				});
+                $(function () {
+                    $('input').iCheck({
+                        checkboxClass: 'icheckbox_flat-green',
+                        radioClass: 'iradio_flat-green',
+                        increaseArea: '20%' // optional
+                    });
+                });
 			</script>
 		</div>
 	</div>

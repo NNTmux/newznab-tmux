@@ -52,18 +52,22 @@
 							<br>
 							<div class="input-group input-group-lg">
 								<span class="input-group-addon"><i class="glyphicon glyphicon-envelope red"></i></span>
-								<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control" placeholder="Email"/>
+								<input autocomplete="off" id="email" name="email" value="{$email}" type="email"
+									   class="form-control" placeholder="Email"/>
 							</div>
 							<div class="clearfix"></div>
 							<br>
 							<div class="input-group input-group-lg">
 								<span class="input-group-addon"><i class="glyphicon glyphicon-lock red"></i></span>
-								<input autocomplete="off" id="password" name="password" value="{$confirmpassword}" type="password" class="form-control" placeholder="Password"/>
+								<input autocomplete="off" id="password" name="password" value="{$confirmpassword}"
+									   type="password" class="form-control" placeholder="Password"/>
 							</div>
 							<div class="clearfix"></div>
 							<div class="input-group input-group-lg">
 								<span class="input-group-addon"><i class="glyphicon glyphicon-lock red"></i></span>
-								<input autocomplete="off" id="password_confirmation" name="password_confirmation" value="{$confirmpassword}" type="password" class="form-control" placeholder="Retype password"/>
+								<input autocomplete="off" id="password_confirmation" name="password_confirmation"
+									   value="{$confirmpassword}" type="password" class="form-control"
+									   placeholder="Retype password"/>
 							</div>
 							<div class="clearfix"></div>
 							<p class="center col-md-5">

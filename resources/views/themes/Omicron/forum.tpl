@@ -30,7 +30,8 @@
 					</td>
 					<td>
 						<a title="View profile"
-						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+								<strong>{$result.username}</strong></h5></a>
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 							<span class="btn btn-success btn-xs">{$result.rolename}</span>
 						{elseif $result.rolename === 'Supporter'}
@@ -100,7 +101,8 @@
 								  name="addMessage" rows="6"></textarea>
 					</div>
 					<input class="btn btn-success" type="submit" value="submit"/>
-					<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
+					<input class="btn btn-warning" value="Cancel"
+						   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 				</div>
 			</form>
 		</div>

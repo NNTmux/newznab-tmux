@@ -1,5 +1,5 @@
-{if isset($covergrp)}
-	{if $covergrp == "movies"}
+{if isset($covgroup)}
+	{if $covgroup == "movies"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			<input class="form-control" style="width: 150px;" id="movietitle" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -35,7 +35,7 @@
 			<input class="btn btn-success" type="submit" value="Go">
 		</form>
 	{/if}
-	{if $covergrp == "xxx"}
+	{if $covgroup == "xxx"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			<input class="form-control"
 				   style="width: 150px;"
@@ -78,7 +78,7 @@
 			<input class="btn btn-success" type="submit" value="Go">
 		</form>
 	{/if}
-	{if $covergrp == "books"}
+	{if $covgroup == "books"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			<input class="form-control" style="width: 150px;" id="author" type="text" name="author" value="{$author}"
 				   placeholder="Author">
@@ -87,7 +87,7 @@
 			<input class="btn btn-success" type="submit" value="Go">
 		</form>
 	{/if}
-	{if $covergrp == "music"}
+	{if $covgroup == "music"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			<input class="form-control" style="width: 150px;" id="musicartist" type="text" name="artist"
 				   value="{$artist}"
@@ -116,7 +116,7 @@
 			<input class="btn btn-success" type="submit" value="Go">
 		</form>
 	{/if}
-	{if $covergrp == "console"}
+	{if $covgroup == "console"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -138,7 +138,7 @@
 			<input class="btn btn-success" type="submit" value="Go">
 		</form>
 	{/if}
-	{if $covergrp == "games"}
+	{if $covgroup == "games"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">

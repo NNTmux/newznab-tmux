@@ -54,7 +54,7 @@
 				<div class="clearfix"></div>
 				<!-- menu profile quick info -->
 				{if Auth::check()}
-				<div class="profile">
+					<div class="profile">
 						<div class="profile_pic">
 							<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png" alt="User Image"
 								 class="img-circle profile_img">
@@ -63,7 +63,7 @@
 							<span>Welcome,</span>
 							<h2>{$userdata.username}</h2>
 						</div>
-				</div>
+					</div>
 				{/if}
 				<!-- /menu profile quick info -->
 				<br/>
@@ -102,27 +102,31 @@
 							{/if}
 							<div class="clearfix"></div>
 							{if Auth::check()}
-							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
+								<li><a><i class="fa fa-edit"></i> Articles & Links <span
+												class="fa fa-chevron-down"></span></a>
 
-								<ul class="nav child_menu" style="display: none">
+									<ul class="nav child_menu" style="display: none">
 
 										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i> Search</a>
+										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i>
+												Search</a>
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS
 												Feeds</a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>
 												API</a></li>
-								</ul>
-								<div class="clearfix"></div>
-							<li><a href="{{route('logout')}}" onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
-									<i class="fa fa-unlock"></i><span> Sign Out</span>
-								</a>
-							</li>
+									</ul>
+									<div class="clearfix"></div>
+								<li><a href="{{route('logout')}}"
+									   onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
+										<i class="fa fa-unlock"></i><span> Sign Out</span>
+									</a>
+								</li>
 							{else}
-							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
-							</li>
+								<li><a href="{$smarty.const.WWW_TOP}/login"><i
+												class="fa fa-lock"></i><span> Sign In</span></a>
+								</li>
 							{/if}
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 											class="far fa-envelope"></i><span> Contact</span></a></li>
@@ -134,16 +138,16 @@
 		</div>
 		<!-- top navigation -->
 		{if Auth::check()}
-		<div class="top_nav">
-			<div class="nav_menu">
-				<nav class="" role="navigation">
-					<div class="nav toggle">
-						<a id="menu_toggle"><i class="fa fa-bars"></i></a>
-					</div>
-					{$header_menu}
-				</nav>
+			<div class="top_nav">
+				<div class="nav_menu">
+					<nav class="" role="navigation">
+						<div class="nav toggle">
+							<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+						</div>
+						{$header_menu}
+					</nav>
+				</div>
 			</div>
-		</div>
 		{/if}
 		<!-- /top navigation -->
 
@@ -161,8 +165,10 @@
 				<footer>
 					<div class="copyright-info">
 						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
-							<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i class="fab fa-github-alt"></i>.</strong> This software is
-						open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i> <a href="https://github.com/laravel/framework/">Laravel</a>
+							<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
+									class="fab fa-github-alt"></i>.</strong> This software is
+						open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
+						<a href="https://github.com/laravel/framework/">Laravel</a>
 					</div>
 					<div class="clearfix"></div>
 				</footer>
@@ -218,14 +224,14 @@
 
 
 <script>
-    jQuery(document).ready(function(){
+    jQuery(document).ready(function () {
         jQuery.goup({
-			containerColor: "#8bc5c5",
-			arrowColor: "#fdf8f8",
-			bottomOffset: 100,
-			goupSpeed: "normal",
-			title: "Scroll to top"
-		});
+            containerColor: "#8bc5c5",
+            arrowColor: "#fdf8f8",
+            bottomOffset: 100,
+            goupSpeed: "normal",
+            title: "Scroll to top"
+        });
     });
 </script>
 

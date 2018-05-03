@@ -14,23 +14,25 @@
 	</div>
 {literal}
 	<script type="text/javascript">
-		var timer = 0;
-		function getOverview() {
-			$.ajax
-			({
-				url: WWW_TOP + '/nzbvortex?getOverview&isAjax',
-				cache: false
-			}).done(function (html) {
-				$("#vortex").html(html);
-				timer = setTimeout(getOverview, 2500);
-			}).fail(function (response) {
-				$('#vortex').hide();
-				$('#vortex-error').show();
-				$('#vortex-error').html(response.responseText);
-				clearTimeout(timer);
-			});
-		}
-		getOverview();
+        var timer = 0;
+
+        function getOverview() {
+            $.ajax
+            ({
+                url: WWW_TOP + '/nzbvortex?getOverview&isAjax',
+                cache: false
+            }).done(function (html) {
+                $("#vortex").html(html);
+                timer = setTimeout(getOverview, 2500);
+            }).fail(function (response) {
+                $('#vortex').hide();
+                $('#vortex-error').show();
+                $('#vortex-error').html(response.responseText);
+                clearTimeout(timer);
+            });
+        }
+
+        getOverview();
 	</script>
 {/literal}
 {else}

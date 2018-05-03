@@ -7,8 +7,8 @@
 				{eval var="$var," assign='menuevalresult'}
 				{if $menuevalresult|replace:",":"1" == "1"}
 					<li class="mmenu{if $menu.newwindow == "1"}_new{/if}"><a {if $menu.newwindow == "1"}class="external"
-																			target="null"{/if} title="{$menu.tooltip}"
-																			href="{$menu.href}">{$menu.title}</a></li>
+																			 target="null"{/if} title="{$menu.tooltip}"
+																			 href="{$menu.href}">{$menu.title}</a></li>
 				{/if}
 			{/foreach}
 		</ul>

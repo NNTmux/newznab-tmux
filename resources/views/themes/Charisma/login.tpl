@@ -42,7 +42,7 @@
 				<form class="form-horizontal" method="post" action="login">
 					{{csrf_field()}}
 					{if isset($redirect)}
-						<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
+						<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}"/>
 					{/if}
 					<fieldset>
 						<div class="input-group input-group-lg">
@@ -80,7 +80,7 @@
 			<!--/span-->
 		</div>
 		<!--/row-->
-		</div>
+	</div>
 	<!--/fluid-row-->
 </div>
 <!--/.fluid-container-->

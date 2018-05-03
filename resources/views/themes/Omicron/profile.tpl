@@ -70,7 +70,8 @@
 														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-aqua-active">
-																<td colspan="2" style="padding-left: 8px;"><strong>UI Preferences</strong></td>
+																<td colspan="2" style="padding-left: 8px;"><strong>UI
+																		Preferences</strong></td>
 															</tr>
 															<tr>
 																<th>Theme:</th>
@@ -79,12 +80,18 @@
 															<tr>
 																<th>Cover view:</th>
 																<td>
-																	{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}<br/>
-																	{if $user.musicview == "1"}View music covers{else}View standard music category{/if}<br/>
-																	{if $user.consoleview == "1"}View console covers{else}View standard console category{/if}<br/>
-																	{if $user.gameview == "1"}View games covers{else}View standard games category{/if}<br/>
-																	{if $user.bookview == "1"}View book covers{else}View standard book category{/if}<br/>
-																	{if $user.xxxview == "1"}View xxx covers{else}View standard xxx category{/if}<br/>
+																	{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}
+																	<br/>
+																	{if $user.musicview == "1"}View music covers{else}View standard music category{/if}
+																	<br/>
+																	{if $user.consoleview == "1"}View console covers{else}View standard console category{/if}
+																	<br/>
+																	{if $user.gameview == "1"}View games covers{else}View standard games category{/if}
+																	<br/>
+																	{if $user.bookview == "1"}View book covers{else}View standard book category{/if}
+																	<br/>
+																	{if $user.xxxview == "1"}View xxx covers{else}View standard xxx category{/if}
+																	<br/>
 																</td>
 															</tr>
 															</tbody>
@@ -109,12 +116,14 @@
 																<td><span id="ugrtd">{$grabstoday}</span> /
 																	{if $user.grabs >= $user->role->downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
-																		in {($grabstoday.nextdl/3600)|intval}
-																		h {($grabstoday.nextdl/60) % 60}
-																		m)</small> {else} {$user->role->downloadrequests} {/if}
+																			in {($grabstoday.nextdl/3600)|intval}
+																			h {($grabstoday.nextdl/60) % 60}
+																			m)
+																		</small>
+																	{else} {$user->role->downloadrequests} {/if}
 																	{if isset($isadmin) && $grabstoday > 0}
 																		<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
-																			href="#" class="label label-danger">
+																		   href="#" class="label label-danger">
 																			Reset</a>
 																	{/if}</td>
 															</tr>
@@ -126,10 +135,14 @@
 																<tr>
 																	<th>SABnzbd Integration:</th>
 																	<td>
-																		<b>Url:</b> {if $saburl == ''}N/A{else}{$saburl}{/if}<br/>
-																		<b>Key:</b> {if $sabapikey == ''}N/A{else}{$sabapikey}{/if}<br/>
-																		<b>Type:</b> {if $sabapikeytype == ''}N/A{else}{$sabapikeytype}{/if}<br/>
-																		<b>Priority:</b> {if $sabpriority == ''}N/A{else}{$sabpriority}{/if}<br/>
+																		<b>Url:</b> {if $saburl == ''}N/A{else}{$saburl}{/if}
+																		<br/>
+																		<b>Key:</b> {if $sabapikey == ''}N/A{else}{$sabapikey}{/if}
+																		<br/>
+																		<b>Type:</b> {if $sabapikeytype == ''}N/A{else}{$sabapikeytype}{/if}
+																		<br/>
+																		<b>Priority:</b> {if $sabpriority == ''}N/A{else}{$sabpriority}{/if}
+																		<br/>
 																		<b>Storage:</b> {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
 																	</td>
 																</tr>
@@ -146,7 +159,12 @@
 																</tr>
 																<tr>
 																	<th title="Admin Notes">Notes:</th>
-																	<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}{if isset($isadmin)}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="label label-info">Add/Edit</a>{/if}</td>
+																	<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}
+																			<br/>
+																		{/if}{if isset($isadmin)}<a
+																			href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes"
+																			class="label label-info">Add/Edit</a>{/if}
+																	</td>
 																</tr>
 															{/if}
 															</tbody>
@@ -184,72 +202,75 @@
 																	</td>
 																</tr>
 																{if $userinvitedby && $userinvitedby.username != ""}
-																<tr>
-																	<th width="200">Invited By</th>
-																	{if $privileged || !$privateprofiles}
-																		<td>
-																			<a title="View {$userinvitedby.username}'s profile"
-																			   href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a>
-																		</td>
-																	{else}
-																		<td>
-																			{$userinvitedby.username}
-																		</td>
-																	{/if}
-																</tr>
-																	{/if}
+																	<tr>
+																		<th width="200">Invited By</th>
+																		{if $privileged || !$privateprofiles}
+																			<td>
+																				<a title="View {$userinvitedby.username}'s profile"
+																				   href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a>
+																			</td>
+																		{else}
+																			<td>
+																				{$userinvitedby.username}
+																			</td>
+																		{/if}
+																	</tr>
+																{/if}
 																</tbody>
 															</table>
 														{/if}
 														{if isset($isadmin) && $downloadlist|@count > 0}
-														<table class="data table table-condensed table-striped table-responsive table-hover">
-															<tbody>
-															<tr class="bg-aqua-active">
-																<td colspan="2" style="padding-left: 8px;"><strong>Downloads for user</strong>
-																</td>
-															</tr>
-															<tr>
-																<th>date</th>
-																<th>release</th>
-															</tr>
-															{foreach $downloadlist as $download}
-																{if $download@iteration == 10}
-																	<tr class="more">
-																		<td colspan="3"><a
-																					onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;"
-																					href="#">show all...</a></td>
-																	</tr>
-																{/if}
-																<tr {if $download@iteration >= 10}class="extra"
-																	style="display:none;"{/if}>
-																	<td width="80"
-																		title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-																	<td>{if $download->release->guid == ""}n/a{else}<a
-																			href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
+															<table class="data table table-condensed table-striped table-responsive table-hover">
+																<tbody>
+																<tr class="bg-aqua-active">
+																	<td colspan="2" style="padding-left: 8px;"><strong>Downloads
+																			for user</strong>
 																	</td>
 																</tr>
-															{/foreach}
-														</table>
+																<tr>
+																	<th>date</th>
+																	<th>release</th>
+																</tr>
+																{foreach $downloadlist as $download}
+																	{if $download@iteration == 10}
+																		<tr class="more">
+																			<td colspan="3"><a
+																						onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;"
+																						href="#">show all...</a></td>
+																		</tr>
+																	{/if}
+																	<tr {if $download@iteration >= 10}class="extra"
+																		style="display:none;"{/if}>
+																		<td width="80"
+																			title="{$download.timestamp}">{$download.timestamp|date_format}</td>
+																		<td>{if $download->release->guid == ""}n/a{else}
+																				<a
+																				href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
+																		</td>
+																	</tr>
+																{/foreach}
+															</table>
 														{/if}
 													</td>
 												</tr>
 												</tbody>
 											</table>
-											</div>
 										</div>
 									</div>
 								</div>
-								{if isset($isadmin) || !$publicview}
-									<a class="btn btn-primary" href="{$smarty.const.WWW_TOP}profileedit">Edit
-										Profile</a>
-								{/if}
-								{if !isset($isadmin)}
-									<a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
-								{/if}
 							</div>
+							{if isset($isadmin) || !$publicview}
+								<a class="btn btn-primary" href="{$smarty.const.WWW_TOP}profileedit">Edit
+									Profile</a>
+							{/if}
+							{if !isset($isadmin)}
+								<a class="btn btn-warning confirm_action"
+								   href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
+							{/if}
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>

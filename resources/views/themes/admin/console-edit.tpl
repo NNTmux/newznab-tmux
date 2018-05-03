@@ -1,6 +1,7 @@
 <h1>{$title}</h1>
 <div class="well well-sm">
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/console-list"><i class="fa fa-arrow-left"></i> Go back</a>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/console-list"><i class="fa fa-arrow-left"></i> Go
+		back</a>
 	<form enctype="multipart/form-data" action="console-edit?action=submit" method="post">
 		{{csrf_field()}}
 

@@ -52,7 +52,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
@@ -74,7 +74,7 @@
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{foreach $result.languages as $movielanguage}
-													{release_flag($movielanguage, browse)}
+														{release_flag($movielanguage, browse)}
 													{/foreach}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover img-responsive img-rounded"
@@ -93,13 +93,15 @@
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-															title="View NFO" class="modal_nfo label label-primary"
-															rel="nfo">NFO</a>{/if}
+														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+														title="View NFO" class="modal_nfo label label-primary"
+														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+													   rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -149,7 +151,8 @@
 																			Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
 																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																		  id="guid{$result.grp_release_guid}"
-																		  data-toggle="tooltip" data-placement="top" title
+																		  data-toggle="tooltip" data-placement="top"
+																		  title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
@@ -165,8 +168,10 @@
 																				id="imdb{$result.imdbid}"
 																				href="javascript:;"
 																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																				data-toggle="tooltip" data-placement="top"
-																				title data-original-title="Send to CouchPotato">
+																				data-toggle="tooltip"
+																				data-placement="top"
+																				title
+																				data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
@@ -174,7 +179,8 @@
 																		<span class="btn btn-default btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																			Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			Grab{if {$result.grp_release_grabs} != 1}s{/if}
+																			/ <i
 																					class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
 																			Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 																	{/if}
@@ -196,7 +202,7 @@
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{foreach $result.languages as $movielanguage}
-													{release_flag($movielanguage, browse)}
+														{release_flag($movielanguage, browse)}
 													{/foreach}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover img-responsive img-rounded"
@@ -221,7 +227,9 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+													   rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -271,7 +279,8 @@
 																			Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
 																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																		  id="guid{$result.grp_release_guid}"
-																		  data-toggle="tooltip" data-placement="top" title
+																		  data-toggle="tooltip" data-placement="top"
+																		  title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
@@ -287,8 +296,10 @@
 																				id="imdb{$result.imdbid}"
 																				href="javascript:;"
 																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																				data-toggle="tooltip" data-placement="top"
-																				title data-original-title="Send to CouchPotato">
+																				data-toggle="tooltip"
+																				data-placement="top"
+																				title
+																				data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
@@ -296,7 +307,8 @@
 																		<span class="btn btn-default btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																			Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			Grab{if {$result.grp_release_grabs} != 1}s{/if}
+																			/ <i
 																					class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
 																			Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 																	{/if}
@@ -352,7 +364,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>

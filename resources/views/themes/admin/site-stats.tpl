@@ -12,7 +12,8 @@
 			{foreach from=$topgrabs item=result}
 				<tr class="{cycle values=",alt"}">
 					<td width="75%"><a
-								href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$result.id}">{$result.username}</a></td>
+								href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$result.id}">{$result.username}</a>
+					</td>
 					<td>{$result.grabs}</td>
 				</tr>
 			{/foreach}

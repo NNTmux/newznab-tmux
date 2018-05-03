@@ -14,7 +14,8 @@
 						{if isset($isadmin) && $isadmin == 1}<strong>{/if}
 							<a {if $smarty.foreach.result.last}id="last"{/if}
 							   title="{if isset($isadmin) && $isadmin == 1}Admin{else}View profile{/if}"
-							   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+							   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+									<strong>{$result.username}</strong></h5></a>
 							{if isset($isadmin) && $isadmin == 1}</strong>{/if}
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 							<span class="btn btn-success btn-xs">{$result.rolename}</span>
@@ -50,23 +51,25 @@
 		</table>
 		<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
 			{if $result.locked == 0}
-			<div class="header">
-				<h3 id="myLabel">Reply</h3>
-			</div>
-			<div class="body">
-				<form id="forum-post-reply" class="form-horizontal" action="" method="post">
-					{{csrf_field()}}
-					<div class="control-group">
-						<label class="control-label" for="addMessage">Message</label>
-						<div class="controls">
-							<textarea class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6"
+				<div class="header">
+					<h3 id="myLabel">Reply</h3>
+				</div>
+				<div class="body">
+					<form id="forum-post-reply" class="form-horizontal" action="" method="post">
+						{{csrf_field()}}
+						<div class="control-group">
+							<label class="control-label" for="addMessage">Message</label>
+							<div class="controls">
+							<textarea class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage"
+									  rows="6"
 									  cols="100" required aria-required="true"></textarea>
+							</div>
+							<input class="btn btn-success" type="submit" value="Submit"/>
+							<input class="btn btn-warning" value="Cancel"
+								   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 						</div>
-						<input class="btn btn-success" type="submit" value="Submit"/>
-						<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
-					</div>
-				</form>
-			</div>
+					</form>
+				</div>
 			{else}
 				<label class="label label-warning" title="Topic Locked">Topic Locked</label>
 			{/if}

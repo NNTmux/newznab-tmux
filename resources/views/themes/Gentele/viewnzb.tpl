@@ -28,12 +28,12 @@
 				{if $movie && $release.videos_id <= 0 }
 					{if $movie.imdbid > 0}
 						<a class="label label-primary" target="_blank"
-					   		href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}/"
-					   		title="View at IMDB">IMDB</a>
+						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}/"
+						   title="View at IMDB">IMDB</a>
 						<a target="_blank"
-					   		href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$movie.imdbid}/"
-					   		name="trakt{$release.imdbid}" title="View Trakt page"
-					   		class="label label-primary" rel="trakt">TRAKT</a>
+						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$movie.imdbid}/"
+						   name="trakt{$release.imdbid}" title="View Trakt page"
+						   class="label label-primary" rel="trakt">TRAKT</a>
 					{/if}
 					{if $movie.tmdbid > 0}
 						<a class="label label-primary" target="_blank"
@@ -42,7 +42,7 @@
 					{/if}
 					{if $movie.imdbid > 0}
 						<a class="label label-primary" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}"
-					   	title="View all versions">Movie View</a>
+						   title="View all versions">Movie View</a>
 					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
@@ -350,10 +350,10 @@
 																</td>
 															</tr>
 															{if !empty($movie.rtrating)}
-															<tr>
-																<th width="140">RottenTomatoes score</th>
-																<td>{$movie.rtrating}</td>
-															</tr>
+																<tr>
+																	<th width="140">RottenTomatoes score</th>
+																	<td>{$movie.rtrating}</td>
+																</tr>
 															{/if}
 														{/if}
 														{if $show && $release.videos_id > 0}
@@ -476,15 +476,15 @@
 																{assign var="groupname" value=","|explode:$release.group_names}
 																<td>
 																	{foreach $groupname as $grp}
-																			<a title="Browse {$grp}"
-																		   	href="{$smarty.const.WWW_TOP}/browse/group?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
+																		<a title="Browse {$grp}"
+																		   href="{$smarty.const.WWW_TOP}/browse/group?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
 																		<br/>
 																	{/foreach}
 																</td>
 															{else}
 																<td>
 																	<a title="Browse {$release.group_name}"
-																   href="{$smarty.const.WWW_TOP}/browse/group?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
+																	   href="{$smarty.const.WWW_TOP}/browse/group?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
 																</td>
 															{/if}
 														</tr>
@@ -688,7 +688,8 @@
 							{/if}
 							{if $reVideo != false || $reAudio != false}
 								<div id="pane8" class="tab-pane">
-									<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table">
+									<table style="width:100%;"
+										   class="data table table-striped responsive-utilities jambo-table">
 										<tr>
 											<th width="15%"></th>
 											<th>Property</th>

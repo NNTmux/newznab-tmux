@@ -2,7 +2,10 @@
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ <a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}audio{else}{$parentcat}{/if}">{$parentcat}</a> / {if ($catname !== '')} <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
+			/
+			<a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}audio{else}{$parentcat}{/if}">{$parentcat}</a>
+			/ {if ($catname !== '')} <a
+				href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
 		</ol>
 	</div>
 </div>
@@ -59,7 +62,7 @@
 										</div>
 									</div>
 								</div>
-								{if	count($results) > 0}
+								{if    count($results) > 0}
 									<div class="col-md-4">
 										{$results->links()}
 									</div>
@@ -201,7 +204,7 @@
 										</div>
 									</div>
 								</div>
-								{if	count($results) > 0}
+								{if    count($results) > 0}
 									<div class="col-md-4">
 										{$results->links()}
 									</div>

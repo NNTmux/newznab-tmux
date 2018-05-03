@@ -36,7 +36,8 @@
 						<div class="hint">Should be at least six characters long.</div>
 					</div>
 					<div class="form-group has-feedback">
-						<input autocomplete="off" id="password_confirmation" name="password_confirmation" value="{$confirmpassword}"
+						<input autocomplete="off" id="password_confirmation" name="password_confirmation"
+							   value="{$confirmpassword}"
 							   type="password" class="form-control" placeholder="Retype password"/>
 						<span class="glyphicon glyphicon-log-in form-control-feedback"></span>
 					</div>

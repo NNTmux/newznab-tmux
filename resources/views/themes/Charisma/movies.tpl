@@ -46,7 +46,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
@@ -74,7 +74,10 @@
 																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
-																alt="{$result.title|escape:"htmlall"}"/> {if !empty($result.grp_release_failed)} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed for some users"></i>{/if}</a>
+																alt="{$result.title|escape:"htmlall"}"/> {if !empty($result.grp_release_failed)}
+															<i class="zmdi zmdi-alarm" style="color: red"
+															   title="This release has failed for some users"></i>
+														{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -90,7 +93,9 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+													   rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -117,8 +122,8 @@
 														<span class="label label-default">{if $result.rating != ''}{$result.rating}/10{/if}</span>
 														<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
 														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
+														<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+															ago</span>
 														<br/><br/><br/>
 														<div class="release-name text-muted"><a
 																	href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"}</a>
@@ -150,16 +155,21 @@
 															{/if}
 															{if !empty($cpurl) && !empty($cpapi)}
 																<span
-																	id="imdb{$result.imdbid}"
-																	class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																	href="javascript:;"
-																	title="Add to CouchPotato">
+																		id="imdb{$result.imdbid}"
+																		class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																		href="javascript:;"
+																		title="Add to CouchPotato">
 																	<i class="zmdi zmdi-bed"></i>
 																</span>
 															{/if}
 															{if !empty($result.grp_release_failed)}
-																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed} Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>															{/if}
+																<span class="btn btn-default btn-xs"
+																	  title="This release has failed to download for some users">
+																	<i class="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs}
+																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			class="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed}
+																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+															{/if}
 														</div>
 													</div>
 												</div>
@@ -182,7 +192,10 @@
 																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
-																alt="{$result.title|escape:"htmlall"}"/> {if !empty($result.grp_release_failed)} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
+																alt="{$result.title|escape:"htmlall"}"/> {if !empty($result.grp_release_failed)}
+															<i class="zmdi zmdi-alarm" style="color: red"
+															   title="This release has failed to download for some users"></i>
+														{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -198,7 +211,9 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+													   rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -225,8 +240,8 @@
 														<span class="label label-default">{if $result.rating != ''}{$result.rating}/10{/if}</span>
 														<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
 														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
+														<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+															ago</span>
 														<br/><br/><br/>
 														<div class="release-name text-muted"><a
 																	href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"}</a>
@@ -258,16 +273,21 @@
 															{/if}
 															{if !empty($cpurl) && !empty($cpapi)}
 																<span
-																	id="imdb{$result.imdbid}"
-																	class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																	href="javascript:;"
-																	title="Add to CouchPotato">
+																		id="imdb{$result.imdbid}"
+																		class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																		href="javascript:;"
+																		title="Add to CouchPotato">
 																	<i class="zmdi zmdi-bed"></i>
 																</span>
 															{/if}
 															{if !empty($result.grp_release_failed)}
-																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs} Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed} Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>																{/if}
+																<span class="btn btn-default btn-xs"
+																	  title="This release has failed to download for some users">
+																	<i class="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs}
+																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			class="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed}
+																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+															{/if}
 														</div>
 													</div>
 												</div>
@@ -311,7 +331,7 @@
 								</div>
 							</div>
 						</div>
-						{if	count($results) > 0}
+						{if    count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>

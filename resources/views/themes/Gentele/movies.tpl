@@ -99,7 +99,9 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+													   rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -128,8 +130,8 @@
 																<span class="label label-primary">{if $result.rating != ''}{$result.rating}/10{/if}</span>
 																<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
 																<span class="label label-primary">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-primary">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
+																<span class="label label-primary">Posted {$result.grp_release_postdate|timeago}
+																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.grp_release_name|escape:"htmlall"}</a>
@@ -147,11 +149,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$result.grp_release_comments}
 																			Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
-																  id="guid{$result.grp_release_guid}"
-																  data-toggle="tooltip" data-placement="top" title
-																  data-original-title="Send to my download basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																		  id="guid{$result.grp_release_guid}"
+																		  data-toggle="tooltip" data-placement="top"
+																		  title
+																		  data-original-title="Send to my download basket"><i
+																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																			  id="guid{$result.grp_release_guid}"
@@ -165,8 +168,10 @@
 																				id="imdb{$result.imdbid}"
 																				href="javascript:;"
 																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																				data-toggle="tooltip" data-placement="top"
-																				title data-original-title="Send to CouchPotato">
+																				data-toggle="tooltip"
+																				data-placement="top"
+																				title
+																				data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
@@ -174,7 +179,8 @@
 																		<span class="btn btn-default btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																			Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			Grab{if {$result.grp_release_grabs} != 1}s{/if}
+																			/ <i
 																					class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
 																			Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 																	{/if}
@@ -221,7 +227,9 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+													   rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -250,8 +258,8 @@
 																<span class="label label-primary">{if $result.rating != ''}{$result.rating}/10{/if}</span>
 																<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
 																<span class="label label-primary">{$result.grp_release_size|fsize_format:"MB"}</span>
-																	<span class="label label-primary">Posted {$result.grp_release_postdate|timeago}
-																		ago</span>
+																<span class="label label-primary">Posted {$result.grp_release_postdate|timeago}
+																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.grp_release_name|escape:"htmlall"}</a>
@@ -269,11 +277,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$result.grp_release_comments}
 																			Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
-																  id="guid{$result.grp_release_guid}"
-																  data-toggle="tooltip" data-placement="top" title
-																  data-original-title="Send to my download basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																		  id="guid{$result.grp_release_guid}"
+																		  data-toggle="tooltip" data-placement="top"
+																		  title
+																		  data-original-title="Send to my download basket"><i
+																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																			  id="guid{$result.grp_release_guid}"
@@ -284,11 +293,13 @@
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
 																		<span
-																			id="imdb{$result.imdbid}"
-																			href="javascript:;"
-																			class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																			data-toggle="tooltip" data-placement="top"
-																			title data-original-title="Send to CouchPotato">
+																				id="imdb{$result.imdbid}"
+																				href="javascript:;"
+																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				data-toggle="tooltip"
+																				data-placement="top"
+																				title
+																				data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
@@ -296,7 +307,8 @@
 																		<span class="btn btn-default btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																			Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
+																			Grab{if {$result.grp_release_grabs} != 1}s{/if}
+																			/ <i
 																					class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
 																			Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
 																	{/if}

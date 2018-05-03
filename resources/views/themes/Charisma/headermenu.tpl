@@ -31,18 +31,23 @@
 							{if $userdata.movieview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/movies">{$parentcat.title}</a></li>
 							{elseif $userdata.movieview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/movies/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li>
+									<a href="{$smarty.const.WWW_TOP}/browse/movies/{$parentcat.title}">{$parentcat.title}</a>
+								</li>
 							{/if}
 							<hr>
 							<li><a href="{$smarty.const.WWW_TOP}/mymovies">My Movies</a></li>
 							<hr>
 							{if $userdata.movieview == "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/movies/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/movies/{$subcat.title}">{$subcat.title}</a>
+									</li>
 								{/foreach}
 							{elseif $userdata.movieview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/movies/{$subcat.title}">{$subcat.title}</a></li>
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/movies/{$subcat.title}">{$subcat.title}</a>
+									</li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -58,7 +63,8 @@
 							{if $userdata.consoleview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/console">{$parentcat.title}</a></li>
 							{elseif $userdata.consoleview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+								</li>
 							{/if}
 							<hr>
 							{if $userdata.consoleview == "1"}
@@ -68,7 +74,9 @@
 								{/foreach}
 							{elseif $userdata.consoleview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/console/{$subcat.title}">{$subcat.title}</a></li>
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/console/{$subcat.title}">{$subcat.title}</a>
+									</li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -84,7 +92,8 @@
 							{if $userdata.gameview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/games">{$parentcat.title}</a></li>
 							{elseif $userdata.gameview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+								</li>
 							{/if}
 							<hr>
 							{if $userdata.gameview == "1"}
@@ -93,13 +102,15 @@
 										<li><a href="{$smarty.const.WWW_TOP}/games">{$subcat.title}</a>
 										</li>
 									{else}
-										<li><a href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a>
+										<li>
+											<a href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{/if}
 								{/foreach}
 							{elseif $userdata.gameview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/pc/{$subcat.title}">{$subcat.title}</a>
+									</li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -115,7 +126,8 @@
 							{if $userdata.musicview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/music">{$parentcat.title}</a></li>
 							{elseif $userdata.musicview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+								</li>
 							{/if}
 							<hr>
 							{if $userdata.musicview == "1"}
@@ -124,7 +136,9 @@
 								{/foreach}
 							{elseif $userdata.musicview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a></li>
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/music/{$subcat.title}">{$subcat.title}</a>
+									</li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -140,7 +154,8 @@
 							{if $userdata.bookview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
 							{elseif $userdata.bookview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+								</li>
 							{/if}
 							<hr>
 							{foreach $parentcat.subcatlist as $subcat}
@@ -159,7 +174,8 @@
 							{if $userdata.xxxview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}</a></li>
 							{elseif $userdata.xxxview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+								</li>
 							{/if}
 							<hr>
 							{if $userdata.xxxview == "1"}
@@ -168,13 +184,15 @@
 										<li><a href="{$smarty.const.WWW_TOP}/xxx/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{else}
-										<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a>
+										<li>
+											<a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{/if}
 								{/foreach}
 							{elseif $userdata.xxxview != "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/xxx/{$subcat.title}">{$subcat.title}</a>
+									</li>
 								{/foreach}
 							{/if}
 						</ul>
@@ -182,7 +200,8 @@
 				{/if}
 				{if $parentcat.id == {$catClass::OTHER_ROOT}}
 					<li class="nav-parent">
-						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30">
+						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+						   data-delay="30">
 							<i class="zmdi zmdi-thumb-up-down"></i> Other</a>
 						<ul class="dropdown-menu">
 							<li><a href="{$smarty.const.WWW_TOP}/browse/other">Other</a></li>
@@ -194,18 +213,24 @@
 			{/foreach}
 			<ul class="nav navbar-left">
 				<li class="">
-					<form class="navbar-form" id="headsearch_form" action="{$smarty.const.WWW_TOP}/search?id=" method="get">
+					<form class="navbar-form" id="headsearch_form" action="{$smarty.const.WWW_TOP}/search?id="
+						  method="get">
 						<select class="form-control" id="headcat" name="t">
 							<option class="grouping" value="-1">All</option>
 							{foreach $parentcatlist as $parentcat}
-								<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} class="grouping" value="{$parentcat.id}">{$parentcat.title}</option>
+								<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} class="grouping"
+										value="{$parentcat.id}">{$parentcat.title}</option>
 								{foreach $parentcat.subcatlist as $subcat}
-									<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;{$subcat.title}</option>
+									<option {if $header_menu_cat == $subcat.id}selected="selected"{/if}
+											value="{$subcat.id}">&nbsp;&nbsp;{$subcat.title}</option>
 								{/foreach}
 							{/foreach}
 						</select>
-						<input class="form-control" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}" placeholder="Search" type="text" />
-						<button id="headsearch_go" type="submit" class="btn btn-success"><i class="zmdi zmdi-search"></i></button>
+						<input class="form-control" id="headsearch" name="search"
+							   value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}"
+							   placeholder="Search" type="text"/>
+						<button id="headsearch_go" type="submit" class="btn btn-success"><i
+									class="zmdi zmdi-search"></i></button>
 					</form>
 				</li>
 			</ul>
@@ -220,25 +245,32 @@
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="zmdi zmdi-account"></i><span> My Profile</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/cart/index"><i class="zmdi zmdi-shopping-basket"></i><span> My Download Basket</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="zmdi zmdi-cloud-download"></i><span> My Queue</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="zmdi zmdi-movie-alt"></i><span> My movies</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/profile"><i
+									class="zmdi zmdi-account"></i><span> My Profile</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/cart/index"><i class="zmdi zmdi-shopping-basket"></i><span> My Download Basket</span></a>
+					</li>
+					<li><a href="{$smarty.const.WWW_TOP}/queue"><i
+									class="zmdi zmdi-cloud-download"></i><span> My Queue</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i
+									class="zmdi zmdi-movie-alt"></i><span> My movies</span></a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="zmdi zmdi-tv-play"></i> My Shows</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/profileedit"><i class="zmdi zmdi-coffee"></i><span> Account Settings</span></a>
 					</li>
 					{if isset($isadmin)}
-						<li><a href="{$smarty.const.WWW_TOP}/admin/index"><i class="zmdi zmdi-settings"></i><span> Admin</span></a></li>
+						<li><a href="{$smarty.const.WWW_TOP}/admin/index"><i
+										class="zmdi zmdi-settings"></i><span> Admin</span></a></li>
 					{/if}
-					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="zmdi zmdi-lock-open"></i><span> Logout</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="zmdi zmdi-lock-open"></i><span> Logout</span></a>
+					</li>
 				</ul>
 				{else}
 				<li><a href="{$smarty.const.WWW_TOP}/login"><i class="zmdi zmdi-lock"></i><span> Login</span></a></li>
-				<li><a href="{$smarty.const.WWW_TOP}/register"><i class="zmdi zmdi-bookmark-outline"></i><span> Register</span></a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/register"><i
+								class="zmdi zmdi-bookmark-outline"></i><span> Register</span></a></li>
 			</div>
 		{/if}
 		<!-- user dropdown ends -->
 	</div>
-		{/if}
-	</div>
+	{/if}
+</div>
 </div>

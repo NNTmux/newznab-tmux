@@ -1,22 +1,25 @@
-
 <div class="header">
 	<h2> Series > <strong>List</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li> / TV Series List
+			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+			/ TV Series List
 		</ol>
 	</div>
 </div>
 <p>
 	<b>Jump to</b>:
-	&nbsp;[ {if $seriesletter == '0-9'}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/series/0-9">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
+	&nbsp;[ {if $seriesletter == '0-9'}<b><u>{/if}<a
+					href="{$smarty.const.WWW_TOP}/series/0-9">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
 	{foreach $seriesrange as $range}
-	{if $range == $seriesletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/series/{$range}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
+	{if $range == $seriesletter}<b><u>{/if}<a
+	href="{$smarty.const.WWW_TOP}/series/{$range}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
 	{/foreach}]
 </p>
 <div class="btn-group">
 	<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
-	<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my shows</a>
+	<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my
+		shows</a>
 </div>
 {$site->adbrowse}
 {if $serieslist|@count > 0}
