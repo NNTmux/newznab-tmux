@@ -96,12 +96,12 @@ class NntmuxResetDb extends Command
             (new SphinxSearch())->truncateRTIndex();
 
             $this->info('Deleting nzbfiles subfolders.');
-            $files = File::allfiles(Settings::settingValue('..nzbpath'));
+            $files = File::allFiles(Settings::settingValue('..nzbpath'));
             File::delete($files);
 
             $this->info('Deleting all images, previews and samples that still remain.');
 
-            $files = File::allfiles(NN_COVERS);
+            $files = File::allFiles(NN_COVERS);
             foreach ($files as $file) {
                 if (basename($file) !== '.gitignore' && basename($file) !== 'no-cover.jpg' && basename($file) !== 'no-backdrop.jpg') {
                     File::delete($file);

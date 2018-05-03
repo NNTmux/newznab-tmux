@@ -41,6 +41,7 @@ class InstallNntmux extends Command
      * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      * @throws \Symfony\Component\Process\Exception\LogicException
      * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Exception
      */
     public function handle()
     {
