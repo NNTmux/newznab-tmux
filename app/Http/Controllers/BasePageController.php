@@ -12,7 +12,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\Contents;
 use App\Models\Forumpost;
-use Illuminate\Http\Request;
 use App\Models\RoleExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 

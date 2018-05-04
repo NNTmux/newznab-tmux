@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Settings;
+use Illuminate\Http\Request;
 use App\Mail\ForgottenPassword;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
@@ -43,7 +43,7 @@ class ForgotPasswordController extends Controller
         if (empty($email) && empty($rssToken)) {
             app('smarty.view')->assign('error', 'Missing parameter(email and/or apikey to send password reset');
         } else {
-            if (env('NOCAPTCHA_ENABLED') === true && (!empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
+            if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
                 $this->validate($request, [
                     'g-recaptcha-response' => 'required|captcha',
                 ]);

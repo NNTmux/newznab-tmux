@@ -51,7 +51,7 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true && (!empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
+        if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
             ]);
