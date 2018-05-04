@@ -1,8 +1,8 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/music-list.php"><i class="fa fa-arrow-left"></i> Go
+	<h1>{$title}</h1>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/music-list"><i class="fa fa-arrow-left"></i> Go
 		back</a>
-	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
+	<form enctype="multipart/form-data" action="music-edit?action=submit" method="post">
 		{{csrf_field()}}
 
 		<input type="hidden" name="id" value="{$music.id}"/>
@@ -94,7 +94,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $music.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/../covers/music/{$music.id}.jpg" alt=""/>
+							 src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg" alt=""/>
 					{/if}
 				</td>
 			</tr>

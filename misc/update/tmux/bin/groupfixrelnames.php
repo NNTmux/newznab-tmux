@@ -72,15 +72,20 @@ switch (true) {
             ->where('releases.passwordstatus', '>=', 0)
             ->where('releases.nfostatus', '>', Nfo::NFO_UNPROC)
             ->whereNested(function ($query) {
-                $query->where('releases.nfostatus', Nfo::NFO_FOUND)
-                    ->where('releases.proc_nfo', NameFixer::PROC_NFO_NONE)
+                $query->orWhere(function ($query) {
+                    $query->where('releases.nfostatus', Nfo::NFO_FOUND)
+                        ->where('releases.proc_nfo', NameFixer::PROC_NFO_NONE);
+                })
                     ->orWhere('releases.proc_files', NameFixer::PROC_FILES_NONE)
                     ->orWhere('releases.proc_uid', NameFixer::PROC_UID_NONE)
                     ->orWhere('releases.proc_par2', NameFixer::PROC_PAR2_NONE)
                     ->orwhere('releases.proc_srr', NameFixer::PROC_SRR_NONE)
                     ->orWhere('releases.proc_hash16k', NameFixer::PROC_HASH16K_NONE)
                     ->orwhere('releases.isrenamed', '=', 1)
-                    ->whereBetween('releases.dehashstatus', [-6, 0])
+                    ->orWhere(function ($query) {
+                        $query->where('releases.ishashed', '=', 1)
+                        ->whereBetween('releases.dehashstatus', [-6, 0]);
+                    })
                     ->orWhereRaw("releases.name REGEXP '[a-z0-9]{32,64}' AND re.mediainfo REGEXP '\<Movie_name\>'");
             })
             ->whereIn('releases.categories_id', Category::OTHERS_GROUP)

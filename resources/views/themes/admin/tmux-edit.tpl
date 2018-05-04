@@ -1,7 +1,7 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
-	<form action="{$SCRIPT_NAME}?action=submit" method="post">
+	<form action="tmux-edit?action=submit" method="post">
 		{{csrf_field()}}
 
 		{if isset($error) && $error != ''}
@@ -612,9 +612,9 @@
 							Included in the same pane is Update Predb. This scrapes several predb sites and then tries
 							to match
 							against releases.<br/>
-							This should be run along with fixReleasenames.php, this is faster, but only looks at
+							This should be run along with fixReleasenames, this is faster, but only looks at
 							releases.names.
-							fixReleasenames.php goes further and looks at release_files.name.
+							fixReleasenames goes further and looks at release_files.name.
 						</div>
 					</td>
 				</tr>
@@ -655,7 +655,7 @@
 						selected=$site->run_ircscraper separator='<br />'}
 						<div class="hint">Choose to run IRCScraper on irc channels. Setting SCRAPE_IRC_C_Z_BOOL
 							parameter to
-							true or false in settings.php will toggle between the servers. The pane for this can not be
+							true or false in settings will toggle between the servers. The pane for this can not be
 							created after tmux starts.
 						</div>
 					</td>
@@ -665,7 +665,7 @@
 					<td>
 						<div class="explanation">IRC Scraper will scrape several predb channels from the enabled
 							servers.<br/>
-							Copy settings_example.php to settings.php in /lib/IRCScraper and change the settings.<br/>
+							Copy settings_example to settings in /lib/IRCScraper and change the settings.<br/>
 							As a minimum you should set the username and make sure it is unique.
 						</div>
 					</td>

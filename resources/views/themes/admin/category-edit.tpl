@@ -1,12 +1,13 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 
 <div class="well well-sm">
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/category-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
-	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/category-list"><i class="fa fa-arrow-left"></i> Go
+		back</a>
+	<form action="category-edit?action=submit" method="POST">
 		{{csrf_field()}}
 
 		<table class="input data table table-striped responsive-utilities jambo-table">

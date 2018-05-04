@@ -29,23 +29,27 @@
 			<br/>
 		{/if}
 		<p>
-            {if $animeType != ''}({$animeType|escape:"htmlall"}){/if}<br>
-            {if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
+			{if $animeType != ''}({$animeType|escape:"htmlall"}){/if}<br>
+			{if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
 			<span class="descinitial">{$animeDescription|escape:"htmlall"|nl2br|magicurl|truncate:"1500":" </span><a class=\"descmore\" href=\"#\"> more...</a>"}
 				{if $animeDescription|strlen > 1500}<span
 						class="descfull">{$animeDescription|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}
 		</p>
-        <p>
-            {if $animeCharacters != ''}<br>Characters: {$animeCharacters|escape:"htmlall"}{/if}
-            <br>
-            {if $animeCreators !=''}<br><b>Created by: {$animeCreators|escape:"htmlall"}</b>{/if}
-        </p>
 		<p>
-            {if $animeStartDate != '' && $animeStartDate != '1970-01-01'}<br><b>Started:
-                {$animeStartDate|escape:"htmlall"}</b>{/if}
-            {if $animeEndDate != '' && $animeEndDate != '1970-01-01'}<br><b>Ended:
-                {$animeEndDate|escape:"htmlall"}</b>{/if}
-            {if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
+			{if $animeCharacters != ''}<br>Characters: {$animeCharacters|escape:"htmlall"}{/if}
+			<br>
+			{if $animeCreators !=''}<br><b>Created by: {$animeCreators|escape:"htmlall"}</b>{/if}
+		</p>
+		<p>
+			{if $animeStartDate != '' && $animeStartDate != '1970-01-01'}
+				<br>
+				<b>Started:
+				{$animeStartDate|escape:"htmlall"}</b>{/if}
+			{if $animeEndDate != '' && $animeEndDate != '1970-01-01'}
+				<br>
+				<b>Ended:
+				{$animeEndDate|escape:"htmlall"}</b>{/if}
+			{if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
 			{if $animeRelated != ''}<br><i>Related Anime: {$animeRelated|escape:"htmlall"}</i><br/>{/if}
 		</p>
 		<div style="text-align: center;">
@@ -135,7 +139,7 @@
 										<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 										<td>{$result.size|fsize_format:"MB"}</td>
 										<td class="icon_nzb"><a
-													href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
+													href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
 														class="fa fa-cloud-download text-muted" data-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Download NZB"></i></a>

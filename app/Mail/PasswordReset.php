@@ -24,7 +24,7 @@ class PasswordReset extends Mailable
      */
     public function __construct($userId, $newPass)
     {
-        $this->user = User::query()->where('id', $userId)->first();
+        $this->user = User::find($userId);
         $this->newPass = $newPass;
     }
 

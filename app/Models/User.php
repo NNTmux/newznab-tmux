@@ -370,17 +370,16 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $start
-     * @param $offset
-     * @param $orderBy
+     * @param        $orderBy
      * @param string $userName
      * @param string $email
      * @param string $host
      * @param string $role
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      * @throws \Exception
      */
-    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
+    public static function getRange($orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
         UserRequest::clearApiRequests(false);
 
@@ -403,11 +402,7 @@ class User extends Authenticatable
             $users->where('user_roles_id', $role);
         }
 
-        if ($start !== false) {
-            $users->limit($offset)->offset($start);
-        }
-
-        return $users->get();
+        return $users->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -519,10 +514,11 @@ class User extends Authenticatable
     /**
      * Check if the user is in the database, and if their API key is good, return user data if so.
      *
-     * @param int    $userID   ID of the user.
-     * @param string $rssToken API key.
      *
-     * @return bool|array
+     * @param $userID
+     * @param $rssToken
+     *
+     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByIdAndRssToken($userID, $rssToken)
     {

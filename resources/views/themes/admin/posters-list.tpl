@@ -1,6 +1,6 @@
 <div class="well well-sm" id="group_list">
-	<h1>{$page->title}</h1>
-	{if !empty($check)}
+	<h1>{$title}</h1>
+	{if $check != null}
 		<p>
 			Below is a list of MultiGroup posters
 		</p>
@@ -8,14 +8,14 @@
 			<tr>
 				<th>Poster name</th>
 			</tr>
-			{foreach from=$posters item=$poster}
+			{foreach $posters as $poster}
 				<tr class="{cycle values=",alt"}">
 					<td>
-						<a href="{$smarty.const.WWW_TOP}/posters-edit.php?id={$poster->id}&poster={$poster->poster}">{$poster->poster}</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/posters-edit/{$poster->id}">{$poster->poster}</a>
 					</td>
 					<td>
 						<a class="confirm_action btn btn-sm btn-danger"
-						   href="{$smarty.const.WWW_TOP}/poster-delete.php?id={$poster->id} from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   href="{$smarty.const.WWW_TOP}/admin/poster-delete/{$poster->id}"
 						   title="Delete Poster">Delete poster</a>
 					</td>
 				</tr>

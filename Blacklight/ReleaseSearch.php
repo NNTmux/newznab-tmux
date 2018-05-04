@@ -35,34 +35,29 @@ class ReleaseSearch
     /**
      * ReleaseSearch constructor.
      *
-     * @param \Blacklight\db\DB $settings
-     *
      * @throws \Exception
      */
-    public function __construct(DB $settings)
+    public function __construct()
     {
         $this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
         $this->sphinxQueryOpt = ';limit=10000;maxmatches=10000;sort=relevance;mode=extended';
-        $this->pdo = $settings instanceof DB ? $settings : new DB();
     }
 
     /**
      * Create part of a SQL query for searching releases.
      *
      * @param array $options   Array where keys are the column name, and value is the search string.
-     * @param bool  $forceLike Force a "like" search on the column.
      *
-     * @return string
+     * @param null  $query
+     * @param bool  $builder
+     *
+     * @return string|\Illuminate\Database\Query\Builder
      */
-    public function getSearchSQL(array $options = [], $forceLike = false): string
+    public function getSearchSQL(array $options = [], $query = null, $builder = false)
     {
         $this->searchOptions = $options;
 
-        if ($forceLike) {
-            return $this->likeSQL();
-        }
-
-        return $this->sphinxSQL();
+        return $this->sphinxSQL($query, $builder);
     }
 
     /**
@@ -75,47 +70,18 @@ class ReleaseSearch
     }
 
     /**
-     * Create SQL sub-query for standard search.
+     * @param null $query
+     * @param bool $builder
      *
      * @return string
      */
-    private function likeSQL(): string
-    {
-        $return = '';
-        foreach ($this->searchOptions as $columnName => $searchString) {
-            $wordCount = 0;
-            $words = explode(' ', $searchString);
-            foreach ($words as $word) {
-                if ($word !== '') {
-                    $word = trim($word, "-\n\t\r\0\x0B ");
-                    if ($wordCount === 0 && (strpos($word, '^') === 0)) {
-                        $return .= sprintf(' AND r.%s %s', $columnName, $this->pdo->likeString(substr($word, 1), false));
-                    } elseif (strpos($word, '--') === 0) {
-                        $return .= sprintf(' AND r.%s NOT %s', $columnName, $this->pdo->likeString(substr($word, 2)));
-                    } else {
-                        $return .= sprintf(' AND r.%s %s', $columnName, $this->pdo->likeString($word));
-                    }
-                    $wordCount++;
-                }
-            }
-        }
-
-        return $return;
-    }
-
-    /**
-     * Create SQL sub-query using sphinx full text search.
-     *
-     * @return string
-     */
-    private function sphinxSQL(): string
+    private function sphinxSQL($query = null, $builder = false)
     {
         $searchQuery = $fullReturn = '';
 
         foreach ($this->searchOptions as $columnName => $searchString) {
             $searchWords = '';
-            $words = explode(' ', $searchString);
-            foreach ($words as $word) {
+            foreach (explode(' ', $searchString) as $word) {
                 $word = str_replace("'", "\\'", trim($word, "\n\t\r\0\x0B "));
                 if ($word !== '') {
                     $searchWords .= ($word.' ');
@@ -131,9 +97,11 @@ class ReleaseSearch
             }
         }
         if ($searchQuery !== '') {
+            if ($builder === true) {
+                return $query->whereRaw(sprintf("(rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt));
+            }
+
             $fullReturn = sprintf("AND (rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt);
-        } else {
-            $fullReturn = $this->likeSQL();
         }
 
         return $fullReturn;

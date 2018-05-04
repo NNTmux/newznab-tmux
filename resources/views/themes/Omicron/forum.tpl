@@ -1,8 +1,8 @@
 <div class="well well-sm">
-	<h2>{if $page->title !=''}{$page->title}{else}Forum{/if}</h2>
-	{if $results|@count > 0}
+	<h2>{if $title !=''}{$title}{else}Forum{/if}</h2>
+	{if count($results) > 0}
 		<div class=".pagination pagination-centered">
-			{$pager}
+			{$results->links()}
 		</div>
 		<a id="top"></a>
 		<table style="width:100%;" class="data highlight table" id="forumtable">
@@ -30,7 +30,8 @@
 					</td>
 					<td>
 						<a title="View profile"
-						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+								<strong>{$result.username}</strong></h5></a>
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 							<span class="btn btn-success btn-xs">{$result.rolename}</span>
 						{elseif $result.rolename === 'Supporter'}
@@ -76,7 +77,7 @@
 		<div style="float:right;margin-top:5px;"><a class="btn btn-small" href="#top">Top</a></div>
 		<br/>
 		<div class=".pagination pagination-centered">
-			{$pager}
+			{$results->links()}
 		</div>
 	{/if}
 	<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
@@ -100,7 +101,8 @@
 								  name="addMessage" rows="6"></textarea>
 					</div>
 					<input class="btn btn-success" type="submit" value="submit"/>
-					<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
+					<input class="btn btn-warning" value="Cancel"
+						   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 				</div>
 			</form>
 		</div>

@@ -325,13 +325,11 @@ class Release extends Model
      * Used for admin page release-list.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public static function getReleasesRange($start, $num)
+    public static function getReleasesRange()
     {
-        $range = Cache::get(md5($start.$num));
+        $range = Cache::get('range');
         if ($range !== null) {
             return $range;
         }
@@ -353,15 +351,12 @@ class Release extends Model
             ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->orderBy('releases.postdate', 'desc');
-        if ($start !== false) {
-            $query->limit($num)->offset($start);
-        }
+            ->orderByDesc('releases.postdate');
 
-        $range = $query->get();
+        $range = $query->paginate(config('nntmux.items_per_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($start.$num), $range, $expiresAt);
+        Cache::put('range', $range, $expiresAt);
 
         return $range;
     }
@@ -428,11 +423,9 @@ class Release extends Model
      * Get a range of releases. used in admin manage list.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getFailedRange($start, $num)
+    public static function getFailedRange()
     {
         $failedList = self::query()
             ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
@@ -440,11 +433,8 @@ class Release extends Model
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->orderBy('postdate', 'desc');
-        if ($start !== false) {
-            $failedList->limit($num)->offset($start);
-        }
 
-        return $failedList->get();
+        return $failedList->paginate(config('nntmux.items_per_page'));
     }
 
     /**

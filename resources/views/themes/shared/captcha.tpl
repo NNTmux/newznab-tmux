@@ -1,3 +1,0 @@
-{NoCaptcha::display()}
-{NoCaptcha::renderJs()}
-

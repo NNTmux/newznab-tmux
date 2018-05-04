@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 {if $anidblist}
 
@@ -14,7 +14,9 @@
 		</form>
 	</div>
 
-	{$pager}
+	{if count($results) > 0}
+		{$results->links()}
+	{/if}
 
 	<br/><br/>
 
@@ -32,19 +34,21 @@
 				<td class="less"><a href="http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$anidb.anidbid}"
 									title="View in AniDB">{$anidb.anidbid}</a></td>
 				<td><a title="Edit"
-					   href="{$smarty.const.WWW_TOP}/anidb-edit.php?id={$anidb.anidbid}">{$anidb.title|escape:"htmlall"}</a>
+					   href="{$smarty.const.WWW_TOP}/admin/anidb-edit?id={$anidb.anidbid}">{$anidb.title|escape:"htmlall"}</a>
 				</td>
 				<td class="mid"><a title="Delete this AniDB entry"
-								   href="{$smarty.const.WWW_TOP}/anidb-delete.php?id={$anidb.anidbid}">delete</a> | <a
+								   href="{$smarty.const.WWW_TOP}/admin/anidb-delete?id={$anidb.anidbid}">delete</a> | <a
 							title="Remove this anidbid from all releases"
-							href="{$smarty.const.WWW_TOP}/anidb-remove.php?id={$anidb.anidbid}">remove</a></td>
+							href="{$smarty.const.WWW_TOP}/admin/anidb-remove?id={$anidb.anidbid}">remove</a></td>
 			</tr>
 		{/foreach}
 
 	</table>
 
 	<br/>
-	{$pager}
+	{if count($results) > 0}
+		{$results->links()}
+	{/if}
 	{else}
 	<p>No AniDB episodes available.</p>
 	{/if}

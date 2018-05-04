@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 </head>
 <body class="skin-blue layout-boxed">
@@ -52,10 +52,12 @@
 														</div>
 													</div>
 													<label for="comment" class="h6">Message</label>
-										<textarea rows="7" name="comment" id="comment"
-												  class="form-control form-white"></textarea>
-													{$page->smarty->fetch('captcha.tpl')}
-													<button type="submit"  class="btn btn-primary m-t-20">
+													<textarea rows="7" name="comment" id="comment"
+															  class="form-control form-white"></textarea>
+													{if $nocaptcha != false}
+														{NoCaptcha::display()}{NoCaptcha::renderJs()}
+													{/if}
+													<button type="submit" class="btn btn-primary m-t-20">
 														Send message
 													</button>
 												</form>

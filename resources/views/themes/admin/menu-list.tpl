@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
 	{if $menulist}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
@@ -17,14 +17,14 @@
 			{foreach from=$menulist item=menu}
 				<tr class="{cycle values=",alt"}">
 					<td title="Edit {$menu.title}"><a
-								href="{$smarty.const.WWW_TOP}/menu-edit.php?id={$menu.id}">{$menu.title|escape:"htmlall"}</a>
+								href="{$smarty.const.WWW_TOP}/admin/menu-edit?id={$menu.id}">{$menu.title|escape:"htmlall"}</a>
 					</td>
 					<td>{$menu.href}</td>
 					<td>{$menu.tooltip}</td>
 					<td>{if $menu.role == 0}Guests{elseif $menu.role == 1}Users{elseif $menu.role == 2}Admin{else}Other{/if}</td>
 					<td class="mid">{$menu.ordinal}</td>
 					<td class="mid">{if $menu.newwindow == 1}Yes{else}No{/if}</td>
-					<td><a href="{$smarty.const.WWW_TOP}/menu-delete.php?id={$menu.id}">delete</a></td>
+					<td><a href="{$smarty.const.WWW_TOP}/admin/menu-delete/{$menu.id}">delete</a></td>
 				</tr>
 			{/foreach}
 

@@ -39,11 +39,6 @@ class MultigroupPoster extends Model
     public $timestamps = false;
 
     /**
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
      * @return string
      */
     public static function commaSeparatedList(): string

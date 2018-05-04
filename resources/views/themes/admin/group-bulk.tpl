@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
 	{if $groupmsglist}
 		<table class="data table table-striped responsive-utilities jambo-table Sortable">
@@ -17,10 +17,10 @@
 			{/foreach}
 
 		</table>
-		<p>View <a href="group-list.php">all groups</a>.</p>
+		<p>View <a href="group-list">all groups</a>.</p>
 	{else}
 		<p>Regex of groups to add to the site.</p>
-		<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+		<form action="group-bulk?action=submit" method="POST">
 			{{csrf_field()}}
 			<table class="input">
 

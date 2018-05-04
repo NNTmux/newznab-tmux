@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<div style="width:700px">
 		<strong>
 			<strong>
@@ -10,7 +10,7 @@
 		<br/>
 		<div id="message" style="width:717px;">msg</div>
 		{if $local}
-			<form action="{$SCRIPT_NAME}" method="post">
+			<form action="sharing" method="post">
 				{{csrf_field()}}
 				<fieldset style="width:717px;">
 					<legend>Local sharing settings.</legend>
@@ -190,7 +190,7 @@
 
 		{if $sites}
 			<div style="margin-bottom:5px;">These are the remote websites we have seen so far:</div>
-			{$pager}
+			{$sites->links()}
 			<div style="float:right;">
 				<a href="javascript:ajax_sharing_toggle_all(1);" onclick="setTimeout('history.go(0);',700);"
 				   class="sharing_toggle_all">[Enable All]</a>
@@ -231,7 +231,7 @@
 					</tr>
 				{/foreach}
 			</table>
-			{$pager}
+			{$sites->links()}
 		{else}
 			<p>No remote sites found in your database.</p>
 		{/if}

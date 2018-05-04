@@ -1,5 +1,5 @@
 <div class="well well-sm" id="group_list">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>
 		Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
 		Backfill works independently of active.
@@ -14,7 +14,7 @@
 				<input class="btn btn-default" type="submit" value="Go"/>
 			</form>
 			<div style="position:absolute;">
-				{$pager}
+				{$grouplist->links()}
 			</div>
 			<div style="text-align:center;">
 				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"
@@ -25,10 +25,10 @@
 				   onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge
 					all</a><br/>
 				<a title="List all groups Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-active.php">Active Groups</a> |
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-active">Active Groups</a> |
 				<a title="List all groups NOT Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-inactive.php">Inactive Groups</a> |
-				<a title="List all groups" href="{$smarty.const.WWW_TOP}/group-list.php">All Groups</a>
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-inactive">Inactive Groups</a> |
+				<a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
 			</div>
 		</div>
 		<div id="message">msg</div>
@@ -49,7 +49,7 @@
 			{foreach from=$grouplist item=group}
 				<tr id="grouprow-{$group.id}" class="{cycle values=",alt"}">
 					<td>
-						<a href="{$smarty.const.WWW_TOP}/group-edit.php?id={$group.id}">{$group.name|replace:"alt.binaries":"a.b"}</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/group-edit?id={$group.id}">{$group.name|replace:"alt.binaries":"a.b"}</a>
 						<div class="hint">{$group.description}</div>
 					</td>
 					<td class="less">{$group.first_record_postdate}<br/>{$group.first_record_postdate|timeago}</td>
@@ -83,7 +83,7 @@
 		</table>
 		<div style="position:relative;margin-top:5px;">
 			<div style="position:absolute;">
-				{$pager}
+				{$grouplist->links()}
 			</div>
 			<div style="text-align:center;">
 				<form name="groupsearch" action="" style="margin-bottom:5px;">
@@ -101,10 +101,10 @@
 				   onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge
 					all</a><br/>
 				<a title="List all groups Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-active.php">Active Groups</a> |
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-active">Active Groups</a> |
 				<a title="List all groups NOT Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/group-list-inactive.php">Inactive Groups</a> |
-				<a title="List all groups" href="{$smarty.const.WWW_TOP}/group-list.php">All Groups</a>
+				   href="{$smarty.const.WWW_TOP}/admin/group-list-inactive">Inactive Groups</a> |
+				<a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
 			</div>
 		</div>
 	{else}

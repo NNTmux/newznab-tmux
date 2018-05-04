@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
 	<p>
 		Export nzbs from the system into a folder. Specify the full file path to a folder.
@@ -8,13 +8,13 @@
 		path as the first argument. e.g. php scriptname outputpath from(optional) to(optional) groups_id(optional use
 		-1) categories_id(optional)<br/>
 		<span style="font-family:courier;display:block;padding:5px 0 15px 0;">
-	php admin/nzb-export.php /path/to/export/into 01/01/2008 01/01/2010 -1 1050
+	php admin/nzb-export /path/to/export/into 01/01/2008 01/01/2010 -1 1050
 </span>
 
 	</p>
 
 
-	<form action="{$SCRIPT_NAME}" method="POST">
+	<form action="nzb-export" method="POST">
 		{{csrf_field()}}
 
 		<table class="input data table table-striped responsive-utilities jambo-table">

@@ -1,8 +1,8 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 <div class="well well-sm">
 	{if $consolelist}
-		{$pager}
+		{$consolelist->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -16,7 +16,7 @@
 				<tr class="{cycle values=",alt"}">
 					<td class="less">{$console.id}</td>
 					<td><a title="Edit"
-						   href="{$smarty.const.WWW_TOP}/console-edit.php?id={$console.id}">{$console.title}</a></td>
+						   href="{$smarty.const.WWW_TOP}/admin/console-edit?id={$console.id}">{$console.title}</a></td>
 					<td>{$console.platform}</td>
 					<td>{$console.created_at|date_format}</td>
 				</tr>
@@ -24,7 +24,7 @@
 
 		</table>
 		<br/>
-		{$pager}
+		{$consolelist->links()}
 	{else}
 		<p>No games available.</p>
 	{/if}

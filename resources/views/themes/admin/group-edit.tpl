@@ -1,8 +1,8 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/group-list.php"><i class="fa fa-arrow-left"></i> Go
+	<h1>{$title}</h1>
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/group-list"><i class="fa fa-arrow-left"></i> Go
 		back</a>
-	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<form action="group-edit?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
@@ -73,7 +73,7 @@
 				<td><label for="backfill">Backfill:</label></td>
 				<td>
 					{html_radios id="backfill" name='backfill' values=$yesno_ids output=$yesno_names selected=$group.backfill separator='<br />'}
-					<div class="hint">If set to false, backfill.php will ignore this group. This works even if the above
+					<div class="hint">If set to false, backfill will ignore this group. This works even if the above
 						setting is no.
 					</div>
 				</td>

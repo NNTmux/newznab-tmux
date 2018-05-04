@@ -1,8 +1,8 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 <div class="well well-sm">
 
-	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<form enctype="multipart/form-data" action="anidb-edit?action=submit" method="POST">
 		{{csrf_field()}}
 
 		<input type="hidden" name="from" value="{$smarty.get.from}"/>

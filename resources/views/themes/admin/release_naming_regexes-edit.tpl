@@ -1,11 +1,11 @@
 <div class="well well-sm">
-	<h1 xmlns="http://www.w3.org/1999/html">{$page->title}</h1>
+	<h1 xmlns="http://www.w3.org/1999/html">{$title}</h1>
 	{if isset($error) && $error != ''}
 		<div class="error">{$error}</div>
 	{/if}
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/release_naming_regexes-list.php"><i
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-list"><i
 				class="fa fa-arrow-left"></i> Go back</a>
-	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<form action="release_naming_regexes-edit?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
@@ -30,7 +30,7 @@
 					<div class="hint">
 						The regex to use when trying to name a release using the usenet subject.<br/>
 						The regex delimiters are not added, you MUST add them. See <a
-								href="http://php.net/manual/en/regexp.reference.delimiters.php">this</a> page.<br/>
+								href="http://php.net/manual/en/regexp.reference.delimiters">this</a> page.<br/>
 						To make the regex case insensitive, add i after the last delimiter.<br/>
 						You MUST include at least one regex capture group.<br/>
 						You MUST name your regex capture groups (the ones you want included).<br/>

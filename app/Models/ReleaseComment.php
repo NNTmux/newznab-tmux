@@ -119,21 +119,16 @@ class ReleaseComment extends Model
      * Get release_comments rows by limit.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getCommentsRange($start, $num)
+    public static function getCommentsRange()
     {
         $range = self::query()
             ->select(['release_comments.*', 'releases.guid'])
             ->leftJoin('releases', 'releases.id', '=', 'release_comments.releases_id')
             ->orderBy('release_comments.created_at', 'desc');
-        if ($start !== false) {
-            $range->limit($num)->offset($start);
-        }
 
-        return $range->get();
+        return $range->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -161,27 +156,17 @@ class ReleaseComment extends Model
     }
 
     /**
-     * Get comments for a user by limit.
-     *
-     *
      * @param $uid
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getCommentsForUserRange($uid, $start, $num)
+    public static function getCommentsForUserRange($uid)
     {
-        $comments = self::query()
+        return self::query()
             ->select(['release_comments.*', 'r.guid', 'r.searchname', 'u.username'])
             ->join('releases as r', 'r.id', '=', 'release_comments.releases_id')
             ->leftJoin('users as u', 'u.id', '=', 'release_comments.users_id')
             ->where('users_id', $uid)
-            ->orderBy('created_at', 'desc');
-
-        if ($start !== false) {
-            $comments->limit($num)->offset($start);
-        }
-
-        return $comments->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(config('nntmux.items_per_page'));
     }
 }

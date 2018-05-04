@@ -6,6 +6,9 @@ use App\Models\Group;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
+use App\Models\CategoryRegex;
+use App\Models\CollectionRegex;
+use App\Models\ReleaseNamingRegex;
 
 class Regexes
 {
@@ -113,24 +116,27 @@ class Regexes
     }
 
     /**
-     * Get all regex.
+     * @param string $group_regex
      *
-     * @param string $group_regex Optional, a keyword to find a group.
-     * @param int    $limit       Optional, amount of results to limit.
-     * @param int    $offset      Optional, the offset to use when limiting the result set.
-     *
-     * @return array
+     * @return mixed
      */
-    public function getRegex($group_regex = '', $limit = 0, $offset = 0): array
+    public function getRegex($group_regex = '')
     {
-        return $this->pdo->query(
-            sprintf(
-                'SELECT * FROM %s %s ORDER BY id %s',
-                $this->tableName,
-                $this->_groupQueryString($group_regex),
-                ($limit ? ('LIMIT '.$limit.' OFFSET '.$offset) : '')
-            )
-        );
+        if ($this->tableName === 'collection_regexes') {
+            $table = CollectionRegex::class;
+        } elseif ($this->tableName === 'category_regexes') {
+            $table = CategoryRegex::class;
+        } else {
+            $table = ReleaseNamingRegex::class;
+        }
+
+        $result = $table::query();
+        if ($group_regex !== '') {
+            $result->where('group_regex', 'LIKE', '%'.$group_regex.'%');
+        }
+        $result->orderBy('id');
+
+        return $result->paginate(config('nntmux.items_per_page'));
     }
 
     /**

@@ -1,11 +1,11 @@
 <div class="header">
-	{if isset($catname)}
-		{assign var="catsplit" value=">"|explode:$catname}
-	{/if}
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
+			/
+			<a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}audio{else}{$parentcat}{/if}">{$parentcat}</a>
+			/ {if ($catname !== '')} <a
+				href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
 		</ol>
 	</div>
 </div>
@@ -32,7 +32,7 @@
 									{/if}
 									<div class="nzb_multi_operations">
 										{if isset($covgroup) && $covgroup != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers
 											</a>
 											|
 											<b>List</b>
@@ -62,9 +62,11 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-4">
-									{$pager}
-								</div>
+								{if    count($results) > 0}
+									<div class="col-md-4">
+										{$results->links()}
+									</div>
+								{/if}
 							</div>
 							<hr>
 							<table class="data table table-condensed table-striped table-responsive table-hover"
@@ -120,7 +122,7 @@
 												class="seriesinfo label label-default" title="{$result.guid}">
 												Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 											{if $result.anidbid > 0}<span class="label label-default"><a
-														href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a>
+														href="{$smarty.const.WWW_TOP}/anime?id={$result.anidbid}">View Anime</a>
 												</span>{/if}
 											{if !empty($result.failed)}<span class="label label-default">
 												<i class="fa fa-thumbs-o-up"></i>
@@ -136,7 +138,7 @@
 										<td>{$result.postdate|timeago}</td>
 										<td>{$result.size|fsize_format:"MB"}</td>
 										<td>
-											<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"
+											<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"
 											   class="icon_nzb text-muted"><i
 														class="fa fa-cloud-download text-muted"
 														title="Download NZB"></i></a>
@@ -172,8 +174,8 @@
 							<div class="row">
 								<div class="col-md-8">
 									<div class="nzb_multi_operations">
-										{if isset($section) && $section != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+										{if isset($covgroup) && $cobgroup != ''}View:
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
 											|
 											<b>List</b>
 											<br/>
@@ -202,9 +204,11 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-4">
-									{$pager}
-								</div>
+								{if    count($results) > 0}
+									<div class="col-md-4">
+										{$results->links()}
+									</div>
+								{/if}
 							</div>
 						</div>
 					</div>

@@ -16,37 +16,41 @@
 	</div>
 	<div class="well well-sm">
 		<h1>{$animeTitle}
-            {if isset($isadmin)}
+			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
 				   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp; from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
-            {/if}
+			{/if}
 		</h1>
-        {if animePicture != ''}
+		{if animePicture != ''}
 			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
 					 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbid}.jpg"/>
 			</div>
 			<br/>
-        {/if}
+		{/if}
 		<p>
-            {if $animeType != ''}({$animeType|escape:"htmlall"}){/if}<br>
+			{if $animeType != ''}({$animeType|escape:"htmlall"}){/if}<br>
 			{if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
 			<span class="descinitial">{$animeDescription|escape:"htmlall"|nl2br|magicurl|truncate:"1500":" </span><a class=\"descmore\" href=\"#\"> more...</a>"}
-                {if $animeDescription|strlen > 1500}<span
+				{if $animeDescription|strlen > 1500}<span
 						class="descfull">{$animeDescription|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}
 		</p>
 		<p>
-            {if $animeCharacters != ''}<br>Characters: {$animeCharacters|escape:"htmlall"}{/if}
+			{if $animeCharacters != ''}<br>Characters: {$animeCharacters|escape:"htmlall"}{/if}
 			<br>
-            {if $animeCreators !=''}<br><b>Created by: {$animeCreators|escape:"htmlall"}</b>{/if}
+			{if $animeCreators !=''}<br><b>Created by: {$animeCreators|escape:"htmlall"}</b>{/if}
 		</p>
 		<p>
-            {if $animeStartDate != '' && $animeStartDate != '1970-01-01'}<br><b>Started:
-                {$animeStartDate|escape:"htmlall"}</b>{/if}
-            {if $animeEndDate != '' && $animeEndDate != '1970-01-01'}<br><b>Ended:
-                {$animeEndDate|escape:"htmlall"}</b>{/if}
-            {if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
-            {if $animeRelated != ''}<br><i>Related Anime: {$animeRelated|escape:"htmlall"}</i><br/>{/if}
+			{if $animeStartDate != '' && $animeStartDate != '1970-01-01'}
+				<br>
+				<b>Started:
+				{$animeStartDate|escape:"htmlall"}</b>{/if}
+			{if $animeEndDate != '' && $animeEndDate != '1970-01-01'}
+				<br>
+				<b>Ended:
+				{$animeEndDate|escape:"htmlall"}</b>{/if}
+			{if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
+			{if $animeRelated != ''}<br><i>Related Anime: {$animeRelated|escape:"htmlall"}</i><br/>{/if}
 		</p>
 		<div style="text-align: center;">
 			<div class="btn-group">
@@ -74,20 +78,20 @@
 							data-original-title="Send to my Download Basket">
 						<i class="fa fa-shopping-basket"></i></button>
 
-                    {if isset($sabintegrated) && $sabintegrated !=""}
+					{if isset($sabintegrated) && $sabintegrated !=""}
 						<button type="button"
 								class="nzb_multi_operations_sab btn btn-sm btn-primary"
 								data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
 							<i class="fa fa-share"></i></button>
-                    {/if}
-                    {if isset($isadmin)}
+					{/if}
+					{if isset($isadmin)}
 						<input type="button"
 							   class="nzb_multi_operations_edit btn btn-sm btn-warning"
 							   value="Edit"/>
 						<input type="button"
 							   class="nzb_multi_operations_delete btn btn-sm btn-danger"
 							   value="Delete"/>
-                    {/if}
+					{/if}
 				</div>
 			</div>
 			<div class="row">
@@ -104,7 +108,7 @@
 									<th>Size</th>
 									<th>Action</th>
 								</tr>
-                                {foreach $animeEpisodeTitles as $result}
+								{foreach $animeEpisodeTitles as $result}
 									<tr class="{cycle values=",alt"}">
 										<td>
 											<input id="guid{$result.guid}"
@@ -115,18 +119,18 @@
 											   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 											<div>
 												<div>
-                                                    {if $result.nfoid > 0}<span><a
+													{if $result.nfoid > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 																class="modal_nfo label label-primary text-muted">NFO</a>
 														</span>{/if}
-                                                    {if $result.haspreview == 1 && $userdata.canpreview == 1}<a
+													{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 														href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 														name="name{$result.guid}"
 														title="Screenshot of {$result.searchname|escape:"htmlall"}"
 														class="label label-primary" rel="preview">Preview</a>{/if}
 													<span class="label label-primary">{$result.grabs}
 														Grab{if $result.grabs != 1}s{/if}</span>
-                                                    {if $result.reid > 0}<span class="mediainfo label label-primary"
+													{if $result.reid > 0}<span class="mediainfo label label-primary"
 																			   title="{$result.guid}">Media</span>{/if}
 												</div>
 											</div>
@@ -135,7 +139,7 @@
 										<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 										<td>{$result.size|fsize_format:"MB"}</td>
 										<td class="icon_nzb"><a
-													href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
+													href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
 														class="fa fa-cloud-download text-muted" data-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Download NZB"></i></a>
@@ -151,7 +155,7 @@
 														data-original-title="Send to my Download Basket">
 												</i>
 											</a>
-                                            {if isset($sabintegrated) && $sabintegrated !=""}
+											{if isset($sabintegrated) && $sabintegrated !=""}
 												<a href="#">
 													<i
 															id="guid{$result.guid}"
@@ -161,16 +165,16 @@
 															data-original-title="Send to My Queue">
 													</i>
 												</a>
-                                            {/if}
-                                            {if $weHasVortex}
+											{/if}
+											{if $weHasVortex}
 												<a href="#" class="icon_vortex text-muted"><i
 															class="fa fa-share" data-toggle="tooltip"
 															data-placement="top" title
 															data-original-title="Send to NZBVortex"></i></a>
-                                            {/if}
+											{/if}
 										</td>
 									</tr>
-                                {/foreach}
+								{/foreach}
 							</table>
 						</div>
 					</div>

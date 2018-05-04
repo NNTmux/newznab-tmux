@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>
 		Import NZB's from a folder or via the browser into the system. Specify the full file path to a folder containing
 		NZB's.
@@ -7,7 +7,7 @@
 		Importing will add the release to your database, compress the NZB and store it in the nzbfiles/ folder.
 	</p>
 	<ul>
-		<li>If you are importing a large number of NZB files, run the nzb-import.php script in misc/testing/ from the
+		<li>If you are importing a large number of NZB files, run the nzb-import script in misc/testing/ from the
 			command line and pass in the folder path as the first argument.
 		</li>
 		<li>If you are running the script in misc/testing/ from the command line you can pass "true" (no quotes) as the
@@ -19,7 +19,7 @@
 	</ul>
 	<fieldset>
 		<legend>Import From Directory</legend>
-		<form action="{$SCRIPT_NAME}#results" method="POST">
+		<form action="nzb-import#results" method="POST">
 			{{csrf_field()}}
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
@@ -57,7 +57,7 @@
 	</fieldset>
 	<fieldset>
 		<legend>Import From Browser</legend>
-		<form action="{$SCRIPT_NAME}#results" method="POST" enctype="multipart/form-data">
+		<form action="nzb-import#results" method="POST" enctype="multipart/form-data">
 			{{csrf_field()}}
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>

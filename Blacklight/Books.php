@@ -142,115 +142,69 @@ class Books
     }
 
     /**
-     * @param $cat
-     * @param $start
-     * @param $num
-     * @param $orderby
-     * @param array $excludedcats
-     * @return array
+     * @param       $page
+     * @param       $cat
+     * @param       $orderBy
+     * @param array $excludedCats
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getBookRange($cat, $start, $num, $orderby, array $excludedcats = []): array
+    public function getBookRange($page, $cat, $orderBy = '', array $excludedCats = [])
     {
-        $browseby = $this->getBrowseBy();
+        $order = $this->getBookOrder($orderBy);
 
-        $catsrch = '';
+        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
+					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
+            ->select(
+                [
+                    'b.*',
+                    'r.bookinfo_id',
+                    'g.name as group_name',
+                    'rn.releases_id as nfoid',
+                ]
+            )
+            ->from('releases as r')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+            ->join('bookinfo as b', 'b.id', '=', 'r.bookinfo_id')
+            ->where('r.nzbstatus', '=', 1)
+            ->where('b.title', '!=', '')
+            ->where('b.cover', '=', 1);
+        Releases::showPasswords($sql, true);
+        if (\count($excludedCats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedCats);
+        }
+
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
+            Category::getCategorySearch($cat, $sql, true);
         }
 
-        $exccatlist = '';
-        if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
-        }
+        $sql->groupBy('b.id')
+            ->orderBy($order[0], $order[1]);
 
-        $order = $this->getBookOrder($orderby);
-
-        $booksql = sprintf(
-                    "
-				SELECT SQL_CALC_FOUND_ROWS boo.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM bookinfo boo
-				LEFT JOIN releases r ON boo.id = r.bookinfo_id
-				WHERE r.nzbstatus = 1
-				AND boo.cover = 1
-				AND boo.title != ''
-				AND r.passwordstatus %s
-				%s %s %s
-				GROUP BY boo.id
-				ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseby,
-                        $catsrch,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        $bookscache = Cache::get(md5($booksql));
-        if ($bookscache !== null) {
-            $books = $bookscache;
-        } else {
-            $books = $this->pdo->queryCalc($booksql);
-            Cache::put(md5($booksql), $books, $expiresAt);
-        }
-
-        $bookIDs = $releaseIDs = false;
-
-        if (\is_array($books['result'])) {
-            foreach ($books['result'] as $book => $id) {
-                $bookIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
-            }
-        }
-
-        $sql = sprintf(
-            "
-			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-			boo.*,
-			r.bookinfo_id,
-			g.name AS group_name,
-			rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			INNER JOIN bookinfo boo ON boo.id = r.bookinfo_id
-			WHERE boo.id IN (%s)
-			AND r.id IN (%s)
-			%s
-			GROUP BY boo.id
-			ORDER BY %s %s",
-                (\is_array($bookIDs) ? implode(',', $bookIDs) : -1),
-                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                $catsrch,
-                $order[0],
-                $order[1]
-        );
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)));
         if ($return !== null) {
             return $return;
         }
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $books['total'] ?? 0;
-        }
-        Cache::put(md5($sql), $return, $expiresAt);
+
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
+
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)), $return, $expiresAt);
 
         return $return;
     }
@@ -262,17 +216,17 @@ class Books
      */
     public function getBookOrder($orderby): array
     {
-        $order = ($orderby === '') ? 'r.postdate' : $orderby;
+        $order = $orderby === '' ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'title':
-                $orderfield = 'boo.title';
+                $orderfield = 'b.title';
                 break;
             case 'author':
-                $orderfield = 'boo.author';
+                $orderfield = 'b.author';
                 break;
             case 'publishdate':
-                $orderfield = 'boo.publishdate';
+                $orderfield = 'b.publishdate';
                 break;
             case 'size':
                 $orderfield = 'r.size';
@@ -330,11 +284,10 @@ class Books
     public function getBrowseBy(): string
     {
         $browseby = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseby .= 'AND boo.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                $browseby .= 'AND b.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
             }
         }
 

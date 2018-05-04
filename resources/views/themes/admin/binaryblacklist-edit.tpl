@@ -1,9 +1,9 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 <div class="well well-sm">
-	<form action="{$SCRIPT_NAME}?action=submit" method="POST">
+	<form action="binaryblacklist-edit?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input">
 			<tr>

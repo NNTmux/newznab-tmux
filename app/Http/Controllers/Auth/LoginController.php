@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -48,8 +49,13 @@ class LoginController extends Controller
         $this->validate($request, [
             'username'    => 'required',
             'password' => 'required',
-            'g-recaptcha-response' => 'required|captcha',
         ]);
+
+        if (env('NOCAPTCHA_ENABLED') === true) {
+            $this->validate($request, [
+                'g-recaptcha-response' => 'required|captcha',
+            ]);
+        }
 
         $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
@@ -70,5 +76,38 @@ class LoginController extends Controller
             ->withErrors([
                 'login' => 'These credentials do not match our records.',
             ]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function showLoginForm()
+    {
+        $theme = Settings::settingValue('site.main.style');
+        app('smarty.view')->assign(['error' => '', 'username' => '', 'rememberme' => '']);
+        $nocaptcha = env('NOCAPTCHA_ENABLED');
+
+        $meta_title = 'Login';
+        $meta_keywords = 'Login';
+        $meta_description = 'Login';
+        $content = app('smarty.view')->fetch($theme.'/login.tpl');
+        app('smarty.view')->assign(
+            [
+                'error' => 'These credentials do not match our records.',
+                'nocaptcha'=> $nocaptcha,
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]
+        );
+        app('smarty.view')->display($theme.'/basepage.tpl');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        return redirect('/login');
     }
 }

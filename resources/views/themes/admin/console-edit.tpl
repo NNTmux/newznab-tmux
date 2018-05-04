@@ -1,7 +1,8 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/console-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
-	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
+	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/console-list"><i class="fa fa-arrow-left"></i> Go
+		back</a>
+	<form enctype="multipart/form-data" action="console-edit?action=submit" method="post">
 		{{csrf_field()}}
 
 		<input type="hidden" name="id" value="{$console.id}"/>
@@ -86,7 +87,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $console.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/../covers/console/{$console.id}.jpg" alt=""/>
+							 src="{$smarty.const.WWW_TOP}/covers/console/{$console.id}.jpg" alt=""/>
 					{/if}
 				</td>
 			</tr>

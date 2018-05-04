@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>This page is used for testing regex for getting release names from usenet subject.
 		<br/>Maximum releases to display will limit the amount of results displayed on the page. 0 for no limit.
 		<br/>Query limit will limit the amount of releases to select from MySQL (setting this high can be very slow). 0
@@ -27,7 +27,7 @@
 					<div class="hint">
 						The regex to use when trying to name a release using the usenet subject.<br/>
 						The regex delimiters are not added, you MUST add them. See <a
-								href="http://php.net/manual/en/regexp.reference.delimiters.php">this</a> page.<br/>
+								href="http://php.net/manual/en/regexp.reference.delimiters">this</a> page.<br/>
 						To make the regex case insensitive, add i after the last delimiter.<br/>
 						You MUST include at least one regex capture group.<br/>
 						You MUST name your regex capture groups (the ones you want included).<br/>

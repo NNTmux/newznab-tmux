@@ -71,15 +71,13 @@ class Group extends Model
     public static function getGroupsForSelect(): array
     {
         $groups = self::getActive();
-        $temp_array = [];
 
+        $temp_array = [];
         $temp_array[-1] = '--Please Select--';
 
-        $grouped = $groups->mapToGroups(function ($group, $key) {
-            return [$group['name']];
-        });
-
-        $temp_array += array_collapse($grouped->toArray());
+        foreach ($groups as $group) {
+            $temp_array[$group['name']] = $group['name'];
+        }
 
         return $temp_array;
     }
@@ -201,16 +199,14 @@ class Group extends Model
     }
 
     /**
-     * Gets all groups and associated release counts.
+     * Gets all groups.
      *
      *
-     * @param bool $offset
-     * @param bool $limit
      * @param string $groupname
-     * @param null|bool $active
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @param null $active
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getGroupsRange($offset = false, $limit = false, $groupname = '', $active = null)
+    public static function getGroupsRange($groupname = '', $active = null)
     {
         $groups = self::query()->groupBy('id')->orderBy('name');
 
@@ -224,11 +220,7 @@ class Group extends Model
             $groups->where('active', '=', 0);
         }
 
-        if ($offset !== false) {
-            $groups->limit($limit)->offset($offset);
-        }
-
-        return $groups->get();
+        return $groups->paginate(config('nntmux.items_per_page'));
     }
 
     /**

@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 </head>
 <body class="skin-blue layout-boxed">
@@ -18,14 +18,14 @@
 	</div>
 	<div class="box-body">
 		<div class="box-content"
-			<div class="row">
-				<div class="box col-md-12">
-					<div class="box-content">
-						<div class="row">
-							<div class="col-lg-12 col-sm-12 col-xs-12">
-								<div class="panel panel-default">
-									<div class="panel-body pagination2">
-										<div class="box-body">
+		<div class="row">
+			<div class="box col-md-12">
+				<div class="box-content">
+					<div class="row">
+						<div class="col-lg-12 col-sm-12 col-xs-12">
+							<div class="panel panel-default">
+								<div class="panel-body pagination2">
+									<div class="box-body">
 										<div class="row">
 											<div class="col-sm-8">
 												{$msg}
@@ -52,9 +52,9 @@
 														</div>
 													</div>
 													<label for="comment" class="h6">Message</label>
-										<textarea rows="7" name="comment" id="comment"
-												  class="form-control form-white"></textarea>
-													{$page->smarty->fetch('captcha.tpl')}
+													<textarea rows="7" name="comment" id="comment"
+															  class="form-control form-white"></textarea>
+													{NoCaptcha::display()}{NoCaptcha::renderJs()}
 													<button type="submit" value="submit" class="btn btn-primary m-t-20">
 														Send
 														message
@@ -67,11 +67,11 @@
 							</div>
 						</div>
 						{/if}
-							</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 </body>
 </html>

@@ -1,10 +1,8 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
-	<form enctype="multipart/form-data" action="{$SCRIPT_NAME}" method="post">
+	<form enctype="multipart/form-data" action="movie-add" method="post">
 		{{csrf_field()}}
-
-
 		<table class="input data table table-striped responsive-utilities jambo-table">
 
 			<tr>

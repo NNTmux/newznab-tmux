@@ -42,7 +42,7 @@
 				<form class="form-horizontal" method="post" action="login">
 					{{csrf_field()}}
 					{if isset($redirect)}
-						<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
+						<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}"/>
 					{/if}
 					<fieldset>
 						<div class="input-group input-group-lg">
@@ -67,7 +67,9 @@
 						<div class="clearfix"></div>
 						<p class="center col-md-5">
 						<p class="center col-md-5">
-							{$page->smarty->fetch('captcha.tpl')}
+							{if $nocaptcha != false}
+								{NoCaptcha::display()}{NoCaptcha::renderJs()}
+							{/if}
 						</p>
 						<button type="submit" class="btn btn-primary">Login</button>
 					</fieldset>
@@ -78,7 +80,7 @@
 			<!--/span-->
 		</div>
 		<!--/row-->
-		</div>
+	</div>
 	<!--/fluid-row-->
 </div>
 <!--/.fluid-container-->

@@ -7,8 +7,8 @@
         /* <![CDATA[ */
         var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
         var SERVERROOT = "{/literal}{$serverroot}{literal}";
-        var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
-        var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+        var UID = "{/literal}{if Auth::check()}{$userdata.id}{else}{/if}{literal}";
+        var RSSTOKEN = "{/literal}{if Auth::check()}{$userdata.rsstoken}{else}{/if}{literal}";
         /* ]]> */
 	</script>
 	{/literal}
@@ -19,7 +19,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{csrf_token()}}">
 
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Bootstrap core CSS -->
 	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css")}}
@@ -53,9 +53,8 @@
 				</div>
 				<div class="clearfix"></div>
 				<!-- menu profile quick info -->
-				{if $loggedin == "true"}
-				<div class="profile">
-
+				{if Auth::check()}
+					<div class="profile">
 						<div class="profile_pic">
 							<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png" alt="User Image"
 								 class="img-circle profile_img">
@@ -64,7 +63,7 @@
 							<span>Welcome,</span>
 							<h2>{$userdata.username}</h2>
 						</div>
-				</div>
+					</div>
 				{/if}
 				<!-- /menu profile quick info -->
 				<br/>
@@ -74,7 +73,7 @@
 					<div class="menu_section">
 						<h3>Main</h3>
 						<ul class="nav side-menu">
-							{if $loggedin == "true"}
+							{if Auth::check()}
 								<li><a><i class="fa fa-home"></i><span> Browse</span> <span
 												class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
@@ -92,7 +91,7 @@
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/browse"><i
+										<li><a href="{$smarty.const.WWW_TOP}/browse/all"><i
 														class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i
@@ -102,28 +101,32 @@
 								</li>
 							{/if}
 							<div class="clearfix"></div>
-							{if $loggedin == "true"}
-							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
+							{if Auth::check()}
+								<li><a><i class="fa fa-edit"></i> Articles & Links <span
+												class="fa fa-chevron-down"></span></a>
 
-								<ul class="nav child_menu" style="display: none">
+									<ul class="nav child_menu" style="display: none">
 
 										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i> Search</a>
+										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i>
+												Search</a>
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS
 												Feeds</a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>
 												API</a></li>
-								</ul>
-								<div class="clearfix"></div>
-							<li><a href="{{route('logout')}}" onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
-									<i class="fa fa-unlock"></i><span> Sign Out</span>
-								</a>
-							</li>
+									</ul>
+									<div class="clearfix"></div>
+								<li><a href="{{route('logout')}}"
+									   onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
+										<i class="fa fa-unlock"></i><span> Sign Out</span>
+									</a>
+								</li>
 							{else}
-							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
-							</li>
+								<li><a href="{$smarty.const.WWW_TOP}/login"><i
+												class="fa fa-lock"></i><span> Sign In</span></a>
+								</li>
 							{/if}
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 											class="far fa-envelope"></i><span> Contact</span></a></li>
@@ -134,17 +137,17 @@
 			</div>
 		</div>
 		<!-- top navigation -->
-		{if $loggedin == "true"}
-		<div class="top_nav">
-			<div class="nav_menu">
-				<nav class="" role="navigation">
-					<div class="nav toggle">
-						<a id="menu_toggle"><i class="fa fa-bars"></i></a>
-					</div>
-					{$header_menu}
-				</nav>
+		{if Auth::check()}
+			<div class="top_nav">
+				<div class="nav_menu">
+					<nav class="" role="navigation">
+						<div class="nav toggle">
+							<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+						</div>
+						{$header_menu}
+					</nav>
+				</div>
 			</div>
-		</div>
 		{/if}
 		<!-- /top navigation -->
 
@@ -153,7 +156,7 @@
 			<div class="clearfix"></div>
 			<div class="row">
 				<div class="col-md-12 col-sm-12 col-xs-12">
-					{$page->content}
+					{$content}
 					<div class="clearfix"></div>
 				</div>
 			</div>
@@ -162,8 +165,10 @@
 				<footer>
 					<div class="copyright-info">
 						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
-							<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i class="fab fa-github-alt"></i>.</strong> This software is
-						open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i> <a href="https://github.com/laravel/framework/">Laravel</a>
+							<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
+									class="fab fa-github-alt"></i>.</strong> This software is
+						open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
+						<a href="https://github.com/laravel/framework/">Laravel</a>
 					</div>
 					<div class="clearfix"></div>
 				</footer>
@@ -175,7 +180,7 @@
 	</div>
 
 </div>
-<!-- jQuery 3.1.0 -->
+<!-- jQuery 3.2.0 -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/jquery-3.2.x/dist/jquery.min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
 <!-- bootstrap progress js -->
@@ -219,14 +224,14 @@
 
 
 <script>
-    jQuery(document).ready(function(){
+    jQuery(document).ready(function () {
         jQuery.goup({
-			containerColor: "#8bc5c5",
-			arrowColor: "#fdf8f8",
-			bottomOffset: 100,
-			goupSpeed: "normal",
-			title: "Scroll to top"
-		});
+            containerColor: "#8bc5c5",
+            arrowColor: "#fdf8f8",
+            bottomOffset: 100,
+            goupSpeed: "normal",
+            title: "Scroll to top"
+        });
     });
 </script>
 

@@ -1,7 +1,7 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
 	{if $commentslist}
-		{$pager}
+		{$commentslist->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th>user</th>
@@ -14,7 +14,7 @@
 				<tr class="{cycle values=",alt"}">
 					<td>
 						{if $comment.users_id > 0}
-							<a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$comment.users_id}">{$comment.username}</a>
+							<a href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$comment.users_id}">{$comment.username}</a>
 						{else}
 							{$comment.username}
 						{/if}
@@ -27,9 +27,9 @@
 					{/if}
 					<td>{$comment.host}</td>
 					<td>
-						{if $comment.guid}<a href="{$smarty.const.WWW_TOP}/../details/{$comment.guid}#comments">
+						{if $comment.guid}<a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}#comments">
 								view</a> |{/if}
-						<a href="{$smarty.const.WWW_TOP}/comments-delete.php?id={$comment.id}">delete</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/comments-delete?id={$comment.id}">delete</a>
 					</td>
 				</tr>
 			{/foreach}

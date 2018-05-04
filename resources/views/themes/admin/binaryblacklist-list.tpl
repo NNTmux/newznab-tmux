@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 <div class="well well-sm">
 	<p>
 		Binaries can be prevented from being added to the index at all if they match a regex provided in the blacklist.
@@ -23,7 +23,8 @@
 			<tr id="row-{$bin.id}" class="{cycle values=",alt"}">
 				<td>{$bin.id}</td>
 				<td>{$bin.groupname|replace:"alt.binaries":"a.b"}</td>
-				<td title="Edit this blacklist"><a href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?id={$bin.id}">Edit</a>
+				<td title="Edit this blacklist"><a
+							href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit?id={$bin.id}">Edit</a>
 				</td>
 				<td>{$bin.description|truncate:50:"...":true}</td>
 				<td title="Delete this blacklist"><a href="javascript:ajax_binaryblacklist_delete({$bin.id})"
@@ -37,7 +38,7 @@
 					<td style="color:#FF0000">Disabled</td>
 				{/if}
 				<td title="Edit this blacklist"><a
-							href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?id={$bin.id}">{$bin.regex|escape:html|truncate:50:"...":true}</a>
+							href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit?id={$bin.id}">{$bin.regex|escape:html|truncate:50:"...":true}</a>
 				</td>
 				<td>{$bin.last_activity}</td>
 			</tr>

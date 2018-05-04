@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<p>This page lists regex used for getting names for releases from usenet subjects.</p>
 	<div id="message"></div>
 
@@ -11,7 +11,7 @@
 		<input class="btn btn-default" type="submit" value="Go"/>
 	</form>
 	{if isset($regex)}
-		<div>{$pager}</div>
+		<div>{$regex->links()}</div>
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th style="width:20px;">id</th>
@@ -28,7 +28,7 @@
 					<td>{$row.id}</td>
 					<td>{$row.group_regex}</td>
 					<td title="Edit this regex"><a
-								href="{$smarty.const.WWW_TOP}/release_naming_regexes-edit.php?id={$row.id}">Edit</a>
+								href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?id={$row.id}">Edit</a>
 					</td>
 					<td>{$row.description|truncate:50:"...":true}</td>
 					<td title="Delete this regex"><a href="javascript:ajax_release_naming_regex_delete({$row.id})"
@@ -41,11 +41,11 @@
 						<td style="color:#FF0000">Disabled</td>
 					{/if}
 					<td title="Edit this regex"><a
-								href="{$smarty.const.WWW_TOP}/release_naming_regexes-edit.php?id={$row.id}">{$row.regex|escape:html|truncate:50:"...":true}</a>
+								href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-edit?id={$row.id}">{$row.regex|escape:html|truncate:50:"...":true}</a>
 					</td>
 				</tr>
 			{/foreach}
 		</table>
-		<div style="margin-top: 15px">{$pager}</div>
+		<div style="margin-top: 15px">{$regex->links()}</div>
 	{/if}
 </div>

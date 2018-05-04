@@ -1,8 +1,12 @@
-<h1>{$page->title}</h1>
+<h1>{$title}</h1>
 
 <div class="well well-sm">
 	{if $booklist}
-		{$pager}
+		{if $booklist->count() > 0}
+			<div class="col-md-4">
+				{$booklist->links()}
+			</div>
+		{/if}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -15,7 +19,7 @@
 			{foreach from=$booklist item=book}
 				<tr class="{cycle values=",alt"}">
 					<td class="less">{$book.id}</td>
-					<td><a title="Edit" href="{$smarty.const.WWW_TOP}/book-edit.php?id={$book.id}">{$book.title}</a>
+					<td><a title="Edit" href="{$smarty.const.WWW_TOP}/admin/book-edit?id={$book.id}">{$book.title}</a>
 					</td>
 					<td>{$book.author}</td>
 					<td class="mid">{$book.created_at|date_format}</td>
@@ -24,7 +28,11 @@
 
 		</table>
 		<br/>
-		{$pager}
+		{if $booklist->count() > 0}
+			<div class="col-md-4">
+				{$booklist->links()}
+			</div>
+		{/if}
 	{else}
 		<p>No books available.</p>
 	{/if}

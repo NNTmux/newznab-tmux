@@ -153,7 +153,8 @@
 												<tr>
 													<th>Ep</th>
 													<th>Name</th>
-													<th> Select All <input id="check-all" type="checkbox" class="flat-all"/></th>
+													<th> Select All <input id="check-all" type="checkbox"
+																		   class="flat-all"/></th>
 													<th>Category</th>
 													<th>Posted</th>
 													<th>Size</th>
@@ -212,33 +213,40 @@
 																{$result.size|fsize_format:"MB"}
 															</td>
 															<td>
-																<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}" class="icon_nzb text-muted"><i
+																<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"
+																   class="icon_nzb text-muted"><i
 																			class="fa fa-cloud-download text-muted"
-																			data-toggle="tooltip" data-placement="top" title
+																			data-toggle="tooltip" data-placement="top"
+																			title
 																			data-original-title="Download NZB"></i></a>
 																<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
 																			class="fa fa-comments-o text-muted"
-																			data-toggle="tooltip" data-placement="top" title
+																			data-toggle="tooltip" data-placement="top"
+																			title
 																			data-original-title="Comments"></i></a>
 																<a href="#"><i
 																			id="guid{$result.guid}"
-																			class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
+																			class="icon_cart text-muted fa fa-shopping-basket"
+																			data-toggle="tooltip"
 																			data-placement="top" title
 																			data-original-title="Send to my download basket"></i></a>
 																{if isset($sabintegrated) && $sabintegrated !=""}
 																	<a href="#">
-																		<i	id="guid{$result.guid}"
-																			  class="icon_sab text-muted fa fa-share"
-																			  data-toggle="tooltip"
-																			  data-placement="top" title
-																			  data-original-title="Send to my Queue">
+																		<i id="guid{$result.guid}"
+																		   class="icon_sab text-muted fa fa-share"
+																		   data-toggle="tooltip"
+																		   data-placement="top" title
+																		   data-original-title="Send to my Queue">
 																		</i>
 																	</a>
 																{/if}
 																{if $weHasVortex}
 																	<a href="#" class="icon_vortex text-muted"><i
-																				class="fa fa-share" data-toggle="tooltip" data-placement="top"
-																				title data-original-title="Send to NZBVortex"></i></a>
+																				class="fa fa-share"
+																				data-toggle="tooltip"
+																				data-placement="top"
+																				title
+																				data-original-title="Send to NZBVortex"></i></a>
 																{/if}
 															</td>
 														</tr>

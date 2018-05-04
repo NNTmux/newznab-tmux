@@ -38,7 +38,8 @@
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="zmdi zmdi-rss"></i></a>
+		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+			for TV Show <i class="zmdi zmdi-rss"></i></a>
 		{if $show.tvdb > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
@@ -204,7 +205,7 @@
 														</td>
 														<td class="icons" style='width:100px;'>
 															<a title="Download Nzb"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
 																		class="zmdi zmdi-cloud-download text-muted"></i></a>
 															<a class="zmdi zmdi-shopping-basket icon_cart text-muted"
 															   href="#"
@@ -219,10 +220,10 @@
 															{if isset($isadmin)}
 																<br/>
 																<a class="label label-warning"
-																   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																   title="Edit Release">Edit</a>
 																<a class="label label-danger"
-																   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																   title="Delete Release">Delete</a>
 															{/if}
 														</td>

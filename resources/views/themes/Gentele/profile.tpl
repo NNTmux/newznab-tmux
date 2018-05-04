@@ -61,8 +61,8 @@
 														</tr>
 														{if !empty($user.rolechangedate)}
 															<tr>
-															<th width="200">Role expiration date</th>
-															<td>{$user.rolechangedate|date_format:"%A, %B %e, %Y"}</td>
+																<th width="200">Role expiration date</th>
+																<td>{$user.rolechangedate|date_format:"%A, %B %e, %Y"}</td>
 															</tr>
 														{/if}
 														</tbody>
@@ -135,10 +135,14 @@
 															<tr>
 																<th>SABnzbd Integration:</th>
 																<td>
-																	<b>Url:</b> {if $saburl == ''}N/A{else}{$saburl}{/if}<br/>
-																	<b>Key:</b> {if $sabapikey == ''}N/A{else}{$sabapikey}{/if}<br/>
-																	<b>Type:</b> {if $sabapikeytype == ''}N/A{else}{$sabapikeytype}{/if}<br/>
-																	<b>Priority:</b> {if $sabpriority == ''}N/A{else}{$sabpriority}{/if}<br/>
+																	<b>Url:</b> {if $saburl == ''}N/A{else}{$saburl}{/if}
+																	<br/>
+																	<b>Key:</b> {if $sabapikey == ''}N/A{else}{$sabapikey}{/if}
+																	<br/>
+																	<b>Type:</b> {if $sabapikeytype == ''}N/A{else}{$sabapikeytype}{/if}
+																	<br/>
+																	<b>Priority:</b> {if $sabpriority == ''}N/A{else}{$sabpriority}{/if}
+																	<br/>
 																	<b>Storage:</b> {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
 																</td>
 															</tr>
@@ -155,7 +159,11 @@
 															</tr>
 															<tr>
 																<th title="Admin Notes">Notes:</th>
-																<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}{if isset($isadmin)}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="label label-info">Add/Edit</a>{/if}</td>
+																<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}
+																		<br/>
+																	{/if}{if isset($isadmin)}<a
+																		href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes"
+																		class="label label-info">Add/Edit</a>{/if}</td>
 															</tr>
 														{/if}
 														</tbody>
@@ -177,7 +185,9 @@
 																		   onclick="return false;" href="#">Send
 																			Invite</a>
 																		]
-																		<span title="Your invites will be reduced when the invitation is claimed." class="invitesuccess" id="divInviteSuccess"></span>
+																		<span title="Your invites will be reduced when the invitation is claimed."
+																			  class="invitesuccess"
+																			  id="divInviteSuccess"></span>
 																		<span class="invitefailed"
 																			  id="divInviteError"></span>
 																		<div style="display:none;" id="divInvite">
@@ -252,7 +262,8 @@
 								Profile</a>
 						{/if}
 						{if !isset($isadmin)}
-							<a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
+							<a class="btn btn-warning confirm_action"
+							   href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
 						{/if}
 					</div>
 				</div>
