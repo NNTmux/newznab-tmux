@@ -1,3 +1,5 @@
+2018-05-04 DariusIII
+	* Chg: Update utils-admin.js with tinymce
 2018-05-03 DariusIII
 	* Chg: Adjust code in template files
 	* Chg: Add nntmux:reset-truncate command to artisan console
