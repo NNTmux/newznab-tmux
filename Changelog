@@ -1,4 +1,5 @@
 2018-05-04 DariusIII
+	* Chg: Update getBrowseRange query in Releases class
 	* Fix: Fix wrong parameters in api request
 	* Fix: Fix nocaptcha display on login, contact, forgottenpassword and register pages
 	* Chg: Remove stray column from getmoviesRange function

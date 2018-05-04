@@ -103,9 +103,7 @@ class Releases
                 }
                 $query->orderBy($orderBy[0], $orderBy[1]);
             }, 'r')
-            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired'])
-            ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")
-            ->selectRaw("CONCAT(cp.id, ',', c.id) AS category_ids")
+            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"), DB::raw("CONCAT(cp.id, ',', c.id) AS category_ids")])
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
