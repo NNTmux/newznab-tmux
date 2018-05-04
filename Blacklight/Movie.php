@@ -245,7 +245,6 @@ class Movie
             ->select(
                 [
                     'm.*',
-                    'r.movieinfo_id',
                     'g.name as group_name',
                     'rn.releases_id as nfoid',
                 ]
