@@ -17,13 +17,12 @@ class ContactUsController extends BasePageController
      */
     public function contact(Request $request)
     {
-        $this->setPrefs();
         $this->validate($request, [
             'useremail' => 'required',
             'username' => 'required',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true) {
+        if (env('NOCAPTCHA_ENABLED') === true && (!empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
             ]);
@@ -47,7 +46,7 @@ class ContactUsController extends BasePageController
             }
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }
-        $this->smarty->assign('msg', $msg);
+        app('smarty.view')->assign('msg', $msg);
 
         return redirect('contact-us');
     }
@@ -57,24 +56,23 @@ class ContactUsController extends BasePageController
      */
     public function showContactForm()
     {
-        $this->setPrefs();
+        $theme = Settings::settingValue('site.main.style');
         $title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_keywords = 'contact us,contact,get in touch,email';
         $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
-        $content = $this->smarty->fetch('contact.tpl');
+        $content = app('smarty.view')->fetch($theme.'/contact.tpl');
 
-        $this->smarty->assign(
+        app('smarty.view')->assign(
             [
                 'title' => $title,
                 'content' => $content,
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
                 'meta_description' => $meta_description,
-                'nocaptcha' => env('NOCAPTCHA_ENABLED'),
             ]
         );
 
-        $this->pagerender();
+        app('smarty.view')->display($theme.'/basepage.tpl');
     }
 }

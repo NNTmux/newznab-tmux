@@ -92,7 +92,7 @@ class BasePageController extends Controller
      *
      * @throws \Exception
      */
-    public function __construct(Request $request)
+    public function __construct()
     {
         $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback');
         // Buffer settings/DB connection.

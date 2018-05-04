@@ -54,7 +54,9 @@
 													<label for="comment" class="h6">Message</label>
 													<textarea rows="7" name="comment" id="comment"
 															  class="form-control form-white"></textarea>
-													{NoCaptcha::display()}{NoCaptcha::renderJs()}
+													{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+														{NoCaptcha::display()}{NoCaptcha::renderJs()}
+													{/if}
 													<button type="submit" value="submit" class="btn btn-primary m-t-20">
 														Send
 														message

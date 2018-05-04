@@ -82,7 +82,7 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true) {
+        if (env('NOCAPTCHA_ENABLED') === true && (!empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
             ]);
