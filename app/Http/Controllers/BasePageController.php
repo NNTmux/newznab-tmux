@@ -284,10 +284,6 @@ class BasePageController extends Controller
             $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
-        $this->smarty->assign('main_menu', $this->smarty->fetch('mainmenu.tpl'));
-        $this->smarty->assign('useful_menu', $this->smarty->fetch('usefullinksmenu.tpl'));
-        $this->smarty->assign('article_menu', $this->smarty->fetch('articlesmenu.tpl'));
-
         if (! empty($this->userdata)) {
             $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
         } else {
