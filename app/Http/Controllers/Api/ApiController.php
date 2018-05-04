@@ -248,7 +248,7 @@ class ApiController extends BasePageController
                    header(
                        'Location:'.
                        WWW_TOP.
-                       '/getnzb?id=i='.
+                       '/getnzb?i='.
                        $uid.
                        '&r='.
                        $apiKey.
