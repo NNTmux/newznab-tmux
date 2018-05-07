@@ -15,7 +15,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<!-- Meta, title, CSS, favicons, etc. -->
 	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">                                           Ftinymce
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
@@ -112,7 +112,7 @@
 <script type="text/javascript"
 		src="{$smarty.const.WWW_ASSETS}/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
 <!-- tinymce editor -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-dist/tinymce.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js"></script>
 <!-- jQuery migrate script -->

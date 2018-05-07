@@ -684,9 +684,9 @@ function enableFixCrapCustom(){
     }
 }
 
-/** ****** tinyMCE ************************* **/
+/** ****** tinyMCE ***************************/
 tinyMCE.init({
-    selector: 'textarea#addMessage',
+    selector: 'textarea#body',
     theme : "modern",
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',

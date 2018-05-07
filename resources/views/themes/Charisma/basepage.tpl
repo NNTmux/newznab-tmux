@@ -199,7 +199,7 @@
 <!-- autogrowing textarea plugin -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.autogrow-textarea.js")}}
 <!-- tinymce editor -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-dist/tinymce.min.js")}}
 <!-- history.js for cross-browser state change on ajax -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.history.js")}}
 <!-- Charisma functions -->
