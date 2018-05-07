@@ -195,7 +195,7 @@ class Category extends Model
      * @param null  $query
      * @param bool  $builder
      *
-     * @return string
+     * @return string|\Illuminate\Database\Query\Builder
      */
     public static function getCategorySearch(array $cat = [], $query = null, $builder = false)
     {
@@ -225,8 +225,6 @@ class Category extends Model
             case 0:
                 if ($builder === false) {
                     $catsrch = 'AND 1=1';
-                } else {
-                    $catsrch = '';
                 }
                 break;
             // One category constraint
@@ -234,7 +232,7 @@ class Category extends Model
                 if ($builder === false) {
                     $catsrch = $categories[0] !== -1 ? '  AND releases.categories_id = '.$categories[0] : '';
                 } else {
-                    $catsrch = $query->where('r.categories_id', '=', $categories[0]);
+                    return $query->where('r.categories_id', '=', $categories[0]);
                 }
                 break;
             // Multiple category constraints
@@ -242,7 +240,7 @@ class Category extends Model
                 if ($builder === false) {
                     $catsrch = ' AND releases.categories_id IN ('.implode(', ', $categories).') ';
                 } else {
-                    $catsrch = $query->whereIn('r.categories_id', $categories);
+                    return $query->whereIn('r.categories_id', $categories);
                 }
                 break;
         }
