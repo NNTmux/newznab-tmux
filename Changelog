@@ -1,4 +1,5 @@
 2018-05-07 DariusIII
+	* Chg: Update tinymce support
 	* Chg: Use tinymce-dist to provide tinymce editor
 	* Fix: Fix XML_Response check for existing releases(remove is_array check as that is always false with laravels paginator)
 	* Chg: Update controllers - remove Blacklight/db/DB, update app/Exception/Handler class
