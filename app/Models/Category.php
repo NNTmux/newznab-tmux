@@ -220,6 +220,7 @@ class Category extends Model
             }
         }
         $catCount = \count($categories);
+        $catsrch = '';
         switch ($catCount) {
             //No category constraint
             case 0:

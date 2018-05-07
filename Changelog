@@ -1,4 +1,5 @@
 2018-05-07 DariusIII
+	* Chg: Define default value for $catsrch variable
 	* Chg: Update return values of getCategorySearch function in Category model
 2018-05-04 DariusIII
 	* Fix: Fix user-list ordering in admin area
