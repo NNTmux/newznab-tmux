@@ -347,7 +347,7 @@ class XML_Response
     {
         $this->xml->startElement($this->namespace.':response');
         $this->xml->writeAttribute('offset', $this->offset);
-        $this->xml->writeAttribute('total', $this->releases[0]['_totalrows'] ?? 0);
+        $this->xml->writeAttribute('total', $this->releases->total() ?? 0);
         $this->xml->endElement();
     }
 
@@ -356,7 +356,7 @@ class XML_Response
      */
     public function includeReleases(): void
     {
-        if (\is_array($this->releases) && ! empty($this->releases)) {
+        if (! empty($this->releases)) {
             foreach ($this->releases as $this->release) {
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();

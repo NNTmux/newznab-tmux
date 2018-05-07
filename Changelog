@@ -1,5 +1,6 @@
 2018-05-07 DariusIII
-	* CHg: Update controllers - remove Blacklight/db/DB, update app/Exception/Handler class
+	* Fix: Fix XML_Response check for existing releases(remove is_array check as that is always false with laravels paginator)
+	* Chg: Update controllers - remove Blacklight/db/DB, update app/Exception/Handler class
 	* Chg: Update composer.json with new versions of used libraries
 	* Chg: Define default value for $catsrch variable
 	* Chg: Update return values of getCategorySearch function in Category model
