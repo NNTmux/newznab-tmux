@@ -44,7 +44,7 @@ class ConsoleController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $console = new Console(['Settings' => $this->pdo]);
+        $console = new Console(['Settings' => null]);
         $gen = new Genres();
 
         // set the current action

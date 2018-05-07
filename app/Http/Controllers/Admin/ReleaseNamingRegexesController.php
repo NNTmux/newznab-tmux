@@ -17,7 +17,7 @@ class ReleaseNamingRegexesController extends BasePageController
     public function index(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
+        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
 
         $title = 'Release Naming Regex List';
 
@@ -46,7 +46,7 @@ class ReleaseNamingRegexesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
+        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';
@@ -127,7 +127,7 @@ class ReleaseNamingRegexesController extends BasePageController
         $this->smarty->assign(['group' => $group, 'regex' => $regex, 'showlimit' => $showLimit, 'querylimit' => $queryLimit]);
 
         if ($group && $regex) {
-            $this->smarty->assign('data', (new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit));
+            $this->smarty->assign('data', (new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit));
         }
 
         $content = $this->smarty->fetch('release_naming_regexes-test.tpl');

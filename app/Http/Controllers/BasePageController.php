@@ -56,13 +56,6 @@ class BasePageController extends Controller
     public $serverurl = '';
 
     /**
-     * Public access to Captcha object for error checking.
-     *
-     * @var \Blacklight\Captcha
-     */
-    public $captcha;
-
-    /**
      * User's theme.
      *
      * @var string
@@ -75,19 +68,12 @@ class BasePageController extends Controller
     public $token;
 
     /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
-
-    /**
      * @var \Illuminate\Foundation\Application|mixed
      */
     public $smarty;
 
     /**
      * BasePageController constructor.
-     *
-     * @param \Illuminate\Http\Request         $request
      *
      * @throws \Exception
      */
@@ -96,7 +82,6 @@ class BasePageController extends Controller
         $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
-        $this->pdo = new DB();
         $this->smarty = app('smarty.view');
 
         foreach (array_get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
@@ -110,7 +95,7 @@ class BasePageController extends Controller
     /**
      * @throws \Exception
      */
-    protected function setPrefs()
+    protected function setPrefs(): void
     {
         if (Auth::check()) {
             $this->userdata = Auth::user();
@@ -145,7 +130,7 @@ class BasePageController extends Controller
     /**
      * @return bool
      */
-    public function isPostBack()
+    public function isPostBack(): bool
     {
         return \request()->isMethod('POST');
     }
@@ -175,7 +160,7 @@ class BasePageController extends Controller
     }
 
     /**
-     * Show 503 page.
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show503()
     {
@@ -183,11 +168,11 @@ class BasePageController extends Controller
     }
 
     /**
-     * Show 503 page.
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showBadBoy(): void
+    public function showBadBoy()
     {
-        die(view('errors.badboy'));
+        return view('errors.badboy')->with('Message', 'This is not you account.');
     }
 
     /**
@@ -195,7 +180,7 @@ class BasePageController extends Controller
      */
     public function showMaintenance()
     {
-        return view('errors.maintenance')->with('Message', 'Service Temporarily Unavailable');
+        return view('errors.maintenance')->with('Message', 'We are performing an site maintenance.');
     }
 
     /**
@@ -320,7 +305,6 @@ class BasePageController extends Controller
      */
     public function pagerender(): void
     {
-        $this->smarty->assign('page', $this);
         $this->page_template = 'basepage.tpl';
 
         $this->render();
@@ -333,8 +317,6 @@ class BasePageController extends Controller
      */
     public function adminrender(): void
     {
-        $this->smarty->assign('page', $this);
-
         $admin_menu = $this->smarty->fetch('adminmenu.tpl');
         $this->smarty->assign('admin_menu', $admin_menu);
 
@@ -346,7 +328,7 @@ class BasePageController extends Controller
     /**
      * @throws \Exception
      */
-    public function basePage()
+    public function basePage(): void
     {
         $this->setPrefs();
         $this->pagerender();
@@ -355,7 +337,7 @@ class BasePageController extends Controller
     /**
      * @throws \Exception
      */
-    public function adminBasePage()
+    public function adminBasePage(): void
     {
         $this->setAdminPrefs();
         $this->adminrender();

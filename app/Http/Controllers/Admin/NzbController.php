@@ -54,7 +54,7 @@ class NzbController extends BasePageController
             if (\count($filesToProcess) > 0) {
 
                 // Create a new instance of NZBImport and send it the file locations.
-                $NZBImport = new NZBImport(['Browser' => true, 'Settings' => $this->pdo]);
+                $NZBImport = new NZBImport(['Browser' => true, 'Settings' => null]);
 
                 $this->smarty->assign(
                     'output',
@@ -87,7 +87,7 @@ class NzbController extends BasePageController
         }
 
         $this->setAdminPrefs();
-        $rel = new Releases(['Settings' => $this->pdo]);
+        $rel = new Releases(['Settings' => null]);
 
         if ($this->isPostBack()) {
             $path = $request->input('folder');
@@ -98,7 +98,7 @@ class NzbController extends BasePageController
 
             if ($path !== '') {
                 $NE = new NZBExport([
-                    'Browser'  => true, 'Settings' => $this->pdo,
+                    'Browser'  => true, 'Settings' => null,
                     'Releases' => $rel,
                 ]);
                 $retVal = $NE->beginExport(
