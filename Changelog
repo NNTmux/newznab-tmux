@@ -1,4 +1,5 @@
 2018-05-08 DariusIII
+	* Chg: Fix table name in getConsoleRange function
 	* Chg: Update session config and .env.example
 2018-05-07 DariusIII
 	* Chg: Update tinymce support

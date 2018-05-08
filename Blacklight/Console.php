@@ -174,7 +174,7 @@ class Console
             ->select(
                 [
                     'con.*',
-                    'releases.consoleinfo_id',
+                    'r.consoleinfo_id',
                     'g.name as group_name',
                     'gn.title as genre',
                     'rn.releases_id as nfoid',
