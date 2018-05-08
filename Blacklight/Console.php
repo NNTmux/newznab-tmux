@@ -150,6 +150,9 @@ class Console
     public function getConsoleRange($page, $cat, array $excludedcats = [])
     {
         $sql = Release::query()
+            ->where('r.nzbstatus', '=', 1)
+            ->where('con.title', '!=', '')
+            ->where('con.cover', '=', 1)
             ->select(
                 [
                     'con.*',
@@ -179,10 +182,7 @@ class Console
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->join('consoleinfo as con', 'con.id', '=', 'r.consoleinfo_id')
-            ->join('genres as gn', 'con.genres_id', '=', 'gn.id')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('con.title', '!=', '')
-            ->where('con.cover', '=', 1);
+            ->join('genres as gn', 'con.genres_id', '=', 'gn.id');
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
             $sql->whereNotIn('r.categories_id', $excludedcats);
