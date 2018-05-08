@@ -117,7 +117,10 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $sql = $qry->paginate(config('nntmux.items_per_page'));
+        $result = $qry->take(config('nntmux.max_pager_results'));
+        $ids = $result->pluck('id');
+
+        $sql = $qry->whereIn('r.id', $ids)->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page), $sql, $expiresAt);
 
@@ -644,7 +647,9 @@ class Releases
             return $releases;
         }
 
-        $releases = $sql->paginate(config('nntmux.items_per_page'));
+        $result = $sql->take(config('nntmux.max_pager_results'));
+        $ids = $result->pluck('id');
+        $releases = $sql->whereIn('r.id', $ids)->paginate(config('nntmux.items_per_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$type.implode('.', $cat).$minSize), $releases, $expiresAt);
@@ -786,7 +791,10 @@ class Releases
             return $releases;
         }
 
-        $releases = $query->paginate(config('nntmux.items_per_page'));
+        $result = $query->take(config('nntmux.max_pager_results'));
+        $ids = $result->pluck('id');
+
+        $releases = $query->whereIn('r.id', $ids)->paginate(config('nntmux.items_per_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($page.implode('.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
@@ -846,7 +854,9 @@ class Releases
             return $releases;
         }
 
-        $releases = $query->paginate(config('nntmux.items_per_page'));
+        $result = $query->take(config('nntmux.max_pager_results'));
+        $ids = $result->pluck('id');
+        $releases = $query->whereIn('r.id', $ids)->paginate(config('nntmux.items_per_page'));
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($aniDbID.$limit.$name.implode('.', $cat).$maxAge), $releases, $expiresAt);
 
@@ -909,7 +919,9 @@ class Releases
             return $releases;
         }
 
-        $releases = $query->paginate(config('nntmux.items_per_page'));
+        $result = $query->take(config('nntmux.max_pager_results'));
+        $ids = $result->pluck('id');
+        $releases = $query->whereIn('r.id', $ids)->paginate(config('nntmux.items_per_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($imDbId.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
