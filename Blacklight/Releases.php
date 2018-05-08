@@ -498,7 +498,7 @@ class Releases
     {
         $query = null;
         foreach ($userQuery as $query) {
-            $query->orWhere('r.'. $type, $query[$type]);
+            $query->orWhere('r.'.$type, $query[$type]);
             if ($query['categories'] !== '') {
                 $catsArr = explode('|', $query['categories']);
                 if (\count($catsArr) > 1) {
