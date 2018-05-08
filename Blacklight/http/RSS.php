@@ -2,11 +2,11 @@
 
 namespace Blacklight\http;
 
-use App\Models\UserMovie;
 use Blacklight\NZB;
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
+use App\Models\UserMovie;
 use App\Models\UserSerie;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -87,7 +87,7 @@ class RSS extends Capabilities
                 'co.review as co_review',
                 'co.cover as co_cover',
                 'cog.title as co_genre',
-                'bo.cover as bo_cover',])
+                'bo.cover as bo_cover', ])
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
@@ -104,7 +104,7 @@ class RSS extends Capabilities
             ->leftJoin('bookinfo as bo', 'bo.id', '=', 'r.bookinfo_id');
         if (\count($cat)) {
             if ((int) $cat[0] === -2) {
-                $sql->join('users_releases as ur', function($join) use ($userID) {
+                $sql->join('users_releases as ur', function ($join) use ($userID) {
                     $join->on('ur.users_id', '=', $userID)
                         ->on('ur.releases_id', '=', 'r.id');
                 });
@@ -147,8 +147,6 @@ class RSS extends Capabilities
         Cache::put(md5(implode('.', $cat).$offset.$videosId.$aniDbID.$userID.$airDate), $result, $expiresAt);
 
         return $result;
-
-
     }
 
     /**
@@ -219,7 +217,6 @@ class RSS extends Capabilities
      */
     public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = [])
     {
-
         $query = Release::query()
             ->where('r.nzbstatus', NZB::NZB_ADDED)
             ->whereBetween('r.categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER]);
@@ -267,7 +264,6 @@ class RSS extends Capabilities
      */
     public function getFirstInstance($column, $table, $order)
     {
-
         return DB::table($table)
             ->select([$column])
             ->where($column, '>', 0)
