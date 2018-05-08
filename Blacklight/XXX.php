@@ -8,13 +8,13 @@ use App\Models\XxxInfo;
 use App\Models\Category;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Blacklight\processing\adult\ADE;
 use Blacklight\processing\adult\ADM;
 use Blacklight\processing\adult\AEBN;
 use Illuminate\Support\Facades\Cache;
 use Blacklight\processing\adult\Popporn;
 use Blacklight\processing\adult\Hotmovies;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class XXX.
