@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -27,11 +26,6 @@ class Console
     public const CONS_NTFND = -2;
 
     protected const MATCH_PERCENT = 60;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
 
     /**
      * @var bool
@@ -97,7 +91,6 @@ class Console
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -273,20 +266,18 @@ class Console
     }
 
     /**
-     * @return string
+     * @param $query
+     *
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function getBrowseBy(): string
+    public function getBrowseBy($query)
     {
-        $browseBy = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
-                $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
+            if (request()->has($bbk) && request()->input($bbk) !== null) {
+                $bbs = stripslashes(request()->input($bbk));
+                return $query->where('con.'.$bbv, 'LIKE', '%'.$bbs.'%');
             }
         }
-
-        return $browseBy;
     }
 
     /**
@@ -566,7 +557,7 @@ class Console
      */
     protected function _loadGenres(): array
     {
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $gen = new Genres(['Settings' => null]);
 
         $defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
         $genreassoc = [];
