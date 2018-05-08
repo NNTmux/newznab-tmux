@@ -2,14 +2,14 @@
 
 namespace Blacklight\http;
 
-use App\Models\Release;
-use App\Models\UserSerie;
 use Blacklight\NZB;
+use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
+use App\Models\UserSerie;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class RSS -- contains specific functions for RSS.
@@ -145,7 +145,7 @@ class RSS extends Capabilities
                 'v.title',
                 'g.name as group_name',
                 DB::raw("CONCAT(cp.title, '-', c.title) as category_name"),
-                DB::raw('COALESCE(cp.id,0) as parentid')])
+                DB::raw('COALESCE(cp.id,0) as parentid'), ])
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
@@ -157,7 +157,7 @@ class RSS extends Capabilities
             ->offset(0);
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        $result =  Cache::get(md5($limit.$userID.implode('.', $excludedCats).$airDate));
+        $result = Cache::get(md5($limit.$userID.implode('.', $excludedCats).$airDate));
         if ($result !== null) {
             return $result;
         }
@@ -166,8 +166,6 @@ class RSS extends Capabilities
         Cache::put(md5($limit.$userID.implode('.', $excludedCats).$airDate), $result, $expiresAt);
 
         return $result;
-
-
     }
 
     /**
