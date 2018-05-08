@@ -34,14 +34,14 @@ class RssController extends BasePageController
             $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
             $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
 
-            if (isset($firstShow['videos_id'])) {
-                $this->smarty->assign('show', $firstShow['videos_id']);
+            if ($firstShow !== null) {
+                $this->smarty->assign('show', $firstShow->videos_id);
             } else {
                 $this->smarty->assign('show', 1);
             }
 
-            if (isset($firstAni['anidbid'])) {
-                $this->smarty->assign('anidb', $firstAni['anidbid']);
+            if ($firstAni !== null) {
+                $this->smarty->assign('anidb', $firstAni->anidbid);
             } else {
                 $this->smarty->assign('anidb', 1);
             }
@@ -128,6 +128,7 @@ class RssController extends BasePageController
             } else {
                 $relData = $rss->getRss(explode(',', $userCat), $userNum, $userShow, $userAnidb, $uid, $userAirDate);
             }
+
             $rss->output($relData, $params, $outputXML, $offset, 'rss');
         }
     }

@@ -1,4 +1,5 @@
 2018-05-08 DariusIII
+	* Chg: Update RSS class to use query builder completely
 	* Chg: Update RSS/Api results handling for XML
 	* Chg: Update range queries to reduce number of releases returned
 	* Chg: Fix table name in getConsoleRange function
