@@ -21,8 +21,6 @@ class BtcPaymentController extends BasePageController
         $gateway_id = env('MYCELIUM_GATEWAY_ID');
         $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 
-        $userId = Auth::id();
-        $user = User::find($userId);
         $action = $request->input('action') ?? 'view';
         $donation = UserRole::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
         $this->smarty->assign('donation', $donation);
@@ -33,7 +31,7 @@ class BtcPaymentController extends BasePageController
                 $role = $request->input('role');
                 $roleName = $request->input('rolename');
                 $addYears = $request->input('addyears');
-                $data = ['user_id' => $userId, 'username' => $user->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
+                $data = ['user_id' => $this->userdata->id, 'username' => $this->userdata->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
                 $keychain_id = random_int(0, 19);
                 $callback_data = json_encode($data);
 
@@ -43,13 +41,12 @@ class BtcPaymentController extends BasePageController
                 if ($order->payment_id) {
                     // Redirect to a payment gateway
                     $url = 'https://gateway.gear.mycelium.com/pay/'.$order->payment_id;
-                    header('Location: '.$url);
-                    die();
+                    return redirect($url);
                 }
                 break;
             case 'view':
             default:
-                $userId = Auth::id();
+                $userId = $this->userdata->id;
                 break;
         }
 

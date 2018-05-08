@@ -1,3 +1,5 @@
+2018-05-09 DariusIII
+	* Chg: Update BtcPaymentController
 2018-05-08 DariusIII
 	* Chg: Update queries in Console, Movie, Books, Music and XXX classes
 	* Chg: Update laravel/framework to version 5.6.21 and mockery/mockery to version 1.1.0
