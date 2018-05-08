@@ -7,7 +7,6 @@ use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Blacklight\libraries\Geary;
-use Illuminate\Support\Facades\Auth;
 
 class BtcPaymentController extends BasePageController
 {
@@ -41,6 +40,7 @@ class BtcPaymentController extends BasePageController
                 if ($order->payment_id) {
                     // Redirect to a payment gateway
                     $url = 'https://gateway.gear.mycelium.com/pay/'.$order->payment_id;
+
                     return redirect($url);
                 }
                 break;
