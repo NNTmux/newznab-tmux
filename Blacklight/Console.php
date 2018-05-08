@@ -275,6 +275,7 @@ class Console
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (request()->has($bbk) && request()->input($bbk) !== null) {
                 $bbs = stripslashes(request()->input($bbk));
+
                 return $query->where('con.'.$bbv, 'LIKE', '%'.$bbs.'%');
             }
         }
