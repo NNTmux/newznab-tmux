@@ -62,7 +62,7 @@
 	<ul style="text-align: left;">
 		{foreach $parentcategorylist as $category}
 			<li>
-				<a href="{$smarty.const.WWW_TOP}/browse?t={$category.id}">{$category.title}</a> feed <br/>
+				<a href="{$smarty.const.WWW_TOP}/browse/{$category.title}">{$category.title}</a> feed <br/>
 				<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
 					/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 			</li>
@@ -72,7 +72,7 @@
 	<ul style="text-align: left;">
 		{foreach $categorylist as $category}
 			<li>
-				<a href="{$smarty.const.WWW_TOP}/browse?t={$category.id}">{$category.title}</a> feed <br/>
+				<a href="{$smarty.const.WWW_TOP}/browse/{$category.title}">{$category.title}</a> feed <br/>
 				<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
 					/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 			</li>
