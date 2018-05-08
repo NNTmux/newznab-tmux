@@ -13,10 +13,10 @@ use ApaiIO\Operations\Search;
 use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Console.
