@@ -2,9 +2,14 @@
 
 namespace Blacklight\http;
 
+use App\Models\Release;
+use App\Models\UserSerie;
 use Blacklight\NZB;
 use App\Models\Category;
 use Blacklight\Releases;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class RSS -- contains specific functions for RSS.
@@ -110,60 +115,59 @@ class RSS extends Capabilities
     }
 
     /**
-     * Get TV shows for RSS.
-     *
-     * @param int   $limit
+     * @param       $limit
      * @param int   $userID
      * @param array $excludedCats
      * @param int   $airDate
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @throws \Exception
      */
-    public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1): array
+    public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1)
     {
-        return $this->pdo->query(
-            sprintf(
-                "
-				SELECT r.*, v.id, v.title, g.name AS group_name,
-					CONCAT(cp.title, '-', c.title) AS category_name,
-					%s AS category_ids,
-					COALESCE(cp.id,0) AS parentid
-				FROM releases r
-				LEFT JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
-				LEFT JOIN groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN videos v ON v.id = r.videos_id
-				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
-				WHERE %s %s %s
-				AND r.nzbstatus = %d
-				AND r.categories_id BETWEEN %d AND %d
-				AND r.passwordstatus %s
-				ORDER BY postdate DESC %s",
-                $this->releases->getConcatenatedCategoryIDs(),
-                $this->releases->uSQL(
-                    $this->pdo->query(
-                        sprintf(
-                            '
-							SELECT videos_id, categories
-							FROM user_series
-							WHERE users_id = %d',
-                            $userID
-                        ),
-                        true
-                    ),
-                    'videos_id'
-                ),
-                (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-                NZB::NZB_ADDED,
-                Category::TV_ROOT,
-                Category::TV_OTHER,
-                $this->releases->showPasswords,
-                ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
-            ),
-            true,
-            config('nntmux.cache_expiry_medium')
-        );
+        $query = Release::query()
+            ->where('r.nzbstatus', NZB::NZB_ADDED)
+            ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER]);
+        Releases::showPasswords($query, true);
+        $this->releases->uSQL(UserSerie::query()->where('users_id', $userID)->select(['videos_id', 'categories'])->get(), 'videos_id');
+        if (\count($excludedCats) > 0) {
+            $query->whereNotIn('r.categories_id', $excludedCats);
+        }
+
+        if ($airDate > -1) {
+            $query->where('tve.firstaired', '>=', Carbon::now()->subDays($airDate));
+        }
+
+        $query->select(
+            [
+                'r.*',
+                'v.id',
+                'v.title',
+                'g.name as group_name',
+                DB::raw("CONCAT(cp.title, '-', c.title) as category_name"),
+                DB::raw('COALESCE(cp.id,0) as parentid')])
+            ->from('releases as r')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
+            ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
+            ->orderByDesc('r.postdate')
+            ->limit($limit > 100 ? 100 : $limit)
+            ->offset(0);
+
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $result =  Cache::get(md5($limit.$userID.implode('.', $excludedCats).$airDate));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = $query->get();
+        Cache::put(md5($limit.$userID.implode('.', $excludedCats).$airDate), $result, $expiresAt);
+
+        return $result;
+
+
     }
 
     /**

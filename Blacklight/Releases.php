@@ -492,26 +492,24 @@ class Releases
      * @param array  $userQuery
      * @param string $type
      *
-     * @return string
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function uSQL($userQuery, $type): string
+    public function uSQL($userQuery, $type)
     {
-        $sql = '(1=2 ';
+        $query = null;
         foreach ($userQuery as $query) {
-            $sql .= sprintf('OR (r.%s = %d', $type, $query[$type]);
+            $query->orWhere('r.'. $type, $query[$type]);
             if ($query['categories'] !== '') {
                 $catsArr = explode('|', $query['categories']);
                 if (\count($catsArr) > 1) {
-                    $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
+                    $query->whereIn('r.categories_id', $catsArr);
                 } else {
-                    $sql .= sprintf(' AND r.categories_id = %d', $catsArr[0]);
+                    $query->where('r.categories_id', $catsArr[0]);
                 }
             }
-            $sql .= ') ';
         }
-        $sql .= ') ';
 
-        return $sql;
+        return $query;
     }
 
     /**
@@ -591,7 +589,7 @@ class Releases
                 ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
                 ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
                 ->join('releases_se as rse', 'rse.id', '=', 'r.id');
-                //self::showPasswords($query, true);
+                self::showPasswords($query, true);
                 $query->where('r.nzbstatus', '=', NZB::NZB_ADDED);
 
                 if ($maxAge > 0) {

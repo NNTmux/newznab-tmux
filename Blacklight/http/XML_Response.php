@@ -23,6 +23,7 @@ namespace Blacklight\http;
 
 use App\Models\Category;
 use Blacklight\Utility\Utility;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class XMLReturn.
@@ -345,9 +346,16 @@ class XML_Response
 
     public function includeTotalRows(): void
     {
+        if ($this->releases instanceof LengthAwarePaginator) {
+            $total = $this->releases->total();
+        } elseif (isset($this->releases[0]['_totalrows'])) {
+            $total = $this->releases[0]['_totalrows'];
+        } else {
+            $total = 0;
+        }
         $this->xml->startElement($this->namespace.':response');
         $this->xml->writeAttribute('offset', $this->offset);
-        $this->xml->writeAttribute('total', $this->releases[0]['_totalrows'] ?? 0);
+        $this->xml->writeAttribute('total', $total);
         $this->xml->endElement();
     }
 
