@@ -272,18 +272,15 @@ class Movie
         $sql->groupBy('m.imdbid')
             ->orderBy('r.postdate', 'desc');
 
-        /*$return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
+        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
         if ($return !== null) {
             return $return;
-        }*/
+        }
 
         $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
-        dd($return);
-
-
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        /*Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);*/
+        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
     }
