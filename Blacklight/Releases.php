@@ -85,23 +85,23 @@ class Releases
             ->select(['r.*', 'g.name as group_name', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"), DB::raw("CONCAT(cp.id, ',', c.id) AS category_ids")])
             ->from('releases as r')
             ->where('r.nzbstatus', NZB::NZB_ADDED);
-                self::showPasswords($qry, true);
-                if ($cat !== [-1]) {
-                    Category::getCategorySearch($cat, $qry, true);
-                }
-                if ($maxAge > 0) {
-                    $qry->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
-                }
-                if (\count($excludedCats) > 0) {
-                    $qry->whereNotIn('r.categories_id', $excludedCats);
-                }
-                if ($groupName !== -1) {
-                    $qry->where('g.name', $groupName);
-                }
-                if ($minSize > 0) {
-                    $qry->where('r.size', '>=', $minSize);
-                }
-            $qry->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+        self::showPasswords($qry, true);
+        if ($cat !== [-1]) {
+            Category::getCategorySearch($cat, $qry, true);
+        }
+        if ($maxAge > 0) {
+            $qry->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
+        }
+        if (\count($excludedCats) > 0) {
+            $qry->whereNotIn('r.categories_id', $excludedCats);
+        }
+        if ($groupName !== -1) {
+            $qry->where('g.name', $groupName);
+        }
+        if ($minSize > 0) {
+            $qry->where('r.size', '>=', $minSize);
+        }
+        $qry->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
                 ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
                 ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
                 ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
