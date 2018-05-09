@@ -46,11 +46,9 @@
 											</div>
 										</div>
 									</div>
-									{if    count($results) > 0}
-										<div class="col-md-4">
-											{$results->links()}
-										</div>
-									{/if}
+									<div class="col-md-4">
+										{$results->links()}
+									</div>
 								</div>
 								<hr>
 								{foreach $resultsadd as $result}
@@ -192,11 +190,9 @@
 												</div>
 											</div>
 									</div>
-									{if    count($results) > 0}
-										<div class="col-md-4">
-											{$results->links()}
-										</div>
-									{/if}
+									<div class="col-md-4">
+										{$results->links()}
+									</div>
 								</div>
 							</div>
 						</div>

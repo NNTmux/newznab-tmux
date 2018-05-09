@@ -47,6 +47,9 @@
 									</div>
 								</div>
 							</div>
+							<div class="col-md-4">
+								{$results->links()}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -54,7 +57,6 @@
 		</div>
 	</div>
 </form>
-
 <div class="box-body">
 	<div class="row">
 		<div class="col-lg-12 col-sm-12 col-xs-12">
@@ -63,9 +65,6 @@
 					<div class="row">
 						<div class="col-md-8">
 							{if count($results) > 0}
-								<div class="col-md-4">
-									{$results->links()}
-								</div>
 								{foreach $results as $result}
 									<div class="panel panel-default">
 										<div class="panel-body">
