@@ -404,7 +404,6 @@ class Releases
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid');
 
-
         if ($orderBy !== '') {
             $order = $this->getBrowseOrder($orderBy);
             $sql->orderBy($order[0], $order[1]);
@@ -762,7 +761,6 @@ class Releases
                 ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
                 ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
                 ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id');
-
 
         if ($name !== '') {
             $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
