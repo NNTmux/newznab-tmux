@@ -114,6 +114,32 @@ class Releases
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->groupBy('r.id')
             ->orderBy($orderBy[0], $orderBy[1]);
+        self::showPasswords($qry, true);
+        if ($cat !== [-1]) {
+            Category::getCategorySearch($cat, $qry, true);
+        }
+        if ($maxAge > 0) {
+            $qry->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
+        }
+        if (\count($excludedCats) > 0) {
+            $qry->whereNotIn('r.categories_id', $excludedCats);
+        }
+        if ($groupName !== -1) {
+            $qry->where('g.name', $groupName);
+        }
+        if ($minSize > 0) {
+            $qry->where('r.size', '>=', $minSize);
+        }
+        $qry->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+                ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+                ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+                ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
+                ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
+                ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
+                ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
+                ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+                ->groupBy('r.id')
+                ->orderBy($orderBy[0], $orderBy[1]);
         $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page));
         if ($releases !== null) {
             return $releases;
