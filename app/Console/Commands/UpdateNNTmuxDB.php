@@ -41,10 +41,10 @@ class UpdateNNTmuxDB extends Command
      *
      * @return mixed
      * @throws \RuntimeException
+     * @throws \Exception
      */
     public function handle()
     {
-        // TODO Add check to determine if the indexer or other scripts are running. Hopefully
         // also prevent web access.
         $this->output->writeln('<info>Checking database version</info>');
 
