@@ -11,7 +11,6 @@ use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Releases.
@@ -924,7 +923,6 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-
 
         $releases = $query->simplePaginate(config('nntmux.items_per_page'));
 
