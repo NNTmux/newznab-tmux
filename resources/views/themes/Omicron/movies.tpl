@@ -52,14 +52,14 @@
 								</div>
 							</div>
 						</div>
-						{if    count($results) > 0}
+						{if count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
 						{/if}
 					</div>
 					<hr>
-					{foreach $results as $result}
+					{foreach $resultsadd as $result}
 						<!-- Iteratie: {counter} -->
 						{if isset($result.category_name)}
 							{assign var="catnamesplit" value=">"|explode:$result.category_name}
@@ -364,7 +364,7 @@
 								</div>
 							</div>
 						</div>
-						{if    count($results) > 0}
+						{if count($results) > 0}
 							<div class="col-md-4">
 								{$results->links()}
 							</div>
