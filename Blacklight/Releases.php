@@ -67,52 +67,50 @@ class Releases
     }
 
     /**
+     * @param       $page
      * @param array $cat
-     * @param $orderBy
-     * @param int $maxAge
+     * @param       $orderBy
+     * @param int   $maxAge
      * @param array $excludedCats
-     * @param int $groupName
-     * @param int $minSize
-     * @param int $page
+     * @param int   $groupName
+     * @param int   $minSize
+     *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @throws \Exception
      */
     public function getBrowseRange($page, array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $qry = Release::query()
-            ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
-                $query->select(['r.*', 'g.name as group_name'])
-                    ->from('releases as r')
-                    ->where('r.nzbstatus', NZB::NZB_ADDED);
-                self::showPasswords($query, true);
+            ->select(['r.*', 'g.name as group_name', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"), DB::raw("CONCAT(cp.id, ',', c.id) AS category_ids")])
+            ->from('releases as r')
+            ->where('r.nzbstatus', NZB::NZB_ADDED);
+                self::showPasswords($qry, true);
                 if ($cat !== [-1]) {
-                    Category::getCategorySearch($cat, $query, true);
+                    Category::getCategorySearch($cat, $qry, true);
                 }
-                $query->leftJoin('groups as g', 'g.id', '=', 'r.groups_id');
                 if ($maxAge > 0) {
-                    $query->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
+                    $qry->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
                 }
                 if (\count($excludedCats) > 0) {
-                    $query->whereNotIn('r.categories_id', $excludedCats);
+                    $qry->whereNotIn('r.categories_id', $excludedCats);
                 }
                 if ($groupName !== -1) {
-                    $query->where('g.name', $groupName);
+                    $qry->where('g.name', $groupName);
                 }
                 if ($minSize > 0) {
-                    $query->where('r.size', '>=', $minSize);
+                    $qry->where('r.size', '>=', $minSize);
                 }
-                $query->orderBy($orderBy[0], $orderBy[1]);
-            }, 'r')
-            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"), DB::raw("CONCAT(cp.id, ',', c.id) AS category_ids")])
-            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
-            ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
-            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
-            ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->groupBy('r.id')
-            ->orderBy($orderBy[0], $orderBy[1]);
+            $qry->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+                ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+                ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+                ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
+                ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
+                ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
+                ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
+                ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+                ->groupBy('r.id')
+                ->orderBy($orderBy[0], $orderBy[1]);
         $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page));
         if ($releases !== null) {
             return $releases;
