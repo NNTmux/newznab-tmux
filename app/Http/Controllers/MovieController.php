@@ -155,7 +155,7 @@ class MovieController extends BasePageController
         $this->smarty->assign(
             [
                 'resultsadd'=>  $movies,
-                'results' => $results
+                'results' => $results,
             ]
         );
 
