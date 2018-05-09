@@ -53,7 +53,7 @@
 									{/if}
 								</div>
 								<hr>
-								{foreach $results as $result}
+								{foreach $resultsadd as $result}
 									<div class="panel panel-default">
 										<div class="panel-body">
 											<div class="row">

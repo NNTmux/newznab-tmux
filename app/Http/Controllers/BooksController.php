@@ -86,7 +86,12 @@ class BooksController extends BasePageController
             $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/books?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0');
         }
 
-        $this->smarty->assign('results', $books);
+        $this->smarty->assign(
+            [
+                'resultsadd'=>  $books,
+                'results' => $results,
+            ]
+        );
 
         $meta_title = 'Browse Books';
         $meta_keywords = 'browse,nzb,books,description,details';

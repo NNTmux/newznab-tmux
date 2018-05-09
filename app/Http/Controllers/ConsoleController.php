@@ -89,7 +89,12 @@ class ConsoleController extends BasePageController
             }
         }
 
-        $this->smarty->assign('results', $consoles);
+        $this->smarty->assign(
+            [
+                'resultsadd'=>  $consoles,
+                'results' => $results,
+            ]
+        );
 
         $meta_title = 'Browse Console';
         $meta_keywords = 'browse,nzb,console,games,description,details';

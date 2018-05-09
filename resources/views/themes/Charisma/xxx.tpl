@@ -53,7 +53,7 @@
 						{/if}
 					</div>
 					<hr>
-					{foreach $results as $result}
+					{foreach $resultsadd as $result}
 						<!-- Iteratie: {counter} -->
 						{if isset($result.category_name)}
 							{assign var="catnamesplit" value=">"|explode:$result.category_name}
