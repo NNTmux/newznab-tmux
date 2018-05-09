@@ -258,8 +258,8 @@ class Movie
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->join('movieinfo as m', 'm.imdbid', '=', 'r.imdbid')
             ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '!=', '')
-            ->where('m.imdbid', '!=', '0000000');
+            ->where('m.title', '<>', '')
+            ->where('m.imdbid', '<>', '0000000');
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
             $sql->whereNotIn('r.categories_id', $excludedcats);
@@ -358,7 +358,7 @@ class Movie
      */
     public function getTrailer($imdbID)
     {
-        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '!=', '')->first(['trailer']);
+        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '<>', '')->first(['trailer']);
         if ($trailer !== null) {
             return $trailer['trailer'];
         }
