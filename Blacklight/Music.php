@@ -148,7 +148,18 @@ class Music
     public function getMusicRange($page, $cat, array $excludedcats = [])
     {
         $sql = Release::query()
-            ->select(
+            ->where('r.nzbstatus', '=', 1)
+            ->where('m.title', '!=', '')
+            ->where('m.cover', '=', 1);
+        Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedcats);
+        }
+
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+        $sql->select(
                 [
                     'm.*',
                     'r.musicinfo_id',
@@ -177,19 +188,7 @@ class Music
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->join('musicinfo as m', 'm.id', '=', 'r.musicinfo_id')
             ->join('genres as gn', 'm.genres_id', '=', 'gn.id')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '!=', '')
-            ->where('m.cover', '=', 1);
-        Releases::showPasswords($sql, true);
-        if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
-        }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
-        }
-
-        $sql->groupBy('m.id')
+            ->groupBy('m.id')
             ->orderBy('r.postdate', 'desc');
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
@@ -197,7 +196,7 @@ class Music
             return $return;
         }
 
-        $return = $sql->simplePaginate(config('nntmux.items_per_cover_page'));
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
@@ -489,7 +488,8 @@ class Music
                     ColorCLI::alternateOver('   Title:  ').
                     ColorCLI::primary($mus['title']).
                     ColorCLI::alternateOver('   Year:   ').
-                    ColorCLI::primary($mus['year']), true
+                    ColorCLI::primary($mus['year']),
+                    true
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -508,7 +508,8 @@ class Music
                         ' ('.
                         $mus['year'].
                         ')'
-                    ), true
+                    ),
+                    true
                 );
             }
         }
@@ -621,7 +622,8 @@ class Music
                 ColorCLI::doEcho(
                     ColorCLI::header(
                         'Processing '.$res->count().' music release(s).'
-                    ), true
+                    ),
+                    true
                 );
             }
 

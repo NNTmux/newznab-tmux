@@ -122,7 +122,17 @@ class XXX
         $order = $this->getXXXOrder($orderBy);
 
         $sql = Release::query()
-            ->select(
+            ->where('r.nzbstatus', '=', 1)
+            ->where('xxx.title', '!=', '');
+        Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedcats);
+        }
+
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+        $sql->select(
                 [
                     'xxx.*',
                     DB::raw('UNCOMPRESS(xxx.plot) AS plot'),
@@ -152,18 +162,7 @@ class XXX
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->join('xxxinfo as xxx', 'xxx.id', '=', 'r.xxxinfo_id')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('xxx.title', '!=', '');
-        Releases::showPasswords($sql, true);
-        if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
-        }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
-        }
-
-        $sql->groupBy('xxx.id')
+            ->groupBy('xxx.id')
             ->orderBy($order[0], $order[1]);
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
@@ -171,7 +170,7 @@ class XXX
             return $return;
         }
 
-        $return = $sql->simplePaginate(config('nntmux.items_per_cover_page'));
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
@@ -563,7 +562,9 @@ class XXX
 
         if ($this->echooutput) {
             ColorCLI::doEcho(
-                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))), true);
+                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))),
+                true
+            );
         }
 
         return $xxxID;

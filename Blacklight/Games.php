@@ -194,7 +194,7 @@ class Games
             ->from('gamesinfo as gi')
             ->join('genres as g', 'gi.genres_id', '=', 'g.id')
             ->orderByDesc('created_at')
-            ->simplePaginate(config('nntmux.items_per_page'));
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -218,7 +218,18 @@ class Games
     public function getGamesRange($page, $cat, array $excludedcats = [])
     {
         $sql = Release::query()
-            ->select(
+            ->where('r.nzbstatus', '=', 1)
+            ->where('gi.title', '!=', '')
+            ->where('gi.cover', '=', 1);
+        Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedcats);
+        }
+
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+        $sql->select(
                 [
                     'gi.*',
                     'r.gamesinfo_id',
@@ -247,19 +258,7 @@ class Games
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->join('gamesinfo as gi', 'gi.id', '=', 'r.gamesinfo_id')
             ->join('genres as gn', 'gi.genres_id', '=', 'gn.id')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('gi.title', '!=', '')
-            ->where('gi.cover', '=', 1);
-        Releases::showPasswords($sql, true);
-        if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
-        }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
-        }
-
-        $sql->groupBy('gi.id')
+            ->groupBy('gi.id')
             ->orderBy('r.postdate', 'desc');
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
@@ -267,7 +266,7 @@ class Games
             return $return;
         }
 
-        $return = $sql->simplePaginate(config('nntmux.items_per_cover_page'));
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
@@ -633,7 +632,8 @@ class Games
                     ColorCLI::alternateOver('   Title:    ').
                     ColorCLI::primary($game['title']).
                     ColorCLI::alternateOver('   Source:   ').
-                    ColorCLI::primary($this->_classUsed), true
+                    ColorCLI::primary($this->_classUsed),
+                    true
                 );
             }
             if ($game['cover'] === 1) {
@@ -646,7 +646,8 @@ class Games
             if ($this->echoOutput) {
                 ColorCLI::doEcho(
                     ColorCLI::headerOver('Nothing to update: ').
-                    ColorCLI::primary($game['title'].' (PC)'), true
+                    ColorCLI::primary($game['title'].' (PC)'),
+                    true
                 );
             }
         }
@@ -689,7 +690,8 @@ class Games
                     if ($this->echoOutput) {
                         ColorCLI::doEcho(
                             ColorCLI::headerOver('Looking up: ').
-                            ColorCLI::primary($gameInfo['title'].' (PC)'), true
+                            ColorCLI::primary($gameInfo['title'].' (PC)'),
+                            true
                         );
                     }
 

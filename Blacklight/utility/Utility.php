@@ -981,7 +981,7 @@ class Utility
             $range->selectRaw('UNCOMPRESS(plot) AS plot');
         }
 
-        return $range->orderByDesc('created_at')->simplePaginate(config('nntmux.items_per_page'));
+        return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
     }
 
     /**

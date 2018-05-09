@@ -152,7 +152,18 @@ class Books
         $order = $this->getBookOrder($orderBy);
 
         $sql = Release::query()
-            ->select(
+            ->where('r.nzbstatus', '=', 1)
+            ->where('b.title', '!=', '')
+            ->where('b.cover', '=', 1);
+        Releases::showPasswords($sql, true);
+        if (\count($excludedCats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedCats);
+        }
+
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+        $sql->select(
                 [
                     'b.*',
                     'r.bookinfo_id',
@@ -179,19 +190,7 @@ class Books
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->join('bookinfo as b', 'b.id', '=', 'r.bookinfo_id')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('b.title', '!=', '')
-            ->where('b.cover', '=', 1);
-        Releases::showPasswords($sql, true);
-        if (\count($excludedCats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedCats);
-        }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
-        }
-
-        $sql->groupBy('b.id')
+            ->groupBy('b.id')
             ->orderBy($order[0], $order[1]);
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)));
@@ -199,7 +198,7 @@ class Books
             return $return;
         }
 
-        $return = $sql->simplePaginate(config('nntmux.items_per_cover_page'));
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)), $return, $expiresAt);
@@ -464,7 +463,8 @@ class Books
             if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename), true
+                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename),
+                        true
                     );
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
@@ -475,7 +475,8 @@ class Books
             if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename), true
+                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename),
+                        true
                     );
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
@@ -651,7 +652,8 @@ class Books
                     ColorCLI::header('Nothing to update: ').
                     ColorCLI::header($book['author'].
                         ' - '.
-                        $book['title']), true
+                        $book['title']),
+                    true
                 );
             }
         }

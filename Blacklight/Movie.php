@@ -228,7 +228,18 @@ class Movie
     public function getMovieRange($page, $cat, array $excludedcats = [])
     {
         $sql = Release::query()
-            ->select(
+            ->where('r.nzbstatus', '=', 1)
+            ->where('m.title', '<>', '')
+            ->where('m.imdbid', '<>', '0000000');
+        Releases::showPasswords($sql, true);
+        if (\count($excludedcats) > 0) {
+            $sql->whereNotIn('r.categories_id', $excludedcats);
+        }
+
+        if (\count($cat) > 0 && $cat[0] !== -1) {
+            Category::getCategorySearch($cat, $sql, true);
+        }
+        $sql->select(
                 [
                     'm.*',
                     'g.name as group_name',
@@ -257,19 +268,7 @@ class Movie
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->join('movieinfo as m', 'm.imdbid', '=', 'r.imdbid')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '<>', '')
-            ->where('m.imdbid', '<>', '0000000');
-        Releases::showPasswords($sql, true);
-        if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
-        }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
-        }
-
-        $sql->groupBy('m.imdbid')
+            ->groupBy('m.imdbid')
             ->orderBy('r.postdate', 'desc');
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
@@ -277,7 +276,7 @@ class Movie
             return $return;
         }
 
-        $return = $sql->simplePaginate(config('nntmux.items_per_cover_page'));
+        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
@@ -665,7 +664,8 @@ class Movie
                     $mov['year'].
                     ') - '.
                     $mov['imdbid']
-                ), true
+                ),
+                true
             );
         }
 
