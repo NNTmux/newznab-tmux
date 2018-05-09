@@ -1,4 +1,5 @@
 2018-05-09 DariusIII
+	* Chg: Remove groupBy from getBrowseRange function
 	* Chg: Use simplePaginate method in Releases class
 	* Chg: Update getBrowseRange query in Releases class
 	* Fix: Fix links() error on rest of the cover related pages

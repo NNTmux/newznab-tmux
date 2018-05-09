@@ -75,6 +75,7 @@ class Releases
      * @param int   $minSize
      *
      * @return \Illuminate\Contracts\Pagination\Paginator|mixed
+     * @throws \Exception
      */
     public function getBrowseRange($page, array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
     {
@@ -111,7 +112,6 @@ class Releases
             ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
             ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->groupBy('r.id')
             ->orderBy($orderBy[0], $orderBy[1]);
         self::showPasswords($qry, true);
         if ($cat !== [-1]) {
