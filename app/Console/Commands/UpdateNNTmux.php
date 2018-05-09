@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\App;
 use Ytake\LaravelSmarty\Smarty;
+use Illuminate\Support\Facades\App;
 
 class UpdateNNTmux extends Command
 {
