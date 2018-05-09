@@ -281,7 +281,6 @@ class Movie
 
         dd($return);
 
-
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         /*Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);*/
 
