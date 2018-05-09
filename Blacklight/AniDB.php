@@ -163,7 +163,7 @@ class AniDB
         $query->groupBy('at.anidbid')
             ->orderByDesc('at.anidbid');
 
-        return $query->paginate(config('nntmux.items_per_page'));
+        return $query->simplePaginate(config('nntmux.items_per_page'));
     }
 
     /**

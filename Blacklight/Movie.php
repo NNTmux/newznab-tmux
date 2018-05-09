@@ -277,7 +277,7 @@ class Movie
             return $return;
         }
 
-        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
+        $return = $sql->simplePaginate(config('nntmux.items_per_cover_page'));
 
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);

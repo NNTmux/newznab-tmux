@@ -136,7 +136,7 @@ class Regexes
         }
         $result->orderBy('id');
 
-        return $result->paginate(config('nntmux.items_per_page'));
+        return $result->simplePaginate(config('nntmux.items_per_page'));
     }
 
     /**
