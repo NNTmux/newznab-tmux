@@ -146,9 +146,7 @@ class ApiController extends BasePageController
                        $minSize
                    );
                } else {
-                   $page = $request->has('page') ? $request->input('page') : 1;
                    $relData = $releases->getBrowseRange(
-                       $page,
                        $categoryID,
                        '',
                        $maxAge,

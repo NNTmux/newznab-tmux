@@ -6,8 +6,8 @@ use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Watson\Rememberable\Rememberable;
 
 /**
  * @property mixed $release
@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 class Predb extends Model
 {
     use Searchable;
+    use Rememberable;
 
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
@@ -153,9 +154,7 @@ class Predb extends Model
             $search = explode(' ', trim($search));
         }
 
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
-
-        $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
+        $sql = self::query()->remember(config('nntmux.cache_expiry_medium'))->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if ($search !== '') {
             $sql->where(function ($query) use ($search) {
                 for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
@@ -163,16 +162,9 @@ class Predb extends Model
                 }
             });
         }
-        $search = $search !== '' ? implode(',', $search) : '';
-        $check = Cache::get(md5($search));
-        if ($check !== null) {
-            $parr = $check;
-        } else {
-            $parr = $sql->paginate(config('nntmux.items_per_page'));
-            Cache::put(md5($search), $parr, $expiresAt);
-        }
 
-        return $parr;
+            return $sql->paginate(config('nntmux.items_per_page'));
+
     }
 
     /**

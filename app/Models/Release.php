@@ -28,8 +28,6 @@ class Release extends Model
      */
     protected $guarded = [];
 
-    protected $rememberCacheDriver = 'redis';
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -257,7 +255,7 @@ class Release extends Model
     public static function getTopDownloads()
     {
         return self::query()
-            ->remember(15)
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('grabs', '>', 0)
             ->select(['id', 'searchname', 'guid', 'adddate'])
             ->selectRaw('SUM(grabs) as grabs')
@@ -274,7 +272,7 @@ class Release extends Model
     public static function getTopComments()
     {
         return self::query()
-            ->remember(15)
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('comments', '>', 0)
             ->select(['id', 'guid', 'searchname'])
             ->selectRaw('SUM(comments) AS comments')
@@ -291,7 +289,7 @@ class Release extends Model
     public static function getReleases(): array
     {
         return self::query()
-            ->remember(15)
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
@@ -308,7 +306,7 @@ class Release extends Model
     public static function getReleasesRange()
     {
         return self::query()
-           ->remember(10)
+           ->remember(config('nntmux.cache_expiry_medium'))
            ->where('nzbstatus', '=', NZB::NZB_ADDED)
            ->select(
                 [
@@ -337,7 +335,7 @@ class Release extends Model
      */
     public static function getReleasesCount(): int
     {
-        $res = self::query()->remember(10)->count(['id']);
+        $res = self::query()->remember(config('nntmux.cache_expiry_medium'))->count(['id']);
 
         return $res ?? 0;
     }
@@ -349,7 +347,7 @@ class Release extends Model
     public static function getByGuid($guid)
     {
         $sql = self::query()
-            ->remember(5)
+            ->remember(config('nntmux.cache_expiry_short'))
             ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')

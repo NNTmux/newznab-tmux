@@ -10,7 +10,6 @@ use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Releases.
@@ -76,7 +75,7 @@ class Releases
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      * @throws \Exception
      */
-    public function getBrowseRange($page, array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
+    public function getBrowseRange(array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
