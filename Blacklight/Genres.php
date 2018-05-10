@@ -49,7 +49,7 @@ class Genres
             return $genres;
         }
         $genres = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $genres, $expiresAt);
 
         return $genres;
@@ -186,7 +186,7 @@ class Genres
             $disabled = $cats;
         } else {
             $disabled = Genre::query()->where('disabled', '=', 1)->get(['id']);
-            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+            $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
             Cache::put('disabledcats', $disabled, $expiresAt);
         }
 

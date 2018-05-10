@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
+use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    use Rememberable;
+
     /**
      * Category constants.
      * Do NOT use the values, as they may change, always use the constant - that's what it's for.
@@ -169,12 +171,8 @@ class Category extends Model
      */
     public static function getRecentlyAdded()
     {
-        $recent = Cache::get('recentlyadded');
-        if ($recent !== null) {
-            return $recent;
-        }
-
-        $recent = self::query()
+        return self::query()
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('r.adddate', '>', Carbon::now()->subWeek())
             ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
             ->selectRaw('COUNT(r.id) as count')
@@ -183,11 +181,6 @@ class Category extends Model
             ->groupBy('title')
             ->orderBy('count', 'desc')
             ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('recentlyadded', $recent, $expiresAt);
-
-        return $recent;
     }
 
     /**
@@ -303,15 +296,7 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        $children = Cache::get(md5($categoryId));
-        if ($children !== null) {
-            return $children;
-        }
-        $children = self::find($categoryId)->children;
-        Cache::put(md5($categoryId), $children, $expiresAt);
-
-        return $children;
+        return self::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->children;
     }
 
     /**
@@ -343,22 +328,14 @@ class Category extends Model
     /**
      * Get multiple categories.
      *
-     * @param array $ids
+     * @param $ids
      *
-     * @return array|bool
+     * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getByIds($ids)
     {
         if (\count($ids) > 0) {
-            $catIds = Cache::get('categoryids');
-            if ($catIds !== null) {
-                return $catIds;
-            }
-            $catIds = self::query()->whereIn('id', $ids)->get();
-            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-            Cache::put('categoryids', $catIds, $expiresAt);
-
-            return $catIds;
+            return self::query()->remember(config('nntmux.cache_expiry_long'))->whereIn('id', $ids)->get();
         }
 
         return false;
@@ -426,7 +403,7 @@ class Category extends Model
     {
         $ret = [];
 
-        $sql = self::query()->where('status', '=', self::STATUS_ACTIVE);
+        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE);
 
         if (\count($excludedCats) > 0 && \count($roleExcludedCats) === 0) {
             $sql->whereNotIn('id', $excludedCats);
@@ -436,14 +413,7 @@ class Category extends Model
             $sql->whereNotIn('id', $roleExcludedCats);
         }
 
-        $arrsql = Cache::get(md5(implode(',', $excludedCats).implode(',', $roleExcludedCats)));
-        if ($arrsql !== null) {
-            $arr = $arrsql;
-        } else {
-            $arr = $sql->get()->toArray();
-            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-            Cache::put(md5(implode(',', $excludedCats).implode(',', $roleExcludedCats)), $arr, $expiresAt);
-        }
+        $arr = $sql->get()->toArray();
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === self::OTHER_ROOT) {

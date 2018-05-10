@@ -1,3 +1,10 @@
+2018-05-10 DariusIII
+	* Fix: Fix caching in Category model getChildren function
+	* Chg: Update Category model
+	* Chg: Update query caching in Category and predb models
+	* Chg: Use minutes instead of seconds for cache_expiry
+	* Chg: Use Rememberable trait in Release model and Releases class queries
+	* Chg: Cache queries on request to prevent running many duplicated queries
 2018-05-09 DariusIII
 	* Chg: Update themes
 	* Chg: Rearrange pagination queries

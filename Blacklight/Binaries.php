@@ -1714,7 +1714,7 @@ class Binaries
         }
 
         $poster = MultigroupPoster::query()->get(['poster'])->toArray();
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;
