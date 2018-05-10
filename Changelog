@@ -1,4 +1,5 @@
 2018-05-10 DariusIII
+	* Chg: Use Rememberable trait in Release model and Releases class queries
 	* Chg: Cache queries on request to prevent running many duplicated queries
 2018-05-09 DariusIII
 	* Chg: Rearrange pagination queries

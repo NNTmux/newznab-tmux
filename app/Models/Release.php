@@ -9,10 +9,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Watson\Rememberable\Rememberable;
 
 class Release extends Model
 {
-    use CacheQueryBuilder;
+    //use CacheQueryBuilder;
+    use Rememberable;
 
     /**
      * @var bool
@@ -28,6 +30,8 @@ class Release extends Model
      * @var array
      */
     protected $guarded = [];
+
+    protected $rememberCacheDriver = 'redis';
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -255,12 +259,8 @@ class Release extends Model
      */
     public static function getTopDownloads()
     {
-        $releases = Cache::get('topdownloads');
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = self::query()
+        return self::query()
+            ->remember(15)
             ->where('grabs', '>', 0)
             ->select(['id', 'searchname', 'guid', 'adddate'])
             ->selectRaw('SUM(grabs) as grabs')
@@ -269,11 +269,6 @@ class Release extends Model
             ->orderBy('grabs', 'desc')
             ->limit(10)
             ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('topdownloads', $releases, $expiresAt);
-
-        return $releases;
     }
 
     /**
@@ -281,12 +276,10 @@ class Release extends Model
      */
     public static function getTopComments()
     {
-        $comments = Cache::get('topcomments');
-        if ($comments !== null) {
-            return $comments;
-        }
 
-        $comments = self::query()
+
+        return self::query()
+            ->remember(15)
             ->where('comments', '>', 0)
             ->select(['id', 'guid', 'searchname'])
             ->selectRaw('SUM(comments) AS comments')
@@ -295,10 +288,6 @@ class Release extends Model
             ->orderBy('comments', 'desc')
             ->limit(10)
             ->get();
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('topcomments', $comments, $expiresAt);
-
-        return $comments;
     }
 
     /**
@@ -306,22 +295,14 @@ class Release extends Model
      */
     public static function getReleases(): array
     {
-        $result = Cache::get('releaseget');
-        if ($result !== null) {
-            return $result;
-        }
 
-        $result = self::query()
+        return self::query()
+            ->remember(15)
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('releaseget', $result, $expiresAt);
-
-        return $result;
     }
 
     /**
@@ -332,13 +313,10 @@ class Release extends Model
      */
     public static function getReleasesRange()
     {
-        $range = Cache::get('range');
-        if ($range !== null) {
-            return $range;
-        }
-        $query = self::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->select(
+       return self::query()
+           ->remember(10)
+           ->where('nzbstatus', '=', NZB::NZB_ADDED)
+           ->select(
                 [
                     'releases.id',
                     'releases.name',
@@ -354,14 +332,9 @@ class Release extends Model
             ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->orderByDesc('releases.postdate');
+            ->orderByDesc('releases.postdate')
+            ->paginate(config('nntmux.items_per_page'));
 
-        $range = $query->paginate(config('nntmux.items_per_page'));
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put('range', $range, $expiresAt);
-
-        return $range;
     }
 
     /**
@@ -371,13 +344,8 @@ class Release extends Model
      */
     public static function getReleasesCount(): int
     {
-        $res = Cache::get('count');
-        if ($res !== null) {
-            return $res;
-        }
-        $res = self::query()->count(['id']);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put('count', $res, $expiresAt);
+
+        $res = self::query()->remember(10)->count(['id']);
 
         return $res ?? 0;
     }
@@ -388,13 +356,8 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
-        $cached = \is_array($guid) ? md5(implode(',', $guid)) : md5($guid);
-        $result = Cache::get($cached);
-        if ($result !== null) {
-            return $result;
-        }
         $sql = self::query()
+            ->remember(5)
             ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
@@ -417,7 +380,6 @@ class Release extends Model
         }
 
         $result = \is_array($guid) ? $sql->groupBy('releases.id')->get() : $sql->groupBy('releases.id')->first();
-        Cache::put($cached, $result, $expiresAt);
 
         return $result;
     }
