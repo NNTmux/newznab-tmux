@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Watson\Rememberable\Rememberable;
+use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
@@ -173,8 +173,6 @@ class Category extends Model
      */
     public static function getRecentlyAdded()
     {
-
-
         return self::query()
             ->remember(config('nntmux.cache_expiry_long'))
             ->where('r.adddate', '>', Carbon::now()->subWeek())
@@ -339,9 +337,7 @@ class Category extends Model
     public static function getByIds($ids)
     {
         if (\count($ids) > 0) {
-
             return self::query()->remember(config('nntmux.cache_expiry_long'))->whereIn('id', $ids)->get();
-
         }
 
         return false;
@@ -419,10 +415,7 @@ class Category extends Model
             $sql->whereNotIn('id', $roleExcludedCats);
         }
 
-
-            $arr = $sql->get()->toArray();
-
-
+        $arr = $sql->get()->toArray();
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === self::OTHER_ROOT) {

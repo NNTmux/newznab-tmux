@@ -6,8 +6,8 @@ use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Watson\Rememberable\Rememberable;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property mixed $release
@@ -163,8 +163,7 @@ class Predb extends Model
             });
         }
 
-            return $sql->paginate(config('nntmux.items_per_page'));
-
+        return $sql->paginate(config('nntmux.items_per_page'));
     }
 
     /**
