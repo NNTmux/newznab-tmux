@@ -74,8 +74,8 @@ return [
         ],
 
         'request' => [
-            'driver' => 'array'
-        ]
+            'driver' => 'array',
+        ],
 
     ],
 
