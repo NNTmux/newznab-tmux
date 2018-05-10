@@ -20,6 +20,7 @@
 
 namespace App\Models;
 
+use App\Support\Database\CacheQueryBuilder;
 use Blacklight\utility\Utility;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
 class Settings extends Model
 {
     use InsertOnDuplicateKey;
+    use CacheQueryBuilder;
 
     public const REGISTER_STATUS_OPEN = 0;
 

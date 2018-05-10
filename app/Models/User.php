@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
@@ -16,6 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
+    use CacheQueryBuilder;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;

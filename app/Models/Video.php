@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Video extends Model
 {
+    use CacheQueryBuilder;
     /**
      * @var bool
      */

@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    use CacheQueryBuilder;
+
     /**
      * Category constants.
      * Do NOT use the values, as they may change, always use the constant - that's what it's for.

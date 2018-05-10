@@ -1,3 +1,5 @@
+2018-05-10 DariusIII
+	* Chg: Cache queries on request to prevent running many duplicated queries
 2018-05-09 DariusIII
 	* Chg: Rearrange pagination queries
 	* Chg: Remove groupBy from getBrowseRange function

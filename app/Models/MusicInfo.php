@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\Database\CacheQueryBuilder;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 
 class MusicInfo extends Model
 {
     use Searchable;
+    use CacheQueryBuilder;
     /**
      * @var string
      */
