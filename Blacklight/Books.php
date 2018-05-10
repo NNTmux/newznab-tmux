@@ -200,7 +200,7 @@ class Books
 
         $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)), $return, $expiresAt);
 
         return $return;

@@ -81,7 +81,7 @@ class Releases
         $orderBy = $this->getBrowseOrder($orderBy);
 
         return Release::query()
-            ->remember(10)
+            ->remember(config('nntmux.cache_expiry_medium'))
             ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
                 $query->select(['r.*', 'g.name as group_name'])
                     ->from('releases as r')
@@ -324,7 +324,7 @@ class Releases
     {
         if ($this->concatenatedCategoryIDsCache === null) {
             $result = Category::query()
-                ->remember(15)
+                ->remember(config('nntmux.cache_expiry_long'))
                 ->whereNotNull('categories.parentid')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
@@ -560,7 +560,7 @@ class Releases
         }
 
         return Release::query()
-            ->remember(10)
+            ->remember(config('nntmux.cache_expiry_medium'))
             ->fromSub(function ($query) use ($maxAge, $groupName, $sizeFrom, $sizeRange, $sizeTo, $hasNfo, $hasComments, $cat, $excludedCats, $type, $daysNew, $daysOld, $searchOptions, $minSize) {
                 self::showPasswords($query, true);
                 $query->where('r.nzbstatus', '=', NZB::NZB_ADDED);
@@ -685,7 +685,7 @@ class Releases
         }
 
         $query = Release::query()
-            ->remember(10)
+            ->remember(config('nntmux.cache_expiry_medium'))
             ->where('r.nzbstatus', NZB::NZB_ADDED);
         self::showPasswords($query, true);
         if ($show !== null) {
@@ -772,7 +772,7 @@ class Releases
      */
     public function animeSearch($aniDbID, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1)
     {
-        $query = Release::query()->remember(10)->where('r.nzbstatus', NZB::NZB_ADDED);
+        $query = Release::query()->remember(config('nntmux.cache_expiry_medium'))->where('r.nzbstatus', NZB::NZB_ADDED);
         if ($name !== '') {
             $query->join('releases_se as rse', 'rse.id', '=', 'r.id');
             $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
@@ -823,7 +823,7 @@ class Releases
      */
     public function moviesSearch($imDbId, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0)
     {
-        $query = Release::query()->remember(10)->where('r.nzbstatus', NZB::NZB_ADDED)
+        $query = Release::query()->remember(config('nntmux.cache_expiry_medium'))->where('r.nzbstatus', NZB::NZB_ADDED)
         ->whereBetween('r.categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER]);
         if ($name !== '') {
             $query->join('releases_se as rse', 'rse.id', '=', 'r.id');

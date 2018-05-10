@@ -137,7 +137,7 @@ class RSS extends Capabilities
             ->offset(0)
             ->limit($offset > 100 ? 100 : $offset);
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5(implode('.', $cat).$offset.$videosId.$aniDbID.$userID.$airDate));
         if ($result !== null) {
             return $result;
@@ -192,7 +192,7 @@ class RSS extends Capabilities
             ->limit($limit > 100 ? 100 : $limit)
             ->offset(0);
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5($limit.$userID.implode('.', $excludedCats).$airDate));
         if ($result !== null) {
             return $result;
@@ -243,7 +243,7 @@ class RSS extends Capabilities
             ->limit($limit > 100 ? 100 : $limit)
             ->offset(0);
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5($limit.$userID.implode('.', $excludedCats)));
         if ($result !== null) {
             return $result;

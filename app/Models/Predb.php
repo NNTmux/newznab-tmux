@@ -153,7 +153,7 @@ class Predb extends Model
             $search = explode(' ', trim($search));
         }
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
         $sql = self::query()->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if ($search !== '') {
