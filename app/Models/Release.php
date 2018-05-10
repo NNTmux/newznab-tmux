@@ -6,8 +6,8 @@ use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use Watson\Rememberable\Rememberable;
+use Illuminate\Database\Eloquent\Model;
 
 class Release extends Model
 {
@@ -273,8 +273,6 @@ class Release extends Model
      */
     public static function getTopComments()
     {
-
-
         return self::query()
             ->remember(15)
             ->where('comments', '>', 0)
@@ -292,7 +290,6 @@ class Release extends Model
      */
     public static function getReleases(): array
     {
-
         return self::query()
             ->remember(15)
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
@@ -310,7 +307,7 @@ class Release extends Model
      */
     public static function getReleasesRange()
     {
-       return self::query()
+        return self::query()
            ->remember(10)
            ->where('nzbstatus', '=', NZB::NZB_ADDED)
            ->select(
@@ -331,7 +328,6 @@ class Release extends Model
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->orderByDesc('releases.postdate')
             ->paginate(config('nntmux.items_per_page'));
-
     }
 
     /**
@@ -341,7 +337,6 @@ class Release extends Model
      */
     public static function getReleasesCount(): int
     {
-
         $res = self::query()->remember(10)->count(['id']);
 
         return $res ?? 0;

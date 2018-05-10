@@ -79,6 +79,7 @@ class Releases
     public function getBrowseRange($page, array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
     {
         $orderBy = $this->getBrowseOrder($orderBy);
+
         return Release::query()
             ->remember(10)
             ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
@@ -322,7 +323,6 @@ class Releases
     public function getConcatenatedCategoryIDs()
     {
         if ($this->concatenatedCategoryIDsCache === null) {
-
             $result = Category::query()
                 ->remember(15)
                 ->whereNotNull('categories.parentid')
@@ -757,9 +757,7 @@ class Releases
 
         $query->orderByDesc('r.postdate')->limit($limit);
 
-         return $query->paginate(config('nntmux.items_per_page'));
-
-
+        return $query->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -808,8 +806,6 @@ class Releases
             ->leftJoin('releaseextrafull as re', 're.releases_id', '=', 'r.id')
             ->orderByDesc('r.postdate')
             ->limit($limit);
-
-
 
         return $query->paginate(config('nntmux.items_per_page'));
     }
@@ -866,7 +862,6 @@ class Releases
             ->limit($limit);
 
         return $query->paginate(config('nntmux.items_per_page'));
-
     }
 
     /**
