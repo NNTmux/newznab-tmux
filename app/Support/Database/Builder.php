@@ -8,7 +8,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 class Builder extends QueryBuilder
 {
     /**
-     * Taken from https://laracasts.com/discuss/channels/guides/never-execute-a-duplicate-query-again
+     * Taken from https://laracasts.com/discuss/channels/guides/never-execute-a-duplicate-query-again.
      *
      * Run the query as a "select" statement against the connection.
      *
@@ -16,7 +16,7 @@ class Builder extends QueryBuilder
      */
     protected function runSelect()
     {
-        return Cache::store('request')->remember($this->getCacheKey(), 1, function() {
+        return Cache::store('request')->remember($this->getCacheKey(), 1, function () {
             return parent::runSelect();
         });
     }
@@ -29,7 +29,7 @@ class Builder extends QueryBuilder
     protected function getCacheKey()
     {
         return json_encode([
-            $this->toSql() => $this->getBindings()
+            $this->toSql() => $this->getBindings(),
         ]);
     }
 }

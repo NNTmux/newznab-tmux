@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Database\CacheQueryBuilder;
 
 class Video extends Model
 {

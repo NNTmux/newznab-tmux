@@ -5,7 +5,7 @@ namespace App\Support\Database;
 trait CacheQueryBuilder
 {
     /**
-     * Taken from https://laracasts.com/discuss/channels/guides/never-execute-a-duplicate-query-again
+     * Taken from https://laracasts.com/discuss/channels/guides/never-execute-a-duplicate-query-again.
      *
      * Get a new query builder instance for the connection.
      *
