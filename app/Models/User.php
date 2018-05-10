@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
-use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable

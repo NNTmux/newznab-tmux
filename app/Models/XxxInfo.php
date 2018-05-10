@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Database\CacheQueryBuilder;
 
 class XxxInfo extends Model
 {

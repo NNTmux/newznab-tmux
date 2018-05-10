@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Support\Database\CacheQueryBuilder;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Database\CacheQueryBuilder;
 
 class Release extends Model
 {
