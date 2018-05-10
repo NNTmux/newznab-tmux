@@ -1,4 +1,5 @@
 2018-05-10 DariusIII
+	* Fix: Fix caching in Category model getChildren function
 	* Chg: Update Category model
 	* Chg: Update query caching in Category and predb models
 	* Chg: Use minutes instead of seconds for cache_expiry

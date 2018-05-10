@@ -296,7 +296,7 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        return self::find($categoryId)->children->remember(config('nntmux.cache_expiry_long'));
+        return self::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->children;
     }
 
     /**
