@@ -126,8 +126,6 @@ class Category extends Model
      */
     protected $guarded = [];
 
-    protected $rememberCacheDriver = 'redis';
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -330,9 +328,9 @@ class Category extends Model
     /**
      * Get multiple categories.
      *
-     * @param array $ids
+     * @param $ids
      *
-     * @return array|bool
+     * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getByIds($ids)
     {

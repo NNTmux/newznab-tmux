@@ -1,4 +1,5 @@
 2018-05-10 DariusIII
+	* Chg: Update Category model
 	* Chg: Update query caching in Category and predb models
 	* Chg: Use minutes instead of seconds for cache_expiry
 	* Chg: Use Rememberable trait in Release model and Releases class queries
