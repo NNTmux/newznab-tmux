@@ -6,6 +6,7 @@ use Blacklight\Games;
 use Blacklight\Genres;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class GamesController extends BasePageController
 {
@@ -37,8 +38,11 @@ class GamesController extends BasePageController
         $this->smarty->assign('category', $category);
 
         $page = $request->has('page') ? $request->input('page') : 1;
-
-        $results = $games->getGamesRange($page, $catarray, $this->userdata['categoryexclusions']);
+        $ordering = $games->getGamesOrdering();
+        $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
+        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $rslt = $games->getGamesRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '',$this->userdata['categoryexclusions']);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'][0]->total, config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
         $this->smarty->assign('title', $title);
