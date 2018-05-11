@@ -1,4 +1,5 @@
 2018-05-11 DariusIII
+	* Fix: Use raw queries to speed up browse pages
 	* Chg: Replace '!=' with proper '<>' operator
 2018-05-10 DariusIII
 	* Chg: Update font-awesome and laravelcollective/html to latest versions

@@ -91,62 +91,62 @@
 								</thead>
 								<tbody>
 								{foreach $results as $result}
-									<tr id="guid{$result.guid}">
-										<td class="check"><input id="chk{$result.guid|substr:0:7}"
+									<tr id="guid{$result->guid}">
+										<td class="check"><input id="chk{$result->guid|substr:0:7}"
 																 type="checkbox" class="square"
-																 value="{$result.guid}"/></td>
+																 value="{$result->guid}"/></td>
 										<td>
-											<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
-											   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result.failed)}
+											<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}"
+											   class="title">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result->failed)}
 											<i class="zmdi zmdi-alarm" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 											<br/>
-											<span class="label label-default">{$result.grabs}
-												Grab{if $result.grabs != 1}s{/if}</span>
-											{if $result.nfoid > 0}<span><a
-														href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+											<span class="label label-default">{$result->grabs}
+												Grab{if $result->grabs != 1}s{/if}</span>
+											{if $result->nfoid > 0}<span><a
+														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 														class="modal_nfo label label-default" rel="nfo">NFO</a>
 												</span>{/if}
-											{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span><a
-														href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
-														name="name{$result.guid}" class="modal_prev label label-default"
+											{if $result->jpgstatus == 1 && $userdata.canpreview == 1}<span><a
+														href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
+														name="name{$result->guid}" class="modal_prev label label-default"
 														rel="preview">Sample</a></span>{/if}
-											{if $result.haspreview == 1 && $userdata.canpreview == 1}<span><a
-														href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-														name="name{$result.guid}" class="modal_prev label label-default"
+											{if $result->haspreview == 1 && $userdata.canpreview == 1}<span><a
+														href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+														name="name{$result->guid}" class="modal_prev label label-default"
 														rel="preview">Preview</a></span>{/if}
-											{if $result.videos_id > 0}<span class="label label-default"><a
-														href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}">View TV</a>
+											{if $result->videos_id > 0}<span class="label label-default"><a
+														href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}">View TV</a>
 												</span>{/if}
-											{if isset($result.firstaired) && $result.firstaired != ""}<span
-												class="seriesinfo label label-default" title="{$result.guid}">
-												Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
-											{if $result.anidbid > 0}<span class="label label-default"><a
-														href="{$smarty.const.WWW_TOP}/anime?id={$result.anidbid}">View Anime</a>
+											{if isset($result->firstaired) && $result->firstaired != ""}<span
+												class="seriesinfo label label-default" title="{$result->guid}">
+												Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
+											{if $result->anidbid > 0}<span class="label label-default"><a
+														href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}">View Anime</a>
 												</span>{/if}
-											{if !empty($result.failed)}<span class="label label-default">
+											{if !empty($result->failed)}<span class="label label-default">
 												<i class="zmdi zmdi-thumbs-o-up"></i>
-												{$result.grabs} Grab{if $result.grabs != 1}s{/if} /
+												{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 												<i class="zmdi zmdi-thumbs-o-down"></i>
-												{$result.failed} Failed Download{if $result.failed != 1}s{/if}
+												{$result->failed} Failed Download{if $result->failed != 1}s{/if}
 												</span>{/if}
-											<span class="label label-primary">{$result.group_name}</span>
-											<span class="label label-primary">{$result.fromname}</span>
+											<span class="label label-primary">{$result->group_name}</span>
+											<span class="label label-primary">{$result->fromname}</span>
 										</td>
-										<td><span class="label label-default">{$result.category_name}</span>
+										<td><span class="label label-default">{$result->category_name}</span>
 										</td>
-										<td>{$result.postdate|timeago}</td>
-										<td>{$result.size|fsize_format:"MB"}</td>
+										<td>{$result->postdate|timeago}</td>
+										<td>{$result->size|fsize_format:"MB"}</td>
 										<td>
-											<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"
+											<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
 											   class="icon_nzb"><i
 														class="zmdi zmdi-cloud-download"
 														title="Download NZB"></i></a>
-											<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+											<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 														class="zmdi zmdi-comments-o"
 														title="Comments"></i></a>
 											<a href="#"><i
-														id="guid{$result.guid}"
+														id="guid{$result->guid}"
 														class="icon_cart zmdi zmdi-shopping-basket"
 														title="Send to my Download Basket">
 
@@ -154,7 +154,7 @@
 											</a>
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<a href="#"><i
-															id="guid{$result.guid}"
+															id="guid{$result->guid}"
 															class="icon_sab zmdi zmdi-share"
 															title="Send to my Queue">
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BrowseController extends BasePageController
 {
@@ -25,8 +26,11 @@ class BrowseController extends BasePageController
 
         $orderby = '';
         $page = \request()->has('page') ? \request()->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $results = $releases->getBrowseRange([-1], $orderby, -1, $this->userdata['categoryexclusions'], -1);
+        $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], -1);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_page'), $page, ['path' => \request()->url()]);
+
 
         $this->smarty->assign('catname', 'All');
 
@@ -79,8 +83,11 @@ class BrowseController extends BasePageController
         $this->smarty->assign('category', $category);
 
         $orderby = '';
+        $page = \request()->has('page') ? \request()->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $results = $releases->getBrowseRange($catarray, $orderby, -1, $this->userdata['categoryexclusions'], $grp);
+        $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], $grp);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_page'), $page, ['path' => \request()->url()]);
 
         $this->smarty->assign('catname', $id);
 
@@ -139,7 +146,10 @@ class BrowseController extends BasePageController
         $releases = new Releases();
         if ($request->has('g')) {
             $group = $request->input('g');
-            $results = $releases->getBrowseRange([-1], '', -1, $this->userdata['categoryexclusions'], $group);
+            $page = \request()->has('page') ? \request()->input('page') : 1;
+            $offset = ($page - 1) * config('nntmux.items_per_page');
+            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'),'', -1, $this->userdata['categoryexclusions'], $group);
+            $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_page'), $page, ['path' => \request()->url()]);
             $this->smarty->assign('results', $results);
             $meta_title = 'Browse Groups';
             $meta_keywords = 'browse,nzb,description,details';

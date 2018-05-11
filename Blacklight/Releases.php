@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -58,6 +59,8 @@ class Releases
             'Groups'   => null,
         ];
         $options += $defaults;
+        $this->pdo = DB::connection()->getPdo();
+
 
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch();
@@ -65,56 +68,113 @@ class Releases
     }
 
     /**
-     * @param $page
-     * @param array $cat
-     * @param $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
-     * @param int $groupName
-     * @param int $minSize
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
-     * @throws \Exception
+     * Used for browse results.
+     *
+     * @param              $page
+     * @param array        $cat
+     * @param              $start
+     * @param              $num
+     * @param string|array $orderBy
+     * @param int          $maxAge
+     * @param array        $excludedCats
+     * @param string|int   $groupName
+     * @param int          $minSize
+     *
+     * @return array
      */
-    public function getBrowseRange(array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): array
     {
         $orderBy = $this->getBrowseOrder($orderBy);
-
-        return Release::query()
-            ->remember(config('nntmux.cache_expiry_medium'))
-            ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
-                $query->select(['r.*', 'g.name as group_name'])
-                    ->from('releases as r')
-                    ->where('r.nzbstatus', NZB::NZB_ADDED);
-                self::showPasswords($query, true);
-                if ($cat !== [-1]) {
-                    Category::getCategorySearch($cat, $query, true);
-                }
-                $query->leftJoin('groups as g', 'g.id', '=', 'r.groups_id');
-                if ($maxAge > 0) {
-                    $query->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
-                }
-                if (\count($excludedCats) > 0) {
-                    $query->whereNotIn('r.categories_id', $excludedCats);
-                }
-                if ($groupName !== -1) {
-                    $query->where('g.name', $groupName);
-                }
-                if ($minSize > 0) {
-                    $query->where('r.size', '>=', $minSize);
-                }
-                $query->orderBy($orderBy[0], $orderBy[1]);
-            }, 'r')
-            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"), DB::raw("CONCAT(cp.id, ',', c.id) AS category_ids")])
-            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
-            ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
-            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
-            ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->orderBy($orderBy[0], $orderBy[1])
-            ->paginate(config('nntmux.items_per_page'));
+        $qry = sprintf(
+            "SELECT r.*,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
+				df.failed AS failed,
+				rn.releases_id AS nfoid,
+				re.releases_id AS reid,
+				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+				tve.title, tve.firstaired
+			FROM
+			(
+				SELECT r.*, g.name AS group_name
+				FROM releases r
+				LEFT JOIN groups g ON g.id = r.groups_id
+				WHERE r.nzbstatus = %d
+				AND r.passwordstatus %s
+				%s %s %s %s %s
+				ORDER BY %s %s %s
+			) r
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
+			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			GROUP BY r.id
+			ORDER BY %8\$s %9\$s",
+            NZB::NZB_ADDED,
+            $this->showPasswords,
+            Category::getCategorySearch($cat),
+            ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->quote($groupName)) : ''),
+            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+            $orderBy[0],
+            $orderBy[1],
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+        );
+        $releases = Cache::get(md5($qry.$page));
+        if ($releases !== null) {
+            return $releases;
+        }
+        $sql = DB::select($qry);
+        if (\count($sql) > 0) {
+            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
+            $sql['_totalcount'] = $sql['_totalrows'] = $possibleRows;
+        }
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        Cache::put(md5($qry.$page), $sql, $expiresAt);
+        return $sql;
     }
+
+    /**
+     * Used for pager on browse page.
+     *
+     * @param array  $cat
+     * @param int    $maxAge
+     * @param array  $excludedCats
+     * @param string|int $groupName
+     *
+     * @return int
+     */
+    public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = ''): int
+    {
+        $sql = sprintf(
+            'SELECT COUNT(r.id) AS count
+				FROM releases r
+				%s
+				WHERE r.nzbstatus = %d
+				AND r.passwordstatus %s
+				%s %s %s %s',
+            ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
+            NZB::NZB_ADDED,
+            $this->showPasswords,
+            ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->quote($groupName)) : ''),
+            Category::getCategorySearch($cat),
+            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
+        );
+        $count = Cache::get(md5($sql));
+        if ($count !== null) {
+            return $count;
+        }
+        $count = DB::select($sql);
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
+        Cache::put(md5($sql), $count[0]->count, $expiresAt);
+        return $count[0]->count ?? 0;
+    }
+
 
     /**
      * @param null $query

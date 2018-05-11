@@ -224,7 +224,7 @@ class Category extends Model
             // One category constraint
             case 1:
                 if ($builder === false) {
-                    $catsrch = $categories[0] !== -1 ? '  AND releases.categories_id = '.$categories[0] : '';
+                    $catsrch = $categories[0] !== -1 ? '  AND r.categories_id = '.$categories[0] : '';
                 } else {
                     return $query->where('r.categories_id', '=', $categories[0]);
                 }
@@ -232,7 +232,7 @@ class Category extends Model
             // Multiple category constraints
             default:
                 if ($builder === false) {
-                    $catsrch = ' AND releases.categories_id IN ('.implode(', ', $categories).') ';
+                    $catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
                 } else {
                     return $query->whereIn('r.categories_id', $categories);
                 }
