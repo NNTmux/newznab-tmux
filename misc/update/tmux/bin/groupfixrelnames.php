@@ -72,9 +72,10 @@ switch (true) {
             ->where('releases.passwordstatus', '>=', 0)
             ->where('releases.nfostatus', '>', Nfo::NFO_UNPROC)
             ->whereNested(function ($query) {
-                $query->orWhere(function ($query) {$query->where('releases.nfostatus', Nfo::NFO_FOUND)
+                $query->orWhere(function ($query) {
+                    $query->where('releases.nfostatus', Nfo::NFO_FOUND)
                         ->where('releases.proc_nfo', NameFixer::PROC_NFO_NONE);
-                    })
+                })
                     ->orWhere('releases.proc_files', NameFixer::PROC_FILES_NONE)
                     ->orWhere('releases.proc_uid', NameFixer::PROC_UID_NONE)
                     ->orWhere('releases.proc_par2', NameFixer::PROC_PAR2_NONE)
