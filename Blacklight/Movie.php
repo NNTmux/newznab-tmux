@@ -272,14 +272,15 @@ class Movie
         if ($movieCache !== null) {
             $movies = $movieCache;
         } else {
-            $movies = $this->pdo->queryCalc($moviesSql);
+            $data = DBFacade::select($moviesSql);
+            $movies = ['total' => DBFacade::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
         }
         $movieIDs = $releaseIDs = [];
         if (\is_array($movies['result'])) {
             foreach ($movies['result'] as $movie => $id) {
-                $movieIDs[] = $id['imdbid'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $movieIDs[] = $id->imdbid;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
         $sql = sprintf(
@@ -312,7 +313,7 @@ class Movie
         }
         $return = DBFacade::select($sql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $movies['total'] ?? 0;
+            $return['_totalcount'] = $movies['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 

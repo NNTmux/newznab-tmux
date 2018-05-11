@@ -112,12 +112,14 @@ class MovieController extends BasePageController
         $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
 
         foreach ($results as $result) {
-            $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');
-            $result->actors = makeFieldLinks((array) $result, 'actors', 'movies');
-            $result->director = makeFieldLinks((array) $result, 'director', 'movies');
-            $result->languages = explode(', ', $result->language);
+            if (!empty($result->id)) {
+                $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');
+                $result->actors = makeFieldLinks((array) $result, 'actors', 'movies');
+                $result->director = makeFieldLinks((array) $result, 'director', 'movies');
+                $result->languages = explode(', ', $result->language);
 
-            $movies[] = $result;
+                $movies[] = $result;
+            }
         }
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
