@@ -1,3 +1,5 @@
+2018-05-11 DariusIII
+	* Chg: Replace '!=' with proper '<>' operator
 2018-05-10 DariusIII
 	* Chg: Update font-awesome and laravelcollective/html to latest versions
 	* Fix: Fix caching in Category model getChildren function

@@ -249,7 +249,7 @@ abstract class Videos
 
         if (! empty($title)) {
             $sql = Video::query()
-                ->where('title', 'LIKE', rtrim($title, '%'))
+                ->where('title', 'like', rtrim($title, '%'))
                 ->where('type', $type);
             if ($source > 0) {
                 $sql->where('source', $source);

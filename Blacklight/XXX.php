@@ -123,7 +123,7 @@ class XXX
 
         $sql = Release::query()
             ->where('r.nzbstatus', '=', 1)
-            ->where('xxx.title', '!=', '');
+            ->where('xxx.title', '<>', '');
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
             $sql->whereNotIn('r.categories_id', $excludedcats);
@@ -228,7 +228,7 @@ class XXX
                     return $query->where('xxx.'.$bb, '=', $bbv);
                 }
 
-                return $query->where('xxx.'.$bb, 'LIKE', '%'.$bbv.'%');
+                return $query->where('xxx.'.$bb, 'like', '%'.$bbv.'%');
             }
         }
     }

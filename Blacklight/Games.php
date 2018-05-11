@@ -219,7 +219,7 @@ class Games
     {
         $sql = Release::query()
             ->where('r.nzbstatus', '=', 1)
-            ->where('gi.title', '!=', '')
+            ->where('gi.title', '<>', '')
             ->where('gi.cover', '=', 1);
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
@@ -343,10 +343,10 @@ class Games
             if (request()->has($bbk) && request()->input($bbk) !== null) {
                 $bbs = stripslashes(request()->input($bbk));
                 if ($bbk === 'year') {
-                    return $query->where('gi.releasedate', 'LIKE', '%'.$bbs.'%');
+                    return $query->where('gi.releasedate', 'like', '%'.$bbs.'%');
                 }
 
-                return $query->where('gi.'.$bbv, 'LIKE', '%'.$bbs.'%');
+                return $query->where('gi.'.$bbv, 'like', '%'.$bbs.'%');
             }
         }
     }

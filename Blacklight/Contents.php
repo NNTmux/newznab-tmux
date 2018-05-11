@@ -271,7 +271,7 @@ class Contents
     public function data_getAllButFront()
     {
         return Content::query()
-            ->where('id', '!=', 1)
+            ->where('id', '<>', 1)
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
             ->get();
     }

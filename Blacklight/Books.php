@@ -153,7 +153,7 @@ class Books
 
         $sql = Release::query()
             ->where('r.nzbstatus', '=', 1)
-            ->where('b.title', '!=', '')
+            ->where('b.title', '<>', '')
             ->where('b.cover', '=', 1);
         Releases::showPasswords($sql, true);
         if (\count($excludedCats) > 0) {

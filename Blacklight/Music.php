@@ -149,7 +149,7 @@ class Music
     {
         $sql = Release::query()
             ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '!=', '')
+            ->where('m.title', '<>', '')
             ->where('m.cover', '=', 1);
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {

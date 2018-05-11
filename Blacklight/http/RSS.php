@@ -94,7 +94,7 @@ class RSS extends Capabilities
             ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
             ->leftJoin('movieinfo as m', function ($q) {
                 $q->on('m.imdbid', '=', 'r.imdbid')
-                    ->where('m.title', '!=', '');
+                    ->where('m.title', '<>', '');
             })
             ->leftJoin('musicinfo as mu', 'mu.id', '=', 'r.musicinfo_id')
             ->leftJoin('genres as mug', 'mug.id', '=', 'mu.genres_id')

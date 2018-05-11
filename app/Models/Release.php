@@ -411,7 +411,7 @@ class Release extends Model
 
         $alternate = self::query()
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
-            ->where('searchname', 'LIKE', $rel['searchname'])
+            ->where('searchname', 'like', $rel['searchname'])
             ->where('df.release_id', '=', null)
             ->where('categories_id', $rel['categories_id'])
             ->where('id', $rel['id'])

@@ -114,10 +114,10 @@ class Group extends Model
         switch ($order) {
             case '':
             case 'normal':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '!=', 0)->orderBy('name')->get();
+                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get();
                 break;
             case 'date':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '!=', 0)->orderBy('first_record_postdate', 'DESC')->get();
+                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('first_record_postdate', 'DESC')->get();
                 break;
             default:
                 return [];
@@ -188,7 +188,7 @@ class Group extends Model
         $res = self::query();
 
         if ($groupname !== '') {
-            $res->where('name', 'LIKE', '%'.$groupname.'%');
+            $res->where('name', 'like', '%'.$groupname.'%');
         }
 
         if ($active > -1) {
@@ -211,7 +211,7 @@ class Group extends Model
         $groups = self::query()->groupBy('id')->orderBy('name');
 
         if ($groupname !== '') {
-            $groups->where('name', 'LIKE', '%'.$groupname.'%');
+            $groups->where('name', 'like', '%'.$groupname.'%');
         }
 
         if ($active === true) {

@@ -153,7 +153,7 @@ class AniDB
         $query = AnidbTitle::query()
             ->where('at.lang', '=', 'en');
         if ($animetitle !== '') {
-            $query->where('at.title', 'LIKE', '%'.$animetitle.'%');
+            $query->where('at.title', 'like', '%'.$animetitle.'%');
         }
         $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
                 ->from('anidb_titles as at')

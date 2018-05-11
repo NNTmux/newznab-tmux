@@ -132,7 +132,7 @@ class Regexes
 
         $result = $table::query();
         if ($group_regex !== '') {
-            $result->where('group_regex', 'LIKE', '%'.$group_regex.'%');
+            $result->where('group_regex', 'like', '%'.$group_regex.'%');
         }
         $result->orderBy('id');
 

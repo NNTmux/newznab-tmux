@@ -151,7 +151,7 @@ class Console
     {
         $sql = Release::query()
             ->where('r.nzbstatus', '=', 1)
-            ->where('con.title', '!=', '')
+            ->where('con.title', '<>', '')
             ->where('con.cover', '=', 1)
             ->select(
                 [
@@ -275,7 +275,7 @@ class Console
             if (request()->has($bbk) && request()->input($bbk) !== null) {
                 $bbs = stripslashes(request()->input($bbk));
 
-                return $query->where('con.'.$bbv, 'LIKE', '%'.$bbs.'%');
+                return $query->where('con.'.$bbv, 'like', '%'.$bbs.'%');
             }
         }
     }

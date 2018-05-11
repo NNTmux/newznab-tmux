@@ -1141,7 +1141,7 @@ class Movie
     {
         //If we found a year, try looking in a 4 year range.
         $check = MovieInfo::query()
-            ->where('title', 'LIKE', '%'.$this->currentTitle.'%');
+            ->where('title', 'like', '%'.$this->currentTitle.'%');
 
         if ($this->currentYear !== '') {
             $start = Carbon::parse($this->currentYear)->subYears(2)->year;

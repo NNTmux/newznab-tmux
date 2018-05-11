@@ -153,7 +153,7 @@ abstract class TV extends Videos
             ->where(['nzbstatus' => 1, 'videos_id' => 0, 'tv_episodes_id' => $status])
             ->where('size', '>', 1048576)
             ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->where('categories_id', '!=', Category::TV_ANIME)
+            ->where('categories_id', '<>', Category::TV_ANIME)
             ->orderBy('postdate', 'desc')
             ->limit($this->tvqty);
         if ($groupID !== '') {
