@@ -15,8 +15,8 @@ use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use Illuminate\Support\Facades\DB as DBFacade;
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 class Books
 {
@@ -231,6 +231,7 @@ class Books
             $return['_totalcount'] = $books['total'] ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
+
         return $return;
     }
 

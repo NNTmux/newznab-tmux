@@ -241,6 +241,7 @@ class Console
         }
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql.$page), $return, $expiresAt);
+
         return $return;
     }
 
@@ -301,8 +302,8 @@ class Console
     }
 
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function getBrowseBy(): string
     {
         $browseBy = ' ';
@@ -312,6 +313,7 @@ class Console
                 $browseBy .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
             }
         }
+
         return $browseBy;
     }
 
