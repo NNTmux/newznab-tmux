@@ -315,9 +315,9 @@ class Movie
             $return['_totalcount'] = $movies['total'] ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
+
         return $return;
     }
-
 
     /**
      * Get the order type the user requested on the movies page.
