@@ -31,7 +31,6 @@ class BrowseController extends BasePageController
         $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], -1);
         $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_page'), $page, ['path' => \request()->url()]);
 
-
         $this->smarty->assign('catname', 'All');
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
@@ -148,7 +147,7 @@ class BrowseController extends BasePageController
             $group = $request->input('g');
             $page = \request()->has('page') ? \request()->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
-            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'),'', -1, $this->userdata['categoryexclusions'], $group);
+            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata['categoryexclusions'], $group);
             $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_page'), $page, ['path' => \request()->url()]);
             $this->smarty->assign('results', $results);
             $meta_title = 'Browse Groups';
