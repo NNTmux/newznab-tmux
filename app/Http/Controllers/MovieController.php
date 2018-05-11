@@ -152,7 +152,12 @@ class MovieController extends BasePageController
             }
         }
 
-        $this->smarty->assign('results', $movies);
+        $this->smarty->assign(
+            [
+                'resultsadd'=>  $movies,
+                'results' => $results,
+            ]
+        );
 
         $meta_title = 'Browse Movies';
         $meta_keywords = 'browse,nzb,description,details';

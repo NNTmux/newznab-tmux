@@ -33,7 +33,9 @@
 				</div>
 				<div class="row">
 					<div class="col-xs-6">
-						{NoCaptcha::display()}{NoCaptcha::renderJs()}
+						{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+							{NoCaptcha::display()}{NoCaptcha::renderJs()}
+						{/if}
 					</div><!-- /.col -->
 					<hr>
 					<div class="col-xs-12">

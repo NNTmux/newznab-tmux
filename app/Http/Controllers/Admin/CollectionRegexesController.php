@@ -17,7 +17,7 @@ class CollectionRegexesController extends BasePageController
     public function index(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'collection_regexes']);
+        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']);
 
         $title = 'Collections Regex List';
 
@@ -51,7 +51,7 @@ class CollectionRegexesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'collection_regexes']);
+        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']);
         $error = '';
         $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
 
@@ -130,7 +130,7 @@ class CollectionRegexesController extends BasePageController
         $this->smarty->assign(['group' => $group, 'regex' => $regex, 'limit' => $limit]);
 
         if ($group && $regex) {
-            $this->smarty->assign('data', (new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'collection_regexes']))->testCollectionRegex($group, $regex, $limit));
+            $this->smarty->assign('data', (new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']))->testCollectionRegex($group, $regex, $limit));
         }
 
         $content = $this->smarty->fetch('collection_regexes-test.tpl');

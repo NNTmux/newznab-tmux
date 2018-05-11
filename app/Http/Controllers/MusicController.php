@@ -90,7 +90,12 @@ class MusicController extends BasePageController
             }
         }
 
-        $this->smarty->assign('results', $musics);
+        $this->smarty->assign(
+            [
+                'resultsadd'=>  $musics,
+                'results' => $results,
+            ]
+        );
 
         $meta_title = 'Browse Albums';
         $meta_keywords = 'browse,nzb,albums,description,details';

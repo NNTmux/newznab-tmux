@@ -144,24 +144,22 @@ class AniDB
      * Retrieves a range of Anime titles for site display.
      *
      *
-     * @param        $page
      * @param string $animetitle
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getAnimeRange($page, $animetitle = '')
+    public function getAnimeRange($animetitle = '')
     {
         $query = AnidbTitle::query()
-            ->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
-            ->from('anidb_titles as at')
-            ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
             ->where('at.lang', '=', 'en');
         if ($animetitle !== '') {
-            $query->where('at.title', 'LIKE', '%'.$animetitle.'%');
+            $query->where('at.title', 'like', '%'.$animetitle.'%');
         }
-
-        $query->groupBy('at.anidbid')
-            ->orderByDesc('at.anidbid');
+        $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
+                ->from('anidb_titles as at')
+                ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
+                ->groupBy('at.anidbid')
+                ->orderByDesc('at.anidbid');
 
         return $query->paginate(config('nntmux.items_per_page'));
     }

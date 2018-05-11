@@ -13,6 +13,8 @@ use App\Http\Controllers\BasePageController;
 class UserController extends BasePageController
 {
     /**
+     * @param \Illuminate\Http\Request $request
+     *
      * @throws \Exception
      */
     public function index(Request $request)
@@ -57,7 +59,7 @@ class UserController extends BasePageController
         User::updateExpiredRoles();
 
         foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'admin/user-list?ob='.$orderType.'&offset=0');
+            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType.'&offset=0');
         }
 
         $content = $this->smarty->fetch('user-list.tpl');

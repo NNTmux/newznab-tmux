@@ -86,7 +86,12 @@ class AdultController extends BasePageController
             $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/xxx?t='.$category.$browseby_link.'&amp;ob='.$ordertype.'&amp;offset=0');
         }
 
-        $this->smarty->assign('results', $movies);
+        $this->smarty->assign(
+            [
+                'resultsadd'=>  $movies,
+                'results' => $results,
+            ]
+        );
 
         $meta_title = 'Browse XXX';
         $meta_keywords = 'browse,xxx,nzb,description,details';

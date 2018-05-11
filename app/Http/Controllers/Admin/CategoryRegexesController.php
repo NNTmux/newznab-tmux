@@ -17,7 +17,7 @@ class CategoryRegexesController extends BasePageController
     public function index(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
+        $regexes = new Regexes(['Settings' =>null, 'Table_Name' => 'category_regexes']);
 
         $title = 'Category Regex List';
 
@@ -51,7 +51,7 @@ class CategoryRegexesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
+        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';

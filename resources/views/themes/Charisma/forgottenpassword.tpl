@@ -63,7 +63,9 @@
 							<br>
 							<p class="center col-md-5">
 							<p class="center col-md-5">
-								{NoCaptcha::display()}{NoCaptcha::renderJs()}
+								{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+									{NoCaptcha::display()}{NoCaptcha::renderJs()}
+								{/if}
 							</p>
 							<button type="submit" class="btn btn-primary">Request Password Reset</button>
 						</fieldset>

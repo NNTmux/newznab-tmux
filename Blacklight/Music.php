@@ -147,37 +147,9 @@ class Music
      */
     public function getMusicRange($page, $cat, array $excludedcats = [])
     {
-        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
-            ->select(
-                [
-                    'm.*',
-                    'r.musicinfo_id',
-                    'g.name as group_name',
-                    'gn.title as genre',
-                    'rn.releases_id as nfoid',
-                ]
-            )
-            ->from('releases as r')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->join('musicinfo as m', 'm.id', '=', 'r.musicinfo_id')
-            ->join('genres as gn', 'm.genres_id', '=', 'gn.id')
+        $sql = Release::query()
             ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '!=', '')
+            ->where('m.title', '<>', '')
             ->where('m.cover', '=', 1);
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
@@ -187,8 +159,36 @@ class Music
         if (\count($cat) > 0 && $cat[0] !== -1) {
             Category::getCategorySearch($cat, $sql, true);
         }
-
-        $sql->groupBy('m.id')
+        $sql->select(
+                [
+                    'm.*',
+                    'r.musicinfo_id',
+                    'g.name as group_name',
+                    'gn.title as genre',
+                    'rn.releases_id as nfoid',
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_id"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoid"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs"),
+                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_failed"),
+                ]
+            )
+            ->from('releases as r')
+            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+            ->join('musicinfo as m', 'm.id', '=', 'r.musicinfo_id')
+            ->join('genres as gn', 'm.genres_id', '=', 'gn.id')
+            ->groupBy('m.id')
             ->orderBy('r.postdate', 'desc');
 
         $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
@@ -198,7 +198,7 @@ class Music
 
         $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
@@ -488,7 +488,8 @@ class Music
                     ColorCLI::alternateOver('   Title:  ').
                     ColorCLI::primary($mus['title']).
                     ColorCLI::alternateOver('   Year:   ').
-                    ColorCLI::primary($mus['year']), true
+                    ColorCLI::primary($mus['year']),
+                    true
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -507,7 +508,8 @@ class Music
                         ' ('.
                         $mus['year'].
                         ')'
-                    ), true
+                    ),
+                    true
                 );
             }
         }
@@ -620,7 +622,8 @@ class Music
                 ColorCLI::doEcho(
                     ColorCLI::header(
                         'Processing '.$res->count().' music release(s).'
-                    ), true
+                    ),
+                    true
                 );
             }
 

@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use CacheQueryBuilder;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -180,22 +182,22 @@ class User extends Authenticatable
      */
     public static function getCount($role = '', $username = '', $host = '', $email = ''): int
     {
-        $res = self::query()->where('email', '!=', 'sharing@nZEDb.com');
+        $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
         if ($role !== '') {
             $res->where('user_roles_id', $role);
         }
 
         if ($username !== '') {
-            $res->where('username', 'LIKE', '%'.$username.'%');
+            $res->where('username', 'like', '%'.$username.'%');
         }
 
         if ($host !== '') {
-            $res->where('host', 'LIKE', '%'.$host.'%');
+            $res->where('host', 'like', '%'.$host.'%');
         }
 
         if ($email !== '') {
-            $res->where('email', 'LIKE', '%'.$email.'%');
+            $res->where('email', 'like', '%'.$email.'%');
         }
 
         return $res->count(['id']);
@@ -385,17 +387,17 @@ class User extends Authenticatable
 
         $order = getUserBrowseOrder($orderBy);
 
-        $users = self::query()->with('role', 'request')->where('id', '!=', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
+        $users = self::query()->with('role', 'request')->where('id', '<>', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
         if ($userName !== '') {
-            $users->where('username', 'LIKE', '%'.$userName.'%');
+            $users->where('username', 'like', '%'.$userName.'%');
         }
 
         if ($email !== '') {
-            $users->where('email', 'LIKE', '%'.$email.'%');
+            $users->where('email', 'like', '%'.$email.'%');
         }
 
         if ($host !== '') {
-            $users->where('host', 'LIKE', '%'.$host.'%');
+            $users->where('host', 'like', '%'.$host.'%');
         }
 
         if ($role !== '') {
@@ -810,7 +812,7 @@ class User extends Authenticatable
      */
     public static function getUsersByMonth()
     {
-        return self::query()->whereNotNull('created_at')->where('created_at', '!=', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
+        return self::query()->whereNotNull('created_at')->where('created_at', '<>', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
     }
 
     /**

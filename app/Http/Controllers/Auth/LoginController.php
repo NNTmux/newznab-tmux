@@ -51,7 +51,7 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true) {
+        if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
             ]);
@@ -85,7 +85,6 @@ class LoginController extends Controller
     {
         $theme = Settings::settingValue('site.main.style');
         app('smarty.view')->assign(['error' => '', 'username' => '', 'rememberme' => '']);
-        $nocaptcha = env('NOCAPTCHA_ENABLED');
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';
@@ -94,7 +93,6 @@ class LoginController extends Controller
         app('smarty.view')->assign(
             [
                 'error' => 'These credentials do not match our records.',
-                'nocaptcha'=> $nocaptcha,
                 'content' => $content,
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,

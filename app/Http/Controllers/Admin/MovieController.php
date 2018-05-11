@@ -42,7 +42,7 @@ class MovieController extends BasePageController
     public function create(Request $request)
     {
         $this->setAdminPrefs();
-        $movie = new Movie(['Settings' => $this->pdo]);
+        $movie = new Movie(['Settings' => null]);
 
         $title = 'Movie Add';
 

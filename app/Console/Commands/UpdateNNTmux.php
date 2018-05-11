@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Ytake\LaravelSmarty\Smarty;
+use Illuminate\Support\Facades\App;
 
 class UpdateNNTmux extends Command
 {
@@ -47,6 +48,12 @@ class UpdateNNTmux extends Command
     public function handle()
     {
         try {
+            $maintenance = App::isDownForMaintenance();
+
+            if (! $maintenance) {
+                $this->call('down');
+            }
+
             $output = $this->call('nntmux:git');
             if ($output === 'Already up-to-date.') {
                 $this->info($output);
@@ -75,6 +82,10 @@ class UpdateNNTmux extends Command
                     '<comment>You should clear your Smarty compiled template cache at: '.
                     config('ytake-laravel-smarty.compile_path').'</comment>'
                 );
+            }
+
+            if (! $maintenance) {
+                $this->call('up');
             }
         } catch (\Exception $e) {
             $this->error($e->getMessage());

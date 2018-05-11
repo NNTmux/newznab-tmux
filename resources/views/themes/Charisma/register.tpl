@@ -72,7 +72,7 @@
 							<div class="clearfix"></div>
 							<p class="center col-md-5">
 							<p class="center col-md-5">
-								{if $nocaptcha != false}
+								{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
 									{NoCaptcha::display()}{NoCaptcha::renderJs()}
 								{/if}
 							</p>

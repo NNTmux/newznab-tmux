@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -14,6 +13,7 @@ use ApaiIO\Operations\Search;
 use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
@@ -27,11 +27,6 @@ class Console
     public const CONS_NTFND = -2;
 
     protected const MATCH_PERCENT = 60;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
 
     /**
      * @var bool
@@ -97,7 +92,6 @@ class Console
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -133,9 +127,7 @@ class Console
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
         $title = preg_replace('/[^\w ]+/', '', $title);
         $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
-        $words = explode(' ', $title);
-
-        foreach ($words as $word) {
+        foreach (explode(' ', $title) as $word) {
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
                 $word = '+'.$word;
@@ -157,27 +149,32 @@ class Console
      */
     public function getConsoleRange($page, $cat, array $excludedcats = [])
     {
-        $sql = Release::query()->selectRaw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed")
+        $sql = Release::query()
+            ->where('r.nzbstatus', '=', 1)
+            ->where('con.title', '<>', '')
+            ->where('con.cover', '=', 1)
             ->select(
                 [
                     'con.*',
-                    'releases.consoleinfo_id',
+                    'r.consoleinfo_id',
                     'g.name as group_name',
                     'gn.title as genre',
                     'rn.releases_id as nfoid',
+                    DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_id"),
+                    DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
+                    DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview"),
+                    DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password"),
+                    DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid"),
+                    DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoid"),
+                    DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname"),
+                    DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name"),
+                    DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate"),
+                    DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size"),
+                    DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts"),
+                    DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments"),
+                    DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs"),
+                    DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_failed"),
+
                 ]
             )
             ->from('releases as r')
@@ -185,10 +182,7 @@ class Console
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
             ->join('consoleinfo as con', 'con.id', '=', 'r.consoleinfo_id')
-            ->join('genres as gn', 'con.genres_id', '=', 'gn.id')
-            ->where('r.nzbstatus', '=', 1)
-            ->where('con.title', '!=', '')
-            ->where('con.cover', '=', 1);
+            ->join('genres as gn', 'con.genres_id', '=', 'gn.id');
         Releases::showPasswords($sql, true);
         if (\count($excludedcats) > 0) {
             $sql->whereNotIn('r.categories_id', $excludedcats);
@@ -208,7 +202,7 @@ class Console
 
         $return = $sql->paginate(config('nntmux.items_per_cover_page'));
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
 
         return $return;
@@ -271,20 +265,19 @@ class Console
     }
 
     /**
-     * @return string
+     * @param $query
+     *
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function getBrowseBy(): string
+    public function getBrowseBy($query)
     {
-        $browseBy = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
-            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
-                $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
+            if (request()->has($bbk) && request()->input($bbk) !== null) {
+                $bbs = stripslashes(request()->input($bbk));
+
+                return $query->where('con.'.$bbv, 'like', '%'.$bbs.'%');
             }
         }
-
-        return $browseBy;
     }
 
     /**
@@ -564,7 +557,7 @@ class Console
      */
     protected function _loadGenres(): array
     {
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $gen = new Genres(['Settings' => null]);
 
         $defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
         $genreassoc = [];

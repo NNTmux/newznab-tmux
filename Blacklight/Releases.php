@@ -10,8 +10,6 @@ use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Releases.
@@ -67,19 +65,22 @@ class Releases
     }
 
     /**
+     * @param $page
      * @param array $cat
      * @param $orderBy
      * @param int $maxAge
      * @param array $excludedCats
      * @param int $groupName
      * @param int $minSize
-     * @param int $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @throws \Exception
      */
-    public function getBrowseRange($page, array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): LengthAwarePaginator
+    public function getBrowseRange(array $cat, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0)
     {
         $orderBy = $this->getBrowseOrder($orderBy);
-        $qry = Release::query()
+
+        return Release::query()
+            ->remember(config('nntmux.cache_expiry_medium'))
             ->fromSub(function ($query) use ($cat, $maxAge, $excludedCats, $groupName, $minSize, $orderBy) {
                 $query->select(['r.*', 'g.name as group_name'])
                     ->from('releases as r')
@@ -103,9 +104,7 @@ class Releases
                 }
                 $query->orderBy($orderBy[0], $orderBy[1]);
             }, 'r')
-            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired'])
-            ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")
-            ->selectRaw("CONCAT(cp.id, ',', c.id) AS category_ids")
+            ->select(['r.*', 'df.failed as failed', 'rn.releases_id as nfoid', 're.releases_id as reid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.title', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name"), DB::raw("CONCAT(cp.id, ',', c.id) AS category_ids")])
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
@@ -113,17 +112,8 @@ class Releases
             ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
             ->leftJoin('release_nfos as rn', 're.releases_id', '=', 'r.id')
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->groupBy('r.id')
-            ->orderBy($orderBy[0], $orderBy[1]);
-        $releases = Cache::get(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page));
-        if ($releases !== null) {
-            return $releases;
-        }
-        $sql = $qry->paginate(config('nntmux.items_per_page'));
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5(implode('.', $cat).implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$minSize.$groupName.$page), $sql, $expiresAt);
-
-        return $sql;
+            ->orderBy($orderBy[0], $orderBy[1])
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -332,12 +322,8 @@ class Releases
     public function getConcatenatedCategoryIDs()
     {
         if ($this->concatenatedCategoryIDsCache === null) {
-            $this->concatenatedCategoryIDsCache = Cache::get('concatenatedcats');
-            if ($this->concatenatedCategoryIDsCache !== null) {
-                return $this->concatenatedCategoryIDsCache;
-            }
-
             $result = Category::query()
+                ->remember(config('nntmux.cache_expiry_long'))
                 ->whereNotNull('categories.parentid')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
@@ -347,8 +333,6 @@ class Releases
                 $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
             }
         }
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('concatenatedcats', $this->concatenatedCategoryIDsCache, $expiresAt);
 
         return $this->concatenatedCategoryIDsCache;
     }
@@ -366,22 +350,7 @@ class Releases
     {
         $sql = Release::query()
             ->with('group as g', 'nfo as rn', 'category as c', 'failed as df', 'episode as tve')
-            ->select(
-                [
-                    'r.*',
-                    DB::raw("CONCAT(cp.title, '-', c.title) AS category_name"),
-                    'g.name as group_name',
-                    'rn.releases_id as nfoid',
-                    're.releases_id as reid',
-                    'tve.firstaired',
-                    'df.failed as failed',
-                    ]
-            )
-            ->from('releases as r')
-            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
-            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->whereBetween('r.categories_id', [5000, 5999])
+            ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER])
             ->where('r.nzbstatus', NZB::NZB_ADDED);
         self::showPasswords($sql, true);
         if (! empty($userShows)) {
@@ -405,6 +374,21 @@ class Releases
         if ($maxAge > 0) {
             $sql->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
         }
+        $sql->select(
+                [
+                    'r.*',
+                    DB::raw("CONCAT(cp.title, '-', c.title) AS category_name"),
+                    'g.name as group_name',
+                    'rn.releases_id as nfoid',
+                    're.releases_id as reid',
+                    'tve.firstaired',
+                    'df.failed as failed',
+                    ]
+            )
+            ->from('releases as r')
+            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
+            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid');
 
         if ($orderBy !== '') {
             $order = $this->getBrowseOrder($orderBy);
@@ -491,26 +475,24 @@ class Releases
      * @param array  $userQuery
      * @param string $type
      *
-     * @return string
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function uSQL($userQuery, $type): string
+    public function uSQL($userQuery, $type)
     {
-        $sql = '(1=2 ';
+        $query = null;
         foreach ($userQuery as $query) {
-            $sql .= sprintf('OR (r.%s = %d', $type, $query[$type]);
+            $query->orWhere('r.'.$type, $query[$type]);
             if ($query['categories'] !== '') {
                 $catsArr = explode('|', $query['categories']);
                 if (\count($catsArr) > 1) {
-                    $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
+                    $query->whereIn('r.categories_id', $catsArr);
                 } else {
-                    $sql .= sprintf(' AND r.categories_id = %d', $catsArr[0]);
+                    $query->where('r.categories_id', $catsArr[0]);
                 }
             }
-            $sql .= ') ';
         }
-        $sql .= ') ';
 
-        return $sql;
+        return $query;
     }
 
     /**
@@ -576,21 +558,10 @@ class Releases
             $searchOptions['filename'] = $fileName;
         }
 
-        $sql = Release::query()
+        return Release::query()
+            ->remember(config('nntmux.cache_expiry_medium'))
             ->fromSub(function ($query) use ($maxAge, $groupName, $sizeFrom, $sizeRange, $sizeTo, $hasNfo, $hasComments, $cat, $excludedCats, $type, $daysNew, $daysOld, $searchOptions, $minSize) {
-                $query->select(['r.*', 'r.categories_id AS category_ids', 'df.failed as failed', 'g.name as group_name', 'rn.releases_id as nfoid', 're.releases_id as reid', 'cp.id as categoryparentid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.firstaired'])
-                ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name")
-                ->from('releases as r')
-                ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
-                ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
-                ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
-                ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-                ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
-                ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-                ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-                ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-                ->join('releases_se as rse', 'rse.id', '=', 'r.id');
-                //self::showPasswords($query, true);
+                self::showPasswords($query, true);
                 $query->where('r.nzbstatus', '=', NZB::NZB_ADDED);
 
                 if ($maxAge > 0) {
@@ -638,20 +609,20 @@ class Releases
                 if ($minSize > 0) {
                     $query->where('r.size', '>=', $minSize);
                 }
+                $query->select(['r.*', 'r.categories_id AS category_ids', 'df.failed as failed', 'g.name as group_name', 'rn.releases_id as nfoid', 're.releases_id as reid', 'cp.id as categoryparentid', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.imdb', 'v.tmdb', 'tve.firstaired', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
+                ->from('releases as r')
+                ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
+                ->leftJoin('videos as v', 'v.id', '=', 'r.videos_id')
+                ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'r.tv_episodes_id')
+                ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
+                ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
+                ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
+                ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+                ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
+                ->join('releases_se as rse', 'rse.id', '=', 'r.id');
             }, 'r')
-            ->orderBy('r.'.$orderBy[0], $orderBy[1]);
-
-        $releases = Cache::get(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$type.implode('.', $cat).$minSize));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $sql->paginate(config('nntmux.items_per_page'));
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($searchName.$usenetName.$posterName.$fileName.$groupName.$sizeFrom.$sizeTo.$hasNfo.$hasComments.$daysNew.$daysOld.implode('.', $orderBy).$maxAge.implode('.', $excludedCats).$type.implode('.', $cat).$minSize), $releases, $expiresAt);
-
-        return $releases;
+            ->orderBy('r.'.$orderBy[0], $orderBy[1])
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -713,7 +684,21 @@ class Releases
         }
 
         $query = Release::query()
-            ->select(
+            ->remember(config('nntmux.cache_expiry_medium'))
+            ->where('r.nzbstatus', NZB::NZB_ADDED);
+        self::showPasswords($query, true);
+        if ($show !== null) {
+            if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen((string) $show['episodes']) > 0) {
+                $query->whereIn('r.tv_episodes_id', $show['episodes']);
+            } elseif ((int) $show['video'] > 0) {
+                $query->where('r.videos_id', $show['video']);
+                // If $series is set but episode is not, return Season Packs only
+                if (! empty($series) && empty($episode)) {
+                    $query->where('r.tv_epsiodes_id', '=', 0);
+                }
+            }
+        }
+        $query->select(
                 [
                     'r.*',
                     'v.title',
@@ -752,20 +737,7 @@ class Releases
                 ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
                 ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
                 ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
-                ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-                ->where('r.nzbstatus', NZB::NZB_ADDED);
-        self::showPasswords($query, true);
-        if ($show !== null) {
-            if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen((string) $show['episodes']) > 0) {
-                $query->whereIn('r.tv_episodes_id', $show['episodes']);
-            } elseif ((int) $show['video'] > 0) {
-                $query->where('r.videos_id', $show['video']);
-                // If $series is set but episode is not, return Season Packs only
-                if (! empty($series) && empty($episode)) {
-                    $query->where('r.tv_epsiodes_id', '=', 0);
-                }
-            }
-        }
+                ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id');
 
         if ($name !== '') {
             $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
@@ -783,17 +755,8 @@ class Releases
         }
 
         $query->orderByDesc('r.postdate')->limit($limit);
-        $releases = Cache::get(md5($page.implode('.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize));
-        if ($releases !== null) {
-            return $releases;
-        }
 
-        $releases = $query->paginate(config('nntmux.items_per_page'));
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($page.implode('.', $siteIdArr).$series.$episode.$airdate.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
-
-        return $releases;
+        return $query->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -808,7 +771,7 @@ class Releases
      */
     public function animeSearch($aniDbID, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1)
     {
-        $query = Release::query()->where('r.nzbstatus', NZB::NZB_ADDED);
+        $query = Release::query()->remember(config('nntmux.cache_expiry_medium'))->where('r.nzbstatus', NZB::NZB_ADDED);
         if ($name !== '') {
             $query->join('releases_se as rse', 'rse.id', '=', 'r.id');
             $this->releaseSearch->getSearchSQL(['searchname' => $name], $query, true);
@@ -843,16 +806,7 @@ class Releases
             ->orderByDesc('r.postdate')
             ->limit($limit);
 
-        $releases = Cache::get(md5($aniDbID.$limit.$name.implode('.', $cat).$maxAge));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $query->paginate(config('nntmux.items_per_page'));
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($aniDbID.$limit.$name.implode('.', $cat).$maxAge), $releases, $expiresAt);
-
-        return $releases;
+        return $query->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -868,7 +822,7 @@ class Releases
      */
     public function moviesSearch($imDbId, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0)
     {
-        $query = Release::query()->where('r.nzbstatus', NZB::NZB_ADDED)
+        $query = Release::query()->remember(config('nntmux.cache_expiry_medium'))->where('r.nzbstatus', NZB::NZB_ADDED)
         ->whereBetween('r.categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER]);
         if ($name !== '') {
             $query->join('releases_se as rse', 'rse.id', '=', 'r.id');
@@ -906,17 +860,7 @@ class Releases
             ->orderByDesc('r.postdate')
             ->limit($limit);
 
-        $releases = Cache::get(md5($imDbId.$limit.$name.implode('.', $cat).$maxAge.$minSize));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $query->paginate(config('nntmux.items_per_page'));
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($imDbId.$limit.$name.implode('.', $cat).$maxAge.$minSize), $releases, $expiresAt);
-
-        return $releases;
+        return $query->paginate(config('nntmux.items_per_page'));
     }
 
     /**

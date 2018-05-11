@@ -16,7 +16,7 @@ class GameController extends BasePageController
     public function index()
     {
         $this->setAdminPrefs();
-        $game = new Games(['Settings' => $this->pdo]);
+        $game = new Games(['Settings' => null]);
 
         $title = 'Game List';
 
@@ -45,8 +45,8 @@ class GameController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $games = new Games(['Settings' => $this->pdo]);
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $games = new Games(['Settings' => null]);
+        $gen = new Genres(['Settings' => null]);
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';

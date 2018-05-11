@@ -112,7 +112,7 @@
 <script type="text/javascript"
 		src="{$smarty.const.WWW_ASSETS}/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
 <!-- tinymce editor -->
-<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-dist/tinymce.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js"></script>
 <!-- jQuery migrate script -->

@@ -249,7 +249,7 @@ abstract class Videos
 
         if (! empty($title)) {
             $sql = Video::query()
-                ->where('title', 'LIKE', rtrim($title, '%'))
+                ->where('title', 'like', rtrim($title, '%'))
                 ->where('type', $type);
             if ($source > 0) {
                 $sql->where('source', $source);
@@ -306,7 +306,7 @@ abstract class Videos
     public function getAliases($videoId, $alias = '')
     {
         $return = false;
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
         if ($videoId > 0 || $alias !== '') {
             $aliasCache = Cache::get(md5($videoId.$alias));

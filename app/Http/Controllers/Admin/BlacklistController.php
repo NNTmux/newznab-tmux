@@ -73,7 +73,7 @@ class BlacklistController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $binaries = new Binaries(['Settings' => $this->pdo]);
+        $binaries = new Binaries(['Settings' => null]);
         $error = '';
         $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
         $title = 'Binary Black/Whitelist';

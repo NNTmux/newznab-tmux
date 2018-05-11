@@ -108,7 +108,7 @@ class ReleasesController extends BasePageController
     public function destroy($id)
     {
         if ($id) {
-            $releases = new Releases(['Settings' => $this->pdo]);
+            $releases = new Releases(['Settings' => null]);
             $releases->deleteMultiple($id);
         }
 
