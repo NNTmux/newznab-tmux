@@ -6,6 +6,7 @@ use Blacklight\Genres;
 use Blacklight\Console;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ConsoleController extends BasePageController
 {
@@ -46,18 +47,22 @@ class ConsoleController extends BasePageController
         $this->smarty->assign('category', $category);
         $this->smarty->assign('categorytitle', $id);
 
+        $ordering = $console->getConsoleOrdering();
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $page = $request->has('page') ? $request->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
         $consoles = [];
-        $results = $console->getConsoleRange($page, $catarray, $this->userdata['categoryexclusions']);
+        $rslt = $console->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
 
         $maxwords = 50;
         foreach ($results as $result) {
-            if (! empty($result['review'])) {
-                $words = explode(' ', $result['review']);
+            if (! empty($result->review)) {
+                $words = explode(' ', $result->review);
                 if (\count($words) > $maxwords) {
                     $newwords = \array_slice($words, 0, $maxwords);
-                    $result['review'] = implode(' ', $newwords).'...';
+                    $result->review = implode(' ', $newwords).'...';
                 }
             }
             $consoles[] = $result;

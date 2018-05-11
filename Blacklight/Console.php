@@ -80,6 +80,11 @@ class Console
     public $failCache;
 
     /**
+     * @var \Blacklight\db\DB
+     */
+    protected $pdo;
+
+    /**
      * @param array $options Class instances / Echo to cli.
      * @throws \Exception
      */
@@ -91,6 +96,7 @@ class Console
         ];
         $options += $defaults;
 
+        $this->pdo = ($options['Settings'] instanceof \Blacklight\db\DB ? $options['Settings'] : new \Blacklight\db\DB());
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
@@ -142,69 +148,99 @@ class Console
     /**
      * @param       $page
      * @param       $cat
+     * @param       $start
+     * @param       $num
+     * @param       $orderBy
      * @param array $excludedcats
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @return array
      * @throws \Exception
      */
-    public function getConsoleRange($page, $cat, array $excludedcats = [])
+    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedcats = []): array
     {
-        $sql = Release::query()
-            ->where('r.nzbstatus', '=', 1)
-            ->where('con.title', '<>', '')
-            ->where('con.cover', '=', 1)
-            ->select(
-                [
-                    'con.*',
-                    'r.consoleinfo_id',
-                    'g.name as group_name',
-                    'gn.title as genre',
-                    'rn.releases_id as nfoid',
-                    DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_id"),
-                    DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
-                    DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview"),
-                    DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password"),
-                    DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid"),
-                    DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoid"),
-                    DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname"),
-                    DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name"),
-                    DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate"),
-                    DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size"),
-                    DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts"),
-                    DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments"),
-                    DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs"),
-                    DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_failed"),
-
-                ]
-            )
-            ->from('releases as r')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->join('consoleinfo as con', 'con.id', '=', 'r.consoleinfo_id')
-            ->join('genres as gn', 'con.genres_id', '=', 'gn.id');
-        Releases::showPasswords($sql, true);
+        $browseBy = $this->getBrowseBy();
+        $catsrch = '';
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
+            $catsrch = Category::getCategorySearch($cat);
+        }
+        $exccatlist = '';
         if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
+        $order = $this->getConsoleOrder($orderBy);
+        $calcSql = sprintf(
+            "
+					SELECT SQL_CALC_FOUND_ROWS
+						con.id,
+						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
+					FROM consoleinfo con
+					LEFT JOIN releases r ON con.id = r.consoleinfo_id
+					WHERE r.nzbstatus = 1
+					AND con.title != ''
+					AND con.cover = 1
+					AND r.passwordstatus %s
+					%s %s %s
+					GROUP BY con.id
+					ORDER BY %s %s %s",
+            Releases::showPasswords(),
+            $browseBy,
+            $catsrch,
+            $exccatlist,
+            $order[0],
+            $order[1],
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+        );
+        $cached = Cache::get(md5($calcSql.$page));
+        if ($cached !== null) {
+            $consoles = $cached;
+        } else {
+            $consoles = $this->pdo->queryCalc($calcSql);
+            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+            Cache::put(md5($calcSql.$page), $consoles, $expiresAt);
         }
-
-        $sql->groupBy('con.id')
-            ->orderBy('r.postdate', 'desc');
-
-        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
+        $consoleIDs = $releaseIDs = false;
+        if (\is_array($consoles['result'])) {
+            foreach ($consoles['result'] as $console => $id) {
+                $consoleIDs[] = $id['id'];
+                $releaseIDs[] = $id['grp_release_id'];
+            }
+        }
+        $sql = sprintf(
+            '
+				SELECT
+					r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, rn.releases_id, g.name AS group_name, df.failed AS failed,
+				con.*,
+				r.consoleinfo_id,
+				g.name AS group_name,
+				genres.title AS genre,
+				rn.releases_id AS nfoid
+				FROM releases r
+				LEFT OUTER JOIN groups g ON g.id = r.groups_id
+				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+				INNER JOIN consoleinfo con ON con.id = r.consoleinfo_id
+				INNER JOIN genres ON con.genres_id = genres.id
+				WHERE con.id IN (%s)
+				AND r.id IN (%s)
+				%s
+				GROUP BY con.id
+				ORDER BY %s %s',
+            (\is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            $catsrch,
+            $order[0],
+            $order[1]
+        );
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-
-        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
-
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
-
+        $return = DB::select($sql);
+        if (! empty($return)) {
+            $return['_totalcount'] = $consoles['total'] ?? 0;
+        }
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        Cache::put(md5($sql.$page), $return, $expiresAt);
         return $return;
     }
 
@@ -265,19 +301,18 @@ class Console
     }
 
     /**
-     * @param $query
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function getBrowseBy($query)
+    * @return string
+    */
+    public function getBrowseBy(): string
     {
+        $browseBy = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
-            if (request()->has($bbk) && request()->input($bbk) !== null) {
-                $bbs = stripslashes(request()->input($bbk));
-
-                return $query->where('con.'.$bbv, 'like', '%'.$bbs.'%');
+            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
+                $bbs = stripslashes($_REQUEST[$bbk]);
+                $browseBy .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
             }
         }
+        return $browseBy;
     }
 
     /**

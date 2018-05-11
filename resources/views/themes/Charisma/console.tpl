@@ -69,107 +69,107 @@
 											<div class="row">
 												<div class="col-md-2 small-gutter-left">
 													<a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">
-														<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+													   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">
+														<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result->cover == 1}{$result->consoleinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 															 class="img-responsive img-rounded"
 															 width="140" border="0"
-															 alt="{$result.title|escape:"htmlall"}"/>{if !empty($result.grp_release_failed)}
+															 alt="{$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
 														<i class="zmdi zmdi-alarm" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
-													{if $result.url != ""}<a class="label label-default"
+													{if $result->url != ""}<a class="label label-default"
 																			 target="_blank"
-																			 href="{$site->dereferrer_link}{$result.url}"
-																			 name="amazon{$result.consoleinfo_id}"
+																			 href="{$site->dereferrer_link}{$result->url}"
+																			 name="amazon{$result->consoleinfo_id}"
 																			 title="View Amazon page">
 															Amazon</a>{/if}
-													{if $result.nfoid > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+													{if $result->nfoid > 0}<a
+														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">
 															NFO</a>{/if}
 													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name}"
-													   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
-													{if !empty($result.grp_release_failed)}
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
+													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
+													{if !empty($result->failed)}
 														<span class="btn btn-default btn-xs"
 															  title="This release has failed to download for some users">
-														<i class="zmdi zmdi-thumbs-o-up"></i> {$result.grp_release_grabs}
-															Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																	class="zmdi zmdi-thumbs-o-down"></i> {$result.grp_release_failed}
-															Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+														<i class="zmdi zmdi-thumbs-o-up"></i> {$result->grabs}
+															Grab{if {$result->grabs} != 1}s{/if} / <i
+																	class="zmdi zmdi-thumbs-o-down"></i> {$result->failed}
+															Failed Download{if {$result->failed} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-10 small-gutter-left">
 													<h4><a title="View details"
-														   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.title|escape:"htmlall"}</a>
+														   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->title|escape:"htmlall"}</a>
 													</h4>
 													<table>
 														<tr>
-															<td id="guid{$result.grp_release_guid}">
+															<td id="guid{$result->guid}">
 																<label>
 																	<input type="checkbox"
 																		   class="square"
-																		   value="{$result.grp_release_guid}"
+																		   value="{$result->guid}"
 																		   id="chksingle"/>
 																</label>
-																<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-																<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+																<span class="label label-default">{$result->size|fsize_format:"MB"}</span>
+																<span class="label label-default">Posted {$result->postdate|timeago}
 																	ago</span>
 																{if isset($isadmin)}
 																<a
 																		class="label label-warning"
-																		href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI}"
+																		href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result->id}&amp;from={$smarty.server.REQUEST_URI}"
 																		title="Edit release">
 																		Edit</a>{/if}
 																<br/>
-																{if isset($result.genre) && $result.genre != ""}
+																{if isset($result->genre) && $result->genre != ""}
 																	<b>Genre:</b>
-																	{$result.genre}
+																	{$result->genre}
 																	<br/>
 																{/if}
-																{if isset($result.esrb) && $result.esrb != ""}
+																{if isset($result->esrb) && $result->esrb != ""}
 																	<b>Rating:</b>
-																	{$result.esrb}
+																	{$result->esrb}
 																	<br/>
 																{/if}
-																{if isset($result.publisger) && $result.publisher != ""}
+																{if isset($result->publisger) && $result->publisher != ""}
 																	<b>Publisher:</b>
-																	{$result.publisher}
+																	{$result->publisher}
 																	<br/>
 																{/if}
-																{if isset($result.releasedate) && $result.releasedate != ""}
+																{if isset($result->releasedate) && $result->releasedate != ""}
 																	<b>Released:</b>
-																	{$result.releasedate|date_format}
+																	{$result->releasedate|date_format}
 																	<br/>
 																{/if}
-																{if isset($result.review) && $result.review != ""}
+																{if isset($result->review) && $result->review != ""}
 																	<b>Review:</b>
-																	{$result.review|escape:'htmlall'}
+																	{$result->review|escape:'htmlall'}
 																	<br/>
 																{/if}
 																<div>
 																	<a role="button"
 																	   class="btn btn-default btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
+																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																				class="zmdi zmdi-cloud-download"></i><span
-																				class="badge">{$result.grp_release_grabs}
-																			Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
+																				class="badge">{$result->grabs}
+																			Grab{if $result->grabs != 1}s{/if}</span></a>
 																	<a role="button"
 																	   class="btn btn-default btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}#comments"><i
+																	   href="{$smarty.const.WWW_TOP}/details/{$result->guid}#comments"><i
 																				class="zmdi zmdi-comment-o"></i><span
-																				class="badge">{$result.grp_release_comments}
-																			Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
+																				class="badge">{$result->comments}
+																			Comment{if $result->comments != 1}s{/if}</span></a>
 																	<span
-																			id="guid{$result.grp_release_guid}"
+																			id="guid{$result->guid}"
 																			class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																			title="Send to my Download Basket"><i
 																				class="zmdi zmdi-shopping-basket"></i>
 																		</span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span
-																				id="guid{$result.grp_release_guid}"
+																				id="guid{$result->guid}"
 																				class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																				title="Send to my Queue"><i
 																					class="zmdi zmdi-share"></i>

@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Blacklight\Books;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BooksController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     *
+     * @param string                   $id
      *
      * @throws \Exception
      */
@@ -49,15 +52,16 @@ class BooksController extends BasePageController
 
         $books = [];
         $page = $request->has('page') ? $request->input('page') : 1;
-        $results = $book->getBookRange($page, $catarray, $orderby, $this->userdata['categoryexclusions']);
-
+        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $rslt = $book->getBookRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
         $maxwords = 50;
         foreach ($results as $result) {
-            if (! empty($result['overview'])) {
-                $words = explode(' ', $result['overview']);
+            if (! empty($result->overview)) {
+                $words = explode(' ', $result->overview);
                 if (\count($words) > $maxwords) {
                     $newwords = \array_slice($words, 0, $maxwords);
-                    $result['overview'] = implode(' ', $newwords).'...';
+                    $result->overview = implode(' ', $newwords).'...';
                 }
             }
             $books[] = $result;

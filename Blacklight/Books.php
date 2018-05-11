@@ -16,6 +16,7 @@ use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 class Books
 {
@@ -141,68 +142,95 @@ class Books
     /**
      * @param       $page
      * @param       $cat
-     * @param       $orderBy
-     * @param array $excludedCats
+     * @param       $start
+     * @param       $num
+     * @param       $orderby
+     * @param array $excludedcats
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @return array
      * @throws \Exception
      */
-    public function getBookRange($page, $cat, $orderBy = '', array $excludedCats = [])
+    public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
     {
-        $order = $this->getBookOrder($orderBy);
-
-        $sql = Release::query()
-            ->where('r.nzbstatus', '=', 1)
-            ->where('b.title', '<>', '')
-            ->where('b.cover', '=', 1);
-        Releases::showPasswords($sql, true);
-        if (\count($excludedCats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedCats);
-        }
-
+        $browseby = $this->getBrowseBy();
+        $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
+            $catsrch = Category::getCategorySearch($cat);
         }
-        $sql->select(
-                [
-                    'b.*',
-                    'r.bookinfo_id',
-                    'g.name as group_name',
-                    'rn.releases_id as nfoid',
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_id"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_failed"),
-                ]
-            )
-            ->from('releases as r')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->join('bookinfo as b', 'b.id', '=', 'r.bookinfo_id')
-            ->groupBy('b.id')
-            ->orderBy($order[0], $order[1]);
-
-        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)));
+        $exccatlist = '';
+        if (\count($excludedcats) > 0) {
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+        }
+        $order = $this->getBookOrder($orderby);
+        $booksql = sprintf(
+            "
+				SELECT SQL_CALC_FOUND_ROWS boo.id,
+					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
+				FROM bookinfo boo
+				LEFT JOIN releases r ON boo.id = r.bookinfo_id
+				WHERE r.nzbstatus = 1
+				AND boo.cover = 1
+				AND boo.title != ''
+				AND r.passwordstatus %s
+				%s %s %s
+				GROUP BY boo.id
+				ORDER BY %s %s %s",
+            Releases::showPasswords(),
+            $browseby,
+            $catsrch,
+            $exccatlist,
+            $order[0],
+            $order[1],
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+        );
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $bookscache = Cache::get(md5($booksql.$page));
+        if ($bookscache !== null) {
+            $books = $bookscache;
+        } else {
+            $books = $this->pdo->queryCalc($booksql);
+            Cache::put(md5($booksql.$page), $books, $expiresAt);
+        }
+        $bookIDs = $releaseIDs = false;
+        if (\is_array($books['result'])) {
+            foreach ($books['result'] as $book => $id) {
+                $bookIDs[] = $id['id'];
+                $releaseIDs[] = $id['grp_release_id'];
+            }
+        }
+        $sql = sprintf(
+            '
+			SELECT
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, rn.releases_id, g.name AS group_name, df.failed AS failed,
+			boo.*,
+			r.bookinfo_id,
+			g.name AS group_name,
+			rn.releases_id AS nfoid
+			FROM releases r
+			LEFT OUTER JOIN groups g ON g.id = r.groups_id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			INNER JOIN bookinfo boo ON boo.id = r.bookinfo_id
+			WHERE boo.id IN (%s)
+			AND r.id IN (%s)
+			%s
+			GROUP BY boo.id
+			ORDER BY %s %s',
+            (\is_array($bookIDs) ? implode(',', $bookIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            $catsrch,
+            $order[0],
+            $order[1]
+        );
+        $return = Cache::get(md5($sql));
         if ($return !== null) {
             return $return;
         }
-
-        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
-
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($page.implode('.', $cat).implode('.', $order).implode('.', $excludedCats)), $return, $expiresAt);
-
+        $return = DBFacade::select($sql);
+        if (! empty($return)) {
+            $return['_totalcount'] = $books['total'] ?? 0;
+        }
+        Cache::put(md5($sql.$page), $return, $expiresAt);
         return $return;
     }
 

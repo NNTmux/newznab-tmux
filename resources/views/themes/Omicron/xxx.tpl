@@ -53,8 +53,8 @@
 					<hr>
 					{foreach $resultsadd as $result}
 						<!-- Iteratie: {counter} -->
-						{if isset($result.category_name)}
-							{assign var="catnamesplit" value=">"|explode:$result.category_name}
+						{if isset($result->category_name)}
+							{assign var="catnamesplit" value=">"|explode:$result->category_name}
 						{/if}
 						{if $result@iteration is odd by 1}
 							<!-- Begin Row -->
@@ -65,131 +65,131 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
+													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}"><img
 																class="cover img-responsive img-rounded"
-																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/>{if !empty($result.grp_release_failed)}
+																alt="{$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
 														<i class="fa fa-exclamation-circle" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
-													{if $result.classused == "ade"}
+													{if $result->classused == "ade"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewade{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewade{$result->title}"
 																title="View AdultdvdEmpire page"
 														><img
 																	src="{$smarty.const.WWW_ASSETS}/images/icons/ade.png"
 																	width="100"></a>
 													{/if}
-													{if $result.classused == "adm"}
+													{if $result->classused == "adm"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewadm{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewadm{$result->title}"
 																title="View AdultDVDMarketplace page"
 														><img
 																	src="{$smarty.const.WWW_ASSETS}/images/icons/adm.png"
 																	width="100"></a>
 													{/if}
-													{if $result.classused == "aebn"}
+													{if $result->classused == "aebn"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewaebn{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewaebn{$result->title}"
 																title="View AEBN page"
 														><img src="{$smarty.const.WWW_ASSETS}/images/icons/aebn.png"
 															  width="100"></a>
 													{/if}
-													{if $result.classused == "hotm"}
+													{if $result->classused == "hotm"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewhm{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewhm{$result->title}"
 																title="View HotMovies page"
 														><img src="{$smarty.const.WWW_ASSETS}/images/icons/hotmovies.png"
 															  width="100"></a>
 													{/if}
-													{if $result.classused == "pop"}
+													{if $result->classused == "pop"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewpop{$result.id}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewpop{$result->id}"
 																title="View Popporn page"
 														><img src="{$smarty.const.WWW_ASSETS}/images/icons/popporn.png"
 															  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
-													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
-													{if !empty($result.grp_release_failed)}
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
+													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
+													{if !empty($result->failed)}
 														<span class="btn btn-default btn-xs"
 															  title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-															Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																	class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
-															Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+															<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
+															Grab{if {$result->grabs} != 1}s{/if} / <i
+																	class="fa fa-thumbs-o-down"></i> {$result->failed}
+															Failed Download{if {$result->failed} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
 
-													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
-													<div id="guid{$result.grp_release_guid}">
+													<div class="release-subtitle">{if $result->genre != ''}{$result->genre}, {/if}</div>
+													<div id="guid{$result->guid}">
 														<label>
 															<input type="checkbox"
 																   class="square"
-																   value="{$result.grp_release_guid}"
+																   value="{$result->guid}"
 																   id="chksingle"/>
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-														<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+														<span class="label label-default">{$result->size|fsize_format:"MB"}</span>
+														<span class="label label-default">Posted {$result->postdate|timeago}
 															ago</span>
 														<br/><br/><br/>
 
 														<div class="release-name text-muted"><a
-																	href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"}</a>
+																	href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																		class="fa fa-cloud-download"></i><span
-																		class="badge"> {$result.grp_release_grabs}
-																	Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
+																		class="badge"> {$result->grabs}
+																	Grab{if $result->grabs != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
+															   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 																		class="fa fa-comment-o"></i><span
-																		class="badge"> {$result.grp_release_comments}
-																	Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
+																		class="badge"> {$result->comments}
+																	Comment{if $result->comments != 1}s{/if}</span></a>
 															<span
-																	id="guid{$result.grp_release_guid}"
+																	id="guid{$result->guid}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket">
 																	<i class="fa fa-shopping-basket"></i>
 															</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span
-																		id="guid{$result.grp_release_guid}"
+																		id="guid{$result->guid}"
 																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																		title="Send to my Queue">
 																		<i class="fa fa-share"></i>
 																</span>
 															{/if}
-															{if !empty($result.grp_release_failed)}
+															{if !empty($result->failed)}
 																<span class="btn btn-default btn-xs"
 																	  title="This release has failed to download for some users">
-																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																			class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
-																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+																	<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
+																	Grab{if {$result->grabs} != 1}s{/if} / <i
+																			class="fa fa-thumbs-o-down"></i> {$result->failed}
+																	Failed Download{if {$result->failed} > 1}s{/if}</span>
 															{/if}
 														</div>
 													</div>
@@ -206,131 +206,131 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
+													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}"><img
 																class="cover img-responsive img-rounded"
-																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/>{if !empty($result.grp_release_failed)}
+																alt="{$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
 														<i class="fa fa-exclamation-circle" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
-													{if $result.classused == "ade"}
+													{if $result->classused == "ade"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewade{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewade{$result->title}"
 																title="View AdultdvdEmpire page"
 														><img
 																	src="{$smarty.const.WWW_ASSETS}/images/icons/ade.png"
 																	width="100"></a>
 													{/if}
-													{if $result.classused == "adm"}
+													{if $result->classused == "adm"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewadm{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewadm{$result->title}"
 																title="View AdultDVDMarketplace page"
 														><img
 																	src="{$smarty.const.WWW_ASSETS}/images/icons/adm.png"
 																	width="100"></a>
 													{/if}
-													{if $result.classused == "aebn"}
+													{if $result->classused == "aebn"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewaebn{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewaebn{$result->title}"
 																title="View AEBN page"
 														><img src="{$smarty.const.WWW_ASSETS}/images/icons/aebn.png"
 															  width="100"></a>
 													{/if}
-													{if $result.classused == "hotm"}
+													{if $result->classused == "hotm"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewhm{$result.title}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewhm{$result->title}"
 																title="View HotMovies page"
 														><img src="{$smarty.const.WWW_ASSETS}/images/icons/hotmovies.png"
 															  width="100"></a>
 													{/if}
-													{if $result.classused == "pop"}
+													{if $result->classused == "pop"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}{$result.directurl}"
-																name="viewpop{$result.id}"
+																href="{$site->dereferrer_link}{$result->directurl}"
+																name="viewpop{$result->id}"
 																title="View Popporn page"
 														><img src="{$smarty.const.WWW_ASSETS}/images/icons/popporn.png"
 															  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.grp_release_grpname}"
-													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
-													{if !empty($result.grp_release_failed)}
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
+													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
+													{if !empty($result->failed)}
 														<span class="btn btn-default btn-xs"
 															  title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-															Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																	class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
-															Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+															<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
+															Grab{if {$result->grabs} != 1}s{/if} / <i
+																	class="fa fa-thumbs-o-down"></i> {$result->failed}
+															Failed Download{if {$result->failed} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
 
-													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
-													<div id="guid{$result.grp_release_guid}">
+													<div class="release-subtitle">{if $result->genre != ''}{$result->genre}, {/if}</div>
+													<div id="guid{$result->guid}">
 														<label>
 															<input type="checkbox"
 																   class="square"
-																   value="{$result.grp_release_guid}"
+																   value="{$result->guid}"
 																   id="chksingle"/>
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$result.grp_release_size|fsize_format:"MB"}</span>
-														<span class="label label-default">Posted {$result.grp_release_postdate|timeago}
+														<span class="label label-default">{$result->size|fsize_format:"MB"}</span>
+														<span class="label label-default">Posted {$result->postdate|timeago}
 															ago</span>
 														<br/><br/><br/>
 
 														<div class="release-name text-muted"><a
-																	href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$mname[$m@index]|escape:"htmlall"}</a>
+																	href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																		class="fa fa-cloud-download"></i><span
-																		class="badge"> {$result.grp_release_grabs}
-																	Grab{if $result.grp_release_grabs != 1}s{/if}</span></a>
+																		class="badge"> {$result->grabs}
+																	Grab{if $result->grabs != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
+															   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 																		class="fa fa-comment-o"></i><span
-																		class="badge"> {$result.grp_release_comments}
-																	Comment{if $result.grp_release_comments != 1}s{/if}</span></a>
+																		class="badge"> {$result->comments}
+																	Comment{if $result->comments != 1}s{/if}</span></a>
 															<span
-																	id="guid{$result.grp_release_guid}"
+																	id="guid{$result->guid}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket">
 																	<i class="fa fa-shopping-basket"></i>
 															</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span
-																		id="guid{$result.grp_release_guid}"
+																		id="guid{$result->guid}"
 																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																		title="Send to my Queue">
 																		<i class="fa fa-share"></i>
 																</span>
 															{/if}
-															{if !empty($result.grp_release_failed)}
+															{if !empty($result->failed)}
 																<span class="btn btn-default btn-xs"
 																	  title="This release has failed to download for some users">
-																	<i class="fa fa-thumbs-o-up"></i> {$result.grp_release_grabs}
-																	Grab{if {$result.grp_release_grabs} != 1}s{/if} / <i
-																			class="fa fa-thumbs-o-down"></i> {$result.grp_release_failed}
-																	Failed Download{if {$result.grp_release_failed} > 1}s{/if}</span>
+																	<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
+																	Grab{if {$result->grabs} != 1}s{/if} / <i
+																			class="fa fa-thumbs-o-down"></i> {$result->failed}
+																	Failed Download{if {$result->failed} > 1}s{/if}</span>
 															{/if}
 														</div>
 													</div>

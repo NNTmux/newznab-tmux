@@ -1,4 +1,5 @@
 2018-05-11 DariusIII
+	* Fix: Fix Books and Console pages
 	* Fix: Use raw queries to speed up browse pages
 	* Chg: Replace '!=' with proper '<>' operator
 2018-05-10 DariusIII
