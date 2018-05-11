@@ -14,7 +14,6 @@
       "App\\": "app/"
     },
     "classmap": [
-      "public/pages/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/",
       "database/factories",
@@ -87,6 +86,7 @@
     "ext-zlib": "*",
     "adrenth/thetvdb2": "~2.0",
     "aharen/omdbapi": "^2.0",
+    "anhskohbo/no-captcha": "^3.0",
     "b3rs3rk/steamfront": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
     "bhuvidya/laravel-countries": "^1.0",
@@ -120,7 +120,7 @@
     "bower-asset/responsive-tables-js": "~1.0.6",
     "bower-asset/select2": "~4.0.2",
     "bower-asset/slimScroll": "~1.3.7",
-    "bower-asset/tinymce-builded": "~4.4.3",
+    "bower-asset/tinymce-dist": "^4.7",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "dev-master",
     "doctrine/dbal": "^2.6",
@@ -130,7 +130,7 @@
     "fxp/composer-asset-plugin": "~1.1",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
-    "imdbphp/imdbphp": "^5.2",
+    "imdbphp/imdbphp": "^6.0",
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
@@ -161,11 +161,12 @@
 
   "require-dev": {
     "ext-bcmath": "*",
+    "barryvdh/laravel-debugbar": "^3.1",
     "filp/whoops": "~2.0",
     "fzaninotto/faker": "~1.4",
-    "mockery/mockery": "0.9.*",
+    "mockery/mockery": "^1.0",
     "moontoast/math": "^1.1",
-    "nunomaduro/collision": "^1.1",
+    "nunomaduro/collision": "^2.0",
     "orangehill/iseed": "^2.5",
     "php-coveralls/php-coveralls": "^2.0",
     "phpunit/phpunit": "^7.0",
