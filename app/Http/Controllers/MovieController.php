@@ -6,6 +6,7 @@ use App\Models\User;
 use Blacklight\Movie;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -88,9 +89,8 @@ class MovieController extends BasePageController
             $category = $cat !== null ? $cat['id'] : Category::MOVIE_ROOT;
         }
 
-        $user = User::find(Auth::id());
-        $cpapi = $user['cp_api'];
-        $cpurl = $user['cp_url'];
+        $cpapi = $this->userdata['cp_api'];
+        $cpurl = $this->userdata['cp_url'];
         $this->smarty->assign('cpapi', $cpapi);
         $this->smarty->assign('cpurl', $cpurl);
 
@@ -104,14 +104,20 @@ class MovieController extends BasePageController
         $this->smarty->assign('categorytitle', $id);
 
         $page = $request->has('page') ? $request->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+
+        $ordering = $movie->getMovieOrdering();
+        $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
         $movies = [];
-        $results = $movie->getMovieRange($page, $catarray, $this->userdata['categoryexclusions']);
+        $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
+
         foreach ($results as $result) {
-            $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
-            $result['actors'] = makeFieldLinks($result, 'actors', 'movies');
-            $result['director'] = makeFieldLinks($result, 'director', 'movies');
-            $result['languages'] = explode(', ', $result['language']);
+            $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');
+            $result->actors = makeFieldLinks((array) $result, 'actors', 'movies');
+            $result->director = makeFieldLinks((array) $result, 'director', 'movies');
+            $result->languages = explode(', ', $result->language);
 
             $movies[] = $result;
         }

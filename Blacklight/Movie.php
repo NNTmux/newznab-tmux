@@ -21,6 +21,7 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use Tmdb\Repository\ConfigurationRepository;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 /**
  * Class Movie.
@@ -218,71 +219,105 @@ class Movie
     }
 
     /**
+     * Get movie releases with covers for movie browse page.
+     *
+     *
      * @param       $page
      * @param       $cat
-     * @param array $excludedcats
+     * @param       $start
+     * @param       $num
+     * @param       $orderBy
+     * @param int   $maxAge
+     * @param array $excludedCats
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
-     * @throws \Exception
+     * @return array|bool
      */
-    public function getMovieRange($page, $cat, array $excludedcats = [])
+    public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
-        $sql = Release::query()
-            ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '<>', '')
-            ->where('m.imdbid', '<>', '0000000');
-        Releases::showPasswords($sql, true);
-        if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
-        }
-
+        $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
+            $catsrch = Category::getCategorySearch($cat);
         }
-        $sql->select(
-                [
-                    'm.*',
-                    'g.name as group_name',
-                    'rn.releases_id as nfoid',
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_id"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_failed"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_catname"),
-                ]
-            )
-            ->from('releases as r')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->join('movieinfo as m', 'm.imdbid', '=', 'r.imdbid')
-            ->groupBy('m.imdbid')
-            ->orderBy('r.postdate', 'desc');
-
-        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
+        $order = $this->getMovieOrder($orderBy);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $moviesSql =
+            sprintf(
+                "
+					SELECT SQL_CALC_FOUND_ROWS
+						m.imdbid,
+						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
+					FROM movieinfo m
+					LEFT JOIN releases r USING (imdbid)
+					WHERE r.nzbstatus = 1
+					AND m.title != ''
+					AND m.imdbid != '0000000'
+					AND r.passwordstatus %s
+					%s %s %s %s
+					GROUP BY m.imdbid
+					ORDER BY %s %s %s",
+                $this->showPasswords,
+                $this->getBrowseBy(),
+                (! empty($catsrch) ? $catsrch : ''),
+                (
+                $maxAge > 0
+                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
+                    : ''
+                ),
+                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            );
+        $movieCache = Cache::get(md5($moviesSql.$page));
+        if ($movieCache !== null) {
+            $movies = $movieCache;
+        } else {
+            $movies = $this->pdo->queryCalc($moviesSql);
+            Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
+        }
+        $movieIDs = $releaseIDs = [];
+        if (\is_array($movies['result'])) {
+            foreach ($movies['result'] as $movie => $id) {
+                $movieIDs[] = $id['imdbid'];
+                $releaseIDs[] = $id['grp_release_id'];
+            }
+        }
+        $sql = sprintf(
+            "
+			SELECT
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed,
+				CONCAT(cp.title, ' > ', c.title) AS catname,
+			m.*,
+			rn.releases_id AS nfoid
+			FROM releases r
+			LEFT OUTER JOIN groups g ON g.id = r.groups_id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			LEFT OUTER JOIN categories c ON c.id = r.categories_id
+			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
+			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
+			WHERE m.imdbid IN (%s)
+			AND r.id IN (%s) %s
+			GROUP BY m.imdbid
+			ORDER BY %s %s",
+            (\is_array($movieIDs) ? implode(',', $movieIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            (! empty($catsrch) ? $catsrch : ''),
+            $order[0],
+            $order[1]
+        );
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-
-        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
-
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
-
+        $return = DBFacade::select($sql);
+        if (\count($return) > 0) {
+            $return['_totalcount'] = $movies['total'] ?? 0;
+        }
+        Cache::put(md5($sql.$page), $return, $expiresAt);
         return $return;
     }
+
 
     /**
      * Get the order type the user requested on the movies page.
