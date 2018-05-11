@@ -9,8 +9,8 @@ use App\Models\Category;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Releases.
@@ -60,7 +60,6 @@ class Releases
         ];
         $options += $defaults;
         $this->pdo = DB::connection()->getPdo();
-
 
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch();
@@ -135,6 +134,7 @@ class Releases
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($qry.$page), $sql, $expiresAt);
+
         return $sql;
     }
 
@@ -172,9 +172,9 @@ class Releases
         $count = DB::select($sql);
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
+
         return $count[0]->count ?? 0;
     }
-
 
     /**
      * @param null $query
