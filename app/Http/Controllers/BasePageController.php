@@ -13,8 +13,8 @@ use App\Models\Settings;
 use Blacklight\Contents;
 use App\Models\Forumpost;
 use App\Models\RoleExcludedCategory;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BasePageController extends Controller
 {

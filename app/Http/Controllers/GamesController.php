@@ -6,7 +6,6 @@ use Blacklight\Games;
 use Blacklight\Genres;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class GamesController extends BasePageController
 {
