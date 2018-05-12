@@ -23,10 +23,9 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 class Music
 {
     protected const MATCH_PERCENT = 60;
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
+
+
+    protected $pdo;
 
     /**
      * @var bool
@@ -121,11 +120,8 @@ class Music
         $album = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $album);
         $album = preg_replace('/[^\w ]+/', '', $album);
         $album = preg_replace('/(WEB|FLAC|CD)/', '', $album);
-        $album = trim(preg_replace('/\s\s+/i', ' ', $album));
-        $album = trim($album);
-        $words = explode(' ', $album);
-
-        foreach ($words as $word) {
+        $album = trim(trim(preg_replace('/\s\s+/i', ' ', $album)));
+        foreach (explode(' ', $album) as $word) {
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
                 $word = '+'.$word;
@@ -159,7 +155,7 @@ class Music
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
         $order = $this->getMusicOrder($orderby);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $musicSql =
             sprintf(
                 "

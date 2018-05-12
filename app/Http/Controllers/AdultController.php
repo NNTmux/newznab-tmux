@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Blacklight\XXX;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdultController extends BasePageController
 {
@@ -48,12 +49,17 @@ class AdultController extends BasePageController
 
         $movies = [];
         $page = $request->has('page') ? $request->input('page') : 1;
-        $results = $adult->getXXXRange($page, $catarray, $orderby, $this->userdata['categoryexclusions']);
+        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1,  $this->userdata['categoryexclusions']);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
         foreach ($results as $result) {
-            $result['genre'] = makeFieldLinks($result, 'genre', 'xxx');
-            $result['actors'] = makeFieldLinks($result, 'actors', 'xxx');
-            $result['director'] = makeFieldLinks($result, 'director', 'xxx');
-            $movies[] = $result;
+            if (! empty($result->id)) {
+                $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');
+                $result->actors = makeFieldLinks((array) $result, 'actors', 'movies');
+                $result->director = makeFieldLinks((array) $result, 'director', 'movies');
+
+                $movies[] = $result;
+            }
         }
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
         $this->smarty->assign('title', stripslashes($title));
