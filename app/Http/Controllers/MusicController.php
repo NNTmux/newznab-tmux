@@ -6,6 +6,7 @@ use Blacklight\Music;
 use Blacklight\Genres;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class MusicController extends BasePageController
 {
@@ -48,9 +49,14 @@ class MusicController extends BasePageController
         $this->smarty->assign('categorytitle', $id);
 
         $page = $request->has('page') ? $request->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $ordering = $music->getMusicOrdering();
+        $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
+
 
         $musics = [];
-        $results = $music->getMusicRange($page, $catarray, $this->userdata['categoryexclusions']);
+        $rslt = $music->getMusicRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
+        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'][0]->total, config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
 
         $artist = ($request->has('artist') && ! empty($request->input('artist'))) ? stripslashes($request->input('artist')) : '';
         $this->smarty->assign('artist', $artist);
@@ -65,8 +71,11 @@ class MusicController extends BasePageController
         }
 
         foreach ($results as $result) {
-            $result['genre'] = $tmpgnr[$result['genres_id']];
-            $musics[] = $result;
+            if (! empty($result->id)) {
+                $res = (array) $result;
+                $result->genre = $tmpgnr[$res['genres_id']];
+                $musics[] = $result;
+            }
         }
 
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';

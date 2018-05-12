@@ -4,7 +4,7 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use Blacklight\db\DB;
+use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -88,7 +88,7 @@ class Music
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
@@ -137,70 +137,100 @@ class Music
         return MusicInfo::search($searchwords)->first();
     }
 
-    /**
-     * @param       $page
-     * @param       $cat
-     * @param array $excludedcats
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
-     * @throws \Exception
-     */
-    public function getMusicRange($page, $cat, array $excludedcats = [])
+/**
+* @param       $cat
+* @param       $start
+* @param       $num
+* @param       $orderby
+* @param array $excludedcats
+*
+* @return array
+* @throws \Exception
+*/
+    public function getMusicRange($page, $cat, $start, $num, $orderby, array $excludedcats = [])
     {
-        $sql = Release::query()
-            ->where('r.nzbstatus', '=', 1)
-            ->where('m.title', '<>', '')
-            ->where('m.cover', '=', 1);
-        Releases::showPasswords($sql, true);
+        $browseby = $this->getBrowseBy();
+        $catsrch = '';
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
+            $catsrch = Category::getCategorySearch($cat);
+        }
+        $exccatlist = '';
         if (\count($excludedcats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedcats);
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
-
-        if (\count($cat) > 0 && $cat[0] !== -1) {
-            Category::getCategorySearch($cat, $sql, true);
+        $order = $this->getMusicOrder($orderby);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $musicSql =
+            sprintf(
+                "
+				SELECT SQL_CALC_FOUND_ROWS
+					m.id,
+					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
+				FROM musicinfo m
+				LEFT JOIN releases r ON r.musicinfo_id = m.id
+				WHERE r.nzbstatus = 1
+				AND m.title != ''
+				AND m.cover = 1
+				AND r.passwordstatus %s
+				%s %s %s
+				GROUP BY m.id
+				ORDER BY %s %s %s",
+                Releases::showPasswords(),
+                $browseby,
+                $catsrch,
+                $exccatlist,
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            );
+        $musicCache = Cache::get(md5($musicSql.$page));
+        if ($musicCache !== null) {
+            $music = $musicCache;
+        } else {
+            $data = DB::select($musicSql);
+            $music = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            Cache::put(md5($musicSql.$page), $music, $expiresAt);
         }
-        $sql->select(
-                [
-                    'm.*',
-                    'r.musicinfo_id',
-                    'g.name as group_name',
-                    'gn.title as genre',
-                    'rn.releases_id as nfoid',
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_id"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoid"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs"),
-                    \Illuminate\Support\Facades\DB::raw("GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_failed"),
-                ]
-            )
-            ->from('releases as r')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id')
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'r.id')
-            ->join('musicinfo as m', 'm.id', '=', 'r.musicinfo_id')
-            ->join('genres as gn', 'm.genres_id', '=', 'gn.id')
-            ->groupBy('m.id')
-            ->orderBy('r.postdate', 'desc');
-
-        $return = Cache::get(md5($page.implode('.', $cat).implode('.', $excludedcats)));
+        $musicIDs = $releaseIDs = false;
+        if (\is_array($music['result'])) {
+            foreach ($music['result'] as $mus => $id) {
+                $musicIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
+            }
+        }
+        $sql = sprintf(
+            '
+			SELECT
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
+				m.*,
+				r.musicinfo_id, r.haspreview,
+				g.name AS group_name,
+				rn.releases_id AS nfoid
+			FROM releases r
+			LEFT OUTER JOIN groups g ON g.id = r.groups_id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			INNER JOIN musicinfo m ON m.id = r.musicinfo_id
+			WHERE m.id IN (%s)
+			AND r.id IN (%s)
+			%s
+			GROUP BY m.id
+			ORDER BY %s %s',
+            (\is_array($musicIDs) ? implode(',', $musicIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            $catsrch,
+            $order[0],
+            $order[1]
+        );
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-
-        $return = $sql->paginate(config('nntmux.items_per_cover_page'));
-
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($page.implode('.', $cat).implode('.', $excludedcats)), $return, $expiresAt);
-
+        $return = DB::select($sql);
+        if (! empty($return)) {
+            $return['_totalcount'] = $music['total'] ?? 0;
+        }
+        Cache::put(md5($sql.$page), $return, $expiresAt);
         return $return;
     }
 
@@ -264,14 +294,13 @@ class Music
     public function getBrowseBy(): string
     {
         $browseby = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if (stripos($bbv, 'id') !== false) {
                     $browseby .= 'AND m.'.$bbv.' = '.$bbs;
                 } else {
-                    $browseby .= 'AND m.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                    $browseby .= 'AND m.'.$bbv.' '.$this->pdo->quote('%'.$bbs.'%');
                 }
             }
         }
@@ -322,7 +351,7 @@ class Music
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $gen = new Genres(['Settings' => null]);
         $ri = new ReleaseImage();
         $titlepercent = 0;
 
@@ -383,7 +412,7 @@ class Music
 
         $mus['publisher'] = (string) $amaz->ItemAttributes->Publisher;
 
-        $mus['releasedate'] = $this->pdo->escapeString((string) $amaz->ItemAttributes->ReleaseDate);
+        $mus['releasedate'] = $this->pdo->quote((string) $amaz->ItemAttributes->ReleaseDate);
         if ($mus['releasedate'] === "''") {
             $mus['releasedate'] = 'null';
         }
