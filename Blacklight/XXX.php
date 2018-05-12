@@ -215,6 +215,7 @@ class XXX
             $return['_totalcount'] = $xxxmovies['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
+
         return $return;
     }
 
@@ -270,6 +271,7 @@ class XXX
                 }
             }
         }
+
         return $browseBy;
     }
 

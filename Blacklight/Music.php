@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -13,6 +12,7 @@ use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
 use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
@@ -23,7 +23,6 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 class Music
 {
     protected const MATCH_PERCENT = 60;
-
 
     protected $pdo;
 
@@ -133,16 +132,16 @@ class Music
         return MusicInfo::search($searchwords)->first();
     }
 
-/**
-* @param       $cat
-* @param       $start
-* @param       $num
-* @param       $orderby
-* @param array $excludedcats
-*
-* @return array
-* @throws \Exception
-*/
+    /**
+     * @param       $cat
+     * @param       $start
+     * @param       $num
+     * @param       $orderby
+     * @param array $excludedcats
+     *
+     * @return array
+     * @throws \Exception
+     */
     public function getMusicRange($page, $cat, $start, $num, $orderby, array $excludedcats = [])
     {
         $browseby = $this->getBrowseBy();
@@ -227,6 +226,7 @@ class Music
             $return['_totalcount'] = $music['total'] ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
+
         return $return;
     }
 
