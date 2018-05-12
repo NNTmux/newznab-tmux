@@ -6,7 +6,6 @@ use Blacklight\Genres;
 use Blacklight\Console;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class ConsoleController extends BasePageController
 {

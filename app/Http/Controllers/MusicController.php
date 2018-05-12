@@ -6,7 +6,6 @@ use Blacklight\Music;
 use Blacklight\Genres;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class MusicController extends BasePageController
 {

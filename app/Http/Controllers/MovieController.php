@@ -6,7 +6,6 @@ use Blacklight\Movie;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class MovieController extends BasePageController
 {

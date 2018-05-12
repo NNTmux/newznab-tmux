@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Blacklight\XXX;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdultController extends BasePageController
 {
@@ -50,7 +49,7 @@ class AdultController extends BasePageController
         $movies = [];
         $page = $request->has('page') ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
-        $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1,  $this->userdata['categoryexclusions']);
+        $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata['categoryexclusions']);
         $results = $this->paginate($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, $request->url());
         foreach ($results as $result) {
             if (! empty($result->id)) {
