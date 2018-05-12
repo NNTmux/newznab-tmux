@@ -53,7 +53,6 @@ class MusicController extends BasePageController
         $ordering = $music->getMusicOrdering();
         $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-
         $musics = [];
         $rslt = $music->getMusicRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
         $results = $this->paginate($rslt, $rslt['_totalcount'][0]->total, config('nntmux.items_per_cover_page'), $page, $request->url());
