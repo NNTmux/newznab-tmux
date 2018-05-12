@@ -51,7 +51,7 @@ class AdultController extends BasePageController
         $page = $request->has('page') ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1,  $this->userdata['categoryexclusions']);
-        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
+        $results = $this->paginate($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, $request->url());
         foreach ($results as $result) {
             if (! empty($result->id)) {
                 $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');

@@ -56,7 +56,7 @@ class MusicController extends BasePageController
 
         $musics = [];
         $rslt = $music->getMusicRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
-        $results = new LengthAwarePaginator($rslt, $rslt['_totalcount'][0]->total, config('nntmux.items_per_cover_page'), $page, ['path' => $request->url()]);
+        $results = $this->paginate($rslt, $rslt['_totalcount'][0]->total, config('nntmux.items_per_cover_page'), $page, $request->url());
 
         $artist = ($request->has('artist') && ! empty($request->input('artist'))) ? stripslashes($request->input('artist')) : '';
         $this->smarty->assign('artist', $artist);

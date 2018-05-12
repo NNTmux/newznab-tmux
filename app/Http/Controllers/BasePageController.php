@@ -13,6 +13,7 @@ use App\Models\Settings;
 use Blacklight\Contents;
 use App\Models\Forumpost;
 use App\Models\RoleExcludedCategory;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class BasePageController extends Controller
@@ -90,6 +91,19 @@ class BasePageController extends Controller
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
 
         $this->smarty->assign('serverroot', url('/'));
+    }
+
+    /**
+     * @param $query
+     * @param $totalcount
+     * @param $items
+     * @param $page
+     * @param $path
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginate($query, $totalcount, $items, $page, $path)
+    {
+        return new LengthAwarePaginator($query, $totalcount, $items, $page, ['path' => $path]);
     }
 
     /**
