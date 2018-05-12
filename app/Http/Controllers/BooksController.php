@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Blacklight\Books;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class BooksController extends BasePageController
 {
