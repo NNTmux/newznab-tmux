@@ -311,6 +311,7 @@ class Games
             $return['_totalcount'] = $games['total'][0]->total ?? 0;
         }
         Cache::put(md5($returnSql.$page), $return, $expiresAt);
+
         return $return;
     }
 
@@ -388,9 +389,9 @@ class Games
                 }
             }
         }
+
         return $browseBy;
     }
-
 
     /**
      * Updates the game for game-edit.php.
