@@ -168,7 +168,7 @@
 																<div class="release-subtitle">{if $result->actors != ''}Cast: {$result->actors}, {/if}</div>
 																<br>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->name|escape:"htmlall"}</a>
+																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-default btn-xs"
@@ -319,7 +319,7 @@
 																<div class="release-subtitle">{if $result->actors != ''}Cast: {$result->actors}, {/if}</div>
 																<br>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->name|escape:"htmlall"}</a>
+																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-default btn-xs"

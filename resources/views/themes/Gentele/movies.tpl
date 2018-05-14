@@ -132,7 +132,7 @@
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->name|escape:"htmlall"}</a>
+																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-default btn-xs"
@@ -260,7 +260,7 @@
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->name|escape:"htmlall"}</a>
+																			href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-default btn-xs"
