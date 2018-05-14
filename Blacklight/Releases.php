@@ -685,9 +685,9 @@ class Releases
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
+
         return $releases;
     }
-
 
     /**
      * Search TV Shows via the API.
@@ -705,7 +705,8 @@ class Releases
      *
      * @return array
      */
-    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array {
+    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    {
         $siteSQL = [];
         $showSql = '';
         if (\is_array($siteIdArr)) {
@@ -819,8 +820,10 @@ class Releases
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
+
         return $releases;
     }
+
     /**
      * @param        $aniDbID
      * @param int    $offset
@@ -881,8 +884,10 @@ class Releases
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
+
         return $releases;
     }
+
     /**
      * @param int $imDbId
      * @param int $offset
@@ -944,6 +949,7 @@ class Releases
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
+
         return $releases;
     }
 
@@ -1046,6 +1052,7 @@ class Releases
         $count = DB::select($sql);
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
+
         return $count[0]->count ?? 0;
     }
 }
