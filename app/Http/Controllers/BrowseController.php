@@ -77,7 +77,7 @@ class BrowseController extends BasePageController
         $catarray = [];
         $catarray[] = $category['id'];
 
-        $this->smarty->assign('parentcat', $parentCategory);
+        $this->smarty->assign('parentcat', ucfirst($parentCategory));
         $this->smarty->assign('category', $category);
 
         $orderby = '';
@@ -87,7 +87,7 @@ class BrowseController extends BasePageController
         $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], $grp);
         $results = $this->paginate($rslt, $rslt['_totalcount'], config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
-        $this->smarty->assign('catname', $id);
+        $this->smarty->assign('catname', title_case($id));
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
 
@@ -117,7 +117,7 @@ class BrowseController extends BasePageController
             $this->smarty->assign('catname', $grp);
         }
 
-        $meta_title = 'Browse '.$parentCategory.' > '.$id;
+        $meta_title = 'Browse '.$parentCategory.' / '.$id;
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';
 

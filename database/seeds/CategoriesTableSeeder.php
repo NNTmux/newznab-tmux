@@ -119,7 +119,7 @@ class CategoriesTableSeeder extends Seeder
             9 =>
             array (
                 'id' => 1060,
-                'title' => 'WiiWare/VC',
+                'title' => 'WiiWare VC',
                 'parentid' => 1000,
                 'status' => 1,
                 'description' => NULL,

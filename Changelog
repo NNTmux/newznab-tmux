@@ -1,4 +1,5 @@
 2018-05-14 DariusIII
+	* Chg: Update category names display
 	* Chg: Update composer.json
 	* Chg: Add barryvdh/laravel-ide-helper
 	* Chg: Update Books class

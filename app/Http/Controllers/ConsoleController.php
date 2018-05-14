@@ -21,7 +21,6 @@ class ConsoleController extends BasePageController
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }
-        $id = str_slug($id);
         $console = new Console(['Settings' => $this->settings]);
         $gen = new Genres(['Settings' => $this->settings]);
 
@@ -31,7 +30,7 @@ class ConsoleController extends BasePageController
             $ctmp[] =
                 [
                     'id' => $ccat->id,
-                    'title' => str_slug($ccat->title),
+                    'title' => $ccat->title,
                 ];
         }
         $category = Category::GAME_ROOT;
