@@ -26,7 +26,7 @@ class AnidbController extends BasePageController
 
         $this->smarty->assign('animetitle', $aname);
 
-        $page = request()->has('page') ? request()->input('page') : 1;
+        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
 
         $anidblist = $AniDB->getAnimeRange($page, $aname);
         $this->smarty->assign('anidblist', $anidblist);
