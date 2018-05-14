@@ -223,12 +223,12 @@ class Books
             $order[0],
             $order[1]
         );
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
         $return = DBFacade::select($sql);
-        if (! empty($return)) {
+        if (\count($return) > 0) {
             $return['_totalcount'] = $books[0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);

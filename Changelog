@@ -1,4 +1,5 @@
 2018-05-14 DariusIII
+	* Chg: Update Books class
 	* Fix: Use DBFacade for select query
 	* Fix: Fix couple of console problems
 	* Fix: Use proper parameter to display release names in movies and XXX pages
