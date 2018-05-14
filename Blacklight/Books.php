@@ -189,7 +189,7 @@ class Books
             $books = $bookscache;
         } else {
             $data = DBFacade::select($booksql);
-            $books = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            $books = ['total' => DBFacade::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($booksql.$page), $books, $expiresAt);
         }
         $bookIDs = $releaseIDs = false;
