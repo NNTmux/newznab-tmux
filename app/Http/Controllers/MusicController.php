@@ -47,7 +47,7 @@ class MusicController extends BasePageController
         $this->smarty->assign('category', $category);
         $this->smarty->assign('categorytitle', $id);
 
-        $page = $request->has('page') ? $request->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $ordering = $music->getMusicOrdering();
         $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';

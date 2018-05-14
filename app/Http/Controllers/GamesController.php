@@ -36,7 +36,7 @@ class GamesController extends BasePageController
         $this->smarty->assign('catlist', $ctmp);
         $this->smarty->assign('category', $category);
 
-        $page = $request->has('page') ? $request->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $ordering = $games->getGamesOrdering();
         $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');

@@ -48,7 +48,7 @@ class ConsoleController extends BasePageController
 
         $ordering = $console->getConsoleOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
-        $page = $request->has('page') ? $request->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
         $consoles = [];

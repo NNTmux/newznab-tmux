@@ -34,7 +34,7 @@ class SeriesController extends BasePageController
             $catarray = [];
             $catarray[] = $category;
 
-            $page = $request->has('page') ? $request->input('page') : 1;
+            $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
 
             $rel = $releases->tvSearch(['id' => $id], '', '', '', $offset, 1000, '', $catarray, -1);

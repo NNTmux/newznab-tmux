@@ -134,7 +134,7 @@ class MyMoviesController extends BasePageController
 
                 $ordering = $releases->getBrowseOrdering();
 
-                $page = $request->has('page') ? $request->input('page') : 1;
+                $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
                 $results = $mv->getMovieRange($page, $movies, $this->userdata['categoryexclusions']);
 

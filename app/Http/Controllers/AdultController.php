@@ -47,7 +47,7 @@ class AdultController extends BasePageController
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $movies = [];
-        $page = $request->has('page') ? $request->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata['categoryexclusions']);
         $results = $this->paginate($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());

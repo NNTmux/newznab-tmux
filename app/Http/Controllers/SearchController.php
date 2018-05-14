@@ -32,7 +32,7 @@ class SearchController extends BasePageController
 
         $ordering = $releases->getBrowseOrdering();
         $orderBy = ($request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '');
-        $page = $request->has('page') ? $request->input('page') : 1;
+        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $this->smarty->assign(
