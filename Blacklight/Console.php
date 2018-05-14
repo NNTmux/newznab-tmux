@@ -202,8 +202,8 @@ class Console
         $consoleIDs = $releaseIDs = false;
         if (\is_array($consoles['result'])) {
             foreach ($consoles['result'] as $console => $id) {
-                $consoleIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $consoleIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
         $sql = sprintf(
@@ -237,7 +237,7 @@ class Console
             return $return;
         }
         $return = DB::select($sql);
-        if (! empty($return)) {
+        if (\count($return) > 0) {
             $return['_totalcount'] = $consoles[0]->total ?? 0;
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));

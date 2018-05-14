@@ -1,4 +1,5 @@
 2018-05-14 DariusIII
+	* Fix: Fix couple of console problems
 	* Fix: Use proper parameter to display release names in movies and XXX pages
 	* Fix: Fix queries in Book and Console classes
 	* Chg: Add check if the page variable is numeric to prevent errors in offset variable

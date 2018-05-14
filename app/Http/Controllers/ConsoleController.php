@@ -18,6 +18,10 @@ class ConsoleController extends BasePageController
     public function show(Request $request, $id = '')
     {
         $this->setPrefs();
+        if ($id === 'WiiVare') {
+            $id = 'WiiVareVC';
+        }
+        $id = str_slug($id);
         $console = new Console(['Settings' => $this->settings]);
         $gen = new Genres(['Settings' => $this->settings]);
 
@@ -27,7 +31,7 @@ class ConsoleController extends BasePageController
             $ctmp[] =
                 [
                     'id' => $ccat->id,
-                    'title' => $ccat->title,
+                    'title' => str_slug($ccat->title),
                 ];
         }
         $category = Category::GAME_ROOT;
@@ -36,7 +40,7 @@ class ConsoleController extends BasePageController
                 ->where('title', $id)
                 ->where('parentid', '=', Category::GAME_ROOT)
                 ->first(['id']);
-            $category = $cat !== null ? $cat['id'] : Category::MUSIC_ROOT;
+            $category = $cat !== null ? $cat['id'] : Category::GAME_ROOT;
         }
 
         $catarray = [];
