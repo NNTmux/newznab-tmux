@@ -183,19 +183,20 @@ class Books
             $order[1],
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $bookscache = Cache::get(md5($booksql.$page));
         if ($bookscache !== null) {
             $books = $bookscache;
         } else {
-            $books = $this->pdo->queryCalc($booksql);
+            $data = DBFacade::select($booksql);
+            $books = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($booksql.$page), $books, $expiresAt);
         }
         $bookIDs = $releaseIDs = false;
         if (\is_array($books['result'])) {
             foreach ($books['result'] as $book => $id) {
-                $bookIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $bookIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
         $sql = sprintf(
@@ -228,7 +229,7 @@ class Books
         }
         $return = DBFacade::select($sql);
         if (! empty($return)) {
-            $return['_totalcount'] = $books['total'] ?? 0;
+            $return['_totalcount'] = $books[0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 

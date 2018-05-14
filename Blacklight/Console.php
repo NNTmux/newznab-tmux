@@ -194,8 +194,9 @@ class Console
         if ($cached !== null) {
             $consoles = $cached;
         } else {
-            $consoles = $this->pdo->queryCalc($calcSql);
-            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
+            $data = DB::select($calcSql);
+            $consoles = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
             Cache::put(md5($calcSql.$page), $consoles, $expiresAt);
         }
         $consoleIDs = $releaseIDs = false;
@@ -237,9 +238,9 @@ class Console
         }
         $return = DB::select($sql);
         if (! empty($return)) {
-            $return['_totalcount'] = $consoles['total'] ?? 0;
+            $return['_totalcount'] = $consoles[0]->total ?? 0;
         }
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
