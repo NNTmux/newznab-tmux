@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Collection
+ * App\Models\Collection.
  *
  * @property int $id
  * @property string $subject

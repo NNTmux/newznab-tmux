@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Forumpost
+ * App\Models\Forumpost.
  *
  * @property int $id
  * @property int $forumid

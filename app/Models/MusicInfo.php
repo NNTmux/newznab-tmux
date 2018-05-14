@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Support\Database\CacheQueryBuilder;
 
 /**
- * App\Models\MusicInfo
+ * App\Models\MusicInfo.
  *
  * @property int $id
  * @property string $title

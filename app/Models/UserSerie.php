@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\UserSerie
+ * App\Models\UserSerie.
  *
  * @property int $id
  * @property int $users_id

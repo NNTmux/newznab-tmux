@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Group
+ * App\Models\Group.
  *
  * @property int $id
  * @property string $name

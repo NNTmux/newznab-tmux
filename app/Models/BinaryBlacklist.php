@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\BinaryBlacklist
+ * App\Models\BinaryBlacklist.
  *
  * @property int $id
  * @property string|null $groupname

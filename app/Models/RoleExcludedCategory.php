@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\RoleExcludedCategory
+ * App\Models\RoleExcludedCategory.
  *
  * @property int $id
  * @property int $user_roles_id

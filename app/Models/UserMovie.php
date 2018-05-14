@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\UserMovie
+ * App\Models\UserMovie.
  *
  * @property int $id
  * @property int $users_id

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\PredbImport
+ * App\Models\PredbImport.
  *
  * @property string $title
  * @property string|null $nfo

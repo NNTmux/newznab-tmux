@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Invitation
+ * App\Models\Invitation.
  *
  * @property int $id
  * @property string $guid

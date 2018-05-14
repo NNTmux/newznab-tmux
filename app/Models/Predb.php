@@ -10,7 +10,7 @@ use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Predb
+ * App\Models\Predb.
  *
  * @property mixed $release
  * @property mixed $hash

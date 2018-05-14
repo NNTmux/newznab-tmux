@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\MultigroupPart
+ * App\Models\MultigroupPart.
  *
  * @property int $binaries_id
  * @property string $messageid

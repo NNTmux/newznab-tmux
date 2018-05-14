@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Support\Database\CacheQueryBuilder;
 
 /**
- * App\Models\Video
+ * App\Models\Video.
  *
  * @property int $id Show ID to be used in other tables as reference
  * @property bool $type 0 = TV, 1 = Film, 2 = Anime

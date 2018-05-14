@@ -6,7 +6,7 @@ use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\VideoAlias
+ * App\Models\VideoAlias.
  *
  * @property int $videos_id FK to videos.id of the parent title.
  * @property string $title AKA of the video.

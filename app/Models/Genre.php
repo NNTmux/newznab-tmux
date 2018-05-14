@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Genre
+ * App\Models\Genre.
  *
  * @property int $id
  * @property string $title

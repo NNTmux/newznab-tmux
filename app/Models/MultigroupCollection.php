@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\MultigroupCollection
+ * App\Models\MultigroupCollection.
  *
  * @property int $id
  * @property string $subject

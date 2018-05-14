@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Part
+ * App\Models\Part.
  *
  * @property int $binaries_id
  * @property string $messageid

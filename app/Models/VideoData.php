@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\VideoData
+ * App\Models\VideoData.
  *
  * @property int $releases_id FK to releases.id
  * @property string|null $containerformat
