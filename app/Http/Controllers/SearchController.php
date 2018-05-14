@@ -32,6 +32,8 @@ class SearchController extends BasePageController
 
         $ordering = $releases->getBrowseOrdering();
         $orderBy = ($request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '');
+        $page = $request->has('page') ? $request->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $this->smarty->assign(
             [
@@ -63,7 +65,7 @@ class SearchController extends BasePageController
                 );
             }
 
-            $results = $releases->search(
+            $rslt = $releases->search(
                 $searchString,
                 -1,
                 -1,
@@ -75,12 +77,16 @@ class SearchController extends BasePageController
                 0,
                 -1,
                 -1,
+                $offset,
+                config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata['categoryexclusions'],
                 'basic',
                 $categoryID
             );
+
+            $results = $this->paginate($rslt, $rslt['_totalrows'], config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->smarty->assign(
                 [
@@ -171,7 +177,8 @@ You can combine some of these rules, but not all.<br />';
                     -1 => '--Select--', 1  => '100MB', 2  => '250MB', 3  => '500MB', 4  => '1GB', 5  => '2GB',
                     6  => '3GB', 7  => '4GB', 8  => '8GB', 9  => '16GB', 10 => '32GB', 11 => '64GB',
                 ],
-                'results' => $results, 'sadvanced' => $searchType !== 'basic',
+                'results' => $results,
+                'sadvanced' => $searchType !== 'basic',
                 'grouplist' => Group::getGroupsForSelect(),
                 'catlist' => Category::getForSelect(),
                 'search_description' => $search_description,

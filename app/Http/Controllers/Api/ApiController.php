@@ -124,6 +124,7 @@ class ApiController extends BasePageController
                $groupName = $api->group();
                UserRequest::addApiRequest($uid, $request->getRequestUri());
                $categoryID = $api->categoryID();
+               $limit = $api->limit();
 
                if ($request->has('q')) {
                    $relData = $releases->search(
@@ -138,6 +139,7 @@ class ApiController extends BasePageController
                        0,
                        -1,
                        -1,
+                       $limit,
                        '',
                        $maxAge,
                        $catExclusions,
@@ -147,7 +149,10 @@ class ApiController extends BasePageController
                    );
                } else {
                    $relData = $releases->getBrowseRange(
+                       1,
                        $categoryID,
+                       $offset,
+                       $limit,
                        '',
                        $maxAge,
                        $catExclusions,
@@ -192,11 +197,11 @@ class ApiController extends BasePageController
                }
 
                $relData = $releases->tvSearch(
-                   1,
                    $siteIdArr,
                    $series,
                    $episode,
                    $airdate ?? '',
+                   $api->offset(),
                    $api->limit(),
                    $request->input('q') ?? '',
                    $api->categoryID(),
@@ -219,6 +224,7 @@ class ApiController extends BasePageController
 
                $relData = $releases->moviesSearch(
                    $imdbId,
+                   $api->offset(),
                    $api->limit(),
                    $request->input('q') ?? '',
                    $api->categoryID(),
@@ -229,7 +235,7 @@ class ApiController extends BasePageController
                $api->addCoverURL(
                    $relData,
                    function ($release) {
-                       return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
+                       return Utility::getCoverURL(['type' => 'movies', 'id' => $release->imdbid]);
                    }
                );
 

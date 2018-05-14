@@ -95,15 +95,17 @@ class BasePageController extends Controller
 
     /**
      * @param $query
-     * @param $totalcount
+     * @param $totalCount
      * @param $items
      * @param $page
      * @param $path
+     * @param $reqQuery
+     *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginate($query, $totalcount, $items, $page, $path)
+    public function paginate($query, $totalCount, $items, $page, $path, $reqQuery)
     {
-        return new LengthAwarePaginator($query, $totalcount, $items, $page, ['path' => $path]);
+        return new LengthAwarePaginator($query, $totalCount, $items, $page, ['path' => $path, 'query' => $reqQuery]);
     }
 
     /**

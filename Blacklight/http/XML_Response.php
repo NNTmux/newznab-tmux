@@ -348,8 +348,8 @@ class XML_Response
     {
         if ($this->releases instanceof LengthAwarePaginator) {
             $total = $this->releases->total();
-        } elseif (isset($this->releases[0]['_totalrows'])) {
-            $total = $this->releases[0]['_totalrows'];
+        } elseif (isset($this->releases[0]->_totalrows)) {
+            $total = $this->releases[0]->_totalrows;
         } else {
             $total = 0;
         }
@@ -366,10 +366,12 @@ class XML_Response
     {
         if (! empty($this->releases)) {
             foreach ($this->releases as $this->release) {
-                $this->xml->startElement('item');
-                $this->includeReleaseMain();
-                $this->setZedAttributes();
-                $this->xml->endElement();
+                if (isset($this->release->id)) {
+                    $this->xml->startElement('item');
+                    $this->includeReleaseMain();
+                    $this->setZedAttributes();
+                    $this->xml->endElement();
+                }
             }
         }
     }
@@ -379,22 +381,22 @@ class XML_Response
      */
     public function includeReleaseMain(): void
     {
-        $this->xml->writeElement('title', $this->release['searchname']);
+        $this->xml->writeElement('title', $this->release->searchname);
         $this->xml->startElement('guid');
         $this->xml->writeAttribute('isPermaLink', 'true');
-        $this->xml->text("{$this->server['server']['url']}details/{$this->release['guid']}");
+        $this->xml->text("{$this->server['server']['url']}details/{$this->release->guid}");
         $this->xml->endElement();
         $this->xml->writeElement(
             'link',
-            "{$this->server['server']['url']}getnzb?id={$this->release['guid']}.nzb".
+            "{$this->server['server']['url']}getnzb?id={$this->release->guid}.nzb".
             "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
-        $this->xml->writeElement('comments', "{$this->server['server']['url']}details/{$this->release['guid']}#comments");
-        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release['adddate'])));
-        $this->xml->writeElement('category', $this->release['category_name']);
+        $this->xml->writeElement('comments', "{$this->server['server']['url']}details/{$this->release->guid}#comments");
+        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release->adddate)));
+        $this->xml->writeElement('category', $this->release->category_name);
         if ($this->namespace === 'newznab') {
-            $this->xml->writeElement('description', $this->release['searchname']);
+            $this->xml->writeElement('description', $this->release->searchname);
         } else {
             $this->writeRssCdata();
         }
@@ -402,11 +404,11 @@ class XML_Response
             $this->xml->startElement('enclosure');
             $this->xml->writeAttribute(
                 'url',
-                "{$this->server['server']['url']}getnzb?id={$this->release['guid']}.nzb".
+                "{$this->server['server']['url']}getnzb?id={$this->release->guid}.nzb".
                 "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );
-            $this->xml->writeAttribute('length', $this->release['size']);
+            $this->xml->writeAttribute('length', $this->release->size);
             $this->xml->writeAttribute('type', 'application/x-nzb');
             $this->xml->endElement();
         }
@@ -417,45 +419,45 @@ class XML_Response
      */
     protected function setZedAttributes(): void
     {
-        $this->writeZedAttr('category', $this->release['categories_id']);
-        $this->writeZedAttr('size', $this->release['size']);
-        if (isset($this->release['coverurl']) && ! empty($this->release['coverurl'])) {
+        $this->writeZedAttr('category', $this->release->categories_id);
+        $this->writeZedAttr('size', $this->release->size);
+        if (isset($this->release->coverurl) && ! empty($this->release->coverurl)) {
             $this->writeZedAttr(
                 'coverurl',
-                $this->server['server']['url']."covers/{$this->release['coverurl']}"
+                $this->server['server']['url']."covers/{$this->release->coverurl}"
             );
         }
 
         if ((int) $this->parameters['extended'] === 1) {
-            $this->writeZedAttr('files', $this->release['totalpart']);
-            $this->writeZedAttr('poster', $this->release['fromname']);
-            if (($this->release['videos_id'] > 0 || $this->release['tv_episodes_id'] > 0) && $this->namespace === 'newznab') {
+            $this->writeZedAttr('files', $this->release->totalpart);
+            $this->writeZedAttr('poster', $this->release->fromname);
+            if (($this->release->videos_id > 0 || $this->release->tv_episodes_id > 0) && $this->namespace === 'newznab') {
                 $this->setTvAttr();
             }
 
-            if (isset($this->release['imdbid']) && $this->release['imdbid'] > 0) {
-                $this->writeZedAttr('imdb', $this->release['imdbid']);
+            if (isset($this->release->imdbid) && $this->release->imdbid > 0) {
+                $this->writeZedAttr('imdb', $this->release->imdbid);
             }
-            if (isset($this->release['anidbid']) && $this->release['anidbid'] > 0) {
-                $this->writeZedAttr('anidbid', $this->release['anidbid']);
+            if (isset($this->release->anidbid) && $this->release->anidbid > 0) {
+                $this->writeZedAttr('anidbid', $this->release->anidbid);
             }
-            if (isset($this->release['predb_id']) && $this->release['predb_id'] > 0) {
+            if (isset($this->release->predb_id) && $this->release->predb_id > 0) {
                 $this->writeZedAttr('prematch', 1);
             }
-            if (isset($this->release['nfostatus']) && (int) $this->release['nfostatus'] === 1) {
+            if (isset($this->release->nfostatus) && (int) $this->release->nfostatus === 1) {
                 $this->writeZedAttr(
                     'info',
                     $this->server['server']['url'].
-                    "api?t=info&id={$this->release['guid']}&r={$this->parameters['token']}"
+                    "api?t=info&id={$this->release->guid}&r={$this->parameters['token']}"
                 );
             }
 
-            $this->writeZedAttr('grabs', $this->release['grabs']);
-            $this->writeZedAttr('comments', $this->release['comments']);
-            $this->writeZedAttr('password', $this->release['passwordstatus']);
-            $this->writeZedAttr('usenetdate', date_format(date_create($this->release['postdate']), 'D, d M Y H:i:s O'));
-            if (! empty($this->release['group_name'])) {
-                $this->writeZedAttr('group', $this->release['group_name']);
+            $this->writeZedAttr('grabs', $this->release->grabs);
+            $this->writeZedAttr('comments', $this->release->comments);
+            $this->writeZedAttr('password', $this->release->passwordstatus);
+            $this->writeZedAttr('usenetdate', date_format(date_create($this->release->postdate), 'D, d M Y H:i:s O'));
+            if (! empty($this->release->group_name)) {
+                $this->writeZedAttr('group', $this->release->group_name);
             }
         }
     }
@@ -465,36 +467,36 @@ class XML_Response
      */
     protected function setTvAttr(): void
     {
-        if (! empty($this->release['title'])) {
-            $this->writeZedAttr('title', $this->release['title']);
+        if (! empty($this->release->title)) {
+            $this->writeZedAttr('title', $this->release->title);
         }
-        if (isset($this->release['series']) && $this->release['series'] > 0) {
-            $this->writeZedAttr('season', $this->release['series']);
+        if (isset($this->release->series) && $this->release->series > 0) {
+            $this->writeZedAttr('season', $this->release->series);
         }
-        if (isset($this->release['episode']) && $this->release['episode'] > 0) {
-            $this->writeZedAttr('episode', $this->release['episode']);
+        if (isset($this->release->episode) && $this->release->episode > 0) {
+            $this->writeZedAttr('episode', $this->release->episode);
         }
-        if (! empty($this->release['firstaired'])) {
-            $this->writeZedAttr('tvairdate', $this->release['firstaired']);
+        if (! empty($this->release->firstaired)) {
+            $this->writeZedAttr('tvairdate', $this->release->firstaired);
         }
-        if (isset($this->release['tvdb']) && $this->release['tvdb'] > 0) {
-            $this->writeZedAttr('tvdbid', $this->release['tvdb']);
+        if (isset($this->release->tvdb) && $this->release->tvdb > 0) {
+            $this->writeZedAttr('tvdbid', $this->release->tvdb);
         }
-        if (isset($this->release['trakt']) && $this->release['trakt'] > 0) {
-            $this->writeZedAttr('traktid', $this->release['trakt']);
+        if (isset($this->release->trakt) && $this->release->trakt > 0) {
+            $this->writeZedAttr('traktid', $this->release->trakt);
         }
-        if (isset($this->release['tvrage']) && $this->release['tvrage'] > 0) {
-            $this->writeZedAttr('tvrageid', $this->release['tvrage']);
-            $this->writeZedAttr('rageid', $this->release['tvrage']);
+        if (isset($this->release->tvrage) && $this->release->tvrage > 0) {
+            $this->writeZedAttr('tvrageid', $this->release->tvrage);
+            $this->writeZedAttr('rageid', $this->release->tvrage);
         }
-        if (isset($this->release['tvmaze']) && $this->release['tvmaze'] > 0) {
-            $this->writeZedAttr('tvmazeid', $this->release['tvmaze']);
+        if (isset($this->release->tvmaze) && $this->release->tvmaze > 0) {
+            $this->writeZedAttr('tvmazeid', $this->release->tvmaze);
         }
-        if (isset($this->release['imdb']) && $this->release['imdb'] > 0) {
-            $this->writeZedAttr('imdbid', str_pad($this->release['imdb'], 7, '0', STR_PAD_LEFT));
+        if (isset($this->release->imdb) && $this->release->imdb > 0) {
+            $this->writeZedAttr('imdbid', str_pad($this->release->imdb, 7, '0', STR_PAD_LEFT));
         }
-        if (isset($this->release['tmdb']) && $this->release['tmdb'] > 0) {
-            $this->writeZedAttr('tmdbid', $this->release['tmdb']);
+        if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
+            $this->writeZedAttr('tmdbid', $this->release->tmdb);
         }
     }
 
@@ -593,7 +595,7 @@ class XML_Response
             $this->writeRssConsoleInfo();
         }
         $w->startElement('description');
-        $w->writeCData($this->cdata."\t</div>");
+        $w->writeCdata($this->cdata."\t</div>");
         $w->endElement();
     }
 

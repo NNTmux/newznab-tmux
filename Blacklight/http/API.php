@@ -60,10 +60,10 @@ class API extends Capabilities
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
-                if (isset($release['id'])) {
-                    $language = AudioData::query()->where('releases_id', $release['id'])->first(['audiolanguage']);
+                if (isset($release->id)) {
+                    $language = AudioData::query()->where('releases_id', $release->id)->first(['audiolanguage']);
                     if ($language !== null) {
-                        $releases[$key]['searchname'] = $releases[$key]['searchname'].' '.$language['audiolanguage'];
+                        $releases[$key]->searchname = $releases[$key]->searchname.' '.$language['audiolanguage'];
                     }
                 }
             }
@@ -177,8 +177,10 @@ class API extends Capabilities
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
-                $coverURL = $getCoverURL($release);
-                $releases[$key]['coverurl'] = $coverURL;
+                if (isset($release->id)) {
+                    $coverURL = $getCoverURL($release);
+                    $releases[$key]->coverurl = $coverURL;
+                }
             }
         }
     }

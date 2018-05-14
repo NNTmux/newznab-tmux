@@ -216,139 +216,139 @@
 					</thead>
 					<tbody>
 					{foreach $results as $result}
-						<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}"
-							id="guid{$result.guid}">
+						<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result->adddate|strtotime} new{/if}"
+							id="guid{$result->guid}">
 							<td class="check">
-								<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="square"
-									   value="{$result.guid}">
+								<input id="chk{$result->guid|substr:0:7}" type="checkbox" class="square"
+									   value="{$result->guid}">
 							</td>
 							<td class="item">
-								<label for="chk{$result.guid|substr:0:7}">
+								<label for="chk{$result->guid|substr:0:7}">
 									<a class="title" title="View details"
-									   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result.failed)}
+									   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/{$result->searchname|escape:"htmlall"}">{$result->searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result->failed)}
 									<i class="zmdi zmdi-alarm" style="color: red"
 									   title="This release has failed to download for some users"></i>{/if}
 								</label value="Searchname">
 								<div class="resextra">
 									<div class="btns" style="float:right">
-										{release_flag($result.searchname, browse)}
-										{if $result.passwordstatus == 1}
+										{release_flag($result->searchname, browse)}
+										{if $result->passwordstatus == 1}
 											<img title="RAR/ZIP Possibly Passworded."
 												 src="{$smarty.const.WWW_ASSETS}/images/icons/lock2.png"
 												 alt="RAR/ZIP Possibly Passworded.">
-										{elseif $result.passwordstatus == 2}
+										{elseif $result->passwordstatus == 2}
 											<img title="RAR/ZIP Possibly Damaged."
 												 src="{$smarty.const.WWW_ASSETS}/images/icons/broken.png"
 												 alt="RAR/ZIP Possibly Damaged.">
-										{elseif $result.passwordstatus == 10}
+										{elseif $result->passwordstatus == 10}
 											<img title="RAR/ZIP is Passworded."
 												 src="{$smarty.const.WWW_ASSETS}/images/icons/lock.gif"
 												 alt="RAR/ZIP is Passworded.">
 										{/if}
-										{if $result.videostatus > 0}
+										{if $result->videostatus > 0}
 											<a
 													class="model_prev label label-default"
-													href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
+													href="{$smarty.const.WWW_TOP}/details/{$result->guid}"
 													title="This release has a video preview."
 													rel="preview"
 											><i class="icon-youtube-play"></i>
 											</a>
 										{/if}
-										{if $result.nfoid > 0}
-											<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo"
+										{if $result->nfoid > 0}
+											<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}" title="View Nfo"
 											   class="modal_nfo label label-default" rel="nfo">Nfo</a>
 										{/if}
-										{if $result.imdbid > 0}
-											<a href="#" name="name{$result.imdbid}" title="View movie info"
+										{if $result->imdbid > 0}
+											<a href="#" name="name{$result->imdbid}" title="View movie info"
 											   class="modal_imdb label label-default" rel="movie">Cover</a>
 										{/if}
-										{if $result.haspreview == 1 && $userdata.canpreview == 1}
-										<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-										   name="name{$result.guid}"
-										   title="Screenshot of {$result.searchname|escape:"htmlall"}"
+										{if $result->haspreview == 1 && $userdata.canpreview == 1}
+										<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+										   name="name{$result->guid}"
+										   title="Screenshot of {$result->searchname|escape:"htmlall"}"
 										   class="modal_prev label label-default" rel="preview">Preview</a>{/if}
-										{if $result.jpgstatus == 1 && $userdata.canpreview == 1}
-										<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
-										   name="name{$result.guid}"
-										   title="Sample of {$result.searchname|escape:"htmlall"}"
+										{if $result->jpgstatus == 1 && $userdata.canpreview == 1}
+										<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
+										   name="name{$result->guid}"
+										   title="Sample of {$result->searchname|escape:"htmlall"}"
 										   class="modal_prev label label-default" rel="preview">Sample</a>{/if}
-										{if $result.musicinfo_id > 0}
-											<a href="#" name="name{$result.musicinfo_id}" title="View music info"
+										{if $result->musicinfo_id > 0}
+											<a href="#" name="name{$result->musicinfo_id}" title="View music info"
 											   class="modal_music label label-default" rel="music">Cover</a>
 										{/if}
-										{if $result.consoleinfo_id > 0}
-											<a href="#" name="name{$result.consoleinfo_id}" title="View console info"
+										{if $result->consoleinfo_id > 0}
+											<a href="#" name="name{$result->consoleinfo_id}" title="View console info"
 											   class="modal_console label label-default" rel="console">Cover</a>
 										{/if}
-										{if $result.videos_id > 0}
+										{if $result->videos_id > 0}
 											<a class="label label-default"
-											   href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}"
+											   href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}"
 											   title="View all episodes">View
 												Series</a>
 										{/if}
-										{if $result.anidbid > 0}
+										{if $result->anidbid > 0}
 											<a class="label label-default"
-											   href="{$smarty.const.WWW_TOP}/anime?id={$result.anidbid}"
+											   href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}"
 											   title="View all episodes">View
 												Anime</a>
 										{/if}
-										{if isset($result.firstaired) && $result.firstaired != ''}
+										{if isset($result->firstaired) && $result->firstaired != ''}
 											<span class="seriesinfo label label-default"
-												  title="{$result.guid}">Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>
+												  title="{$result->guid}">Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>
 										{/if}
-										{if $result.group_name != ""}
+										{if $result->group_name != ""}
 											<a class="label label-default"
-											   href="{$smarty.const.WWW_TOP}/browse/group?g={$result.group_name|escape:"htmlall"}"
-											   title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
+											   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name|escape:"htmlall"}"
+											   title="Browse {$result->group_name}">{$result->group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 										{/if}
-										{if !empty($result.failed)}<span class="label label-default">
+										{if !empty($result->failed)}<span class="label label-default">
 											<i class="zmdi zmdi-thumbs-o-up"></i>
-											{$result.grabs} Grab{if $result.grabs != 1}s{/if} /
+											{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 											<i class="zmdi zmdi-thumbs-o-down"></i>
-											{$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>
+											{$result->failed} Failed Download{if $result->failed != 1}s{/if}</span>
 										{/if}
 									</div>
 								</div>
 							</td>
 							<td class="category">
-								<a title="Browse {$result.category_name}"
-								   href="{$smarty.const.WWW_TOP}/browse/{$result.category_name}">{$result.category_name}</a>
+								<a title="Browse {$result->category_name}"
+								   href="{$smarty.const.WWW_TOP}/browse/{$result->category_name}">{$result->category_name}</a>
 							</td>
-							<td class="posted" title="{$result.postdate}">
-								{$result.postdate|timeago}
+							<td class="posted" title="{$result->postdate}">
+								{$result->postdate|timeago}
 							</td>
 							<td class="size">
-								{$result.size|fsize_format:"MB"}
-								{if $result.completion > 0}
+								{$result->size|fsize_format:"MB"}
+								{if $result->completion > 0}
 									<br>
-									{if $result.completion < 100}
-										<span class="warning">{$result.completion}%</span>
+									{if $result->completion < 100}
+										<span class="warning">{$result->completion}%</span>
 									{else}
-										{$result.completion}%
+										{$result->completion}%
 									{/if}
 								{/if}
 							</td>
 							<td class="files">
 								<a title="View file list"
-								   href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart}</a>
-								{if $result.rarinnerfilecount > 0}
+								   href="{$smarty.const.WWW_TOP}/filelist/{$result->guid}">{$result->totalpart}</a>
+								{if $result->rarinnerfilecount > 0}
 									<div class="rarfilelist">
 										<img src="{$smarty.const.WWW_ASSETS}/images/icons/magnifier.png"
-											 alt="{$result.guid}">
+											 alt="{$result->guid}">
 									</div>
 								{/if}
 							</td>
 							<td class="stats">
 								<a title="View comments"
-								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments">{$result.comments}
-									cmt{if $result.comments != 1}s{/if}</a>
-								<br>{$result.grabs} grab{if $result.grabs != 1}s{/if}
+								   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments">{$result->comments}
+									cmt{if $result->comments != 1}s{/if}</a>
+								<br>{$result->grabs} grab{if $result->grabs != 1}s{/if}
 							</td>
 							<td class="icon_nzb"><a
-										href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
+										href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 											class="zmdi zmdi-cloud-download text-muted"
 											title="Download NZB"></i></a>
-								<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+								<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 											class="zmdi zmdi-comments-o text-muted"
 											title="Comments"></i></a>
 								<a href="#" class="icon_cart text-muted"><i

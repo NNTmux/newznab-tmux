@@ -48,16 +48,14 @@ class ReleaseSearch
      *
      * @param array $options   Array where keys are the column name, and value is the search string.
      *
-     * @param null  $query
-     * @param bool  $builder
      *
      * @return string|\Illuminate\Database\Query\Builder
      */
-    public function getSearchSQL(array $options = [], $query = null, $builder = false)
+    public function getSearchSQL(array $options = [])
     {
         $this->searchOptions = $options;
 
-        return $this->sphinxSQL($query, $builder);
+        return $this->sphinxSQL();
     }
 
     /**
@@ -75,7 +73,7 @@ class ReleaseSearch
      *
      * @return string
      */
-    private function sphinxSQL($query = null, $builder = false)
+    private function sphinxSQL()
     {
         $searchQuery = $fullReturn = '';
 
@@ -97,10 +95,6 @@ class ReleaseSearch
             }
         }
         if ($searchQuery !== '') {
-            if ($builder === true) {
-                return $query->whereRaw(sprintf("(rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt));
-            }
-
             $fullReturn = sprintf("AND (rse.query = '@@relaxed %s')", trim($searchQuery).$this->sphinxQueryOpt);
         }
 

@@ -53,7 +53,7 @@ class BooksController extends BasePageController
         $page = $request->has('page') ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $rslt = $book->getBookRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
-        $results = $this->paginate($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, $request->url());
+        $results = $this->paginate($rslt, $rslt['_totalcount'], config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
         $maxwords = 50;
         foreach ($results as $result) {
             if (! empty($result->overview)) {
