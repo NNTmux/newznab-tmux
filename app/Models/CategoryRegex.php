@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\CategoryRegex
+ * App\Models\CategoryRegex.
  *
  * @property int $id
  * @property string $group_regex This is a regex to match against usenet groups

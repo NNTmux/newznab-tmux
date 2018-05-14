@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseSubtitle
+ * App\Models\ReleaseSubtitle.
  *
  * @property int $id
  * @property int $releases_id FK to releases.id

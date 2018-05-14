@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\MultigroupBinary
+ * App\Models\MultigroupBinary.
  *
  * @property int $id
  * @property string $name

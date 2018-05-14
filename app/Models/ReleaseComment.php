@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseComment
+ * App\Models\ReleaseComment.
  *
  * @property int $id
  * @property int $releases_id FK to releases.id

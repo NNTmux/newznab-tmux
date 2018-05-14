@@ -6,7 +6,7 @@ use Blacklight\SphinxSearch;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseFile
+ * App\Models\ReleaseFile.
  *
  * @property int $releases_id FK to releases.id
  * @property string $name

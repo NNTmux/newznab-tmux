@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Binary
+ * App\Models\Binary.
  *
  * @property int $id
  * @property string $name

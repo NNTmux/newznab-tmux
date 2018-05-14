@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Support\Database\CacheQueryBuilder;
 
 /**
- * App\Models\ConsoleInfo
+ * App\Models\ConsoleInfo.
  *
  * @property int $id
  * @property string $title

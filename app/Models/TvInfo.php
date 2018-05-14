@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\TvInfo
+ * App\Models\TvInfo.
  *
  * @property int $videos_id FK to video.id
  * @property string $summary Description/summary of the show.

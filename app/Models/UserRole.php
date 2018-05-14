@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\UserRole
+ * App\Models\UserRole.
  *
  * @property int $id
  * @property string $name

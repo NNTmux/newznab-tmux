@@ -6,7 +6,7 @@ use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseRegex
+ * App\Models\ReleaseRegex.
  *
  * @property int $releases_id
  * @property int $collection_regex_id

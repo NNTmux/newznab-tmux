@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseSearchData
+ * App\Models\ReleaseSearchData.
  *
  * @mixin \Eloquent
  */
