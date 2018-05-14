@@ -6,6 +6,40 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Database\CacheQueryBuilder;
 
+/**
+ * App\Models\Video
+ *
+ * @property int $id Show ID to be used in other tables as reference
+ * @property bool $type 0 = TV, 1 = Film, 2 = Anime
+ * @property string $title Name of the video.
+ * @property string $countries_id Two character country code (FK to countries table).
+ * @property string $started Date (UTC) of production's first airing.
+ * @property int $anidb ID number for anidb site
+ * @property int $imdb ID number for IMDB site (without the 'tt' prefix).
+ * @property int $tmdb ID number for TMDB site.
+ * @property int $trakt ID number for TraktTV site.
+ * @property int $tvdb ID number for TVDB site
+ * @property int $tvmaze ID number for TVMaze site.
+ * @property int $tvrage ID number for TVRage site.
+ * @property bool $source Which site did we use for info?
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VideoAlias[] $alias
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TvEpisode[] $episode
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereAnidb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereCountriesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereImdb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereStarted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTmdb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTrakt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvdb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvmaze($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvrage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereType($value)
+ * @mixin \Eloquent
+ */
 class Video extends Model
 {
     use CacheQueryBuilder;

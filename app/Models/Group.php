@@ -11,6 +11,38 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Group
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $backfill_target
+ * @property int $first_record
+ * @property string|null $first_record_postdate
+ * @property int $last_record
+ * @property string|null $last_record_postdate
+ * @property string|null $last_updated
+ * @property int|null $minfilestoformrelease
+ * @property int|null $minsizetoformrelease
+ * @property bool $active
+ * @property bool $backfill
+ * @property string|null $description
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfill($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfillTarget($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastUpdated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinfilestoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinsizetoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereName($value)
+ * @mixin \Eloquent
+ */
 class Group extends Model
 {
     /**

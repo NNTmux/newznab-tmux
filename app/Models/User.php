@@ -14,6 +14,101 @@ use Illuminate\Support\Facades\Password;
 use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * App\Models\User
+ *
+ * @property int $id
+ * @property string $username
+ * @property string|null $firstname
+ * @property string|null $lastname
+ * @property string $email
+ * @property string $password
+ * @property int $user_roles_id FK to user_roles.id
+ * @property string|null $host
+ * @property int $grabs
+ * @property string $rsstoken
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property string|null $resetguid
+ * @property string|null $lastlogin
+ * @property string|null $apiaccess
+ * @property int $invites
+ * @property int|null $invitedby
+ * @property int $movieview
+ * @property int $xxxview
+ * @property int $musicview
+ * @property int $consoleview
+ * @property int $bookview
+ * @property int $gameview
+ * @property string|null $saburl
+ * @property string|null $sabapikey
+ * @property bool|null $sabapikeytype
+ * @property bool|null $sabpriority
+ * @property bool $queuetype Type of queue, Sab or NZBGet
+ * @property string|null $nzbgeturl
+ * @property string|null $nzbgetusername
+ * @property string|null $nzbgetpassword
+ * @property string|null $nzbvortex_api_key
+ * @property string|null $nzbvortex_server_url
+ * @property string $userseed
+ * @property string $notes
+ * @property string|null $cp_url
+ * @property string|null $cp_api
+ * @property string|null $style
+ * @property string|null $rolechangedate When does the role expire
+ * @property string|null $remember_token
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $excludedCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failedRelease
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Invitation[] $invitation
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $release
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
+ * @property-read \App\Models\UserRole $role
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiaccess($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereBookview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereConsoleview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCpApi($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCpUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereFirstname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereGameview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereGrabs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereHost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereInvitedby($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereInvites($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereLastlogin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereLastname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereMovieview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereMusicview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgetpassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgeturl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgetusername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbvortexApiKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbvortexServerUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereQueuetype($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereResetguid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRolechangedate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRsstoken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabapikey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabapikeytype($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabpriority($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSaburl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereStyle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserRolesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserseed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereXxxview($value)
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
     use Notifiable;

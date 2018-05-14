@@ -4,6 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\ReleaseExtraFull
+ *
+ * @property int $releases_id FK to releases.id
+ * @property string|null $mediainfo
+ * @property-read \App\Models\Release $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull whereMediainfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseExtraFull whereReleasesId($value)
+ * @mixin \Eloquent
+ */
 class ReleaseExtraFull extends Model
 {
     /**

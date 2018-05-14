@@ -4,6 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Menu
+ *
+ * @property int $id
+ * @property string $href
+ * @property string $title
+ * @property int $newwindow
+ * @property string $tooltip
+ * @property int $role
+ * @property int $ordinal
+ * @property string $menueval
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereHref($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereMenueval($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereNewwindow($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereOrdinal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereRole($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereTooltip($value)
+ * @mixin \Eloquent
+ */
 class Menu extends Model
 {
     /**

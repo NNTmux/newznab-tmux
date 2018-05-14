@@ -5,6 +5,21 @@ namespace App\Models;
 use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\AnidbTitle
+ *
+ * @property int $anidbid ID of title from AniDB
+ * @property string $type type of title.
+ * @property string $lang
+ * @property string $title
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbEpisode[] $episode
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereAnidbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereLang($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereType($value)
+ * @mixin \Eloquent
+ */
 class AnidbTitle extends Model
 {
     use InsertOnDuplicateKey;

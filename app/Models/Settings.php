@@ -29,6 +29,20 @@ use App\Support\Database\CacheQueryBuilder;
 
 /**
  * Settings - model for settings table.
+ *
+ * @property string $section
+ * @property string $subsection
+ * @property string $name
+ * @property string $value
+ * @property string $hint
+ * @property string $setting
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereHint($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSection($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSetting($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereSubsection($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Settings whereValue($value)
+ * @mixin \Eloquent
  */
 class Settings extends Model
 {

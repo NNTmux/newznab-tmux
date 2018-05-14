@@ -4,6 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserExcludedCategory
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property int $categories_id
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Category $category
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserExcludedCategory whereCategoriesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserExcludedCategory whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserExcludedCategory whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserExcludedCategory whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserExcludedCategory whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class UserExcludedCategory extends Model
 {
     /**

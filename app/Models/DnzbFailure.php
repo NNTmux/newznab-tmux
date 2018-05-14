@@ -5,6 +5,19 @@ namespace App\Models;
 use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\DnzbFailure
+ *
+ * @property int $release_id
+ * @property int $users_id
+ * @property int $failed
+ * @property-read \App\Models\Release $release
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereFailed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereReleaseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DnzbFailure whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class DnzbFailure extends Model
 {
     use InsertOnDuplicateKey;

@@ -4,6 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\ReleaseNfo
+ *
+ * @property int $releases_id FK to releases.id
+ * @property mixed|null $nfo
+ * @property-read \App\Models\Release $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereNfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseNfo whereReleasesId($value)
+ * @mixin \Eloquent
+ */
 class ReleaseNfo extends Model
 {
     /**

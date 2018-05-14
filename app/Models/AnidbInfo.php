@@ -4,6 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\AnidbInfo
+ *
+ * @property-read \App\Models\AnidbEpisode $episode
+ * @property-read \App\Models\AnidbTitle $title
+ * @mixin \Eloquent
+ */
 class AnidbInfo extends Model
 {
     /**

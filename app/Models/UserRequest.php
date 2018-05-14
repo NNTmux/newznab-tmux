@@ -5,6 +5,22 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserRequest
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property string $hosthash
+ * @property string $request
+ * @property string $timestamp
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereHosthash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereRequest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereTimestamp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class UserRequest extends Model
 {
     /**

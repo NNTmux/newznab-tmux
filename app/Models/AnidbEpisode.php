@@ -5,6 +5,23 @@ namespace App\Models;
 use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\AnidbEpisode
+ *
+ * @property int $anidbid ID of title from AniDB
+ * @property int $episodeid anidb id for this episode
+ * @property int $episode_no Numeric version of episode (leave 0 for combined episodes).
+ * @property string $episode_title Title of the episode (en, x-jat)
+ * @property string $airdate
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
+ * @property-read \App\Models\AnidbTitle $title
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAirdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAnidbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereEpisodeid($value)
+ * @mixin \Eloquent
+ */
 class AnidbEpisode extends Model
 {
     use InsertOnDuplicateKey;

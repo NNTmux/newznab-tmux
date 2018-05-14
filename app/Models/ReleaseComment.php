@@ -5,6 +5,49 @@ namespace App\Models;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\ReleaseComment
+ *
+ * @property int $id
+ * @property int $releases_id FK to releases.id
+ * @property string $text
+ * @property bool $isvisible
+ * @property bool $issynced
+ * @property string|null $gid
+ * @property string|null $cid
+ * @property string $text_hash
+ * @property string $username
+ * @property int $users_id
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property string|null $host
+ * @property bool $shared
+ * @property string $shareid
+ * @property string $siteid
+ * @property int|null $sourceid
+ * @property mixed $nzb_guid
+ * @property-read \App\Models\Release $release
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereGid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereHost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereIssynced($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereIsvisible($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereNzbGuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereReleasesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereShared($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereShareid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereSiteid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereSourceid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereTextHash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class ReleaseComment extends Model
 {
     /**

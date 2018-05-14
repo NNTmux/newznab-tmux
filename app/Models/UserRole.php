@@ -4,6 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserRole
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $apirequests
+ * @property int $downloadrequests
+ * @property int $defaultinvites
+ * @property bool $isdefault
+ * @property bool $canpreview
+ * @property bool $hideads
+ * @property int $donation
+ * @property int $addyears
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\RoleExcludedCategory[] $roleExcludedCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereAddyears($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereApirequests($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereCanpreview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereDefaultinvites($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereDonation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereDownloadrequests($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereHideads($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereIsdefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereName($value)
+ * @mixin \Eloquent
+ */
 class UserRole extends Model
 {
     /**

@@ -6,6 +6,32 @@ use Illuminate\Support\Carbon;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Category
+ *
+ * @property int $id
+ * @property string $title
+ * @property int|null $parentid
+ * @property int $status
+ * @property string|null $description
+ * @property bool $disablepreview
+ * @property int $minsizetoformrelease
+ * @property int $maxsizetoformrelease
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
+ * @property-read \App\Models\Category|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
+ * @property-read \App\Models\RoleExcludedCategory $roleExcludedCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $userExcludedCategory
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDisablepreview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereMaxsizetoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereMinsizetoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereParentid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereTitle($value)
+ * @mixin \Eloquent
+ */
 class Category extends Model
 {
     use Rememberable;

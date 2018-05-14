@@ -5,6 +5,22 @@ namespace App\Models;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Invitation
+ *
+ * @property int $id
+ * @property string $guid
+ * @property int $users_id
+ * @property string|null $created_at
+ * @property string|null $updated_at
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereGuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class Invitation extends Model
 {
     public const DEFAULT_INVITES = 1;

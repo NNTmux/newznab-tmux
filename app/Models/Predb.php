@@ -10,8 +10,39 @@ use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * App\Models\Predb
+ *
  * @property mixed $release
  * @property mixed $hash
+ * @property int $id Primary key
+ * @property string $title
+ * @property string|null $nfo
+ * @property string|null $size
+ * @property string|null $category
+ * @property string|null $predate
+ * @property string $source
+ * @property int $requestid
+ * @property int $groups_id FK to groups
+ * @property bool $nuked Is this pre nuked? 0 no 2 yes 1 un nuked 3 mod nuked
+ * @property string|null $nukereason If this pre is nuked, what is the reason?
+ * @property string|null $files How many files does this pre have ?
+ * @property string $filename
+ * @property bool $searched
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereCategory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereFiles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereGroupsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereNfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereNuked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereNukereason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb wherePredate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereRequestid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSearched($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereTitle($value)
+ * @mixin \Eloquent
  */
 class Predb extends Model
 {

@@ -5,6 +5,26 @@ namespace App\Models;
 use Blacklight\SphinxSearch;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\ReleaseFile
+ *
+ * @property int $releases_id FK to releases.id
+ * @property string $name
+ * @property int $size
+ * @property bool $ishashed
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property bool $passworded
+ * @property-read \App\Models\Release $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereIshashed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile wherePassworded($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereReleasesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class ReleaseFile extends Model
 {
     /**

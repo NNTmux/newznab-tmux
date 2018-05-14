@@ -9,6 +9,124 @@ use Illuminate\Support\Facades\DB;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Release
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $searchname
+ * @property int|null $totalpart
+ * @property int $groups_id FK to groups.id
+ * @property int $size
+ * @property string|null $postdate
+ * @property string|null $adddate
+ * @property string $updatetime
+ * @property string|null $gid
+ * @property string $guid
+ * @property string $leftguid The first letter of the release guid
+ * @property string|null $fromname
+ * @property float $completion
+ * @property int $categories_id
+ * @property int $videos_id FK to videos.id of the parent series.
+ * @property int $tv_episodes_id FK to tv_episodes.id for the episode.
+ * @property int|null $imdbid
+ * @property int $xxxinfo_id
+ * @property int|null $musicinfo_id FK to musicinfo.id
+ * @property int|null $consoleinfo_id FK to consoleinfo.id
+ * @property int $gamesinfo_id
+ * @property int|null $bookinfo_id FK to bookinfo.id
+ * @property int|null $anidbid FK to anidb_titles.anidbid
+ * @property int $predb_id FK to predb.id
+ * @property int $grabs
+ * @property int $comments
+ * @property bool $passwordstatus
+ * @property int $rarinnerfilecount
+ * @property bool $haspreview
+ * @property bool $nfostatus
+ * @property bool $jpgstatus
+ * @property bool $videostatus
+ * @property bool $audiostatus
+ * @property bool $dehashstatus
+ * @property bool $reqidstatus
+ * @property bool $nzbstatus
+ * @property bool $iscategorized
+ * @property bool $isrenamed
+ * @property bool $ishashed
+ * @property bool $proc_pp
+ * @property bool $proc_sorter
+ * @property bool $proc_par2
+ * @property bool $proc_nfo
+ * @property bool $proc_files
+ * @property bool $proc_uid
+ * @property bool $proc_srr Has the release been srr
+ * processed
+ * @property bool $proc_hash16k Has the release been hash16k
+ * processed
+ * @property mixed|null $nzb_guid
+ * @property-read \App\Models\Category $category
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
+ * @property-read \App\Models\TvEpisode $episode
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failed
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseFile[] $file
+ * @property-read \App\Models\Group $group
+ * @property-read \App\Models\ReleaseNfo $nfo
+ * @property-read \App\Models\Predb $predb
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseExtraFull[] $releaseExtra
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleasesGroups[] $releaseGroup
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $userRelease
+ * @property-read \App\Models\Video $video
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAdddate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAnidbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAudiostatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereBookinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereCategoriesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereComments($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereCompletion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereConsoleinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereDehashstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereFromname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGamesinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGrabs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGroupsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereHaspreview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereImdbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereIscategorized($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereIshashed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereIsrenamed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereJpgstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereLeftguid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereMusicinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereNfostatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereNzbGuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereNzbstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release wherePasswordstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release wherePostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release wherePredbId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcFiles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcHash16k($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcNfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcPar2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcPp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcSorter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcSrr($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcUid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereRarinnerfilecount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereReqidstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereSearchname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereTotalpart($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereTvEpisodesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereUpdatetime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideosId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideostatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereXxxinfoId($value)
+ * @mixin \Eloquent
+ */
 class Release extends Model
 {
     use Rememberable;
