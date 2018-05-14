@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseNfo
+ * App\Models\ReleaseNfo.
  *
  * @property int $releases_id FK to releases.id
  * @property mixed|null $nfo

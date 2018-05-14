@@ -6,7 +6,7 @@ use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\DnzbFailure
+ * App\Models\DnzbFailure.
  *
  * @property int $release_id
  * @property int $users_id

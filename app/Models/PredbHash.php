@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\PredbHash
+ * App\Models\PredbHash.
  *
  * @property int $predb_id id, of the predb entry, this hash belongs to
  * @property mixed $hash

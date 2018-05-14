@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\MovieInfo
+ * App\Models\MovieInfo.
  *
  * @property int $id
  * @property int $imdbid

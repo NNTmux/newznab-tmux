@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ReleaseUnique
+ * App\Models\ReleaseUnique.
  *
  * @property int $releases_id FK to releases.id.
  * @property mixed $uniqueid Unique_ID from mediainfo.

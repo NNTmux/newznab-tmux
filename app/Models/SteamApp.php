@@ -6,7 +6,7 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\SteamApp
+ * App\Models\SteamApp.
  *
  * @property string $name Steam application name
  * @property int $appid Steam application id

@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\UsersRelease
+ * App\Models\UsersRelease.
  *
  * @property int $id
  * @property int $users_id

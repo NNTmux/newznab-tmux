@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\MissedPart
+ * App\Models\MissedPart.
  *
  * @property int $id
  * @property int $numberid

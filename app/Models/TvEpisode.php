@@ -6,7 +6,7 @@ use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\TvEpisode
+ * App\Models\TvEpisode.
  *
  * @property int $id
  * @property int $videos_id FK to videos.id of the parent series.

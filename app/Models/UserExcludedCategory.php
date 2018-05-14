@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\UserExcludedCategory
+ * App\Models\UserExcludedCategory.
  *
  * @property int $id
  * @property int $users_id

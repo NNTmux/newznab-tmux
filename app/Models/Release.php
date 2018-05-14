@@ -10,7 +10,7 @@ use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Release
+ * App\Models\Release.
  *
  * @property int $id
  * @property string $name

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\SharingSite
+ * App\Models\SharingSite.
  *
  * @property int $id
  * @property string $site_name

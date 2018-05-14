@@ -6,7 +6,7 @@ use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\AnidbEpisode
+ * App\Models\AnidbEpisode.
  *
  * @property int $anidbid ID of title from AniDB
  * @property int $episodeid anidb id for this episode

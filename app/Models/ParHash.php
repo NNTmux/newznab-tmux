@@ -6,7 +6,7 @@ use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ParHash
+ * App\Models\ParHash.
  *
  * @property int $releases_id FK to releases.id
  * @property string $hash hash_16k block of par2

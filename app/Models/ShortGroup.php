@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\ShortGroup
+ * App\Models\ShortGroup.
  *
  * @property int $id
  * @property string $name
