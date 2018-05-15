@@ -99,9 +99,9 @@ Route::post('movie', 'MovieController@showMovie');
 
 Route::post('movietrailers', 'MovieController@showTrailer');
 
-Route::get('Music/{id?}', 'MusicController@show');
+Route::get('Audio/{id?}', 'MusicController@show');
 
-Route::post('Music/{id?}', 'MusicController@show');
+Route::post('Audio/{id?}', 'MusicController@show');
 
 Route::get('nfo/{id?}', 'NfoController@showNfo');
 

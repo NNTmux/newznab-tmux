@@ -212,7 +212,7 @@
 											class="fa fa-gamepad"></i><span> Console</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 											class="fa fa-film"></i><span> Movies</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/Music"><i
+							<li><a href="{$smarty.const.WWW_TOP}/Audio"><i
 											class="fa fa-music"></i><span> Music</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 											class="fa fa-gamepad"></i><span> Games</span></a></li>
@@ -222,7 +222,7 @@
 											class="fa fa-venus-mars"></i><span> Adult</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/Books"><i
 											class="fa fa-book"></i><span> Books</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/browse/all"><i
+							<li><a href="{$smarty.const.WWW_TOP}/browse/All"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a>
 							</li>

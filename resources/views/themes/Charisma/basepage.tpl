@@ -91,7 +91,7 @@
 													class="zmdi zmdi-xbox"></i><span> Console</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 													class="zmdi zmdi-movie-alt"></i><span> Movies</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/Music"><i
+									<li><a href="{$smarty.const.WWW_TOP}/Audio"><i
 													class="zmdi zmdi-audio"></i><span> Music</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 													class="zmdi zmdi-keyboard"></i><span> Games</span></a></li>
@@ -102,7 +102,7 @@
 									</li>
 									<li><a href="{$smarty.const.WWW_TOP}/Books"><i
 													class="zmdi zmdi-book"></i><span> Books</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/browse/all"><i class="zmdi zmdi-view-list-alt"></i><span> Browse All Releases</span></a>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/All"><i class="zmdi zmdi-view-list-alt"></i><span> Browse All Releases</span></a>
 									</li>
 									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i
 													class="zmdi zmdi-group"></i><span> Browse Groups</span></a>

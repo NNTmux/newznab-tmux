@@ -57,7 +57,7 @@ class BrowseController extends BasePageController
      * @param string $id
      * @throws \Exception
      */
-    public function show(string $parentCategory, string $id = 'all')
+    public function show(string $parentCategory, string $id = 'All')
     {
         $this->setPrefs();
         $releases = new Releases(['Settings' => $this->settings]);
@@ -65,7 +65,7 @@ class BrowseController extends BasePageController
         $parentId = Category::query()->where('title', $parentCategory)->first(['id']);
 
         $query = Category::query();
-        if ($id !== 'all') {
+        if ($id !== 'All') {
             $query->where('title', $id)->where('parentid', $parentId['id']);
         } else {
             $query->where('id', $parentId['id']);
