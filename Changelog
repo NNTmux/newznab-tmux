@@ -1,4 +1,5 @@
 2018-05-15 DariusIII
+	* Fix: Prevent errors if no results for cover view are returned
 	* Fix: Many route and themes related fixes
 2018-05-14 DariusIII
 	* Chg: Update category names display
