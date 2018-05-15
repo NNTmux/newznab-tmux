@@ -202,7 +202,7 @@ class Books
         $sql = sprintf(
             '
 			SELECT
-				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, rn.releases_id, g.name AS group_name, df.failed AS failed,
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
 			boo.*,
 			r.bookinfo_id,
 			g.name AS group_name,
@@ -229,7 +229,7 @@ class Books
         }
         $return = DBFacade::select($sql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $books[0]->total ?? 0;
+            $return['_totalcount'] = $books['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 
