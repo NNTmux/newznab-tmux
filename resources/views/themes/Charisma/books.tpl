@@ -3,7 +3,8 @@
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ {$catname|escape:"htmlall"}
+			/  <a href="{$smarty.const.WWW_TOP}/browse/{$catname->parent->title}">{$catname->parent->title}</a>
+			/ <a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>
 		</ol>
 	</div>
 </div>

@@ -79,9 +79,9 @@ class AdultController extends BasePageController
         if ((int) $category === -1) {
             $this->smarty->assign('catname', 'All');
         } else {
-            $cdata = Category::find($category);
-            if ($cdata) {
-                $this->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
+            $cdata = (new Category)->find($category);
+            if ($cdata !== null) {
+                $this->smarty->assign('catname', $cdata);
             } else {
                 $this->show404();
             }

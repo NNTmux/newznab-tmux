@@ -37,8 +37,8 @@ Route::prefix('browse')->group(function () {
 
 Route::get('anime/{id?}', 'AnimeController@index');
 
-Route::get('books/{id?}', 'BooksController@index');
-Route::post('books/{id?}', 'BooksController@index');
+Route::get('Books/{id?}', 'BooksController@index');
+Route::post('Books/{id?}', 'BooksController@index');
 
 Route::prefix('cart')->group(function () {
     Route::get('index', 'CartController@index');
@@ -71,9 +71,9 @@ Route::get('apihelp', 'ApiHelpController@index');
 
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::get('console/{id?}', 'ConsoleController@show');
+Route::get('Console/{id?}', 'ConsoleController@show');
 
-Route::post('console/{id?}', 'ConsoleController@show');
+Route::post('Console/{id?}', 'ConsoleController@show');
 
 Route::get('browsegroup', 'BrowseGroupController@show');
 
@@ -85,31 +85,31 @@ Route::get('failed', 'FailedReleasesController@show');
 
 Route::post('failed', 'FailedReleasesController@show');
 
-Route::get('games', 'GamesController@show');
+Route::get('Games', 'GamesController@show');
 
-Route::get('movies/{id?}', 'MovieController@showMovies');
+Route::get('Movies/{id?}', 'MovieController@showMovies');
 
 Route::get('movie', 'MovieController@showMovie');
 
 Route::get('movietrailers', 'MovieController@showTrailer');
 
-Route::post('movies/{id?}', 'MovieController@showMovies');
+Route::post('Movies/{id?}', 'MovieController@showMovies');
 
 Route::post('movie', 'MovieController@showMovie');
 
 Route::post('movietrailers', 'MovieController@showTrailer');
 
-Route::get('music/{id?}', 'MusicController@show');
+Route::get('Music/{id?}', 'MusicController@show');
 
-Route::post('music/{id?}', 'MusicController@show');
+Route::post('Music/{id?}', 'MusicController@show');
 
 Route::get('nfo/{id?}', 'NfoController@showNfo');
 
 Route::post('nfo/{id?}', 'NfoController@showNfo');
 
-Route::get('xxx/{id?}', 'AdultController@show');
+Route::get('XXX/{id?}', 'AdultController@show');
 
-Route::post('xxx/{id?}', 'AdultController@show');
+Route::post('XXX/{id?}', 'AdultController@show');
 
 Route::get('contact-us', 'ContactUsController@showContactForm');
 Route::post('contact-us', 'ContactUsController@contact');
