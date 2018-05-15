@@ -1,4 +1,5 @@
 2018-05-15 DariusIII
+	* Chg: Update laravel/framework and ytake/laravel.smarty to latest versions
 	* Fix: Start fixing full movie view
 	* Fix: Fix route to full movie view in themes
 	* Fix: Fix display of search filter on cover pages
