@@ -208,21 +208,21 @@
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
-							<li><a href="{$smarty.const.WWW_TOP}/console"><i
+							<li><a href="{$smarty.const.WWW_TOP}/Console"><i
 											class="fa fa-gamepad"></i><span> Console</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/movies"><i
+							<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 											class="fa fa-film"></i><span> Movies</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/music"><i
+							<li><a href="{$smarty.const.WWW_TOP}/Music"><i
 											class="fa fa-music"></i><span> Music</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/games"><i
+							<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 											class="fa fa-gamepad"></i><span> Games</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/series"><i
 											class="fa fa-television"></i><span> TV</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/xxx"><i
+							<li><a href="{$smarty.const.WWW_TOP}/XXX"><i
 											class="fa fa-venus-mars"></i><span> Adult</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/books"><i
+							<li><a href="{$smarty.const.WWW_TOP}/Books"><i
 											class="fa fa-book"></i><span> Books</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/browse"><i
+							<li><a href="{$smarty.const.WWW_TOP}/browse/all"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a>
 							</li>

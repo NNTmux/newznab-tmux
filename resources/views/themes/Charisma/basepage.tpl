@@ -87,22 +87,22 @@
 							<li class="accordion">
 								<a href="#"><i class="zmdi zmdi-view-list-alt"></i><span> Browse</span></a>
 								<ul class="nav nav-pills nav-stacked">
-									<li><a href="{$smarty.const.WWW_TOP}/console"><i
+									<li><a href="{$smarty.const.WWW_TOP}/Console"><i
 													class="zmdi zmdi-xbox"></i><span> Console</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/movies"><i
+									<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 													class="zmdi zmdi-movie-alt"></i><span> Movies</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/music"><i
+									<li><a href="{$smarty.const.WWW_TOP}/Music"><i
 													class="zmdi zmdi-audio"></i><span> Music</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/games"><i
+									<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 													class="zmdi zmdi-keyboard"></i><span> Games</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/series"><i
 													class="zmdi zmdi-tv-play"></i><span> TV</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i
+									<li><a href="{$smarty.const.WWW_TOP}/XXX"><i
 													class="zmdi zmdi-male-female"></i><span> Adult</span></a>
 									</li>
-									<li><a href="{$smarty.const.WWW_TOP}/books"><i
+									<li><a href="{$smarty.const.WWW_TOP}/Books"><i
 													class="zmdi zmdi-book"></i><span> Books</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/browse"><i class="zmdi zmdi-view-list-alt"></i><span> Browse All Releases</span></a>
+									<li><a href="{$smarty.const.WWW_TOP}/browse/all"><i class="zmdi zmdi-view-list-alt"></i><span> Browse All Releases</span></a>
 									</li>
 									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i
 													class="zmdi zmdi-group"></i><span> Browse Groups</span></a>
