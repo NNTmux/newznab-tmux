@@ -44,7 +44,7 @@
 						</td>
 						<td>
 							<h4><a title="View Movie"
-								   href="{$smarty.const.WWW_TOP}/movies/?imdb={$movie.imdbid}">{$movie.title|escape:"htmlall"}
+								   href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}">{$movie.title|escape:"htmlall"}
 									({$movie.year})</a></h4>
 							{if isset($movie.tagline) && $movie.tagline != ''}<b>{$movie.tagline}</b><br/>{/if}
 							{if isset($movie.plot) && $movie.plot != ''}{$movie.plot}<br/><br/>{/if}

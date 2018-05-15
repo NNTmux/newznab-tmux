@@ -75,7 +75,7 @@
 													{foreach $result->languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
-													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result->imdbid}"><img
+													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
 																class="cover img-responsive img-rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
@@ -104,7 +104,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result->genre != ''}
 															<b>Genre: </b>
 															{$result->genre}, {/if}</div>
@@ -203,7 +203,7 @@
 													{foreach $result->languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
-													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result->imdbid}"><img
+													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
 																class="cover img-responsive img-rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
@@ -232,7 +232,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result->genre != ''}
 															<b>Genre: </b>
 															{$result->genre}, {/if}</div>

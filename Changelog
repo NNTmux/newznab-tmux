@@ -1,4 +1,5 @@
 2018-05-15 DariusIII
+	* Fix: Fix route to full movie view in themes
 	* Fix: Fix display of search filter on cover pages
 	* Chg: Update links to category browsing pages in all the themes
 	* Chg: Change Music category into Audio to match database setting
