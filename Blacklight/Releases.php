@@ -726,18 +726,19 @@ class Releases
 				FROM videos v
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
 				WHERE (%s) %s %s %s
-				GROUP BY v.id",
+				GROUP BY v.id
+				LIMIT 1",
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : '')
             );
-            $show = $this->pdo->queryOneRow($showQry);
+            $show = DB::select($showQry);
             if ($show !== false) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && strlen((string) $show['episodes']) > 0) {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
-                } elseif ((int) $show['video'] > 0) {
-                    $showSql = 'AND r.videos_id = '.$show['video'];
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen($show[0]->episodes) > 0) {
+                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
+                } elseif ((int) $show[0]->video > 0) {
+                    $showSql = 'AND r.videos_id = '.$show[0]->video;
                     // If $series is set but episode is not, return Season Packs only
                     if (! empty($series) && empty($episode)) {
                         $showSql .= ' AND r.tv_episodes_id = 0';

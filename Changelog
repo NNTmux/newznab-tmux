@@ -1,4 +1,5 @@
 2018-05-15 DariusIII
+	* Fix: Fix tvSearch query
 	* Chg: Use original subcategory titles when browsing
 	* Fix: Prevent errors if no results for cover view are returned
 	* Fix: Many route and themes related fixes
