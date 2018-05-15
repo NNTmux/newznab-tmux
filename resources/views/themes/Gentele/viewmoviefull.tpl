@@ -12,43 +12,43 @@
 		{foreach $results as $result}
 			<div class="well well-sm">
 				<div id="moviefull" style="min-height:340px;">
-					{if $result.cover == 1}
+					{if $result->cover == 1}
 						<img class="pull-right" style="margin-right:50px; max-height:278px;"
-							 alt="{$result.title|escape:"htmlall"} Logo"
-							 src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg"/>
+							 alt="{$result->title|escape:"htmlall"} Logo"
+							 src="{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg"/>
 					{else}
 						<img class="pull-right" style="margin-right:50px; max-height:278px;"
-							 alt="{$result.title|escape:"htmlall"} Logo"
+							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}
-					<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</span>
+					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"} ({$result->year})</span>
 					<a class="btn btn-transparent btn-primary" target="_blank"
-					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
-					   name="imdb{$result.imdbid}" title="View IMDB page">IMDB</a>
+					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->imdbid}/"
+					   name="imdb{$result->imdbid}" title="View IMDB page">IMDB</a>
 					<a class="btn btn-transparent btn-primary" target="_blank"
-					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
-					   name="trakt{$result.imdbid}" title="View Trakt page" rel="trakt">TRAKT</a>
-					<h4>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>
-					{if $result.tagline != ''}
-						<p class="lead" style="margin-right:300px;">"{$result.tagline|escape:"htmlall"}"</p>
+					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result->imdbid}/"
+					   name="trakt{$result->imdbid}" title="View Trakt page" rel="trakt">TRAKT</a>
+					<h4>{if $result->genre != ''}{$result->genre|replace:"|":" / "}{/if}</h4>
+					{if $result->tagline != ''}
+						<p class="lead" style="margin-right:300px;">"{$result->tagline|escape:"htmlall"}"</p>
 					{/if}
 					<dl style="margin-right:300px;">
-						{if $result.plot != ''}
+						{if $result->plot != ''}
 							<dt>Plot</dt>
-							<dd>{$result.plot|escape:"htmlall"}</dd>
+							<dd>{$result->plot|escape:"htmlall"}</dd>
 						{/if}
-						{if $result.rating != ''}
+						{if $result->rating != ''}
 							<dt>Rating</dt>
-							<dd>{$result.rating}
-							/10 {if isset($result.ratingcount) && $result.ratingcount != ''}({$result.ratingcount|number_format} votes)</dd>{/if}
+							<dd>{$result->rating}
+							/10 {if isset($result->ratingcount) && $result->ratingcount != ''}({$result->ratingcount|number_format} votes)</dd>{/if}
 						{/if}
-						{if $result.director != ''}
+						{if $result->director != ''}
 							<dt>Director</dt>
-							<dd>{$result.director|replace:"|":", "}</dd>
+							<dd>{$result->director|replace:"|":", "}</dd>
 						{/if}
-						{if $result.actors != ''}
+						{if $result->actors != ''}
 							<dt>Actors</dt>
-							<dd>{$result.actors|replace:"|":", "}</dd>
+							<dd>{$result->actors|replace:"|":", "}</dd>
 						{/if}
 					</dl>
 				</div>
@@ -106,53 +106,53 @@
 											<th>Size</th>
 											<th>Action</th>
 										</tr>
-										<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
-											<td><input id="guid{$result.grp_release_guid}"
+										<tr class="{cycle values=",alt"}" id="guid{$result->guid}">
+											<td><input id="guid{$result->guid}"
 													   type="checkbox"
 													   class="flat"
-													   value="{$result.grp_release_guid}"/></td>
+													   value="{$result->guid}"/></td>
 											<td class="item">
 												<a title="View details"
-												   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.grp_release_name|escape:"htmlall"|replace:".":" "}</a>
+												   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
 												<br/>
-												<span class="label label-primary">{$result.grp_release_grabs}
-													grab{if $result.grp_release_grabs != 1}s{/if}</span>
-												{if isset($result.grp_release_nfoid) && $result.grp_release_nfoid > 0}
+												<span class="label label-primary">{$result->grabs}
+													grab{if $result->grabs != 1}s{/if}</span>
+												{if isset($result->nfoid) && $result->nfoid > 0}
 													<span><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+															href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 															class="modal_nfo label label-primary text-muted">NFO</a>
 													</span>{/if}
-												{if $result.grp_release_password == 2}
+												{if $result->password == 2}
 													<i class="fa fa-icon-lock"></i>
-												{elseif $result.grp_release_password == 1}
+												{elseif $result->password == 1}
 													<i class="fa fa-icon-lock"></i>
 												{/if}
 											</td>
 											<td class="less"><span
-														class="label label-primary">{$result.grp_release_catname}</span>
+														class="label label-primary">{$result->catname}</span>
 											</td>
 											<td class="less mid"
-												title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
-											<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
+												title="{$result->postdate}">{$result->postdate|timeago}</td>
+											<td class="less right">{$result->size|fsize_format:"MB"}</td>
 											<td>
-												<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"
+												<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
 												   class="icon_nzb text-muted"><i
 															class="fa fa-cloud-download text-muted"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Download NZB"></i></a>
-												<a href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
+												<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 															class="fa fa-comments-o text-muted"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Comments"></i></a>
 												<a href="#"><i
-															id="guid{$result.grp_release_guid}"
+															id="guid{$result->guid}"
 															class="icon_cart text-muted fa fa-shopping-basket"
 															data-toggle="tooltip"
 															data-placement="top" title
 															data-original-title="Send to my download basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<a href="#">
-														<i id="guid{$result.grp_release_guid}"
+														<i id="guid{$result->guid}"
 														   class="icon_sab text-muted fa fa-share"
 														   data-toggle="tooltip"
 														   data-placement="top" title

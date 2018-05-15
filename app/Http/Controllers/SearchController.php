@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 class SearchController extends BasePageController
 {
     /**
-     * @param $id
      * @param \Illuminate\Http\Request $request
+     *
      * @throws \Exception
      */
     public function search(Request $request)
