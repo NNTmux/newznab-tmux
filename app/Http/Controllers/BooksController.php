@@ -93,6 +93,7 @@ class BooksController extends BasePageController
             [
                 'resultsadd'=>  $books,
                 'results' => $results,
+                'covgroup' => 'books',
             ]
         );
 

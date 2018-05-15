@@ -161,6 +161,7 @@ class MovieController extends BasePageController
             [
                 'resultsadd'=>  $movies,
                 'results' => $results,
+                'covgroup' => 'movies',
             ]
         );
 

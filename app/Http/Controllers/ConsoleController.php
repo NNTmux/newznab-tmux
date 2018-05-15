@@ -100,6 +100,7 @@ class ConsoleController extends BasePageController
             [
                 'resultsadd'=>  $consoles,
                 'results' => $results,
+                'covgroup' => 'console',
             ]
         );
 

@@ -74,6 +74,7 @@ class GamesController extends BasePageController
         }
 
         $this->smarty->assign('results', $results);
+        $this->smarty->assign('covgroup', 'games');
 
         $meta_title = 'Browse Games';
         $meta_keywords = 'browse,nzb,games,description,details';

@@ -95,6 +95,7 @@ class AdultController extends BasePageController
             [
                 'resultsadd'=>  $movies,
                 'results' => $results,
+                'covgroup' => 'xxx',
             ]
         );
 

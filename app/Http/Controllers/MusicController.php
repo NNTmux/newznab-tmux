@@ -101,6 +101,7 @@ class MusicController extends BasePageController
             [
                 'resultsadd'=>  $musics,
                 'results' => $results,
+                'covgroup' => 'music',
             ]
         );
 
