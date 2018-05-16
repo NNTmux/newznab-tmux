@@ -82,7 +82,7 @@
 										<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 														class="fa fa-film"></i><span> Movies</span></a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/Audio"><i
-														class="fa fa-music"></i><span> Music</span></a></li>
+														class="fa fa-music"></i><span> Audio</span></a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 														class="fa fa-gamepad"></i><span> Games</span></a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/series"><i
