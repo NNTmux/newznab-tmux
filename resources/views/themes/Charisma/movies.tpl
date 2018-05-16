@@ -89,8 +89,8 @@
 													{assign var="mpass" value=","|explode:$result->grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result->grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
-													{foreach $msplits as $loop=>$m name="loop"}
-													{if $smarty.foreach.loop.first}
+													{foreach $msplits as $m}
+													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
 																class="cover img-responsive img-rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
@@ -229,8 +229,8 @@
 													{assign var="mpass" value=","|explode:$result->grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result->grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
-													{foreach $msplits as $loop=>$m name="loop"}
-													{if $smarty.foreach.loop.first}
+													{foreach $msplits as $m}
+													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
 																class="cover img-responsive img-rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
