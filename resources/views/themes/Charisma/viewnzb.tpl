@@ -41,7 +41,7 @@
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 							   title="View at TMDb">TMDb</a>
 						{/if}
-						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}"
+						<a class="label label-default" href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}"
 						   title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}

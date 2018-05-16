@@ -1,4 +1,5 @@
 2018-05-16 DariusIII
+	* Fix: Fix movie view link from details page
 	* Chg: Fix release details display error
 	* Chg: settingValue function will not throw an exception anymore on empty setting value, but will return null
 	* Chg: Check also tmdb, fanart and omdb keys

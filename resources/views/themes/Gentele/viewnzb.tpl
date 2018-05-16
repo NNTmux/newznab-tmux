@@ -41,7 +41,7 @@
 						   title="View at TMDb">TMDb</a>
 					{/if}
 					{if $movie.imdbid > 0}
-						<a class="label label-primary" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}"
+						<a class="label label-primary" href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}"
 						   title="View all versions">Movie View</a>
 					{/if}
 				{/if}
