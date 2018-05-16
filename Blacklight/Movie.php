@@ -179,7 +179,7 @@ class Movie
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
-        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
+        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey', true);
         if ($this->traktcheck !== null) {
             $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
         }
