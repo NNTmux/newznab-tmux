@@ -98,7 +98,7 @@
 									</tr>
 									</thead>
 									<tbody>
-									{foreach $results as $result}
+									{foreach $resultsadd as $result}
 										<tr id="guid{$result->guid}">
 											<td><input id="chk{$result->guid|substr:0:7}"
 													   type="checkbox" name="table_records" class="flat"

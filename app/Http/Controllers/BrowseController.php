@@ -87,11 +87,24 @@ class BrowseController extends BasePageController
         $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], $grp);
         $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
+        $browse = [];
+
+        foreach ($results as $result) {
+            if (! empty($result->id)) {
+                $browse[] = $result;
+            }
+        }
+
         $this->smarty->assign('catname', $id);
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
 
-        $this->smarty->assign('results', $results);
+        $this->smarty->assign(
+            [
+                'results' => $results,
+                'resultsadd' => $browse,
+            ]
+        );
 
         $covgroup = '';
         if ($category === -1 && $grp === -1) {

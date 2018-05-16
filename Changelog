@@ -1,4 +1,5 @@
 2018-05-16 DariusIII
+	* Fix: Fix empty releases at bottom of browse pages
 	* Fix: Fix category filter when searching for releases
 	* Chg: Update release edit links in all themes
 	* Fix: Fix movie view link from details page

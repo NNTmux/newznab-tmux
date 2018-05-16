@@ -152,20 +152,18 @@ class XML_Response
      */
     protected function returnCaps(): string
     {
-        $w = $this->xml;
-        $s = $this->server;
 
-        $w->startDocument('1.0', 'UTF-8');
-        $w->startElement('caps');
-        $this->addNode(['name' => 'server', 'data' => $s['server']]);
-        $this->addNode(['name' => 'limits', 'data' => $s['limits']]);
-        $this->addNode(['name' => 'registration', 'data' => $s['registration']]);
-        $this->addNodes(['name' => 'searching', 'data' => $s['searching']]);
+        $this->xml->startDocument('1.0', 'UTF-8');
+        $this->xml->startElement('caps');
+        $this->addNode(['name' => 'server', 'data' => $this->server['server']]);
+        $this->addNode(['name' => 'limits', 'data' => $this->server['limits']]);
+        $this->addNode(['name' => 'registration', 'data' => $this->server['registration']]);
+        $this->addNodes(['name' => 'searching', 'data' => $this->server['searching']]);
         $this->writeCategoryListing();
-        $w->endElement();
-        $w->endDocument();
+        $this->xml->endElement();
+        $this->xml->endDocument();
 
-        return $w->outputMemory();
+        return $this->xml->outputMemory();
     }
 
     /**
@@ -175,20 +173,19 @@ class XML_Response
      */
     protected function returnApiRss(): string
     {
-        $w = $this->xml;
         $this->xml->startDocument('1.0', 'UTF-8');
         $this->includeRssAtom(); // Open RSS
-        $w->startElement('channel'); // Open channel
+        $this->xml->startElement('channel'); // Open channel
         $this->includeRssAtomLink();
         $this->includeMetaInfo();
         $this->includeImage();
         $this->includeTotalRows();
         $this->includeReleases();
-        $w->endElement(); // End channel
-        $w->endElement(); // End RSS
-        $w->endDocument();
+        $this->xml->endElement(); // End channel
+        $this->xml->endElement(); // End RSS
+        $this->xml->endDocument();
 
-        return $w->outputMemory();
+        return $this->xml->outputMemory();
     }
 
     /**
@@ -243,14 +240,14 @@ class XML_Response
     protected function writeCategoryListing(): void
     {
         $this->xml->startElement('categories');
-        foreach ($this->server['categories'] as $p) {
+        foreach ($this->server['categories'] as $this->parameters) {
             $this->xml->startElement('category');
-            $this->xml->writeAttribute('id', $p['id']);
-            $this->xml->writeAttribute('name', html_entity_decode($p['title']));
-            if ($p['description'] !== '') {
-                $this->xml->writeAttribute('description', html_entity_decode($p['description']));
+            $this->xml->writeAttribute('id', $this->parameters['id']);
+            $this->xml->writeAttribute('name', html_entity_decode($this->parameters['title']));
+            if ($this->parameters['description'] !== '') {
+                $this->xml->writeAttribute('description', html_entity_decode($this->parameters['description']));
             }
-            foreach ($p['subcatlist'] as $c) {
+            foreach ($this->parameters['subcatlist'] as $c) {
                 $this->xml->startElement('subcat');
                 $this->xml->writeAttribute('id', $c['id']);
                 $this->xml->writeAttribute('name', html_entity_decode($c['title']));
@@ -520,28 +517,21 @@ class XML_Response
      */
     protected function writeRssCdata(): void
     {
-        $this->cdata = '';
-
-        $w = $this->xml;
-        $r = $this->release;
-        $s = $this->server;
-        $p = $this->parameters;
-
         $this->cdata = "\n\t<div>\n";
         switch (1) {
-            case ! empty($r['cover']):
+            case ! empty($this->release['cover']):
                 $dir = 'movies';
                 $column = 'imdbid';
                 break;
-            case ! empty($r['mu_cover']):
+            case ! empty($this->release['mu_cover']):
                 $dir = 'music';
                 $column = 'musicinfo_id';
                 break;
-            case ! empty($r['co_cover']):
+            case ! empty($this->release['co_cover']):
                 $dir = 'console';
                 $column = 'consoleinfo_id';
                 break;
-            case ! empty($r['bo_cover']):
+            case ! empty($this->release['bo_cover']):
                 $dir = 'books';
                 $column = 'bookinfo_id';
                 break;
@@ -550,20 +540,20 @@ class XML_Response
             $dcov = ($dir === 'movies' ? '-cover' : '');
             $this->cdata .=
                 "\t<img style=\"margin-left:10px;margin-bottom:10px;float:right;\" ".
-                "src=\"{$s['server']['url']}covers/{$dir}/{$r[$column]}{$dcov}.jpg\" ".
-                "width=\"120\" alt=\"{$r['searchname']}\" />\n";
+                "src=\"{$this->server['server']['url']}covers/{$dir}/{$this->release[$column]}{$dcov}.jpg\" ".
+                "width=\"120\" alt=\"{$this->release['searchname']}\" />\n";
         }
-        $size = Utility::bytesToSizeString($r['size']);
+        $size = Utility::bytesToSizeString($this->release['size']);
         $this->cdata .=
-            "\t<li>ID: <a href=\"{$s['server']['url']}details/{$r['guid']}\">{$r['guid']}</a></li>\n".
-            "\t<li>Name: {$r['searchname']}</li>\n".
+            "\t<li>ID: <a href=\"{$this->server['server']['url']}details/{$this->release['guid']}\">{$this->release['guid']}</a></li>\n".
+            "\t<li>Name: {$this->release['searchname']}</li>\n".
             "\t<li>Size: {$size}</li>\n".
-            "\t<li>Category: <a href=\"{$s['server']['url']}browse?t={$r['categories_id']}\">{$r['category_name']}</a></li>\n".
-            "\t<li>Group: <a href=\"{$s['server']['url']}browse?g={$r['group_name']}\">{$r['group_name']}</a></li>\n".
-            "\t<li>Poster: {$r['fromname']}</li>\n".
-            "\t<li>Posted: {$r['postdate']}</li>\n";
+            "\t<li>Category: <a href=\"{$this->server['server']['url']}browse?t={$this->release['categories_id']}\">{$this->release['category_name']}</a></li>\n".
+            "\t<li>Group: <a href=\"{$this->server['server']['url']}browse?g={$this->release['group_name']}\">{$this->release['group_name']}</a></li>\n".
+            "\t<li>Poster: {$this->release['fromname']}</li>\n".
+            "\t<li>Posted: {$this->release['postdate']}</li>\n";
 
-        switch ($r['passwordstatus']) {
+        switch ($this->release['passwordstatus']) {
             case 0:
                 $pstatus = 'None';
                 break;
@@ -580,23 +570,23 @@ class XML_Response
                 $pstatus = 'Unknown';
         }
         $this->cdata .= "\t<li>Password: {$pstatus}</li>\n";
-        if ($r['nfostatus'] === 1) {
+        if ($this->release['nfostatus'] === 1) {
             $this->cdata .=
                 "\t<li>Nfo: ".
-                "<a href=\"{$s['server']['url']}api?t=nfo&id={$r['guid']}&raw=1&i={$p['uid']}&r={$p['token']}\">".
-                "{$r['searchname']}.nfo</a></li>\n";
+                "<a href=\"{$this->server['server']['url']}api?t=nfo&id={$this->release['guid']}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
+                "{$this->release['searchname']}.nfo</a></li>\n";
         }
 
-        if ($r['parentid'] === Category::MOVIE_ROOT && $r['imdbid'] !== '') {
+        if ($this->release['parentid'] === Category::MOVIE_ROOT && $this->release['imdbid'] !== '') {
             $this->writeRssMovieInfo();
-        } elseif ($r['parentid'] === Category::MUSIC_ROOT && $r['musicinfo_id'] > 0) {
+        } elseif ($this->release['parentid'] === Category::MUSIC_ROOT && $this->release['musicinfo_id'] > 0) {
             $this->writeRssMusicInfo();
-        } elseif ($r['parentid'] === Category::GAME_ROOT && $r['consoleinfo_id'] > 0) {
+        } elseif ($this->release['parentid'] === Category::GAME_ROOT && $this->release['consoleinfo_id'] > 0) {
             $this->writeRssConsoleInfo();
         }
-        $w->startElement('description');
-        $w->writeCdata($this->cdata."\t</div>");
-        $w->endElement();
+        $this->xml->startElement('description');
+        $this->xml->writeCdata($this->cdata."\t</div>");
+        $this->xml->endElement();
     }
 
     /**
@@ -604,8 +594,6 @@ class XML_Response
      */
     protected function writeRssMovieInfo(): void
     {
-        $r = $this->release;
-
         $movieCol = ['rating', 'plot', 'year', 'genre', 'director', 'actors'];
 
         $cData = $this->buildCdata($movieCol);
@@ -613,7 +601,7 @@ class XML_Response
         $this->cdata .=
             "\t<li>Imdb Info:
 				\t<ul>
-					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$r['imdbid']}/\">{$r['searchname']}</a></li>\n
+					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$this->release['imdbid']}/\">{$this->release['searchname']}</a></li>\n
 					\t{$cData}
 				\t</ul>
 			\t</li>
@@ -625,15 +613,14 @@ class XML_Response
      */
     protected function writeRssMusicInfo(): void
     {
-        $r = $this->release;
         $tData = $cDataUrl = '';
 
         $musicCol = ['mu_artist', 'mu_genre', 'mu_publisher', 'mu_releasedate', 'mu_review'];
 
         $cData = $this->buildCdata($musicCol);
 
-        if ($r['mu_url'] !== '') {
-            $cDataUrl = "<li>Amazon: <a href=\"{$r['mu_url']}\">{$r['mu_title']}</a></li>";
+        if ($this->release['mu_url'] !== '') {
+            $cDataUrl = "<li>Amazon: <a href=\"{$this->release['mu_url']}\">{$this->release['mu_title']}</a></li>";
         }
 
         $this->cdata .=
@@ -643,8 +630,8 @@ class XML_Response
 			{$cData}
 			</ul>
 			</li>\n";
-        if ($r['mu_tracks'] !== '') {
-            $tracks = explode('|', $r['mu_tracks']);
+        if ($this->release['mu_tracks'] !== '') {
+            $tracks = explode('|', $this->release['mu_tracks']);
             if (\count($tracks) > 0) {
                 foreach ($tracks as $track) {
                     $track = trim($track);
@@ -665,7 +652,6 @@ class XML_Response
      */
     protected function writeRssConsoleInfo(): void
     {
-        $r = $this->release;
         $gamesCol = ['co_genre', 'co_publisher', 'year', 'co_review'];
 
         $cData = $this->buildCdata($gamesCol);
@@ -673,7 +659,7 @@ class XML_Response
         $this->cdata .= "
 		<li>Console Info:
 			<ul>
-				<li>Amazon: <a href=\"{$r['co_url']}\">{$r['co_title']}</a></li>\n
+				<li>Amazon: <a href=\"{$this->release['co_url']}\">{$this->release['co_title']}</a></li>\n
 				{$cData}
 			</ul>
 		</li>\n";
@@ -688,19 +674,17 @@ class XML_Response
      */
     protected function buildCdata($columns): string
     {
-        $r = $this->release;
-
         $cData = '';
 
         foreach ($columns as $info) {
-            if (! empty($r[$info])) {
+            if (! empty($this->release[$info])) {
                 if ($info === 'mu_releasedate') {
                     $ucInfo = 'Released';
-                    $rDate = date('Y-m-d', strtotime($r[$info]));
+                    $rDate = date('Y-m-d', strtotime($this->release[$info]));
                     $cData .= "<li>{$ucInfo}: {$rDate}</li>\n";
                 } else {
                     $ucInfo = ucfirst(preg_replace('/^[a-z]{2}_/i', '', $info));
-                    $cData .= "<li>{$ucInfo}: {$r[$info]}</li>\n";
+                    $cData .= "<li>{$ucInfo}: {$this->release[$info]}</li>\n";
                 }
             }
         }
