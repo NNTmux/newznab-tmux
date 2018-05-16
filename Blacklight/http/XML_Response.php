@@ -152,7 +152,6 @@ class XML_Response
      */
     protected function returnCaps(): string
     {
-
         $this->xml->startDocument('1.0', 'UTF-8');
         $this->xml->startElement('caps');
         $this->addNode(['name' => 'server', 'data' => $this->server['server']]);
