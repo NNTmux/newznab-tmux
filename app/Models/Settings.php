@@ -240,20 +240,11 @@ class Settings extends Model
     }
 
     /**
-     * Return the value of supplied setting.
-     * The setting can be either a normal condition array for the custom 'setting' finder or a
-     * dotted string notation setting. Note that dotted notation will be converted to an array,
-     * so it will be slower: Explicitly use the array format if speed it paramount.
-     * Be aware that this method only returns the first of any values found, so make sure your
-     * $setting produces a unique result.
-     * @param bool|array $setting
-     * @param bool $returnAlways Indicates if the method should throw an exception (false) or return
-     *                           null on failure. Defaults to throwing an exception.
+     * @param $setting
      *
-     * @return string|null		 The setting's value, or null on failure IF 'returnAlways' is true.
-     * @throws \Exception
+     * @return null|string
      */
-    public static function settingValue($setting, $returnAlways = false): ?string
+    public static function settingValue($setting): ?string
     {
         $setting = self::settingToArray($setting);
         $result = self::query()->where([
@@ -264,8 +255,6 @@ class Settings extends Model
 
         if ($result !== null) {
             $value = $result;
-        } elseif ($returnAlways === false) {
-            throw new \RuntimeException('Unable to fetch setting from Db!');
         } else {
             $value = null;
         }

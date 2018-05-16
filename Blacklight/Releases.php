@@ -185,7 +185,7 @@ class Releases
      */
     public static function showPasswords($query = null, $builder = false)
     {
-        $setting = Settings::settingValue('..showpasswordedrelease', true);
+        $setting = Settings::settingValue('..showpasswordedrelease');
         $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).

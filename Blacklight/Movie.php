@@ -184,12 +184,12 @@ class Movie
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
-        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey', true);
+        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
         if ($this->traktcheck !== null) {
             $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
         }
         $this->client = new Client();
-        $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey', true);
+        $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey');
         if ($this->tmdbtokencheck !== null) {
             $this->tmdbtoken = new ApiToken($this->tmdbtokencheck);
             $this->tmdbclient = new TmdbClient($this->tmdbtoken, [
@@ -201,11 +201,11 @@ class Movie
             $this->tmdbconfig = $this->configRepository->load();
             $this->helper = new ImageHelper($this->tmdbconfig);
         }
-        $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey', true);
+        $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
         if ($this->fanartapikey !== null) {
             $this->fanart = new FanartTV($this->fanartapikey);
         }
-        $this->omdbapikey = Settings::settingValue('APIs..omdbkey', true);
+        $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }

@@ -248,7 +248,7 @@ class Versions extends Collection
      */
     public function getSQLPatchFromDB(): ?string
     {
-        $dbVersion = Settings::settingValue('..sqlpatch', true);
+        $dbVersion = Settings::settingValue('..sqlpatch');
 
         if (! is_numeric($dbVersion)) {
             throw new \RuntimeException('Bad sqlpatch value');
