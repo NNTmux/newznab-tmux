@@ -249,20 +249,10 @@ class ApiController extends BasePageController
                UserRequest::addApiRequest($uid, $request->getRequestUri());
                $relData = Release::checkGuidForApi($request->input('id'));
                if ($relData !== false) {
-                   header(
-                       'Location:'.
-                       WWW_TOP.
-                       '/getnzb?i='.
-                       $uid.
-                       '&r='.
-                       $apiKey.
-                       '&id='.
-                       $request->input('id').
-                       (($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')
-                   );
-               } else {
-                   Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
+                   return redirect(WWW_TOP.'/getnzb?i='.$uid.'&r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
                }
+
+               Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
                break;
 
            // Get individual NZB details.
@@ -295,9 +285,9 @@ class ApiController extends BasePageController
                if ($rel !== null) {
                    if ($data !== null) {
                        if ($request->has('o') && $request->input('o') === 'file') {
-                           header('Content-type: application/octet-stream');
-                           header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");
-                           exit($data['nfo']);
+                           return response()->streamDownload(function () use ($data) {
+                               echo $data['nfo'];
+                           }, $rel['searchname'].'.nfo', ['Content-type:' => 'application/octet-stream']);
                        }
 
                        echo nl2br(Utility::cp437toUTF($data['nfo']));
