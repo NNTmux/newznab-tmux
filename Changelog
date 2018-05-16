@@ -1,4 +1,5 @@
 2018-05-16 DariusIII
+	* Chg: Update the check for release from isset to !empty in XML_Response
 	* Fix: Fix total releases count display in xml
 	* Fix: Fix empty releases at bottom of browse pages
 	* Fix: Fix category filter when searching for releases

@@ -355,7 +355,7 @@ class XML_Response
     {
         if (! empty($this->releases)) {
             foreach ($this->releases as $this->release) {
-                if (isset($this->release->id)) {
+                if (! empty($this->release->id)) {
                     $this->xml->startElement('item');
                     $this->includeReleaseMain();
                     $this->setZedAttributes();
