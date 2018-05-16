@@ -158,6 +158,11 @@ class Movie
     protected $tmdbconfig;
 
     /**
+     * @var null|string
+     */
+    protected $traktcheck;
+
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -174,7 +179,10 @@ class Movie
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
-        $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
+        if ($this->traktcheck !== null) {
+            $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+        }
         $this->client = new Client();
         $this->tmdbtoken = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
         $this->tmdbclient = new TmdbClient(
@@ -412,11 +420,13 @@ class Movie
             return $trailer['trailer'];
         }
 
-        $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
-        if ($data !== false) {
-            $this->parseTraktTv($data);
-            if (! empty($data['trailer'])) {
-                return $data['trailer'];
+        if ($this->traktcheck !== null) {
+            $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
+            if ($data !== false) {
+                $this->parseTraktTv($data);
+                if (! empty($data['trailer'])) {
+                    return $data['trailer'];
+                }
             }
         }
 
@@ -919,27 +929,31 @@ class Movie
      */
     protected function fetchTraktTVProperties($imdbId)
     {
-        $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
-        if ($resp !== false) {
-            similar_text($this->currentTitle, $resp['title'], $percent);
-            if ($percent > self::MATCH_PERCENT) {
-                similar_text($this->currentYear, $resp['year'], $percent);
-                if ($percent >= self::YEAR_MATCH_PERCENT) {
-                    $ret = [];
-                    if (isset($resp['ids']['trakt'])) {
-                        $ret['id'] = $resp['ids']['trakt'];
+        if ($this->traktcheck !== null) {
+            $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
+            if ($resp !== false) {
+                similar_text($this->currentTitle, $resp['title'], $percent);
+                if ($percent > self::MATCH_PERCENT) {
+                    similar_text($this->currentYear, $resp['year'], $percent);
+                    if ($percent >= self::YEAR_MATCH_PERCENT) {
+                        $ret = [];
+                        if (isset($resp['ids']['trakt'])) {
+                            $ret['id'] = $resp['ids']['trakt'];
+                        }
+
+                        if (isset($resp['title'])) {
+                            $ret['title'] = $resp['title'];
+                        } else {
+                            return false;
+                        }
+                        if ($this->echooutput) {
+                            ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
+                        }
+
+                        return $ret;
                     }
 
-                    if (isset($resp['title'])) {
-                        $ret['title'] = $resp['title'];
-                    } else {
-                        return false;
-                    }
-                    if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
-                    }
-
-                    return $ret;
+                    return false;
                 }
 
                 return false;
@@ -1134,7 +1148,7 @@ class Movie
                 }
 
                 // Check on Trakt.
-                if ($movieUpdated === false) {
+                if ($movieUpdated === false && $this->traktcheck !== null) {
                     $data = $this->traktTv->client->movieSummary($movieName, 'full');
                     if ($data !== false) {
                         $this->parseTraktTv($data);
