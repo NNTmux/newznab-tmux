@@ -1,4 +1,5 @@
 2018-05-16 DariusIII
+	* Chg: Update release edit links in all themes
 	* Fix: Fix movie view link from details page
 	* Chg: Fix release details display error
 	* Chg: settingValue function will not throw an exception anymore on empty setting value, but will return null
