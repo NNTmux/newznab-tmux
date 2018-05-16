@@ -23,7 +23,6 @@ namespace Blacklight\http;
 
 use App\Models\Category;
 use Blacklight\Utility\Utility;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class XMLReturn.
