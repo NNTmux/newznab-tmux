@@ -163,6 +163,11 @@ class Movie
     protected $traktcheck;
 
     /**
+     * @var null|string
+     */
+    protected $tmdbtokencheck;
+
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -184,21 +189,23 @@ class Movie
             $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
         }
         $this->client = new Client();
-        $this->tmdbtoken = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
-        $this->tmdbclient = new TmdbClient(
-            $this->tmdbtoken,
-            [
-            'cache' => [
-                'enabled' => false,
-            ],
-        ]
-        );
-        $this->configRepository = new ConfigurationRepository($this->tmdbclient);
-        $this->tmdbconfig = $this->configRepository->load();
-        $this->helper = new ImageHelper($this->tmdbconfig);
-        $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
-        $this->fanart = new FanartTV($this->fanartapikey);
-        $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
+        $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey', true);
+        if ($this->tmdbtokencheck !== null) {
+            $this->tmdbtoken = new ApiToken($this->tmdbtokencheck);
+            $this->tmdbclient = new TmdbClient($this->tmdbtoken, [
+                    'cache' => [
+                        'enabled' => false,
+                    ],
+                ]);
+            $this->configRepository = new ConfigurationRepository($this->tmdbclient);
+            $this->tmdbconfig = $this->configRepository->load();
+            $this->helper = new ImageHelper($this->tmdbconfig);
+        }
+        $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey', true);
+        if ($this->fanartapikey !== null) {
+            $this->fanart = new FanartTV($this->fanartapikey);
+        }
+        $this->omdbapikey = Settings::settingValue('APIs..omdbkey', true);
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
@@ -741,7 +748,7 @@ class Movie
      */
     protected function fetchFanartTVProperties($imdbId)
     {
-        if ($this->fanartapikey !== '') {
+        if ($this->fanartapikey !== null) {
             $art = $this->fanart->getMovieFanart('tt'.$imdbId);
 
             if ($art !== null && $art !== false) {
