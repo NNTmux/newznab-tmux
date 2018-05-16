@@ -751,7 +751,7 @@ jQuery(function($){
     // search.tpl
     $('#search_search_button').click(function(){
         if ($('#search').val())
-            document.location=WWW_TOP + "/search?id=" + $('#search').val() + ($("#search_cat").val()!=-1 ? "?t="+$("#search_cat").val() : "");
+            document.location=WWW_TOP + "/search?id=" + $('#search').val() + ($("#search_cat").val()!=-1 ? "&t="+$("#search_cat").val() : "");
         return false;
     });
 

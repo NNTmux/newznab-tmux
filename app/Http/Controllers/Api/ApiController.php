@@ -107,12 +107,12 @@ class ApiController extends BasePageController
 
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
-        $minSize = ($request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0);
+        $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $offset = $api->offset();
 
         // Set API Parameters based on Request objects
-        $params['extended'] = ($request->has('extended') && (int) $request->input('extended') === 1 ? '1' : '0');
-        $params['del'] = ($request->has('del') && (int) $request->input('del') === 1 ? '1' : '0');
+        $params['extended'] = $request->has('extended') && (int) $request->input('extended') === 1 ? '1' : '0';
+        $params['del'] = $request->has('del') && (int) $request->input('del') === 1 ? '1' : '0';
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
 
@@ -220,7 +220,7 @@ class ApiController extends BasePageController
                $maxAge = $api->maxAge();
                UserRequest::addApiRequest($uid, $request->getRequestUri());
 
-               $imdbId = ($request->input('imdbid') ?? -1);
+               $imdbId = $request->input('imdbid') ?? -1;
 
                $relData = $releases->moviesSearch(
                    $imdbId,

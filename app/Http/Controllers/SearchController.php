@@ -61,7 +61,7 @@ class SearchController extends BasePageController
             foreach ($releases->getBrowseOrdering() as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search?id='.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.implode(',', $categoryID).'&amp;ob='.$orderType
+                    WWW_TOP.'/search?id='.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType
                 );
             }
 
@@ -86,7 +86,7 @@ class SearchController extends BasePageController
                 $categoryID
             );
 
-            $results = $this->paginate($rslt, $rslt['_totalrows'], config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+            $results = $this->paginate($rslt ?? [], $rslt['_totalrows'] ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->smarty->assign(
                 [
