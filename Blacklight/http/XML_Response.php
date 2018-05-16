@@ -510,19 +510,19 @@ class XML_Response
     {
         $this->cdata = "\n\t<div>\n";
         switch (1) {
-            case ! empty($this->release['cover']):
+            case ! empty($this->release->cover):
                 $dir = 'movies';
                 $column = 'imdbid';
                 break;
-            case ! empty($this->release['mu_cover']):
+            case ! empty($this->release->mu_cover):
                 $dir = 'music';
                 $column = 'musicinfo_id';
                 break;
-            case ! empty($this->release['co_cover']):
+            case ! empty($this->release->co_cover):
                 $dir = 'console';
                 $column = 'consoleinfo_id';
                 break;
-            case ! empty($this->release['bo_cover']):
+            case ! empty($this->release->bo_cover):
                 $dir = 'books';
                 $column = 'bookinfo_id';
                 break;
@@ -531,20 +531,20 @@ class XML_Response
             $dcov = ($dir === 'movies' ? '-cover' : '');
             $this->cdata .=
                 "\t<img style=\"margin-left:10px;margin-bottom:10px;float:right;\" ".
-                "src=\"{$this->server['server']['url']}covers/{$dir}/{$this->release[$column]}{$dcov}.jpg\" ".
-                "width=\"120\" alt=\"{$this->release['searchname']}\" />\n";
+                "src=\"{$this->server['server']['url']}covers/{$dir}/{$this->release->$column}{$dcov}.jpg\" ".
+                "width=\"120\" alt=\"{$this->release->searchname}\" />\n";
         }
-        $size = Utility::bytesToSizeString($this->release['size']);
+        $size = Utility::bytesToSizeString($this->release->size);
         $this->cdata .=
-            "\t<li>ID: <a href=\"{$this->server['server']['url']}details/{$this->release['guid']}\">{$this->release['guid']}</a></li>\n".
-            "\t<li>Name: {$this->release['searchname']}</li>\n".
+            "\t<li>ID: <a href=\"{$this->server['server']['url']}details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
+            "\t<li>Name: {$this->release->searchname}</li>\n".
             "\t<li>Size: {$size}</li>\n".
-            "\t<li>Category: <a href=\"{$this->server['server']['url']}browse?t={$this->release['categories_id']}\">{$this->release['category_name']}</a></li>\n".
-            "\t<li>Group: <a href=\"{$this->server['server']['url']}browse?g={$this->release['group_name']}\">{$this->release['group_name']}</a></li>\n".
-            "\t<li>Poster: {$this->release['fromname']}</li>\n".
-            "\t<li>Posted: {$this->release['postdate']}</li>\n";
+            "\t<li>Category: <a href=\"{$this->server['server']['url']}browse?t={$this->release->categories_id}\">{$this->release->category_name}</a></li>\n".
+            "\t<li>Group: <a href=\"{$this->server['server']['url']}browse?g={$this->release->group_name}\">{$this->release->group_name}</a></li>\n".
+            "\t<li>Poster: {$this->release->fromname}</li>\n".
+            "\t<li>Posted: {$this->release->postdate}</li>\n";
 
-        switch ($this->release['passwordstatus']) {
+        switch ($this->release->passwordstatus) {
             case 0:
                 $pstatus = 'None';
                 break;
@@ -561,18 +561,18 @@ class XML_Response
                 $pstatus = 'Unknown';
         }
         $this->cdata .= "\t<li>Password: {$pstatus}</li>\n";
-        if ($this->release['nfostatus'] === 1) {
+        if ($this->release->nfostatus === 1) {
             $this->cdata .=
                 "\t<li>Nfo: ".
-                "<a href=\"{$this->server['server']['url']}api?t=nfo&id={$this->release['guid']}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
-                "{$this->release['searchname']}.nfo</a></li>\n";
+                "<a href=\"{$this->server['server']['url']}api?t=nfo&id={$this->release->guid}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
+                "{$this->release->searchname}.nfo</a></li>\n";
         }
 
-        if ($this->release['parentid'] === Category::MOVIE_ROOT && $this->release['imdbid'] !== '') {
+        if ($this->release->parentid === Category::MOVIE_ROOT && $this->release->imdbid !== '') {
             $this->writeRssMovieInfo();
-        } elseif ($this->release['parentid'] === Category::MUSIC_ROOT && $this->release['musicinfo_id'] > 0) {
+        } elseif ($this->release->parentid === Category::MUSIC_ROOT && $this->release->musicinfo_id > 0) {
             $this->writeRssMusicInfo();
-        } elseif ($this->release['parentid'] === Category::GAME_ROOT && $this->release['consoleinfo_id'] > 0) {
+        } elseif ($this->release->parentid === Category::GAME_ROOT && $this->release->consoleinfo_id > 0) {
             $this->writeRssConsoleInfo();
         }
         $this->xml->startElement('description');
@@ -592,7 +592,7 @@ class XML_Response
         $this->cdata .=
             "\t<li>Imdb Info:
 				\t<ul>
-					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$this->release['imdbid']}/\">{$this->release['searchname']}</a></li>\n
+					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$this->release->imdbid}/\">{$this->release->searchname}</a></li>\n
 					\t{$cData}
 				\t</ul>
 			\t</li>
@@ -610,8 +610,8 @@ class XML_Response
 
         $cData = $this->buildCdata($musicCol);
 
-        if ($this->release['mu_url'] !== '') {
-            $cDataUrl = "<li>Amazon: <a href=\"{$this->release['mu_url']}\">{$this->release['mu_title']}</a></li>";
+        if ($this->release->mu_url !== '') {
+            $cDataUrl = "<li>Amazon: <a href=\"{$this->release->mu_url}\">{$this->release->mu_title}</a></li>";
         }
 
         $this->cdata .=
@@ -621,8 +621,8 @@ class XML_Response
 			{$cData}
 			</ul>
 			</li>\n";
-        if ($this->release['mu_tracks'] !== '') {
-            $tracks = explode('|', $this->release['mu_tracks']);
+        if ($this->release->mu_tracks !== '') {
+            $tracks = explode('|', $this->release->mu_tracks);
             if (\count($tracks) > 0) {
                 foreach ($tracks as $track) {
                     $track = trim($track);
@@ -650,7 +650,7 @@ class XML_Response
         $this->cdata .= "
 		<li>Console Info:
 			<ul>
-				<li>Amazon: <a href=\"{$this->release['co_url']}\">{$this->release['co_title']}</a></li>\n
+				<li>Amazon: <a href=\"{$this->release->co_url}\">{$this->release->co_title}</a></li>\n
 				{$cData}
 			</ul>
 		</li>\n";
@@ -668,14 +668,14 @@ class XML_Response
         $cData = '';
 
         foreach ($columns as $info) {
-            if (! empty($this->release[$info])) {
+            if (! empty($this->release->$info)) {
                 if ($info === 'mu_releasedate') {
                     $ucInfo = 'Released';
-                    $rDate = date('Y-m-d', strtotime($this->release[$info]));
+                    $rDate = date('Y-m-d', strtotime($this->release->$info));
                     $cData .= "<li>{$ucInfo}: {$rDate}</li>\n";
                 } else {
                     $ucInfo = ucfirst(preg_replace('/^[a-z]{2}_/i', '', $info));
-                    $cData .= "<li>{$ucInfo}: {$this->release[$info]}</li>\n";
+                    $cData .= "<li>{$ucInfo}: {$this->release->$info}</li>\n";
                 }
             }
         }

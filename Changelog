@@ -1,4 +1,5 @@
 2018-05-16 DariusIII
+	* Chg: Use raw queries in RSS and adjust XML_Response to accomodate RSS changes
 	* Chg: Update ApiController to use redirect  and streamDownload functions
 	* Chg: Update the check for release from isset to !empty in XML_Response
 	* Fix: Fix total releases count display in xml
