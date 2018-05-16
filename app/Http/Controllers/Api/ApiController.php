@@ -139,6 +139,7 @@ class ApiController extends BasePageController
                        0,
                        -1,
                        -1,
+                       $offset,
                        $limit,
                        '',
                        $maxAge,
