@@ -1,6 +1,6 @@
 {if isset($covgroup)}
 	{if $covgroup == "movies"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">>
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="movietitle" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -37,7 +37,7 @@
 		</form>
 	{/if}
 	{if $covgroup == "xxx"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">>
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
 			{{csrf_field()}}
 			<input class="form-control"
 				   style="width: 150px;"
@@ -91,7 +91,7 @@
 		</form>
 	{/if}
 	{if $covgroup == "music"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">>
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="musicartist" type="text" name="artist"
 				   value="{$artist}"
@@ -121,7 +121,7 @@
 		</form>
 	{/if}
 	{if $covgroup == "console"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">>
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -144,7 +144,7 @@
 		</form>
 	{/if}
 	{if $covgroup == "games"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">>
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
