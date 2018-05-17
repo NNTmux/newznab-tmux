@@ -90,7 +90,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.gameview == "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 							{elseif $userdata.gameview != "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
 								</li>
@@ -99,7 +99,7 @@
 							{if $userdata.gameview == "1"}
 								{foreach $parentcat.subcatlist as $subcat}
 									{if $subcat.id == {$catClass::PC_GAMES}}
-										<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$subcat.title}</a>
+										<li><a href="{$smarty.const.WWW_TOP}/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{else}
 										<li>
@@ -151,16 +151,26 @@
 							<i class="zmdi zmdi-book"></i> Books
 						</a>
 						<ul class="dropdown-menu">
-							{if $userdata.bookview == "1"}
+                            {if $userdata.bookview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
-							{elseif $userdata.bookview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                            {elseif $userdata.bookview != "1"}
+								<li>
+									<a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
 								</li>
-							{/if}
+                            {/if}
 							<hr>
-							{foreach $parentcat.subcatlist as $subcat}
-								<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a></li>
-							{/foreach}
+                            {if $userdata.bookview == "1"}
+                                {foreach $parentcat.subcatlist as $subcat}
+									<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+									</li>
+                                {/foreach}
+                            {elseif $userdata.bookview != "1"}
+                                {foreach $parentcat.subcatlist as $subcat}
+									<li>
+										<a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+									</li>
+                                {/foreach}
+                            {/if}
 						</ul>
 					</li>
 				{/if}
@@ -180,7 +190,7 @@
 							<hr>
 							{if $userdata.xxxview == "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
+									{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WEB-DL} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
 										<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{else}

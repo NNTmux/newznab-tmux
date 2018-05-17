@@ -24,7 +24,7 @@
 									<div class="col-md-8">
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
-													href="{$smarty.const.WWW_TOP}/browse/books/{$categorytitle}">List</a><br/>
+													href="{$smarty.const.WWW_TOP}/browse/Books/{$categorytitle}">List</a><br/>
 											Check all: <input type="checkbox" class="square-all"/> <br/>
 											With Selected:
 											<div class="btn-group">
@@ -176,7 +176,7 @@
 										<form id="nzb_multi_operations_form" action="get">
 											<div class="nzb_multi_operations">
 												View: <strong>Covers</strong> | <a
-														href="{$smarty.const.WWW_TOP}/browse/{$category->title}">List</a><br/>
+														href="{$smarty.const.WWW_TOP}/browse/Books/{$categorytitle}">List</a><br/>
 												Check all: <input type="checkbox" class="square-all"/> <br/>
 												With Selected:
 												<div class="btn-group">

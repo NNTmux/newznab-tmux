@@ -90,7 +90,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.gameview == "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
 							{elseif $userdata.gameview != "1"}
 								<li>
 									<a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
@@ -195,7 +195,7 @@
 							<hr>
 							{if $userdata.xxxview == "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
+                                    {if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WEB-DL} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
 										<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{else}
