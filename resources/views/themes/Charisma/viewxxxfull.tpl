@@ -122,7 +122,7 @@
 										</td>
 										<td class="less mid"
 											title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
-										<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
+										<td class="less right">{$result.grp_release_size|filesize}</td>
 										<td class="icons">
 											<a title="Download NZB"
 											   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"><i

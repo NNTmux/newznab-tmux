@@ -65,7 +65,7 @@
 													   class="backfill_deactive">Activate</a>{/if}</td>
 					<td class="less">{$group.num_releases}</td>
 					<td class="less">{if $group.minfilestoformrelease==""}n/a{else}{$group.minfilestoformrelease}{/if}</td>
-					<td class="less">{if $group.minsizetoformrelease==""}n/a{else}{$group.minsizetoformrelease|fsize_format:"MB"}{/if}</td>
+					<td class="less">{if $group.minsizetoformrelease==""}n/a{else}{$group.minsizetoformrelease|filesize}{/if}</td>
 					<td class="less">{$group.backfill_target}</td>
 					<td class="less" id="groupdel-{$group.id}">
 						<a title="Reset this group" href="javascript:ajax_group_reset({$group.id})" class="group_reset">Reset</a>

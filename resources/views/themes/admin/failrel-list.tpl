@@ -22,7 +22,7 @@
 								href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 					</td>
 					<td class="less">{$release.category_name}</td>
-					<td class="less right">{$release.size|fsize_format:"MB"}</td>
+					<td class="less right">{$release.size|filesize}</td>
 					<td class="less mid"><a href="release-files?id={$release.guid}">{$release.totalpart}</a></td>
 					<td class="less">{$release.postdate|date_format}</td>
 					<td class="less">{$release.adddate|date_format}</td>

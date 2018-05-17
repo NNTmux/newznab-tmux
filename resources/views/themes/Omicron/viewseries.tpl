@@ -201,7 +201,7 @@
 														<td width="40"
 															title="{$result.postdate}">{$result.postdate|timeago}</td>
 														<td>
-															{$result.size|fsize_format:"MB"}
+															{$result.size|filesize}
 														</td>
 														<td class="icons" style='width:100px;'>
 															<a title="Download Nzb"

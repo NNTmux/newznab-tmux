@@ -31,10 +31,10 @@
 					{/if}
 				</td>
 				<td class="mid">
-					{if $category.minsizetoformrelease != 0 }{$category.minsizetoformrelease|fsize_format:"MB"}{/if}
+					{if $category.minsizetoformrelease != 0 }{$category.minsizetoformrelease|filesize}{/if}
 				</td>
 				<td class="mid">
-					{if $category.maxsizetoformrelease != 0 }{$category.maxsizetoformrelease|fsize_format:"MB"}{/if}
+					{if $category.maxsizetoformrelease != 0 }{$category.maxsizetoformrelease|filesize}{/if}
 				</td>
 				<td>{if $category.status == "1"}Yes{else}No{/if}</td>
 				<td class="mid">{if $category.disablepreview == "1"}Yes{else}No{/if}</td>

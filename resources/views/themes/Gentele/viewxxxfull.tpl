@@ -9,40 +9,40 @@
 </div>
 {if $results|@count > 0}
 	<div class="box-body">
-		{foreach $results as $result}
+		{foreach $resultsadd as $result}
 			<div class="well well small">
 				<div id="moviefull" style="min-height:340px;">
-					{if $result.cover == 1}
+					{if $result->cover == 1}
 						<img class="pull-right" style="margin-right:50px; max-height:278px;"
-							 alt="{$result.title|escape:"htmlall"} Logo"
-							 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg"/>
+							 alt="{$result->title|escape:"htmlall"} Logo"
+							 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg"/>
 					{else}
 						<img class="pull-right" style="margin-right:50px; max-height:278px;"
-							 alt="{$result.title|escape:"htmlall"} Logo"
+							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}
-					<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"}</span>
-					<h4>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>
-					{if $result.tagline != ''}
-						<p class="lead" style="margin-right:300px;">"{$result.tagline|escape:"htmlall"}"</p>
+					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"}</span>
+					<h4>{if $result->genre != ''}{$result->genre|replace:"|":" / "}{/if}</h4>
+					{if $result->tagline != ''}
+						<p class="lead" style="margin-right:300px;">"{$result->tagline|escape:"htmlall"}"</p>
 					{/if}
 					<dl style="margin-right:300px;">
-						{if isset($result.plot) && $result.plot != ''}
+						{if isset($result->plot) && $result->plot != ''}
 							<dt>Plot</dt>
-							<dd>{$result.plot|escape:"htmlall"}</dd>
+							<dd>{$result->plot|escape:"htmlall"}</dd>
 						{/if}
-						{if isset($result.rating) && $result.rating != ''}
+						{if isset($result->rating) && $result->rating != ''}
 							<dt>Rating</dt>
-							<dd>{$result.rating}
-							/10 {if isset($result.ratingcount) && $result.ratingcount != ''}({$result.ratingcount|number_format} votes)</dd>{/if}
+							<dd>{$result->rating}
+							/10 {if isset($result->ratingcount) && $result->ratingcount != ''}({$result->ratingcount|number_format} votes)</dd>{/if}
 						{/if}
-						{if isset($result.director) && $result.director != ''}
+						{if isset($result->director) && $result->director != ''}
 							<dt>Director</dt>
-							<dd>{$result.director|replace:"|":", "}</dd>
+							<dd>{$result->director|replace:"|":", "}</dd>
 						{/if}
-						{if isset($result.actors) && $result.actors != ''}
+						{if isset($result->actors) && $result->actors != ''}
 							<dt>Actors</dt>
-							<dd>{$result.actors|replace:"|":", "}</dd>
+							<dd>{$result->actors|replace:"|":", "}</dd>
 						{/if}
 					</dl>
 				</div>
@@ -100,68 +100,80 @@
 											<th>Size</th>
 											<th>Action</th>
 										</tr>
-										<tr class="{cycle values=",alt"}" id="guid{$result.grp_release_guid}">
-											<td><input id="guid{$result.grp_release_guid}"
-													   type="checkbox"
-													   class="flat"
-													   value="{$result.grp_release_guid}"/></td>
-											<td class="item">
-												<a title="View details"
-												   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}">{$result.grp_release_name|escape:"htmlall"|replace:".":" "}</a>
-												<br/>
-												<span class="label label-primary">{$result.grp_release_grabs}
-													grab{if $result.grp_release_grabs != 1}s{/if}</span>
-												{if isset($result.grp_release_nfoid) && $result.grp_release_nfoid > 0}
-													<span><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-															class="modal_nfo label label-primary text-muted">NFO</a>
-													</span>{/if}
-												{if $result.grp_release_password == 2}
-													<i class="fa fa-lock"></i>
-												{elseif $result.grp_release_password == 1}
-													<i class="fa fa-lock"></i>
-												{/if}
-											</td>
-											<td class="less"><span
-														class="label label-primary">{$result.grp_release_catname}</span>
-											</td>
-											<td class="less mid"
-												title="{$result.grp_release_postdate}">{$result.grp_release_postdate|timeago}</td>
-											<td class="less right">{$result.grp_release_size|fsize_format:"MB"}</td>
-											<td>
-												<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result.grp_release_guid}"
-												   class="icon_nzb text-muted"><i
-															class="fa fa-cloud-download text-muted"
-															data-toggle="tooltip" data-placement="top" title
-															data-original-title="Download NZB"></i></a>
-												<a href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments"><i
-															class="fa fa-comments-o text-muted"
-															data-toggle="tooltip" data-placement="top" title
-															data-original-title="Comments"></i></a>
-												<a href="#"><i
-															id="guid{$result.grp_release_guid}"
-															class="icon_cart text-muted fa fa-shopping-basket"
-															data-toggle="tooltip"
-															data-placement="top" title
-															data-original-title="Send to my download basket"></i></a>
-												{if isset($sabintegrated) && $sabintegrated !=""}
-													<a href="#">
-														<i id="guid{$result.grp_release_guid}"
-														   class="icon_sab text-muted fa fa-share"
-														   data-toggle="tooltip"
-														   data-placement="top" title
-														   data-original-title="Send to my Queue">
-														</i>
-													</a>
-												{/if}
-												{if $weHasVortex}
-													<a href="#" class="icon_vortex text-muted"><i
-																class="fa fa-share" data-toggle="tooltip"
-																data-placement="top"
-																title data-original-title="Send to NZBVortex"></i></a>
-												{/if}
-											</td>
-										</tr>
+										{assign var="msplits" value=","|explode:$result->grp_release_id}
+										{assign var="mguid" value=","|explode:$result->grp_release_guid}
+										{assign var="mnfo" value=","|explode:$result->grp_release_nfoid}
+										{assign var="mgrp" value=","|explode:$result->grp_release_grpname}
+										{assign var="mname" value="#"|explode:$result->grp_release_name}
+										{assign var="mpostdate" value=","|explode:$result->grp_release_postdate}
+										{assign var="msize" value=","|explode:$result->grp_release_size}
+										{assign var="mtotalparts" value=","|explode:$result->grp_release_totalparts}
+										{assign var="mcomments" value=","|explode:$result->grp_release_comments}
+										{assign var="mgrabs" value=","|explode:$result->grp_release_grabs}
+										{assign var="mpass" value=","|explode:$result->grp_release_password}
+										{assign var="minnerfiles" value=","|explode:$result->grp_rarinnerfilecount}
+										{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
+										{assign var="mcatname" value=","|explode:$result->grp_release_catname}
+										{foreach $msplits as $m}
+											<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
+												<td><input id="guid{$mguid[$m@index]}"
+														   type="checkbox"
+														   class="flat"
+														   value="{$mguid[$m@index]}"/></td>
+												<td class="item">
+													<a title="View details"
+													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+													<br/>
+													<span class="label label-primary">{$mgrabs[$m@index]}
+														grab{if $mgrabs[$m@index] != 1}s{/if}</span>
+													{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span><a
+																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+																class="modal_nfo label label-primary text-muted">NFO</a>
+														</span>{/if}
+													{if $mpass[$m@index] == 2}
+														<i class="fa fa-lock"></i>
+													{elseif $mpass[$m@index] == 1}
+														<i class="fa fa-lock"></i>
+													{/if}
+												</td>
+												<td class="less"><span
+															class="label label-primary">{$mcatname[$m@index]}</span>
+												</td>
+												<td class="less mid"
+													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
+												<td class="less right">{$msize[$m@index]|filesize}</td>
+												<td>
+													<a href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}" class="icon_nzb text-muted"><i
+																class="fa fa-cloud-download text-muted"
+																data-toggle="tooltip" data-placement="top" title
+																data-original-title="Download NZB"></i></a>
+													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																class="fa fa-comments-o text-muted"
+																data-toggle="tooltip" data-placement="top" title
+																data-original-title="Comments"></i></a>
+													<a href="#"><i
+																id="guid{$mguid[$m@index]}"
+																class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
+																data-placement="top" title
+																data-original-title="Send to my download basket"></i></a>
+													{if isset($sabintegrated) && $sabintegrated !=""}
+														<a href="#">
+															<i	id="guid{$mguid[$m@index]}"
+																  class="icon_sab text-muted fa fa-share"
+																  data-toggle="tooltip"
+																  data-placement="top" title
+																  data-original-title="Send to my Queue">
+															</i>
+														</a>
+													{/if}
+													{if $weHasVortex}
+														<a href="#" class="icon_vortex text-muted"><i
+																	class="fa fa-share" data-toggle="tooltip" data-placement="top"
+																	title data-original-title="Send to NZBVortex"></i></a>
+													{/if}
+												</td>
+											</tr>
+										{/foreach}
 									</table>
 									<hr>
 									{if $results|@count > 10}
@@ -205,11 +217,9 @@
 													</div>
 												</div>
 											</div>
-											{if    count($results) > 0}
-												<div class="col-md-4">
-													{$results->links()}
-												</div>
-											{/if}
+											<div class="col-md-4">
+												{$results->links()}
+											</div>
 										</div>
 									{/if}
 								</div>

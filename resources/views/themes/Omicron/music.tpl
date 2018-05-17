@@ -102,7 +102,7 @@
 															   class="square"
 															   value="{$result->guid}" id="chksingle"/>
 													</label>
-													<span class="label label-default">{$result->size|fsize_format:"MB"}</span>
+													<span class="label label-default">{$result->size|filesize}</span>
 													<span class="label label-default">Posted {$result->postdate|timeago}
 														ago</span>
 													{if isset($isadmin)}<a class="label label-warning"

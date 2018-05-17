@@ -11,10 +11,10 @@
 {$site|print_r}
 
 		{foreach from=$mysql item=data}
-			{$data.name} Index Size ({$data.indexsize|fsize_format:"MB"}) Data Size ({$data.datasize|fsize_format:"MB"})
+			{$data.name} Index Size ({$data.indexsize|filesize}) Data Size ({$data.datasize|filesize})
 		{/foreach}
 
-		Totalsize ({$mysqltotalsize|fsize_format:"MB"})
+		Totalsize ({$mysqltotalsize|filesize})
 
 </textarea>
 

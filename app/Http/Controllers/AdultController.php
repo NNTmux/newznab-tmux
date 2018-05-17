@@ -53,13 +53,14 @@ class AdultController extends BasePageController
         $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
         foreach ($results as $result) {
             if (! empty($result->id)) {
-                $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');
-                $result->actors = makeFieldLinks((array) $result, 'actors', 'movies');
-                $result->director = makeFieldLinks((array) $result, 'director', 'movies');
+                $result->genre = makeFieldLinks((array) $result, 'genre', 'xxx');
+                $result->actors = makeFieldLinks((array) $result, 'actors', 'xxx');
+                $result->director = makeFieldLinks((array) $result, 'director', 'xxx');
 
                 $movies[] = $result;
             }
         }
+
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
         $this->smarty->assign('title', stripslashes($title));
 

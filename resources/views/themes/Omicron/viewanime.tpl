@@ -137,7 +137,7 @@
 										</td>
 										<td><span class="label label-primary">{$result.category_name}</span></td>
 										<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
-										<td>{$result.size|fsize_format:"MB"}</td>
+										<td>{$result.size|filesize}</td>
 										<td class="icon_nzb"><a
 													href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
 														class="fa fa-cloud-download text-muted" data-toggle="tooltip"

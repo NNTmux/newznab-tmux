@@ -333,7 +333,7 @@
 										{$result->postdate|timeago}
 									</td>
 									<td class="size">
-										{$result->size|fsize_format:"MB"}
+										{$result->size|filesize}
 										{if $result->completion > 0}
 											<br>
 											{if $result->completion < 100}

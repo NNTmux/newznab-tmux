@@ -493,7 +493,7 @@
 																	<th width="140">Size /
 																		Completion
 																	</th>
-																	<td>{$release.size|fsize_format:"MB"}{if $release.completion > 0}&nbsp;({if $release.completion < 100}
+																	<td>{$release.size|filesize}{if $release.completion > 0}&nbsp;({if $release.completion < 100}
 																			<span class="warning">{$release.completion}
 																			%</span>{else}{$release.completion}%{/if}){/if}
 																	</td>
@@ -546,7 +546,7 @@
 																				<i class="fa fa-lock"></i>
 																				<span class="label label-danger">Passworded</span>
 																			{/if}
-																			<span class="label label-default">{$rf.size|fsize_format:"MB"}</span>
+																			<span class="label label-default">{$rf.size|filesize}</span>
 																			<span class="label label-default">{$rf.created_at|date_format}</span>
 																			<br/>
 																		{/foreach}

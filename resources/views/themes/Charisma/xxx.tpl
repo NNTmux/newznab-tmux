@@ -66,7 +66,7 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}"><img
+													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
 																class="cover img-responsive img-rounded"
 																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
@@ -139,7 +139,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
 
 													<div class="release-subtitle">{if $result->genre != ''}{$result->genre}, {/if}</div>
 													<div id="guid{$result->guid}">
@@ -151,7 +151,7 @@
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$result->size|fsize_format:"MB"}</span>
+														<span class="label label-default">{$result->size|filesize}</span>
 														<span class="label label-default">Posted {$result->postdate|timeago}
 															ago</span>
 														<br/><br/><br/>
@@ -199,7 +199,7 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}"><img
+													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
 																class="cover img-responsive img-rounded"
 																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
@@ -272,7 +272,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
 
 													<div class="release-subtitle">{if $result->genre != ''}{$result->genre}, {/if}</div>
 													<div id="guid{$result->guid}">
@@ -284,7 +284,7 @@
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$result->size|fsize_format:"MB"}</span>
+														<span class="label label-default">{$result->size|filesize}</span>
 														<span class="label label-default">Posted {$result->postdate|timeago}
 															ago</span>
 														<br/><br/><br/>
