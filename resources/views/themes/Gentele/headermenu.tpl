@@ -163,9 +163,18 @@
 								</li>
 							{/if}
 							<hr>
-							{foreach $parentcat.subcatlist as $subcat}
-								<li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a></li>
-							{/foreach}
+                            {if $userdata.bookview == "1"}
+							    {foreach $parentcat.subcatlist as $subcat}
+								    <li><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                    </li>
+							    {/foreach}
+                            {elseif $userdata.bookview != "1"}
+                                {foreach $parentcat.subcatlist as $subcat}
+                                    <li>
+                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                    </li>
+                                {/foreach}
+                            {/if}
 						</ul>
 					</li>
 				{/if}
