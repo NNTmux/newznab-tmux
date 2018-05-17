@@ -123,8 +123,8 @@
 					<div class="panel-body pagination2">
 						<div class="tabbable">
 							<ul class="nav nav-tabs">
-								{foreach $seasons as $seasonnum => $season name = "seas"}
-									<li {if $smarty.foreach.seas.first}class="active"{/if}><a
+								{foreach $seasons as $seasonnum => $season}
+									<li {if $season@first}class="active"{/if}><a
 												title="View Season {$seasonnum}" href="#{$seasonnum}"
 												data-toggle="tab">{$seasonnum}</a></li>
 								{/foreach}
@@ -132,7 +132,7 @@
 							<div class="tab-content">
 								{foreach $seasons as $seasonnum => $season name = "tv"}
 									{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
-									<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
+									<div class="tab-pane{if $season@first} active{/if} fade in"
 										 id="{$seasonnum}">
 										<table class="tb_{$seasonnum} data table table-condensed table-bordered table-responsive table-hover"
 											   id="browsetable">

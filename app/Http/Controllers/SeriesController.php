@@ -6,7 +6,6 @@ use App\Models\Video;
 use Blacklight\Releases;
 use App\Models\UserSerie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SeriesController extends BasePageController
 {
@@ -46,13 +45,13 @@ class SeriesController extends BasePageController
             } elseif (! $rel) {
                 $this->smarty->assign('nodata', 'No releases for this series.');
             } else {
-                $myshows = UserSerie::getShow(Auth::id(), $show['id']);
-
-                $sorted = array_sort(array_sort($rel)['data']);
+                $myshows = UserSerie::getShow($this->userdata->id, $show['id']);
 
                 $series = [];
-                foreach ($sorted as $r) {
-                    $series[$r['series']][$r['episode']][] = $r;
+                foreach ($rel as $r) {
+                    if (! empty($r->id)) {
+                        $series[$r->series][$r->episode][] = $r;
+                    }
                 }
 
                 $this->smarty->assign('seasons', $series);
@@ -107,7 +106,7 @@ class SeriesController extends BasePageController
                 $letter = '';
             }
 
-            $masterserieslist = Video::getSeriesList(Auth::id(), $letter, $showname);
+            $masterserieslist = Video::getSeriesList($this->userdata->id, $letter, $showname);
 
             $title = 'Series List';
             $meta_title = 'View Series List';

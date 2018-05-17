@@ -123,16 +123,16 @@
 					<div class="panel-body pagination2">
 						<div class="tabbable">
 							<ul class="nav nav-tabs">
-								{foreach $seasons as $seasonnum => $season name = "seas"}
-									<li {if $smarty.foreach.seas.first}class="active"{/if}><a
+								{foreach $seasons as $seasonnum => $season}
+									<li {if $season@first}class="active"{/if}><a
 												title="View Season {$seasonnum}" href="#{$seasonnum}"
 												data-toggle="tab">{$seasonnum}</a></li>
 								{/foreach}
 							</ul>
 							<div class="tab-content">
-								{foreach $seasons as $seasonnum => $season name = "tv"}
+								{foreach $seasons as $seasonnum => $season}
 									{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
-									<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
+									<div class="tab-pane{if $season@first} active{/if} fade in"
 										 id="{$seasonnum}">
 										<table class="tb_{$seasonnum} data table table-condensed table-bordered table-responsive table-hover"
 											   id="browsetable">
@@ -155,7 +155,7 @@
 											{foreach $season as $episodes}
 												{foreach $episodes as $result}
 													<tr class="{cycle values=",alt"}"
-														id="guid{$result.guid}">
+														id="guid{$result->guid}">
 														{if $result@total>1 && $result@index == 0}
 															<td rowspan="{$result@total}" width="30">
 																<h4>{$episodes@key}</h4></td>
@@ -164,48 +164,48 @@
 														{/if}
 														<td>
 															<a title="View details"
-															   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+															   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
 
 															<div>
-																{if $result.nfoid > 0}<span
+																{if $result->nfoid > 0}<span
 																		class="label label-default">
-																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 																	   class="text-muted">NFO</a>
 																	</span>{/if}
-																{if $result.image == 1 && $userdata.canpreview == 1}
+																{if $result->image == 1 && $userdata.canpreview == 1}
 																<a
-																		href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-																		name="name{$result.guid}"
+																		href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+																		name="name{$result->guid}"
 																		title="View Screenshot"
 																		class="modal_prev label label-default"
 																		rel="preview">Preview</a>{/if}
-																<span class="label label-default">{$result.grabs}
-																	Grab{if $result.grabs != 1}s{/if}</span>
-																{if $result.firstaired != ""}<span
+																<span class="label label-default">{$result->grabs}
+																	Grab{if $result->grabs != 1}s{/if}</span>
+																{if $result->firstaired != ""}<span
 																	class="label label-success"
-																	title="{$result.title} Aired on {$result.firstaired|date_format}">
-																	Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
-																{if $result.reid > 0}<span
+																	title="{$result->title} Aired on {$result->firstaired|date_format}">
+																	Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
+																{if $result->reid > 0}<span
 																	class="mediainfo label label-default"
-																	title="{$result.guid}">Media</span>{/if}
+																	title="{$result->guid}">Media</span>{/if}
 															</div>
 														</td>
 														<td class="check" width="10"><input
-																	id="chk{$result.guid|substr:0:7}"
+																	id="chk{$result->guid|substr:0:7}"
 																	type="checkbox"
 																	class="square" name="{$seasonnum}"
-																	value="{$result.guid}"/></td>
+																	value="{$result->guid}"/></td>
 														<td>
-															<span class="label label-default">{$result.category_name}</span>
+															<span class="label label-default">{$result->category_name}</span>
 														</td>
 														<td width="40"
-															title="{$result.postdate}">{$result.postdate|timeago}</td>
+															title="{$result->postdate}">{$result->postdate|timeago}</td>
 														<td>
-															{$result.size|filesize}
+															{$result->size|filesize}
 														</td>
 														<td class="icons" style='width:100px;'>
 															<a title="Download Nzb"
-															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result.guid}"><i
+															   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																		class="zmdi zmdi-cloud-download text-muted"></i></a>
 															<a class="zmdi zmdi-shopping-basket icon_cart text-muted"
 															   href="#"
@@ -220,10 +220,10 @@
 															{if isset($isadmin)}
 																<br/>
 																<a class="label label-warning"
-																   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result->id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																   title="Edit Release">Edit</a>
 																<a class="label label-danger"
-																   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$result->id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																   title="Delete Release">Delete</a>
 															{/if}
 														</td>
