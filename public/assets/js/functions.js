@@ -21,6 +21,7 @@ jQuery(function($){
     $('.cartadd').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(".guid").attr('id').substring(4);
+        alert(guid);
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -231,6 +232,8 @@ jQuery(function($){
     $('.icon_cart').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(this).attr('id').substring(4);
+        //alert(guid);
+        //alert(SERVERROOT + "/cart/add?id=" + guid);
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -548,7 +551,7 @@ jQuery(function($){
             $(this).attr('checked', false);
         });
         var guidstring = guids.toString();
-        // alert (guidstring); // This is just for testing shit
+         //alert (guidstring); // This is just for testing shit
         $.post( SERVERROOT + "/cart/add?id=" + guidstring);
     }));
     $('button.nzb_multi_operations_sab').on('click', (function(){

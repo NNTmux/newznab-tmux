@@ -1,4 +1,5 @@
 2018-05-17 DariusIII
+	* Fix: Fix adding releases to download basket
 	* Chg: Remove Gamma theme related assets as the theme is not used anymore
 	* Chg: Rename XBOX 360 DLC to Xbox 360 DLC to be consistent with rest of the categories
 	* Fix: Fix XXX and Full XXX movie view

@@ -36,6 +36,7 @@ class CartController extends BasePageController
 
     /**
      * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
@@ -54,7 +55,7 @@ class CartController extends BasePageController
             UsersRelease::addCart(Auth::id(), $d['id']);
         }
 
-        return redirect('/cart/index');
+        //return redirect('/cart/index');
     }
 
     /**
