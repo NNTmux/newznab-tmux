@@ -101,7 +101,7 @@
 								{foreach $parentcat.subcatlist as $subcat}
 									{if $subcat.id == {$catClass::PC_GAMES}}
 										<li>
-											<a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$subcat.title}</a>
+											<a href="{$smarty.const.WWW_TOP}/{$subcat.title}">{$subcat.title}</a>
 										</li>
 									{else}
 										<li>
