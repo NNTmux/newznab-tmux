@@ -21,7 +21,7 @@
 						<div class="col-md-8">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/movies/{$categorytitle}">List</a><br/>
+										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
@@ -354,7 +354,7 @@
 						<div class="col-md-8">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/movies/{$category->title}">List</a>
+										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a>
 								<br/>
 								With Selected:
 								<div class="btn-group">

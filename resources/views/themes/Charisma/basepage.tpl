@@ -92,7 +92,7 @@
 									<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 													class="zmdi zmdi-movie-alt"></i><span> Movies</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/Audio"><i
-													class="zmdi zmdi-audio"></i><span> Music</span></a></li>
+													class="zmdi zmdi-audio"></i><span> Audio</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 													class="zmdi zmdi-keyboard"></i><span> Games</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/series"><i
