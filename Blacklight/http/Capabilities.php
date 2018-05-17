@@ -26,6 +26,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\Response;
 
 /**
  * Class Output -- abstract class for printing web requests outside of Smarty.
@@ -60,56 +61,52 @@ abstract class Capabilities
     /**
      * Print XML or JSON output.
      *
-     * @param array  $data   Data to print.
-     * @param array  $params Additional request parameters
-     * @param bool   $xml    True: Print as XML False: Print as JSON.
-     * @param int    $offset How much releases to skip
-     * @param string $type   What type of API query to format if XML
      *
+     * @param        $data
+     * @param        $params
+     * @param bool   $xml
+     * @param        $offset
+     * @param string $type
+     *
+     * @return \Illuminate\Http\Response
      * @throws \Exception
      */
-    public function output($data, $params, $xml = true, $offset, $type = ''): void
+    public function output($data, $params, $xml = true, $offset, $type = '')
     {
         $this->type = $type;
 
         $options = [
             'Parameters' => $params,
-            'Data'       => $data,
-            'Server'     => $this->getForMenu(),
-            'Offset'     => $offset,
-            'Type'       => $type,
+            'Data' => $data,
+            'Server' => $this->getForMenu(),
+            'Offset' => $offset,
+            'Type' => $type,
         ];
 
         // Generate the XML Response
         $response = (new XML_Response($options))->returnXML();
 
-        if ($xml) {
-            header('Content-type: text/xml');
-        } else {
+        if ($xml === false) {
             // JSON encode the XMLWriter response
-            $response = json_encode(
-            // Convert SimpleXMLElement response from XMLWriter
+            $response = json_encode(// Convert SimpleXMLElement response from XMLWriter
             //into array with namespace preservation
-                Utility::xmlToArray(
-                // Load the XMLWriter response
-                    @simplexml_load_string($response),
-                    [
+                Utility::xmlToArray(// Load the XMLWriter response
+                    @simplexml_load_string($response), [
                         'attributePrefix' => '_',
-                        'textContent'     => 'text',
-                    ]
-                )
-                // Strip the RSS+XML info from the JSON response by selecting enclosed data only
-                ['rss']['channel'],
-                JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES
-            );
-            header('Content-type: application/json');
+                        'textContent' => 'text',
+                    ])
+                    // Strip the RSS+XML info from the JSON response by selecting enclosed data only
+                ['rss']['channel'], JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES);
         }
         if ($response === false) {
             Utility::showApiError(201);
-        } else {
-            header('Content-Length: '.\strlen($response));
-            echo $response;
         }
+
+        $endResponse = Response::make($response, 200);
+
+        return $endResponse->sendContent()->withHeaders(['Content-type' => $xml === true ? 'application/rss+xml' : 'application/json',
+            'Content-Length' => \strlen($response),
+        ]);
     }
 
     /**

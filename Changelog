@@ -1,3 +1,5 @@
+2018-05-17 DariusIII
+	* Chg: Use laravel Response class to return xml in Capabilities class output function
 2018-05-16 DariusIII
 	* Chg: Use proper smarty3 syntax for foreach loops in movies.tpl in all themes
 	* Fix: Fix search in ApiController
