@@ -1,4 +1,5 @@
 2018-05-17 DariusIII
+	* Chg: Rename XBOX 360 DLC to Xbox 360 DLC to be consistent with rest of the categories
 	* Fix: Fix XXX and Full XXX movie view
 	* Fix: Revert to old output code with addition of exit; to prevent overwriting of sent headers
 	* Chg: Use laravel Response class to return xml in Capabilities class output function
