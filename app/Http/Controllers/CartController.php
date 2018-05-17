@@ -54,8 +54,6 @@ class CartController extends BasePageController
         foreach ($data as $d) {
             UsersRelease::addCart(Auth::id(), $d['id']);
         }
-
-        //return redirect('/cart/index');
     }
 
     /**
