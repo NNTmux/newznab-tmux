@@ -1,3 +1,5 @@
+2018-05-18 DariusIII
+	* Fix: Fix various list views in admin area
 2018-05-17 DariusIII
 	* Fix: Partialy fix series view
 	* Chg: Update laravel/tinker to version 1.0.7

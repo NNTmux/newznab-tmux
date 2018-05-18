@@ -5,6 +5,7 @@ namespace Blacklight;
 use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\AnidbTitle;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 class AniDB
 {
@@ -155,7 +156,7 @@ class AniDB
         if ($animetitle !== '') {
             $query->where('at.title', 'like', '%'.$animetitle.'%');
         }
-        $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
+        $query->select(['at.anidbid', DBFacade::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
                 ->from('anidb_titles as at')
                 ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
                 ->groupBy('at.anidbid')
