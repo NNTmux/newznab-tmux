@@ -151,7 +151,7 @@
 														</tr>
 														<tr>
 															<td>
-																{if{{Setting::settingValue('site.main.userselstyle')}} == 1}
+																{if {{App\Models\Settings::settingValue('site.main.userselstyle')}} == 1}
 																	{html_options style="color: black;" id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 																{/if}
 															</td>

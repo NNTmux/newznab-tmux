@@ -1,4 +1,5 @@
 2018-05-18 DariusIII
+	* Fix: Fix user profile edit page
 	* Fix: Fix wrong argument that got missed in headsearch form
 	* Fix: Fix various list views in admin area
 2018-05-17 DariusIII
