@@ -1,5 +1,4 @@
 2018-05-18 DariusIII
-	* Chg: Update bootswatch to version 4.1.1
 	* Fix: Fix more errors in Charisma theme
 	* Fix: Fix user profile edit page
 	* Fix: Fix wrong argument that got missed in headsearch form
