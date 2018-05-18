@@ -8,7 +8,7 @@
 	</div>
 </div>
 {if $error == ''}
-{if {{Setting::settingValue('apps.sabnzbplus.integrationtype')}} > 0 || $user.queuetype == 2}
+{if {{App\Models\Settings::settingValue('apps.sabnzbplus.integrationtype')}} > 0 || $user.queuetype == 2}
 <p style="text-align:center;">
 	The following queue is pulled from
 	<a href="{$serverURL|escape:"htmlall"}">{$serverURL|escape:"htmlall"}</a>.
