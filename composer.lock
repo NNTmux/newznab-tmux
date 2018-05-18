@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "992f9d1c7de6b85801db741e394a9a2e",
+    "content-hash": "2a9637ac9d67f43698bbd5fb9bc78d53",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -536,57 +536,19 @@
         },
         {
             "name": "bower-asset/bootswatch",
-            "version": "v3.3.7",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thomaspark/bootswatch.git",
-                "reference": "4b0d3762f309326a6d66fa4ea18945a7fc11f8ef"
+                "reference": "0836a73018fd2c80409160f9ad6988670d1becd5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thomaspark/bootswatch/zipball/4b0d3762f309326a6d66fa4ea18945a7fc11f8ef",
-                "reference": "4b0d3762f309326a6d66fa4ea18945a7fc11f8ef",
+                "url": "https://api.github.com/repos/thomaspark/bootswatch/zipball/0836a73018fd2c80409160f9ad6988670d1becd5",
+                "reference": "0836a73018fd2c80409160f9ad6988670d1becd5",
                 "shasum": ""
             },
-            "require": {
-                "bower-asset/bootstrap": "~3.3.7"
-            },
-            "require-dev": {
-                "bower-asset/bootstrap-sass-official": "~3.3.7",
-                "bower-asset/font-awesome": "~4.0.0",
-                "bower-asset/html5shiv": "~3.7.0",
-                "bower-asset/respond": "~1.4.2"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-ignore": [
-                    "2",
-                    "api",
-                    "assets",
-                    "bower_components",
-                    "custom",
-                    "default",
-                    "global",
-                    "help",
-                    "tests",
-                    "_config.yml",
-                    ".gitignore",
-                    ".travis.yml",
-                    "CNAME",
-                    "composer.json",
-                    "favicon.ico",
-                    "Gemfile",
-                    "Gruntfile.js",
-                    "index.html",
-                    "package.json",
-                    "*/index.html"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Bootswatch is a collection of themes for Bootstrap.",
-            "time": "2016-07-30T21:56:26+00:00"
+            "type": "bower-asset-library"
         },
         {
             "name": "bower-asset/chosen",

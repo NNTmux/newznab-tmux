@@ -97,7 +97,7 @@
     "bower-asset/bootstrap-datepicker": "~1.6.4",
     "bower-asset/bootstrap-hover-dropdown": "~2.2.1",
     "bower-asset/bootstrap-progressbar": "~0.9.0",
-    "bower-asset/bootswatch": "~3.3.7",
+    "bower-asset/bootswatch": "^4.1",
     "bower-asset/chosen": "^1.6",
     "bower-asset/colorbox": "~1.6.3",
     "bower-asset/fancyBox": "~v3.0",
