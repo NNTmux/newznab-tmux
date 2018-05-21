@@ -86,7 +86,7 @@ class SearchController extends BasePageController
                 $categoryID
             );
 
-            $results = $this->paginate($rslt ?? [], $rslt['_totalrows'] ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->smarty->assign(
                 [

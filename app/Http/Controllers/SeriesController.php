@@ -47,11 +47,18 @@ class SeriesController extends BasePageController
             } else {
                 $myshows = UserSerie::getShow($this->userdata->id, $show['id']);
 
+                // Sort releases by season, episode, date posted.
+                $series = $episode = $posted = [];
+                foreach ($rel as $rlk => $rlv) {
+                    $series[$rlk] = $rlv->series;
+                    $episode[$rlk] = $rlv->episode;
+                    $posted[$rlk] = $rlv->postdate;
+                }
+                array_multisort($series, SORT_DESC, $episode, SORT_DESC, $posted, SORT_DESC, $rel);
+
                 $series = [];
                 foreach ($rel as $r) {
-                    if (! empty($r->id)) {
-                        $series[$r->series][$r->episode][] = $r;
-                    }
+                    $series[$r->series][$r->episode][] = $r;
                 }
 
                 $this->smarty->assign('seasons', $series);

@@ -308,7 +308,7 @@ class Games
         }
         $return = DB::select($returnSql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $games['total'][0]->total ?? 0;
+            $return[0]->_totalcount = $games['total'][0]->total ?? 0;
         }
         Cache::put(md5($returnSql.$page), $return, $expiresAt);
 

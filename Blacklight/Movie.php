@@ -342,7 +342,7 @@ class Movie
         }
         $return = DBFacade::select($sql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $movies['total'][0]->total ?? 0;
+            $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 

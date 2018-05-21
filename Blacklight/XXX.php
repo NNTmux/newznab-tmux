@@ -225,7 +225,7 @@ class XXX
         }
         $return = DB::select($sql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $xxxmovies['total'][0]->total ?? 0;
+            $return[0]->_totalcount = $xxxmovies['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 

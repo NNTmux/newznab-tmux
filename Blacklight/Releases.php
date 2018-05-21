@@ -130,7 +130,7 @@ class Releases
         $sql = DB::select($qry);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
-            $sql['_totalcount'] = $sql['_totalrows'] = $possibleRows;
+            $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($qry.$page), $sql, $expiresAt);
@@ -681,7 +681,7 @@ class Releases
         }
         $releases = DB::select($sql);
         if (! empty($releases) && \count($releases) > 0) {
-            $releases['_totalrows'] = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -809,16 +809,17 @@ class Releases
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
+        /*$releases = Cache::get(md5($sql));
         if ($releases !== null) {
             return $releases;
-        }
+        }*/
         $releases = DB::select($sql);
         if (! empty($releases) && \count($releases) > 0) {
-            $releases['_totalrows'] = $this->getPagerCount(
+            $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
         }
+
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
@@ -881,7 +882,7 @@ class Releases
         }
         $releases = DB::select($sql);
         if (! empty($releases) && \count($releases) > 0) {
-            $releases['_totalrows'] = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
@@ -946,7 +947,7 @@ class Releases
         }
         $releases = DB::select($sql);
         if (! empty($releases) && \count($releases) > 0) {
-            $releases['_totalrows'] = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);

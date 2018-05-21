@@ -56,7 +56,7 @@ class ConsoleController extends BasePageController
 
         $consoles = [];
         $rslt = $console->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
-        $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $maxwords = 50;
         foreach ($results as $result) {

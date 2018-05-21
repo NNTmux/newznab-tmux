@@ -54,7 +54,7 @@ class MusicController extends BasePageController
 
         $musics = [];
         $rslt = $music->getMusicRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata['categoryexclusions']);
-        $results = $this->paginate($rslt, $rslt['_totalcount'][0]->total, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($rslt, $rslt[0]->_totalcount[0]->total, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $artist = ($request->has('artist') && ! empty($request->input('artist'))) ? stripslashes($request->input('artist')) : '';
         $this->smarty->assign('artist', $artist);
@@ -69,11 +69,9 @@ class MusicController extends BasePageController
         }
 
         foreach ($results as $result) {
-            if (! empty($result->id)) {
-                $res = (array) $result;
-                $result->genre = $tmpgnr[$res['genres_id']];
-                $musics[] = $result;
-            }
+            $res = (array) $result;
+            $result->genre = $tmpgnr[$res['genres_id']];
+            $musics[] = $result;
         }
 
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';

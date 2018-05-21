@@ -229,7 +229,7 @@ class Books
         }
         $return = DBFacade::select($sql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $books['total'][0]->total ?? 0;
+            $return[0]->_totalcount = $books['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 

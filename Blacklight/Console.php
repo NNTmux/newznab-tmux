@@ -238,7 +238,7 @@ class Console
         }
         $return = DB::select($sql);
         if (\count($return) > 0) {
-            $return['_totalcount'] = $consoles[0]->total ?? 0;
+            $return[0]->_totalcount = $consoles[0]->total ?? 0;
         }
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql.$page), $return, $expiresAt);

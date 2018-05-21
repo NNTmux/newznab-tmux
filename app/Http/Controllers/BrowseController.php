@@ -28,7 +28,7 @@ class BrowseController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], -1);
-        $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign('catname', 'All');
 
@@ -85,14 +85,12 @@ class BrowseController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
         $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], $grp);
-        $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $browse = [];
 
         foreach ($results as $result) {
-            if (! empty($result->id)) {
-                $browse[] = $result;
-            }
+            $browse[] = $result;
         }
 
         $this->smarty->assign('catname', $id);
@@ -160,7 +158,7 @@ class BrowseController extends BasePageController
             $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
             $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata['categoryexclusions'], $group);
-            $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
             $this->smarty->assign('results', $results);
             $meta_title = 'Browse Groups';
             $meta_keywords = 'browse,nzb,description,details';

@@ -41,7 +41,7 @@ class GamesController extends BasePageController
         $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $rslt = $games->getGamesRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', $this->userdata['categoryexclusions']);
-        $results = $this->paginate($rslt ?? [], $rslt['_totalcount'] ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
         $this->smarty->assign('title', $title);
