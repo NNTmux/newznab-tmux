@@ -129,7 +129,7 @@ class BrowseController extends BasePageController
         }
 
         if ($id === 'All' && $parentCategory === 'All') {
-            $meta_title = 'Browse '.$parentCategory .' releases';
+            $meta_title = 'Browse '.$parentCategory.' releases';
         } else {
             $meta_title = 'Browse '.$parentCategory.' / '.$id.' releases';
         }
