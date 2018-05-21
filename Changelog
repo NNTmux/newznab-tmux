@@ -1,4 +1,5 @@
 2018-05-21 DariusIII
+	* Chg: Update api description template to include apikey in links
 	* Fix: Prevent duplicated 'All' on browse all releases
 	* Chg: Add .editorconfig file
 	* Fix: Fix errors in full series view
