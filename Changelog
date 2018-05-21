@@ -1,4 +1,5 @@
 2018-05-20 DariusIII
+	* Fix: Fix errors in full series view
 	* Chg: Re-use old code and fix _totalrows and _totalcount insertion into existing array/object
 2018-05-18 DariusIII
 	* Fix: Fix more errors in Charisma theme

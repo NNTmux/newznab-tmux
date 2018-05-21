@@ -66,7 +66,7 @@ class SeriesController extends BasePageController
                 $this->smarty->assign('myshows', $myshows);
 
                 //get series name(s), description, country and genre
-                $seriestitles = $seriescountry = [];
+                $seriestitles = $seriessummary = $seriescountry = [];
                 $seriestitles[] = $show['title'];
 
                 if (! empty($show['summary'])) {
@@ -79,8 +79,8 @@ class SeriesController extends BasePageController
 
                 $seriestitles = implode('/', array_map('trim', $seriestitles));
                 $this->smarty->assign('seriestitles', $seriestitles);
-                $this->smarty->assign('seriessummary', array_shift($seriessummary));
-                $this->smarty->assign('seriescountry', array_shift($seriescountry));
+                $this->smarty->assign('seriessummary', $seriessummary ? array_shift($seriessummary) : '');
+                $this->smarty->assign('seriescountry', $seriescountry ? array_shift($seriescountry) : '');
 
                 $title = 'Series';
                 $meta_title = 'View TV Series';
