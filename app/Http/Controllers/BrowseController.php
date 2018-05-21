@@ -128,7 +128,11 @@ class BrowseController extends BasePageController
             $this->smarty->assign('catname', $grp);
         }
 
-        $meta_title = 'Browse '.$parentCategory.' / '.$id;
+        if ($id === 'All' && $parentCategory === 'All') {
+            $meta_title = 'Browse '.$parentCategory .' releases';
+        } else {
+            $meta_title = 'Browse '.$parentCategory.' / '.$id.' releases';
+        }
         $meta_keywords = 'browse,nzb,description,details';
         $meta_description = 'Browse for Nzbs';
 

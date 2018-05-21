@@ -1,4 +1,5 @@
 2018-05-21 DariusIII
+	* Fix: Prevent duplicated 'All' on browse all releases
 	* Chg: Add .editorconfig file
 	* Fix: Fix errors in full series view
 	* Chg: Re-use old code and fix _totalrows and _totalcount insertion into existing array/object
