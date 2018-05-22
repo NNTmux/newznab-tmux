@@ -1,4 +1,5 @@
 2018-05-22 DariusIII
+	* Chg: Add csrf_field to btc_payment pages
 	* Chg: Update 503.blade.php for better information display
 	* Chg: Update symfony components and psy/psych to latest versions
 2018-05-21 DariusIII

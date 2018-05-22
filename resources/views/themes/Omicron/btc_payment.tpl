@@ -11,6 +11,7 @@
 	<table class="data table table-condensed responsive-utilities jambo-table">
 		{foreach $donation as $donate}
 			<form method="post" action="btc_payment?action=submit">
+                {{csrf_field()}}
 				<thead>
 				<tr>
 					<th>{$donate->name} ({$donate->donation}$)</th>
@@ -24,6 +25,5 @@
 				</td>
 			</form>
 		{/foreach}
-		</form>
 	</table>
 </div>

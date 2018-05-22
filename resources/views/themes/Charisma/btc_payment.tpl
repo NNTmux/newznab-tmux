@@ -25,6 +25,5 @@
 				</td>
 			</form>
 		{/foreach}
-		</form>
 	</table>
 </div>
