@@ -1,4 +1,5 @@
 2018-05-22 DariusIII
+	* Chg: Remove Charisma and Omicron themes from main repo and move them into separate repositories
 	* Chg: Update 404 page
 	* Chg: Add csrf_field to btc_payment pages
 	* Chg: Update 503.blade.php for better information display
