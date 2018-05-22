@@ -1,3 +1,5 @@
+2018-05-22 DariusIII
+	* Chg: Update symfony components and psy/psych to latest versions
 2018-05-21 DariusIII
 	* Chg: Update api description template to include apikey in links
 	* Fix: Prevent duplicated 'All' on browse all releases
