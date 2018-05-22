@@ -120,6 +120,7 @@ class GroupController extends BasePageController
 
             case 'view':
             default:
+                $title = 'Group Edit';
                 if ($request->has('id')) {
                     $title = 'Newsgroup Edit';
                     $id = $request->input('id');
