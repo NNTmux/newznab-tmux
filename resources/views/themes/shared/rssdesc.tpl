@@ -62,7 +62,7 @@
 	<ul style="text-align: left;">
 		{foreach $parentcategorylist as $category}
 			<li>
-				<a href="{$smarty.const.WWW_TOP}/browse/{$category.title}">{$category.title}</a> feed <br/>
+				{$category.title} feed <br/>
 				<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
 					/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 			</li>
@@ -72,7 +72,7 @@
 	<ul style="text-align: left;">
 		{foreach $categorylist as $category}
 			<li>
-				<a href="{$smarty.const.WWW_TOP}/browse/{$category.title}">{$category.title}</a> feed <br/>
+                {$category.title} feed <br/>
 				<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
 					/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 			</li>
@@ -82,8 +82,8 @@
 	<ul style="text-align: left;">
 		<li>
 			Multiple categories separated by comma.<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/{$parentcat.title},{$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
-				/rss/{$parentcat.title},{$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;i={$userdata.id}
+			<a href="{$smarty.const.WWW_TOP}/rss?t={$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
+				/rss?t={$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;i={$userdata.id}
 				&amp;r={$userdata.rsstoken}</a>
 		</li>
 	</ul>
@@ -92,17 +92,17 @@
 		<li>
 			Tv Series (Use the TVRage ID)<br/>
 			<a href="{$smarty.const.WWW_TOP}/rss?show={$show}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
-				/rss/?show={$show}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
+				/rss?show={$show}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 		</li>
 		<li>
 			Tv Series aired in last seven days (Using the Video ID and airdate)<br/>
 			<a href="{$smarty.const.WWW_TOP}/rss?show={$show}&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
-				/rss/?show={$show}&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
+				/rss?show={$show}&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 		</li>
 		<li>
 			Anime Feed (Use the AniDB ID)<br/>
 			<a href="{$smarty.const.WWW_TOP}/rss?anidb={$anidb}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
-				/rss/?anidb={$anidb}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
+				/rss?anidb={$anidb}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 		</li>
 	</ul>
 </div>
