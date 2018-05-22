@@ -91,6 +91,8 @@ class UserController extends BasePageController
             'notes' => '',
         ];
 
+        $title = 'View User';
+
         // set the current action
         $action = $request->input('action') ?? 'view';
 
