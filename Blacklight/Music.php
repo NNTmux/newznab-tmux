@@ -133,6 +133,7 @@ class Music
     }
 
     /**
+     * @param $page
      * @param       $cat
      * @param       $start
      * @param       $num
@@ -223,7 +224,7 @@ class Music
         }
         $return = DB::select($sql);
         if (! empty($return)) {
-            $return[0]->_totalcount = $music['total'] ?? 0;
+            $return[0]->_totalcount = $music['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
 

@@ -69,8 +69,8 @@ class MusicController extends BasePageController
         }
 
         foreach ($results as $result) {
-            $res = (array) $result;
-            $result->genre = $tmpgnr[$res['genres_id']];
+            $res = $result;
+            $result->genre = $tmpgnr[$res->genres_id];
             $musics[] = $result;
         }
 
