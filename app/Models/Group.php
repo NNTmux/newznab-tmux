@@ -231,12 +231,10 @@ class Group extends Model
     }
 
     /**
-     * Gets all groups.
-     *
-     *
      * @param string $groupname
-     * @param null $active
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param null   $active
+     *
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
     public static function getGroupsRange($groupname = '', $active = null)
     {
@@ -252,7 +250,7 @@ class Group extends Model
             $groups->where('active', '=', 0);
         }
 
-        return $groups->paginate(config('nntmux.items_per_page'));
+        return $groups->get();
     }
 
     /**
