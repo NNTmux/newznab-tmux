@@ -110,16 +110,12 @@ class AnidbController extends BasePageController
                     request()->input('episodetitles')
                 );
 
-                if (! empty(request()->input('from'))) {
-                    return redirect(request()->input('from'));
-                }
-
                 return redirect('admin/anidb-list');
                 break;
 
             case 'view':
             default:
-                if (request()->has('id')) {
+                if (!empty($id)) {
                     $this->title = 'AniDB Edit';
                     $AniDBAPIArray = $AniDB->getAnimeInfo($id);
                     $this->smarty->assign('anime', $AniDBAPIArray);
@@ -140,17 +136,6 @@ class AnidbController extends BasePageController
         $this->adminrender();
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
