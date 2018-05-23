@@ -71,11 +71,13 @@
 	<h3>Sub Category</h3>
 	<ul style="text-align: left;">
 		{foreach $categorylist as $category}
-			<li>
-                {$category.title} feed <br/>
-				<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
+            {if !empty($category.title)}
+			    <li>
+                    {$category.title} feed <br/>
+				    <a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
 					/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
-			</li>
+			    </li>
+            {/if}
 		{/foreach}
 	</ul>
 	<h3>Multi Category</h3>
