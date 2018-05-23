@@ -35,7 +35,11 @@ Route::prefix('browse')->group(function () {
     Route::get('{parentCategory}/{id?}', 'BrowseController@show');
 });
 
-Route::get('anime/{id?}', 'AnimeController@index');
+Route::get('anime', 'AnimeController@showAnime');
+Route::post('anime', 'AnimeController@showAnime');
+
+Route::get('animelist', 'AnimeController@showList');
+Route::post('animelist', 'AnimeController@showList');
 
 Route::get('Books/{id?}', 'BooksController@index');
 Route::post('Books/{id?}', 'BooksController@index');

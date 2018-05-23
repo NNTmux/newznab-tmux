@@ -12,7 +12,7 @@
 							<li><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">TV</a></li>
 							<hr>
 							<li><a href="{$smarty.const.WWW_TOP}/series">TV Series</a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/anime">Anime Series</a></li>
+							<li><a href="{$smarty.const.WWW_TOP}/animelist">Anime Series</a></li>
 							<hr>
 							{foreach $parentcat.subcatlist as $subcat}
 								<li><a href="{$smarty.const.WWW_TOP}/browse/TV/{$subcat.title}">{$subcat.title}</a></li>
