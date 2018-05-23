@@ -18,7 +18,7 @@
 		<h1>{$animeTitle}
 			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
-				   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp; from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
+				   href="{$smarty.const.WWW_TOP}/admin/anidb-edit?id={$animeAnidbid}&amp; from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
 			{/if}
 		</h1>
 		{if animePicture != ''}
