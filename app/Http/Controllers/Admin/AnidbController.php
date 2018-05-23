@@ -115,7 +115,7 @@ class AnidbController extends BasePageController
 
             case 'view':
             default:
-                if (!empty($id)) {
+                if (! empty($id)) {
                     $this->title = 'AniDB Edit';
                     $AniDBAPIArray = $AniDB->getAnimeInfo($id);
                     $this->smarty->assign('anime', $AniDBAPIArray);
@@ -135,7 +135,6 @@ class AnidbController extends BasePageController
 
         $this->adminrender();
     }
-
 
     /**
      * Remove the specified resource from storage.
