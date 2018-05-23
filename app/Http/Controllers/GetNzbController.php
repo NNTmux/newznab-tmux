@@ -150,6 +150,6 @@ class GetNzbController extends BasePageController
 
         return response()->streamDownload(function () use ($nzbPath) {
             readgzfile($nzbPath);
-        }, $cleanName, $headers);
+        }, $cleanName.'.nzb', $headers);
     }
 }
