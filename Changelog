@@ -1,4 +1,5 @@
 2018-05-23 DariusIII
+	* Fix: Fix user search in admin/user-list page
 	* Fix: Fix groups browsing
 	* Chg: Don't use pagination for groups list page
 	* Fix: Fix Admin/AnidbController edit function
