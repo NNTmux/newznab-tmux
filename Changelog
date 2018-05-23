@@ -1,4 +1,5 @@
 2018-05-23 DariusIII
+	* Fix: Fix typo that lead to bad anidb rss feed
 	* Fix: Fix link to admin/anidb-edit page in viewanime template
 	* Fix: Fix misplaced bracket in animelist view
 	* Fix: Fix subcategory rss feeds info

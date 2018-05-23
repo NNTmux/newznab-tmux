@@ -103,7 +103,7 @@ class RssController extends BasePageController
             if ($request->has('show')) {
                 $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
             } elseif ($request->has('anidb')) {
-                $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('snidb') + 0);
+                $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
             }
 
             $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
