@@ -36,7 +36,7 @@ class BrowseController extends BasePageController
         $this->smarty->assign(
             [
                 'results' => $results,
-                'resultsadd' => $browse
+                'resultsadd' => $browse,
             ]
         );
 
