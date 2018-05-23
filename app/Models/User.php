@@ -483,19 +483,19 @@ class User extends Authenticatable
         $order = getUserBrowseOrder($orderBy);
 
         $users = self::query()->with('role', 'request')->where('id', '<>', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
-        if (!empty($userName)) {
+        if (! empty($userName)) {
             $users->where('username', 'like', '%'.$userName.'%');
         }
 
-        if (!empty($email)) {
+        if (! empty($email)) {
             $users->where('email', 'like', '%'.$email.'%');
         }
 
-        if (!empty($host)) {
+        if (! empty($host)) {
             $users->where('host', 'like', '%'.$host.'%');
         }
 
-        if (!empty($role)) {
+        if (! empty($role)) {
             $users->where('user_roles_id', $role);
         }
 
