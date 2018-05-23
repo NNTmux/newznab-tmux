@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 
 class BrowseController extends BasePageController
 {
-    public function __construct(Request $request)
-    {
-        parent::__construct($request);
-    }
-
     /**
      * @throws \Exception
      */
@@ -34,7 +29,16 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
 
-        $this->smarty->assign('results', $results);
+        foreach ($results as $result) {
+            $browse[] = $result;
+        }
+
+        $this->smarty->assign(
+            [
+                'results' => $results,
+                'resultsadd' => $browse
+            ]
+        );
 
         $meta_title = 'Browse All Releases';
         $meta_keywords = 'browse,nzb,description,details';
@@ -163,7 +167,21 @@ class BrowseController extends BasePageController
             $offset = ($page - 1) * config('nntmux.items_per_page');
             $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata['categoryexclusions'], $group);
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
-            $this->smarty->assign('results', $results);
+
+            $browse = [];
+
+            foreach ($results as $result) {
+                $browse[] = $result;
+            }
+
+            $this->smarty->assign(
+                [
+                    'results' => $results,
+                    'resultsadd' => $browse,
+                    'parentcat' => $group,
+                    'catname' => 'all',
+                ]
+            );
             $meta_title = 'Browse Groups';
             $meta_keywords = 'browse,nzb,description,details';
             $meta_description = 'Browse Groups';

@@ -3,8 +3,8 @@
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
 			/
-			<a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}">{$parentcat}</a>
-			/ {if ($catname != '' && $catname != 'All')} <a
+			<a href="{$smarty.const.WWW_TOP}/{if preg_match('/^alt\.binaries|a\.b|dk\./i', $parentcat)}browse/group?g={else}browse/{/if}{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}">{$parentcat}</a>
+			/ {if ($catname != '' && $catname != 'all')} <a
 				href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
 		</ol>
 	</div>
