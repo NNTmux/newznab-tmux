@@ -1,4 +1,5 @@
 2018-05-23 DariusIII
+	* Fix: Fix misplaced bracket in animelist view
 	* Fix: Fix subcategory rss feeds info
 	* Fix: Fix anime releases view
 	* Fix: Fix viewanime page variable call

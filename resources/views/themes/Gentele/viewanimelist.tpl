@@ -29,7 +29,7 @@
 							<label for="title">Search:</label>
 							<input class="form-control" style="width: 150px;" id="title appendedInputButton" type="text"
 								   name="title" value="{$animetitle}" placeholder="Search here"/>
-							<button type="submit" class="btn btn-default">GO</button>
+							<button type="submit" class="btn btn-default">Search</button>
 						</form>
 					</td>
 				</tr>
@@ -45,7 +45,7 @@
 						<td><a class="title" title="View anime"
 							   href="{$smarty.const.WWW_TOP}/anime?id={$a.anidbid}">{$a.title|escape:"htmlall"}</a>{if {$a.startdate} != ''}
 							<br/><span class="label label-info">({$a.startdate|date_format}
-								- {/if}{if $a.enddate != ''}{$a.enddate|date_format}{/if})</span></td>
+								- {/if}{if $a.enddate != ''}{$a.enddate|date_format}){/if}</span></td>
 						<td>{if {$a.type} != ''}{$a.type|escape:"htmlall"}{/if}</td>
 						<td>{if {$a.categories} != ''}{$a.categories|escape:"htmlall"|replace:'|':', '}{/if}</td>
 						<td>{if {$a.rating} != ''}{$a.rating}{/if}</td>
