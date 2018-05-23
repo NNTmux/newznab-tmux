@@ -1,3 +1,5 @@
+2018-05-23 DariusIII
+	* Chg: Update php-coveralls/php-coveralls to latest version
 2018-05-22 DariusIII
 	* Fix: Fix audio cover view errors for real this time
 	* Fix: Properly fix audio cover view errors
