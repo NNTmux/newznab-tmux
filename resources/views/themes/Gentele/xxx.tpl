@@ -254,8 +254,8 @@
 													{assign var="mpass" value=","|explode:$result->grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result->grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
-													{foreach $msplits as $loop=>$m name="loop"}
-													{if $smarty.foreach.loop.first}
+                                                    {foreach $msplits as $m}
+                                                    {if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
 																class="cover img-responsive img-rounded"
 																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"

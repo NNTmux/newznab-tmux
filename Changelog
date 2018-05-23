@@ -1,4 +1,5 @@
 2018-05-23 DariusIII
+	* Fix: Fix XXX releases cover view missing release names in second column
 	* Fix: Fix user search in admin/user-list page
 	* Fix: Fix groups browsing
 	* Chg: Don't use pagination for groups list page
