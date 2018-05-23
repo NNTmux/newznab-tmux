@@ -12,7 +12,7 @@ class BrowseGroupController extends BasePageController
     public function show()
     {
         $this->setPrefs();
-        $groupList = Group::getGroupsRange( '', true);
+        $groupList = Group::getGroupsRange('', true);
         $this->smarty->assign('results', $groupList);
 
         $meta_title = 'Browse Groups';
