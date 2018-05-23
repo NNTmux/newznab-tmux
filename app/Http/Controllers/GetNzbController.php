@@ -148,7 +148,7 @@ class GetNzbController extends BasePageController
         $headers += ['X-DNZB-RCode:' => '200',
             'X-DNZB-RText:' => 'OK, NZB content follows.', ];
 
-        return response()->streamDownload(function () use ($nzbPath) {
+        return response()->download(function () use ($nzbPath) {
             readgzfile($nzbPath);
         }, $cleanName.'.nzb', $headers);
     }
