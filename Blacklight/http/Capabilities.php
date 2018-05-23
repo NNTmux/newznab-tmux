@@ -109,6 +109,7 @@ abstract class Capabilities
         } else {
             header('Content-Length: '.\strlen($response));
             echo $response;
+            exit;
         }
     }
 

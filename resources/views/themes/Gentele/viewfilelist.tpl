@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 	<h2>For
 		<a href="{$smarty.const.WWW_TOP}/details/{$rel.guid}">{$rel.searchname|escape:'htmlall'}</a>
 	</h2>
@@ -30,7 +30,7 @@
 						 src="{$smarty.const.WWW_ASSETS}/images/fileicons/{$icon}.png"/></td>
 				<td class="less right">{if $completion < 100}<span class="warning">{$completion}
 						%</span>{else}{$completion}%{/if}</td>
-				<td class="less right">{if $file.size < 100000}{$file.size|fsize_format:"KB"}{else}{$file.size|fsize_format:"MB"}{/if}</td>
+				<td class="less right">{$file.size|filesize}</td>
 			</tr>
 		{/foreach}
 	</table>

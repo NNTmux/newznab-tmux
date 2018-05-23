@@ -4,6 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\ReleaseUnique.
+ *
+ * @property int $releases_id FK to releases.id.
+ * @property mixed $uniqueid Unique_ID from mediainfo.
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique whereReleasesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseUnique whereUniqueid($value)
+ * @mixin \Eloquent
+ */
 class ReleaseUnique extends Model
 {
     /**

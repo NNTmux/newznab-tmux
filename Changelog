@@ -1,3 +1,386 @@
+2018-05-23 DariusIII
+	* Fix: Fix Admin/AnidbController edit function
+	* Fix: Fix anidb-edit link
+	* Fix: Fix typo that lead to bad anidb rss feed
+	* Fix: Fix link to admin/anidb-edit page in viewanime template
+	* Fix: Fix misplaced bracket in animelist view
+	* Fix: Fix subcategory rss feeds info
+	* Fix: Fix anime releases view
+	* Fix: Fix viewanime page variable call
+	* Chg: Update php-coveralls/php-coveralls to latest version
+2018-05-22 DariusIII
+	* Fix: Fix audio cover view errors for real this time
+	* Fix: Properly fix audio cover view errors
+	* Chg: Update laravel/framework and fxp/composer-asset-manager to their latest versions
+	* Fix: Fix anime view
+	* Fix: Fix wrong variable for pagination in MusicController
+	* Fix: Fix rss feed links
+	* Fix: Add $title variable to Admin/UserController
+	* Fix: Define $title variable in Admin/GroupController
+	* Chg: Remove Charisma and Omicron themes from main repo and move them into separate repositories
+	* Chg: Update 404 page
+	* Chg: Add csrf_field to btc_payment pages
+	* Chg: Update 503.blade.php for better information display
+	* Chg: Update symfony components and psy/psych to latest versions
+2018-05-21 DariusIII
+	* Chg: Update api description template to include apikey in links
+	* Fix: Prevent duplicated 'All' on browse all releases
+	* Chg: Add .editorconfig file
+	* Fix: Fix errors in full series view
+	* Chg: Re-use old code and fix _totalrows and _totalcount insertion into existing array/object
+2018-05-18 DariusIII
+	* Fix: Fix more errors in Charisma theme
+	* Fix: Fix user profile edit page
+	* Fix: Fix wrong argument that got missed in headsearch form
+	* Fix: Fix various list views in admin area
+2018-05-17 DariusIII
+	* Fix: Partialy fix series view
+	* Chg: Update laravel/tinker to version 1.0.7
+	* Fix: Fix XXX_WEBDL category check
+	* Fix: Fix adding releases to download basket
+	* Chg: Remove Gamma theme related assets as the theme is not used anymore
+	* Chg: Rename XBOX 360 DLC to Xbox 360 DLC to be consistent with rest of the categories
+	* Fix: Fix XXX and Full XXX movie view
+	* Fix: Revert to old output code with addition of exit; to prevent overwriting of sent headers
+	* Chg: Use laravel Response class to return xml in Capabilities class output function
+2018-05-16 DariusIII
+	* Chg: Use proper smarty3 syntax for foreach loops in movies.tpl in all themes
+	* Fix: Fix search in ApiController
+	* Chg: Use raw queries in RSS and adjust XML_Response to accomodate RSS changes
+	* Chg: Update ApiController to use redirect  and streamDownload functions
+	* Chg: Update the check for release from isset to !empty in XML_Response
+	* Fix: Fix total releases count display in xml
+	* Fix: Fix empty releases at bottom of browse pages
+	* Fix: Fix category filter when searching for releases
+	* Chg: Update release edit links in all themes
+	* Fix: Fix movie view link from details page
+	* Chg: Fix release details display error
+	* Chg: settingValue function will not throw an exception anymore on empty setting value, but will return null
+	* Chg: Check also tmdb, fanart and omdb keys
+	* Chg: Add check for existence of trakttv api key in Movies class
+	* Fix: Fix movies cover and full view
+	* Chg: Revert smarty to version 3.1.31
+2018-05-15 DariusIII
+	* Chg: Update laravel/framework and ytake/laravel.smarty to latest versions
+	* Fix: Start fixing full movie view
+	* Fix: Fix route to full movie view in themes
+	* Fix: Fix display of search filter on cover pages
+	* Chg: Update links to category browsing pages in all the themes
+	* Chg: Change Music category into Audio to match database setting
+	* Fix: Fix links to categories in side menus
+	* Fix: Fix tvSearch query
+	* Chg: Use original subcategory titles when browsing
+	* Fix: Prevent errors if no results for cover view are returned
+	* Fix: Many route and themes related fixes
+2018-05-14 DariusIII
+	* Chg: Update category names display
+	* Chg: Update composer.json
+	* Chg: Add barryvdh/laravel-ide-helper
+	* Chg: Update Books class
+	* Fix: Use DBFacade for select query
+	* Fix: Fix couple of console problems
+	* Fix: Use proper parameter to display release names in movies and XXX pages
+	* Fix: Fix queries in Book and Console classes
+	* Chg: Add check if the page variable is numeric to prevent errors in offset variable
+	* Chg: Update Releases class, controllers and API responses
+2018-05-12 DariusIII
+	* Chg: Use function to call paginator
+	* Chg: Update Adult and Music pages
+	* Chg: Update music cover pages
+	* Fix: Fix games covers page
+2018-05-11 DariusIII
+	* Fix: Fix movie covers page
+	* Fix: Partial fix for movie page
+	* Fix: Fix Books and Console pages
+	* Fix: Use raw queries to speed up browse pages
+	* Chg: Replace '!=' with proper '<>' operator
+2018-05-10 DariusIII
+	* Chg: Update font-awesome and laravelcollective/html to latest versions
+	* Fix: Fix caching in Category model getChildren function
+	* Chg: Update Category model
+	* Chg: Update query caching in Category and predb models
+	* Chg: Use minutes instead of seconds for cache_expiry
+	* Chg: Use Rememberable trait in Release model and Releases class queries
+	* Chg: Cache queries on request to prevent running many duplicated queries
+2018-05-09 DariusIII
+	* Chg: Update themes
+	* Chg: Rearrange pagination queries
+	* Chg: Remove groupBy from getBrowseRange function
+	* Chg: Use simplePaginate method in Releases class
+	* Chg: Update getBrowseRange query in Releases class
+	* Fix: Fix links() error on rest of the cover related pages
+	* Fix: Fix links() array error on movies page
+	* Chg: Use <> operator instead of != in query builder
+	* Chg: Update maintenance mode handling when updating nntmux
+	* Fix: Fix category links in rssdesc.tpl
+	* Chg: Update BtcPaymentController
+2018-05-08 DariusIII
+	* Chg: Update queries in Console, Movie, Books, Music and XXX classes
+	* Chg: Update laravel/framework to version 5.6.21 and mockery/mockery to version 1.1.0
+	* Chg: Remove Blacklight/db/DB class from Console
+	* Chg: Update getConsoleRange query
+	* Chg: Update RSS class to use query builder completely
+	* Chg: Update RSS/Api results handling for XML
+	* Chg: Update range queries to reduce number of releases returned
+	* Chg: Fix table name in getConsoleRange function
+	* Chg: Update session config and .env.example
+2018-05-07 DariusIII
+	* Chg: Update tinymce support
+	* Chg: Use tinymce-dist to provide tinymce editor
+	* Fix: Fix XML_Response check for existing releases(remove is_array check as that is always false with laravels paginator)
+	* Chg: Update controllers - remove Blacklight/db/DB, update app/Exception/Handler class
+	* Chg: Update composer.json with new versions of used libraries
+	* Chg: Define default value for $catsrch variable
+	* Chg: Update return values of getCategorySearch function in Category model
+2018-05-04 DariusIII
+	* Fix: Fix user-list ordering in admin area
+	* Chg: Update getBrowseRange query in Releases class
+	* Fix: Fix wrong parameters in api request
+	* Fix: Fix nocaptcha display on login, contact, forgottenpassword and register pages
+	* Chg: Remove stray column from getmoviesRange function
+	* Chg: Remove main, usefull and article menus from basepage controller
+	* Chg: Update utils-admin.js with tinymce
+2018-05-03 DariusIII
+	* Chg: Adjust code in template files
+	* Chg: Add nntmux:reset-truncate command to artisan console
+	* Chg: Update php-tmdb/api and font-awesome to latest versions
+	* Chg: Add theme patch
+	* Chg: Update themes, remove Gamma theme
+2018-05-02 DariusIII
+	* Chg: Update laravel/framework to version 5.6.20, symfony components and font-awesome to their latest versions
+2018-04-30 DariusIII
+	* Chg: Update .env.example
+	* Chg: Update laravel/framework to version 5.6.19 and symfony components to their latest versions
+	* Chg: Update queries in Games class
+	* Fix: Fix group browsing links in all themes
+	* Fix: Fix games cover page
+	* Chg: Update getBrowseBy function in XXX class
+	* Fix: Fix XXX ordering
+	* Fix: Fix column and table names used in Games, Music and XXX get range functions
+2018-04-29 DariusIII
+	* Chg: Use find command for userId check in Mail
+	* Chg: Update phpunit and php-code-coverage to latest versions
+2018-04-27 DariusIII
+	* Chg: Try to fix multiple cart additions by changing to requests
+	* Chg: Update NfoController and add missing route to web.php
+	* Chg: Update CartController, use redirect instead of 404 page when no data is found on store function
+	* Chg: Update getNzb PHPDOC block
+	* Chg: Use laravel's response for nzb downloads
+2018-04-26 DariusIII
+	* Fix: Fix zipped downloads
+	* Chg: Update laravel/framework to version 5.6.18
+	* Fix: Fix wrong usage of id parameter before zip
+	* Chg: Update paths in utils and functions.js
+	* Fix: Fix series view
+	* Chg: Fix typo in tvSearch query
+2018-04-25 DariusIII
+	* Chg: Update SeriesController
+	* Chg: Possible fix for missing series when series are selected
+	* Fix: Fix undefined index title on series view
+	* Chg: Update query in getVideoById function in Video class
+	* Fix: Fix typo in column name in Releases tvSearch function
+	* Fix: Fix XXX list view
+	* Fix: Fix admin predb search
+	* Fix: Update Predb model getAll function PHPDOC block
+	* Fix: Fix adding new user roles
+	* Fix: Remove duplicated SESSION_DRIVER from .env.example
+	* Chg: Update smarty/smarty to version 3.1.32
+2018-04-24 DariusIII
+	* Chg: Update groupfixrelnames query
+	* Chg: Add cache table migration for users that want to use database for caching
+	* Chg: Change paths in themes browse templates
+	* Chg: Adjust controllers for changed functions
+	* Chg: Use query builder for animeSearch, movieSearch, export functions
+2018-04-23 DariusIII
+	* Chg: Update series page range and category handling
+	* Chg: Use query builder for tvSearch
+	* Chg: Remove static admin from .htaccess
+	* Chg: Update BrowseController and themes browse pages
+	* Fix: Fix adding mgr posters
+	* Chg: Remove opcache statistics page from admin
+	* Fix: Fix bad logic in RoleController
+	* Fix: Fix Sharing and SharingSite models definitions
+2018-04-22 DariusIII
+	* Chg: Update guzzlehttp/guzzle to version 6.3.3
+2018-04-21 DariusIII
+	* Fix: Fix admin movie-list page
+2018-04-20 DariusIII
+	* Fix: Remove unused pager from ReleasesController
+	* Chg: Update imdbphp/imdbphp to version 6.0.1
+	* Chg: Update Readme.md
+	* Fix: Fix numerous category browsing issues
+	* Chg: Update browsing per category
+	* Chg: Update anime page links in all the themes
+	* Chg: Fix myshows/browse page
+	* Chg: Add browse route for myshows
+	* Fix: Fix active/inactive groups display
+	* Chg: Update error pages
+2018-04-19 DariusIII
+	* Chg: Update actions in admin theme
+	* Fix: Fix group list pagination
+	* Fix: Add missing group routes
+	* Fix: Fix bugs in redirects
+	* Fix: Fix link on content addition
+	* Chg: Change redirect route on site edit submit action
+	* Chg: Update admin redirects
+	* Chg: Update ProfileController, fix Sabnzbd constructor call
+	* Chg: Add SharingController
+	* Chg: Update ShowsController add show-remove option
+	* Chg: Add PredbController
+	* Chg: Add NzbController
+	* Chg: Add MusicController
+	* Chg: Add MovieController
+	* Chg: Add MenuController
+	* Chg: Add GameController
+	* Chg: Update ForumController and routes for deleting forum
+	* Chg: Add FailedReleasesController
+	* Chg: Add ConsoleController
+	* Chg: Add CommentsController
+	* Chg: Update used libraries to their latest versions
+	* Fix: Fix install.lock file generation on install
+	* Chg: Add option to .env.example to decide if session should be encrypted or not
+2018-04-18 DariusIII
+	* Chg: Add ShowsController
+	* Chg: Add and use admin middleware
+	* Chg: Update Regexes class getRegex function
+	* Chg: Add ReleasesController
+	* Chg: Add MgrPosterController
+	* Chg: Add TmuxController
+	* Chg: Add AjaxController, update utils-admin.js
+	* Chg: Add ReleaseNamingRegexesController
+	* Chg: Use api/v1 for api
+	* Chg: Add CollectionRegexesController
+	* Chg: Update routes
+	* Chg: Add CategoryRegexesController
+2018-04-17 DariusIII
+	* Chg: Rename admin to oldadmin folder
+	* Chg: Update admin theme
+	* Chg: Update laravel/framework to version 5.6.17
+	* Chg: Add admin GroupController
+	* Chg: Add admin ContentController
+	* Chg: Add admin RoleController
+	* Chg: Add admin SiteController
+	* Chg: Add admin UserController
+	* Chg: Add BookController and edit Blacklist/Anidb class
+	* Chg: Add admin CategoryController
+	* Chg: Add admin anidb and blacklist controllers
+2018-04-16 DariusIII
+	* Chg: Update nesbot/carbon to latest version
+	* Chg: Start adding admin routes and controllers
+	* Chg: Add TermsController and add nzbvortex to queue controller
+	* Chg: Update themes for series
+	* Chg: Add SeriesController
+	* Chg: Add controller for send to functions
+	* Chg: Optimize queue controller
+	* Chg: Add NZBGetController and route
+	* Chg: Update headermenu.tpl in all themes
+	* Chg: Use laravel pager in all themes
+	* Chg: Update Books class getBookRange function and BooksController
+	* Chg: Rename BasePageController index function to basePage
+2018-04-15 DariusIII
+	* Chg: Update the routes
+	* Chg: Update Profile and Forum controllers
+2018-04-13 DariusIII
+	* Chg: Add deleteTopic route and function
+	* Chg: Add NfoController and route
+	* Chg: Remove unused pages and update xxx route
+	* Chg: Update AdultController and XXX class
+	* Chg: Update used libraries
+	* Chg: Add AdultController
+	* Chg: Adjust queries in classes related to browsing
+	* Chg: Update redirect on new rss key generation
+	* Chg: Add option to edit profile to ProfileController
+	* Chg: Add MyShowsController, adjust rest of the controllers and classes
+	* Chg: Add MyMoviesController
+	* Fix: Fix search
+2018-04-12 DariusIII
+	* Fix: Fix a bug in group model getGroupsForSelect function
+	* Chg: Update search
+	* Fix: Fix missing = in search query
+	* Chg: Update headermenu search
+	* Chg: Update search
+2018-04-11 DariusIII
+	* Chg: Add SearchController
+	* Chg: Add MusicController
+	* Chg: Fix missing release_flag from smarty, update themes
+	* Chg: Add MovieController
+	* Chg: Add GamesController, adjust themes and classes
+	* Chg: Update CartController
+	* Chg: Update returned response in FailedReleasesController
+	* Fix: Fix contact-us page
+2018-04-10 DariusIII
+	* Chg: Update Forum and FailedRelease controllers
+	* Chg: Update used libraries to their latest versions
+	* Chg: Use response helper for headers in Cart, ContactUs and FailedReleases controllers
+2018-04-09 DariusIII
+	* Chg: Update comments handling in user profile page
+	* Chg: Remove pager from profile
+	* Chg: Use laravel pagination in forum
+	* Chg: Add ForumController and routes
+2018-04-08 DariusIII
+	* Chg: Add FileListController and routes
+	* Chg: Add FailedReleasesController and routes
+	* Chg: Add ContentController and route
+2018-04-07 DariusIII
+	* Chg: Add BtcPaymentController
+	* Chg: Update libraries to their latest versions
+2018-04-06 DariusIII
+	* Fix: Fix pager on browse pages
+2018-04-05 DariusIII
+	* Chg: Update themes for new group browse route
+	* Chg: Add BrowseGroupController
+	* Chg: Update contact form
+	* Chg: Update and improve registration page
+	* Fix: Fix NOCAPTCHA on login pages
+	* Chg: Add ConsoleController
+	* Chg: Update handling of requests for nzb files
+2018-04-04 DariusIII
+	* Chg: Add RSS controller and route
+	* Chg: Add initial GetNzbController
+	* Chg: Update details pages
+	* Chg: Add Api\ApiController, update routes/web.php
+	* Chg: Add ApiHelp controller
+	* Chg: Update links in themes for new routes
+	* Chg: Update functions.js to include csrf-token
+	* Chg: Update logout logic
+	* Chg: Update themes and routes
+	* Chg: Add CartController
+2018-04-03 DariusIII
+	* Chg: Update BrowseController
+	* Fix: Fix return value of Category model getCategorySearch function
+	* Chg: Add BooksController and update Category getCategorySearch function
+	* Chg: Add AnimeController
+	* Chg: Update BrowseController, enable non-cover view browsing of categories and subcategories
+2018-04-02 DariusIII
+	* Chg: Update routes and browse controller
+2018-04-01 DariusIII
+	* Chg: Update Base and Browse controllers
+	* Chg: Allow disabling of captcha on login page
+2018-03-31 DariusIII
+	* Chg: Add barryvdh/laravel-debugbar as dev requirement
+2018-03-30 DariusIII
+	* Chg: Add initial BrowseController
+2018-03-29 DariusIII
+	* Chg: Update themes, BasePage and Profile controllers
+	* Chg: Update themes and use ForgottenPasswordController
+	* Chg: Remove login/register pages, use Login/Register controllers completely
+2018-03-28 DariusIII
+	* Chg: Update laravel/framework to version 5.6.14
+	* Chg: Change login/register pages
+	* Chg: Change from Page to BasePage in Captcha class, remove unused use statement in SABNzbd class
+	* Chg: Remove Page and AdminPage classes, adjust pages accordingly
+	* Chg: Update font-awesome to version 5.0.9
+2018-03-27 DariusIII
+	* Chg: Update session, .htaccess and env.example
+	* Chg: Use url helper to define serverroot and replace request->header with header
+	* Fix: Fix forum/forumpost pages routing
+	* Chg: Remove $kernel variable assignment from bootstraping laravel
+	* Chg: Fix RSS feeds for logged out users
+2018-03-26 DariusIII
+	* Chg: Update laravel/framework to version 5.6.13, guzzlehttp/guzzle and phpunit to latest versions
+	* Chg: Add missing filelist route
+	* Chg: Add newline after Info comment message in DbUpdate class
+	* Chg: Update laravelcollective/html and guzzlehttp/guzzle top latest versions
 2018-03-22 DariusIII
 	* Chg: Update jeremeamia/superclosure to latest version
 2018-03-21 DariusIII

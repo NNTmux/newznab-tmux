@@ -5,6 +5,33 @@ namespace App\Models;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Forumpost.
+ *
+ * @property int $id
+ * @property int $forumid
+ * @property int $parentid
+ * @property int $users_id
+ * @property string $subject
+ * @property string $message
+ * @property bool $locked
+ * @property bool $sticky
+ * @property int $replies
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereForumid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereLocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereMessage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereParentid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereReplies($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereSticky($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereSubject($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class Forumpost extends Model
 {
     /**
@@ -110,26 +137,14 @@ class Forumpost extends Model
     }
 
     /**
-     * Get count of posts for parent forum.
-     *
-     * @return int
-     */
-    public static function getBrowseCount(): int
-    {
-        $res = self::query()->count('id');
-
-        return $res ?? 0;
-    }
-
-    /**
      * Get browse range for forum.
      *
      *
      * @param $start
      *
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getBrowseRange($start)
+    public static function getBrowseRange()
     {
         return self::query()
             ->where('forumpost.parentid', '=', 0)
@@ -137,8 +152,7 @@ class Forumpost extends Model
             ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
             ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
             ->orderBy('forumpost.updated_at', 'desc')
-            ->limit(config('nntmux.items_per_page'))->offset($start)
-            ->get();
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**

@@ -4,10 +4,48 @@ namespace App\Models;
 
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Database\CacheQueryBuilder;
 
+/**
+ * App\Models\MusicInfo.
+ *
+ * @property int $id
+ * @property string $title
+ * @property string|null $asin
+ * @property string|null $url
+ * @property int|null $salesrank
+ * @property string|null $artist
+ * @property string|null $publisher
+ * @property string|null $releasedate
+ * @property string|null $review
+ * @property string $year
+ * @property int|null $genres_id
+ * @property string|null $tracks
+ * @property bool $cover
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Genre|null $genre
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereArtist($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereAsin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereCover($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereGenresId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo wherePublisher($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereReleasedate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereReview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereSalesrank($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereTracks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereYear($value)
+ * @mixin \Eloquent
+ */
 class MusicInfo extends Model
 {
     use Searchable;
+    use CacheQueryBuilder;
     /**
      * @var string
      */

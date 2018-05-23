@@ -21,6 +21,7 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use Tmdb\Repository\ConfigurationRepository;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 /**
  * Class Movie.
@@ -157,6 +158,16 @@ class Movie
     protected $tmdbconfig;
 
     /**
+     * @var null|string
+     */
+    protected $traktcheck;
+
+    /**
+     * @var null|string
+     */
+    protected $tmdbtokencheck;
+
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -173,22 +184,27 @@ class Movie
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
-        $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+        $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
+        if ($this->traktcheck !== null) {
+            $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+        }
         $this->client = new Client();
-        $this->tmdbtoken = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
-        $this->tmdbclient = new TmdbClient(
-            $this->tmdbtoken,
-            [
-            'cache' => [
-                'enabled' => false,
-            ],
-        ]
-        );
-        $this->configRepository = new ConfigurationRepository($this->tmdbclient);
-        $this->tmdbconfig = $this->configRepository->load();
-        $this->helper = new ImageHelper($this->tmdbconfig);
+        $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey');
+        if ($this->tmdbtokencheck !== null) {
+            $this->tmdbtoken = new ApiToken($this->tmdbtokencheck);
+            $this->tmdbclient = new TmdbClient($this->tmdbtoken, [
+                    'cache' => [
+                        'enabled' => false,
+                    ],
+                ]);
+            $this->configRepository = new ConfigurationRepository($this->tmdbclient);
+            $this->tmdbconfig = $this->configRepository->load();
+            $this->helper = new ImageHelper($this->tmdbconfig);
+        }
         $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
-        $this->fanart = new FanartTV($this->fanartapikey);
+        if ($this->fanartapikey !== null) {
+            $this->fanart = new FanartTV($this->fanartapikey);
+        }
         $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
@@ -221,6 +237,7 @@ class Movie
      * Get movie releases with covers for movie browse page.
      *
      *
+     * @param       $page
      * @param       $cat
      * @param       $start
      * @param       $num
@@ -230,19 +247,17 @@ class Movie
      *
      * @return array|bool
      */
-    public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
+    public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
-
         $order = $this->getMovieOrder($orderBy);
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-
         $moviesSql =
-                sprintf(
-                    "
+            sprintf(
+                "
 					SELECT SQL_CALC_FOUND_ROWS
 						m.imdbid,
 						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -255,36 +270,34 @@ class Movie
 					%s %s %s %s
 					GROUP BY m.imdbid
 					ORDER BY %s %s %s",
-                        $this->showPasswords,
-                        $this->getBrowseBy(),
-                        (! empty($catsrch) ? $catsrch : ''),
-                        (
-                            $maxAge > 0
-                                ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                                : ''
-                        ),
-                        (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                );
-        $movieCache = Cache::get(md5($moviesSql));
+                $this->showPasswords,
+                $this->getBrowseBy(),
+                (! empty($catsrch) ? $catsrch : ''),
+                (
+                $maxAge > 0
+                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
+                    : ''
+                ),
+                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            );
+        $movieCache = Cache::get(md5($moviesSql.$page));
         if ($movieCache !== null) {
             $movies = $movieCache;
         } else {
-            $movies = $this->pdo->queryCalc($moviesSql);
-            Cache::put(md5($moviesSql), $movies, $expiresAt);
+            $data = DBFacade::select($moviesSql);
+            $movies = ['total' => DBFacade::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
         }
-
         $movieIDs = $releaseIDs = [];
-
         if (\is_array($movies['result'])) {
             foreach ($movies['result'] as $movie => $id) {
-                $movieIDs[] = $id['imdbid'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $movieIDs[] = $id->imdbid;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
-
         $sql = sprintf(
             "
 			SELECT
@@ -317,22 +330,21 @@ class Movie
 			AND r.id IN (%s) %s
 			GROUP BY m.imdbid
 			ORDER BY %s %s",
-                (\is_array($movieIDs) ? implode(',', $movieIDs) : -1),
-                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                (! empty($catsrch) ? $catsrch : ''),
-                $order[0],
-                $order[1]
+            (\is_array($movieIDs) ? implode(',', $movieIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            (! empty($catsrch) ? $catsrch : ''),
+            $order[0],
+            $order[1]
         );
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $movies['total'] ?? 0;
+        $return = DBFacade::select($sql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
         }
-
-        Cache::put(md5($sql), $return, $expiresAt);
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
     }
@@ -410,16 +422,18 @@ class Movie
      */
     public function getTrailer($imdbID)
     {
-        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '!=', '')->first(['trailer']);
+        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '<>', '')->first(['trailer']);
         if ($trailer !== null) {
             return $trailer['trailer'];
         }
 
-        $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
-        if ($data !== false) {
-            $this->parseTraktTv($data);
-            if (! empty($data['trailer'])) {
-                return $data['trailer'];
+        if ($this->traktcheck !== null) {
+            $data = $this->traktTv->client->movieSummary('tt'.$imdbID, 'full');
+            if ($data !== false) {
+                $this->parseTraktTv($data);
+                if (! empty($data['trailer'])) {
+                    return $data['trailer'];
+                }
             }
         }
 
@@ -717,7 +731,8 @@ class Movie
                     $mov['year'].
                     ') - '.
                     $mov['imdbid']
-                ), true
+                ),
+                true
             );
         }
 
@@ -733,7 +748,7 @@ class Movie
      */
     protected function fetchFanartTVProperties($imdbId)
     {
-        if ($this->fanartapikey !== '') {
+        if ($this->fanartapikey !== null) {
             $art = $this->fanart->getMovieFanart('tt'.$imdbId);
 
             if ($art !== null && $art !== false) {
@@ -921,27 +936,31 @@ class Movie
      */
     protected function fetchTraktTVProperties($imdbId)
     {
-        $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
-        if ($resp !== false) {
-            similar_text($this->currentTitle, $resp['title'], $percent);
-            if ($percent > self::MATCH_PERCENT) {
-                similar_text($this->currentYear, $resp['year'], $percent);
-                if ($percent >= self::YEAR_MATCH_PERCENT) {
-                    $ret = [];
-                    if (isset($resp['ids']['trakt'])) {
-                        $ret['id'] = $resp['ids']['trakt'];
+        if ($this->traktcheck !== null) {
+            $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
+            if ($resp !== false) {
+                similar_text($this->currentTitle, $resp['title'], $percent);
+                if ($percent > self::MATCH_PERCENT) {
+                    similar_text($this->currentYear, $resp['year'], $percent);
+                    if ($percent >= self::YEAR_MATCH_PERCENT) {
+                        $ret = [];
+                        if (isset($resp['ids']['trakt'])) {
+                            $ret['id'] = $resp['ids']['trakt'];
+                        }
+
+                        if (isset($resp['title'])) {
+                            $ret['title'] = $resp['title'];
+                        } else {
+                            return false;
+                        }
+                        if ($this->echooutput) {
+                            ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
+                        }
+
+                        return $ret;
                     }
 
-                    if (isset($resp['title'])) {
-                        $ret['title'] = $resp['title'];
-                    } else {
-                        return false;
-                    }
-                    if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
-                    }
-
-                    return $ret;
+                    return false;
                 }
 
                 return false;
@@ -1136,7 +1155,7 @@ class Movie
                 }
 
                 // Check on Trakt.
-                if ($movieUpdated === false) {
+                if ($movieUpdated === false && $this->traktcheck !== null) {
                     $data = $this->traktTv->client->movieSummary($movieName, 'full');
                     if ($data !== false) {
                         $this->parseTraktTv($data);
@@ -1193,7 +1212,7 @@ class Movie
     {
         //If we found a year, try looking in a 4 year range.
         $check = MovieInfo::query()
-            ->where('title', 'LIKE', '%'.$this->currentTitle.'%');
+            ->where('title', 'like', '%'.$this->currentTitle.'%');
 
         if ($this->currentYear !== '') {
             $start = Carbon::parse($this->currentYear)->subYears(2)->year;

@@ -103,7 +103,7 @@ return [
     ],
     10 => [
         'id' => 1070,
-        'title' => 'XBOX 360 DLC',
+        'title' => 'Xbox 360 DLC',
         'parentid' => 1000,
         'status' => 1,
         'description' => null,

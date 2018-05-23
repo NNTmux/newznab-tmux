@@ -11,11 +11,108 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * App\Models\User.
+ *
+ * @property int $id
+ * @property string $username
+ * @property string|null $firstname
+ * @property string|null $lastname
+ * @property string $email
+ * @property string $password
+ * @property int $user_roles_id FK to user_roles.id
+ * @property string|null $host
+ * @property int $grabs
+ * @property string $rsstoken
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property string|null $resetguid
+ * @property string|null $lastlogin
+ * @property string|null $apiaccess
+ * @property int $invites
+ * @property int|null $invitedby
+ * @property int $movieview
+ * @property int $xxxview
+ * @property int $musicview
+ * @property int $consoleview
+ * @property int $bookview
+ * @property int $gameview
+ * @property string|null $saburl
+ * @property string|null $sabapikey
+ * @property bool|null $sabapikeytype
+ * @property bool|null $sabpriority
+ * @property bool $queuetype Type of queue, Sab or NZBGet
+ * @property string|null $nzbgeturl
+ * @property string|null $nzbgetusername
+ * @property string|null $nzbgetpassword
+ * @property string|null $nzbvortex_api_key
+ * @property string|null $nzbvortex_server_url
+ * @property string $userseed
+ * @property string $notes
+ * @property string|null $cp_url
+ * @property string|null $cp_api
+ * @property string|null $style
+ * @property string|null $rolechangedate When does the role expire
+ * @property string|null $remember_token
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $excludedCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failedRelease
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Invitation[] $invitation
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $release
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
+ * @property-read \App\Models\UserRole $role
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiaccess($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereBookview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereConsoleview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCpApi($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCpUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereFirstname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereGameview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereGrabs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereHost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereInvitedby($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereInvites($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereLastlogin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereLastname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereMovieview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereMusicview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgetpassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgeturl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbgetusername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbvortexApiKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereNzbvortexServerUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereQueuetype($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereResetguid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRolechangedate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRsstoken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabapikey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabapikeytype($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSabpriority($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereSaburl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereStyle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserRolesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserseed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereXxxview($value)
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
     use Notifiable;
+    use CacheQueryBuilder;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -47,6 +144,8 @@ class User extends Authenticatable
      * @var bool
      */
     protected $dateFormat = false;
+
+    protected $hidden = ['remember_token', 'password'];
 
     /**
      * @var array
@@ -178,22 +277,22 @@ class User extends Authenticatable
      */
     public static function getCount($role = '', $username = '', $host = '', $email = ''): int
     {
-        $res = self::query()->where('email', '!=', 'sharing@nZEDb.com');
+        $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
         if ($role !== '') {
             $res->where('user_roles_id', $role);
         }
 
         if ($username !== '') {
-            $res->where('username', 'LIKE', '%'.$username.'%');
+            $res->where('username', 'like', '%'.$username.'%');
         }
 
         if ($host !== '') {
-            $res->where('host', 'LIKE', '%'.$host.'%');
+            $res->where('host', 'like', '%'.$host.'%');
         }
 
         if ($email !== '') {
-            $res->where('email', 'LIKE', '%'.$email.'%');
+            $res->where('email', 'like', '%'.$email.'%');
         }
 
         return $res->count(['id']);
@@ -368,44 +467,39 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $start
-     * @param $offset
-     * @param $orderBy
+     * @param        $orderBy
      * @param string $userName
      * @param string $email
      * @param string $host
      * @param string $role
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      * @throws \Exception
      */
-    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
+    public static function getRange($orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
         UserRequest::clearApiRequests(false);
 
         $order = getUserBrowseOrder($orderBy);
 
-        $users = self::query()->with('role', 'request')->where('id', '!=', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
+        $users = self::query()->with('role', 'request')->where('id', '<>', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
         if ($userName !== '') {
-            $users->where('username', 'LIKE', '%'.$userName.'%');
+            $users->where('username', 'like', '%'.$userName.'%');
         }
 
         if ($email !== '') {
-            $users->where('email', 'LIKE', '%'.$email.'%');
+            $users->where('email', 'like', '%'.$email.'%');
         }
 
         if ($host !== '') {
-            $users->where('host', 'LIKE', '%'.$host.'%');
+            $users->where('host', 'like', '%'.$host.'%');
         }
 
         if ($role !== '') {
             $users->where('user_roles_id', $role);
         }
 
-        if ($start !== false) {
-            $users->limit($offset)->offset($start);
-        }
-
-        return $users->get();
+        return $users->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -517,10 +611,11 @@ class User extends Authenticatable
     /**
      * Check if the user is in the database, and if their API key is good, return user data if so.
      *
-     * @param int    $userID   ID of the user.
-     * @param string $rssToken API key.
      *
-     * @return bool|array
+     * @param $userID
+     * @param $rssToken
+     *
+     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getByIdAndRssToken($userID, $rssToken)
     {
@@ -573,7 +668,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate a stron password.
+     * Generate a strong password.
      *
      *
      * @param int $length
@@ -756,52 +851,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Verify if the user is logged in.
-     *
-     * @return bool
-     * @throws \Exception
-     */
-    public static function isLoggedIn(): bool
-    {
-        if (isset($_SESSION['uid'])) {
-            return true;
-        }
-        if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
-            $u = self::find($_COOKIE['uid']);
-
-            if ((int) $u['user_roles_id'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'].$_COOKIE['uid'])) {
-                self::login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
-            }
-        }
-
-        return isset($_SESSION['uid']);
-    }
-
-    /**
-     * Log in a user.
-     *
-     * @param int    $userID   ID of the user.
-     * @param string $host
-     * @param bool $remember Save the user in cookies to keep them logged in.
-     *
-     * @throws \Exception
-     */
-    public static function login($userID, $host = '', $remember = false): void
-    {
-        $_SESSION['uid'] = $userID;
-
-        if ((int) Settings::settingValue('..storeuserips') !== 1) {
-            $host = '';
-        }
-
-        self::updateSiteAccessed($userID, $host);
-
-        if ($remember === true) {
-            self::setCookies($userID);
-        }
-    }
-
-    /**
      * When a user logs in, update the last time they logged in.
      *
      * @param int    $userID ID of the user.
@@ -815,41 +864,6 @@ class User extends Authenticatable
                 'host' => $host,
             ]
         );
-    }
-
-    /**
-     * Set up cookies for a user.
-     *
-     * @param int $userID
-     */
-    public static function setCookies($userID): void
-    {
-        $user = self::find($userID);
-        $secure_cookie = request()->secure();
-        setcookie('uid', $userID, time() + 2592000, '/', null, $secure_cookie, true);
-        setcookie('idh', self::hashSHA1($user['userseed'].$userID), time() + 2592000, '/', null, $secure_cookie, true);
-    }
-
-    /**
-     * Return the User ID of the user.
-     *
-     * @return int
-     */
-    public static function currentUserId(): int
-    {
-        return $_SESSION['uid'] ?? -1;
-    }
-
-    /**
-     * Logout the user, destroying his cookies and session.
-     */
-    public static function logout(): void
-    {
-        session_unset();
-        session_destroy();
-        $secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? '1' : '0');
-        setcookie('uid', null, -1, '/', null, $secure_cookie, true);
-        setcookie('idh', null, -1, '/', null, $secure_cookie, true);
     }
 
     /**
@@ -893,7 +907,7 @@ class User extends Authenticatable
      */
     public static function getUsersByMonth()
     {
-        return self::query()->whereNotNull('created_at')->where('created_at', '!=', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
+        return self::query()->whereNotNull('created_at')->where('created_at', '<>', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
     }
 
     /**

@@ -12,12 +12,10 @@
 		<div class="login-box-body">
 			<p class="login-box-msg">Please sign in to access the site</p>
 			<form action="login" method="post">
-				<input type="hidden" name="_token" value="{$csrf_token}">
-				{if isset($redirect)}
-					<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}"/>
-				{/if}
+				{{csrf_field()}}
 				<div class="form-group has-feedback">
-					<input id="username" name="username" type="text" class="form-control" placeholder="Username or email"/>
+					<input id="username" name="username" type="text" class="form-control"
+						   placeholder="Username or email"/>
 					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
@@ -32,7 +30,9 @@
 									   name="rememberme" type="checkbox"> Remember Me
 							</label>
 							<hr>
-							{$page->smarty->fetch('captcha.tpl')}
+							{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+								{NoCaptcha::display()}{NoCaptcha::renderJs()}
+							{/if}
 						</div>
 					</div><!-- /.col -->
 					<div class="col-xs-4">
@@ -47,13 +47,13 @@
 			<!-- iCheck -->
 			<script src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js" type="text/javascript"></script>
 			<script>
-				$(function () {
-					$('input').iCheck({
-						checkboxClass: 'icheckbox_flat-green',
-						radioClass: 'iradio_flat-green',
-						increaseArea: '20%' // optional
-					});
-				});
+                $(function () {
+                    $('input').iCheck({
+                        checkboxClass: 'icheckbox_flat-green',
+                        radioClass: 'iradio_flat-green',
+                        increaseArea: '20%' // optional
+                    });
+                });
 			</script>
 		</div>
 	</div>

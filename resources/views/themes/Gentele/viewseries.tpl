@@ -136,16 +136,16 @@
 						<div class="panel-body pagination2">
 							<div class="tabbable">
 								<ul class="nav nav-tabs">
-									{foreach $seasons as $seasonnum => $season name = "seas"}
-										<li {if $smarty.foreach.seas.first}class="active"{/if}><a
+									{foreach $seasons as $seasonnum => $season}
+										<li {if $season@first}class="active"{/if}><a
 													title="View Season {$seasonnum}" href="#{$seasonnum}"
 													data-toggle="tab">{$seasonnum}</a></li>
 									{/foreach}
 								</ul>
 								<div class="tab-content">
-									{foreach $seasons as $seasonnum => $season name = "tv"}
+									{foreach $seasons as $seasonnum => $season}
 										{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
-										<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
+										<div class="tab-pane{if $season@first} active{/if} fade in"
 											 id="{$seasonnum}">
 											<table class="tb_{$seasonnum} data table table-striped responsive-utilities jambo-table"
 												   id="browsetable">
@@ -153,7 +153,8 @@
 												<tr>
 													<th>Ep</th>
 													<th>Name</th>
-													<th> Select All <input id="check-all" type="checkbox" class="flat-all"/></th>
+													<th> Select All <input id="check-all" type="checkbox"
+																		   class="flat-all"/></th>
 													<th>Category</th>
 													<th>Posted</th>
 													<th>Size</th>
@@ -163,7 +164,7 @@
 												{foreach $season as $episodes}
 													{foreach $episodes as $result}
 														<tr class="{cycle values=",alt"}"
-															id="guid{$result.guid}">
+															id="guid{$result->guid}">
 															{if $result@total>1 && $result@index == 0}
 																<td rowspan="{$result@total}" width="30">
 																	<h4>{$episodes@key}</h4></td>
@@ -172,73 +173,80 @@
 															{/if}
 															<td>
 																<a title="View details"
-																   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+																   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>
 
 																<div>
-																	{if $result.nfoid > 0}<span>
-																		<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+																	{if $result->nfoid > 0}<span>
+																		<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 																		   class="modal_nfo label label-primary text-muted">NFO</a>
 																		</span>{/if}
-																	{if $result.image == 1 && $userdata.canpreview == 1}
+																	{if $result->image == 1 && $userdata.canpreview == 1}
 																	<a
-																			href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-																			name="name{$result.guid}"
+																			href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+																			name="name{$result->guid}"
 																			data-fancybox
 																			title="View Screenshot"
 																			class="label label-primary"
 																			rel="preview">Preview</a>{/if}
-																	<span class="label label-primary">{$result.grabs}
-																		Grab{if $result.grabs != 1}s{/if}</span>
-																	{if $result.firstaired != ""}<span
+																	<span class="label label-primary">{$result->grabs}
+																		Grab{if $result->grabs != 1}s{/if}</span>
+																	{if $result->firstaired != ""}<span
 																		class="label label-success"
-																		title="{$result.title} Aired on {$result.firstaired|date_format}">
-																		Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
-																	{if $result.reid > 0}<span
+																		title="{$result->title} Aired on {$result->firstaired|date_format}">
+																		Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
+																	{if $result->reid > 0}<span
 																		class="mediainfo label label-primary"
-																		title="{$result.guid}">Media</span>{/if}
+																		title="{$result->guid}">Media</span>{/if}
 																</div>
 															</td>
 															<td width="10"><input
-																		id="guid{$result.guid}"
+																		id="guid{$result->guid}"
 																		type="checkbox"
 																		class="flat" name="table_data{$seasonnum}"
-																		value="{$result.guid}"/></td>
+																		value="{$result->guid}"/></td>
 															<td>
-																<span class="label label-primary">{$result.category_name}</span>
+																<span class="label label-primary">{$result->category_name}</span>
 															</td>
 															<td width="40"
-																title="{$result.postdate}">{$result.postdate|timeago}</td>
+																title="{$result->postdate}">{$result->postdate|timeago}</td>
 															<td>
-																{$result.size|fsize_format:"MB"}
+																{$result->size|filesize}
 															</td>
 															<td>
-																<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}" class="icon_nzb text-muted"><i
+																<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
+																   class="icon_nzb text-muted"><i
 																			class="fa fa-cloud-download text-muted"
-																			data-toggle="tooltip" data-placement="top" title
+																			data-toggle="tooltip" data-placement="top"
+																			title
 																			data-original-title="Download NZB"></i></a>
-																<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+																<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 																			class="fa fa-comments-o text-muted"
-																			data-toggle="tooltip" data-placement="top" title
+																			data-toggle="tooltip" data-placement="top"
+																			title
 																			data-original-title="Comments"></i></a>
 																<a href="#"><i
-																			id="guid{$result.guid}"
-																			class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
+																			id="guid{$result->guid}"
+																			class="icon_cart text-muted fa fa-shopping-basket"
+																			data-toggle="tooltip"
 																			data-placement="top" title
 																			data-original-title="Send to my download basket"></i></a>
 																{if isset($sabintegrated) && $sabintegrated !=""}
 																	<a href="#">
-																		<i	id="guid{$result.guid}"
-																			  class="icon_sab text-muted fa fa-share"
-																			  data-toggle="tooltip"
-																			  data-placement="top" title
-																			  data-original-title="Send to my Queue">
+																		<i id="guid{$result->guid}"
+																		   class="icon_sab text-muted fa fa-share"
+																		   data-toggle="tooltip"
+																		   data-placement="top" title
+																		   data-original-title="Send to my Queue">
 																		</i>
 																	</a>
 																{/if}
 																{if $weHasVortex}
 																	<a href="#" class="icon_vortex text-muted"><i
-																				class="fa fa-share" data-toggle="tooltip" data-placement="top"
-																				title data-original-title="Send to NZBVortex"></i></a>
+																				class="fa fa-share"
+																				data-toggle="tooltip"
+																				data-placement="top"
+																				title
+																				data-original-title="Send to NZBVortex"></i></a>
 																{/if}
 															</td>
 														</tr>

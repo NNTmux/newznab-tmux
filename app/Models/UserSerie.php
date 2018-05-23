@@ -5,6 +5,24 @@ namespace App\Models;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserSerie.
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property int $videos_id FK to videos.id
+ * @property string|null $categories List of categories for user tv shows
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCategories($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUsersId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereVideosId($value)
+ * @mixin \Eloquent
+ */
 class UserSerie extends Model
 {
     /**

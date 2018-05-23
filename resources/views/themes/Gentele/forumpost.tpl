@@ -14,7 +14,8 @@
 						{if isset($isadmin) && $isadmin == 1}<strong>{/if}
 							<a {if $smarty.foreach.result.last}id="last"{/if}
 							   title="{if isset($isadmin) && $isadmin == 1}Admin{else}View profile{/if}"
-							   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+							   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+									<strong>{$result.username}</strong></h5></a>
 							{if isset($isadmin) && $isadmin == 1}</strong>{/if}
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 							<span class="btn btn-success btn-xs">{$result.rolename}</span>
@@ -40,7 +41,7 @@
 							<br/>
 							<div>
 								<a class="confirm_action btn btn-sm btn-danger"
-								   href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id} from={$smarty.server.REQUEST_URI|escape:"url"}"
+								   href="{$smarty.const.WWW_TOP}/admin/forum-delete/{$result.id}"
 								   title="Delete Post">Delete</a>
 							</div>
 						{/if}
@@ -56,6 +57,7 @@
 				</div>
 				<div class="body">
 					<form id="forum-post-reply" class="form-horizontal" action="" method="post">
+						{{csrf_field()}}
 						<div class="control-group">
 							<label class="control-label" for="addMessage">Message</label>
 							<div class="controls">

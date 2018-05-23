@@ -594,8 +594,8 @@ newznab-tmux https://github.com/NNTmux/newznab-tmux
    1030                                 Console/Wii                     Nintendo Wii
    1040                                 Console/Xbox                    Microsoft XBox
    1050                                 Console/Xbox 360                Microsoft XBox 360
-   1060                                 Console/Wiiware/VC              Wii homebrew
-   1070                                 Console/XBOX 360 DLC            Microsoft XBox 360 Downloadable Content
+   1060                                 Console/Wiiware VC              Wii homebrew
+   1070                                 Console/Xbox 360 DLC            Microsoft XBox 360 Downloadable Content
    1080                                 Console/PS3                     Playstation 3
    1999                                 Console/Other                   Misc Console
    1110                                 Console/3DS                     Nintendo 3DS

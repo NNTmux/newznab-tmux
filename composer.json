@@ -123,7 +123,7 @@
     "bower-asset/tinymce-dist": "^4.7",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "dev-master",
-    "doctrine/dbal": "^2.6",
+    "doctrine/dbal": "^2.7",
     "exeu/apai-io": "~2.0",
     "fideloper/proxy": "~4.0",
     "foolz/sphinxql-query-builder": "^1.2",
@@ -149,7 +149,7 @@
     "php-tmdb/api": "~2.1",
     "predis/predis": "^1.1",
     "ramsey/uuid": "^3.7",
-    "smarty/smarty": "~3.1",
+    "smarty/smarty": "^3.1",
     "spatie/laravel-fractal": "^5.3",
     "vlucas/phpdotenv": "^2.4",
     "wandersonwhcr/illuminate-romans": "^1.0",
@@ -162,6 +162,7 @@
   "require-dev": {
     "ext-bcmath": "*",
     "barryvdh/laravel-debugbar": "^3.1",
+    "barryvdh/laravel-ide-helper": "^2.4",
     "filp/whoops": "~2.0",
     "fzaninotto/faker": "~1.4",
     "mockery/mockery": "^1.0",
@@ -185,7 +186,9 @@
       "Blacklight\\build\\ComposerScripts::postInstallCmd"
     ],
     "post-update-cmd": [
-      "Blacklight\\build\\ComposerScripts::postUpdate"
+      "Blacklight\\build\\ComposerScripts::postUpdate",
+      "php artisan ide-helper:generate",
+      "php artisan ide-helper:meta"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

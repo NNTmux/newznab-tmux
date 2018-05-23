@@ -3,13 +3,14 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use Blacklight\db\DB;
+use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\GamesInfo;
 use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 class Games
@@ -45,11 +46,6 @@ class Games
      * @var bool
      */
     public $maxHitRequest;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
 
     /**
      * @var array|bool|string
@@ -107,6 +103,11 @@ class Games
     protected $giantBomb;
 
     /**
+     * @var
+     */
+    protected $pdo;
+
+    /**
      * Games constructor.
      *
      * @param array $options
@@ -121,8 +122,7 @@ class Games
         ];
         $options += $defaults;
         $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
 
         $this->publicKey = Settings::settingValue('APIs..giantbombkey');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
@@ -190,19 +190,17 @@ class Games
     }
 
     /**
-     * @param $start
-     * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @throws \InvalidArgumentException
      */
-    public function getRange($start, $num): array
+    public function getRange()
     {
-        return $this->pdo->query(
-            sprintf(
-                'SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY created_at DESC %s',
-                ($start === false ? '' : 'LIMIT '.$num.' OFFSET '.$start)
-            )
-        );
+        return GamesInfo::query()
+            ->select(['gi.*', 'g.title as genretitle'])
+            ->from('gamesinfo as gi')
+            ->join('genres as g', 'gi.genres_id', '=', 'g.id')
+            ->orderByDesc('created_at')
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -216,6 +214,7 @@ class Games
     }
 
     /**
+     * @param $page
      * @param        $cat
      * @param        $start
      * @param        $num
@@ -226,29 +225,24 @@ class Games
      * @return array
      * @throws \Exception
      */
-    public function getGamesRange($cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
+    public function getGamesRange($page, $cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
     {
         $browseBy = $this->getBrowseBy();
-
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
-
         if ($maxAge > 0) {
             $maxAge = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge);
         }
-
         $exccatlist = '';
         if (\count($excludedCats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
-
         $order = $this->getGamesOrder($orderBy);
-
         $gamesSql =
-                sprintf(
-                    "
+            sprintf(
+                "
 				SELECT SQL_CALC_FOUND_ROWS gi.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM gamesinfo gi
@@ -260,53 +254,37 @@ class Games
 				%s %s %s %s
 				GROUP BY gi.id
 				ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseBy,
-                        $catsrch,
-                        $maxAge,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        $gamesCache = Cache::get(md5($gamesSql));
+                Releases::showPasswords(),
+                $browseBy,
+                $catsrch,
+                $maxAge,
+                $exccatlist,
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            );
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $gamesCache = Cache::get(md5($gamesSql.$page));
         if ($gamesCache !== null) {
             $games = $gamesCache;
         } else {
-            $games = $this->pdo->queryCalc($gamesSql);
-            Cache::put(md5($gamesSql), $games, $expiresAt);
+            $data = DB::select($gamesSql);
+            $games = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            Cache::put(md5($gamesSql.$page), $games, $expiresAt);
         }
-
         $gameIDs = $releaseIDs = false;
-
         if (\is_array($games['result'])) {
             foreach ($games['result'] as $game => $id) {
-                $gameIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $gameIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
-
         $returnSql =
-                sprintf(
-                    "
+            sprintf(
+                '
 				SELECT
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-					GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id, g.name AS group_name,
+					r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed,
+				gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id,
 				rn.releases_id AS nfoid
 				FROM releases r
 				LEFT OUTER JOIN groups g ON g.id = r.groups_id
@@ -317,23 +295,22 @@ class Games
 				AND r.id IN (%s)
 				%s
 				GROUP BY gi.id
-				ORDER BY %s %s",
-                        (\is_array($gameIDs) ? implode(',', $gameIDs) : -1),
-                        (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                        $catsrch,
-                        $order[0],
-                        $order[1]
-                );
-        $return = Cache::get(md5($returnSql));
+				ORDER BY %s %s',
+                (\is_array($gameIDs) ? implode(',', $gameIDs) : -1),
+                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                $catsrch,
+                $order[0],
+                $order[1]
+            );
+        $return = Cache::get(md5($returnSql.$page));
         if ($return !== null) {
             return $return;
         }
-
-        $return = $this->pdo->query($returnSql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $games['total'] ?? 0;
+        $return = DB::select($returnSql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $games['total'][0]->total ?? 0;
         }
-        Cache::put(md5($returnSql), $return, $expiresAt);
+        Cache::put(md5($returnSql.$page), $return, $expiresAt);
 
         return $return;
     }
@@ -402,15 +379,13 @@ class Games
     public function getBrowseBy(): string
     {
         $browseBy = ' ';
-        $browseByArr = $this->getBrowseByOptions();
-
-        foreach ($browseByArr as $bbk => $bbv) {
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if ($bbk === 'year') {
-                    $browseBy .= 'AND YEAR (gi.releasedate) '.$this->pdo->likeString($bbs, true, true);
+                    $browseBy .= 'AND YEAR (gi.releasedate) '.$this->pdo->quote('%'.$bbs.'%');
                 } else {
-                    $browseBy .= 'AND gi.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                    $browseBy .= 'AND gi.'.$bbv.' '.$this->pdo->quote('%'.$bbs.'%');
                 }
             }
         }
@@ -465,7 +440,7 @@ class Games
     {
         //wait 10 seconds before proceeding (steam api limit)
         sleep(10);
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $gen = new Genres(['Settings' => null]);
         $ri = new ReleaseImage();
 
         $game = [];
@@ -473,7 +448,7 @@ class Games
         // Process Steam first before GiantBomb as Steam has more details
         $this->_gameResults = false;
         $genreName = '';
-        $this->_getGame = new Steam(['DB' => $this->pdo]);
+        $this->_getGame = new Steam(['DB' => null]);
         $this->_classUsed = 'Steam';
 
         $steamGameID = $this->_getGame->search($gameInfo['title']);
@@ -699,7 +674,8 @@ class Games
                     ColorCLI::alternateOver('   Title:    ').
                     ColorCLI::primary($game['title']).
                     ColorCLI::alternateOver('   Source:   ').
-                    ColorCLI::primary($this->_classUsed), true
+                    ColorCLI::primary($this->_classUsed),
+                    true
                 );
             }
             if ($game['cover'] === 1) {
@@ -712,7 +688,8 @@ class Games
             if ($this->echoOutput) {
                 ColorCLI::doEcho(
                     ColorCLI::headerOver('Nothing to update: ').
-                    ColorCLI::primary($game['title'].' (PC)'), true
+                    ColorCLI::primary($game['title'].' (PC)'),
+                    true
                 );
             }
         }
@@ -727,24 +704,22 @@ class Games
      */
     public function processGamesReleases(): void
     {
-        $res = $this->pdo->queryDirect(
-            sprintf(
-                '
-				SELECT searchname, id
-				FROM releases
-				WHERE nzbstatus = 1 %s
-				AND gamesinfo_id = 0 %s
-				ORDER BY postdate DESC
-				LIMIT %d',
-                $this->renamed,
-                $this->catWhere,
-                $this->gameQty
-            )
-        );
+        $query = Release::query()
+            ->where('nzbstatus', '=', 1)
+            ->where('gamesinfo_id', '=', 0)
+            ->where('categories_id', '=', Category::PC_GAMES);
+        if ((int) Settings::settingValue('..lookupgames') === 2) {
+            $query->where('isrenamed', '=', 1);
+        }
+        $query->select(['searchname', 'id'])
+            ->orderByDesc('postdate')
+            ->limit($this->gameQty);
 
-        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+        $res = $query->get();
+
+        if ($res->count() > 0) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->rowCount().' games release(s).'), true);
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->count().' games release(s).'), true);
             }
 
             foreach ($res as $arr) {
@@ -757,7 +732,8 @@ class Games
                     if ($this->echoOutput) {
                         ColorCLI::doEcho(
                             ColorCLI::headerOver('Looking up: ').
-                            ColorCLI::primary($gameInfo['title'].' (PC)'), true
+                            ColorCLI::primary($gameInfo['title'].' (PC)'),
+                            true
                         );
                     }
 
@@ -778,10 +754,10 @@ class Games
                         $gameId = $gameCheck['id'];
                     }
                     // Update release.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d %s', $gameId, $arr['id'], $this->catWhere));
+                    Release::query()->where('id', '=', $arr['id'])->where('categories_id', '=', Category::PC_GAMES)->update(['gamesinfo_id' => $gameId]);
                 } else {
                     // Could not parse release title.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d %s', -2, $arr['id'], $this->catWhere));
+                    Release::query()->where('id', '=', $arr['id'])->where('categories_id', '=', Category::PC_GAMES)->update(['gamesinfo_id' => -2]);
 
                     if ($this->echoOutput) {
                         echo '.';

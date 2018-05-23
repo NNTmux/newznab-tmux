@@ -1,11 +1,11 @@
 <div class="header">
-	{if isset($catname)}
-		{assign var="catsplit" value=">"|explode:$catname}
-	{/if}
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
+			/
+			<a href="{$smarty.const.WWW_TOP}/browse/{if ($parentcat == 'music')}Audio{else}{$parentcat}{/if}">{$parentcat}</a>
+			/ {if ($catname != '' && $catname != 'All')} <a
+				href="{$smarty.const.WWW_TOP}/browse/{$parentcat}/{$catname}">{$catname}</a>{/if}
 		</ol>
 	</div>
 </div>
@@ -32,7 +32,7 @@
 									{/if}
 									<div class="nzb_multi_operations">
 										{if isset($covgroup) && $covgroup != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers
 											</a>
 											|
 											<b>List</b>
@@ -69,9 +69,11 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-4">
-									{$pager}
-								</div>
+								{if    count($results) > 0}
+									<div class="col-md-4">
+										{$results->links()}
+									</div>
+								{/if}
 							</div>
 							<hr>
 							<div class="container">
@@ -96,77 +98,77 @@
 									</tr>
 									</thead>
 									<tbody>
-									{foreach $results as $result}
-										<tr id="guid{$result.guid}">
-											<td><input id="chk{$result.guid|substr:0:7}"
+									{foreach $resultsadd as $result}
+										<tr id="guid{$result->guid}">
+											<td><input id="chk{$result->guid|substr:0:7}"
 													   type="checkbox" name="table_records" class="flat"
-													   value="{$result.guid}"/></td>
+													   value="{$result->guid}"/></td>
 											<td>
-												<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
-												   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result.failed)}
+												<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}"
+												   class="title">{$result->searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result->failed)}
 												<i class="fa fa-exclamation-circle" style="color: red"
 												   title="This release has failed to download for some users"></i>{/if}
 												<br/>
-												<span class="label label-primary">{$result.grabs}
-													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.nfoid > 0}<span><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+												<span class="label label-primary">{$result->grabs}
+													Grab{if $result->grabs != 1}s{/if}</span>
+												{if $result->nfoid > 0}<span><a
+															href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 															class="modal_nfo label label-primary" rel="nfo">NFO</a>
 													</span>{/if}
-												{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span><a
-															href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
-															name="name{$result.guid}"
+												{if $result->jpgstatus == 1 && $userdata.canpreview == 1}<span><a
+															href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
+															name="name{$result->guid}"
 															data-fancybox
 															class="label label-primary"
 															rel="preview">Sample</a></span>{/if}
-												{if $result.haspreview == 1 && $userdata.canpreview == 1}<span><a
-															href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-															name="name{$result.guid}"
+												{if $result->haspreview == 1 && $userdata.canpreview == 1}<span><a
+															href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
+															name="name{$result->guid}"
 															data-fancybox
 															class="label label-primary"
 															rel="preview">Preview</a></span>{/if}
-												{if $result.videos_id > 0}<span><a
-															href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}"
+												{if $result->videos_id > 0}<span><a
+															href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}"
 															class="label label-primary" rel="series">View TV</a>
 													</span>{/if}
-												{if !empty($result.firstaired)}<span
-													class="seriesinfo label label-primary" title="{$result.guid}">
-													Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
-												{if $result.anidbid > 0}<span><a class="label label-primary"
-																				 href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View
+												{if !empty($result->firstaired)}<span
+													class="seriesinfo label label-primary" title="{$result->guid}">
+													Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
+												{if $result->anidbid > 0}<span><a class="label label-primary"
+																				 href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}">View
 												Anime</a></span>{/if}
-												{if !empty($result.failed)}<span class="label label-primary">
+												{if !empty($result->failed)}<span class="label label-primary">
 													<i class="fa fa-thumbs-o-up"></i>
-													{$result.grabs} Grab{if $result.grabs != 1}s{/if} /
+													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>
-													{$result.failed} Failed Download{if $result.failed != 1}s{/if}
+													{$result->failed} Failed Download{if $result->failed != 1}s{/if}
 													</span>{/if}
-												<span class="label label-primary">{$result.group_name}</span>
-												<span class="label label-primary">{$result.fromname}</span>
+												<span class="label label-primary">{$result->group_name}</span>
+												<span class="label label-primary">{$result->fromname}</span>
 											</td>
-											<td><span class="label label-primary">{$result.category_name}</span>
+											<td><span class="label label-primary">{$result->category_name}</span>
 											</td>
-											<td>{$result.postdate|timeago}</td>
-											<td>{$result.size|fsize_format:"MB"}</td>
+											<td>{$result->postdate|timeago}</td>
+											<td>{$result->size|filesize}</td>
 											<td>
-												<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"
+												<a href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"
 												   class="icon_nzb text-muted"><i
 															class="fa fa-cloud-download text-muted"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Download NZB"></i></a>
-												<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+												<a href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 															class="fa fa-comments-o text-muted"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Comments"></i></a>
 												<a href="#"><i
-															id="guid{$result.guid}"
+															id="guid{$result->guid}"
 															class="icon_cart text-muted fa fa-shopping-basket"
 															data-toggle="tooltip"
 															data-placement="top" title
 															data-original-title="Send to my download basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<a href="#">
-														<i id="guid{$result.guid}"
+														<i id="guid{$result->guid}"
 														   class="icon_sab text-muted fa fa-share"
 														   data-toggle="tooltip"
 														   data-placement="top" title
@@ -190,8 +192,8 @@
 							<div class="row">
 								<div class="col-md-8">
 									<div class="nzb_multi_operations">
-										{if isset($section) && $section != ''}View:
-											<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
+										{if isset($covgroup) && $covgroup != ''}View:
+											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
 											|
 											<b>List</b>
 											<br/>
@@ -227,9 +229,11 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-4">
-									{$pager}
-								</div>
+								{if    count($results) > 0}
+									<div class="col-md-4">
+										{$results->links()}
+									</div>
+								{/if}
 							</div>
 						</div>
 					</div>

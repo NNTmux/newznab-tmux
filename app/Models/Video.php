@@ -4,9 +4,45 @@ namespace App\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Database\CacheQueryBuilder;
 
+/**
+ * App\Models\Video.
+ *
+ * @property int $id Show ID to be used in other tables as reference
+ * @property bool $type 0 = TV, 1 = Film, 2 = Anime
+ * @property string $title Name of the video.
+ * @property string $countries_id Two character country code (FK to countries table).
+ * @property string $started Date (UTC) of production's first airing.
+ * @property int $anidb ID number for anidb site
+ * @property int $imdb ID number for IMDB site (without the 'tt' prefix).
+ * @property int $tmdb ID number for TMDB site.
+ * @property int $trakt ID number for TraktTV site.
+ * @property int $tvdb ID number for TVDB site
+ * @property int $tvmaze ID number for TVMaze site.
+ * @property int $tvrage ID number for TVRage site.
+ * @property bool $source Which site did we use for info?
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VideoAlias[] $alias
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TvEpisode[] $episode
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereAnidb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereCountriesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereImdb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereStarted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTmdb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTrakt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvdb($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvmaze($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereTvrage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereType($value)
+ * @mixin \Eloquent
+ */
 class Video extends Model
 {
+    use CacheQueryBuilder;
     /**
      * @var bool
      */
@@ -51,27 +87,26 @@ class Video extends Model
      *
      *
      * @param $id
-     * @return array
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
-    public static function getByVideoID($id): array
+    public static function getByVideoID($id)
     {
         return self::query()
+            ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
             ->where('videos.id', $id)
             ->join('tv_info', 'videos.id', '=', 'tv_info.videos_id')
-            ->first(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
-            ->toArray();
+            ->first();
     }
 
     /**
      * Retrieves a range of all shows for the show-edit admin list.
      *
      *
-     * @param $start
-     * @param $num
      * @param string $showname
-     * @return array
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getRange($start, $num, $showname = ''): array
+    public static function getRange($showname = '')
     {
         $sql = self::query()
             ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
@@ -81,11 +116,7 @@ class Video extends Model
             $sql->where('videos.title', 'like', '%'.$showname.'%');
         }
 
-        if ($start !== false) {
-            $sql->limit($num)->offset($start);
-        }
-
-        return $sql->get()->toArray();
+        return $sql->paginate(config('nntmux.items_per_page'));
     }
 
     /**

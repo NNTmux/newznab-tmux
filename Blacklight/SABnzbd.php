@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
@@ -91,15 +90,15 @@ class SABnzbd
     private $client;
 
     /**
-     * Construct.
+     * SABnzbd constructor.
      *
-     * @param \BasePage $page
+     * @param \App\Http\Controllers\BasePageController $page
      *
      * @throws \Exception
      */
-    public function __construct(&$page)
+    public function __construct($page)
     {
-        $this->uid = User::currentUserId();
+        $this->uid = $page->userdata['id'];
         $this->rsstoken = $page->userdata['rsstoken'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);
@@ -170,7 +169,7 @@ class SABnzbd
                     '&name='.
                     urlencode(
                         $this->serverurl.
-                        'getnzb/'.
+                        'getnzb?id='.
                         $guid.
                         '&i='.
                         $this->uid.

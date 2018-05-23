@@ -21,7 +21,13 @@ jQuery(function($){
     $('.cartadd').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(".guid").attr('id').substring(4);
-        $.post( SERVERROOT + "cart?add=" + guid, function(resp){
+        alert(guid);
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.post( SERVERROOT + "/cart/add?id=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
             PNotify.desktop.permission();
@@ -226,7 +232,14 @@ jQuery(function($){
     $('.icon_cart').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(this).attr('id').substring(4);
-        $.post( SERVERROOT + "cart?add=" + guid, function(resp){
+        //alert(guid);
+        //alert(SERVERROOT + "/cart/add?id=" + guid);
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.post( SERVERROOT + "/cart/add?id=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
             PNotify.desktop.permission();
@@ -496,7 +509,7 @@ jQuery(function($){
         });
         ids = ids.substring(0,ids.length-1);
         if (ids)
-            window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
+            window.location = SERVERROOT + "/getnzb?zip=1&id="+ids;
     }));
 
     $('input.nzb_multi_operations_download_cart').on('click', (function(){
@@ -507,7 +520,7 @@ jQuery(function($){
         });
         ids = ids.substring(0,ids.length-1);
         if (ids)
-            window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
+            window.location = SERVERROOT + "/getnzb?zip=1&id="+ids;
     }));
 
 
@@ -538,8 +551,8 @@ jQuery(function($){
             $(this).attr('checked', false);
         });
         var guidstring = guids.toString();
-        // alert (guidstring); // This is just for testing shit
-        $.post( SERVERROOT + "cart?add=" + guidstring);
+         //alert (guidstring); // This is just for testing shit
+        $.post( SERVERROOT + "/cart/add?id=" + guidstring);
     }));
     $('button.nzb_multi_operations_sab').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
@@ -685,7 +698,7 @@ jQuery(function($){
                     history: false
                 }
             })).get().on('pnotify.confirm', function() {
-                $.post( SERVERROOT + "cart?delete", { 'delete': ids }, function(resp){
+                $.post( SERVERROOT + "/cart/delete/", { 'delete': ids }, function(resp){
                     location.reload(true);
                 });
             }).on('pnotify.cancel', function() {
@@ -733,15 +746,15 @@ jQuery(function($){
         {
 
             var sText = $('#headsearch').val();
-            var sCat = ($("#headcat").val()!=-1 ? "?t="+$("#headcat").val() : "");
-            document.location= WWW_TOP + "/search/" +  sText + sCat;
+            var sCat = ($("#headcat").val()!=-1 ? "&t="+$("#headcat").val() : "");
+            document.location= WWW_TOP + "/search?id=" +  sText + sCat;
         }
     });
 
     // search.tpl
     $('#search_search_button').click(function(){
         if ($('#search').val())
-            document.location=WWW_TOP + "/search/" + $('#search').val() + ($("#search_cat").val()!=-1 ? "?t="+$("#search_cat").val() : "");
+            document.location=WWW_TOP + "/search?id=" + $('#search').val() + ($("#search_cat").val()!=-1 ? "&t="+$("#search_cat").val() : "");
         return false;
     });
 

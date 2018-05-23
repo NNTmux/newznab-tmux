@@ -343,7 +343,7 @@ class Tmux
      */
     public function rand_bool($loop, $chance = 60): bool
     {
-        $usecache = Settings::settingValue('site.tmux.usecache', true) ?? 0;
+        $usecache = Settings::settingValue('site.tmux.usecache') ?? 0;
         if ($loop === 1 || $usecache === 0) {
             return false;
         }

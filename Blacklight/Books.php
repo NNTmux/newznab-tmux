@@ -15,6 +15,7 @@ use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
+use Illuminate\Support\Facades\DB as DBFacade;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 class Books
@@ -125,11 +126,8 @@ class Books
         $searchWords = $searchsql = '';
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
         $title = preg_replace('/[^\w ]+/', '', $title);
-        $title = trim(preg_replace('/\s\s+/i', ' ', $title));
-        $title = trim($title);
-        $words = explode(' ', $title);
-
-        foreach ($words as $word) {
+        $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
+        foreach (explode(' ', $title) as $word) {
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
                 $word = '+'.$word;
@@ -142,32 +140,30 @@ class Books
     }
 
     /**
-     * @param $cat
-     * @param $start
-     * @param $num
-     * @param $orderby
+     * @param       $page
+     * @param       $cat
+     * @param       $start
+     * @param       $num
+     * @param       $orderby
      * @param array $excludedcats
+     *
      * @return array
      * @throws \Exception
      */
-    public function getBookRange($cat, $start, $num, $orderby, array $excludedcats = []): array
+    public function getBookRange($page, $cat, $start, $num, $orderby, array $excludedcats = []): array
     {
         $browseby = $this->getBrowseBy();
-
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
-
         $exccatlist = '';
         if (\count($excludedcats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
-
         $order = $this->getBookOrder($orderby);
-
         $booksql = sprintf(
-                    "
+            "
 				SELECT SQL_CALC_FOUND_ROWS boo.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM bookinfo boo
@@ -179,49 +175,34 @@ class Books
 				%s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseby,
-                        $catsrch,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            Releases::showPasswords(),
+            $browseby,
+            $catsrch,
+            $exccatlist,
+            $order[0],
+            $order[1],
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        $bookscache = Cache::get(md5($booksql));
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $bookscache = Cache::get(md5($booksql.$page));
         if ($bookscache !== null) {
             $books = $bookscache;
         } else {
-            $books = $this->pdo->queryCalc($booksql);
-            Cache::put(md5($booksql), $books, $expiresAt);
+            $data = DBFacade::select($booksql);
+            $books = ['total' => DBFacade::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            Cache::put(md5($booksql.$page), $books, $expiresAt);
         }
-
         $bookIDs = $releaseIDs = false;
-
         if (\is_array($books['result'])) {
             foreach ($books['result'] as $book => $id) {
-                $bookIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $bookIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
-
         $sql = sprintf(
-            "
+            '
 			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
 			boo.*,
 			r.bookinfo_id,
 			g.name AS group_name,
@@ -235,22 +216,22 @@ class Books
 			AND r.id IN (%s)
 			%s
 			GROUP BY boo.id
-			ORDER BY %s %s",
-                (\is_array($bookIDs) ? implode(',', $bookIDs) : -1),
-                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                $catsrch,
-                $order[0],
-                $order[1]
+			ORDER BY %s %s',
+            (\is_array($bookIDs) ? implode(',', $bookIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            $catsrch,
+            $order[0],
+            $order[1]
         );
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $books['total'] ?? 0;
+        $return = DBFacade::select($sql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $books['total'][0]->total ?? 0;
         }
-        Cache::put(md5($sql), $return, $expiresAt);
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
     }
@@ -262,17 +243,17 @@ class Books
      */
     public function getBookOrder($orderby): array
     {
-        $order = ($orderby === '') ? 'r.postdate' : $orderby;
+        $order = $orderby === '' ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'title':
-                $orderfield = 'boo.title';
+                $orderfield = 'b.title';
                 break;
             case 'author':
-                $orderfield = 'boo.author';
+                $orderfield = 'b.author';
                 break;
             case 'publishdate':
-                $orderfield = 'boo.publishdate';
+                $orderfield = 'b.publishdate';
                 break;
             case 'size':
                 $orderfield = 'r.size';
@@ -330,11 +311,10 @@ class Books
     public function getBrowseBy(): string
     {
         $browseby = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseby .= 'AND boo.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                $browseby .= 'AND b.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
             }
         }
 
@@ -513,7 +493,8 @@ class Books
             if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename), true
+                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename),
+                        true
                     );
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
@@ -524,7 +505,8 @@ class Books
             if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename), true
+                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename),
+                        true
                     );
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
@@ -700,7 +682,8 @@ class Books
                     ColorCLI::header('Nothing to update: ').
                     ColorCLI::header($book['author'].
                         ' - '.
-                        $book['title']), true
+                        $book['title']),
+                    true
                 );
             }
         }

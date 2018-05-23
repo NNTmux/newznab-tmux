@@ -3,12 +3,12 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\XxxInfo;
 use App\Models\Category;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Blacklight\processing\adult\ADE;
 use Blacklight\processing\adult\ADM;
 use Blacklight\processing\adult\AEBN;
@@ -21,11 +21,6 @@ use Blacklight\processing\adult\Hotmovies;
  */
 class XXX
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
-
     /**
      * What scraper class did we use -- used for template and trailer information.
      *
@@ -77,6 +72,8 @@ class XXX
      */
     public $catWhere;
 
+    protected $pdo;
+
     /**
      * @param array $options Echo to cli / Class instances.
      *
@@ -90,9 +87,8 @@ class XXX
             'Settings'     => null,
         ];
         $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->pdo = DB::connection()->getPdo();
 
         $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = Releases::showPasswords();
@@ -115,27 +111,24 @@ class XXX
     /**
      * Get XXX releases with covers for xxx browse page.
      *
+     * @param $page
      * @param       $cat
      * @param       $start
      * @param       $num
      * @param       $orderBy
-     * @param       $maxAge
+     * @param int $maxAge
      * @param array $excludedCats
      *
      * @return array
-     * @throws \Exception
      */
-    public function getXXXRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
+    public function getXXXRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
-
         $order = $this->getXXXOrder($orderBy);
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $xxxmoviesSql =
             sprintf(
                 "
@@ -154,7 +147,7 @@ class XXX
                 $this->getBrowseBy(),
                 $catsrch,
                 (
-                    $maxAge > 0
+                $maxAge > 0
                     ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                     : ''
                 ),
@@ -162,25 +155,22 @@ class XXX
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-           );
-
-        $xxxmoviesCache = Cache::get(md5($xxxmoviesSql));
+            );
+        $xxxmoviesCache = Cache::get(md5($xxxmoviesSql.$page));
         if ($xxxmoviesCache !== null) {
             $xxxmovies = $xxxmoviesCache;
         } else {
-            $xxxmovies = $this->pdo->queryCalc($xxxmoviesSql);
-            Cache::put(md5($xxxmoviesSql), $xxxmovies, $expiresAt);
+            $data = DB::select($xxxmoviesSql);
+            $xxxmovies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            Cache::put(md5($xxxmoviesSql.$page), $xxxmovies, $expiresAt);
         }
-
         $xxxIDs = $releaseIDs = false;
-
         if (\is_array($xxxmovies['result'])) {
             foreach ($xxxmovies['result'] as $xxx => $id) {
-                $xxxIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $xxxIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
-
         $sql = sprintf(
             "
 			SELECT
@@ -221,7 +211,7 @@ class XXX
             $this->getBrowseBy(),
             $catsrch,
             (
-                $maxAge > 0
+            $maxAge > 0
                 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                 : ''
             ),
@@ -229,23 +219,21 @@ class XXX
             $order[0],
             $order[1]
         );
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-
-        $return = $this->pdo->query($sql);
-        if (! empty($return)) {
-            $return[0]['_totalcount'] = $xxxmovies['total'] ?? 0;
+        $return = DB::select($sql);
+        if (\count($return) > 0) {
+            $return[0]->_totalcount = $xxxmovies['total'][0]->total ?? 0;
         }
-
-        Cache::put(md5($sql), $return, $expiresAt);
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
     }
 
     /**
-     * Get the order type the user requested on the movies page.
+     * Get the order type the user requested on the xxx page.
      *
      * @param $orderBy
      *
@@ -253,14 +241,14 @@ class XXX
      */
     protected function getXXXOrder($orderBy): array
     {
-        $orderArr = explode('_', (($orderBy === '') ? 'MAX(r.postdate)' : $orderBy));
+        $orderArr = explode('_', (($orderBy === '') ? 'r.postdate' : $orderBy));
         switch ($orderArr[0]) {
             case 'title':
                 $orderField = 'xxx.title';
                 break;
             case 'posted':
             default:
-                $orderField = 'MAX(r.postdate)';
+                $orderField = 'r.postdate';
                 break;
         }
 
@@ -283,8 +271,7 @@ class XXX
     protected function getBrowseBy(): string
     {
         $browseBy = ' ';
-        $browseByArr = ['title', 'director', 'actors', 'genre', 'id'];
-        foreach ($browseByArr as $bb) {
+        foreach (['title', 'director', 'actors', 'genre', 'id'] as $bb) {
             if (isset($_REQUEST[$bb]) && ! empty($_REQUEST[$bb])) {
                 $bbv = stripslashes($_REQUEST[$bb]);
                 if ($bb === 'genre') {
@@ -293,7 +280,7 @@ class XXX
                 if ($bb === 'id') {
                     $browseBy .= 'AND xxx.'.$bb.'='.$bbv;
                 } else {
-                    $browseBy .= 'AND xxx.'.$bb.' '.$this->pdo->likeString($bbv, true, true);
+                    $browseBy .= 'AND xxx.'.$bb.' '.$this->pdo->quote('%'.$bbv.'%');
                 }
             }
         }
@@ -630,7 +617,9 @@ class XXX
 
         if ($this->echooutput) {
             ColorCLI::doEcho(
-                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))), true);
+                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))),
+                true
+            );
         }
 
         return $xxxID;

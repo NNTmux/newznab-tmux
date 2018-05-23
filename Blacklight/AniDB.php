@@ -4,6 +4,8 @@ namespace Blacklight;
 
 use Blacklight\db\DB;
 use App\Models\Category;
+use App\Models\AnidbTitle;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 class AniDB
 {
@@ -142,67 +144,25 @@ class AniDB
     /**
      * Retrieves a range of Anime titles for site display.
      *
-     * @param int $start
-     * @param int $num
-     * @param string $animetitle
-     * @return array|bool
-     */
-    public function getAnimeRange($start, $num, $animetitle = '')
-    {
-        if ($start === false) {
-            $limit = '';
-        } else {
-            $limit = ' LIMIT '.$num.' OFFSET '.$start;
-        }
-
-        $rsql = '';
-        if ($animetitle !== '') {
-            $rsql = sprintf('AND at.title %s', $this->pdo->likeString($animetitle, true, true));
-        }
-
-        return $this->pdo->query(
-            sprintf(
-                "
-				SELECT at.anidbid, GROUP_CONCAT(at.title SEPARATOR ', ') AS title,
-					ai.description
-				FROM anidb_titles AS at
-				LEFT JOIN anidb_info AS ai USING (anidbid)
-				WHERE 1=1 %s
-				AND at.lang = 'en'
-				GROUP BY at.anidbid
-				ORDER BY at.anidbid ASC %s",
-                $rsql,
-                $limit
-            )
-        );
-    }
-
-    /**
-     * Retrives the count of Anime titles for pager functions optionally filtered by title.
      *
      * @param string $animetitle
-     * @return int
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getAnimeCount($animetitle = ''): int
+    public function getAnimeRange($animetitle = '')
     {
-        $rsql = '';
+        $query = AnidbTitle::query()
+            ->where('at.lang', '=', 'en');
         if ($animetitle !== '') {
-            $rsql .= sprintf('AND at.title %s', $this->pdo->likeString($animetitle, true, true));
+            $query->where('at.title', 'like', '%'.$animetitle.'%');
         }
+        $query->select(['at.anidbid', DBFacade::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
+                ->from('anidb_titles as at')
+                ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
+                ->groupBy('at.anidbid')
+                ->orderByDesc('at.anidbid');
 
-        $res = $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT COUNT(DISTINCT at.anidbid) AS num
-				FROM anidb_titles AS at
-				LEFT JOIN anidb_info AS ai USING (anidbid)
-				WHERE 1=1
-				%s',
-                $rsql
-            )
-        );
-
-        return $res['num'];
+        return $query->paginate(config('nntmux.items_per_page'));
     }
 
     /**
