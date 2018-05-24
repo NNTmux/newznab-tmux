@@ -1,3 +1,5 @@
+2018-05-24 DariusIII
+	* Fix: Fix errors on no returned results in tvSearch
 2018-05-23 DariusIII
 	* Chg: Try to fix nzb file downloads that fail in nzbget
 	* Fix: Fix missing nzb extension on file download
