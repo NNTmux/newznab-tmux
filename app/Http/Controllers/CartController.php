@@ -57,7 +57,7 @@ class CartController extends BasePageController
     }
 
     /**
-     * @param $id
+     * @param string|array $id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
@@ -67,12 +67,12 @@ class CartController extends BasePageController
         $this->setPrefs();
         $ids = null;
         if (! empty($id)) {
-            $ids = (array) $id;
+            $ids = explode(',', $id);
         } elseif (\is_array($id)) {
             $ids = $id;
         }
 
-        if ($ids !== null && UsersRelease::delCartByGuid($ids, Auth::id())) {
+        if (!empty($ids) && UsersRelease::delCartByGuid($ids, $this->userdata->id)) {
             return redirect('/cart/index');
         }
 

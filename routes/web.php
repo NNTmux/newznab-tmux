@@ -46,6 +46,7 @@ Route::post('Books/{id?}', 'BooksController@index');
 
 Route::prefix('cart')->group(function () {
     Route::get('index', 'CartController@index');
+    Route::post('index', 'CartController@index');
     Route::get('add', 'CartController@store');
     Route::post('add', 'CartController@store');
     Route::get('delete/{id}', 'CartController@destroy');

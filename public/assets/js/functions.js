@@ -679,6 +679,13 @@ jQuery(function($){
             if ($(row).val()!="on")
                 ids.push($(row).val());
         });
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        //alert(SERVERROOT + "/cart/delete/" + ids);
         if (ids)
         {
             PNotify.prototype.options.styling = "fontawesome";
@@ -698,9 +705,7 @@ jQuery(function($){
                     history: false
                 }
             })).get().on('pnotify.confirm', function() {
-                $.post( SERVERROOT + "/cart/delete/", { 'delete': ids }, function(resp){
-                    location.reload(true);
-                });
+                $.post( SERVERROOT + "/cart/delete/" + ids)
             }).on('pnotify.cancel', function() {
                 alert('Cancelled');
             });
@@ -711,7 +716,7 @@ jQuery(function($){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
             var nzburl = SERVERROOT + "sendtoqueue/" + guid;
-            $.post( nzburl, function(resp){
+            $.post( nzburl, function(){
                 PNotify.prototype.options.styling = "fontawesome";
                 PNotify.desktop.permission();
                 (new PNotify({
