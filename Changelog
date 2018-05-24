@@ -1,4 +1,5 @@
 2018-05-24 DariusIII
+	* Chg: Allow nzb downloads for not logged in users (sab/nzbget are not logged in)
 	* Chg: Potential fix for sent emails reply to field
 	* Fix: Fix advanced search
 	* Chg: Do not send google recaptcha response inside contact email message

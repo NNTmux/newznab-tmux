@@ -129,7 +129,7 @@ class GetNzbController extends BasePageController
         $headers[] = [
             'Content-Disposition:' => 'attachment; filename='.$cleanName.'.nzb',
             'Content-Type:' => 'application/x-nzb',
-            'Expires:' => date('r', time() + 31536000),
+            'Expires:' => date('r', Carbon::now()->addDays(365)->timestamp),
             'X-DNZB-Failure:' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
             'X-DNZB-Category:' => $relData['category_name'],
             'X-DNZB-Details:' => $this->serverurl.'details/'.$request->input('id'),
