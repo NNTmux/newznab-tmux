@@ -9,7 +9,6 @@ use App\Models\Settings;
 use Blacklight\NZBVortex;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\Auth;
 
 class QueueController extends BasePageController
 {
@@ -91,7 +90,7 @@ class QueueController extends BasePageController
             [
                 'queueType' => $queueType,
                 'error' => $error,
-                'user' => $this->userdata
+                'user' => $this->userdata,
             ]
         );
         $title = 'Your '.$queueType.' Download Queue';
