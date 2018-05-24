@@ -1,4 +1,5 @@
 2018-05-24 DariusIII
+	* Chg: Do not send google recaptcha response inside contact email message
 	* Fix: Fix errors on no returned results in tvSearch
 2018-05-23 DariusIII
 	* Chg: Try to fix nzb file downloads that fail in nzbget

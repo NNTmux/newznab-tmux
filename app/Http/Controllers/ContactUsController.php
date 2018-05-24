@@ -36,7 +36,7 @@ class ContactUsController extends BasePageController
             $mailBody = 'Values submitted from contact form: ';
 
             foreach ($request->all() as $key => $value) {
-                if ($key !== 'submit' && $key !== '_token') {
+                if ($key !== 'submit' && $key !== '_token' && $key !== 'g-recaptcha-response') {
                     $mailBody .= "$key : $value".PHP_EOL;
                 }
             }
