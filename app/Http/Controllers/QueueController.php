@@ -21,23 +21,20 @@ class QueueController extends BasePageController
     public function index(Request $request)
     {
         $this->setPrefs();
-        $userData = User::find(Auth::id());
-        if (! $userData) {
-            $this->show404();
-        }
-        $this->smarty->assign('user', $userData);
+
+        $this->smarty->assign();
 
         $queueType = $error = '';
         $queue = null;
         switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {
             case SABnzbd::INTEGRATION_TYPE_NONE:
-                if ($userData['queuetype'] === 2) {
+                if ($this->userdata->queuetype === 2) {
                     $queueType = 'NZBGet';
                     $queue = new NZBGet($this);
                 }
                 break;
             case SABnzbd::INTEGRATION_TYPE_USER:
-                switch ((int) $userData['queuetype']) {
+                switch ((int) $this->userdata->queuetype) {
                     case 1:
                         $queueType = 'Sabnzbd';
                         $queue = new SABnzbd($this);
@@ -90,7 +87,13 @@ class QueueController extends BasePageController
             }
         }
 
-        $this->smarty->assign(['queueType' => $queueType, 'error' => $error, 'user', User::class]);
+        $this->smarty->assign(
+            [
+                'queueType' => $queueType,
+                'error' => $error,
+                'user' => $this->userdata
+            ]
+        );
         $title = 'Your '.$queueType.' Download Queue';
         $meta_title = 'View'.$queueType.' Queue';
         $meta_keywords = 'view,'.strtolower($queueType).',queue';
