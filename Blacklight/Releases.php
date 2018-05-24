@@ -735,7 +735,7 @@ class Releases
             );
             $show = DB::select($showQry);
 
-            if (!empty($show)) {
+            if (! empty($show)) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen($show[0]->episodes) > 0) {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
