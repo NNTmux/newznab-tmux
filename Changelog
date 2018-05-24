@@ -1,4 +1,5 @@
 2018-05-24 DariusIII
+	* Chg: Comment out test message from functions.js
 	* Chg: Allow nzb downloads for not logged in users (sab/nzbget are not logged in)
 	* Chg: Potential fix for sent emails reply to field
 	* Fix: Fix advanced search

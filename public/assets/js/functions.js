@@ -21,7 +21,7 @@ jQuery(function($){
     $('.cartadd').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(".guid").attr('id').substring(4);
-        alert(guid);
+        //alert(guid);
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
