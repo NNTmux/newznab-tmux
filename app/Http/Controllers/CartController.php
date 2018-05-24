@@ -72,7 +72,7 @@ class CartController extends BasePageController
             $ids = $id;
         }
 
-        if (!empty($ids) && UsersRelease::delCartByGuid($ids, $this->userdata->id)) {
+        if (! empty($ids) && UsersRelease::delCartByGuid($ids, $this->userdata->id)) {
             return redirect('/cart/index');
         }
 
