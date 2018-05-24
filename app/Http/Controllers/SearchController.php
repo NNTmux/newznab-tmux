@@ -129,7 +129,7 @@ class SearchController extends BasePageController
                 );
             }
 
-            $results = $releases->search(
+            $rslt = $releases->search(
                 ($searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr']),
                 ($searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject']),
                 ($searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter']),
@@ -141,12 +141,16 @@ class SearchController extends BasePageController
                 $searchVars['searchadvhascomments'],
                 ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
                 ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
+                $offset,
+                config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata['categoryexclusions'],
                 'advanced',
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
+
+            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->smarty->assign(
                 [
