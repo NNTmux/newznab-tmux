@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Database\CacheQueryBuilder;
 
 /**
  * App\Models\GamesInfo.
@@ -44,7 +43,6 @@ use App\Support\Database\CacheQueryBuilder;
 class GamesInfo extends Model
 {
     use Searchable;
-    use CacheQueryBuilder;
 
     /**
      * @var string

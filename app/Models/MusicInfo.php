@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Database\CacheQueryBuilder;
 
 /**
  * App\Models\MusicInfo.
@@ -45,7 +44,6 @@ use App\Support\Database\CacheQueryBuilder;
 class MusicInfo extends Model
 {
     use Searchable;
-    use CacheQueryBuilder;
     /**
      * @var string
      */

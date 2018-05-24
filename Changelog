@@ -1,4 +1,5 @@
 2018-05-24 DariusIII
+	* Chg: Remove usage of CacheQueryBuilder trait
 	* Chg: Add more checks to ids in CartController destroy function
 	* Chg: Update QueueController
 	* Fix: Fix deletion from cart when using multioperation

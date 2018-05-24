@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Database\CacheQueryBuilder;
 
 /**
  * App\Models\XxxInfo.
@@ -44,7 +43,6 @@ use App\Support\Database\CacheQueryBuilder;
  */
 class XxxInfo extends Model
 {
-    use CacheQueryBuilder;
     /**
      * @var string
      */

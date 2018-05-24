@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Database\CacheQueryBuilder;
 
 /**
  * App\Models\Video.
@@ -42,7 +41,6 @@ use App\Support\Database\CacheQueryBuilder;
  */
 class Video extends Model
 {
-    use CacheQueryBuilder;
     /**
      * @var bool
      */

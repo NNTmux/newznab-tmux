@@ -25,7 +25,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Database\CacheQueryBuilder;
 
 /**
  * Settings - model for settings table.
@@ -47,7 +46,6 @@ use App\Support\Database\CacheQueryBuilder;
 class Settings extends Model
 {
     use InsertOnDuplicateKey;
-    use CacheQueryBuilder;
 
     public const REGISTER_STATUS_OPEN = 0;
 
@@ -171,8 +169,7 @@ class Settings extends Model
                         'section'    => $setting['section'],
                         'subsection' => $setting['subsection'],
                         'name'       => $setting['name'],
-                    ],
-                    true
+                    ]
                 );
                 if ($value === null) {
                     $result = false;

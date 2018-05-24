@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
-use App\Support\Database\CacheQueryBuilder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -112,7 +111,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
-    use CacheQueryBuilder;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
