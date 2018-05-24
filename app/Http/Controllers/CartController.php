@@ -66,7 +66,7 @@ class CartController extends BasePageController
     {
         $this->setPrefs();
         $ids = null;
-        if (! empty($id)) {
+        if (! empty($id) && ! \is_array($id)) {
             $ids = explode(',', $id);
         } elseif (\is_array($id)) {
             $ids = $id;
