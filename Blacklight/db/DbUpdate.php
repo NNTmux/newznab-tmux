@@ -41,8 +41,7 @@ class DbUpdate
     public $git;
 
     /**
-     * @var object    Instance variable for logging object. Currently only ColorCLI supported,
-     * but expanding for full logging with agnostic API planned.
+     * @var mixed
      */
     public $log;
 
