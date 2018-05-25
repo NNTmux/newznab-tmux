@@ -30,6 +30,9 @@ class UserController extends BasePageController
 
         $ordering = getUserBrowseOrdering();
         $orderBy = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_page');
+
 
         $variables = [
             'username' => $request->has('username') ? $request->input('username') : '',
@@ -37,6 +40,13 @@ class UserController extends BasePageController
             'host' => $request->has('host') ? $request->input('host') : '',
             'role' => $request->has('role') ? $request->input('role') : '',
         ];
+
+        $rslt = User::getRange(
+            $offset, config('nntmux.items_per_page'), $orderBy, $variables['username'],
+            $variables['email'], $variables['host'], $variables['role'], true
+        );
+
+        $results = $this->paginate($rslt ?? [], User::getCount() ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign(
             [
@@ -46,20 +56,14 @@ class UserController extends BasePageController
                 'role'              => $variables['role'],
                 'role_ids'          => array_keys($roles),
                 'role_names'        => $roles,
-                'userlist' => User::getRange(
-                    $orderBy,
-                    $variables['username'],
-                    $variables['email'],
-                    $variables['host'],
-                    $variables['role']
-                ),
+                'userlist'          => $results,
             ]
         );
 
         User::updateExpiredRoles();
 
         foreach ($ordering as $orderType) {
-            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType.'&offset=0');
+            $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType);
         }
 
         $content = $this->smarty->fetch('user-list.tpl');

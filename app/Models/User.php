@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
@@ -465,39 +466,99 @@ class User extends Authenticatable
     }
 
     /**
+     * @param        $start
+     * @param        $offset
      * @param        $orderBy
      * @param string $userName
      * @param string $email
      * @param string $host
      * @param string $role
+     * @param bool   $apiRequests
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return array
      * @throws \Exception
      */
-    public static function getRange($orderBy, $userName = '', $email = '', $host = '', $role = '')
+    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
     {
-        UserRequest::clearApiRequests(false);
-
-        $order = getUserBrowseOrder($orderBy);
-
-        $users = self::query()->with('role', 'request')->where('id', '<>', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
-        if (! empty($userName)) {
-            $users->where('username', 'like', '%'.$userName.'%');
+        if ($apiRequests) {
+            UserRequest::clearApiRequests(false);
+            $query = "
+				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
+				FROM users
+				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
+				LEFT JOIN user_requests ON user_requests.users_id = users.id
+				WHERE users.id != 0 %s %s %s %s
+				AND email != 'sharing@nZEDb.com'
+				GROUP BY users.id
+				ORDER BY %s %s %s";
+        } else {
+            $query = '
+				SELECT users.*, user_roles.name AS rolename
+				FROM users
+				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
+				WHERE 1=1 %s %s %s %s
+				ORDER BY %s %s %s';
         }
+        $order = self::getBrowseOrder($orderBy);
+        return DB::select(
+            sprintf(
+                $query,
+                ! empty($userName) ? 'AND users.username ' . 'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
+                ! empty($email) ? 'AND users.email ' . 'LIKE ' .DB::connection()->getPdo()->quote('%'.$email.'%') : '',
+                ! empty($host) ? 'AND users.host ' . 'LIKE ' .DB::connection()->getPdo()->quote('%'.$host.'%') : '',
+                (! empty($role) ? ('AND users.role = ' . $role) : ''),
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ('LIMIT ' . $offset . ' OFFSET ' . $start))
+            )
+        );
+    }
 
-        if (! empty($email)) {
-            $users->where('email', 'like', '%'.$email.'%');
+    /**
+     * Get sort types for sorting users on the web page user list.
+     *
+     * @param $orderBy
+     *
+     * @return string[]
+     */
+    public static function getBrowseOrder($orderBy)
+    {
+        $order = (empty($orderBy) ? 'username_desc' : $orderBy);
+        $orderArr = explode('_', $order);
+        switch ($orderArr[0]) {
+            case 'username':
+                $orderField = 'username';
+                break;
+            case 'email':
+                $orderField = 'email';
+                break;
+            case 'host':
+                $orderField = 'host';
+                break;
+            case 'createdat':
+                $orderField = 'created_at';
+                break;
+            case 'lastlogin':
+                $orderField = 'lastlogin';
+                break;
+            case 'apiaccess':
+                $orderField = 'apiaccess';
+                break;
+            case 'grabs':
+                $orderField = 'grabs';
+                break;
+            case 'role':
+                $orderField = 'role';
+                break;
+            case 'rolechangedate':
+                $orderField = 'rolechangedate';
+                break;
+            default:
+                $orderField = 'username';
+                break;
         }
-
-        if (! empty($host)) {
-            $users->where('host', 'like', '%'.$host.'%');
-        }
-
-        if (! empty($role)) {
-            $users->where('user_roles_id', $role);
-        }
-
-        return $users->paginate(config('nntmux.items_per_page'));
+        $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+        return [$orderField, $orderSort];
     }
 
     /**
