@@ -526,6 +526,11 @@ jQuery(function($){
 
     $('button.nzb_multi_operations_cart').on('click', (function(){
         var guids = new Array();
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
             var $cartIcon = $(row).parent().children('div.icons').children('.icon_cart');

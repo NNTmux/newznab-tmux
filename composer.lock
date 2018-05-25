@@ -3531,16 +3531,16 @@
         },
         {
             "name": "laravel/scout",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "297d9c5ef94c3f70e9c76b87a02d4b527698956e"
+                "reference": "f1b5d65a7d4a70bafaba7ec996176e95341c44ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/297d9c5ef94c3f70e9c76b87a02d4b527698956e",
-                "reference": "297d9c5ef94c3f70e9c76b87a02d4b527698956e",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/f1b5d65a7d4a70bafaba7ec996176e95341c44ec",
+                "reference": "f1b5d65a7d4a70bafaba7ec996176e95341c44ec",
                 "shasum": ""
             },
             "require": {
@@ -3563,7 +3563,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0-dev"
+                    "dev-master": "4.0-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -3592,7 +3592,7 @@
                 "laravel",
                 "search"
             ],
-            "time": "2018-03-16T18:00:44+00:00"
+            "time": "2018-05-24T13:35:34+00:00"
         },
         {
             "name": "laravel/tinker",

@@ -1,4 +1,5 @@
 2018-05-25 DariusIII
+	* Chg: Update laravel/scout to version 4.0.4
 	* Chg: Update PHPDOC block in DbUpdate log property
 	* Chg: Use laravelcollective Form in forms
 	* Chg: Add genealabs/laravel-caffeine to prevent csrf_token expiration in forms
