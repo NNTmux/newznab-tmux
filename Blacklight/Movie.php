@@ -16,11 +16,11 @@ use Illuminate\Support\Carbon;
 use Tmdb\Client as TmdbClient;
 use Blacklight\utility\Utility;
 use Blacklight\libraries\FanartTV;
+use Illuminate\Support\Facades\DB;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use Tmdb\Repository\ConfigurationRepository;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Movie.
