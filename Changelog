@@ -1,3 +1,5 @@
+2018-05-25 DariusIII
+	* Chg: Remove unneeded variable declaration as it is overwritten immediately
 2018-05-24 DariusIII
 	* Chg: Remove usage of CacheQueryBuilder trait
 	* Chg: Add more checks to ids in CartController destroy function
