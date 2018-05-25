@@ -33,7 +33,6 @@ class UserController extends BasePageController
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-
         $variables = [
             'username' => $request->has('username') ? $request->input('username') : '',
             'email' => $request->has('email') ? $request->input('email') : '',
