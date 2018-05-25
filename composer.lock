@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "992f9d1c7de6b85801db741e394a9a2e",
+    "content-hash": "ceaa3e1d0c023b26952070da0411a33d",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2559,6 +2559,63 @@
             "time": "2018-05-22T14:43:18+00:00"
         },
         {
+            "name": "genealabs/laravel-caffeine",
+            "version": "0.6.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/GeneaLabs/laravel-caffeine.git",
+                "reference": "100aa45e1d655e643057ccb97b636f14f579a529"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/GeneaLabs/laravel-caffeine/zipball/100aa45e1d655e643057ccb97b636f14f579a529",
+                "reference": "100aa45e1d655e643057ccb97b636f14f579a529",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/routing": "5.3 - 5.6",
+                "illuminate/support": "5.3 - 5.6",
+                "jenssegers/model": "*",
+                "php": ">=7.1.3"
+            },
+            "require-dev": {
+                "codedungeon/phpunit-result-printer": "*",
+                "mockery/mockery": "0.9.*",
+                "orchestra/testbench": "^3.6",
+                "orchestra/testbench-browser-kit": "^3.6",
+                "orchestra/testbench-dusk": "3.6.x-dev@dev",
+                "phpmd/phpmd": "^2.6",
+                "phpunit/phpunit": "*",
+                "satooshi/php-coveralls": "*",
+                "sebastian/phpcpd": "*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "GeneaLabs\\LaravelCaffeine\\Providers\\Service"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GeneaLabs\\LaravelCaffeine\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Bronner",
+                    "email": "hello@genealabs.com"
+                }
+            ],
+            "description": "Keeping Your Laravel Forms Awake",
+            "time": "2018-05-13T23:26:57+00:00"
+        },
+        {
             "name": "google/recaptcha",
             "version": "1.1.3",
             "source": {
@@ -3067,6 +3124,54 @@
                 "tags"
             ],
             "time": "2017-10-26T18:34:37+00:00"
+        },
+        {
+            "name": "jenssegers/model",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jenssegers/model.git",
+                "reference": "2d8d7c813632b86734b3ff094333d500278e39e9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jenssegers/model/zipball/2d8d7c813632b86734b3ff094333d500278e39e9",
+                "reference": "2d8d7c813632b86734b3ff094333d500278e39e9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^5.0",
+                "illuminate/support": "^4.0|^5.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0|^5.0",
+                "satooshi/php-coveralls": "^0.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jenssegers\\Model\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jens Segers",
+                    "homepage": "https://jenssegers.com"
+                }
+            ],
+            "description": "An Laravel eloquent-like model class, for Laravel and other frameworks",
+            "homepage": "https://github.com/jenssegers/model",
+            "keywords": [
+                "eloquent",
+                "laravel",
+                "model"
+            ],
+            "time": "2017-02-21T10:09:15+00:00"
         },
         {
             "name": "jeremeamia/SuperClosure",

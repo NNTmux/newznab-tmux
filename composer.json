@@ -128,6 +128,7 @@
     "fideloper/proxy": "~4.0",
     "foolz/sphinxql-query-builder": "^1.2",
     "fxp/composer-asset-plugin": "~1.1",
+    "genealabs/laravel-caffeine": "^0.6.11",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
     "imdbphp/imdbphp": "^6.0",
