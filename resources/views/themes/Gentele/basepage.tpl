@@ -235,9 +235,8 @@
     });
 </script>
 
-<form id="frm-logout" action="{{route('logout')}}" method="post" style="display: none;">
-	{{csrf_field()}}
-</form>
+{{Form::open(['id' => 'frm-logout', 'route' => 'logout'])}}
+{{Form::close()}}
 
 </body>
 

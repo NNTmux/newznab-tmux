@@ -15,7 +15,7 @@
 			feed</a>. Some NZB downloaders can read this feed and automatically start downloading.
 	</div>
 	{if $results|@count > 0}
-		<form id="nzb_multi_operations_form" action="get">
+		{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 			{{csrf_field()}}
 			<div class="nzb_multi_operations">
 				<small>With Selected:</small>
@@ -29,7 +29,7 @@
 						   value="Download"/>
 				</div>
 			</div>
-		</form>
+		{{Form::close()}}
 		<div class="row">
 			<div class="col-lg-12 portlets">
 				<div class="panel panel-default">

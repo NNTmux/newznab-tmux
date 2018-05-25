@@ -37,8 +37,7 @@
 										</div>
 										<div class="row m-b-30">
 											<div class="col-sm-6">
-												<form method="POST" action="{$smarty.const.WWW_TOP}contact-us">
-													{{csrf_field()}}
+												{{Form::open(['url' => 'contact-us'])}}
 													<div class="row">
 														<div class="col-sm-6">
 															<label for="username" class="h6">Name</label>
@@ -60,7 +59,7 @@
 													<button type="submit" class="btn btn-primary m-t-20">
 														Send message
 													</button>
-												</form>
+												{{Form::close()}}
 											</div>
 										</div>
 									</div>

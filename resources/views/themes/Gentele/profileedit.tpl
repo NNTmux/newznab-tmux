@@ -22,8 +22,7 @@
 							<li><a href="#tab2_3" data-toggle="tab"><i class="fa fa-cloud-download"></i> Downloaders</a>
 							</li>
 						</ul>
-						<form action="profileedit?action=submit" method="post">
-							{{csrf_field()}}
+						{{Form::open(['url' => 'profileedit?action=submit'])}}
 							<div class="tab-content">
 								<div class="tab-pane fade active in" id="tab2_1">
 									<table cellpadding="0" cellspacing="0" width="100%">
@@ -299,7 +298,7 @@
 								</div>
 							</div>
 							<input type="submit" value="Save" class="btn btn-primary"/>
-						</form>
+						{{Form::close()}}
 					</div>
 				</div>
 			</div>

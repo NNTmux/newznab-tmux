@@ -24,13 +24,12 @@
 				<tr>
 					<td colspan="10">
 						<h2>{$aletter}...</h2>
-						<form name="anidbsearch" class="form pull-right" action="" method="get"
-							  style="margin-top:-35px;">
-							<label for="title">Search:</label>
-							<input class="form-control" style="width: 150px;" id="title appendedInputButton" type="text"
-								   name="title" value="{$animetitle}" placeholder="Search here"/>
-							<button type="submit" class="btn btn-default">Search</button>
-						</form>
+                        {{Form::open(['class' => 'form pull-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
+							{{Form::label('title', 'Search:')}}
+                            {{Form::text('title', $animetitle, ['class' => 'form-control', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
+                            'placeholder' => 'Search here'])}}
+                            {{Form::button('Search', ['class' => 'btn btn-default', 'type' => 'submit'])}}
+						{{Form::close()}}
 					</td>
 				</tr>
 				<tr>

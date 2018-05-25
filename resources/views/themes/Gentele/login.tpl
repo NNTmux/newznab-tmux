@@ -11,8 +11,7 @@
 		</div><!-- /.login-logo -->
 		<div class="login-box-body">
 			<p class="login-box-msg">Please sign in to access the site</p>
-			<form action="login" method="post">
-				{{csrf_field()}}
+			{{Form::open(['url' => 'login'])}}
 				<div class="form-group has-feedback">
 					<input id="username" name="username" type="text" class="form-control"
 						   placeholder="Username or email"/>
@@ -40,7 +39,7 @@
 
 					</div><!-- /.col -->
 				</div>
-			</form>
+			{{Form::close()}}
 
 			<a href="{$smarty.const.WWW_TOP}/forgottenpassword" class="text-center">I forgot my password</a><br>
 			<a href="{$smarty.const.WWW_TOP}/register" class="text-center">Register a new membership</a>

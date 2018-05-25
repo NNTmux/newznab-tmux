@@ -56,7 +56,7 @@
 					<h3 id="myLabel">Reply</h3>
 				</div>
 				<div class="body">
-					<form id="forum-post-reply" class="form-horizontal" action="" method="post">
+                    {{Form::open(['id' => 'forum-post-reply', 'class' => 'form-horizontal'])}}
 						{{csrf_field()}}
 						<div class="control-group">
 							<label class="control-label" for="addMessage">Message</label>
@@ -67,7 +67,7 @@
 							<input class="btn btn-warning" value="Cancel"
 								   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 						</div>
-					</form>
+					{{Form::close()}}
 				</div>
 			{else}
 				<label class="label label-warning" title="Topic Locked">Topic Locked</label>

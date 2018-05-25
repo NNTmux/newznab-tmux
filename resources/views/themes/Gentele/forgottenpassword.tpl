@@ -19,8 +19,7 @@
 				cannot remember your email, or no longer have access to it, please <a
 						href="{$smarty.const.WWW_TOP}/contact-us">contact
 					us</a>.</p>
-			<form action="forgottenpassword?action=submit" method="post">
-				{{csrf_field()}}
+            {{Form::open(['url' => 'forgottenpassword?action=submit'])}}
 				<div class="form-group has-feedback">
 					<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control"
 						   placeholder="Email"/>
@@ -43,7 +42,7 @@
 						<button type="submit" class="btn btn-primary btn-block btn-flat">Request Password Reset</button>
 					</div><!-- /.col -->
 				</div>
-			</form>
+			{{Form::close()}}
 			{elseif $sent != ''}
 			<p>
 				A password reset request has been sent to your email.

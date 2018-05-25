@@ -11,7 +11,7 @@
 </div>
 {$site->adbrowse}
 {if $results|@count > 0}
-	<form id="nzb_multi_operations_form" action="get">
+	{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 		<div class="box-body">
 			<div class="row">
 				<div class="col-md-12 col-xs-12">
@@ -240,5 +240,5 @@
 				</div>
 			</div>
 		</div>
-	</form>
+	{{Form::close()}}
 {/if}

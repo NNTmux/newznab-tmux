@@ -27,8 +27,7 @@
 		<div style="text-align: center">{$search_description}
 			<div>
 				<br>
-				<form method="get" action="{$smarty.const.WWW_TOP}/search">
-					{{csrf_field()}}
+				{{Form::open(['url' => 'search', 'method' => 'get'])}}
 					<div id="sbasic" class="row" style="text-align:center;{if $sadvanced} display:none;{/if}">
 						<div class="col-md-6">
 							<input id="search" class="form-control" maxlength="500" name="search"
@@ -42,9 +41,9 @@
 							<input id="search_search_button" class="btn btn-primary" type="submit" value="Search"/>
 						</div>
 					</div>
-				</form>
+				{{Form::close()}}
 			</div>
-			<form method="get" action="{$smarty.const.WWW_TOP}/search">
+			{{Form::open(['url' => 'search', 'method' => 'get'])}}
 				<div id="sadvanced" {if not $sadvanced}style="display:none"{/if}>
 					<div style="text-align: center;">
 						<table class="data table table-striped responsive-utilities jambo-table">
@@ -116,7 +115,7 @@
 						</table>
 					</div>
 				</div>
-			</form>
+			{{Form::close()}}
 			{if $results|@count == 0 && ($search || $subject|| $searchadvr|| $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) != ""}
 				<div style="text-align: center;">
 					<div class="nosearchresults">
@@ -143,8 +142,7 @@
 			{elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
 			{else}
 				<div class="well well-sm">
-					<form style="padding-top:10px;" id="nzb_multi_operations_form" method="get"
-						  action="{$smarty.const.WWW_TOP}/search">
+					{{Form::open(['id' => 'nzb_multi_operations_form','style' => 'padding-top:10px;', 'method' => 'get', 'url' => 'search'])}}
 						<div class="row">
 							<div class="col-md-8">
 								{if isset($shows)}
@@ -437,7 +435,7 @@
 							{/if}
 						</div>
 						<br><br><br>
-					</form>
+					{{Form::close()}}
 				</div>
 			{/if}
 		</div>

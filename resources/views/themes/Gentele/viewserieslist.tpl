@@ -26,17 +26,17 @@
 	{if $serieslist|@count > 0}
 		<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
 			<div class="col-md-12 pull-right">
-				<form class="form pull-right" style="margin-top:-35px;">
-					<form name="showsearch" class="navbar-form" action="" method="get">
+			    {{Form::open(['class' => 'form pull-right', 'style' => 'margin-top:-35px;'])}}
+                    {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
 						<div class="input-group">
 							<input class="form-control" style="width: 150px;"
 								   id="title appendedInputButton"
 								   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}"{else}{/if}"
 								   placeholder="Search here"/>
-							<button type="submit" class="btn btn-success">GO</button>
+                            {{Form::button('Go', ['class' => 'btn btn-success', 'type' => 'submit'])}}
 						</div>
-					</form>
-				</form>
+					{{Form::close()}}
+				{{Form::close()}}
 			</div>
 			{foreach $serieslist as $sletter => $series}
 				<tr>

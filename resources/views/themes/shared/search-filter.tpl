@@ -1,7 +1,6 @@
 {if isset($covgroup)}
 	{if $covgroup == "movies"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
-			{{csrf_field()}}
+        {{Form::open(['name' => 'browseby', 'url' => 'search', 'class' => 'form-inline'])}}
 			<input class="form-control" style="width: 150px;" id="movietitle" type="text" name="title" value="{$title}"
 				   placeholder="Title">
 			<input class="form-control" style="width: 150px;" id="movieactors" type="text" name="actors"
@@ -33,8 +32,8 @@
 					<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
-			<input class="btn btn-success" type="submit" value="Go">
-		</form>
+            {{Form::submit('Go', ['class' => 'btn btn-success'])}}
+		{{Form::close()}}
 	{/if}
 	{if $covgroup == "xxx"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
@@ -78,7 +77,7 @@
 				{/foreach}
 			</select>
 			<input class="btn btn-success" type="submit" value="Go">
-		</form>
+		{{Form::close()}}
 	{/if}
 	{if $covgroup == "books"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
@@ -88,7 +87,7 @@
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
 			<input class="btn btn-success" type="submit" value="Go">
-		</form>
+		{{Form::close()}}
 	{/if}
 	{if $covgroup == "music"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
@@ -118,7 +117,7 @@
 				{/foreach}
 			</select>
 			<input class="btn btn-success" type="submit" value="Go">
-		</form>
+		{{Form::close()}}
 	{/if}
 	{if $covgroup == "console"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
@@ -141,7 +140,7 @@
 				{/foreach}
 			</select>
 			<input class="btn btn-success" type="submit" value="Go">
-		</form>
+		{{Form::close()}}
 	{/if}
 	{if $covgroup == "games"}
 		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
@@ -167,7 +166,7 @@
 			{*{/foreach}*}
 			{*</select>*}
 			<input class="btn btn-success" type="submit" value="Go">
-		</form>
+		{{Form::close()}}
 	{/if}
 {/if}
 {if {$smarty.get.page} == "console"}
@@ -190,7 +189,7 @@
 			{/foreach}
 		</select>
 		<input class="btn btn-success" type="submit" value="Go">
-	</form>
+	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "games"}
 	<form class="form-inline" name="browseby" action="games" style="margin:0;">
@@ -216,7 +215,7 @@
 		{*{/foreach}*}
 		{*</select>*}
 		<input class="btn btn-success" type="submit" value="Go">
-	</form>
+	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "books"}
 	<form class="form-inline" name="browseby" action="books" style="margin:0;">
@@ -226,7 +225,7 @@
 		<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
 		<input class="btn btn-success" type="submit" value="Go">
-	</form>
+	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "movies"}
 	<form class="form-inline" name="browseby" action="movies">
@@ -262,7 +261,7 @@
 			{/foreach}
 		</select>
 		<input class="btn btn-success" type="submit" value="Go">
-	</form>
+	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "xxx"}
 	<form class="form-inline" name="browseby" action="xxx">
@@ -306,7 +305,7 @@
 			{/foreach}
 		</select>
 		<input class="btn btn-success" type="submit" value="Go">
-	</form>
+	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "music"}
 	<form class="form-inline" name="browseby" action="music" style="margin:0;">
@@ -335,5 +334,5 @@
 			{/foreach}
 		</select>
 		<input class="btn btn-success" type="submit" value="Go">
-	</form>
+	{{Form::close()}}
 {/if}

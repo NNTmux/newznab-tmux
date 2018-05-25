@@ -15,8 +15,7 @@
 			</div>
 			<div class="register-box-body">
 				<p class="login-box-msg">Register a new membership</p>
-				<form action="register?action=submit{$invite_code_query}" method="post">
-					{{csrf_field()}}
+                {{Form::open(['url' => "register?action=submit{$invite_code_query}"])}}
 					<div class="form-group has-feedback">
 						<input autocomplete="off" id="username" name="username" value="{$username}" type="text"
 							   class="form-control" placeholder="Username"/>
@@ -62,7 +61,7 @@
 						</div>
 					</div>
 					<a href="{$serverroot}login" class="text-center">I already have a membership</a>
-				</form>
+				{{Form::close()}}
 			</div><!-- /.form-box -->
 		</div>
 		<!-- /.register-box -->

@@ -12,7 +12,7 @@
 <div class="well well-sm">
 	{include file='search-filter.tpl'}
 </div>
-<form id="nzb_multi_operations_form" action="get">
+{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="box-body">
 		<div class="row">
 			<div class="col-lg-12 col-sm-12 col-xs-12">
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 	</div>
-</form>
+{{Form::close()}}
 <div class="box-body">
 	<div class="row">
 		<div class="col-lg-12 col-sm-12 col-xs-12">
@@ -197,7 +197,7 @@
 		</div>
 	</div>
 </div>
-<form id="nzb_multi_operations_form" action="get">
+{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="box-body">
 		<div class="row">
 			<div class="col-lg-12 col-sm-12 col-xs-12">
@@ -242,4 +242,4 @@
 			</div>
 		</div>
 	</div>
-</form>
+{{Form::close()}}

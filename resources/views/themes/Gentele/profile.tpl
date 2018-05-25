@@ -191,11 +191,12 @@
 																		<span class="invitefailed"
 																			  id="divInviteError"></span>
 																		<div style="display:none;" id="divInvite">
-																			<form id="frmSendInvite" method="GET">
-																				<label for="txtInvite">Email</label>:
-																				<input type="text" id="txtInvite"/>
-																				<input type="submit" value="Send"/>
-																			</form>
+                                                                            {{Form::open(['id' => 'frmSendInvite', 'method' => 'get'])}}
+                                                                                {{Form::label('txtInvite', 'Email')}}
+                                                                                {{Form::text(['id' => txtInvite])}}
+																				{{Form::text('txtInvite', null, ['id' => 'txtInvite'])}}
+																				{{Form::submit('Send')}}
+																			{{Form::close()}}
 																		</div>
 																	{/if}
 																</td>

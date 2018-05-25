@@ -3,7 +3,7 @@
 		<h1>Add to category</h1>
 	</div>
 	<h3>{$type|ucwords} {$movie.title|escape:"htmlall"} in</h3>
-	<form class="form-horizontal" id="mymovies" action="{$smarty.const.WWW_TOP}/mymovies/do{$type}" method="post">
+    {{Form::open(['id' => 'mymovies', 'class' => 'form-horizontal', 'url' => "mymovies/do{$type}"])}}
 		<input type="hidden" name="subpage" value="{$imdbid}"/>
 		<div class="control-group">
 			<label class="control-label" for="category">Choose</label>
@@ -18,5 +18,5 @@
 				<input class="btn btn-success" type="submit" name="{$type}" value="{$type|ucwords}"/>
 			</div>
 		</div>
-	</form>
+	{{Form::close()}}
 </div>

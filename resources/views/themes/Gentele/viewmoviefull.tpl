@@ -54,7 +54,7 @@
 					</dl>
 				</div>
 			</div>
-			<form id="nzb_multi_operations_form" action="get">
+			{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 				<div class="well well-sm">
 					<div class="nzb_multi_operations">
 						{if isset($section) && $section != ''}View:
@@ -235,7 +235,7 @@
 									{/if}
 								</div>
 							</div>
-			</form>
+			{{Form::close()}}
 			{/if}
 		{/foreach}
 	</div>

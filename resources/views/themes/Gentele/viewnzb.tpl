@@ -662,13 +662,12 @@
 										No comments yet...
 									</div>
 								{/if}
-								<form action="/details" method="post">
-									{{csrf_field()}}
+                                {{Form::open(['url' => "details/{$release.guid}"])}}
 									<label for="txtAddComment">Add Comment:</label><br/>
 									<textarea id="txtAddComment" name="txtAddComment" rows="6" cols="60"></textarea>
 									<br/>
-									<input class="btn" type="submit" value="Submit"/>
-								</form>
+                                    {{Form::submit('Submit', ['class' => 'btn btn-default'])}}
+								{{Form::close()}}
 							</div>
 							{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
 								<div id="pane6" class="tab-pane">
