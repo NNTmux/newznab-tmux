@@ -6,7 +6,6 @@ use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -21,7 +20,7 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use Tmdb\Repository\ConfigurationRepository;
-use Illuminate\Support\Facades\DB as DBFacade;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Movie.
@@ -182,11 +181,11 @@ class Movie
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
         if ($this->traktcheck !== null) {
-            $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+            $this->traktTv = new TraktTv(['Settings' => null]);
         }
         $this->client = new Client();
         $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey');
@@ -287,8 +286,8 @@ class Movie
         if ($movieCache !== null) {
             $movies = $movieCache;
         } else {
-            $data = DBFacade::select($moviesSql);
-            $movies = ['total' => DBFacade::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            $data = DB::select($moviesSql);
+            $movies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
         }
         $movieIDs = $releaseIDs = [];
@@ -340,7 +339,7 @@ class Movie
         if ($return !== null) {
             return $return;
         }
-        $return = DBFacade::select($sql);
+        $return = DB::select($sql);
         if (\count($return) > 0) {
             $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
         }
@@ -404,7 +403,7 @@ class Movie
                 if ($bb === 'imdb') {
                     $browseBy .= sprintf('AND m.imdbid = %d', $bbv);
                 } else {
-                    $browseBy .= 'AND m.'.$bb.' '.$this->pdo->likeString($bbv, true, true);
+                    $browseBy .= 'AND m.'.$bb.' '.'LIKE'.' %'.$this->pdo->quote($bbv).'%';
                 }
             }
         }
@@ -553,7 +552,7 @@ class Movie
                 if (\in_array($key, ['genre', 'language'], false)) {
                     $value = substr($value, 0, 64);
                 }
-                $value = $this->pdo->escapeString($value);
+                $value = $this->pdo->quote($value);
                 $query[1] .= "$value, ";
                 $query[2] .= "$key = $value, ";
             }
@@ -565,7 +564,7 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        return $this->pdo->queryInsert($query[0].') '.$query[1].') '.$query[2]);
+        return DB::insert($query[0].') '.$query[1].') '.$query[2]);
     }
 
     /**
@@ -1178,7 +1177,7 @@ class Movie
                                     similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
                                     if ($percent > 80) {
                                         $ret = $this->fetchTMDBProperties($result['id'], true);
-                                        if ($ret !== false) {
+                                        if ($ret !== false && ! empty($ret['imdbid'])) {
                                             $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
                                             if ($imdbID !== false) {
                                                 $movieUpdated = true;
