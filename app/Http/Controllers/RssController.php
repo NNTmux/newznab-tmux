@@ -65,7 +65,7 @@ class RssController extends BasePageController
             );
             $this->pagerender();
         } else {
-           $uid = -1;
+            $uid = -1;
             // User requested a feed, ensure either logged in or passing a valid token.
             if (Auth::check()) {
                 $uid = Auth::id();
