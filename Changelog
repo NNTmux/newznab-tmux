@@ -1,3 +1,5 @@
+2018-05-26 DariusIII
+	* Fix: Fix users list display in admin area
 2018-05-25 DariusIII
 	* Chg: Update symfony components
 	* Chg: Update admin/user-list handling

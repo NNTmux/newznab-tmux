@@ -92,7 +92,7 @@
 								   href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->id}#notes"><img
 								src="{$smarty.const.WWW_TOP}/shared/images/icons/{if $user->notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
 								alt=""/></a></td>
-				<td>{$user->role->name}</td>
+				<td>{$user->rolename}</td>
 				<td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
 				<td>{if $user->user_roles_id !="2"}<a class="confirm_action"
 													 href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">

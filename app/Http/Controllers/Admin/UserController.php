@@ -45,7 +45,7 @@ class UserController extends BasePageController
             $variables['email'], $variables['host'], $variables['role'], true
         );
 
-        $results = $this->paginate($rslt ?? [], User::getCount() ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
+        $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign(
             [

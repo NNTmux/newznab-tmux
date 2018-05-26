@@ -507,7 +507,7 @@ class User extends Authenticatable
                 ! empty($userName) ? 'AND users.username '.'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
                 ! empty($email) ? 'AND users.email '.'LIKE '.DB::connection()->getPdo()->quote('%'.$email.'%') : '',
                 ! empty($host) ? 'AND users.host '.'LIKE '.DB::connection()->getPdo()->quote('%'.$host.'%') : '',
-                (! empty($role) ? ('AND users.role = '.$role) : ''),
+                (! empty($role) ? ('AND users.user_roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
@@ -549,7 +549,7 @@ class User extends Authenticatable
                 $orderField = 'grabs';
                 break;
             case 'role':
-                $orderField = 'role';
+                $orderField = 'rolename';
                 break;
             case 'rolechangedate':
                 $orderField = 'rolechangedate';
