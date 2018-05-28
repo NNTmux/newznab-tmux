@@ -53,13 +53,6 @@ Route::prefix('cart')->group(function () {
     Route::post('delete/{id}', 'CartController@destroy');
 });
 
-Route::prefix('api/v1')->group(function () {
-    Route::namespace('Api')->group(function () {
-        Route::get('api', 'ApiController@api');
-        Route::post('api', 'ApiController@api');
-    });
-});
-
 Route::get('details/{guid}', 'DetailsController@show');
 Route::post('details/{guid}', 'DetailsController@show');
 

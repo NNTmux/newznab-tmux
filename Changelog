@@ -1,4 +1,5 @@
 2018-05-28 DariusIII
+	* Chg: Move API related routes to routes/api.php
 	* Chg: Update phpunit/php-code-coverage to version 6.0.5
 	* Fix: Fix issues related to myshows, their rss and browsing
 	* Fix: Fix issues in admin/group-list page, fixes issue #603
