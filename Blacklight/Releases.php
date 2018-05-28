@@ -437,7 +437,7 @@ class Releases
 				ORDER BY %s %s %s",
                 $this->getConcatenatedCategoryIDs(),
                 $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
@@ -445,7 +445,7 @@ class Releases
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
                 $orderBy[0],
                 $orderBy[1],
-                ($offset === false ? '' : (' LIMIT ' . $limit . ' OFFSET ' . $offset))
+                ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
 
         $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -481,7 +481,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s',
                 $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
@@ -490,7 +490,6 @@ class Releases
             )
         );
     }
-
 
     /**
      * Delete multiple releases, or a single by ID.
@@ -587,6 +586,7 @@ class Releases
             $sql .= ') ';
         }
         $sql .= ') ';
+
         return $sql;
     }
 

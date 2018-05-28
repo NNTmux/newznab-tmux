@@ -108,7 +108,7 @@ class RssController extends BasePageController
 
             $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
-            $userCat = ($request->has('t') ? ((int) $request->input('t') === 0 ? -1 : (int)$request->input('t')) : -1);
+            $userCat = ($request->has('t') ? ((int) $request->input('t') === 0 ? -1 : (int) $request->input('t')) : -1);
             $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 100);
             $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
 
