@@ -8,7 +8,6 @@ use App\Models\Settings;
 use Blacklight\Releases;
 use App\Models\UserSerie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MyShowsController extends BasePageController
 {
