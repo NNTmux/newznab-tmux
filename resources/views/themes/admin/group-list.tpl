@@ -5,18 +5,19 @@
 		Backfill works independently of active.
 	</p>
 	{if $grouplist}
-		<div style="position:relative;margin-bottom:5px;">
-			<form name="groupsearch" action="" style="margin-bottom:5px;">
-				{{csrf_field()}}
-				<label for="groupname">Group</label>
+		<div class="row" style="position:relative;margin-bottom:5px;">
+            <div class="col-md-4">
+            {{Form::open(['name' => 'groupsearch', 'style' => 'margin-bottom:5px;'])}}
+                {{Form::label('grouopname', 'Group')}}
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
 				&nbsp;&nbsp;
 				<input class="btn btn-default" type="submit" value="Go"/>
-			</form>
-			<div style="position:absolute;">
+			{{Form::close()}}
+            </div>
+			<div class="col-md-4">
 				{$grouplist->links()}
 			</div>
-			<div style="text-align:center;">
+			<div class="col-md-4" style="text-align:center;">
 				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"
 				   onclick="return confirm('Are you sure? This will reset all groups, deleting all collections/binaries/parts (does not delete releases).');">Reset
 					all</a> |
@@ -31,7 +32,7 @@
 				<a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
 			</div>
 		</div>
-		<div id="message">msg</div>
+		<div id="message">{$msg}</div>
 		<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th>group</th>
@@ -81,32 +82,33 @@
 				</tr>
 			{/foreach}
 		</table>
-		<div style="position:relative;margin-top:5px;">
-			<div style="position:absolute;">
-				{$grouplist->links()}
-			</div>
-			<div style="text-align:center;">
-				<form name="groupsearch" action="" style="margin-bottom:5px;">
-					{{csrf_field()}}
-					<label for="groupname">Group</label>
-					<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
-					&nbsp;&nbsp;
-					<input class="btn btn-default" type="submit" value="Go"/>
-				</form>
-				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"
-				   onclick="return confirm('Are you sure? This will reset all groups, deleting all collections/binaries/parts (does not delete releases).');">Reset
-					all</a> |
-				<a title="Delete all releases, binaries/parts from all groups" href="javascript:ajax_all_purge()"
-				   class="all_purge"
-				   onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge
-					all</a><br/>
-				<a title="List all groups Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/admin/group-list-active">Active Groups</a> |
-				<a title="List all groups NOT Activated for Update_Binaries"
-				   href="{$smarty.const.WWW_TOP}/admin/group-list-inactive">Inactive Groups</a> |
-				<a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
-			</div>
-		</div>
+        <div class="row" style="position:relative;margin-bottom:5px;">
+            <div class="col-md-4">
+                {{Form::open(['name' => 'groupsearch', 'style' => 'margin-bottom:5px;'])}}
+                {{Form::label('grouopname', 'Group')}}
+                <input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
+                &nbsp;&nbsp;
+                <input class="btn btn-default" type="submit" value="Go"/>
+                {{Form::close()}}
+            </div>
+            <div class="col-md-4">
+                {$grouplist->links()}
+            </div>
+            <div class="col-md-4" style="text-align:center;">
+                <a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"
+                   onclick="return confirm('Are you sure? This will reset all groups, deleting all collections/binaries/parts (does not delete releases).');">Reset
+                    all</a> |
+                <a title="Delete all releases, collections/binaries/parts from all groups"
+                   href="javascript:ajax_all_purge()" class="all_purge"
+                   onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge
+                    all</a><br/>
+                <a title="List all groups Activated for Update_Binaries"
+                   href="{$smarty.const.WWW_TOP}/admin/group-list-active">Active Groups</a> |
+                <a title="List all groups NOT Activated for Update_Binaries"
+                   href="{$smarty.const.WWW_TOP}/admin/group-list-inactive">Inactive Groups</a> |
+                <a title="List all groups" href="{$smarty.const.WWW_TOP}/admin/group-list">All Groups</a>
+            </div>
+        </div>
 	{else}
 		<p>No groups available (eg. none have been added).</p>
 	{/if}

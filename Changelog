@@ -1,3 +1,5 @@
+2018-05-28 DariusIII
+	* Fix: Fix issues in admin/group-list page, fixes issue #603
 2018-05-26 DariusIII
 	* Fix: Fix users list display in admin area
 2018-05-25 DariusIII

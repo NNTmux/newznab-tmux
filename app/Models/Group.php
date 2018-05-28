@@ -234,7 +234,7 @@ class Group extends Model
      * @param string $groupname
      * @param null   $active
      *
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getGroupsRange($groupname = '', $active = null)
     {
@@ -250,7 +250,7 @@ class Group extends Model
             $groups->where('active', '=', 0);
         }
 
-        return $groups->get();
+        return $groups->paginate();
     }
 
     /**
@@ -359,7 +359,7 @@ class Group extends Model
                 'first_record' => 0,
                 'first_record_postdate' => null,
                 'last_record' => 0,
-                'člast_record_postdate' => null,
+                'last_record_postdate' => null,
                 'last_updated' => null,
                 'active' => 0,
             ]
