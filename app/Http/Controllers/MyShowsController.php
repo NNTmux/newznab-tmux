@@ -20,8 +20,8 @@ class MyShowsController extends BasePageController
     public function show(Request $request)
     {
         $this->setPrefs();
-        $action = $request->input('id') ?? '';
-        $videoId = $request->input('subpage') ?? '';
+        $action = $request->input('action') ?? '';
+        $videoId = $request->input('id') ?? '';
 
         if ($request->has('from')) {
             $this->smarty->assign('from', WWW_TOP.$request->input('from'));
@@ -31,7 +31,7 @@ class MyShowsController extends BasePageController
 
         switch ($action) {
             case 'delete':
-                $show = UserSerie::getShow(Auth::id(), $videoId);
+                $show = UserSerie::getShow($this->userdata->id, $videoId);
                 if ($request->has('from')) {
                     header('Location:'.WWW_TOP.$request->input('from'));
                 } else {
@@ -40,13 +40,13 @@ class MyShowsController extends BasePageController
                 if (! $show) {
                     $this->show404();
                 } else {
-                    UserSerie::delShow(Auth::id(), $videoId);
+                    UserSerie::delShow($this->userdata->id, $videoId);
                 }
 
                 break;
             case 'add':
             case 'doadd':
-                $show = UserSerie::getShow(Auth::id(), $videoId);
+                $show = UserSerie::getShow($this->userdata->id, $videoId);
                 if ($show) {
                     $this->show404('Already subscribed');
                 } else {
@@ -58,7 +58,7 @@ class MyShowsController extends BasePageController
 
                 if ($action === 'doadd') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
-                    UserSerie::addShow(Auth::id(), $videoId, $category);
+                    UserSerie::addShow($this->userdata->id, $videoId, $category);
                     if ($request->has('from')) {
                         header('Location:'.WWW_TOP.$request->input('from'));
                     } else {
@@ -89,7 +89,7 @@ class MyShowsController extends BasePageController
                 break;
             case 'edit':
             case 'doedit':
-                $show = UserSerie::getShow(Auth::id(), $videoId);
+                $show = UserSerie::getShow($this->userdata->id, $videoId);
 
                 if (! $show) {
                     $this->show404();
@@ -97,7 +97,7 @@ class MyShowsController extends BasePageController
 
                 if ($action === 'doedit') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
-                    UserSerie::updateShow(Auth::id(), $videoId, $category);
+                    UserSerie::updateShow($this->userdata->id, $videoId, $category);
                     if ($request->has('from')) {
                         return redirect($request->input('from'));
                     }
@@ -136,7 +136,7 @@ class MyShowsController extends BasePageController
                     $categories[$c['id']] = $c['title'];
                 }
 
-                $shows = UserSerie::getShows(Auth::id());
+                $shows = UserSerie::getShows($this->userdata->id);
                 $results = [];
                 foreach ($shows as $showk => $show) {
                     $showcats = explode('|', $show['categories']);
@@ -182,14 +182,18 @@ class MyShowsController extends BasePageController
         $meta_keywords = 'search,add,to,cart,nzb,description,details';
         $meta_description = 'Browse Your Shows';
 
-        $shows = UserSerie::getShows(Auth::id());
+        $shows = UserSerie::getShows($this->userdata->id);
 
         $releases = new Releases(['Settings' => $this->settings]);
 
+        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
+        $offset = ($page - 1) * config('nntmux.items_per_page');
         $ordering = $releases->getBrowseOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        $browseCount = $releases->getShowsCount($shows, -1, $this->userdata['categoryexclusions']);
 
-        $results = $releases->getShowsRange($shows ?? [], $orderby, -1, $this->userdata['categoryexclusions']);
+        $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign('covgroup', '');
 
@@ -199,7 +203,7 @@ class MyShowsController extends BasePageController
 
         $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
 
-        $this->smarty->assign('results', $results);
+        $this->smarty->assign(['results' => $results, 'resultsadd' => $rslt]);
 
         $this->smarty->assign('shows', true);
 

@@ -108,7 +108,7 @@ class RssController extends BasePageController
 
             $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
-            $userCat = ($request->has('t') ? ((int) $request->input('t') === 0 ? -1 : $request->input('t')) : -1);
+            $userCat = ($request->has('t') ? ((int) $request->input('t') === 0 ? -1 : (int)$request->input('t')) : -1);
             $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 100);
             $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
 
@@ -121,9 +121,9 @@ class RssController extends BasePageController
                     'token'    => $rssToken,
                 ];
 
-            if ((int) $userCat === -3) {
+            if ($userCat === -3) {
                 $relData = $rss->getShowsRss($userNum, $uid, User::getCategoryExclusion($uid), $userAirDate);
-            } elseif ((int) $userCat === -4) {
+            } elseif ($userCat === -4) {
                 $relData = $rss->getMyMoviesRss($userNum, $uid, User::getCategoryExclusion($uid));
             } else {
                 $relData = $rss->getRss(explode(',', $userCat), $userNum, $userShow, $userAnidb, $uid, $userAirDate);

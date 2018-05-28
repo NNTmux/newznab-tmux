@@ -75,15 +75,15 @@
 						<td>{$s.countries_id|escape:"htmlall"}</td>
 						<td class="mid">
 							{if $s.userseriesid != null}
-								<a href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   class="myshows btn btn-sm btn-warning" rel="edit" name="series{$s.id}"
 								   title="Edit">Edit</a>
 								<br/>
-								<a href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   class="myshows btn btn-sm btn-danger" rel="remove" name="series{$s.id}"
 								   title="Remove from My Shows">Remove</a>
 							{else}
-								<a href="{$smarty.const.WWW_TOP}/myshows/add/{$s.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   class="myshows btn btn-sm btn-primary" rel="add" name="series{$s.id}"
 								   title="Add to My Shows">Add</a>
 							{/if}

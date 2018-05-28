@@ -354,12 +354,10 @@ class XML_Response
     {
         if (! empty($this->releases)) {
             foreach ($this->releases as $this->release) {
-                if (! empty($this->release->id)) {
-                    $this->xml->startElement('item');
-                    $this->includeReleaseMain();
-                    $this->setZedAttributes();
-                    $this->xml->endElement();
-                }
+                $this->xml->startElement('item');
+                $this->includeReleaseMain();
+                $this->setZedAttributes();
+                $this->xml->endElement();
             }
         }
     }

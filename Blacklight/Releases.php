@@ -398,65 +398,99 @@ class Releases
     }
 
     /**
-     * @param        $userShows
-     * @param string $orderBy
-     * @param int    $maxAge
-     * @param array  $excludedCats
+     * Get TV for my shows page.
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
-     * @throws \Exception
+     * @param          $userShows
+     * @param int|bool $offset
+     * @param int      $limit
+     * @param string|array   $orderBy
+     * @param int      $maxAge
+     * @param array    $excludedCats
+     *
+     * @return array
      */
-    public function getShowsRange($userShows, $orderBy = '', $maxAge = -1, array $excludedCats = [])
+    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, $excludedCats = [])
     {
-        $sql = Release::query()
-            ->with('group as g', 'nfo as rn', 'category as c', 'failed as df', 'episode as tve')
-            ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->where('r.nzbstatus', NZB::NZB_ADDED);
-        self::showPasswords($sql, true);
-        if (! empty($userShows)) {
-            foreach ($userShows as $query) {
-                $sql->orWhere('r.videos_id', '=', $query['videos_id']);
-                if ($query['categories'] !== '') {
-                    $catsArr = explode('|', $query['categories']);
-                    if (\count($catsArr) > 1) {
-                        $sql->whereIn('r.categories_id', $catsArr);
-                    } else {
-                        $sql->where('r.categories_id', $catsArr[0]);
-                    }
-                }
-            }
+        $orderBy = $this->getBrowseOrder($orderBy);
+        $sql = sprintf(
+                "SELECT r.*,
+					CONCAT(cp.title, '-', c.title) AS category_name,
+					%s AS category_ids,
+					groups.name AS group_name,
+					rn.releases_id AS nfoid, re.releases_id AS reid,
+					tve.firstaired,
+					df.failed AS failed
+				FROM releases r
+				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+				LEFT JOIN groups ON groups.id = r.groups_id
+				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
+				LEFT JOIN categories c ON c.id = r.categories_id
+				LEFT JOIN categories cp ON cp.id = c.parentid
+				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+				WHERE %s %s
+				AND r.nzbstatus = %d
+				AND r.categories_id BETWEEN %d AND %d
+				AND r.passwordstatus %s
+				%s
+				GROUP BY r.id
+				ORDER BY %s %s %s",
+                $this->getConcatenatedCategoryIDs(),
+                $this->uSQL($userShows, 'videos_id'),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+                NZB::NZB_ADDED,
+                Category::TV_ROOT,
+                Category::TV_OTHER,
+                $this->showPasswords,
+                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
+                $orderBy[0],
+                $orderBy[1],
+                ($offset === false ? '' : (' LIMIT ' . $limit . ' OFFSET ' . $offset))
+        );
+
+        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
         }
 
-        if (\count($excludedCats) > 0) {
-            $sql->whereNotIn('r.categories_id', $excludedCats);
-        }
+        $result = DB::select($sql);
+        Cache::put(md5($sql), $result, $expiresAt);
 
-        if ($maxAge > 0) {
-            $sql->where('r.postdate', '>', Carbon::now()->subDays($maxAge));
-        }
-        $sql->select(
-                [
-                    'r.*',
-                    DB::raw("CONCAT(cp.title, '-', c.title) AS category_name"),
-                    'g.name as group_name',
-                    'rn.releases_id as nfoid',
-                    're.releases_id as reid',
-                    'tve.firstaired',
-                    'df.failed as failed',
-                    ]
-            )
-            ->from('releases as r')
-            ->leftJoin('video_data as re', 're.releases_id', '=', 'r.id')
-            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid');
-
-        if ($orderBy !== '') {
-            $order = $this->getBrowseOrder($orderBy);
-            $sql->orderBy($order[0], $order[1]);
-        }
-
-        return $sql->paginate(config('nntmux.items_per_page'));
+        return $result;
     }
+
+    /**
+     * Get count for my shows page pagination.
+     *
+     * @param       $userShows
+     * @param int   $maxAge
+     * @param array $excludedCats
+     *
+     * @return int
+     */
+    public function getShowsCount($userShows, $maxAge = -1, $excludedCats = [])
+    {
+        return $this->getPagerCount(
+            sprintf(
+                'SELECT r.id
+				FROM releases r
+				WHERE %s %s
+				AND r.nzbstatus = %d
+				AND r.categories_id BETWEEN %d AND %d
+				AND r.passwordstatus %s
+				%s',
+                $this->uSQL($userShows, 'videos_id'),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+                NZB::NZB_ADDED,
+                Category::TV_ROOT,
+                Category::TV_OTHER,
+                $this->showPasswords,
+                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+            )
+        );
+    }
+
 
     /**
      * Delete multiple releases, or a single by ID.
@@ -535,24 +569,25 @@ class Releases
      * @param array  $userQuery
      * @param string $type
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return string
      */
     public function uSQL($userQuery, $type)
     {
-        $query = null;
+        $sql = '(1=2 ';
         foreach ($userQuery as $query) {
-            $query->orWhere('r.'.$type, $query[$type]);
-            if ($query['categories'] !== '') {
-                $catsArr = explode('|', $query['categories']);
+            $sql .= sprintf('OR (r.%s = %d', $type, $query->$type);
+            if (! empty($query->categories)) {
+                $catsArr = explode('|', $query->categories);
                 if (\count($catsArr) > 1) {
-                    $query->whereIn('r.categories_id', $catsArr);
+                    $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
                 } else {
-                    $query->where('r.categories_id', $catsArr[0]);
+                    $sql .= sprintf(' AND r.categories_id = %d', $catsArr[0]);
                 }
             }
+            $sql .= ') ';
         }
-
-        return $query;
+        $sql .= ') ';
+        return $sql;
     }
 
     /**

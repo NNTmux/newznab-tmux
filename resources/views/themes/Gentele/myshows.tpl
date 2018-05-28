@@ -44,11 +44,11 @@
 										<td>
 											<div class="btn-group">
 												<a class="btn btn-xs btn-warning myshows"
-												   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}"
+												   href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$show.videos_id}"
 												   rel="edit" name="series{$show.videos_id}"
 												   title="Edit Categories">Edit</a>
 												<a class="btn btn-xs btn-danger confirm_action myshows"
-												   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.videos_id}"
+												   href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$show.videos_id}"
 												   rel="remove" name="series{$show.videos_id}"
 												   title="Remove from My Shows">Remove</a>
 											</div>
