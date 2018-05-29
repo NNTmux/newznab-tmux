@@ -1,4 +1,5 @@
 2018-05-29 DariusIII
+	* Fix: Left commented out code for testing
 	* Fix: Fix sent headers when downloading an nzb
 	* Fix: Fix group browsing list page
 2018-05-28 DariusIII

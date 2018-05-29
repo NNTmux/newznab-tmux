@@ -108,9 +108,9 @@ class GetNzbController extends BasePageController
 
         $nzbPath = (new NZB())->getNZBPath($request->input('id'));
 
-        /*if (! File::exists($nzbPath)) {
+        if (! File::exists($nzbPath)) {
             Utility::showApiError(300, 'NZB file not found!');
-        }*/
+        }
 
         $relData = Release::getByGuid($request->input('id'));
         if ($relData !== null) {
