@@ -108,9 +108,9 @@ class GetNzbController extends BasePageController
 
         $nzbPath = (new NZB())->getNZBPath($request->input('id'));
 
-        if (! File::exists($nzbPath)) {
+        /*if (! File::exists($nzbPath)) {
             Utility::showApiError(300, 'NZB file not found!');
-        }
+        }*/
 
         $relData = Release::getByGuid($request->input('id'));
         if ($relData !== null) {
@@ -126,7 +126,7 @@ class GetNzbController extends BasePageController
 
         $cleanName = str_replace([',', ' ', '/'], '_', $relData['searchname']);
 
-        $headers[] = [
+        $headers = [
             'Content-Disposition:' => 'attachment; filename='.$cleanName.'.nzb',
             'Content-Type:' => 'application/x-nzb',
             'Expires:' => date('r', Carbon::now()->addDays(365)->timestamp),

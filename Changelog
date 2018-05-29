@@ -1,4 +1,5 @@
 2018-05-29 DariusIII
+	* Fix: Fix sent headers when downloading an nzb
 	* Fix: Fix group browsing list page
 2018-05-28 DariusIII
 	* Chg: Move API related routes to routes/api.php
