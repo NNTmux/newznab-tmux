@@ -250,7 +250,7 @@ class Group extends Model
             $groups->where('active', '=', 0);
         }
 
-        return $groups->paginate();
+        return $groups->paginate(config('nntmux.items_per_page'));
     }
 
     /**

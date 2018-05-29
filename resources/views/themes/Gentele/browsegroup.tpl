@@ -15,6 +15,9 @@
 				<div class="col-lg-12 portlets">
 					<div class="panel panel-default">
 						<div class="panel-body pagination2">
+                            <div class="col-md-4">
+                                {$results->links()}
+                            </div>
 							<table class="data table table-striped responsive-utilities jambo-table Sortable"
 								   style="table-layout: auto;" data-sort-order="desc">
 								<thead>
@@ -37,6 +40,9 @@
 								{/foreach}
 								</tbody>
 							</table>
+                            <div class="col-md-4">
+                                {$results->links()}
+                            </div>
 						</div>
 					</div>
 				</div>

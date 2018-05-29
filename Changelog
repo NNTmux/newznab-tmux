@@ -1,3 +1,5 @@
+2018-05-29 DariusIII
+	* Fix: Fix group browsing list page
 2018-05-28 DariusIII
 	* Chg: Move API related routes to routes/api.php
 	* Chg: Update phpunit/php-code-coverage to version 6.0.5
