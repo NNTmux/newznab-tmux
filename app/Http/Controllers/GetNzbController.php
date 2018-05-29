@@ -127,7 +127,6 @@ class GetNzbController extends BasePageController
         $cleanName = str_replace([',', ' ', '/'], '_', $relData['searchname']);
 
         $headers = [
-            'Content-Disposition:' => 'attachment; filename='.$cleanName.'.nzb',
             'Content-Type:' => 'application/x-nzb',
             'Expires:' => date('r', Carbon::now()->addDays(365)->timestamp),
             'X-DNZB-Failure:' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
