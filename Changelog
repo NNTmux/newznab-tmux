@@ -1,3 +1,5 @@
+2018-05-30 DariusIII
+	* Chg: Update intervention/image to version 2.4.2
 2018-05-29 DariusIII
 	* Chg: Update NNTP class, simplify some of the if-else statements
 	* Fix: Fix wrong size in substr check in NNTP class
