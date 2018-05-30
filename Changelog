@@ -1,4 +1,5 @@
 2018-05-30 DariusIII
+	* Chg: Update kevinlebrun/colors.php to version 1.0.3
 	* Chg: Update intervention/image to version 2.4.2
 2018-05-29 DariusIII
 	* Chg: Update NNTP class, simplify some of the if-else statements

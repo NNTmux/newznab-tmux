@@ -3266,16 +3266,16 @@
         },
         {
             "name": "kevinlebrun/colors.php",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kevinlebrun/colors.php.git",
-                "reference": "6d7140aeedef46c97c2324f09b752c599ef17dac"
+                "reference": "cdda5eee41314b87cd5a8bb91b1ffc7c0210e673"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kevinlebrun/colors.php/zipball/6d7140aeedef46c97c2324f09b752c599ef17dac",
-                "reference": "6d7140aeedef46c97c2324f09b752c599ef17dac",
+                "url": "https://api.github.com/repos/kevinlebrun/colors.php/zipball/cdda5eee41314b87cd5a8bb91b1ffc7c0210e673",
+                "reference": "cdda5eee41314b87cd5a8bb91b1ffc7c0210e673",
                 "shasum": ""
             },
             "require": {
@@ -3313,7 +3313,7 @@
                 "console",
                 "shell"
             ],
-            "time": "2016-04-12T20:58:34+00:00"
+            "time": "2018-05-30T08:34:23+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
