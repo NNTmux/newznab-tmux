@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Extensions\util\Versions;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Extensions\util\Versions;
 use App\Http\Controllers\Controller;
 
 class ApiV2Controller extends Controller
@@ -17,7 +17,7 @@ class ApiV2Controller extends Controller
         $serverroot = url('/');
         $category = Category::getForMenu();
 
-        $capabilities =  [
+        $capabilities = [
             'server' => [
                 'appversion' => (new Versions())->getGitTagInFile(),
                 'version'    => (new Versions())->getGitTagInRepo(),
