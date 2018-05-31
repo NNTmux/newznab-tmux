@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -48,7 +47,7 @@ class UserMovie extends Model
                     'users_id' => $uid,
                     'imdbid' => $imdbid,
                     'categories' => ! empty($catID) ? implode('|', $catID) : 'NULL',
-                    'created_at' => Carbon::now(),
+                    'created_at' => now(),
                 ]
             );
     }

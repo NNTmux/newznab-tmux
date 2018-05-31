@@ -263,7 +263,7 @@ class Games
                 $order[1],
                 ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
             );
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $gamesCache = Cache::get(md5($gamesSql.$page));
         if ($gamesCache !== null) {
             $games = $gamesCache;
@@ -551,7 +551,7 @@ class Games
 
                         if ($this->_gameResults->original_release_date !== '') {
                             $dateReleased = $this->_gameResults->original_release_date;
-                            $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : Carbon::now();
+                            $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
                             if ($date instanceof \DateTime) {
                                 $game['releasedate'] = (string) $date->format('Y-m-d');
                             }
@@ -640,8 +640,8 @@ class Games
                             'backdrop' => $game['backdrop'],
                             'trailer' => $game['trailer'],
                             'classused' => $game['classused'],
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]
                     );
             } else {

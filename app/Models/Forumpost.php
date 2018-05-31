@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -71,7 +70,7 @@ class Forumpost extends Model
                 return -1;
             }
 
-            self::query()->where('id', $parentId)->increment('replies', 1, ['updated_at' => Carbon::now()]);
+            self::query()->where('id', $parentId)->increment('replies', 1, ['updated_at' => now()]);
         }
 
         return self::create(

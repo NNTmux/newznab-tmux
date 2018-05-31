@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -60,8 +59,8 @@ class UserSerie extends Model
                     'users_id' => $userId,
                     'videos_id' => $videoId,
                     'categories' => ! empty($catID) ? implode('|', $catID) : 'NULL',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
     }

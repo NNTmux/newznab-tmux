@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -59,8 +58,8 @@ class UserDownload extends Model
     public static function getDownloadRequests($userID): int
     {
         // Clear old requests.
-        self::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
-        $value = self::query()->where('users_id', $userID)->where('timestamp', '>', Carbon::now()->subDay())->count('id');
+        self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
+        $value = self::query()->where('users_id', $userID)->where('timestamp', '>', now()->subDay())->count('id');
 
         return $value === false ? 0 : $value;
     }
@@ -90,7 +89,7 @@ class UserDownload extends Model
                 [
                     'users_id' => $userID,
                     'releases_id' => $releaseID,
-                    'timestamp' => Carbon::now(),
+                    'timestamp' => now(),
                 ]
             );
     }

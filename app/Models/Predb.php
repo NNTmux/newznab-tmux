@@ -5,7 +5,6 @@ namespace App\Models;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Laravel\Scout\Searchable;
-use Illuminate\Support\Carbon;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -107,7 +106,7 @@ class Predb extends Model
             ->join('releases', 'predb.title', '=', 'releases.searchname')
             ->select(['predb.id as predb_id', 'releases.id as releases_id']);
         if ($dateLimit !== false && is_numeric($dateLimit)) {
-            $query->where('adddate', '>', Carbon::now()->subDays($dateLimit));
+            $query->where('adddate', '>', now()->subDays($dateLimit));
         }
 
         $res = $query->get();

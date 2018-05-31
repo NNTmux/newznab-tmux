@@ -3,11 +3,9 @@
 namespace Blacklight;
 
 use App\Models\Group;
-use App\Models\Video;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -132,7 +130,7 @@ class Releases
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($qry.$page), $sql, $expiresAt);
 
         return $sql;
@@ -170,7 +168,7 @@ class Releases
             return $count;
         }
         $count = DB::select($sql);
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
         return $count[0]->count ?? 0;
@@ -448,7 +446,7 @@ class Releases
                 ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
 
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5($sql));
         if ($result !== null) {
             return $result;
@@ -718,7 +716,7 @@ class Releases
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -856,7 +854,7 @@ class Releases
             );
         }
 
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -920,7 +918,7 @@ class Releases
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -985,7 +983,7 @@ class Releases
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -1089,7 +1087,7 @@ class Releases
             return $count;
         }
         $count = DB::select($sql);
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
         return $count[0]->count ?? 0;

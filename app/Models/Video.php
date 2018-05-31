@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -160,7 +159,7 @@ class Video extends Model
                 $join->on('videos.id', '=', 'us.videos_id')->where('us.users_id', '=', $uid);
             })
             ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->where('tve.firstaired', '<', Carbon::now())
+            ->where('tve.firstaired', '<', now())
             ->leftJoin('releases as r', 'r.videos_id', '=', 'videos.id')
             ->orderBy('videos.title')
             ->orderByDesc('tve.firstaired')

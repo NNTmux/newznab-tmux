@@ -5,7 +5,6 @@ namespace Blacklight;
 use App\Models\Genre;
 use Blacklight\db\DB;
 use App\Models\Category;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class Genres
@@ -49,7 +48,7 @@ class Genres
             return $genres;
         }
         $genres = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $genres, $expiresAt);
 
         return $genres;
@@ -186,7 +185,7 @@ class Genres
             $disabled = $cats;
         } else {
             $disabled = Genre::query()->where('disabled', '=', 1)->get(['id']);
-            $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
             Cache::put('disabledcats', $disabled, $expiresAt);
         }
 

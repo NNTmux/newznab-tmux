@@ -7,7 +7,6 @@ use App\Models\Release;
 use App\Models\XxxInfo;
 use App\Models\Category;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\adult\ADE;
 use Blacklight\processing\adult\ADM;
@@ -128,7 +127,7 @@ class XXX
             $catsrch = Category::getCategorySearch($cat);
         }
         $order = $this->getXXXOrder($orderBy);
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $xxxmoviesSql =
             sprintf(
                 "
@@ -598,8 +597,8 @@ class XXX
                     'trailers' => $mov['trailers'],
                     'directurl' => $mov['directurl'],
                     'classused' => $mov['classused'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
             // Update BoxCover.

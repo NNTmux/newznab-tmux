@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -455,7 +454,7 @@ class User extends Authenticatable
      */
     public static function updateExpiredRoles(): int
     {
-        $data = self::query()->whereDate('rolechangedate', '<', Carbon::now())->get();
+        $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
             Mail::to($u['email'])->send(new AccountChange($u['id']));
@@ -921,7 +920,7 @@ class User extends Authenticatable
     {
         self::query()->where('id', $userID)->update(
             [
-                'lastlogin' => Carbon::now(),
+                'lastlogin' => now(),
                 'host' => $host,
             ]
         );
@@ -1060,7 +1059,7 @@ class User extends Authenticatable
             UserDownload::query()->update(['releases_id' => null]);
         }
 
-        UserRequest::query()->where('timestamp', '<', Carbon::now()->subDays($days))->delete();
-        UserDownload::query()->where('timestamp', '<', Carbon::now()->subDays($days))->delete();
+        UserRequest::query()->where('timestamp', '<', now()->subDays($days))->delete();
+        UserDownload::query()->where('timestamp', '<', now()->subDays($days))->delete();
     }
 }

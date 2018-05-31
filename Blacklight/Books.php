@@ -10,7 +10,6 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Settings;
 use ApaiIO\Operations\Search;
-use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
@@ -183,7 +182,7 @@ class Books
             $order[1],
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $bookscache = Cache::get(md5($booksql.$page));
         if ($bookscache !== null) {
             $books = $bookscache;
@@ -636,8 +635,8 @@ class Books
                     'overview' =>$book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
         } else {

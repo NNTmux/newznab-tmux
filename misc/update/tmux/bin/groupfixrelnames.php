@@ -12,7 +12,6 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NZBContents;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
@@ -224,7 +223,7 @@ switch (true) {
         $pres = Predb::query()
             ->whereRaw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"')
             ->where('searched', '=', 0)
-            ->where('predate', '<', Carbon::now()->subDay())
+            ->where('predate', '<', now()->subDay())
             ->select(['id as predb_id', 'title', 'source', 'searched'])
             ->orderBy('predate')
             ->limit($maxPerRun)

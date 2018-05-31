@@ -7,7 +7,6 @@ use App\Models\Predb;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
-use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
 
@@ -1153,7 +1152,7 @@ class NameFixer
             $limit = 'LIMIT 1000000';
         }
 
-        ColorCLI::doEcho(ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.Carbon::now()->format('Y-m-d')), true);
+        ColorCLI::doEcho(ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now()->format('Y-m-d')), true);
         ColorCLI::doEcho(ColorCLI::primary('Matching predb filename to cleaned release_files.name.'), true);
 
         $counter = $counted = 0;

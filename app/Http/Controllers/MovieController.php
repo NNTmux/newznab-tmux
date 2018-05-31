@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Blacklight\Movie;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 
 class MovieController extends BasePageController
 {
@@ -138,7 +137,7 @@ class MovieController extends BasePageController
         $this->smarty->assign('genres', $genres);
         $this->smarty->assign('genre', $genre);
 
-        $years = range(1903, Carbon::now()->addYear()->year);
+        $years = range(1903, now()->addYear()->year);
         rsort($years);
         $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
         $this->smarty->assign('years', $years);

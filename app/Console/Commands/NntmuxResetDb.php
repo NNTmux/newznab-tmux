@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Group;
 use App\Models\Settings;
 use Blacklight\SphinxSearch;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -42,7 +41,7 @@ class NntmuxResetDb extends Command
     public function handle()
     {
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
-            $timestart = Carbon::now();
+            $timestart = now();
 
             DB::unprepared('SET FOREIGN_KEY_CHECKS = 0;');
             DB::commit();
@@ -108,7 +107,7 @@ class NntmuxResetDb extends Command
                 }
             }
 
-            $this->info('Deleted all releases, images, previews and samples. This script finished '.Carbon::now()->diffForHumans($timestart).' start');
+            $this->info('Deleted all releases, images, previews and samples. This script finished '.now()->diffForHumans($timestart).' start');
             DB::unprepared('SET FOREIGN_KEY_CHECKS = 1;');
             DB::commit();
         } else {

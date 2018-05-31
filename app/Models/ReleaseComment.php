@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -147,8 +146,8 @@ class ReleaseComment extends Model
                     'gid' => $gid,
                     'text' => $text,
                     'users_id' => $userid,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                     'host' => $host,
                     'username' => $username,
                 ]

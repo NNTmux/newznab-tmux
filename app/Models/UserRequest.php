@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -84,7 +83,7 @@ class UserRequest extends Model
      */
     public static function addApiRequest($userID, $request): void
     {
-        self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> Carbon::now()]);
+        self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> now()]);
     }
 
     /**
@@ -100,9 +99,9 @@ class UserRequest extends Model
     public static function clearApiRequests($userID): void
     {
         if ($userID === false) {
-            self::query()->where('timestamp', '<', Carbon::now()->subDay())->delete();
+            self::query()->where('timestamp', '<', now()->subDay())->delete();
         } else {
-            self::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
+            self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
         }
     }
 }

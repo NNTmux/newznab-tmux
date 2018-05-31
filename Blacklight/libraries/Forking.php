@@ -8,7 +8,6 @@ use Blacklight\NNTP;
 use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Illuminate\Support\Carbon;
 use Blacklight\processing\PostProcess;
 
 /**
@@ -433,7 +432,7 @@ class Forking extends \fork_daemon
         $backfilldays = '';
         if ((int) $backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = Carbon::now()->subDays((int) $days);
+            $backfilldays = now()->subDays((int) $days);
         } elseif ((int) $backfill_days === 2) {
             $backfilldays = Settings::settingValue('..safebackfilldate');
         }

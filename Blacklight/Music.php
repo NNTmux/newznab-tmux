@@ -10,7 +10,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
-use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -155,7 +154,7 @@ class Music
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
         $order = $this->getMusicOrder($orderby);
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $musicSql =
             sprintf(
                 "
@@ -481,8 +480,8 @@ class Music
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
         } else {

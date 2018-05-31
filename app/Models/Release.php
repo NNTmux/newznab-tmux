@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
@@ -265,7 +264,7 @@ class Release extends Model
                     'searchname' => $parameters['searchname'],
                     'totalpart' => $parameters['totalpart'],
                     'groups_id' => $parameters['groups_id'],
-                    'adddate' => Carbon::now(),
+                    'adddate' => now(),
                     'guid' => $parameters['guid'],
                     'leftguid' => $parameters['guid'][0],
                     'postdate' => $parameters['postdate'],

@@ -7,7 +7,6 @@ use Blacklight\NNTP;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\ReleaseImage;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -269,7 +268,7 @@ class Group extends Model
                 'backfill_target' => $group['backfill_target'],
                 'first_record' => $group['first_record'],
                 'last_record' => $group['last_record'],
-                'last_updated' => Carbon::now(),
+                'last_updated' => now(),
                 'active' => $group['active'],
                 'backfill' => $group['backfill'],
                 'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],

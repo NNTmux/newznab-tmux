@@ -316,7 +316,7 @@ class Binaries
      */
     public function logIndexerStart(): void
     {
-        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => Carbon::now()]);
+        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => now()]);
     }
 
     /**
@@ -518,7 +518,7 @@ class Binaries
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
                                 'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
-                                'last_updated' => Carbon::now(),
+                                'last_updated' => now(),
                             ]
                         );
                 } else {
@@ -528,7 +528,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $last,
-                                'last_updated' => Carbon::now(),
+                                'last_updated' => now(),
                             ]
                         );
                 }
@@ -862,7 +862,7 @@ class Binaries
                     $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
 
                     // Get the current unixtime from PHP.
-                    $now = Carbon::now()->timestamp;
+                    $now = now()->timestamp;
 
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
@@ -1032,7 +1032,7 @@ class Binaries
      */
     protected function updateBlacklistUsage(): void
     {
-        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => Carbon::now()]);
+        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => now()]);
         $this->_binaryBlacklistIdsToUpdate = [];
     }
 
@@ -1330,7 +1330,7 @@ class Binaries
      */
     public function daytopost($days, $data): string
     {
-        $goalTime = Carbon::now()->subDays($days)->timestamp;
+        $goalTime = now()->subDays($days)->timestamp;
         // The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
         // times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
 
@@ -1714,7 +1714,7 @@ class Binaries
         }
 
         $poster = MultigroupPoster::query()->get(['poster'])->toArray();
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_short'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;

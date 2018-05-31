@@ -10,7 +10,6 @@ use Blacklight\Releases;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -100,7 +99,7 @@ class GetNzbController extends BasePageController
 
                 return response()->streamDownload(function () use ($zip) {
                     echo $zip;
-                }, Carbon::now()->format('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
+                }, now()->format('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
             }
 
             $this->show404();
@@ -128,7 +127,7 @@ class GetNzbController extends BasePageController
 
         $headers = [
             'Content-Type:' => 'application/x-nzb',
-            'Expires:' => date('r', Carbon::now()->addDays(365)->timestamp),
+            'Expires:' => date('r', now()->addDays(365)->timestamp),
             'X-DNZB-Failure:' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
             'X-DNZB-Category:' => $relData['category_name'],
             'X-DNZB-Details:' => $this->serverurl.'details/'.$request->input('id'),

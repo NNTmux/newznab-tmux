@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -199,7 +198,7 @@ class Category extends Model
     {
         return self::query()
             ->remember(config('nntmux.cache_expiry_long'))
-            ->where('r.adddate', '>', Carbon::now()->subWeek())
+            ->where('r.adddate', '>', now()->subWeek())
             ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
             ->selectRaw('COUNT(r.id) as count')
             ->join('categories as cp', 'cp.id', '=', 'categories.parentid')

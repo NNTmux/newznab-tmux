@@ -10,7 +10,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
-use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
@@ -196,7 +195,7 @@ class Console
         } else {
             $data = DB::select($calcSql);
             $consoles = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
             Cache::put(md5($calcSql.$page), $consoles, $expiresAt);
         }
         $consoleIDs = $releaseIDs = false;
@@ -240,7 +239,7 @@ class Console
         if (\count($return) > 0) {
             $return[0]->_totalcount = $consoles[0]->total ?? 0;
         }
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_long'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
@@ -701,8 +700,8 @@ class Console
                         'esrb' => $con['esrb'],
                         'releasedate' => $con['releasedate'] !== '' ? $con['releasedate'] : 'null',
                         'review' => substr($con['review'], 0, 3000),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ]
                 );
             if ($con['cover'] === 1) {

@@ -5,7 +5,6 @@ namespace Blacklight\http;
 use Blacklight\NZB;
 use App\Models\Category;
 use Blacklight\Releases;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -105,7 +104,7 @@ class RSS extends Capabilities
                 ' LIMIT 0,'.($offset > 100 ? 100 : $offset)
             );
 
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5($sql));
         if ($result !== null) {
             return $result;
@@ -167,7 +166,7 @@ class RSS extends Capabilities
             ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
         );
 
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5($sql));
         if ($result !== null) {
             return $result;
@@ -229,7 +228,7 @@ class RSS extends Capabilities
             ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
         );
 
-        $expiresAt = Carbon::now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $result = Cache::get(md5($sql));
         if ($result !== null) {
             return $result;

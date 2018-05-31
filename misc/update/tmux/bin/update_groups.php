@@ -7,7 +7,6 @@ use App\Models\Group;
 use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
 use Blacklight\ConsoleTools;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 $start = time();
@@ -40,7 +39,7 @@ foreach ($data as $newgroup) {
                 'name' => $newgroup['group'],
                 'first_record' => $newgroup['first'],
                 'last_record' => $newgroup['last'],
-                'updated' => Carbon::now(),
+                'updated' => now(),
             ]
         );
         ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));

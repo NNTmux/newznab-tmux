@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -64,7 +63,7 @@ class Invitation extends Model
         //
         // Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
         //
-        self::query()->where('created_at', '<', Carbon::now()->subDays(self::DEFAULT_INVITE_EXPIRY_DAYS));
+        self::query()->where('created_at', '<', now()->subDays(self::DEFAULT_INVITE_EXPIRY_DAYS));
 
         return self::query()->where('guid', $inviteToken)->first();
     }

@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;
 use Symfony\Component\Process\Process;
@@ -124,7 +123,7 @@ class InstallNntmux extends Command
                 }
 
                 if (! $error && $this->addAdminUser()) {
-                    @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.Carbon::now());
+                    @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
                     $process = new Process('php artisan key:generate --force');
                     $process->setTimeout(600);

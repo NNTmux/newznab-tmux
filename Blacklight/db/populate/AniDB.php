@@ -290,7 +290,7 @@ class AniDB
                     'picture' => $AniDBInfoArray['picture'],
                     'categories' => $AniDBInfoArray['categories'],
                     'characters' => $AniDBInfoArray['characters'],
-                    'updated' => Carbon::now(),
+                    'updated' => now(),
                 ]
             );
         if (! empty($AniDBInfoArray['epsarr'])) {
@@ -328,7 +328,7 @@ class AniDB
     private function populateMainTable()
     {
         $lastUpdate = Carbon::createFromTimestamp($this->lastUpdate);
-        $current = Carbon::now();
+        $current = now();
 
         if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {
             if ($this->echooutput) {
@@ -483,7 +483,7 @@ class AniDB
                     'picture' => $AniDBInfoArray['picture'],
                     'categories' => $AniDBInfoArray['categories'],
                     'characters' => $AniDBInfoArray['characters'],
-                    'updated' => Carbon::now(),
+                    'updated' => now(),
                 ]
             );
         if (! empty($AniDBInfoArray['epsarr'])) {
