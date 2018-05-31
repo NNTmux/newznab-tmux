@@ -18,3 +18,10 @@ Route::prefix('v1')->group(function () {
         Route::post('api', 'ApiController@api');
     });
 });
+
+Route::prefix('v2')->middleware('auth:api')->group(function () {
+    Route::namespace('Api')->group(function () {
+        Route::get('capabilities', 'ApiV2Controller@capabilities');
+        Route::post('capabilities', 'ApiV2Controller@capabilities');
+    });
+});

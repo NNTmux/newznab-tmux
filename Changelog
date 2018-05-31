@@ -1,3 +1,5 @@
+2018-06-01 DariusIII
+	* Chg: Start building API v2
 2018-05-31 DariusIII
 	* Fix: Fix rsstoken references in Gentele and shared templates
 	* Chg: Rename rsstoken column into api_token

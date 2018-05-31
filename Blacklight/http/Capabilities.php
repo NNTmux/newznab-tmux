@@ -121,16 +121,7 @@ abstract class Capabilities
      */
     public function getForMenu(): array
     {
-        $serverroot = '';
-        $https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
-
-        if (isset($_SERVER['SERVER_NAME'])) {
-            $serverroot = (
-                ($https === true ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].
-                (((int) $_SERVER['SERVER_PORT'] !== 80 && (int) $_SERVER['SERVER_PORT'] !== 443) ? ':'.$_SERVER['SERVER_PORT'] : '').
-                WWW_TOP.'/'
-            );
-        }
+        $serverroot = url('/');
 
         return [
             'server' => [
@@ -141,7 +132,7 @@ abstract class Capabilities
                 'email'      => Settings::settingValue('site.main.email'),
                 'meta'       => Settings::settingValue('site.main.metakeywords'),
                 'url'        => $serverroot,
-                'image'      => $serverroot.'assets/images/tmux_logo.png',
+                'image'      => $serverroot.'/assets/images/tmux_logo.png',
             ],
             'limits' => [
                 'max'     => 100,
