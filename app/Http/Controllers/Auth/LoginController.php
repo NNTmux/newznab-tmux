@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -69,6 +70,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
             Auth::logoutOtherDevices($request->input('password'));
+            User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
             return redirect()->intended($this->redirectPath());
         }

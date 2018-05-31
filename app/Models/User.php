@@ -238,7 +238,7 @@ class User extends Authenticatable
     /**
      * @return array
      */
-    public static function get(): array
+    public static function getAllUsers(): array
     {
         return self::all()->toArray();
     }
