@@ -166,6 +166,7 @@ class RegisterController extends Controller
 
                         if ($ret->id > 0) {
                             Auth::loginUsingId($ret->id);
+                            User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
                             return redirect()->intended($this->redirectPath());
                         }
