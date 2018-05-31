@@ -76,11 +76,11 @@ class UserDownload extends Model
     /**
      * If a user downloads a NZB, log it.
      *
-     * @param int $userID id of the user.
      *
-     * @param     $releaseID
+     * @param $userID
+     * @param $releaseID
      *
-     * @return bool|int
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addDownloadRequest($userID, $releaseID)
     {

@@ -55,9 +55,9 @@ class UsersRelease extends Model
      * @param $uid
      * @param $releaseid
      *
-     * @return int
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addCart($uid, $releaseid): int
+    public static function addCart($uid, $releaseid)
     {
         return self::query()->insertGetId(
             [

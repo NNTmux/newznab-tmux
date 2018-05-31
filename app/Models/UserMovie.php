@@ -34,12 +34,13 @@ class UserMovie extends Model
     protected $dateFormat = false;
 
     /**
-     * @param $uid
-     * @param $imdbid
+     * @param       $uid
+     * @param       $imdbid
      * @param array $catID
-     * @return int
+     *
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addMovie($uid, $imdbid, array $catID = []): int
+    public static function addMovie($uid, $imdbid, array $catID = [])
     {
         return self::query()
             ->insertGetId(

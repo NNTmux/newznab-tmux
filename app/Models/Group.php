@@ -255,11 +255,12 @@ class Group extends Model
     /**
      * Update an existing group.
      *
-     * @param array $group
      *
-     * @return bool
+     * @param $group
+     *
+     * @return int
      */
-    public static function updateGroup($group): bool
+    public static function updateGroup($group)
     {
         return self::query()->where('id', $group['id'])->update(
             [

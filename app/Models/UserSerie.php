@@ -49,9 +49,9 @@ class UserSerie extends Model
      * @param $userId
      * @param $videoId
      * @param array $catID
-     * @return int
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addShow($userId, $videoId, array $catID = []): int
+    public static function addShow($userId, $videoId, array $catID = [])
     {
         return self::query()
             ->insertGetId(
