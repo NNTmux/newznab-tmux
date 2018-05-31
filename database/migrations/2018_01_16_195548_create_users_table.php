@@ -26,7 +26,7 @@ class CreateUsersTable extends Migration {
 			$table->integer('user_roles_id')->default(1)->index('ix_user_roles')->comment('FK to user_roles.id');
 			$table->string('host', 40)->nullable();
 			$table->integer('grabs')->default(0);
-			$table->string('rsstoken', 64);
+			$table->string('api_token', 64);
 			$table->timestamps();
 			$table->string('resetguid', 50)->nullable();
 			$table->dateTime('lastlogin')->nullable();

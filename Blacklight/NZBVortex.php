@@ -87,7 +87,7 @@ final class NZBVortex
 
             $host = $page->serverurl;
             $data = User::find(User::currentUserId());
-            $url = sprintf('%sgetnzb?id=%s.nzb&i=%s&r=%s', $host, $nzb, $data['id'], $data['rsstoken']);
+            $url = sprintf('%sgetnzb?id=%s.nzb&i=%s&r=%s', $host, $nzb, $data['id'], $data['api_token']);
 
             $params = [
                 'sessionid' => $this->session,

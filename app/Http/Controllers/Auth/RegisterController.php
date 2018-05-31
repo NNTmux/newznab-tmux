@@ -61,7 +61,7 @@ class RegisterController extends Controller
             'user_roles_id' => $data['user_roles_id'],
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
-            'rsstoken' => md5(Password::getRepository()->createNewToken()),
+            'api_token' => md5(Password::getRepository()->createNewToken()),
             'userseed' => md5(Utility::generateUuid()),
         ]);
     }

@@ -83,7 +83,7 @@ class NZBGet
     {
         $this->serverurl = $page->serverurl;
         $this->uid = $page->userdata['id'];
-        $this->rsstoken = $page->userdata['rsstoken'];
+        $this->api_token = $page->userdata['api_token'];
 
         if (! empty($page->userdata['nzbgeturl'])) {
             $this->url = $page->userdata['nzbgeturl'];
@@ -176,7 +176,7 @@ class NZBGet
             '%26i%3D'.
             $this->uid.
             '%26r%3D'.
-            $this->rsstoken
+            $this->api_token
             .
             '</string>
 						</value>

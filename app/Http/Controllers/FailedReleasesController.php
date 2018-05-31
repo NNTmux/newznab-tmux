@@ -21,19 +21,19 @@ class FailedReleasesController extends BasePageController
         // Page is accessible only by the rss token, or logged in users.
         if (Auth::check()) {
             $uid = Auth::id();
-            $rssToken = $this->userdata['rsstoken'];
+            $rssToken = $this->userdata['api_token'];
         } else {
-            if (! $request->has('userid') || ! $request->has('rsstoken')) {
+            if (! $request->has('userid') || ! $request->has('api_token')) {
                 return response('Error!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
             }
 
-            $res = User::getByIdAndRssToken($request->input('userid'), $request->input('rsstoken'));
+            $res = User::getByIdAndRssToken($request->input('userid'), $request->input('api_token'));
             if ($res === null) {
                 return response('Error!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong user ID or rss key!']);
             }
 
             $uid = $res['id'];
-            $rssToken = $res['rsstoken'];
+            $rssToken = $res['api_token'];
         }
 
         if (isset($uid, $rssToken) && is_numeric($uid) && $request->has('guid')) {

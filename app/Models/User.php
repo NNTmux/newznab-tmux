@@ -598,7 +598,7 @@ class User extends Authenticatable
      */
     public static function updateRssKey($uid): int
     {
-        self::query()->where('id', $uid)->update(['rsstoken' => md5(Password::getRepository()->createNewToken())]);
+        self::query()->where('id', $uid)->update(['api_token' => md5(Password::getRepository()->createNewToken())]);
 
         return self::SUCCESS;
     }
@@ -679,7 +679,7 @@ class User extends Authenticatable
      */
     public static function getByIdAndRssToken($userID, $rssToken)
     {
-        $user = self::query()->where(['id' => $userID, 'rsstoken' => $rssToken])->first();
+        $user = self::query()->where(['id' => $userID, 'api_token' => $rssToken])->first();
         if ($user === null) {
             return false;
         }
@@ -693,7 +693,7 @@ class User extends Authenticatable
      */
     public static function getByRssToken(string $rssToken)
     {
-        return self::query()->where('rsstoken', $rssToken)->first();
+        return self::query()->where('api_token', $rssToken)->first();
     }
 
     /**
@@ -901,7 +901,7 @@ class User extends Authenticatable
                 'email' => $email,
                 'user_roles_id' => $role,
                 'host' => $storeips,
-                'rsstoken' => md5(Password::getRepository()->createNewToken()),
+                'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
                 'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
                 'userseed' => md5(Utility::generateUuid()),

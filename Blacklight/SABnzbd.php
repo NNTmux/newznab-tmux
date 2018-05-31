@@ -98,7 +98,7 @@ class SABnzbd
     public function __construct($page)
     {
         $this->uid = $page->userdata['id'];
-        $this->rsstoken = $page->userdata['rsstoken'];
+        $this->api_token = $page->userdata['api_token'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);
 
@@ -173,7 +173,7 @@ class SABnzbd
                         '&i='.
                         $this->uid.
                         '&r='.
-                        $this->rsstoken
+                        $this->api_token
                     )
         )->getBody()->getContents();
     }
