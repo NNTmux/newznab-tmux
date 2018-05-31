@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Extensions\util\Versions;
 use App\Models\Category;
 use App\Models\Settings;
-use App\Transformers\CategoryTransformer;
-use Blacklight\http\API;
 use App\Http\Controllers\Controller;
 
 class ApiV2Controller extends Controller
