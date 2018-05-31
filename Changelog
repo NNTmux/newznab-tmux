@@ -1,4 +1,5 @@
 2018-05-31 DariusIII
+	* Fix: Fix rsstoken references in Gentele and shared templates
 	* Chg: Rename rsstoken column into api_token
 	* Fix: Fix wrong links to nzb download page
 	* Chg: Update RegisterController

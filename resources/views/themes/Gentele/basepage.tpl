@@ -8,7 +8,7 @@
         var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
         var SERVERROOT = "{/literal}{$serverroot}{literal}";
         var UID = "{/literal}{if Auth::check()}{$userdata.id}{else}{/if}{literal}";
-        var RSSTOKEN = "{/literal}{if Auth::check()}{$userdata.rsstoken}{else}{/if}{literal}";
+        var RSSTOKEN = "{/literal}{if Auth::check()}{$userdata.api_token}{else}{/if}{literal}";
         /* ]]> */
 	</script>
 	{/literal}

@@ -52,7 +52,7 @@
 					   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 					   title="View at AniDB" target="_blank">AniDB</a>
 					<a class="label label-primary"
-					   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Anime
+					   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">Anime
 						RSS Feed</a>
 				{/if}
 				{if $show && $release.videos_id > 0}

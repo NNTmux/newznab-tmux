@@ -62,7 +62,7 @@
 													<tr>
 														<th width="200">API Key</th>
 														<td>
-															{$user.rsstoken}
+															{$user.api_token}
 														</td>
 													</tr>
 													</tbody>

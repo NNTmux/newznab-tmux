@@ -5,7 +5,7 @@
 	<br>
 	{if $loggedin=="true"}
 		<h3>API Credentials</h3>
-		<p>Your credentials should be provided as <span style="font-family:courier;">&apikey={$userdata.rsstoken}</span>
+		<p>Your credentials should be provided as <span style="font-family:courier;">&apikey={$userdata.api_token}</span>
 		</p>
 	{/if}
 	<br>
@@ -19,23 +19,23 @@
 			credentials in order to be ran.
 		</dd>
 		<br>
-		<dt>Search <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api/v1/api?t=search&amp;q=linux&amp;apikey={$userdata.rsstoken}">?t=search&amp;q=linux</a></span>
+		<dt>Search <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api/v1/api?t=search&amp;q=linux&amp;apikey={$userdata.api_token}">?t=search&amp;q=linux</a></span>
 		</dt>
 		<dd>Returns a list of nzbs matching a query. You can also filter by site category by including a comma separated
 			list of categories as follows <span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api?t=search&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;apikey={$userdata.rsstoken}">?t=search&amp;cat={$catClass::GAME_ROOT}
+						href="{$smarty.const.WWW_TOP}/api?t=search&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;apikey={$userdata.api_token}">?t=search&amp;cat={$catClass::GAME_ROOT}
 					,{$catClass::MOVIE_ROOT}</a></span>. Include <span
 					style="font-family:courier;">&amp;extended=1</span> to return extended information in the search
 			results.
 		</dd>
 		<br>
 		<dt>TV <span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=tvsearch&amp;q=law%20and%20order&amp;season=7&amp;ep=12&amp;apikey={$userdata.rsstoken}">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</a></span>
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=tvsearch&amp;q=law%20and%20order&amp;season=7&amp;ep=12&amp;apikey={$userdata.api_token}">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</a></span>
 		</dt>
 		<dd>Returns a list of nzbs matching a query, category, tvrageid, season or episode.
 			You can also filter by site category by including a comma separated list of categories as follows:
 			<span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=tvsearch&amp;rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;apikey={$userdata.rsstoken}">?t=tvsearch&amp;cat={$catClass::GAME_ROOT}
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=tvsearch&amp;rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;apikey={$userdata.api_token}">?t=tvsearch&amp;cat={$catClass::GAME_ROOT}
 					,{$catClass::MOVIE_ROOT}</a></span>.
 			Include <span style="font-family:courier;">&amp;extended=1</span> to return extended information in the
 			search results.
@@ -47,28 +47,28 @@
 		</dd>
 		<br>
 		<dt>Movies <span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=movie&amp;imdbid=1418646&amp;apikey={$userdata.rsstoken}">?t=movie&amp;imdbid=1418646</a></span>
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=movie&amp;imdbid=1418646&amp;apikey={$userdata.api_token}">?t=movie&amp;imdbid=1418646</a></span>
 		</dt>
 		<dd>Returns a list of nzbs matching a query, an imdbid and optionally a category. Filter by
 			site category by including a comma separated list of categories as follows <span
 					style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=movie&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;apikey={$userdata.rsstoken}">?t=movie&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=movie&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;apikey={$userdata.api_token}">?t=movie&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
 					,{$catClass::MOVIE_HD}</a></span>. Include <span style="font-family:courier;">&amp;extended=1</span>
 			to return extended information in the search results.
 		</dd>
 		<br>
 		<dt>Details <span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;apikey={$userdata.rsstoken}">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;apikey={$userdata.api_token}">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
 		</dt>
 		<dd>Returns detailed information about an nzb.</dd>
 		<br>
 		<dt>Info <span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;apikey={$userdata.rsstoken}">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;apikey={$userdata.api_token}">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
 		</dt>
 		<dd>Returns NFO contents for an NZB. Retrieve the NFO as file by specifying o=file in the request URI.</dd>
 		<br>
 		<dt>Get <span style="font-family:courier;"><a
-						href="{$smarty.const.WWW_TOP}/api/v1/api?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;apikey={$userdata.rsstoken}">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+						href="{$smarty.const.WWW_TOP}/api/v1/api?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;apikey={$userdata.api_token}">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
 		</dt>
 		<dd>Downloads the nzb file associated with an Id.</dd>
 	</dl>

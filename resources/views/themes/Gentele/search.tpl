@@ -152,7 +152,7 @@
 										<a title="Manage your shows"
 										   href="{$smarty.const.WWW_TOP}/myshows">Manage My Shows</a> |
 										<a title="All releases in your shows as an RSS feed"
-										   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Rss
+										   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">Rss
 											Feed</a>
 									</p>
 								{/if}
