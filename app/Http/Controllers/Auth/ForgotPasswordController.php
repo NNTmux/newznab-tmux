@@ -64,7 +64,7 @@ class ForgotPasswordController extends Controller
             //
             // Send the email
             //
-            $resetLink = $request->server('SERVER_NAME').'/forgottenpassword?action=reset&guid='.$guid;
+            $resetLink = $request->server('SERVER_NAME').'/resetpassword?guid='.$guid;
             Mail::to($ret['email'])->send(new ForgottenPassword($resetLink));
             $sent = true;
         }
