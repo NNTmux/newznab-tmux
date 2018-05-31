@@ -68,6 +68,7 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
+            Auth::logoutOtherDevices($request->input('password'));
             return redirect()->intended($this->redirectPath());
         }
 
