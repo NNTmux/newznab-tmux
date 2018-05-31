@@ -150,7 +150,7 @@
 													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
 												<td class="less right">{$msize[$m@index]|filesize}</td>
 												<td>
-													<a href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"
+													<a href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"
 													   class="icon_nzb text-muted"><i
 																class="fa fa-cloud-download text-muted"
 																data-toggle="tooltip" data-placement="top" title
