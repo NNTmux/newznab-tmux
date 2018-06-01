@@ -91,21 +91,21 @@
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
 													{foreach $msplits as $m}
 													{if $m@first}
-													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
+													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
 																class="cover img-responsive img-rounded"
-																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
 															<i class="fa fa-exclamation-circle" style="color: red"
 															   title="This release has failed for some users"></i>
 														{/if}</a>
 													<a target="_blank"
-													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->imdbid}/"
-													   name="imdb{$result->imdbid}" title="View IMDB page"
+													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
+													   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page"
 													   class="label label-primary" rel="imdb">IMDB</a>
 													<a target="_blank"
-													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result->imdbid}/"
-													   name="trakt{$result->imdbid}" title="View Trakt page"
+													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
+													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
@@ -114,11 +114,11 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result->imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}">{$result->title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result->genre != ''}
 															<b>Genre: </b>
 															{$result->genre}, {/if}</div>
@@ -177,7 +177,7 @@
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
 																		<span
-																				id="imdb{$result->imdbid}"
+																				id="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"
 																				href="javascript:;"
 																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																				data-toggle="tooltip" data-placement="top"
@@ -231,21 +231,21 @@
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
 													{foreach $msplits as $m}
 													{if $m@first}
-													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
+													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
 																class="cover img-responsive img-rounded"
-																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
 															<i class="fa fa-exclamation-circle" style="color: red"
 															   title="This release has failed to download for some users"></i>
 														{/if}</a>
 													<a target="_blank"
-													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->imdbid}/"
-													   name="imdb{$result->imdbid}" title="View IMDB page"
+													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
+													   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page"
 													   class="label label-primary" rel="imdb">IMDB</a>
 													<a target="_blank"
-													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result->imdbid}/"
-													   name="trakt{$result->imdbid}" title="View Trakt page"
+													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
+													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
@@ -254,11 +254,11 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result->imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}">{$result->title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result->genre != ''}
 															<b>Genre: </b>
 															{$result->genre}, {/if}</div>
@@ -317,7 +317,7 @@
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
 																		<span
-																				id="imdb{$result->imdbid}"
+																				id="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"
 																				href="javascript:;"
 																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																				data-toggle="tooltip" data-placement="top"

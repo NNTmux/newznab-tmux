@@ -267,7 +267,7 @@
 													   class="modal_nfo label label-primary" rel="nfo">Nfo</a>
 												{/if}
 												{if $result->imdbid > 0}
-													<a href="#" name="name{$result->imdbid}" title="View movie info"
+													<a href="#" name="name{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View movie info"
 													   class="modal_imdb label label-primary" rel="movie">Cover</a>
 												{/if}
 												{if $result->haspreview == 1 && $userdata.canpreview == 1}

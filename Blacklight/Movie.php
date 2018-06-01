@@ -229,7 +229,7 @@ class Movie
      */
     public function getMovieInfo($imdbId)
     {
-        return MovieInfo::query()->where('imdbid', $imdbId)->first();
+        return MovieInfo::query()->where('imdbid', str_pad($imdbId, 7, '0', STR_PAD_LEFT))->first();
     }
 
     /**
@@ -1046,7 +1046,7 @@ class Movie
                 ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID), true);
             }
 
-            Release::query()->where('id', $id)->update(['imdbid' => $imdbID]);
+            Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT)]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
