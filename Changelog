@@ -1,4 +1,5 @@
 2018-06-01 DariusIII
+	* Chg: Update phpunit to version 7.2.2
 	* Fix: Try to add missing leading zeroes on movie imdbid's
 	* Chg: Start building API v2
 2018-05-31 DariusIII
