@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Category;
 use App\Models\Settings;
-use App\Extensions\util\Versions;
-use App\Http\Controllers\Controller;
-use App\Models\UserRequest;
-use App\Transformers\CategoryTransformer;
-use App\Transformers\MoviesTransformer;
 use Blacklight\http\API;
 use Blacklight\Releases;
+use App\Models\UserRequest;
 use Illuminate\Http\Request;
+use App\Extensions\util\Versions;
+use App\Http\Controllers\Controller;
+use App\Transformers\MoviesTransformer;
+use App\Transformers\CategoryTransformer;
 
 class ApiV2Controller extends Controller
 {
