@@ -269,7 +269,7 @@ class XML_Response
                 break;
             case 'nntmux':
             default:
-                $url = $this->server['server']['url'].'rss-info/';
+                $url = $this->server['server']['url'].'/rss-info/';
         }
 
         $this->xml->startElement('rss');
@@ -303,12 +303,12 @@ class XML_Response
 
         switch ($this->namespace) {
             case 'newznab':
-                $path = 'apihelp/';
+                $path = '/apihelp/';
                 $tag = 'API';
                 break;
             case 'nntmux':
             default:
-                $path = 'rss-info/';
+                $path = '/rss-info/';
                 $tag = 'RSS';
         }
 
@@ -410,7 +410,7 @@ class XML_Response
         if (isset($this->release->coverurl) && ! empty($this->release->coverurl)) {
             $this->writeZedAttr(
                 'coverurl',
-                $this->server['server']['url']."covers/{$this->release->coverurl}"
+                $this->server['server']['url']."/covers/{$this->release->coverurl}"
             );
         }
 

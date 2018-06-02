@@ -23,5 +23,7 @@ Route::prefix('v2')->middleware('auth:api')->group(function () {
     Route::namespace('Api')->group(function () {
         Route::get('capabilities', 'ApiV2Controller@capabilities');
         Route::post('capabilities', 'ApiV2Controller@capabilities');
+        Route::get('movies', 'ApiV2Controller@movie');
+        Route::post('movies', 'ApiV2Controller@movie');
     });
 });
