@@ -370,15 +370,15 @@ class XML_Response
         $this->xml->writeElement('title', $this->release->searchname);
         $this->xml->startElement('guid');
         $this->xml->writeAttribute('isPermaLink', 'true');
-        $this->xml->text("{$this->server['server']['url']}details/{$this->release->guid}");
+        $this->xml->text("{$this->server['server']['url']}/details/{$this->release->guid}");
         $this->xml->endElement();
         $this->xml->writeElement(
             'link',
-            "{$this->server['server']['url']}getnzb?id={$this->release->guid}.nzb".
+            "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
             "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
-        $this->xml->writeElement('comments', "{$this->server['server']['url']}details/{$this->release->guid}#comments");
+        $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
         $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release->adddate)));
         $this->xml->writeElement('category', $this->release->category_name);
         if ($this->namespace === 'newznab') {
@@ -390,7 +390,7 @@ class XML_Response
             $this->xml->startElement('enclosure');
             $this->xml->writeAttribute(
                 'url',
-                "{$this->server['server']['url']}getnzb?id={$this->release->guid}.nzb".
+                "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
                 "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );
@@ -529,16 +529,16 @@ class XML_Response
             $dcov = ($dir === 'movies' ? '-cover' : '');
             $this->cdata .=
                 "\t<img style=\"margin-left:10px;margin-bottom:10px;float:right;\" ".
-                "src=\"{$this->server['server']['url']}covers/{$dir}/{$this->release->$column}{$dcov}.jpg\" ".
+                "src=\"{$this->server['server']['url']}/covers/{$dir}/{$this->release->$column}{$dcov}.jpg\" ".
                 "width=\"120\" alt=\"{$this->release->searchname}\" />\n";
         }
         $size = Utility::bytesToSizeString($this->release->size);
         $this->cdata .=
-            "\t<li>ID: <a href=\"{$this->server['server']['url']}details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
+            "\t<li>ID: <a href=\"{$this->server['server']['url']}/details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
             "\t<li>Name: {$this->release->searchname}</li>\n".
             "\t<li>Size: {$size}</li>\n".
-            "\t<li>Category: <a href=\"{$this->server['server']['url']}browse?t={$this->release->categories_id}\">{$this->release->category_name}</a></li>\n".
-            "\t<li>Group: <a href=\"{$this->server['server']['url']}browse?g={$this->release->group_name}\">{$this->release->group_name}</a></li>\n".
+            "\t<li>Category: <a href=\"{$this->server['server']['url']}/browse/{$this->release->category_name}\">{$this->release->category_name}</a></li>\n".
+            "\t<li>Group: <a href=\"{$this->server['server']['url']}/browse/group?g={$this->release->group_name}\">{$this->release->group_name}</a></li>\n".
             "\t<li>Poster: {$this->release->fromname}</li>\n".
             "\t<li>Posted: {$this->release->postdate}</li>\n";
 
@@ -562,7 +562,7 @@ class XML_Response
         if ($this->release->nfostatus === 1) {
             $this->cdata .=
                 "\t<li>Nfo: ".
-                "<a href=\"{$this->server['server']['url']}api?t=nfo&id={$this->release->guid}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
+                "<a href=\"{$this->server['server']['url']}/api?t=nfo&id={$this->release->guid}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
                 "{$this->release->searchname}.nfo</a></li>\n";
         }
 

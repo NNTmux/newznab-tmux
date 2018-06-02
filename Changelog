@@ -1,4 +1,5 @@
 2018-06-02 DariusIII
+	* Fix: Fix RSS links in XML output
 	* Chg: Update api/v2/capabilites return data
 2018-06-01 DariusIII
 	* Chg: Update phpunit to version 7.2.2
