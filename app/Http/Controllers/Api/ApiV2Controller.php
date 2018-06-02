@@ -15,7 +15,7 @@ class ApiV2Controller extends Controller
     public function capabilities()
     {
         $serverroot = url('/');
-        $category = Category::getForMenu();
+        $category = Category::getForApi();
 
         $capabilities = [
             'server' => [
@@ -24,25 +24,23 @@ class ApiV2Controller extends Controller
                 'title'      => Settings::settingValue('site.main.title'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
                 'email'      => Settings::settingValue('site.main.email'),
-                'meta'       => Settings::settingValue('site.main.metakeywords'),
                 'url'        => $serverroot,
-                'image'      => $serverroot.'/assets/images/tmux_logo.png',
             ],
             'limits' => [
                 'max'     => 100,
                 'default' => 100,
             ],
             'registration' => [
-                'available' => 'yes',
+                'available' => 'no',
                 'open'      => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
             ],
             'searching' => [
-                'search'       => ['available' => 'yes', 'supportedParams' => 'q'],
-                'tv-search'    => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid'],
+                'search'       => ['available' => 'yes', 'supportedParams' => 'id'],
+                'tv-search'    => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+                'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid'],
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
-            'categories' => $category,
+            'categories' => fractal($category, new \App\Transformers\CategoryTransformer()),
         ];
 
         return response()->json($capabilities);

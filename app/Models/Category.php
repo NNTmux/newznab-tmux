@@ -477,6 +477,14 @@ class Category extends Model
     }
 
     /**
+     * @return mixed
+     */
+    public static function getForApi()
+    {
+        return self::query()->remember(config('nntmux.cache_expiry_long'))->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->whereNull('parentid')->get();
+    }
+
+    /**
      * Return a list of categories for use in a dropdown.
      *
      * @param bool $blnIncludeNoneSelected
