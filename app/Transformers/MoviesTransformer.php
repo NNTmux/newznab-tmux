@@ -2,7 +2,6 @@
 
 namespace App\Transformers;
 
-use Blacklight\Releases;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
 
@@ -15,7 +14,6 @@ class MoviesTransformer extends TransformerAbstract
      */
     public function transform(\stdClass $releases)
     {
-
         return [
             'title' => $releases->searchname,
             'details' => url('/').'/details/'.$releases->guid,
