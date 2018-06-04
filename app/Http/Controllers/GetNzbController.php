@@ -126,25 +126,25 @@ class GetNzbController extends BasePageController
         $cleanName = str_replace([',', ' ', '/'], '_', $relData['searchname']);
 
         $headers = [
-            'Content-Type:' => 'application/x-nzb',
-            'Expires:' => date('r', now()->addDays(365)->timestamp),
-            'X-DNZB-Failure:' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
-            'X-DNZB-Category:' => $relData['category_name'],
-            'X-DNZB-Details:' => $this->serverurl.'details/'.$request->input('id'),
+            'Content-Type' => 'application/x-nzb',
+            'Expires' => date('r', now()->addDays(365)->timestamp),
+            'X-DNZB-Failure' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
+            'X-DNZB-Category' => $relData['category_name'],
+            'X-DNZB-Details' => $this->serverurl.'details/'.$request->input('id'),
         ];
 
         if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
-            $headers += ['X-DNZB-MoreInfo:' => 'http://www.imdb.com/title/tt'.$relData['imdbid']];
+            $headers += ['X-DNZB-MoreInfo' => 'http://www.imdb.com/title/tt'.$relData['imdbid']];
         } elseif (! empty($relData['tvdb']) && $relData['tvdb'] > 0) {
             $headers += ['X-DNZB-MoreInfo' => 'http://www.thetvdb.com/?tab=series&id='.$relData['tvdb']];
         }
 
         if ((int) $relData['nfostatus'] === 1) {
-            $headers += ['X-DNZB-NFO: ' => $this->serverurl.'nfo/'.$request->input('id')];
+            $headers += ['X-DNZB-NFO ' => $this->serverurl.'nfo/'.$request->input('id')];
         }
 
-        $headers += ['X-DNZB-RCode:' => '200',
-            'X-DNZB-RText:' => 'OK, NZB content follows.', ];
+        $headers += ['X-DNZB-RCode' => '200',
+            'X-DNZB-RText' => 'OK, NZB content follows.', ];
 
         return response()->streamDownload(function () use ($nzbPath) {
             readgzfile($nzbPath);
