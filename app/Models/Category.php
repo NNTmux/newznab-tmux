@@ -129,6 +129,34 @@ class Category extends Model
             self::OTHER_MISC,
         ];
 
+    public const MOVIES_GROUP =
+        [
+            self::MOVIE_FOREIGN,
+            self::MOVIE_ROOT,
+            self::MOVIE_OTHER,
+            self::MOVIE_SD,
+            self::MOVIE_HD,
+            self::MOVIE_UHD,
+            self::MOVIE_3D,
+            self::MOVIE_BLURAY,
+            self::MOVIE_DVD,
+            self::MOVIE_WEBDL,
+        ];
+
+    public const TV_GROUP =
+        [
+            self::TV_FOREIGN,
+            self::TV_ROOT,
+            self::TV_OTHER,
+            self::TV_SD,
+            self::TV_HD,
+            self::TV_UHD,
+            self::TV_ANIME,
+            self::TV_DOCU,
+            self::TV_SPORT,
+            self::TV_WEBDL,
+        ];
+
     /**
      * Temporary category while we sort through the name.
      * @var int
