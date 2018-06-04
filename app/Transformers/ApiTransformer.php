@@ -2,9 +2,9 @@
 
 namespace App\Transformers;
 
+use App\Models\Category;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
-use App\Models\Category;
 
 class ApiTransformer extends TransformerAbstract
 {
@@ -15,7 +15,8 @@ class ApiTransformer extends TransformerAbstract
      *
      * @param $user
      */
-    public function __construct($user) {
+    public function __construct($user)
+    {
         $this->user = $user;
     }
 
