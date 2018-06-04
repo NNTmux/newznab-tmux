@@ -283,7 +283,7 @@ class XML_Response
     {
         $this->xml->startElement('atom:link');
         $this->xml->startAttribute('href');
-        $this->xml->text($this->server['server']['url'].($this->namespace === 'newznab' ? 'api' : 'rss'));
+        $this->xml->text($this->server['server']['url'].($this->namespace === 'newznab' ? '/api' : '/rss'));
         $this->xml->endAttribute();
         $this->xml->startAttribute('rel');
         $this->xml->text('self');
@@ -329,7 +329,7 @@ class XML_Response
     protected function includeImage(): void
     {
         $this->xml->startElement('image');
-        $this->xml->writeAttribute('url', $this->server['server']['url'].'assets/images/tmux_logo.png');
+        $this->xml->writeAttribute('url', $this->server['server']['url'].'/assets/images/tmux_logo.png');
         $this->xml->writeAttribute('title', $this->server['server']['title']);
         $this->xml->writeAttribute('link', $this->server['server']['url']);
         $this->xml->writeAttribute(
