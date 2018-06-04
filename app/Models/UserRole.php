@@ -123,7 +123,7 @@ class UserRole extends Model
                 'name' => $request['name'],
                 'apirequests' => $request['apirequests'],
                 'isdefault' => $request['isdefault'],
-                'downloadrequests' => $request['name'],
+                'downloadrequests' => $request['downloadrequests'],
                 'defaultinvites' => $request['defaultinvites'],
                 'canpreview' => $request['canpreview'],
                 'hideads' => $request['hideads'],

@@ -1,4 +1,5 @@
 2018-06-04 DariusIII
+	* Fix: Fix editing of user roles (copy-paste error)
 	* Chg: Update user rate limiting on role update
 	* Chg: Add dynamic api throthling
 	* Fix: Fix headers that are being sent with getNzb function
