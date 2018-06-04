@@ -26,7 +26,7 @@
         </dd>
         <br>
         <dt>TV <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/tv?=law%20and%20order&amp;season=7&amp;ep=12&amp;api_token={$userdata.api_token}">tv?=law and order&amp;season=7&amp;ep=12</a></span>
+                    href="{$smarty.const.WWW_TOP}/api/v2/tv?id=law%20and%20order&amp;season=7&amp;ep=12&amp;api_token={$userdata.api_token}">tv?=law and order&amp;season=7&amp;ep=12</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query, category, tvrageid, season or episode.
             You can also filter by site category by including a comma separated list of categories as follows:
