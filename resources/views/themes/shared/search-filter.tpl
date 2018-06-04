@@ -36,7 +36,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "xxx"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			{{csrf_field()}}
 			<input class="form-control"
 				   style="width: 150px;"
@@ -80,7 +80,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "books"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="author" type="text" name="author" value="{$author}"
 				   placeholder="Author">
@@ -90,7 +90,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "music"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="musicartist" type="text" name="artist"
 				   value="{$artist}"
@@ -120,7 +120,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "console"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
@@ -143,7 +143,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "games"}
-		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="post">
+		<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 			{{csrf_field()}}
 			<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 				   placeholder="Title">
