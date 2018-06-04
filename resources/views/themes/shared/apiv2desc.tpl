@@ -22,9 +22,7 @@
         <dd>Returns a list of nzbs matching a query. You can also filter by site category by including a comma separated
             list of categories as follows <span style="font-family:courier;"><a
                     href="{$smarty.const.WWW_TOP}/api/v2/search&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">search&amp;cat={$catClass::GAME_ROOT}
-                    ,{$catClass::MOVIE_ROOT}</a></span>. Include <span
-                style="font-family:courier;">&amp;extended=1</span> to return extended information in the search
-            results.
+                    ,{$catClass::MOVIE_ROOT}</a></span>.
         </dd>
         <br>
         <dt>TV <span style="font-family:courier;"><a
@@ -35,8 +33,6 @@
             <span style="font-family:courier;"><a
                     href="{$smarty.const.WWW_TOP}/api/v2/tvsearch&amp;rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">?t=tvsearch&amp;cat={$catClass::GAME_ROOT}
                     ,{$catClass::MOVIE_ROOT}</a></span>.
-            Include <span style="font-family:courier;">&amp;extended=1</span> to return extended information in the
-            search results.
         </dd>
         <dd>
             You can also supply the following parameters to do site specfic ID searches:
@@ -51,8 +47,7 @@
             site category by including a comma separated list of categories as follows <span
                 style="font-family:courier;"><a
                     href="{$smarty.const.WWW_TOP}/api/v2/movies&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;api_token={$userdata.api_token}">?t=movie&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
-                    ,{$catClass::MOVIE_HD}</a></span>. Include <span style="font-family:courier;">&amp;extended=1</span>
-            to return extended information in the search results.
+                    ,{$catClass::MOVIE_HD}</a></span>.
         </dd>
         <br>
         <dt>Details <span style="font-family:courier;"><a

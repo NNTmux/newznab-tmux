@@ -1,4 +1,5 @@
 2018-06-04 DariusIII
+	* Chg: Remove references to extended info in API V2, API always sends extended information
 	* Chg: Add API V2 help page
 	* Chg: Complete v2 api, add related transformers and routes
 	* Chg: Update phpunit, whoops and php-parser packages
