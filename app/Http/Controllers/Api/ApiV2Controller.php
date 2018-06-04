@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Category;
-use App\Models\Release;
-use App\Models\Settings;
 use App\Models\User;
-use App\Transformers\ApiTransformer;
-use App\Transformers\DetailsTransformer;
+use App\Models\Release;
+use App\Models\Category;
+use App\Models\Settings;
 use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\UserRequest;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
 use App\Extensions\util\Versions;
 use App\Http\Controllers\Controller;
-use App\Transformers\CategoryTransformer;
+use App\Transformers\ApiTransformer;
 use Illuminate\Support\Facades\Auth;
+use App\Transformers\DetailsTransformer;
+use App\Transformers\CategoryTransformer;
 
 class ApiV2Controller extends Controller
 {
     public function __construct()
     {
-
     }
 
     /**
