@@ -17,21 +17,21 @@
             credentials in order to be retrieved.
         </dd>
         <br>
-        <dt>Search <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api/v2/search&amp;id=linux&amp;api_token={$userdata.api_token}">search&amp;id=linux</a></span>
+        <dt>Search <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api/v2/search?id=linux&amp;api_token={$userdata.api_token}">search?id=linux</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query. You can also filter by site category by including a comma separated
             list of categories as follows <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/search&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">search&amp;cat={$catClass::GAME_ROOT}
+                    href="{$smarty.const.WWW_TOP}/api/v2/search?cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">search?cat={$catClass::GAME_ROOT}
                     ,{$catClass::MOVIE_ROOT}</a></span>.
         </dd>
         <br>
         <dt>TV <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/tvsearch&amp;q=law%20and%20order&amp;season=7&amp;ep=12&amp;api_token={$userdata.api_token}">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</a></span>
+                    href="{$smarty.const.WWW_TOP}/api/v2/tv?=law%20and%20order&amp;season=7&amp;ep=12&amp;api_token={$userdata.api_token}">tv?=law and order&amp;season=7&amp;ep=12</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query, category, tvrageid, season or episode.
             You can also filter by site category by including a comma separated list of categories as follows:
             <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/tvsearch&amp;rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">?t=tvsearch&amp;cat={$catClass::GAME_ROOT}
+                    href="{$smarty.const.WWW_TOP}/api/v2/tv?rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">tv?cat={$catClass::GAME_ROOT}
                     ,{$catClass::MOVIE_ROOT}</a></span>.
         </dd>
         <dd>
@@ -41,22 +41,22 @@
         </dd>
         <br>
         <dt>Movies <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/movies&amp;imdbid=1418646&amp;api_token={$userdata.api_token}">?t=movie&amp;imdbid=1418646</a></span>
+                    href="{$smarty.const.WWW_TOP}/api/v2/movies?imdbid=1418646&amp;api_token={$userdata.api_token}">movies?imdbid=1418646</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query, an imdbid and optionally a category. Filter by
             site category by including a comma separated list of categories as follows <span
                 style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/movies&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;api_token={$userdata.api_token}">?t=movie&amp;imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
+                    href="{$smarty.const.WWW_TOP}/api/v2/movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;api_token={$userdata.api_token}">movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
                     ,{$catClass::MOVIE_HD}</a></span>.
         </dd>
         <br>
         <dt>Details <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}">details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+                    href="{$smarty.const.WWW_TOP}/api/v2/details?id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}">details?id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
         </dt>
         <dd>Returns detailed information about an nzb.</dd>
         <br>
         <dt>Get <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/getnzb&amp;id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}">getnzb&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+                    href="{$smarty.const.WWW_TOP}/api/v2/getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}">getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
         </dt>
         <dd>Downloads the nzb file associated with an Id.</dd>
     </dl>
