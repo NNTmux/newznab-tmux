@@ -39,6 +39,7 @@ class CreateUsersTable extends Migration {
 			$table->integer('consoleview')->default(1);
 			$table->integer('bookview')->default(1);
 			$table->integer('gameview')->default(1);
+			$table->integer('rate_limit')->default(60);
 			$table->string('saburl')->nullable();
 			$table->string('sabapikey')->nullable();
 			$table->boolean('sabapikeytype')->nullable();

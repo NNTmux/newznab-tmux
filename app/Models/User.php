@@ -332,6 +332,8 @@ class User extends Authenticatable
         $userName = trim($userName);
         $email = trim($email);
 
+        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+
         if (! self::isValidUsername($userName)) {
             return self::ERR_SIGNUP_BADUNAME;
         }
@@ -380,6 +382,7 @@ class User extends Authenticatable
             'nzbvortex_api_key' => $nzbvortexApiKey,
             'cp_url' => $cp_url,
             'cp_api' => $cp_api,
+            'rate_limit' => $rateLimit,
         ];
 
         self::query()->where('id', $id)->update($sql);
@@ -888,6 +891,8 @@ class User extends Authenticatable
             return false;
         }
 
+        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+
         if (\defined('NN_INSTALLER')) {
             $storeips = '';
         } else {
@@ -906,6 +911,7 @@ class User extends Authenticatable
                 'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
                 'userseed' => md5(Utility::generateUuid()),
                 'notes' => $notes,
+                'rate_limit' => $rateLimit,
             ]
         )->id;
     }

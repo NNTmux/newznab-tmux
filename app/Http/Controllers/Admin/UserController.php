@@ -92,6 +92,7 @@ class UserController extends BasePageController
             'password' => '',
             'role' => User::ROLE_USER,
             'notes' => '',
+            'rate_limit' => 60,
         ];
 
         $title = 'View User';

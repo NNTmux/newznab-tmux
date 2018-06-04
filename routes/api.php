@@ -26,7 +26,7 @@ Route::prefix('v2')->group(function () {
     });
 });
 
-Route::prefix('v2')->middleware('auth:api')->group(function () {
+Route::prefix('v2')->middleware('auth:api', 'throttle:rate_limit,1')->group(function () {
     Route::namespace('Api')->group(function () {
         Route::get('movies', 'ApiV2Controller@movie');
         Route::post('movies', 'ApiV2Controller@movie');

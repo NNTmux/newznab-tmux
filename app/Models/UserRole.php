@@ -104,6 +104,7 @@ class UserRole extends Model
                 'hideads' => $request['hideads'],
                 'donation' => $request['donation'],
                 'addyears' => $request['addyears'],
+                'rate_limit' => $request['rate_limit'],
             ]
         );
     }
@@ -126,6 +127,7 @@ class UserRole extends Model
                 'hideads' => $request['hideads'],
                 'donation' => $request['donation'],
                 'addyears' => $request['addyears'],
+                'rate_limit' => $request['rate_limit'],
             ]
         );
     }

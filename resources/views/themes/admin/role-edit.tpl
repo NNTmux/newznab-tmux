@@ -28,6 +28,14 @@
 				</td>
 			</tr>
 
+            <tr>
+                <td>Api rate limit:</td>
+                <td>
+                    <input name="rate_limit" type="text" value="{$role.rate_limit}"/>
+                    <div class="hint">Number of api requests allowed per 1 minute</div>
+                </td>
+            </tr>
+
 			<tr>
 				<td>Download Requests:</td>
 				<td>

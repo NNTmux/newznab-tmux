@@ -20,6 +20,7 @@ class CreateUserRolesTable extends Migration {
 		    $table->integer('id', true);
 			$table->string('name', 32);
 			$table->integer('apirequests')->unsigned();
+            $table->integer('rate_limit')->default(60);
 			$table->integer('downloadrequests')->unsigned();
 			$table->integer('defaultinvites')->unsigned();
 			$table->boolean('isdefault')->default(0);
