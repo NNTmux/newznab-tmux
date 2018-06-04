@@ -2,8 +2,8 @@
 
 namespace App\Transformers;
 
-use App\Models\Category;
 use App\Models\Release;
+use App\Models\Category;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
 
@@ -16,7 +16,8 @@ class DetailsTransformer extends TransformerAbstract
      *
      * @param $user
      */
-    public function __construct($user) {
+    public function __construct($user)
+    {
         $this->user = $user;
     }
 
