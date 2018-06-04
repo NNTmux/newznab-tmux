@@ -403,7 +403,7 @@ class Movie
                 if ($bb === 'imdb') {
                     $browseBy .= sprintf('AND m.imdbid = %d', $bbv);
                 } else {
-                    $browseBy .= 'AND m.'.$bb.' '.'LIKE'.' %'.$this->pdo->quote($bbv).'%';
+                    $browseBy .= 'AND m.'.$bb.' '.'LIKE '.$this->pdo->quote('%'.$bbv.'%');
                 }
             }
         }
