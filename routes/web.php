@@ -66,6 +66,7 @@ Route::post('rss', 'RssController@rss');
 Route::get('profile', 'ProfileController@show');
 
 Route::get('apihelp', 'ApiHelpController@index');
+Route::get('apiv2help', 'ApiHelpController@apiv2');
 
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 

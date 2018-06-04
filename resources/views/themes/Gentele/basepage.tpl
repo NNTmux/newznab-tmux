@@ -116,6 +116,8 @@
 												Feeds</a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>
 												API</a></li>
+                                        <li><a href="{$smarty.const.WWW_TOP}/apiv2help"><i class="fa fa-cloud"></i>
+                                                API V2</a></li>
 									</ul>
 									<div class="clearfix"></div>
 								<li><a href="{{route('logout')}}"

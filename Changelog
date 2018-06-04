@@ -1,4 +1,5 @@
 2018-06-04 DariusIII
+	* Chg: Add API V2 help page
 	* Chg: Complete v2 api, add related transformers and routes
 	* Chg: Update phpunit, whoops and php-parser packages
 	* Fix: Fix links in XML
