@@ -6,6 +6,7 @@
 		<tr>
 			<th>name</th>
 			<th>request limit</th>
+            <th>api rate limit</th>
 			<th>download limit</th>
 			<th>invites</th>
 			<th>can preview</th>
@@ -17,10 +18,11 @@
 		</tr>
 
 
-		{foreach from=$userroles item=role}
+		{foreach $userroles as $role}
 			<tr class="{cycle values=",alt"}">
 				<td><a href="{$smarty.const.WWW_TOP}/admin/role-edit?id={$role.id}">{$role.name}</a></td>
 				<td>{$role.apirequests}</td>
+                <td>{$role.rate_limit}</td>
 				<td>{$role.downloadrequests}</td>
 				<td>{$role.defaultinvites}</td>
 				<td>{if $role.canpreview == 1}Yes{else}No{/if}</td>

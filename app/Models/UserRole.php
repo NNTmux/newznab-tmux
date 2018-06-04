@@ -116,6 +116,7 @@ class UserRole extends Model
      */
     public static function updateRole($request): int
     {
+        User::query()->where('user_roles_id', $request['id'])->update(['rate_limit' => $request['rate_limit']]);
         return self::query()->where('id', $request['id'])->update(
             [
                 'name' => $request['name'],
