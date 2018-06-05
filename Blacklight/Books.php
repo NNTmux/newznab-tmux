@@ -11,9 +11,9 @@ use App\Models\Settings;
 use ApaiIO\Operations\Search;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
-use Illuminate\Support\Facades\DB;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 class Books
