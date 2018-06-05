@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\BookInfo;
@@ -14,13 +13,13 @@ use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
-use Illuminate\Support\Facades\DB as DBFacade;
+use Illuminate\Support\Facades\DB;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 class Books
 {
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -88,7 +87,7 @@ class Books
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -122,7 +121,7 @@ class Books
     {
 
         //only used to get a count of words
-        $searchWords = $searchsql = '';
+        $searchWords = '';
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
         $title = preg_replace('/[^\w ]+/', '', $title);
         $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
@@ -187,8 +186,8 @@ class Books
         if ($bookscache !== null) {
             $books = $bookscache;
         } else {
-            $data = DBFacade::select($booksql);
-            $books = ['total' => DBFacade::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            $data = DB::select($booksql);
+            $books = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($booksql.$page), $books, $expiresAt);
         }
         $bookIDs = $releaseIDs = false;
@@ -226,7 +225,7 @@ class Books
         if ($return !== null) {
             return $return;
         }
-        $return = DBFacade::select($sql);
+        $return = DB::select($sql);
         if (\count($return) > 0) {
             $return[0]->_totalcount = $books['total'][0]->total ?? 0;
         }
@@ -246,13 +245,13 @@ class Books
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'title':
-                $orderfield = 'b.title';
+                $orderfield = 'boo.title';
                 break;
             case 'author':
-                $orderfield = 'b.author';
+                $orderfield = 'boo.author';
                 break;
             case 'publishdate':
-                $orderfield = 'b.publishdate';
+                $orderfield = 'boo.publishdate';
                 break;
             case 'size':
                 $orderfield = 'r.size';
@@ -313,7 +312,7 @@ class Books
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseby .= 'AND b.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                $browseby .= 'AND boo.'.$bbv.' '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
             }
         }
 
