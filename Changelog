@@ -1,4 +1,5 @@
 2018-06-05 DariusIII
+	* Fix: Fix Games cover view search filter browsing
 	* Chg: Update routes/web.php to allow post method to Games page
 	* Chg: Update phpunit/phpunit to version 7.2.4
 	* Fix: Fix search-filter template, fixes browsing cover views per specific items (director, actor title etc)

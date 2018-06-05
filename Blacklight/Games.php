@@ -383,9 +383,9 @@ class Games
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if ($bbk === 'year') {
-                    $browseBy .= 'AND YEAR (gi.releasedate) '.$this->pdo->quote('%'.$bbs.'%');
+                    $browseBy .= 'AND YEAR (gi.releasedate) '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
                 } else {
-                    $browseBy .= 'AND gi.'.$bbv.' '.$this->pdo->quote('%'.$bbs.'%');
+                    $browseBy .= 'AND gi.'.$bbv.' '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
                 }
             }
         }
