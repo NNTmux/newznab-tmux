@@ -1,4 +1,5 @@
 2018-06-05 DariusIII
+	* Chg: Update groupfixrelnames main query
 	* Fix: Fix Books cover view search filtering
 	* Fix: Fix Games cover view search filter browsing
 	* Chg: Update routes/web.php to allow post method to Games page
