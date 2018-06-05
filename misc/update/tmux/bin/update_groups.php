@@ -56,11 +56,8 @@ function myInArray($array, $value, $key)
             if (myInArray($val, $value, $key)) {
                 return true;
             }
-        } else {
-            //else check if the given key has $value as value
-            if ($array[$key] === $value) {
-                return true;
-            }
+        } elseif ($array[$key] === $value) {
+            return true;
         }
     }
 
