@@ -88,7 +88,7 @@
 		{{Form::close()}}
 	{/if}
 	{if $covgroup == "music"}
-        {{Form::open(['name' => 'browseby', 'url' => 'Music', 'class' => 'form-inline'])}}
+        {{Form::open(['name' => 'browseby', 'url' => 'Audio', 'class' => 'form-inline'])}}
 			<input class="form-control" style="width: 150px;" id="musicartist" type="text" name="artist"
 				   value="{$artist}"
 				   placeholder="Artist">
@@ -286,7 +286,7 @@
 	{{Form::close()}}
 {/if}
 {if {$smarty.get.page} == "music"}
-    {{Form::open(['name' => 'browseby', 'url' => 'Music', 'class' => 'form-inline'])}}
+    {{Form::open(['name' => 'browseby', 'url' => 'Audio', 'class' => 'form-inline'])}}
 		<input class="form-control" style="width: 150px;" id="musicartist" type="text" name="artist" value="{$artist}"
 			   placeholder="Artist">
 		<input class="form-control" style="width: 150px;" id="musictitle" type="text" name="title" value="{$title}"
