@@ -85,6 +85,7 @@ Route::get('failed', 'FailedReleasesController@show');
 Route::post('failed', 'FailedReleasesController@show');
 
 Route::get('Games', 'GamesController@show');
+Route::post('Games', 'GamesController@show');
 
 Route::get('Movies/{id?}', 'MovieController@showMovies');
 
