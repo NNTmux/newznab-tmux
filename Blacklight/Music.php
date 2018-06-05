@@ -296,7 +296,7 @@ class Music
                 if (stripos($bbv, 'id') !== false) {
                     $browseby .= 'AND m.'.$bbv.' = '.$bbs;
                 } else {
-                    $browseby .= 'AND m.'.$bbv.' '.$this->pdo->quote('%'.$bbs.'%');
+                    $browseby .= 'AND m.'.$bbv.' '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
                 }
             }
         }
