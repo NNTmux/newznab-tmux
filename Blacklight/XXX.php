@@ -279,7 +279,7 @@ class XXX
                 if ($bb === 'id') {
                     $browseBy .= 'AND xxx.'.$bb.'='.$bbv;
                 } else {
-                    $browseBy .= 'AND xxx.'.$bb.' '.$this->pdo->quote('%'.$bbv.'%');
+                    $browseBy .= 'AND xxx.'.$bb.' '.'LIKE '.$this->pdo->quote('%'.$bbv.'%');
                 }
             }
         }
