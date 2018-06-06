@@ -1322,7 +1322,6 @@ class NameFixer
             )
         );
 
-
         if (! empty($row)) {
             if ($row[0]->title !== $release->searchname) {
                 $this->updateRelease($release, $row[0]->title, $method = 'predb hash release name: '.$row[0]->source, $echo, $hashtype, $namestatus, $show, $row[0]->predb_id);
