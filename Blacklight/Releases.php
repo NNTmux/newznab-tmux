@@ -22,7 +22,7 @@ class Releases
     public const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -764,7 +764,7 @@ class Releases
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : '')
+                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->quote($airdate)) : '')
             );
             $show = DB::select($showQry);
 
