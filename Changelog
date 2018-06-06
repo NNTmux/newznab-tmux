@@ -1,4 +1,5 @@
 2018-06-06 DariusIII
+	* Chg: Remove unused pdo variable from Steam class
 	* Chg: Fix declaration of $pdo variable in Releases class
 	* Chg: Update chosen to latest version
 	* Chg: Remove unnecessary __construct in v2 api controller
