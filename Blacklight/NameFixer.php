@@ -222,15 +222,14 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
+        $total = \count($releases);
 
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' releases to process.');
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' releases to process.');
 
-                foreach ($releases as $rel) {
-                    $releaseRow = DBFacade::select(
+            foreach ($releases as $rel) {
+                $releaseRow = DBFacade::select(
                         sprintf(
                             '
 							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
@@ -242,22 +241,21 @@ class NameFixer
                         )
                     );
 
-                    $this->checked++;
+                $this->checked++;
 
-                    // Ignore encrypted NFOs.
-                    if (preg_match('/^=newz\[NZB\]=\w+/', $releaseRow['textstring'])) {
-                        $this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $rel['releases_id']);
-                        continue;
-                    }
-
-                    $this->reset();
-                    $this->checkName($releaseRow, $echo, $type, $nameStatus, $show, $preId);
-                    $this->_echoRenamed($show);
+                // Ignore encrypted NFOs.
+                if (preg_match('/^=newz\[NZB\]=\w+/', $releaseRow['textstring'])) {
+                    $this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $rel['releases_id']);
+                    continue;
                 }
-                $this->_echoFoundCount($echo, ' NFO\'s');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+
+                $this->reset();
+                $this->checkName($releaseRow, $echo, $type, $nameStatus, $show, $preId);
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' NFO\'s');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -309,23 +307,21 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' file names to process.');
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' file names to process.');
 
-                foreach ($releases as $release) {
-                    $this->reset();
-                    $this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
-                    $this->checked++;
-                    $this->_echoRenamed($show);
-                }
-
-                $this->_echoFoundCount($echo, ' files');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+            foreach ($releases as $release) {
+                $this->reset();
+                $this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+                $this->checked++;
+                $this->_echoRenamed($show);
             }
+
+            $this->_echoFoundCount($echo, ' files');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -375,22 +371,20 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' xxx file names to process.');
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' xxx file names to process.');
 
-                foreach ($releases as $release) {
-                    $this->reset();
-                    $this->xxxNameCheck($release, $echo, $type, $nameStatus, $show);
-                    $this->checked++;
-                    $this->_echoRenamed($show);
-                }
-                $this->_echoFoundCount($echo, ' files');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+            foreach ($releases as $release) {
+                $this->reset();
+                $this->xxxNameCheck($release, $echo, $type, $nameStatus, $show);
+                $this->checked++;
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' files');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -442,22 +436,20 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' srr file extensions to process.');
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' srr file extensions to process.');
 
-                foreach ($releases as $release) {
-                    $this->reset();
-                    $this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
-                    $this->checked++;
-                    $this->_echoRenamed($show);
-                }
-                $this->_echoFoundCount($echo, ' files');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+            foreach ($releases as $release) {
+                $this->reset();
+                $this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
+                $this->checked++;
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' files');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -501,14 +493,13 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
 
-                echo ColorCLI::primary(number_format($total).' releases to process.');
-                $Nfo = new Nfo();
-                $nzbContents = new NZBContents(
+            echo ColorCLI::primary(number_format($total).' releases to process.');
+            $Nfo = new Nfo();
+            $nzbContents = new NZBContents(
                     [
                         'Echo'        => $this->echooutput,
                         'NNTP'        => $nntp,
@@ -518,18 +509,17 @@ class NameFixer
                     ]
                 );
 
-                foreach ($releases as $release) {
-                    if ($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], $nameStatus, $show) === true) {
-                        $this->fixed++;
-                    }
-
-                    $this->checked++;
-                    $this->_echoRenamed($show);
+            foreach ($releases as $release) {
+                if ($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], $nameStatus, $show) === true) {
+                    $this->fixed++;
                 }
-                $this->_echoFoundCount($echo, ' files');
-            } else {
-                echo ColorCLI::alternate('Nothing to fix.');
+
+                $this->checked++;
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' files');
+        } else {
+            echo ColorCLI::alternate('Nothing to fix.');
         }
     }
 
@@ -591,21 +581,19 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' unique ids to process.');
-                foreach ($releases as $rel) {
-                    $this->checked++;
-                    $this->reset();
-                    $this->uidCheck($rel, $echo, $type, $nameStatus, $show);
-                    $this->_echoRenamed($show);
-                }
-                $this->_echoFoundCount($echo, ' UID\'s');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' unique ids to process.');
+            foreach ($releases as $rel) {
+                $this->checked++;
+                $this->reset();
+                $this->uidCheck($rel, $echo, $type, $nameStatus, $show);
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' UID\'s');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -658,21 +646,19 @@ class NameFixer
         }
 
         $releases = $this->_getReleases($time, $cats, $query);
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' mediainfo movie names to process.');
-                foreach ($releases as $rel) {
-                    $this->checked++;
-                    $this->reset();
-                    $this->mediaMovieNameCheck($rel, $echo, $type, $nameStatus, $show);
-                    $this->_echoRenamed($show);
-                }
-                $this->_echoFoundCount($echo, ' MediaInfo\'s');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' mediainfo movie names to process.');
+            foreach ($releases as $rel) {
+                $this->checked++;
+                $this->reset();
+                $this->mediaMovieNameCheck($rel, $echo, $type, $nameStatus, $show);
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' MediaInfo\'s');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -733,33 +719,29 @@ class NameFixer
 
         $releases = $this->_getReleases($time, $cats, $query);
 
-        if ($releases instanceof \Traversable) {
-            $total = $releases->rowCount();
-            if ($total > 0) {
-                $this->_totalReleases = $total;
-                echo ColorCLI::primary(number_format($total).' hash_16K to process.');
-                foreach ($releases as $rel) {
-                    $this->checked++;
-                    $this->reset();
-                    $this->hashCheck($rel, $echo, $type, $nameStatus, $show);
-                    $this->_echoRenamed($show);
-                }
-                $this->_echoFoundCount($echo, ' hashes');
-            } else {
-                echo ColorCLI::info('Nothing to fix.');
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            echo ColorCLI::primary(number_format($total).' hash_16K to process.');
+            foreach ($releases as $rel) {
+                $this->checked++;
+                $this->reset();
+                $this->hashCheck($rel, $echo, $type, $nameStatus, $show);
+                $this->_echoRenamed($show);
             }
+            $this->_echoFoundCount($echo, ' hashes');
+        } else {
+            echo ColorCLI::info('Nothing to fix.');
         }
     }
 
     /**
-     * @param int $time 1: 24 hours, 2: no time limit
-     * @param int $cats 1: other categories, 2: all categories
-     * @param string $query Query to execute.
+     * @param        $time
+     * @param        $cats
+     * @param        $query
+     * @param string $limit
      *
-     * @param string $limit limit defined by maxperrun
-     *
-     * @return bool|\PDOStatement False on failure, PDOStatement with query results on success.
-     * @throws \RuntimeException
+     * @return array|bool
      */
     protected function _getReleases($time, $cats, $query, $limit = '')
     {
@@ -912,11 +894,15 @@ class NameFixer
                         ColorCLI::headerOver('Method:    ').
                         ColorCLI::primary($type.$method).
                         ColorCLI::headerOver('Releases ID: ').
-                        ColorCLI::primary($release['releases_id']), true);
+                        ColorCLI::primary($release['releases_id']),
+                        true
+                    );
                     if (! empty($release['filename'])) {
                         ColorCLI::doEcho(
                             ColorCLI::headerOver('Filename:  ').
-                            ColorCLI::primary($release['filename']), true);
+                            ColorCLI::primary($release['filename']),
+                            true
+                        );
                     }
 
                     if ($type !== 'PAR2, ') {
@@ -2284,11 +2270,10 @@ class NameFixer
 				AND (r.predb_id > 0 OR r.anidbid > 0)"
             );
 
-            if ($result instanceof \Traversable) {
-                foreach ($result as $res) {
-                    $floor = round(($res['relsize'] - $release['relsize']) / $res['relsize'] * 100, 1);
-                    if ($floor >= -5 && $floor <= 5) {
-                        $this->updateRelease(
+            foreach ($result as $res) {
+                $floor = round(($res['relsize'] - $release['relsize']) / $res['relsize'] * 100, 1);
+                if ($floor >= -5 && $floor <= 5) {
+                    $this->updateRelease(
                             $release,
                             $res['searchname'],
                             $method = 'hashCheck: PAR2 hash_16K',
@@ -2299,8 +2284,7 @@ class NameFixer
                             $res['predb_id']
                         );
 
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
