@@ -9,6 +9,7 @@ use App\Models\Release;
 use App\Models\Category;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 /**
  * Class NameFixer.
@@ -229,14 +230,14 @@ class NameFixer
                 echo ColorCLI::primary(number_format($total).' releases to process.');
 
                 foreach ($releases as $rel) {
-                    $releaseRow = $this->pdo->queryOneRow(
+                    $releaseRow = DBFacade::select(
                         sprintf(
                             '
 							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-							WHERE rel.id = %d',
+							WHERE rel.id = %d LIMIT 1',
                             $rel['releases_id']
                         )
                     );
@@ -767,19 +768,19 @@ class NameFixer
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
             echo ColorCLI::header($query.$this->timeother.$queryLimit.";\n");
-            $releases = $this->pdo->queryDirect($query.$this->timeother.$queryLimit);
+            $releases = DBFacade::select($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
             echo ColorCLI::header($query.$this->timeall.$queryLimit.";\n");
-            $releases = $this->pdo->queryDirect($query.$this->timeall.$queryLimit);
+            $releases = DBFacade::select($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
             echo ColorCLI::header($query.$this->fullother.$queryLimit.";\n");
-            $releases = $this->pdo->queryDirect($query.$this->fullother.$queryLimit);
+            $releases = DBFacade::select($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
             echo ColorCLI::header($query.$this->fullall.$queryLimit.";\n");
-            $releases = $this->pdo->queryDirect($query.$this->fullall.$queryLimit);
+            $releases = DBFacade::select($query.$this->fullall.$queryLimit);
         }
 
         return $releases;
@@ -1074,7 +1075,7 @@ class NameFixer
         }
 
         //Find release matches with fulltext and then identify exact matches with cleaned LIKE string
-        $res = $this->pdo->queryDirect(
+        $res = DBFacade::select(
             sprintf(
                 '
 				SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1090,7 +1091,7 @@ class NameFixer
         );
 
         if ($res !== false) {
-            $total = $res->rowCount();
+            $total = \count($res);
         }
 
         // Run if row count is positive, but do not run if row count exceeds 10 (as this is likely a failed title match)
@@ -1158,7 +1159,7 @@ class NameFixer
         $counter = $counted = 0;
         $timestart = time();
 
-        $query = $this->pdo->queryDirect(
+        $query = DBFacade::select(
             sprintf(
                 "
 					SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1176,7 +1177,7 @@ class NameFixer
         );
 
         if ($query !== false) {
-            $total = $query->rowCount();
+            $total = \count($query);
 
             if ($total > 0 && $query instanceof \Traversable) {
                 echo ColorCLI::header($n.number_format($total).' releases to process.');
@@ -1320,7 +1321,7 @@ class NameFixer
             $hashtype = 'MD5, ';
         }
 
-        $row = $this->pdo->queryOneRow(
+        $row = DBFacade::select(
             sprintf(
                 '
 						SELECT p.id AS predb_id, p.title, p.source
@@ -1389,8 +1390,8 @@ class NameFixer
                 .'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
         }
 
-        $res = $this->pdo->queryDirect($query);
-        $total = $res->rowCount();
+        $res = DBFacade::select($query);
+        $total = \count($res);
         echo ColorCLI::primary(number_format($total).' releases to process.');
         if ($res instanceof \Traversable) {
             foreach ($res as $row) {
@@ -1729,167 +1730,165 @@ class NameFixer
     {
         $result = [];
 
-        if ($this->done === false && $this->relid !== (int) $release['releases_id']) {
-            if (preg_match('/(\w[-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release['textstring'], $result) && ! preg_match('/\.pdf|Audio ?Book/i', $release['textstring'])) {
-                $releaseName = $result[0];
-                if (preg_match('/(idiomas|lang|language|langue|sprache).*?\b(?P<lang>Brazilian|Chinese|Croatian|Danish|DE|Deutsch|Dutch|Estonian|ES|English|Englisch|Finnish|Flemish|Francais|French|FR|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)\b/i', $release['textstring'], $result)) {
-                    switch ($result['lang']) {
-                        case 'DE':
-                            $result['lang'] = 'DUTCH';
-                            break;
-                        case 'Englisch':
-                            $result['lang'] = 'ENGLISH';
-                            break;
-                        case 'FR':
-                            $result['lang'] = 'FRENCH';
-                            break;
-                        case 'ES':
-                            $result['lang'] = 'SPANISH';
-                            break;
-                        default:
-                            break;
-                    }
-                    $releaseName = $releaseName.'.'.$result['lang'];
+        if ($this->done === false && $this->relid !== (int) $release['releases_id'] && preg_match('/(\w[-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release['textstring'], $result) && ! preg_match('/\.pdf|Audio ?Book/i', $release['textstring'])) {
+            $releaseName = $result[0];
+            if (preg_match('/(idiomas|lang|language|langue|sprache).*?\b(?P<lang>Brazilian|Chinese|Croatian|Danish|DE|Deutsch|Dutch|Estonian|ES|English|Englisch|Finnish|Flemish|Francais|French|FR|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)\b/i', $release['textstring'], $result)) {
+                switch ($result['lang']) {
+                    case 'DE':
+                        $result['lang'] = 'DUTCH';
+                        break;
+                    case 'Englisch':
+                        $result['lang'] = 'ENGLISH';
+                        break;
+                    case 'FR':
+                        $result['lang'] = 'FRENCH';
+                        break;
+                    case 'ES':
+                        $result['lang'] = 'SPANISH';
+                        break;
+                    default:
+                        break;
                 }
-
-                if (preg_match('/(frame size|(video )?res(olution)?|video).*?(?P<res>(272|336|480|494|528|608|\(?640|688|704|720x480|810|816|820|1 ?080|1280( \@)?|1 ?920(x1080)?))/i', $release['textstring'], $result)) {
-                    switch ($result['res']) {
-                        case '272':
-                        case '336':
-                        case '480':
-                        case '494':
-                        case '608':
-                        case '640':
-                        case '(640':
-                        case '688':
-                        case '704':
-                        case '720x480':
-                            $result['res'] = '480p';
-                            break;
-                        case '1280x720':
-                        case '1280':
-                        case '1280 @':
-                            $result['res'] = '720p';
-                            break;
-                        case '810':
-                        case '816':
-                        case '820':
-                        case '1920':
-                        case '1 920':
-                        case '1080':
-                        case '1 080':
-                        case '1920x1080':
-                            $result['res'] = '1080p';
-                            break;
-                        case '2160':
-                            $result['res'] = '2160p';
-                            break;
-                    }
-
-                    $releaseName = $releaseName.'.'.$result['res'];
-                } elseif (preg_match('/(largeur|width).*?(?P<res>(\(?640|688|704|720|1280( \@)?|1 ?920))/i', $release['textstring'], $result)) {
-                    switch ($result['res']) {
-                        case '640':
-                        case '(640':
-                        case '688':
-                        case '704':
-                        case '720':
-                            $result['res'] = '480p';
-                            break;
-                        case '1280 @':
-                        case '1280':
-                            $result['res'] = '720p';
-                            break;
-                        case '1920':
-                        case '1 920':
-                            $result['res'] = '1080p';
-                            break;
-                        case '2160':
-                            $result['res'] = '2160p';
-                            break;
-                    }
-
-                    $releaseName = $releaseName.'.'.$result['res'];
-                }
-
-                if (preg_match('/source.*?\b(?P<source>BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)\b/i', $release['textstring'], $result)) {
-                    switch ($result['source']) {
-                        case 'BD':
-                            $result['source'] = 'Bluray.x264';
-                            break;
-                        case 'CAMRIP':
-                            $result['source'] = 'CAM';
-                            break;
-                        case 'DBrip':
-                            $result['source'] = 'BDRIP';
-                            break;
-                        case 'DVD R1':
-                        case 'NTSC':
-                        case 'PAL':
-                        case 'VOD':
-                            $result['source'] = 'DVD';
-                            break;
-                        case 'HD':
-                            $result['source'] = 'HDTV';
-                            break;
-                        case 'Ripped ':
-                            $result['source'] = 'DVDRIP';
-                    }
-
-                    $releaseName = $releaseName.'.'.$result['source'];
-                } elseif (preg_match('/(codec( (name|code))?|(original )?format|res(olution)|video( (codec|format|res))?|tv system|type|writing library).*?\b(?P<video>AVC|AVI|DBrip|DIVX|\(Divx|DVD|[HX][._ -]?264|MPEG-4 Visual|NTSC|PAL|WMV|XVID)\b/i', $release['textstring'], $result)) {
-                    switch ($result['video']) {
-                        case 'AVI':
-                            $result['video'] = 'DVDRIP';
-                            break;
-                        case 'DBrip':
-                            $result['video'] = 'BDRIP';
-                            break;
-                        case '(Divx':
-                            $result['video'] = 'DIVX';
-                            break;
-                        case 'h264':
-                        case 'h-264':
-                        case 'h.264':
-                            $result['video'] = 'H264';
-                            break;
-                        case 'MPEG-4 Visual':
-                        case 'x264':
-                        case 'x-264':
-                        case 'x.264':
-                            $result['video'] = 'x264';
-                            break;
-                        case 'NTSC':
-                        case 'PAL':
-                            $result['video'] = 'DVD';
-                            break;
-                    }
-
-                    $releaseName = $releaseName.'.'.$result['video'];
-                }
-
-                if (preg_match('/(audio( format)?|codec( name)?|format).*?\b(?P<audio>0x0055 MPEG-1 Layer 3|AAC( LC)?|AC-?3|\(AC3|DD5(.1)?|(A_)?DTS-?(HD)?|Dolby(\s?TrueHD)?|TrueHD|FLAC|MP3)\b/i', $release['textstring'], $result)) {
-                    switch ($result['audio']) {
-                        case '0x0055 MPEG-1 Layer 3':
-                            $result['audio'] = 'MP3';
-                            break;
-                        case 'AC-3':
-                        case '(AC3':
-                            $result['audio'] = 'AC3';
-                            break;
-                        case 'AAC LC':
-                            $result['audio'] = 'AAC';
-                            break;
-                        case 'A_DTS':
-                        case 'DTS-HD':
-                        case 'DTSHD':
-                            $result['audio'] = 'DTS';
-                    }
-                    $releaseName = $releaseName.'.'.$result['audio'];
-                }
-                $releaseName .= '-NoGroup';
-                $this->updateRelease($release, $releaseName, $method = 'nfoCheck: Title (Year)', $echo, $type, $namestatus, $show);
+                $releaseName = $releaseName.'.'.$result['lang'];
             }
+
+            if (preg_match('/(frame size|(video )?res(olution)?|video).*?(?P<res>(272|336|480|494|528|608|\(?640|688|704|720x480|810|816|820|1 ?080|1280( \@)?|1 ?920(x1080)?))/i', $release['textstring'], $result)) {
+                switch ($result['res']) {
+                    case '272':
+                    case '336':
+                    case '480':
+                    case '494':
+                    case '608':
+                    case '640':
+                    case '(640':
+                    case '688':
+                    case '704':
+                    case '720x480':
+                        $result['res'] = '480p';
+                        break;
+                    case '1280x720':
+                    case '1280':
+                    case '1280 @':
+                        $result['res'] = '720p';
+                        break;
+                    case '810':
+                    case '816':
+                    case '820':
+                    case '1920':
+                    case '1 920':
+                    case '1080':
+                    case '1 080':
+                    case '1920x1080':
+                        $result['res'] = '1080p';
+                        break;
+                    case '2160':
+                        $result['res'] = '2160p';
+                        break;
+                }
+
+                $releaseName = $releaseName.'.'.$result['res'];
+            } elseif (preg_match('/(largeur|width).*?(?P<res>(\(?640|688|704|720|1280( \@)?|1 ?920))/i', $release['textstring'], $result)) {
+                switch ($result['res']) {
+                    case '640':
+                    case '(640':
+                    case '688':
+                    case '704':
+                    case '720':
+                        $result['res'] = '480p';
+                        break;
+                    case '1280 @':
+                    case '1280':
+                        $result['res'] = '720p';
+                        break;
+                    case '1920':
+                    case '1 920':
+                        $result['res'] = '1080p';
+                        break;
+                    case '2160':
+                        $result['res'] = '2160p';
+                        break;
+                }
+
+                $releaseName = $releaseName.'.'.$result['res'];
+            }
+
+            if (preg_match('/source.*?\b(?P<source>BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)\b/i', $release['textstring'], $result)) {
+                switch ($result['source']) {
+                    case 'BD':
+                        $result['source'] = 'Bluray.x264';
+                        break;
+                    case 'CAMRIP':
+                        $result['source'] = 'CAM';
+                        break;
+                    case 'DBrip':
+                        $result['source'] = 'BDRIP';
+                        break;
+                    case 'DVD R1':
+                    case 'NTSC':
+                    case 'PAL':
+                    case 'VOD':
+                        $result['source'] = 'DVD';
+                        break;
+                    case 'HD':
+                        $result['source'] = 'HDTV';
+                        break;
+                    case 'Ripped ':
+                        $result['source'] = 'DVDRIP';
+                }
+
+                $releaseName = $releaseName.'.'.$result['source'];
+            } elseif (preg_match('/(codec( (name|code))?|(original )?format|res(olution)|video( (codec|format|res))?|tv system|type|writing library).*?\b(?P<video>AVC|AVI|DBrip|DIVX|\(Divx|DVD|[HX][._ -]?264|MPEG-4 Visual|NTSC|PAL|WMV|XVID)\b/i', $release['textstring'], $result)) {
+                switch ($result['video']) {
+                    case 'AVI':
+                        $result['video'] = 'DVDRIP';
+                        break;
+                    case 'DBrip':
+                        $result['video'] = 'BDRIP';
+                        break;
+                    case '(Divx':
+                        $result['video'] = 'DIVX';
+                        break;
+                    case 'h264':
+                    case 'h-264':
+                    case 'h.264':
+                        $result['video'] = 'H264';
+                        break;
+                    case 'MPEG-4 Visual':
+                    case 'x264':
+                    case 'x-264':
+                    case 'x.264':
+                        $result['video'] = 'x264';
+                        break;
+                    case 'NTSC':
+                    case 'PAL':
+                        $result['video'] = 'DVD';
+                        break;
+                }
+
+                $releaseName = $releaseName.'.'.$result['video'];
+            }
+
+            if (preg_match('/(audio( format)?|codec( name)?|format).*?\b(?P<audio>0x0055 MPEG-1 Layer 3|AAC( LC)?|AC-?3|\(AC3|DD5(.1)?|(A_)?DTS-?(HD)?|Dolby(\s?TrueHD)?|TrueHD|FLAC|MP3)\b/i', $release['textstring'], $result)) {
+                switch ($result['audio']) {
+                    case '0x0055 MPEG-1 Layer 3':
+                        $result['audio'] = 'MP3';
+                        break;
+                    case 'AC-3':
+                    case '(AC3':
+                        $result['audio'] = 'AC3';
+                        break;
+                    case 'AAC LC':
+                        $result['audio'] = 'AAC';
+                        break;
+                    case 'A_DTS':
+                    case 'DTS-HD':
+                    case 'DTSHD':
+                        $result['audio'] = 'DTS';
+                }
+                $releaseName = $releaseName.'.'.$result['audio'];
+            }
+            $releaseName .= '-NoGroup';
+            $this->updateRelease($release, $releaseName, $method = 'nfoCheck: Title (Year)', $echo, $type, $namestatus, $show);
         }
     }
 
@@ -2075,7 +2074,7 @@ class NameFixer
     public function uidCheck($release, $echo, $type, $namestatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release['releases_id']) {
-            $result = $this->pdo->queryDirect(
+            $result = DBFacade::select(
                 "
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
@@ -2165,7 +2164,7 @@ class NameFixer
     public function xxxNameCheck($release, $echo, $type, $namestatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release['releases_id']) {
-            $result = $this->pdo->queryDirect(
+            $result = DBFacade::select(
                 sprintf(
                     "
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -2220,7 +2219,7 @@ class NameFixer
     public function srrNameCheck($release, $echo, $type, $namestatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release['releases_id']) {
-            $result = $this->pdo->queryDirect(
+            $result = DBFacade::select(
                 sprintf(
                     "
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -2275,7 +2274,7 @@ class NameFixer
     public function hashCheck($release, $echo, $type, $namestatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release['releases_id']) {
-            $result = $this->pdo->queryDirect(
+            $result = DBFacade::select(
                 "
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r

@@ -120,8 +120,8 @@ class ReleaseImage
             $height = $cover->height();
             $ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
             // New dimensions
-            $new_width = (int) ($ratio * $width);
-            $new_height = (int) ($ratio * $height);
+            $new_width = $ratio * $width;
+            $new_height = $ratio * $height;
             if ($new_width < $width && $new_width > 10 && $new_height > 10) {
                 $cover->resize($new_width, $new_height);
 
@@ -156,6 +156,6 @@ class ReleaseImage
     {
         $thumb = $guid.'_thumb.jpg';
 
-        Storage::delete($this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv');
+        Storage::delete([$this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv']);
     }
 }

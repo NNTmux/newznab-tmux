@@ -2,18 +2,12 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 
 class ReleaseSearch
 {
     public const FULLTEXT = 0;
     public const LIKE = 1;
     public const SPHINX = 2;
-
-    /***
-     * @var DB
-     */
-    public $pdo;
 
     /**
      * Array where keys are the column name, and value is the search string.
@@ -68,9 +62,6 @@ class ReleaseSearch
     }
 
     /**
-     * @param null $query
-     * @param bool $builder
-     *
      * @return string
      */
     private function sphinxSQL()

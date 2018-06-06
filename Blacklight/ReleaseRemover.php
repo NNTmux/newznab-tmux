@@ -707,7 +707,7 @@ class ReleaseRemover
      *
      * @return bool
      */
-    protected function removeBlacklist()
+    protected function removeBlacklist(): bool
     {
         $status = sprintf('AND status = %d', Binaries::BLACKLIST_ENABLED);
 
@@ -715,7 +715,7 @@ class ReleaseRemover
             $status = '';
         }
 
-        $regexList = $this->pdo->query(
+        $regexList = \Illuminate\Support\Facades\DB::select(
             sprintf(
                 'SELECT regex, id, groupname, msgcol
 				FROM binaryblacklist
@@ -760,7 +760,7 @@ class ReleaseRemover
                 // Get the group ID if the regex is set to work against a group.
                 $groupID = '';
                 if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
-                    $groupIDs = $this->pdo->query(
+                    $groupIDs = \Illuminate\Support\Facades\DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
                         $this->pdo->escapeString($regex['groupname'])
                     );
@@ -768,7 +768,9 @@ class ReleaseRemover
                     $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
                         continue;
-                    } elseif ($groupIDCount === 1) {
+                    }
+
+                    if ($groupIDCount === 1) {
                         $groupIDs = $groupIDs[0]['id'];
                     } else {
                         $string = '';
@@ -836,9 +838,9 @@ class ReleaseRemover
      *
      * @return bool
      */
-    protected function removeBlacklistFiles()
+    protected function removeBlacklistFiles(): bool
     {
-        $allRegex = $this->pdo->query(
+        $allRegex = \Illuminate\Support\Facades\DB::select(
             sprintf(
                 'SELECT regex, id, groupname
 				FROM binaryblacklist
@@ -869,14 +871,16 @@ class ReleaseRemover
                 // Get the group ID if the regex is set to work against a group.
                 $groupID = '';
                 if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
-                    $groupIDs = $this->pdo->query(
+                    $groupIDs = \Illuminate\Support\Facades\DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
                         $this->pdo->escapeString($regex['groupname'])
                     );
                     $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
                         continue;
-                    } elseif ($groupIDCount === 1) {
+                    }
+
+                    if ($groupIDCount === 1) {
                         $groupIDs = $groupIDs[0]['id'];
                     } else {
                         $string = '';
@@ -1041,7 +1045,7 @@ class ReleaseRemover
     protected function checkSelectQuery()
     {
         // Run the query, check if it picked up anything.
-        $result = $this->pdo->query($this->cleanSpaces($this->query));
+        $result = \Illuminate\Support\Facades\DB::select($this->cleanSpaces($this->query));
         if (\count($result) <= 0) {
             $this->error = '';
             if ($this->method === 'userCriteria') {
@@ -1087,9 +1091,9 @@ class ReleaseRemover
                     if ($args[1] === 'equals') {
                         if ($args[2] === 'NULL') {
                             return ' AND imdbid IS NULL ';
-                        } else {
-                            return ' AND imdbid = '.$args[2];
                         }
+
+                        return ' AND imdbid = '.$args[2];
                     }
                     break;
                 case 'nzbstatus':
@@ -1125,7 +1129,7 @@ class ReleaseRemover
                 case 'groupname':
                     switch ($args[1]) {
                         case 'equals':
-                            $group = $this->pdo->queryOneRow('SELECT id FROM groups WHERE name = '.$this->pdo->escapeString($args[2]));
+                            $group = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name = '.$this->pdo->escapeString($args[2]));
                             if ($group === false) {
                                 $this->error = 'This group was not found in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1133,7 +1137,7 @@ class ReleaseRemover
 
                             return ' AND groups_id = '.$group['id'];
                         case 'like':
-                            $groups = $this->pdo->query('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
+                            $groups = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
                             if (\count($groups) === 0) {
                                 $this->error = 'No groups were found with this pattern in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1264,7 +1268,7 @@ class ReleaseRemover
      *
      * @return string
      */
-    protected function cleanSpaces($string)
+    protected function cleanSpaces($string): string
     {
         return trim(preg_replace('/\s{2,}/', ' ', $string));
     }
@@ -1277,7 +1281,7 @@ class ReleaseRemover
      *
      * @return string
      */
-    protected function formatLike($string, $type)
+    protected function formatLike($string, $type): string
     {
         $newString = explode(' ', $string);
         if (\count($newString) > 1) {
@@ -1344,24 +1348,14 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, 'chinese');
             $regexMatch =
                 str_replace(
-                    'nl  subed|bed|s',
-                    'nlsubs|nlsubbed|nlsubed',
-                    str_replace(
-                        '?',
-                        '',
-                        str_replace(
-                            '.',
-                            ' ',
-                            str_replace(
-                                ['-', '(', ')'],
-                                '',
-                                substr(
-                                    $dbRegex,
-                                    $forBegin,
-                                    strrpos($dbRegex, ')') - $forBegin
-                                )
-                            )
-                        )
+                    ['-', '(', ')', '.', '?', 'nl  subed|bed|s'], [
+                    '',
+                    '',
+                    '',
+                    ' ', '', 'nlsubs|nlsubbed|nlsubed'], substr(
+                        $dbRegex,
+                        $forBegin,
+                        strrpos($dbRegex, ')') - $forBegin
                     )
                 );
         } elseif (substr($dbRegex, 8, 2) === '4u') {
@@ -1369,29 +1363,17 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, '4u');
             $regexMatch =
                 str_replace(
-                    'nov[ a]+rip',
-                    'nova',
-                    str_replace(
-                        '4u.nl',
-                        '"4u" "nl"',
-                        substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
-                    )
+                    ['4u.nl', 'nov[ a]+rip'], ['"4u" "nl"', 'nova'], substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
                 );
         } elseif (substr($dbRegex, 8, 5) === 'bd|dl') {
             // Find first bd|dl instance position in Regex, then find last closing parenthesis as this is reversed.
             $forBegin = strpos($dbRegex, 'bd|dl');
             $regexMatch =
                 str_replace(
-                    ['\\', ']', '['],
-                    '',
-                    str_replace(
-                        'bd|dl)mux',
-                        'bdmux|dlmux',
-                        substr(
-                            $dbRegex,
-                            $forBegin,
-                            strrpos($dbRegex, ')') - $forBegin
-                        )
+                    ['bd|dl)mux', '\\', ']', '['], array('bdmux|dlmux', '', '', ''), substr(
+                        $dbRegex,
+                        $forBegin,
+                        strrpos($dbRegex, ')') - $forBegin
                     )
                 );
         } elseif (substr($dbRegex, 7, 9) === 'imageset|') {

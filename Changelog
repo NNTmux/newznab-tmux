@@ -1,4 +1,5 @@
 2018-06-06 DariusIII
+	* Chg: Update code style of some of the classes
 	* Chg: Updated dragonmantank/cron-expression and paragonie/random_compat to their latest versions
 2018-06-05 DariusIII
 	* Chg: Update NZB class, use array access in place of substr and merge some if-else loops

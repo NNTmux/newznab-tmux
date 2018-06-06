@@ -198,12 +198,11 @@ class ReleaseCleaning
         if (preg_match('/www\.town\.ag/i', $this->subject)) {
             return $this->generic_town();
         }
-        switch ($groupName) {
-            case 'alt.binaries.teevee':
-                return $this->teevee();
-            default:
-                return $this->generic();
+        if ($groupName === 'alt.binaries.teevee') {
+            return $this->teevee();
         }
+
+        return $this->generic();
     }
 
     /**
@@ -409,6 +408,10 @@ class ReleaseCleaning
     }
 
     // Run at the end because this can be dangerous. In the future it's better to make these per group. There should not be numbers after yEnc because we remove them as well before inserting (even when importing).
+
+    /**
+     * @return array
+     */
     public function generic()
     {
         // This regex gets almost all of the predb release names also keep in mind that not every subject ends with yEnc, some are truncated, because of the 255 character limit and some have extra charaters tacked onto the end, like (5/10).
