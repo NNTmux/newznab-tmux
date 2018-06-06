@@ -222,19 +222,6 @@ class User extends Authenticatable
         return $this->hasMany(ReleaseComment::class, 'users_id');
     }
 
-    protected static function boot(): void
-    {
-        parent::boot();
-
-        static::deleting(function (User $user) {
-            $user->release()->delete();
-            $user->failedRelease()->delete();
-            $user->excludedCategory()->delete();
-            $user->download()->delete();
-            $user->request()->delete();
-        });
-    }
-
     /**
      * @return array
      */
@@ -343,17 +330,13 @@ class User extends Authenticatable
         }
 
         $res = self::getByUsername($userName);
-        if ($res) {
-            if ((int) $res['id'] !== (int) $id) {
-                return self::ERR_SIGNUP_UNAMEINUSE;
-            }
+        if ($res && (int) $res['id'] !== (int) $id) {
+            return self::ERR_SIGNUP_UNAMEINUSE;
         }
 
         $res = self::getByEmail($email);
-        if ($res) {
-            if ((int) $res['id'] !== (int) $id) {
-                return self::ERR_SIGNUP_EMAILINUSE;
-            }
+        if ($res && (int) $res['id'] !== (int) $id) {
+            return self::ERR_SIGNUP_EMAILINUSE;
         }
 
         $sql = [
@@ -731,13 +714,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate a strong password.
-     *
-     *
-     * @param int $length
-     * @param bool $add_dashes
+     * @param int    $length
+     * @param bool   $add_dashes
      * @param string $available_sets
+     *
      * @return bool|string
+     * @throws \Exception
      */
     public static function generatePassword($length = 15, $add_dashes = false, $available_sets = 'luds')
     {
@@ -796,7 +778,7 @@ class User extends Authenticatable
      * @throws \Exception
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public static function signup($userName, $password, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false)
+    public static function signup($userName, $password, $email, $host, $role = self::ROLE_USER, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false)
     {
         $userName = trim($userName);
         $password = trim($password);

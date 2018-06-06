@@ -1,4 +1,5 @@
 2018-06-06 DariusIII
+	* Chg: Update User model
 	* Fix: Fix couple of mistakes in NameFixer class
 	* Chg: Change group checking in ReleaseRemover
 	* Fix: Fix noticed problems in NameFixer and ReleaseRemover classes
