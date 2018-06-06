@@ -20,10 +20,6 @@ use App\Transformers\CategoryTransformer;
 
 class ApiV2Controller extends Controller
 {
-    public function __construct()
-    {
-    }
-
     /**
      * @return \Illuminate\Http\JsonResponse
      */

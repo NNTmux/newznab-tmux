@@ -1,4 +1,5 @@
 2018-06-06 DariusIII
+	* Chg: Remove unnecessary __construct in v2 api controller
 	* Chg: Fix an typo in ProcessReleases class
 	* Chg: Update User model
 	* Fix: Fix couple of mistakes in NameFixer class
