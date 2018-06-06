@@ -1130,12 +1130,12 @@ class ReleaseRemover
                     switch ($args[1]) {
                         case 'equals':
                             $group = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name = '.$this->pdo->escapeString($args[2]));
-                            if ($group === false) {
+                            if (empty($group)) {
                                 $this->error = 'This group was not found in your database: '.$args[2].PHP_EOL;
                                 break;
                             }
 
-                            return ' AND groups_id = '.$group->id;
+                            return ' AND groups_id = '.$group[0]->id;
                         case 'like':
                             $groups = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
                             if (\count($groups) === 0) {

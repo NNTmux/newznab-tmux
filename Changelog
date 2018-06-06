@@ -1,4 +1,5 @@
 2018-06-06 DariusIII
+	* Chg: Change group checking in ReleaseRemover
 	* Fix: Fix noticed problems in NameFixer and ReleaseRemover classes
 	* Chg: Update NameFixer class again, fix errors introduced in previous commit
 	* Chg: Update code style of some of the classes
