@@ -1352,7 +1352,7 @@ class ReleaseRemover
                     '',
                     '',
                     '',
-                    ' ', '', 'nlsubs|nlsubbed|nlsubed'], substr(
+                    ' ', '', 'nlsubs|nlsubbed|nlsubed', ], substr(
                         $dbRegex,
                         $forBegin,
                         strrpos($dbRegex, ')') - $forBegin
@@ -1370,7 +1370,7 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, 'bd|dl');
             $regexMatch =
                 str_replace(
-                    ['bd|dl)mux', '\\', ']', '['], array('bdmux|dlmux', '', '', ''), substr(
+                    ['bd|dl)mux', '\\', ']', '['], ['bdmux|dlmux', '', '', ''], substr(
                         $dbRegex,
                         $forBegin,
                         strrpos($dbRegex, ')') - $forBegin

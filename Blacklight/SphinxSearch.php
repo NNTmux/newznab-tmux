@@ -5,8 +5,8 @@ namespace Blacklight;
 use App\Models\Release;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use Illuminate\Support\Facades\DB;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxSearch
 {

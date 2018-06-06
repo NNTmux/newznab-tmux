@@ -9,8 +9,8 @@ use App\Models\ReleaseNfo;
 use dariusiii\rarinfo\SfvInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
-use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB;
+use Blacklight\processing\PostProcess;
 
 /**
  * Class Nfo
