@@ -733,7 +733,7 @@ class ReleaseRemover
         if (\count($regexList) > 0) {
             foreach ($regexList as $regex) {
                 $regexSQL = $ftMatch = $regexMatch = $opTypeName = '';
-                $dbRegex = $this->pdo->escapeString($regex['regex']);
+                $dbRegex = $this->pdo->escapeString($regex->regex);
 
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
@@ -742,7 +742,7 @@ class ReleaseRemover
                     }
                 }
 
-                switch ((int) $regex['msgcol']) {
+                switch ((int) $regex->msgcol) {
                     case Binaries::BLACKLIST_FIELD_SUBJECT:
                         $regexSQL = sprintf('WHERE %s (r.name REGEXP %s OR r.searchname REGEXP %2$s)', $ftMatch, $dbRegex);
                         $opTypeName = 'Subject';
@@ -759,10 +759,10 @@ class ReleaseRemover
 
                 // Get the group ID if the regex is set to work against a group.
                 $groupID = '';
-                if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
+                if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = \Illuminate\Support\Facades\DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->escapeString($regex['groupname'])
+                        $this->pdo->escapeString($regex->groupname)
                     );
 
                     $groupIDCount = \count($groupIDs);
@@ -771,18 +771,18 @@ class ReleaseRemover
                     }
 
                     if ($groupIDCount === 1) {
-                        $groupIDs = $groupIDs[0]['id'];
+                        $groupIDs = $groupIDs[0]->id;
                     } else {
                         $string = '';
                         foreach ($groupIDs as $ID) {
-                            $string .= $ID['id'].',';
+                            $string .= $ID->id.',';
                         }
                         $groupIDs = substr($string, 0, -1);
                     }
 
                     $groupID = ' AND r.groups_id in ('.$groupIDs.') ';
                 }
-                $this->method = 'Blacklist ['.$regex['id'].']';
+                $this->method = 'Blacklist ['.$regex->id.']';
 
                 // Check if using FT Match and declare for echo
                 if ($ftMatch !== '' && $opTypeName === 'Subject') {
@@ -856,12 +856,12 @@ class ReleaseRemover
 
         if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
-                $dbRegex = $this->pdo->escapeString($regex['regex']);
+                $dbRegex = $this->pdo->escapeString($regex->regex);
 
                 $regexSQL = sprintf(
                     'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 				WHERE rf.name REGEXP %s ',
-                    $this->pdo->escapeString($regex['regex'])
+                    $this->pdo->escapeString($regex->regex)
                 );
 
                 if ($regexSQL === '') {
@@ -870,10 +870,10 @@ class ReleaseRemover
 
                 // Get the group ID if the regex is set to work against a group.
                 $groupID = '';
-                if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
+                if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = \Illuminate\Support\Facades\DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->escapeString($regex['groupname'])
+                        $this->pdo->escapeString($regex->groupname)
                     );
                     $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
@@ -881,11 +881,11 @@ class ReleaseRemover
                     }
 
                     if ($groupIDCount === 1) {
-                        $groupIDs = $groupIDs[0]['id'];
+                        $groupIDs = $groupIDs[0]->id;
                     } else {
                         $string = '';
                         foreach ($groupIDs as $fID) {
-                            $string .= $fID['id'].',';
+                            $string .= $fID->id.',';
                         }
                         $groupIDs = substr($string, 0, -1);
                     }
@@ -893,7 +893,7 @@ class ReleaseRemover
                     $groupID = ' AND r.groups_id in ('.$groupIDs.') ';
                 }
 
-                $this->method = 'Blacklist Files '.$regex['id'];
+                $this->method = 'Blacklist Files '.$regex->id;
 
                 $blType = 'only REGEXP';
                 $ftUsing = PHP_EOL;
@@ -1135,7 +1135,7 @@ class ReleaseRemover
                                 break;
                             }
 
-                            return ' AND groups_id = '.$group['id'];
+                            return ' AND groups_id = '.$group->id;
                         case 'like':
                             $groups = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
                             if (\count($groups) === 0) {
@@ -1144,7 +1144,7 @@ class ReleaseRemover
                             }
                             $gQuery = ' AND groups_id IN (';
                             foreach ($groups as $group) {
-                                $gQuery .= $group['id'].',';
+                                $gQuery .= $group->id.',';
                             }
                             $gQuery = substr($gQuery, 0, -0).')';
 
@@ -1251,7 +1251,7 @@ class ReleaseRemover
         );
 
         // Check the users response.
-        $userInput = trim(fgets(fopen('php://stdin', 'brt')));
+        $userInput = trim(fgets(fopen('php://stdin', 'rtb')));
         if ($userInput !== 'yes') {
             echo ColorCLI::primary('You typed: "'.$userInput.'", the program will exit.');
 
