@@ -1,4 +1,5 @@
 2018-06-06 DariusIII
+	* Chg: Fix an typo in ProcessReleases class
 	* Chg: Update User model
 	* Fix: Fix couple of mistakes in NameFixer class
 	* Chg: Change group checking in ReleaseRemover
