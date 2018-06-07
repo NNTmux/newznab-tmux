@@ -34,7 +34,7 @@ class DetailsTransformer extends TransformerAbstract
             return [
                 'title' => $releases->searchname,
                 'details' => url('/').'/details/'.$releases->guid,
-                'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
+                'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category name' => $releases->category_name,
                 'size' => $releases->size,

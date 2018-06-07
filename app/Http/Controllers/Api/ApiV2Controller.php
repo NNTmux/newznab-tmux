@@ -83,9 +83,12 @@ class ApiV2Controller extends Controller
             $minSize
         );
 
-        $relData = fractal($relData, new ApiTransformer($user));
+        $response = [
+            'Total' => $relData[0]->_totalrows ?? 0,
+            'Results' => fractal($relData, new ApiTransformer($user))
+        ];
 
-        return response()->json($relData);
+        return response()->json($response);
     }
 
     /**
@@ -144,9 +147,12 @@ class ApiV2Controller extends Controller
             );
         }
 
-        $relData = fractal($relData, new ApiTransformer($user));
+        $response = [
+            'Total' => $relData[0]->_totalrows ?? 0,
+            'Results' => fractal($relData, new ApiTransformer($user))
+        ];
 
-        return response()->json($relData);
+        return response()->json($response);
     }
 
     /**
@@ -206,9 +212,12 @@ class ApiV2Controller extends Controller
             $minSize
         );
 
-        $relData = fractal($relData, new ApiTransformer($user));
+        $response = [
+            'Total' => $relData[0]->_totalrows ?? 0,
+            'Results' => fractal($relData, new ApiTransformer($user))
+        ];
 
-        return response()->json($relData);
+        return response()->json($response);
     }
 
     /**
