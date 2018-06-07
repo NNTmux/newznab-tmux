@@ -2275,17 +2275,17 @@ class NameFixer
             );
 
             foreach ($result as $res) {
-                $floor = round(($res['relsize'] - $release->relsize) / $res['relsize'] * 100, 1);
+                $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
                 if ($floor >= -5 && $floor <= 5) {
                     $this->updateRelease(
                             $release,
-                            $res['searchname'],
+                            $res->searchname,
                             $method = 'hashCheck: PAR2 hash_16K',
                             $echo,
                             $type,
                             $namestatus,
                             $show,
-                            $res['predb_id']
+                            $res->predb_id
                         );
 
                     return true;

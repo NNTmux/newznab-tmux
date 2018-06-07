@@ -1,4 +1,5 @@
 2018-06-07 DariusIII
+	* Fix: Fix used values in hashCheck function
 	* Chg: Use api specific searches (apiTvSearch and apiSearch) and optimize used columns to reduce response time
 	* Fix: Uncomment caching for tvSearch (was commented for testing and forgot about it)
 	* Chg: Update API V2 response for tv series search
