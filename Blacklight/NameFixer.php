@@ -1166,7 +1166,7 @@ class NameFixer
             )
         );
 
-        if ($query !== false) {
+        if (! empty($query)) {
             $total = \count($query);
 
             if ($total > 0 && $query instanceof \Traversable) {

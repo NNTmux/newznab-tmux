@@ -1022,12 +1022,12 @@ class ReleaseRemover
         $deletedCount = 0;
         foreach ($this->result as $release) {
             if ($this->delete) {
-                $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
-                    echo ColorCLI::primary('Deleting: '.$this->method.': '.$release['searchname']);
+                    echo ColorCLI::primary('Deleting: '.$this->method.': '.$release->searchname);
                 }
             } elseif ($this->echoCLI) {
-                echo ColorCLI::primary('Would be deleting: '.$this->method.': '.$release['searchname']);
+                echo ColorCLI::primary('Would be deleting: '.$this->method.': '.$release->searchname);
             }
             $deletedCount++;
         }
