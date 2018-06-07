@@ -1,4 +1,5 @@
 2018-06-07 DariusIII
+	* Chg: Update API V2 response for tv series search
 	* Chg: Add total results count to API V2 response, rename link to url
 2018-06-06 DariusIII
 	* Chg: Remove unused pdo variable from Steam class
