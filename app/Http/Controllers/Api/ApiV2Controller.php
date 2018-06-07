@@ -112,24 +112,13 @@ class ApiV2Controller extends Controller
         $limit = $api->limit();
 
         if ($request->has('id')) {
-            $relData = $releases->search(
+            $relData = $releases->apiSearch(
                 $request->input('id'),
-                -1,
-                -1,
-                -1,
                 $groupName,
-                -1,
-                -1,
-                0,
-                0,
-                -1,
-                -1,
                 $offset,
                 $limit,
-                '',
                 $maxAge,
                 $catExclusions,
-                'basic',
                 $categoryID,
                 $minSize
             );
@@ -199,7 +188,7 @@ class ApiV2Controller extends Controller
             $airdate = str_replace('/', '-', $year[0].'-'.$episode);
         }
 
-        $relData = $releases->tvSearch(
+        $relData = $releases->apiTvSearch(
             $siteIdArr,
             $series,
             $episode,
