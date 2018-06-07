@@ -843,10 +843,10 @@ class Releases
             $limit,
             $offset
         );
-        /*$releases = Cache::get(md5($sql));
+        $releases = Cache::get(md5($sql));
         if ($releases !== null) {
             return $releases;
-        }*/
+        }
         $releases = DB::select($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount(

@@ -1,4 +1,5 @@
 2018-06-07 DariusIII
+	* Fix: Uncomment caching for tvSearch (was commented for testing and forgot about it)
 	* Chg: Update API V2 response for tv series search
 	* Chg: Add total results count to API V2 response, rename link to url
 2018-06-06 DariusIII
