@@ -1028,7 +1028,7 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
 				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
 				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,

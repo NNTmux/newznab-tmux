@@ -1,4 +1,5 @@
 2018-06-07 DariusIII
+	* Chg: Add added column to API v2 json response
 	* Fix: Fix used values in hashCheck function
 	* Chg: Use api specific searches (apiTvSearch and apiSearch) and optimize used columns to reduce response time
 	* Fix: Uncomment caching for tvSearch (was commented for testing and forgot about it)
