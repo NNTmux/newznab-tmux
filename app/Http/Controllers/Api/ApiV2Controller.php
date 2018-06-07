@@ -85,7 +85,7 @@ class ApiV2Controller extends Controller
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($user))
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -149,7 +149,7 @@ class ApiV2Controller extends Controller
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($user))
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -214,7 +214,7 @@ class ApiV2Controller extends Controller
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($user))
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
