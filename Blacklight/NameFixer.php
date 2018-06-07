@@ -1255,7 +1255,7 @@ class NameFixer
         if (\strlen($this->_fileName) > 0 && strpos($this->_fileName, '.') !== 0) {
             switch (true) {
 
-                case strpos($this->_fileName, '.') ``:
+                case strpos($this->_fileName, '.') !== false:
                     //some filenames start with a period that ends up creating bad matches so we don't process them
                     $this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
                     continue;
