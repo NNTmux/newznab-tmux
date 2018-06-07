@@ -723,7 +723,7 @@ class Releases
     }
 
     /**
-     * Search function for API
+     * Search function for API.
      *
      * @param string|int $searchName
      * @param string|int $groupName
