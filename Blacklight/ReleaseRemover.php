@@ -856,7 +856,6 @@ class ReleaseRemover
 
         if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
-
                 $regexSQL = sprintf(
                     'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 				WHERE rf.name REGEXP %s ',
