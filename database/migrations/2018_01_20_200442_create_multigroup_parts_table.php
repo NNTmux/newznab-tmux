@@ -14,7 +14,10 @@ class CreateMultigroupPartsTable extends Migration {
 	{
 		Schema::create('multigroup_parts', function(Blueprint $table)
 		{
-			$table->bigInteger('binaries_id')->unsigned()->default(0);
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->bigInteger('binaries_id')->unsigned()->default(0);
 			$table->string('messageid')->default('');
 			$table->bigInteger('number')->unsigned()->default(0);
 			$table->integer('partnumber')->unsigned()->default(0);

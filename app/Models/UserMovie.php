@@ -2,9 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserMovie.
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property int|null $imdbid
+ * @property string|null $categories List of categories for user movies
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereCategories($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereImdbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class UserMovie extends Model
 {
     /**
@@ -18,12 +34,13 @@ class UserMovie extends Model
     protected $dateFormat = false;
 
     /**
-     * @param $uid
-     * @param $imdbid
+     * @param       $uid
+     * @param       $imdbid
      * @param array $catID
-     * @return int
+     *
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addMovie($uid, $imdbid, array $catID = []): int
+    public static function addMovie($uid, $imdbid, array $catID = [])
     {
         return self::query()
             ->insertGetId(
@@ -31,7 +48,7 @@ class UserMovie extends Model
                     'users_id' => $uid,
                     'imdbid' => $imdbid,
                     'categories' => ! empty($catID) ? implode('|', $catID) : 'NULL',
-                    'created_at' => Carbon::now(),
+                    'created_at' => now(),
                 ]
             );
     }

@@ -14,7 +14,10 @@ class CreateReleaseSubtitlesTable extends Migration {
 	{
 		Schema::create('release_subtitles', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('releases_id')->unsigned()->comment('FK to releases.id');
 			$table->integer('subsid')->unsigned();
 			$table->string('subslanguage', 50);

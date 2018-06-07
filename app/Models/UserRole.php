@@ -4,6 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserRole.
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $apirequests
+ * @property int $downloadrequests
+ * @property int $defaultinvites
+ * @property bool $isdefault
+ * @property bool $canpreview
+ * @property bool $hideads
+ * @property int $donation
+ * @property int $addyears
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\RoleExcludedCategory[] $roleExcludedCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereAddyears($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereApirequests($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereCanpreview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereDefaultinvites($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereDonation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereDownloadrequests($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereHideads($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereIsdefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRole whereName($value)
+ * @mixin \Eloquent
+ */
 class UserRole extends Model
 {
     /**
@@ -61,62 +88,48 @@ class UserRole extends Model
     }
 
     /**
-     * @param $name
-     * @param $apirequests
-     * @param $downloadrequests
-     * @param $defaultinvites
-     * @param $canpreview
-     * @param $hideads
-     * @param $donation
-     * @param $addYear
+     * @param $request
+     *
      * @return int
      */
-    public static function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads, $donation, $addYear): int
+    public static function addRole($request): int
     {
-        return self::create(
+        return self::query()->insertGetId(
             [
-                'name' => $name,
-                'apirequests' => $apirequests,
-                'downloadrequests' => $downloadrequests,
-                'defaultinvites' => $defaultinvites,
-                'canpreview' => $canpreview,
-                'hideads' => $hideads,
-                'donation' => $donation,
-                'addyears' => $addYear,
+                'name' => $request['name'],
+                'apirequests' => $request['apirequests'],
+                'downloadrequests' => $request['name'],
+                'defaultinvites' => $request['defaultinvites'],
+                'canpreview' => $request['canpreview'],
+                'hideads' => $request['hideads'],
+                'donation' => $request['donation'],
+                'addyears' => $request['addyears'],
+                'rate_limit' => $request['rate_limit'],
             ]
-        )->id;
+        );
     }
 
     /**
-     * @param $id
-     * @param $name
-     * @param $apirequests
-     * @param $downloadrequests
-     * @param $defaultinvites
-     * @param $isdefault
-     * @param $canpreview
-     * @param $hideads
-     * @param $donation
-     * @param $addYear
+     * @param $request
+     *
      * @return int
      */
-    public static function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads, $donation, $addYear): int
+    public static function updateRole($request): int
     {
-        if ((int) $isdefault === 1) {
-            self::query()->update(['isdefault' => 0]);
-        }
+        User::query()->where('user_roles_id', $request['id'])->update(['rate_limit' => $request['rate_limit']]);
 
-        return self::query()->where('id', $id)->update(
+        return self::query()->where('id', $request['id'])->update(
             [
-                'name' => $name,
-                'apirequests' => $apirequests,
-                'downloadrequests' => $downloadrequests,
-                'defaultinvites' => $defaultinvites,
-                'isdefault' => $isdefault,
-                'canpreview' => $canpreview,
-                'hideads' => $hideads,
-                'donation' => $donation,
-                'addyears' => $addYear,
+                'name' => $request['name'],
+                'apirequests' => $request['apirequests'],
+                'isdefault' => $request['isdefault'],
+                'downloadrequests' => $request['downloadrequests'],
+                'defaultinvites' => $request['defaultinvites'],
+                'canpreview' => $request['canpreview'],
+                'hideads' => $request['hideads'],
+                'donation' => $request['donation'],
+                'addyears' => $request['addyears'],
+                'rate_limit' => $request['rate_limit'],
             ]
         );
     }

@@ -4,7 +4,7 @@
 			<h3 id="myLabel">Edit Post</h3>
 		</div>
 		<div class="body">
-			<form id="forum-post-edit" class="form-horizontal" action="" method="POST">
+            {{Form::open(['id' => 'forum-post-edit', 'class' => 'form-horizontal'])}}
 				<div class="control-group">
 					<label class="control-label" for="addMessage">Edit Post</label>
 					<div class="controls">
@@ -14,7 +14,7 @@
 					<input class="btn btn-warning" value="Cancel"
 						   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 				</div>
-			</form>
+			{{Form::close()}}
 		</div>
 	</div>
 </div>

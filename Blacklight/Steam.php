@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
 use App\Models\SteamApp;
 use b3rs3rk\steamfront\Main;
@@ -20,11 +19,6 @@ class Steam
      * @var int The ID of the Steam Game matched
      */
     protected $steamGameID;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    protected $pdo;
 
     /**
      * @var
@@ -46,8 +40,6 @@ class Steam
     {
         $defaults = ['DB' => null];
         $options += $defaults;
-
-        $this->pdo = ($options['DB'] instanceof DB ? $options['DB'] : new DB());
 
         $this->steamFront = new Main(
             [

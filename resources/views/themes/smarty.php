@@ -16,7 +16,8 @@
  *
  * @link <http://www.gnu.org/licenses/>.
  * @author niel
- * @copyright 2015 NN
+ * @edit DariusIII
+ * @copyright 2015 nZEDb/NNTmux
  */
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap'.DIRECTORY_SEPARATOR.'autoload.php';
 

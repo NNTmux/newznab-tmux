@@ -21,6 +21,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\MultigroupPoster.
+ *
+ * @property int $id
+ * @property string $poster
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MultigroupPoster whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MultigroupPoster wherePoster($value)
+ * @mixin \Eloquent
+ */
 class MultigroupPoster extends Model
 {
     /**
@@ -37,11 +46,6 @@ class MultigroupPoster extends Model
      * @var bool
      */
     public $timestamps = false;
-
-    /**
-     * @var bool
-     */
-    public $incrementing = false;
 
     /**
      * @return string

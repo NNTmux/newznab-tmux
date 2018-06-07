@@ -19,27 +19,30 @@
 				cannot remember your email, or no longer have access to it, please <a
 						href="{$smarty.const.WWW_TOP}/contact-us">contact
 					us</a>.</p>
-			<form action="forgottenpassword?action=submit" method="post">
+            {{Form::open(['url' => 'forgottenpassword?action=submit'])}}
 				<div class="form-group has-feedback">
 					<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control"
 						   placeholder="Email"/>
 					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">
-					<input autocomplete="off" id="apikey" name="apikey" value="{$apikey}" type="text" class="form-control"
+					<input autocomplete="off" id="apikey" name="apikey" value="{$apikey}" type="text"
+						   class="form-control"
 						   placeholder="Apikey"/>
 					<span class="glyphicon glyphicon-user form-control-feedback"></span>
 				</div>
 				<div class="row">
 					<div class="col-xs-6">
-						{$page->smarty->fetch('captcha.tpl')}
+						{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+							{NoCaptcha::display()}{NoCaptcha::renderJs()}
+						{/if}
 					</div><!-- /.col -->
 					<hr>
 					<div class="col-xs-12">
 						<button type="submit" class="btn btn-primary btn-block btn-flat">Request Password Reset</button>
 					</div><!-- /.col -->
 				</div>
-			</form>
+			{{Form::close()}}
 			{elseif $sent != ''}
 			<p>
 				A password reset request has been sent to your email.

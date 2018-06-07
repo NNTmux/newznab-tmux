@@ -2,18 +2,18 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\AudioData;
 use App\Models\VideoData;
 use App\Models\ReleaseUnique;
 use App\Models\ReleaseSubtitle;
 use Blacklight\utility\Utility;
 use App\Models\ReleaseExtraFull;
+use Illuminate\Support\Facades\DB;
 
 class ReleaseExtra
 {
     /**
-     * @var \Blacklight\db\DB|null
+     * @var \PDO
      */
     public $pdo;
 
@@ -25,7 +25,7 @@ class ReleaseExtra
      */
     public function __construct($settings = null)
     {
-        $this->pdo = $settings instanceof DB ? $settings : new DB();
+        $this->pdo = DB::connection()->getPdo();
     }
 
     /**
@@ -116,7 +116,7 @@ class ReleaseExtra
     {
         return ReleaseSubtitle::query()
             ->where('releases_id', $id)
-            ->selectRaw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")
+            ->select([DB::raw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")])
             ->orderBy('subsid')
             ->first();
     }
@@ -128,7 +128,7 @@ class ReleaseExtra
      */
     public function getBriefByGuid($guid)
     {
-        return $this->pdo->queryOneRow(
+        return DB::select(
             sprintf(
                 "SELECT containerformat, videocodec, videoduration, videoaspect,
                         CONCAT(video_data.videowidth,'x',video_data.videoheight,' @',format(videoframerate,0),'fps') AS size,
@@ -141,8 +141,8 @@ class ReleaseExtra
                         LEFT OUTER JOIN audio_data ON video_data.releases_id = audio_data.releases_id
                         INNER JOIN releases r ON r.id = video_data.releases_id
                         WHERE r.guid = %s
-                        GROUP BY r.id",
-                $this->pdo->escapeString($guid)
+                        GROUP BY r.id LIMIT 1",
+                $this->pdo->quote($guid)
             )
         );
     }
@@ -150,11 +150,11 @@ class ReleaseExtra
     /**
      * @param $guid
      *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null|object
      */
     public function getByGuid($guid)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT video_data.* FROM video_data INNER JOIN releases r ON r.id = video_data.releases_id WHERE r.guid = %s', $this->pdo->escapeString($guid)));
+        return VideoData::query()->where('r.guid', $guid)->leftJoin('releases as r', 'r.id', '=', 'video_data.releases_id')->first();
     }
 
     /**
@@ -178,9 +178,9 @@ class ReleaseExtra
         $containerformat = '';
         $overallbitrate = '';
 
-        if (isset($arrXml['File']) && isset($arrXml['File']['track'])) {
+        if (isset($arrXml['File']['track'])) {
             foreach ($arrXml['File']['track'] as $track) {
-                if (isset($track['@attributes']) && isset($track['@attributes']['type'])) {
+                if (isset($track['@attributes']['type'])) {
                     if ($track['@attributes']['type'] === 'General') {
                         if (isset($track['Format'])) {
                             $containerformat = $track['Format'];
@@ -188,11 +188,9 @@ class ReleaseExtra
                         if (isset($track['Overall_bit_rate'])) {
                             $overallbitrate = $track['Overall_bit_rate'];
                         }
-                        if (isset($track['Unique_ID'])) {
-                            if (preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['Unique_ID'], $matches)) {
-                                $uniqueid = $matches['hash'];
-                                $this->addUID($releaseID, $uniqueid);
-                            }
+                        if (isset($track['Unique_ID']) && preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['Unique_ID'], $matches)) {
+                            $uniqueid = $matches['hash'];
+                            $this->addUID($releaseID, $uniqueid);
                         }
                     } elseif ($track['@attributes']['type'] === 'Video') {
                         $videoduration = $videoformat = $videocodec = $videowidth = $videoheight = $videoaspect = $videoframerate = $videolibrary = '';
@@ -412,7 +410,7 @@ class ReleaseExtra
     public function addFull($id, $xml)
     {
         $ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();
-        if (! isset($ckid['releases_id'])) {
+        if ($ckid === null) {
             ReleaseExtraFull::query()->insert(['releases_id' => $id, 'mediainfo' => $xml]);
         }
     }

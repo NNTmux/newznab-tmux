@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Release;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
+use Illuminate\Support\Facades\DB;
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxSearch
@@ -101,8 +102,7 @@ class SphinxSearch
         $new = Release::query()
                 ->where('releases.id', $releaseID)
                 ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname'])
-                ->selectRaw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')
+                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname', DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')])
                 ->groupBy('releases.id')
                 ->first();
 

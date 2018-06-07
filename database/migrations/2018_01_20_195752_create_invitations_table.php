@@ -14,7 +14,10 @@ class CreateInvitationsTable extends Migration {
 	{
 		Schema::create('invitations', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('guid', 50);
 			$table->integer('users_id')->unsigned()->index('FK_users_inv');
 			$table->timestamps();

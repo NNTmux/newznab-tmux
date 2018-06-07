@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
+use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
 
@@ -71,7 +71,7 @@ class ReleaseImage
     {
         try {
             $img = (new ImageManager())->make($imgLoc);
-        } catch (NotReadableException $e) {
+        } catch (NotFoundException $e) {
             if ($e->getCode() === 404) {
                 ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
             } elseif ($e->getCode() === 503) {
@@ -80,12 +80,13 @@ class ReleaseImage
                 ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
             }
 
-            Log::warning($e->getMessage());
+            return false;
+        } catch (NotReadableException $e) {
+            ColorCLI::doEcho(ColorCLI::notice($e->getMessage()), true);
 
             return false;
         } catch (ImageException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
-            Log::error($e->getMessage());
 
             return false;
         }
@@ -119,8 +120,8 @@ class ReleaseImage
             $height = $cover->height();
             $ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
             // New dimensions
-            $new_width = (int) ($ratio * $width);
-            $new_height = (int) ($ratio * $height);
+            $new_width = $ratio * $width;
+            $new_height = $ratio * $height;
             if ($new_width < $width && $new_width > 10 && $new_height > 10) {
                 $cover->resize($new_width, $new_height);
 
@@ -155,6 +156,6 @@ class ReleaseImage
     {
         $thumb = $guid.'_thumb.jpg';
 
-        Storage::delete($this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv');
+        Storage::delete([$this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv']);
     }
 }

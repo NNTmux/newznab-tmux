@@ -14,7 +14,10 @@ class CreateReleaseNamingRegexesTable extends Migration {
 	{
 		Schema::create('release_naming_regexes', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('group_regex', 255)->default('')->index('ix_release_naming_regexes_group_regex')->comment('This is a regex to match against usenet groups');
 			$table->string('regex', 5000)->default('')->comment('Regex used for extracting name from subject');
 			$table->boolean('status')->default(1)->index('ix_release_naming_regexes_status')->comment('1=ON 0=OFF');

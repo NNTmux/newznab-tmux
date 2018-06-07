@@ -199,6 +199,7 @@ class Contents
 
     /**
      * @param $content
+     *
      * @return int
      */
     public function data_update($content): int
@@ -270,7 +271,7 @@ class Contents
     public function data_getAllButFront()
     {
         return Content::query()
-            ->where('id', '!=', 1)
+            ->where('id', '<>', 1)
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
             ->get();
     }

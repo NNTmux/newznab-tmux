@@ -26,17 +26,17 @@
 	{if $serieslist|@count > 0}
 		<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
 			<div class="col-md-12 pull-right">
-				<form class="form pull-right" style="margin-top:-35px;">
-					<form name="showsearch" class="navbar-form" action="" method="get">
+			    {{Form::open(['class' => 'form pull-right', 'style' => 'margin-top:-35px;'])}}
+                    {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
 						<div class="input-group">
 							<input class="form-control" style="width: 150px;"
 								   id="title appendedInputButton"
 								   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}"{else}{/if}"
 								   placeholder="Search here"/>
-							<button type="submit" class="btn btn-success">GO</button>
+                            {{Form::button('Go', ['class' => 'btn btn-success', 'type' => 'submit'])}}
 						</div>
-					</form>
-				</form>
+					{{Form::close()}}
+				{{Form::close()}}
 			</div>
 			{foreach $serieslist as $sletter => $series}
 				<tr>
@@ -75,15 +75,15 @@
 						<td>{$s.countries_id|escape:"htmlall"}</td>
 						<td class="mid">
 							{if $s.userseriesid != null}
-								<a href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   class="myshows btn btn-sm btn-warning" rel="edit" name="series{$s.id}"
 								   title="Edit">Edit</a>
 								<br/>
-								<a href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   class="myshows btn btn-sm btn-danger" rel="remove" name="series{$s.id}"
 								   title="Remove from My Shows">Remove</a>
 							{else}
-								<a href="{$smarty.const.WWW_TOP}/myshows/add/{$s.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+								<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   class="myshows btn btn-sm btn-primary" rel="add" name="series{$s.id}"
 								   title="Add to My Shows">Add</a>
 							{/if}
@@ -112,7 +112,7 @@
 									   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$s.tmdb}">TMDB</a>
 								{/if}
 								<a title="RSS Feed for {$s.title|escape:"htmlall"}"
-								   href="{$smarty.const.WWW_TOP}/rss?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}"><i
+								   href="{$smarty.const.WWW_TOP}/rss?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}"><i
 											class="fa fa-rss"></i></a>
 							{/if}
 						</td>

@@ -60,10 +60,10 @@ class API extends Capabilities
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
-                if (isset($release['id'])) {
-                    $language = AudioData::query()->where('releases_id', $release['id'])->first(['audiolanguage']);
+                if (isset($release->id)) {
+                    $language = AudioData::query()->where('releases_id', $release->id)->first(['audiolanguage']);
                     if ($language !== null) {
-                        $releases[$key]['searchname'] = $releases[$key]['searchname'].' '.$language['audiolanguage'];
+                        $releases[$key]->searchname = $releases[$key]->searchname.' '.$language['audiolanguage'];
                     }
                 }
             }
@@ -78,13 +78,13 @@ class API extends Capabilities
     public function maxAge(): int
     {
         $maxAge = -1;
-        if (isset($this->getRequest['maxage'])) {
-            if ($this->getRequest['maxage'] === '') {
+        if (request()->has('maxage')) {
+            if (empty(request()->input('maxage'))) {
                 Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
-            } elseif (! is_numeric($this->getRequest['maxage'])) {
+            } elseif (! is_numeric(request()->input('maxage'))) {
                 Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
             } else {
-                $maxAge = (int) $this->getRequest['maxage'];
+                $maxAge = (int) request()->input('maxage');
             }
         }
 
@@ -98,8 +98,8 @@ class API extends Capabilities
     public function categoryID(): array
     {
         $categoryID[] = -1;
-        if (isset($this->getRequest['cat'])) {
-            $categoryIDs = urldecode($this->getRequest['cat']);
+        if (request()->has('cat')) {
+            $categoryIDs = urldecode(request()->input('cat'));
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
             if (strpos($categoryIDs, Category::TV_HD) !== false &&
                 strpos($categoryIDs, Category::TV_WEBDL) === false) {
@@ -120,8 +120,8 @@ class API extends Capabilities
     public function group()
     {
         $groupName = -1;
-        if (isset($this->getRequest['group'])) {
-            $group = Group::isValidGroup($this->getRequest['group']);
+        if (request()->has('group')) {
+            $group = Group::isValidGroup(request()->input('group'));
             if ($group !== false) {
                 $groupName = $group;
             }
@@ -137,8 +137,8 @@ class API extends Capabilities
     public function limit(): int
     {
         $limit = 100;
-        if (isset($this->getRequest['limit']) && is_numeric($this->getRequest['limit']) && $this->getRequest['limit'] < 100) {
-            $limit = (int) $this->getRequest['limit'];
+        if (request()->has('limit') && is_numeric(request()->input('limit'))) {
+            $limit = (int) request()->input('limit');
         }
 
         return $limit;
@@ -151,8 +151,8 @@ class API extends Capabilities
     public function offset(): int
     {
         $offset = 0;
-        if (isset($this->getRequest['offset']) && is_numeric($this->getRequest['offset'])) {
-            $offset = (int) $this->getRequest['offset'];
+        if (request()->has('offset') && is_numeric(request()->input('offset'))) {
+            $offset = (int) request()->input('offset');
         }
 
         return $offset;
@@ -164,7 +164,7 @@ class API extends Capabilities
      */
     public function verifyEmptyParameter($parameter): void
     {
-        if (isset($this->getRequest[$parameter]) && $this->getRequest[$parameter] === '') {
+        if (request()->has($parameter) && empty(request()->input($parameter))) {
             Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
     }
@@ -177,8 +177,10 @@ class API extends Capabilities
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
-                $coverURL = $getCoverURL($release);
-                $releases[$key]['coverurl'] = $coverURL;
+                if (isset($release->id)) {
+                    $coverURL = $getCoverURL($release);
+                    $releases[$key]->coverurl = $coverURL;
+                }
             }
         }
     }

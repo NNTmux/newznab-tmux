@@ -4,13 +4,132 @@ namespace App\Models;
 
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
+use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Release.
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $searchname
+ * @property int|null $totalpart
+ * @property int $groups_id FK to groups.id
+ * @property int $size
+ * @property string|null $postdate
+ * @property string|null $adddate
+ * @property string $updatetime
+ * @property string|null $gid
+ * @property string $guid
+ * @property string $leftguid The first letter of the release guid
+ * @property string|null $fromname
+ * @property float $completion
+ * @property int $categories_id
+ * @property int $videos_id FK to videos.id of the parent series.
+ * @property int $tv_episodes_id FK to tv_episodes.id for the episode.
+ * @property int|null $imdbid
+ * @property int $xxxinfo_id
+ * @property int|null $musicinfo_id FK to musicinfo.id
+ * @property int|null $consoleinfo_id FK to consoleinfo.id
+ * @property int $gamesinfo_id
+ * @property int|null $bookinfo_id FK to bookinfo.id
+ * @property int|null $anidbid FK to anidb_titles.anidbid
+ * @property int $predb_id FK to predb.id
+ * @property int $grabs
+ * @property int $comments
+ * @property bool $passwordstatus
+ * @property int $rarinnerfilecount
+ * @property bool $haspreview
+ * @property bool $nfostatus
+ * @property bool $jpgstatus
+ * @property bool $videostatus
+ * @property bool $audiostatus
+ * @property bool $dehashstatus
+ * @property bool $reqidstatus
+ * @property bool $nzbstatus
+ * @property bool $iscategorized
+ * @property bool $isrenamed
+ * @property bool $ishashed
+ * @property bool $proc_pp
+ * @property bool $proc_sorter
+ * @property bool $proc_par2
+ * @property bool $proc_nfo
+ * @property bool $proc_files
+ * @property bool $proc_uid
+ * @property bool $proc_srr Has the release been srr
+ * processed
+ * @property bool $proc_hash16k Has the release been hash16k
+ * processed
+ * @property mixed|null $nzb_guid
+ * @property-read \App\Models\Category $category
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
+ * @property-read \App\Models\TvEpisode $episode
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failed
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseFile[] $file
+ * @property-read \App\Models\Group $group
+ * @property-read \App\Models\ReleaseNfo $nfo
+ * @property-read \App\Models\Predb $predb
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseExtraFull[] $releaseExtra
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleasesGroups[] $releaseGroup
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $userRelease
+ * @property-read \App\Models\Video $video
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAdddate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAnidbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAudiostatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereBookinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereCategoriesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereComments($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereCompletion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereConsoleinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereDehashstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereFromname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGamesinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGrabs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGroupsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereGuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereHaspreview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereImdbid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereIscategorized($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereIshashed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereIsrenamed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereJpgstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereLeftguid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereMusicinfoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereNfostatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereNzbGuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereNzbstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release wherePasswordstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release wherePostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release wherePredbId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcFiles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcHash16k($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcNfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcPar2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcPp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcSorter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcSrr($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereProcUid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereRarinnerfilecount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereReqidstatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereSearchname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereTotalpart($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereTvEpisodesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereUpdatetime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideosId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereVideostatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereXxxinfoId($value)
+ * @mixin \Eloquent
+ */
 class Release extends Model
 {
+    use Rememberable;
+
     /**
      * @var bool
      */
@@ -145,7 +264,7 @@ class Release extends Model
                     'searchname' => $parameters['searchname'],
                     'totalpart' => $parameters['totalpart'],
                     'groups_id' => $parameters['groups_id'],
-                    'adddate' => Carbon::now(),
+                    'adddate' => now(),
                     'guid' => $parameters['guid'],
                     'leftguid' => $parameters['guid'][0],
                     'postdate' => $parameters['postdate'],
@@ -252,12 +371,8 @@ class Release extends Model
      */
     public static function getTopDownloads()
     {
-        $releases = Cache::get('topdownloads');
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = self::query()
+        return self::query()
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('grabs', '>', 0)
             ->select(['id', 'searchname', 'guid', 'adddate'])
             ->selectRaw('SUM(grabs) as grabs')
@@ -266,11 +381,6 @@ class Release extends Model
             ->orderBy('grabs', 'desc')
             ->limit(10)
             ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('topdownloads', $releases, $expiresAt);
-
-        return $releases;
     }
 
     /**
@@ -278,12 +388,8 @@ class Release extends Model
      */
     public static function getTopComments()
     {
-        $comments = Cache::get('topcomments');
-        if ($comments !== null) {
-            return $comments;
-        }
-
-        $comments = self::query()
+        return self::query()
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('comments', '>', 0)
             ->select(['id', 'guid', 'searchname'])
             ->selectRaw('SUM(comments) AS comments')
@@ -292,10 +398,6 @@ class Release extends Model
             ->orderBy('comments', 'desc')
             ->limit(10)
             ->get();
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('topcomments', $comments, $expiresAt);
-
-        return $comments;
     }
 
     /**
@@ -303,41 +405,27 @@ class Release extends Model
      */
     public static function getReleases(): array
     {
-        $result = Cache::get('releaseget');
-        if ($result !== null) {
-            return $result;
-        }
-
-        $result = self::query()
+        return self::query()
+            ->remember(config('nntmux.cache_expiry_long'))
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
-        Cache::put('releaseget', $result, $expiresAt);
-
-        return $result;
     }
 
     /**
      * Used for admin page release-list.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public static function getReleasesRange($start, $num)
+    public static function getReleasesRange()
     {
-        $range = Cache::get(md5($start.$num));
-        if ($range !== null) {
-            return $range;
-        }
-        $query = self::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->select(
+        return self::query()
+           ->remember(config('nntmux.cache_expiry_medium'))
+           ->where('nzbstatus', '=', NZB::NZB_ADDED)
+           ->select(
                 [
                     'releases.id',
                     'releases.name',
@@ -353,17 +441,8 @@ class Release extends Model
             ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->orderBy('releases.postdate', 'desc');
-        if ($start !== false) {
-            $query->limit($num)->offset($start);
-        }
-
-        $range = $query->get();
-
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($start.$num), $range, $expiresAt);
-
-        return $range;
+            ->orderByDesc('releases.postdate')
+            ->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -373,13 +452,7 @@ class Release extends Model
      */
     public static function getReleasesCount(): int
     {
-        $res = Cache::get('count');
-        if ($res !== null) {
-            return $res;
-        }
-        $res = self::query()->count(['id']);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        Cache::put('count', $res, $expiresAt);
+        $res = self::query()->remember(config('nntmux.cache_expiry_medium'))->count(['id']);
 
         return $res ?? 0;
     }
@@ -390,13 +463,8 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
-        $cached = \is_array($guid) ? md5(implode(',', $guid)) : md5($guid);
-        $result = Cache::get($cached);
-        if ($result !== null) {
-            return $result;
-        }
         $sql = self::query()
+            ->remember(config('nntmux.cache_expiry_short'))
             ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
@@ -419,7 +487,6 @@ class Release extends Model
         }
 
         $result = \is_array($guid) ? $sql->groupBy('releases.id')->get() : $sql->groupBy('releases.id')->first();
-        Cache::put($cached, $result, $expiresAt);
 
         return $result;
     }
@@ -428,11 +495,9 @@ class Release extends Model
      * Get a range of releases. used in admin manage list.
      *
      *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getFailedRange($start, $num)
+    public static function getFailedRange()
     {
         $failedList = self::query()
             ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
@@ -440,11 +505,8 @@ class Release extends Model
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->orderBy('postdate', 'desc');
-        if ($start !== false) {
-            $failedList->limit($num)->offset($start);
-        }
 
-        return $failedList->get();
+        return $failedList->paginate(config('nntmux.items_per_page'));
     }
 
     /**
@@ -466,7 +528,7 @@ class Release extends Model
 
         $alternate = self::query()
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
-            ->where('searchname', 'LIKE', $rel['searchname'])
+            ->where('searchname', 'like', $rel['searchname'])
             ->where('df.release_id', '=', null)
             ->where('categories_id', $rel['categories_id'])
             ->where('id', $rel['id'])

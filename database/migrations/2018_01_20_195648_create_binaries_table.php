@@ -14,7 +14,10 @@ class CreateBinariesTable extends Migration {
 	{
 		Schema::create('binaries', function(Blueprint $table)
 		{
-			$table->bigInteger('id', true)->unsigned();
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->bigInteger('id', true)->unsigned();
 			$table->string('name', 1000)->default('');
 			$table->integer('collections_id')->unsigned()->default(0)->index('ix_binaries_collection');
 			$table->integer('filenumber')->unsigned()->default(0);

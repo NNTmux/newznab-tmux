@@ -14,7 +14,10 @@ class CreateMenuTable extends Migration {
 	{
 		Schema::create('menu', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('href', 2000)->default('');
 			$table->string('title', 2000)->default('');
 			$table->integer('newwindow')->unsigned()->default(0);

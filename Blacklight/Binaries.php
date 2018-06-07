@@ -104,13 +104,6 @@ class Binaries
     protected $_partRepairLimit;
 
     /**
-     * Should we show dropped yEnc to CLI?
-     *
-     * @var bool
-     */
-    protected $_showDroppedYEncParts;
-
-    /**
      * Echo to cli?
      *
      * @var bool
@@ -265,7 +258,6 @@ class Binaries
         $this->_newGroupDaysToScan = Settings::settingValue('..newgroupdaystoscan') !== '' ? (int) Settings::settingValue('..newgroupdaystoscan') : 3;
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
-        $this->_showDroppedYEncParts = (int) Settings::settingValue('..showdroppedyencparts') === 1;
         $this->allAsMgr = (int) Settings::settingValue('..allasmgr') === 1;
 
         $this->blackList = $this->whiteList = [];
@@ -324,7 +316,7 @@ class Binaries
      */
     public function logIndexerStart(): void
     {
-        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => Carbon::now()]);
+        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => now()]);
     }
 
     /**
@@ -526,7 +518,7 @@ class Binaries
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
                                 'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
-                                'last_updated' => Carbon::now(),
+                                'last_updated' => now(),
                             ]
                         );
                 } else {
@@ -536,7 +528,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $last,
-                                'last_updated' => Carbon::now(),
+                                'last_updated' => now(),
                             ]
                         );
                 }
@@ -713,13 +705,6 @@ class Binaries
                     $header['matches'][1] .= ' yEnc';
                 }
             } else {
-                if ($this->_showDroppedYEncParts === true && strpos($header['Subject'], '"Usenet Index Post') !== 0) {
-                    file_put_contents(
-                        NN_LOGS.'not_yenc'.$this->groupMySQL['name'].'.dropped.log',
-                        $header['Subject'].PHP_EOL,
-                        FILE_APPEND
-                    );
-                }
                 $this->notYEnc++;
                 continue;
             }
@@ -733,7 +718,6 @@ class Binaries
             if (! isset($header['Bytes'])) {
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
-            $header['Bytes'] = (int) $header['Bytes'];
 
             if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
                 $mgrHeaders[] = $header;
@@ -819,12 +803,13 @@ class Binaries
     /**
      * Parse headers into collections/binaries and store header data as parts.
      *
-     * @param array $headers    The retrieved headers
-     * @param bool  $multiGroup Is this task being run in MGR mode?
+     *
+     * @param array $headers
+     * @param bool  $multiGroup
      *
      * @throws \Exception
      */
-    protected function storeHeaders(array $headers, $multiGroup): void
+    protected function storeHeaders(array $headers = [], $multiGroup = false): void
     {
         $this->multiGroup = $multiGroup;
         $binariesUpdate = $collectionIDs = $articles = [];
@@ -849,13 +834,6 @@ class Binaries
                 // Attempt to find the file count. If it is not found, set it to 0.
                 if (! $whitelistMatch && ! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $this->header['matches'][1], $fileCount)) {
                     $fileCount[1] = $fileCount[3] = 0;
-                    if ($this->_showDroppedYEncParts === true) {
-                        file_put_contents(
-                            NN_LOGS.'no_files'.$this->groupMySQL['name'].'.log',
-                            $this->header['Subject'].PHP_EOL,
-                            FILE_APPEND
-                        );
-                    }
                 }
 
                 if ($this->multiGroup) {
@@ -884,7 +862,7 @@ class Binaries
                     $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
 
                     // Get the current unixtime from PHP.
-                    $now = Carbon::now()->timestamp;
+                    $now = now()->timestamp;
 
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
@@ -1054,7 +1032,7 @@ class Binaries
      */
     protected function updateBlacklistUsage(): void
     {
-        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => Carbon::now()]);
+        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => now()]);
         $this->_binaryBlacklistIdsToUpdate = [];
     }
 
@@ -1352,7 +1330,7 @@ class Binaries
      */
     public function daytopost($days, $data): string
     {
-        $goalTime = Carbon::now()->subDays($days)->timestamp;
+        $goalTime = now()->subDays($days)->timestamp;
         // The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
         // times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
 
@@ -1382,7 +1360,7 @@ class Binaries
         $wantedArticle = round(($data['last'] + $data['first']) / 2);
         $aMax = $data['last'];
         $aMin = $data['first'];
-        $reallyOldArticle = $oldArticle = $articleTime = null;
+        $oldArticle = $articleTime = null;
 
         while (true) {
             // Article exists outside of available range, this shouldn't happen
@@ -1736,7 +1714,7 @@ class Binaries
         }
 
         $poster = MultigroupPoster::query()->get(['poster'])->toArray();
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;

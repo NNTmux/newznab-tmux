@@ -41,8 +41,7 @@ class DbUpdate
     public $git;
 
     /**
-     * @var object    Instance variable for logging object. Currently only ColorCLI supported,
-     * but expanding for full logging with agnostic API planned.
+     * @var mixed
      */
     public $log;
 
@@ -249,7 +248,7 @@ class DbUpdate
 
                     // Skip comments.
                     if (preg_match('!^\s*(#|--|//)\s*(.+?)\s*$!', $line, $matches)) {
-                        echo ColorCLI::info('COMMENT: '.$matches[2]);
+                        echo ColorCLI::info('COMMENT: '.$matches[2]).PHP_EOL;
                         continue;
                     }
 

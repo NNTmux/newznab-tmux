@@ -4,6 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UsersRelease.
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property int $releases_id FK to releases.id
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Release $release
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereReleasesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsersRelease whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class UsersRelease extends Model
 {
     /**
@@ -37,16 +54,19 @@ class UsersRelease extends Model
     /**
      * @param $uid
      * @param $releaseid
-     * @return int
+     *
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addCart($uid, $releaseid): int
+    public static function addCart($uid, $releaseid)
     {
-        return self::create(
+        return self::query()->insertGetId(
             [
                 'users_id' => $uid,
                 'releases_id' => $releaseid,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
-        )->id;
+        );
     }
 
     /**
@@ -77,7 +97,7 @@ class UsersRelease extends Model
             }
         }
 
-        return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete();
+        return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete() === 1;
     }
 
     /**

@@ -1,9 +1,10 @@
 <div class="well well-sm">
-	<h1>{$page->title}</h1>
+	<h1>{$title}</h1>
 
 	<div style="float:right;">
 
 		<form name="usersearch" action="">
+			{{csrf_field()}}
 			<label for="username">username</label>
 			<input id="username" type="text" name="username" value="{$username}" size="10"/>
 			&nbsp;&nbsp;
@@ -23,7 +24,7 @@
 		</form>
 	</div>
 
-	{$pager}
+	{$userlist->links()}
 
 	<br/><br/>
 
@@ -73,28 +74,29 @@
 			<th>options</th>
 		</tr>
 
-
 		{foreach $userlist as $user}
 			<tr class="{cycle values=",alt"}">
-				<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}">{$user.username}</a>
+				<td><a title="Edit user"
+					   href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->id}">{$user->username}</a>
 				</td>
-				<td><a title="View profile" href="{$smarty.const.WWW_TOP}/../profile?id={$user.id}">{$user.email}</a>
+				<td><a title="View profile" href="{$smarty.const.WWW_TOP}/profile?id={$user->id}">{$user->email}</a>
 				</td>
-				<td>{$user.host}</td>
-				<td title="{$user.created_at}">{$user.created_at|date_format}</td>
-				<td title="{$user.lastlogin}">{$user.lastlogin|date_format}</td>
-				<td title="{$user.apiaccess}">{$user.apiaccess|date_format}</td>
-				<td>{$user.apirequests}</td>
-				<td class="mid">{$user.grabs}</td>
-				<td class="mid">{$user.invites}</td>
-				<td class="mid"><a title="{if $user.notes|count_characters > 0}View{else}Add{/if} Notes"
-								   href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}#notes"><img
-								src="{$smarty.const.WWW_TOP}/../shared/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
+				<td>{$user->host}</td>
+				<td title="{$user->created_at}">{$user->created_at|date_format}</td>
+				<td title="{$user->lastlogin}">{$user->lastlogin|date_format}</td>
+				<td title="{$user->apiaccess}">{$user->apiaccess|date_format}</td>
+				<td>{$user->apirequests}</td>
+				<td class="mid">{$user->grabs}</td>
+				<td class="mid">{$user->invites}</td>
+				<td class="mid"><a title="{if $user->notes|count_characters > 0}View{else}Add{/if} Notes"
+								   href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->id}#notes"><img
+								src="{$smarty.const.WWW_TOP}/shared/images/icons/{if $user->notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
 								alt=""/></a></td>
-				<td>{$user->role->name}</td>
-				<td>{if !empty($user.rolechangedate)}{$user.rolechangedate}{/if}</td>
-				<td>{if $user.user_roles_id !="2"}<a class="confirm_action"
-										   href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">delete</a>{/if}
+				<td>{$user->rolename}</td>
+				<td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
+				<td>{if $user->user_roles_id !="2"}<a class="confirm_action"
+													 href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">
+							delete</a>{/if}
 				</td>
 			</tr>
 		{/foreach}

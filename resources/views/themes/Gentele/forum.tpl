@@ -1,8 +1,8 @@
 <div class="well well-sm">
-	<h2>{if $page->title !=''}{$page->title}{else}Forum{/if}</h2>
-	{if $results|@count > 0}
+	<h2>{if $title !=''}{$title}{else}Forum{/if}</h2>
+	{if count($results) > 0}
 		<div class=".pagination pagination-centered">
-			{$pager}
+			{$results->links()}
 		</div>
 		<a id="top"></a>
 		<table style="width:100%;" class="data highlight table" id="forumtable">
@@ -24,7 +24,7 @@
 						<div class="hint">
 							{$result.message|truncate:200:'...':false:false}
 						</div>
-							<br/>
+						<br/>
 						{if $result.locked == 1}
 							<button type="button"
 									class="btn btn-sm btn-warning"
@@ -35,7 +35,8 @@
 					</td>
 					<td>
 						<a title="View profile"
-						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+								<strong>{$result.username}</strong></h5></a>
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 							<span class="btn btn-success btn-xs">{$result.rolename}</span>
 						{elseif $result.rolename === 'Supporter'}
@@ -81,7 +82,7 @@
 		<div style="float:right;margin-top:5px;"><a class="btn btn-small" href="#top">Top</a></div>
 		<br/>
 		<div class=".pagination pagination-centered">
-			{$pager}
+			{$results->links()}
 		</div>
 	{/if}
 	<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
@@ -89,7 +90,7 @@
 			<h3 id="myLabel">Add New Post</h3>
 		</div>
 		<div class="body">
-			<form id="new-forum-thread" class="form-horizontal" action="" method="post">
+            {{Form::open(['id' => 'new-forum-thread', 'class' => 'form-horizontal'])}}
 				<div class="control-group">
 					<label class="control-label" for="addSubject">Subject</label>
 					<div class="controls">
@@ -103,9 +104,10 @@
 						<textarea maxlength="5000" id="addMessage" name="addMessage"></textarea>
 					</div>
 					<input class="btn btn-success" type="submit" value="submit"/>
-					<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
+					<input class="btn btn-warning" value="Cancel"
+						   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 				</div>
-			</form>
+			{{Form::close()}}
 		</div>
 	</div>
 </div>

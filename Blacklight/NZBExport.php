@@ -70,6 +70,7 @@ class NZBExport
      * @param array $params
      *
      * @return bool
+     * @throws \Exception
      */
     public function beginExport($params)
     {
@@ -124,7 +125,7 @@ class NZBExport
                 return $this->returnValue();
             }
             $groups = $this->pdo->query('SELECT id, name FROM groups WHERE id = '.$params[3]);
-            if (count($groups) === 0) {
+            if (\count($groups) === 0) {
                 $this->echoOut('The group ID is not in the DB: '.$params[3]);
 
                 return $this->returnValue();
@@ -139,7 +140,7 @@ class NZBExport
             $currentExport = 0;
             // Get all the releases based on the parameters.
             $releases = $this->releases->getForExport($fromDate, $toDate, $group['id']);
-            $totalFound = count($releases);
+            $totalFound = \count($releases);
             if ($totalFound === 0) {
                 if ($this->echoCLI) {
                     echo 'No releases found to export for group: '.$group['name'].PHP_EOL;
@@ -152,8 +153,8 @@ class NZBExport
 
             // Create a path to store the new NZB files.
             $currentPath = $path.$this->safeFilename($group['name']).DS;
-            if (! is_dir($currentPath)) {
-                mkdir($currentPath);
+            if (! is_dir($currentPath) && ! mkdir($currentPath) && ! is_dir($currentPath)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $currentPath));
             }
             foreach ($releases as $release) {
 

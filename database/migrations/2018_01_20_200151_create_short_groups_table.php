@@ -14,7 +14,10 @@ class CreateShortGroupsTable extends Migration {
 	{
 		Schema::create('short_groups', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('id', true);
 			$table->string('name')->default('')->index('ix_shortgroups_name');
 			$table->bigInteger('first_record')->unsigned()->default(0);
 			$table->bigInteger('last_record')->unsigned()->default(0);

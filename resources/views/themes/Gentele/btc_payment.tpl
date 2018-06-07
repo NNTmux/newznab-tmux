@@ -10,21 +10,20 @@
 	</div>
 	<table class="data table table-condensed responsive-utilities jambo-table">
 		{foreach $donation as $donate}
-			<form method="post" action="btc_payment?action=submit">
+            {{Form::open(['url' => 'btc_payment?action=submit'])}}
 				<thead>
 				<tr>
 					<th>{$donate->name} ({$donate->donation}$)</th>
 				</tr>
 				</thead>
 				<td>
-					<input type="hidden" name="price" value="{$donate->donation}">
-					<input type="hidden" name="role" value="{$donate->id}">
-					<input type="hidden" name="rolename" value="{$donate->name}">
-					<input type="hidden" name="addyears" value="{$donate->addyears}">
-					<input type="submit" class="btn btn-primary" value="Pay with BTC">
+                    {{Form::hidden('price', {$donate->donation})}}
+                    {{Form::hidden('role', {$donate->id})}}
+                    {{Form::hidden('rolename', {$donate->name})}}
+                    {{Form::hidden('addyears', {$donate->addyears})}}
+                    {{Form::submit('Pay with BTC', ['class' => 'btn btn-primary'])}}
 				</td>
-			</form>
+			{{Form::close()}}
 		{/foreach}
-		</form>
 	</table>
 </div>

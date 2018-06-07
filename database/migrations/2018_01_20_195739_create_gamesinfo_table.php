@@ -14,7 +14,10 @@ class CreateGamesinfoTable extends Migration {
 	{
 		Schema::create('gamesinfo', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('title');
 			$table->string('asin', 128)->nullable()->unique('ix_gamesinfo_asin');
 			$table->string('url', 1000)->nullable();

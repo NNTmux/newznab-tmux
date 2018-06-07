@@ -4,6 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\BinaryBlacklist.
+ *
+ * @property int $id
+ * @property string|null $groupname
+ * @property string $regex
+ * @property int $msgcol
+ * @property int $optype
+ * @property int $status
+ * @property string|null $description
+ * @property string|null $last_activity
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereGroupname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereLastActivity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereMsgcol($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereOptype($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereRegex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BinaryBlacklist whereStatus($value)
+ * @mixin \Eloquent
+ */
 class BinaryBlacklist extends Model
 {
     /**

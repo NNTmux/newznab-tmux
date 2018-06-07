@@ -9,6 +9,7 @@ use App\Models\ReleaseNfo;
 use dariusiii\rarinfo\SfvInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
+use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
 /**
@@ -17,11 +18,6 @@ use Blacklight\processing\PostProcess;
  */
 class Nfo
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
-
     /**
      * @var int
      */
@@ -288,8 +284,7 @@ class Nfo
                 $qry = Release::query()
                     ->where('nzbstatus', '=', NZB::NZB_ADDED)
                     ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC])
-                    ->select('nfostatus as status')
-                    ->selectRaw('COUNT(id) as count')
+                    ->select(['nfostatus as status', DB::raw('COUNT(id) as count')])
                     ->groupBy(['nfostatus'])
                     ->orderBy('nfostatus');
 

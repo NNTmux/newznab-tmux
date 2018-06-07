@@ -350,7 +350,7 @@ class PostProcess
                     if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first() === null) {
 
                         // Try to add the files to the DB.
-                        if (ReleaseFile::addReleaseFiles($relID, $file['name'], $file['hash_16K'], $file['size'], $query['postdate'] !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate']) : Carbon::now(), 0)) {
+                        if (ReleaseFile::addReleaseFiles($relID, $file['name'], $file['hash_16K'], $file['size'], $query['postdate'] !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate']) : now(), 0)) {
                             $filesAdded++;
                         }
                     }

@@ -11,7 +11,7 @@
 	<div class="alert alert-info">
 		Using 'My Movies' you can search for movies, and add them to a wishlist. If the movie
 		becomes available it will be added to an <strong><a
-					href="{$smarty.const.WWW_TOP}/rss?t=-4&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+					href="{$smarty.const.WWW_TOP}/rss?t=-4&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS
 				Feed</a></strong> you can use to automatically download. You can <strong><a
 					href="{$smarty.const.WWW_TOP}/mymovies">Manage Your Movie
 				List</a></strong> or to remove old items.
@@ -44,7 +44,7 @@
 						</td>
 						<td>
 							<h4><a title="View Movie"
-								   href="{$smarty.const.WWW_TOP}/movies/?imdb={$movie.imdbid}">{$movie.title|escape:"htmlall"}
+								   href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}">{$movie.title|escape:"htmlall"}
 									({$movie.year})</a></h4>
 							{if isset($movie.tagline) && $movie.tagline != ''}<b>{$movie.tagline}</b><br/>{/if}
 							{if isset($movie.plot) && $movie.plot != ''}{$movie.plot}<br/><br/>{/if}

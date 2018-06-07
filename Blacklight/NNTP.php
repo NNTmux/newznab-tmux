@@ -24,11 +24,6 @@ class NNTP extends \Net_NNTP_Client
     protected $_colorCLI;
 
     /**
-     * @var \Blacklight\Logger
-     */
-    protected $_debugging;
-
-    /**
      * @var bool
      */
     protected $_debugBool;
@@ -126,13 +121,7 @@ class NNTP extends \Net_NNTP_Client
      */
     public function doConnect($compression = true, $alternate = false)
     {
-        if (// (Alternate is wanted, AND current server is alt,  OR  Alternate is not wanted AND current is main.)         AND
-        (($alternate && $this->_currentServer === env('NNTP_SERVER_A')) || (! $alternate && $this->_currentServer === env('NNTP_SERVER'))) &&
-            // Don't reconnect to usenet if:
-            // We are already connected to usenet.
-            parent::_isConnected()
-
-        ) {
+        if (parent::_isConnected() && (($alternate && $this->_currentServer === env('NNTP_SERVER_A')) || (! $alternate && $this->_currentServer === env('NNTP_SERVER')))) {
             return true;
         }
 
@@ -393,7 +382,7 @@ class NNTP extends \Net_NNTP_Client
      *                      All older than article number: "-679871775"
      *                      Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
      *
-     * @return array|object Multi-dimensional Array of headers on success, PEAR object on failure.
+     * @return array|string|\Blacklight\NNTP Multi-dimensional Array of headers on success, PEAR object on failure.
      * @throws \Exception
      */
     public function getXOVER($range)
@@ -476,7 +465,8 @@ class NNTP extends \Net_NNTP_Client
      *
      * @param string $wildMat (optional) http://tools.ietf.org/html/rfc3977#section-4
      *
-     * @return array|object Pear error on failure, array with groups on success.
+     * @return array|string Pear error on failure, array with groups on success.
+     * @throws \Exception
      */
     public function getGroups($wildMat = null)
     {
@@ -542,45 +532,36 @@ class NNTP extends \Net_NNTP_Client
                     }
 
                     // If there is an error try the alternate provider or return the PEAR error.
-                } else {
-                    // Check if admin has enabled alternate in site->edit.
-                    if ($alternate === true) {
-                        if ($aConnected === false) {
-                            // Check if the current connected server is the alternate or not.
-                            if ($this->_currentServer === env('NNTP_SERVER')) {
-                                // It's the main so connect to the alternate.
-                                $aConnected = $nntp->doConnect(true, true);
-                            } else {
-                                // It's the alternate so connect to the main.
-                                $aConnected = $nntp->doConnect();
-                            }
-                        }
-                        // If we connected successfully to usenet try to download the article body.
-                        if ($aConnected === true) {
-                            $newBody = $nntp->_getMessage($groupName, $wanted);
-                            // Check if we got an error.
-                            if ($nntp->isError($newBody)) {
-                                if ($aConnected) {
-                                    $nntp->doQuit();
-                                }
-                                // If we got some data, return it.
-                                if ($body !== '') {
-                                    return $body;
-                                }
-                                // Return the error.
-                                return $newBody;
-                            }
-                            // Append the alternate body to the main body.
-                            $body .= $newBody;
-                        }
-                    } else {
-                        // If we got some data, return it.
-                        if ($body !== '') {
-                            return $body;
-                        }
-
-                        return $message;
+                } elseif ($alternate === true) {
+                    if ($aConnected === false) {
+                        // Check if the current connected server is the alternate or not.
+                        $aConnected = $this->_currentServer === env('NNTP_SERVER') ? $nntp->doConnect(true, true) : $nntp->doConnect();
                     }
+                    // If we connected successfully to usenet try to download the article body.
+                    if ($aConnected === true) {
+                        $newBody = $nntp->_getMessage($groupName, $wanted);
+                        // Check if we got an error.
+                        if ($nntp->isError($newBody)) {
+                            if ($aConnected) {
+                                $nntp->doQuit();
+                            }
+                            // If we got some data, return it.
+                            if ($body !== '') {
+                                return $body;
+                            }
+                            // Return the error.
+                            return $newBody;
+                        }
+                        // Append the alternate body to the main body.
+                        $body .= $newBody;
+                    }
+                } else {
+                    // If we got some data, return it.
+                    if ($body !== '') {
+                        return $body;
+                    }
+
+                    return $message;
                 }
             }
 
@@ -1059,7 +1040,7 @@ class NNTP extends \Net_NNTP_Client
             $data .= $buffer;
 
             // Check if we have the ending (.\r\n)
-            if (substr($buffer, -3) === ".\r\n") {
+            if (substr($buffer, -2) === ".\r\n") {
                 // We have a possible ending, next loop check if it is.
                 $possibleTerm = true;
             }

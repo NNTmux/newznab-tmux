@@ -14,7 +14,7 @@ class Backfill
     public $pdo;
 
     /**
-     * @var
+     * @var \Blacklight\Binaries
      */
     protected $_binaries;
 
@@ -84,6 +84,9 @@ class Backfill
             $options['NNTP'] instanceof NNTP
             ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo])
         );
+        $this->_binaries = new Binaries(
+            ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI, 'Settings' => $this->pdo]
+        );
 
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2008-08-14';
@@ -113,7 +116,7 @@ class Backfill
             $res = Group::getActiveBackfill($type);
         }
 
-        $groupCount = count($res);
+        $groupCount = \count($res);
         if ($groupCount > 0) {
             $counter = 1;
             $allTime = microtime(true);
@@ -127,10 +130,6 @@ class Backfill
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(ColorCLI::header($dMessage), true);
             }
-
-            $this->_binaries = new Binaries(
-                ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI, 'Settings' => $this->pdo]
-            );
 
             if ($articles !== '' && ! is_numeric($articles)) {
                 $articles = 20000;

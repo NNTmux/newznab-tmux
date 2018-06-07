@@ -14,7 +14,10 @@ class CreateMissedPartsTable extends Migration {
 	{
 		Schema::create('missed_parts', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->bigInteger('numberid')->unsigned();
 			$table->integer('groups_id')->unsigned()->default(0)->comment('FK to groups.id');
 			$table->boolean('attempts')->default(0)->index('ix_missed_parts_attempts');

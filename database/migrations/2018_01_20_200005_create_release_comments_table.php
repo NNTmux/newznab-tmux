@@ -14,7 +14,10 @@ class CreateReleaseCommentsTable extends Migration {
 	{
 		Schema::create('release_comments', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('releases_id')->unsigned()->index('ix_releasecomment_releases_id')->comment('FK to releases.id');
 			$table->string('text', 2000)->default('');
 			$table->boolean('isvisible')->default(1);

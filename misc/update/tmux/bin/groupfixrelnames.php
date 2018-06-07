@@ -12,7 +12,6 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NZBContents;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
@@ -52,14 +51,14 @@ switch (true) {
                     'releases.nfostatus',
                     'releases.size as relsize',
                     'releases.predb_id',
+                    DB::raw('IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash'),
+                    DB::raw("IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring"),
+                    DB::raw("IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring"),
+                    DB::raw("IFNULL(HEX(ru.uniqueid), '') AS uid"),
+                    DB::raw('IFNULL(ph.hash, 0) AS hash'),
+                    DB::raw("IFNULL(re.mediainfo, '') AS mediainfo"),
                 ]
             )
-            ->selectRaw('IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash')
-            ->selectRaw("IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring")
-            ->selectRaw("IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring")
-            ->selectRaw("IFNULL(HEX(ru.uniqueid), '') AS uid")
-            ->selectRaw('IFNULL(ph.hash, 0) AS hash')
-            ->selectRaw("IFNULL(re.mediainfo, '') AS mediainfo")
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
             ->leftJoin('release_files as rf', 'rf.releases_id', '=', 'releases.id')
             ->leftJoin('release_unique as ru', 'ru.releases_id', '=', 'releases.id')
@@ -72,15 +71,20 @@ switch (true) {
             ->where('releases.passwordstatus', '>=', 0)
             ->where('releases.nfostatus', '>', Nfo::NFO_UNPROC)
             ->whereNested(function ($query) {
-                $query->where('releases.nfostatus', Nfo::NFO_FOUND)
-                    ->where('releases.proc_nfo', NameFixer::PROC_NFO_NONE)
+                $query->orWhere(function ($query) {
+                    $query->where('releases.nfostatus', Nfo::NFO_FOUND)
+                        ->where('releases.proc_nfo', NameFixer::PROC_NFO_NONE);
+                })
                     ->orWhere('releases.proc_files', NameFixer::PROC_FILES_NONE)
                     ->orWhere('releases.proc_uid', NameFixer::PROC_UID_NONE)
                     ->orWhere('releases.proc_par2', NameFixer::PROC_PAR2_NONE)
                     ->orwhere('releases.proc_srr', NameFixer::PROC_SRR_NONE)
                     ->orWhere('releases.proc_hash16k', NameFixer::PROC_HASH16K_NONE)
                     ->orwhere('releases.isrenamed', '=', 1)
-                    ->whereBetween('releases.dehashstatus', [-6, 0])
+                    ->orWhere(function ($query) {
+                        $query->where('releases.ishashed', '=', 1)
+                        ->whereBetween('releases.dehashstatus', [-6, 0]);
+                    })
                     ->orWhereRaw("releases.name REGEXP '[a-z0-9]{32,64}' AND re.mediainfo REGEXP '\<Movie_name\>'");
             })
             ->whereIn('releases.categories_id', Category::OTHERS_GROUP)
@@ -219,7 +223,7 @@ switch (true) {
         $pres = Predb::query()
             ->whereRaw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"')
             ->where('searched', '=', 0)
-            ->where('predate', '<', Carbon::now()->subDay())
+            ->where('predate', '<', now()->subDay())
             ->select(['id as predb_id', 'title', 'source', 'searched'])
             ->orderBy('predate')
             ->limit($maxPerRun)

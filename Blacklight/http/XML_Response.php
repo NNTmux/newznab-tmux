@@ -151,20 +151,17 @@ class XML_Response
      */
     protected function returnCaps(): string
     {
-        $w = $this->xml;
-        $s = $this->server;
-
-        $w->startDocument('1.0', 'UTF-8');
-        $w->startElement('caps');
-        $this->addNode(['name' => 'server', 'data' => $s['server']]);
-        $this->addNode(['name' => 'limits', 'data' => $s['limits']]);
-        $this->addNode(['name' => 'registration', 'data' => $s['registration']]);
-        $this->addNodes(['name' => 'searching', 'data' => $s['searching']]);
+        $this->xml->startDocument('1.0', 'UTF-8');
+        $this->xml->startElement('caps');
+        $this->addNode(['name' => 'server', 'data' => $this->server['server']]);
+        $this->addNode(['name' => 'limits', 'data' => $this->server['limits']]);
+        $this->addNode(['name' => 'registration', 'data' => $this->server['registration']]);
+        $this->addNodes(['name' => 'searching', 'data' => $this->server['searching']]);
         $this->writeCategoryListing();
-        $w->endElement();
-        $w->endDocument();
+        $this->xml->endElement();
+        $this->xml->endDocument();
 
-        return $w->outputMemory();
+        return $this->xml->outputMemory();
     }
 
     /**
@@ -174,20 +171,19 @@ class XML_Response
      */
     protected function returnApiRss(): string
     {
-        $w = $this->xml;
         $this->xml->startDocument('1.0', 'UTF-8');
         $this->includeRssAtom(); // Open RSS
-        $w->startElement('channel'); // Open channel
+        $this->xml->startElement('channel'); // Open channel
         $this->includeRssAtomLink();
         $this->includeMetaInfo();
         $this->includeImage();
         $this->includeTotalRows();
         $this->includeReleases();
-        $w->endElement(); // End channel
-        $w->endElement(); // End RSS
-        $w->endDocument();
+        $this->xml->endElement(); // End channel
+        $this->xml->endElement(); // End RSS
+        $this->xml->endDocument();
 
-        return $w->outputMemory();
+        return $this->xml->outputMemory();
     }
 
     /**
@@ -242,14 +238,14 @@ class XML_Response
     protected function writeCategoryListing(): void
     {
         $this->xml->startElement('categories');
-        foreach ($this->server['categories'] as $p) {
+        foreach ($this->server['categories'] as $this->parameters) {
             $this->xml->startElement('category');
-            $this->xml->writeAttribute('id', $p['id']);
-            $this->xml->writeAttribute('name', html_entity_decode($p['title']));
-            if ($p['description'] !== '') {
-                $this->xml->writeAttribute('description', html_entity_decode($p['description']));
+            $this->xml->writeAttribute('id', $this->parameters['id']);
+            $this->xml->writeAttribute('name', html_entity_decode($this->parameters['title']));
+            if ($this->parameters['description'] !== '') {
+                $this->xml->writeAttribute('description', html_entity_decode($this->parameters['description']));
             }
-            foreach ($p['subcatlist'] as $c) {
+            foreach ($this->parameters['subcatlist'] as $c) {
                 $this->xml->startElement('subcat');
                 $this->xml->writeAttribute('id', $c['id']);
                 $this->xml->writeAttribute('name', html_entity_decode($c['title']));
@@ -273,7 +269,7 @@ class XML_Response
                 break;
             case 'nntmux':
             default:
-                $url = $this->server['server']['url'].'rss-info/';
+                $url = $this->server['server']['url'].'/rss-info/';
         }
 
         $this->xml->startElement('rss');
@@ -287,7 +283,7 @@ class XML_Response
     {
         $this->xml->startElement('atom:link');
         $this->xml->startAttribute('href');
-        $this->xml->text($this->server['server']['url'].($this->namespace === 'newznab' ? 'api' : 'rss'));
+        $this->xml->text($this->server['server']['url'].($this->namespace === 'newznab' ? '/api' : '/rss'));
         $this->xml->endAttribute();
         $this->xml->startAttribute('rel');
         $this->xml->text('self');
@@ -307,12 +303,12 @@ class XML_Response
 
         switch ($this->namespace) {
             case 'newznab':
-                $path = 'apihelp/';
+                $path = '/apihelp/';
                 $tag = 'API';
                 break;
             case 'nntmux':
             default:
-                $path = 'rss-info/';
+                $path = '/rss-info/';
                 $tag = 'RSS';
         }
 
@@ -333,7 +329,7 @@ class XML_Response
     protected function includeImage(): void
     {
         $this->xml->startElement('image');
-        $this->xml->writeAttribute('url', $this->server['server']['url'].'assets/images/logo.png');
+        $this->xml->writeAttribute('url', $this->server['server']['url'].'/assets/images/tmux_logo.png');
         $this->xml->writeAttribute('title', $this->server['server']['title']);
         $this->xml->writeAttribute('link', $this->server['server']['url']);
         $this->xml->writeAttribute(
@@ -347,7 +343,7 @@ class XML_Response
     {
         $this->xml->startElement($this->namespace.':response');
         $this->xml->writeAttribute('offset', $this->offset);
-        $this->xml->writeAttribute('total', $this->releases[0]['_totalrows'] ?? 0);
+        $this->xml->writeAttribute('total', $this->releases[0]->_totalrows ?? 0);
         $this->xml->endElement();
     }
 
@@ -356,7 +352,7 @@ class XML_Response
      */
     public function includeReleases(): void
     {
-        if (\is_array($this->releases) && ! empty($this->releases)) {
+        if (! empty($this->releases)) {
             foreach ($this->releases as $this->release) {
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();
@@ -371,22 +367,22 @@ class XML_Response
      */
     public function includeReleaseMain(): void
     {
-        $this->xml->writeElement('title', $this->release['searchname']);
+        $this->xml->writeElement('title', $this->release->searchname);
         $this->xml->startElement('guid');
         $this->xml->writeAttribute('isPermaLink', 'true');
-        $this->xml->text("{$this->server['server']['url']}details/{$this->release['guid']}");
+        $this->xml->text("{$this->server['server']['url']}/details/{$this->release->guid}");
         $this->xml->endElement();
         $this->xml->writeElement(
             'link',
-            "{$this->server['server']['url']}getnzb/{$this->release['guid']}.nzb".
+            "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
             "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
-        $this->xml->writeElement('comments', "{$this->server['server']['url']}details/{$this->release['guid']}#comments");
-        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release['adddate'])));
-        $this->xml->writeElement('category', $this->release['category_name']);
+        $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
+        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release->adddate)));
+        $this->xml->writeElement('category', $this->release->category_name);
         if ($this->namespace === 'newznab') {
-            $this->xml->writeElement('description', $this->release['searchname']);
+            $this->xml->writeElement('description', $this->release->searchname);
         } else {
             $this->writeRssCdata();
         }
@@ -394,11 +390,11 @@ class XML_Response
             $this->xml->startElement('enclosure');
             $this->xml->writeAttribute(
                 'url',
-                "{$this->server['server']['url']}getnzb/{$this->release['guid']}.nzb".
+                "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
                 "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );
-            $this->xml->writeAttribute('length', $this->release['size']);
+            $this->xml->writeAttribute('length', $this->release->size);
             $this->xml->writeAttribute('type', 'application/x-nzb');
             $this->xml->endElement();
         }
@@ -409,45 +405,45 @@ class XML_Response
      */
     protected function setZedAttributes(): void
     {
-        $this->writeZedAttr('category', $this->release['categories_id']);
-        $this->writeZedAttr('size', $this->release['size']);
-        if (isset($this->release['coverurl']) && ! empty($this->release['coverurl'])) {
+        $this->writeZedAttr('category', $this->release->categories_id);
+        $this->writeZedAttr('size', $this->release->size);
+        if (isset($this->release->coverurl) && ! empty($this->release->coverurl)) {
             $this->writeZedAttr(
                 'coverurl',
-                $this->server['server']['url']."covers/{$this->release['coverurl']}"
+                $this->server['server']['url']."/covers/{$this->release->coverurl}"
             );
         }
 
         if ((int) $this->parameters['extended'] === 1) {
-            $this->writeZedAttr('files', $this->release['totalpart']);
-            $this->writeZedAttr('poster', $this->release['fromname']);
-            if (($this->release['videos_id'] > 0 || $this->release['tv_episodes_id'] > 0) && $this->namespace === 'newznab') {
+            $this->writeZedAttr('files', $this->release->totalpart);
+            $this->writeZedAttr('poster', $this->release->fromname);
+            if (($this->release->videos_id > 0 || $this->release->tv_episodes_id > 0) && $this->namespace === 'newznab') {
                 $this->setTvAttr();
             }
 
-            if (isset($this->release['imdbid']) && $this->release['imdbid'] > 0) {
-                $this->writeZedAttr('imdb', $this->release['imdbid']);
+            if (isset($this->release->imdbid) && $this->release->imdbid > 0) {
+                $this->writeZedAttr('imdb', $this->release->imdbid);
             }
-            if (isset($this->release['anidbid']) && $this->release['anidbid'] > 0) {
-                $this->writeZedAttr('anidbid', $this->release['anidbid']);
+            if (isset($this->release->anidbid) && $this->release->anidbid > 0) {
+                $this->writeZedAttr('anidbid', $this->release->anidbid);
             }
-            if (isset($this->release['predb_id']) && $this->release['predb_id'] > 0) {
+            if (isset($this->release->predb_id) && $this->release->predb_id > 0) {
                 $this->writeZedAttr('prematch', 1);
             }
-            if (isset($this->release['nfostatus']) && (int) $this->release['nfostatus'] === 1) {
+            if (isset($this->release->nfostatus) && (int) $this->release->nfostatus === 1) {
                 $this->writeZedAttr(
                     'info',
                     $this->server['server']['url'].
-                    "api?t=info&id={$this->release['guid']}&r={$this->parameters['token']}"
+                    "api?t=info&id={$this->release->guid}&r={$this->parameters['token']}"
                 );
             }
 
-            $this->writeZedAttr('grabs', $this->release['grabs']);
-            $this->writeZedAttr('comments', $this->release['comments']);
-            $this->writeZedAttr('password', $this->release['passwordstatus']);
-            $this->writeZedAttr('usenetdate', date_format(date_create($this->release['postdate']), 'D, d M Y H:i:s O'));
-            if (! empty($this->release['group_name'])) {
-                $this->writeZedAttr('group', $this->release['group_name']);
+            $this->writeZedAttr('grabs', $this->release->grabs);
+            $this->writeZedAttr('comments', $this->release->comments);
+            $this->writeZedAttr('password', $this->release->passwordstatus);
+            $this->writeZedAttr('usenetdate', date_format(date_create($this->release->postdate), 'D, d M Y H:i:s O'));
+            if (! empty($this->release->group_name)) {
+                $this->writeZedAttr('group', $this->release->group_name);
             }
         }
     }
@@ -457,36 +453,36 @@ class XML_Response
      */
     protected function setTvAttr(): void
     {
-        if (! empty($this->release['title'])) {
-            $this->writeZedAttr('title', $this->release['title']);
+        if (! empty($this->release->title)) {
+            $this->writeZedAttr('title', $this->release->title);
         }
-        if (isset($this->release['series']) && $this->release['series'] > 0) {
-            $this->writeZedAttr('season', $this->release['series']);
+        if (isset($this->release->series) && $this->release->series > 0) {
+            $this->writeZedAttr('season', $this->release->series);
         }
-        if (isset($this->release['episode']) && $this->release['episode'] > 0) {
-            $this->writeZedAttr('episode', $this->release['episode']);
+        if (isset($this->release->episode) && $this->release->episode > 0) {
+            $this->writeZedAttr('episode', $this->release->episode);
         }
-        if (! empty($this->release['firstaired'])) {
-            $this->writeZedAttr('tvairdate', $this->release['firstaired']);
+        if (! empty($this->release->firstaired)) {
+            $this->writeZedAttr('tvairdate', $this->release->firstaired);
         }
-        if (isset($this->release['tvdb']) && $this->release['tvdb'] > 0) {
-            $this->writeZedAttr('tvdbid', $this->release['tvdb']);
+        if (isset($this->release->tvdb) && $this->release->tvdb > 0) {
+            $this->writeZedAttr('tvdbid', $this->release->tvdb);
         }
-        if (isset($this->release['trakt']) && $this->release['trakt'] > 0) {
-            $this->writeZedAttr('traktid', $this->release['trakt']);
+        if (isset($this->release->trakt) && $this->release->trakt > 0) {
+            $this->writeZedAttr('traktid', $this->release->trakt);
         }
-        if (isset($this->release['tvrage']) && $this->release['tvrage'] > 0) {
-            $this->writeZedAttr('tvrageid', $this->release['tvrage']);
-            $this->writeZedAttr('rageid', $this->release['tvrage']);
+        if (isset($this->release->tvrage) && $this->release->tvrage > 0) {
+            $this->writeZedAttr('tvrageid', $this->release->tvrage);
+            $this->writeZedAttr('rageid', $this->release->tvrage);
         }
-        if (isset($this->release['tvmaze']) && $this->release['tvmaze'] > 0) {
-            $this->writeZedAttr('tvmazeid', $this->release['tvmaze']);
+        if (isset($this->release->tvmaze) && $this->release->tvmaze > 0) {
+            $this->writeZedAttr('tvmazeid', $this->release->tvmaze);
         }
-        if (isset($this->release['imdb']) && $this->release['imdb'] > 0) {
-            $this->writeZedAttr('imdbid', str_pad($this->release['imdb'], 7, '0', STR_PAD_LEFT));
+        if (isset($this->release->imdb) && $this->release->imdb > 0) {
+            $this->writeZedAttr('imdbid', str_pad($this->release->imdb, 7, '0', STR_PAD_LEFT));
         }
-        if (isset($this->release['tmdb']) && $this->release['tmdb'] > 0) {
-            $this->writeZedAttr('tmdbid', $this->release['tmdb']);
+        if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
+            $this->writeZedAttr('tmdbid', $this->release->tmdb);
         }
     }
 
@@ -510,28 +506,21 @@ class XML_Response
      */
     protected function writeRssCdata(): void
     {
-        $this->cdata = '';
-
-        $w = $this->xml;
-        $r = $this->release;
-        $s = $this->server;
-        $p = $this->parameters;
-
         $this->cdata = "\n\t<div>\n";
         switch (1) {
-            case ! empty($r['cover']):
+            case ! empty($this->release->cover):
                 $dir = 'movies';
                 $column = 'imdbid';
                 break;
-            case ! empty($r['mu_cover']):
+            case ! empty($this->release->mu_cover):
                 $dir = 'music';
                 $column = 'musicinfo_id';
                 break;
-            case ! empty($r['co_cover']):
+            case ! empty($this->release->co_cover):
                 $dir = 'console';
                 $column = 'consoleinfo_id';
                 break;
-            case ! empty($r['bo_cover']):
+            case ! empty($this->release->bo_cover):
                 $dir = 'books';
                 $column = 'bookinfo_id';
                 break;
@@ -540,20 +529,20 @@ class XML_Response
             $dcov = ($dir === 'movies' ? '-cover' : '');
             $this->cdata .=
                 "\t<img style=\"margin-left:10px;margin-bottom:10px;float:right;\" ".
-                "src=\"{$s['server']['url']}covers/{$dir}/{$r[$column]}{$dcov}.jpg\" ".
-                "width=\"120\" alt=\"{$r['searchname']}\" />\n";
+                "src=\"{$this->server['server']['url']}/covers/{$dir}/{$this->release->$column}{$dcov}.jpg\" ".
+                "width=\"120\" alt=\"{$this->release->searchname}\" />\n";
         }
-        $size = Utility::bytesToSizeString($r['size']);
+        $size = Utility::bytesToSizeString($this->release->size);
         $this->cdata .=
-            "\t<li>ID: <a href=\"{$s['server']['url']}details/{$r['guid']}\">{$r['guid']}</a></li>\n".
-            "\t<li>Name: {$r['searchname']}</li>\n".
+            "\t<li>ID: <a href=\"{$this->server['server']['url']}/details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
+            "\t<li>Name: {$this->release->searchname}</li>\n".
             "\t<li>Size: {$size}</li>\n".
-            "\t<li>Category: <a href=\"{$s['server']['url']}browse?t={$r['categories_id']}\">{$r['category_name']}</a></li>\n".
-            "\t<li>Group: <a href=\"{$s['server']['url']}browse?g={$r['group_name']}\">{$r['group_name']}</a></li>\n".
-            "\t<li>Poster: {$r['fromname']}</li>\n".
-            "\t<li>Posted: {$r['postdate']}</li>\n";
+            "\t<li>Category: <a href=\"{$this->server['server']['url']}/browse/{$this->release->category_name}\">{$this->release->category_name}</a></li>\n".
+            "\t<li>Group: <a href=\"{$this->server['server']['url']}/browse/group?g={$this->release->group_name}\">{$this->release->group_name}</a></li>\n".
+            "\t<li>Poster: {$this->release->fromname}</li>\n".
+            "\t<li>Posted: {$this->release->postdate}</li>\n";
 
-        switch ($r['passwordstatus']) {
+        switch ($this->release->passwordstatus) {
             case 0:
                 $pstatus = 'None';
                 break;
@@ -570,23 +559,23 @@ class XML_Response
                 $pstatus = 'Unknown';
         }
         $this->cdata .= "\t<li>Password: {$pstatus}</li>\n";
-        if ($r['nfostatus'] === 1) {
+        if ($this->release->nfostatus === 1) {
             $this->cdata .=
                 "\t<li>Nfo: ".
-                "<a href=\"{$s['server']['url']}api?t=nfo&id={$r['guid']}&raw=1&i={$p['uid']}&r={$p['token']}\">".
-                "{$r['searchname']}.nfo</a></li>\n";
+                "<a href=\"{$this->server['server']['url']}/api?t=nfo&id={$this->release->guid}&raw=1&i={$this->parameters['uid']}&r={$this->parameters['token']}\">".
+                "{$this->release->searchname}.nfo</a></li>\n";
         }
 
-        if ($r['parentid'] === Category::MOVIE_ROOT && $r['imdbid'] !== '') {
+        if ($this->release->parentid === Category::MOVIE_ROOT && $this->release->imdbid !== '') {
             $this->writeRssMovieInfo();
-        } elseif ($r['parentid'] === Category::MUSIC_ROOT && $r['musicinfo_id'] > 0) {
+        } elseif ($this->release->parentid === Category::MUSIC_ROOT && $this->release->musicinfo_id > 0) {
             $this->writeRssMusicInfo();
-        } elseif ($r['parentid'] === Category::GAME_ROOT && $r['consoleinfo_id'] > 0) {
+        } elseif ($this->release->parentid === Category::GAME_ROOT && $this->release->consoleinfo_id > 0) {
             $this->writeRssConsoleInfo();
         }
-        $w->startElement('description');
-        $w->writeCData($this->cdata."\t</div>");
-        $w->endElement();
+        $this->xml->startElement('description');
+        $this->xml->writeCdata($this->cdata."\t</div>");
+        $this->xml->endElement();
     }
 
     /**
@@ -594,8 +583,6 @@ class XML_Response
      */
     protected function writeRssMovieInfo(): void
     {
-        $r = $this->release;
-
         $movieCol = ['rating', 'plot', 'year', 'genre', 'director', 'actors'];
 
         $cData = $this->buildCdata($movieCol);
@@ -603,7 +590,7 @@ class XML_Response
         $this->cdata .=
             "\t<li>Imdb Info:
 				\t<ul>
-					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$r['imdbid']}/\">{$r['searchname']}</a></li>\n
+					\t<li>IMDB Link: <a href=\"http://www.imdb.com/title/tt{$this->release->imdbid}/\">{$this->release->searchname}</a></li>\n
 					\t{$cData}
 				\t</ul>
 			\t</li>
@@ -615,15 +602,14 @@ class XML_Response
      */
     protected function writeRssMusicInfo(): void
     {
-        $r = $this->release;
         $tData = $cDataUrl = '';
 
         $musicCol = ['mu_artist', 'mu_genre', 'mu_publisher', 'mu_releasedate', 'mu_review'];
 
         $cData = $this->buildCdata($musicCol);
 
-        if ($r['mu_url'] !== '') {
-            $cDataUrl = "<li>Amazon: <a href=\"{$r['mu_url']}\">{$r['mu_title']}</a></li>";
+        if ($this->release->mu_url !== '') {
+            $cDataUrl = "<li>Amazon: <a href=\"{$this->release->mu_url}\">{$this->release->mu_title}</a></li>";
         }
 
         $this->cdata .=
@@ -633,8 +619,8 @@ class XML_Response
 			{$cData}
 			</ul>
 			</li>\n";
-        if ($r['mu_tracks'] !== '') {
-            $tracks = explode('|', $r['mu_tracks']);
+        if ($this->release->mu_tracks !== '') {
+            $tracks = explode('|', $this->release->mu_tracks);
             if (\count($tracks) > 0) {
                 foreach ($tracks as $track) {
                     $track = trim($track);
@@ -655,7 +641,6 @@ class XML_Response
      */
     protected function writeRssConsoleInfo(): void
     {
-        $r = $this->release;
         $gamesCol = ['co_genre', 'co_publisher', 'year', 'co_review'];
 
         $cData = $this->buildCdata($gamesCol);
@@ -663,7 +648,7 @@ class XML_Response
         $this->cdata .= "
 		<li>Console Info:
 			<ul>
-				<li>Amazon: <a href=\"{$r['co_url']}\">{$r['co_title']}</a></li>\n
+				<li>Amazon: <a href=\"{$this->release->co_url}\">{$this->release->co_title}</a></li>\n
 				{$cData}
 			</ul>
 		</li>\n";
@@ -678,19 +663,17 @@ class XML_Response
      */
     protected function buildCdata($columns): string
     {
-        $r = $this->release;
-
         $cData = '';
 
         foreach ($columns as $info) {
-            if (! empty($r[$info])) {
+            if (! empty($this->release->$info)) {
                 if ($info === 'mu_releasedate') {
                     $ucInfo = 'Released';
-                    $rDate = date('Y-m-d', strtotime($r[$info]));
+                    $rDate = date('Y-m-d', strtotime($this->release->$info));
                     $cData .= "<li>{$ucInfo}: {$rDate}</li>\n";
                 } else {
                     $ucInfo = ucfirst(preg_replace('/^[a-z]{2}_/i', '', $info));
-                    $cData .= "<li>{$ucInfo}: {$r[$info]}</li>\n";
+                    $cData .= "<li>{$ucInfo}: {$this->release->$info}</li>\n";
                 }
             }
         }

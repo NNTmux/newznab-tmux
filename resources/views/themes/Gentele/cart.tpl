@@ -11,11 +11,12 @@
 	<div class="alert alert-info" role="alert">
 		<strong>RSS Feed</strong> <br/>
 		Your download basket can also be accessed via an <a
-				href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1">RSS
+				href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}&amp;del=1">RSS
 			feed</a>. Some NZB downloaders can read this feed and automatically start downloading.
 	</div>
 	{if $results|@count > 0}
-		<form id="nzb_multi_operations_form" action="get">
+		{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
+			{{csrf_field()}}
 			<div class="nzb_multi_operations">
 				<small>With Selected:</small>
 				<div class="btn-group">
@@ -24,46 +25,47 @@
 						<input type="button" class="nzb_multi_operations_cartsab btn btn-sm btn-info"
 							   value="Send to queue"/>
 					{/if}
-					<input type="button" class="nzb_multi_operations_download_cart btn btn-sm btn-success" value="Download"/>
+					<input type="button" class="nzb_multi_operations_download_cart btn btn-sm btn-success"
+						   value="Download"/>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-12 portlets">
-					<div class="panel panel-default">
-						<div class="panel-body pagination2 table-responsive">
-							<table class="data table table-striped responsive-utilities jambo-table bulk-action">
-								<thead>
-								<tr class="headings">
-									<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
-									<th class="column-title" style="display: table-cell;">Name</th>
-									<th class="column-title" style="display: table-cell;">Added</th>
-									<th class="column-title" style="display: table-cell;">Action</th>
+		{{Form::close()}}
+		<div class="row">
+			<div class="col-lg-12 portlets">
+				<div class="panel panel-default">
+					<div class="panel-body pagination2 table-responsive">
+						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
+							<thead>
+							<tr class="headings">
+								<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
+								<th class="column-title" style="display: table-cell;">Name</th>
+								<th class="column-title" style="display: table-cell;">Added</th>
+								<th class="column-title" style="display: table-cell;">Action</th>
+							</tr>
+							</thead>
+							<tbody>
+							{foreach $results as $result}
+								<tr class="{cycle values=",alt"}">
+									<td class="a-center ">
+										<input id="chk{$result->release->guid|substr:0:7}" type="checkbox" class="flat"
+											   value="{$result->release->guid}"/>
+									</td>
+									<td>
+										<a title="View details"
+										   href="{$smarty.const.WWW_TOP}/details/{$result->release->guid}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+									</td>
+									<td class="less"
+										title="Added on {$result.created_at}">{$result.created_at}</td>
+									<td><a title="Delete from your cart" href="/cart/delete/{$result->release->guid}"
+										   class="btn btn-danger btn-sm" style="padding-bottom:2px;">Delete</a></td>
 								</tr>
-								</thead>
-								<tbody>
-								{foreach $results as $result}
-									<tr class="{cycle values=",alt"}">
-										<td class="a-center ">
-											<input id="chk{$result->release->guid|substr:0:7}" type="checkbox" class="flat"
-												   value="{$result->release->guid}"/>
-										</td>
-										<td>
-											<a title="View details"
-											   href="{$smarty.const.WWW_TOP}/details/{$result->release->guid}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
-										</td>
-										<td class="less"
-											title="Added on {$result.created_at}">{$result.created_at|date_format}</td>
-										<td><a title="Delete from your cart" href="?delete={$result->release->guid}"
-											   class="btn btn-danger btn-sm" style="padding-bottom:2px;">Delete</a></td>
-									</tr>
-								{/foreach}
-								</tbody>
-							</table>
-							</div>
-						</div>
+							{/foreach}
+							</tbody>
+						</table>
 					</div>
 				</div>
-		</form>
+			</div>
+		</div>
 	{else}
 		<div class="alert alert-danger" role="alert">There are no NZBs in your download basket.</div>
 	{/if}

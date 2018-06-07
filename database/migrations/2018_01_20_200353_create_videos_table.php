@@ -14,7 +14,10 @@ class CreateVideosTable extends Migration {
 	{
 		Schema::create('videos', function(Blueprint $table)
 		{
-			$table->increments('id')->comment('Show ID to be used in other tables as reference ');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id')->comment('Show ID to be used in other tables as reference ');
 			$table->boolean('type')->default(0)->comment('0 = TV, 1 = Film, 2 = Anime');
 			$table->string('title', 180)->comment('Name of the video.');
 			$table->char('countries_id', 2)->default('')->comment('Two character country code (FK to countries table).');

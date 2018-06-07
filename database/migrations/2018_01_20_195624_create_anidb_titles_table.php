@@ -14,7 +14,10 @@ class CreateAnidbTitlesTable extends Migration {
 	{
 		Schema::create('anidb_titles', function(Blueprint $table)
 		{
-			$table->integer('anidbid')->unsigned()->comment('ID of title from AniDB');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('anidbid')->unsigned()->comment('ID of title from AniDB');
 			$table->string('type', 25)->comment('type of title.');
 			$table->string('lang', 25);
 			$table->string('title');

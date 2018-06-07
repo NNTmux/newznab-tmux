@@ -4,15 +4,14 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
-use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
@@ -23,10 +22,8 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 class Music
 {
     protected const MATCH_PERCENT = 60;
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
+
+    protected $pdo;
 
     /**
      * @var bool
@@ -88,7 +85,7 @@ class Music
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
@@ -121,11 +118,8 @@ class Music
         $album = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $album);
         $album = preg_replace('/[^\w ]+/', '', $album);
         $album = preg_replace('/(WEB|FLAC|CD)/', '', $album);
-        $album = trim(preg_replace('/\s\s+/i', ' ', $album));
-        $album = trim($album);
-        $words = explode(' ', $album);
-
-        foreach ($words as $word) {
+        $album = trim(trim(preg_replace('/\s\s+/i', ' ', $album)));
+        foreach (explode(' ', $album) as $word) {
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
                 $word = '+'.$word;
@@ -138,6 +132,7 @@ class Music
     }
 
     /**
+     * @param $page
      * @param       $cat
      * @param       $start
      * @param       $num
@@ -147,26 +142,22 @@ class Music
      * @return array
      * @throws \Exception
      */
-    public function getMusicRange($cat, $start, $num, $orderby, array $excludedcats = [])
+    public function getMusicRange($page, $cat, $start, $num, $orderby, array $excludedcats = [])
     {
         $browseby = $this->getBrowseBy();
-
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
-
         $exccatlist = '';
         if (\count($excludedcats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
-
         $order = $this->getMusicOrder($orderby);
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $musicSql =
-                sprintf(
-                    "
+            sprintf(
+                "
 				SELECT SQL_CALC_FOUND_ROWS
 					m.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -179,48 +170,33 @@ class Music
 				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-                        Releases::showPasswords(),
-                        $browseby,
-                        $catsrch,
-                        $exccatlist,
-                        $order[0],
-                        $order[1],
-                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                );
-        $musicCache = Cache::get(md5($musicSql));
+                Releases::showPasswords(),
+                $browseby,
+                $catsrch,
+                $exccatlist,
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+            );
+        $musicCache = Cache::get(md5($musicSql.$page));
         if ($musicCache !== null) {
             $music = $musicCache;
         } else {
-            $music = $this->pdo->queryCalc($musicSql);
-            Cache::put(md5($musicSql), $music, $expiresAt);
+            $data = DB::select($musicSql);
+            $music = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
+            Cache::put(md5($musicSql.$page), $music, $expiresAt);
         }
-
         $musicIDs = $releaseIDs = false;
-
         if (\is_array($music['result'])) {
             foreach ($music['result'] as $mus => $id) {
-                $musicIDs[] = $id['id'];
-                $releaseIDs[] = $id['grp_release_id'];
+                $musicIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
-
         $sql = sprintf(
-            "
+            '
 			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
 				m.*,
 				r.musicinfo_id, r.haspreview,
 				g.name AS group_name,
@@ -234,23 +210,22 @@ class Music
 			AND r.id IN (%s)
 			%s
 			GROUP BY m.id
-			ORDER BY %s %s",
-                (\is_array($musicIDs) ? implode(',', $musicIDs) : -1),
-                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-                $catsrch,
-                $order[0],
-                $order[1]
+			ORDER BY %s %s',
+            (\is_array($musicIDs) ? implode(',', $musicIDs) : -1),
+            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            $catsrch,
+            $order[0],
+            $order[1]
         );
-
-        $return = Cache::get(md5($sql));
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
-        $return = $this->pdo->query($sql);
+        $return = DB::select($sql);
         if (! empty($return)) {
-            $return[0]['_totalcount'] = $music['total'] ?? 0;
+            $return[0]->_totalcount = $music['total'][0]->total ?? 0;
         }
-        Cache::put(md5($sql), $return, $expiresAt);
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
     }
@@ -315,14 +290,13 @@ class Music
     public function getBrowseBy(): string
     {
         $browseby = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bbk => $bbv) {
+        foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if (stripos($bbv, 'id') !== false) {
                     $browseby .= 'AND m.'.$bbv.' = '.$bbs;
                 } else {
-                    $browseby .= 'AND m.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+                    $browseby .= 'AND m.'.$bbv.' '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
                 }
             }
         }
@@ -373,7 +347,7 @@ class Music
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
-        $gen = new Genres(['Settings' => $this->pdo]);
+        $gen = new Genres(['Settings' => null]);
         $ri = new ReleaseImage();
         $titlepercent = 0;
 
@@ -434,7 +408,7 @@ class Music
 
         $mus['publisher'] = (string) $amaz->ItemAttributes->Publisher;
 
-        $mus['releasedate'] = $this->pdo->escapeString((string) $amaz->ItemAttributes->ReleaseDate);
+        $mus['releasedate'] = $this->pdo->quote((string) $amaz->ItemAttributes->ReleaseDate);
         if ($mus['releasedate'] === "''") {
             $mus['releasedate'] = 'null';
         }
@@ -506,8 +480,8 @@ class Music
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
         } else {
@@ -539,7 +513,8 @@ class Music
                     ColorCLI::alternateOver('   Title:  ').
                     ColorCLI::primary($mus['title']).
                     ColorCLI::alternateOver('   Year:   ').
-                    ColorCLI::primary($mus['year']), true
+                    ColorCLI::primary($mus['year']),
+                    true
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -558,7 +533,8 @@ class Music
                         ' ('.
                         $mus['year'].
                         ')'
-                    ), true
+                    ),
+                    true
                 );
             }
         }
@@ -671,7 +647,8 @@ class Music
                 ColorCLI::doEcho(
                     ColorCLI::header(
                         'Processing '.$res->count().' music release(s).'
-                    ), true
+                    ),
+                    true
                 );
             }
 

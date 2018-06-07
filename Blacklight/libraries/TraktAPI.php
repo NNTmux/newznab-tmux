@@ -2,7 +2,6 @@
 
 namespace Blacklight\libraries;
 
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use Blacklight\ColorCLI;
 use GuzzleHttp\Exception\RequestException;
@@ -18,7 +17,7 @@ class TraktAPI
     /**
      * @var array
      */
-    private static $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
+    private static $types = ['imdb', 'tmdb', 'trakt', 'tvdb'];
 
     /**
      * List of headers to send to Trakt.tv when making a request.
@@ -32,11 +31,6 @@ class TraktAPI
      * @var \GuzzleHttp\Client
      */
     protected $client;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    protected $pdo;
 
     /**
      * Construct. Assign passed request headers.  Headers should be complete with API key.
@@ -54,7 +48,6 @@ class TraktAPI
         $this->requestHeaders = $headers;
 
         $this->client = new Client();
-        $this->pdo = new DB();
     }
 
     /**
@@ -73,9 +66,7 @@ class TraktAPI
         switch ($type) {
             case 'aliases':
             case 'full':
-            case 'images':
-            case 'full,images':
-            case 'full,images,aliases':
+            case 'full,aliases':
                 $extended = $type;
                 break;
             default:
@@ -138,9 +129,7 @@ class TraktAPI
      * @param string $extended Extended info from trakt tv.
      *                         Valid values:
      *                         'min'         Returns enough info to match locally. (Default)
-     *                         'images'      Minimal info and all images.
-     *                         'full'        Complete info for an item.
-     *                         'full,images' Complete info and all images.
+     *                         'full'        Complete info for an item
      *
      * @return array|false
      */
@@ -173,9 +162,13 @@ class TraktAPI
                     } else {
                         ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: '.$e->getCode()), true);
                     }
+
+                    return false;
                 }
             } catch (\RuntimeException $e) {
                 ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'), true);
+
+                return false;
             }
 
             if ($json !== null && $json !== false) {
@@ -196,24 +189,20 @@ class TraktAPI
      * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
      *
      * @param string $movie Title or IMDB id.
-     * @param string $type  imdbID:      Return only the IMDB ID (returns string)
-     *                      full:        Return all extended properties (minus images). (returns array)
-     *                      images:      Return extended images properties (returns array)
-     *                      full,images: Return all extended properties (plus images). (returns array)
+     * @param string $type  imdbid:      Return only the IMDB ID (returns string)
+     *                      full:        Return all extended properties. (returns array)
      *
      * @see    http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
      *
      * @return bool|array|string
      */
-    public function movieSummary($movie = '', $type = 'imdbID')
+    public function movieSummary($movie = '', $type = 'imdbid')
     {
         switch ($type) {
             case 'full':
-            case 'images':
-            case 'full,images':
                 $extended = $type;
                 break;
-            case 'imdbID':
+            case 'imdbid':
             default:
                 $extended = 'min';
         }
@@ -221,7 +210,7 @@ class TraktAPI
         if (! $array) {
             return false;
         }
-        if ($type === 'imdbID' && isset($array['ids']['imdb'])) {
+        if ($type === 'imdbid' && isset($array['ids']['imdb'])) {
             return $array['ids']['imdb'];
         }
 
@@ -256,7 +245,7 @@ class TraktAPI
             default:
         }
 
-        $url = self::API_URL."search?id_type=$type&id=$id";
+        $url = self::API_URL.'search?id_type='.$type.'&id='.$id;
 
         return $this->getJsonArray($url, '');
     }
@@ -275,7 +264,7 @@ class TraktAPI
     public function showSearch($show = '', $type = 'show')
     {
         $searchUrl = self::API_URL.'search?query='.
-                str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)).
+                str_slug($show).
                 '&type='.$type;
 
         return $this->getJsonArray($searchUrl, '');
@@ -286,9 +275,7 @@ class TraktAPI
      * Accepts a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
      *
      * @param string $show  Title or IMDB id.
-     * @param string $type  full:        Return all extended properties (minus images). (returns array)
-     *                      images:      Return extended images properties (returns array)
-     *                      full,images: Return all extended properties (plus images). (returns array)
+     * @param string $type  full:        Return all extended properties. (returns array)
      *
      * @see    http://docs.trakt.apiary.io/#reference/shows/summary/get-a-single-show
      *
@@ -301,33 +288,12 @@ class TraktAPI
         }
         $showUrl = self::API_URL.'shows/'.str_slug($show);
 
-        switch ($type) {
-            case 'images':
-            case 'full,images':
-                $extended = $type;
-                break;
-            case 'full':
-                $extended = 'full';
-                break;
-            default:
-                $extended = '';
+        if ($type === 'full') {
+            $extended = 'full';
+        } else {
+            $extended = '';
         }
 
         return $this->getJsonArray($showUrl, $extended);
-    }
-
-    /**
-     * Generate and return a slug for a given ``$phrase``.
-     *
-     * @param $phrase
-     *
-     * @return mixed
-     */
-    public function slugify($phrase)
-    {
-        $result = preg_replace('#[^a-z0-9\s-]#', '', strtolower($phrase));
-        $result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', ' ', $result)));
-
-        return $result;
     }
 }

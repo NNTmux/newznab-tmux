@@ -21,9 +21,8 @@ namespace App\Extensions\util;
 
 use GitRepo;
 use Symfony\Component\Process\Process;
-use Illuminate\Database\Eloquent\Collection;
 
-class Git extends Collection
+class Git
 {
     /**
      * @var \GitRepo object
@@ -53,7 +52,6 @@ class Git extends Collection
 
         $config += $defaults;
         $this->_config = $config;
-        parent::__construct($config += $defaults);
 
         $this->repo = new GitRepo(
 			$this->_config['filepath'],
@@ -224,9 +222,9 @@ class Git extends Collection
      *
      * Be aware this might cause problems if tags are added out of order?
      *
+     * @param bool $cached
+     *
      * @return string
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
      */
     public function tagLatest($cached = true)
     {

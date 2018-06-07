@@ -14,7 +14,10 @@ class CreateUserSeriesTable extends Migration {
 	{
 		Schema::create('user_series', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('users_id')->unsigned();
 			$table->integer('videos_id')->comment('FK to videos.id');
 			$table->string('categories', 64)->nullable()->comment('List of categories for user tv shows');

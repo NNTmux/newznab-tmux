@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    We could not find page you are looking for. <br> Monkeys are hard at work to find it for you! <br> Or you could try on your own.
+    We could not find page you are looking for. The page does not exist.
 @endsection

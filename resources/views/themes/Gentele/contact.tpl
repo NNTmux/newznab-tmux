@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 </head>
 <body class="skin-blue layout-boxed">
@@ -37,7 +37,7 @@
 										</div>
 										<div class="row m-b-30">
 											<div class="col-sm-6">
-												<form method="POST" action="{$smarty.const.WWW_TOP}contact-us">
+												{{Form::open(['url' => 'contact-us'])}}
 													<div class="row">
 														<div class="col-sm-6">
 															<label for="username" class="h6">Name</label>
@@ -51,13 +51,15 @@
 														</div>
 													</div>
 													<label for="comment" class="h6">Message</label>
-										<textarea rows="7" name="comment" id="comment"
-												  class="form-control form-white"></textarea>
-													{$page->smarty->fetch('captcha.tpl')}
-													<button type="submit"  class="btn btn-primary m-t-20">
+													<textarea rows="7" name="comment" id="comment"
+															  class="form-control form-white"></textarea>
+													{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+														{NoCaptcha::display()}{NoCaptcha::renderJs()}
+													{/if}
+													<button type="submit" class="btn btn-primary m-t-20">
 														Send message
 													</button>
-												</form>
+												{{Form::close()}}
 											</div>
 										</div>
 									</div>

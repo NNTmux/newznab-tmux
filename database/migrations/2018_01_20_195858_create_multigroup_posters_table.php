@@ -14,7 +14,10 @@ class CreateMultigroupPostersTable extends Migration {
 	{
 		Schema::create('multigroup_posters', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('poster')->default('')->unique('poster');
 		});
 	}

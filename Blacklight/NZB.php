@@ -13,13 +13,13 @@ use App\Extensions\util\Versions;
  */
 class NZB
 {
-    const NZB_NONE = 0; // Release has no NZB file yet.
-    const NZB_ADDED = 1; // Release had an NZB file created.
+    public const NZB_NONE = 0; // Release has no NZB file yet.
+    public const NZB_ADDED = 1; // Release had an NZB file created.
 
-    const NZB_DTD_NAME = 'nzb';
-    const NZB_DTD_PUBLIC = '-//newzBin//DTD NZB 1.1//EN';
-    const NZB_DTD_EXTERNAL = 'http://www.newzbin.com/DTD/nzb/nzb-1.1.dtd';
-    const NZB_XML_NS = 'http://www.newzbin.com/DTD/2003/nzb';
+    protected const NZB_DTD_NAME = 'nzb';
+    protected const NZB_DTD_PUBLIC = '-//newzBin//DTD NZB 1.1//EN';
+    protected const NZB_DTD_EXTERNAL = 'http://www.newzbin.com/DTD/nzb/nzb-1.1.dtd';
+    protected const NZB_XML_NS = 'http://www.newzbin.com/DTD/2003/nzb';
 
     /**
      * Levels deep to store NZB files.
@@ -191,8 +191,8 @@ class NZB
         $nzb_guid = '';
 
         $XMLWriter->startDocument('1.0', 'UTF-8');
-        $XMLWriter->startDTD(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
-        $XMLWriter->endDTD();
+        $XMLWriter->startDtd(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
+        $XMLWriter->endDtd();
         $XMLWriter->writeComment($this->_nzbCommentString);
 
         $XMLWriter->startElement('nzb');
@@ -229,7 +229,7 @@ class NZB
                 $XMLWriter->writeAttribute('subject', $subject);
                 $XMLWriter->startElement('groups');
                 if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
-                    $matches = array_unique($matches[1]);
+                    $matches = array_values(array_unique($matches[1]));
                     foreach ($matches as $group) {
                         $XMLWriter->writeElement('group', $group);
                     }
@@ -309,13 +309,13 @@ class NZB
         $nzbPath = '';
 
         for ($i = 0; $i < $levelsToSplit && $i < 32; $i++) {
-            $nzbPath .= substr($releaseGuid, $i, 1).DS;
+            $nzbPath .= $releaseGuid[$i].DS;
         }
 
         $nzbPath = $this->siteNzbPath.$nzbPath;
 
-        if ($createIfNotExist === true && ! is_dir($nzbPath)) {
-            mkdir($nzbPath, 0777, true);
+        if ($createIfNotExist === true && ! is_dir($nzbPath) && ! mkdir($nzbPath, 0777, true) && ! is_dir($nzbPath)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
         }
 
         return $nzbPath;

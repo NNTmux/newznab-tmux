@@ -2,10 +2,8 @@
 
 namespace Blacklight;
 
-use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 
 /**
  * Class SABnzbd.
@@ -91,16 +89,16 @@ class SABnzbd
     private $client;
 
     /**
-     * Construct.
+     * SABnzbd constructor.
      *
-     * @param \BasePage $page
+     * @param \App\Http\Controllers\BasePageController $page
      *
      * @throws \Exception
      */
-    public function __construct(&$page)
+    public function __construct($page)
     {
-        $this->uid = User::currentUserId();
-        $this->rsstoken = $page->userdata['rsstoken'];
+        $this->uid = $page->userdata['id'];
+        $this->api_token = $page->userdata['api_token'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);
 
@@ -170,12 +168,12 @@ class SABnzbd
                     '&name='.
                     urlencode(
                         $this->serverurl.
-                        'getnzb/'.
+                        'getnzb?id='.
                         $guid.
                         '&i='.
                         $this->uid.
                         '&r='.
-                        $this->rsstoken
+                        $this->api_token
                     )
         )->getBody()->getContents();
     }
@@ -320,10 +318,10 @@ class SABnzbd
      */
     public function setCookie($host, $apikey, $priority, $apitype)
     {
-        setcookie('sabnzbd_'.$this->uid.'__host', $host, Carbon::now()->addDays(30)->timestamp);
-        setcookie('sabnzbd_'.$this->uid.'__apikey', $apikey, Carbon::now()->addDays(30)->timestamp);
-        setcookie('sabnzbd_'.$this->uid.'__priority', $priority, Carbon::now()->addDays(30)->timestamp);
-        setcookie('sabnzbd_'.$this->uid.'__apitype', $apitype, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__host', $host, now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apikey', $apikey, now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__priority', $priority, now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apitype', $apitype, now()->addDays(30)->timestamp);
     }
 
     /**
@@ -331,9 +329,9 @@ class SABnzbd
      */
     public function unsetCookie()
     {
-        setcookie('sabnzbd_'.$this->uid.'__host', '', Carbon::now()->subDays(30)->timestamp);
-        setcookie('sabnzbd_'.$this->uid.'__apikey', '', Carbon::now()->subDays(30)->timestamp);
-        setcookie('sabnzbd_'.$this->uid.'__priority', '', Carbon::now()->subDays(30)->timestamp);
-        setcookie('sabnzbd_'.$this->uid.'__apitype', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__host', '', now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apikey', '', now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__priority', '', now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apitype', '', now()->subDays(30)->timestamp);
     }
 }

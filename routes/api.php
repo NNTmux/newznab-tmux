@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +12,31 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('v1')->group(function () {
+    Route::namespace('Api')->group(function () {
+        Route::get('api', 'ApiController@api');
+        Route::post('api', 'ApiController@api');
+    });
+});
+
+Route::prefix('v2')->group(function () {
+    Route::namespace('Api')->group(function () {
+        Route::get('capabilities', 'ApiV2Controller@capabilities');
+        Route::post('capabilities', 'ApiV2Controller@capabilities');
+    });
+});
+
+Route::prefix('v2')->middleware('auth:api', 'throttle:rate_limit,1')->group(function () {
+    Route::namespace('Api')->group(function () {
+        Route::get('movies', 'ApiV2Controller@movie');
+        Route::post('movies', 'ApiV2Controller@movie');
+        Route::get('search', 'ApiV2Controller@search');
+        Route::post('search', 'ApiV2Controller@search');
+        Route::get('tv', 'ApiV2Controller@tv');
+        Route::post('tv', 'ApiV2Controller@tv');
+        Route::get('getnzb', 'ApiV2Controller@getNzb');
+        Route::post('getnzb', 'ApiV2Controller@getNzb');
+        Route::get('details', 'ApiV2Controller@details');
+        Route::post('details', 'ApiV2Controller@details');
+    });
 });

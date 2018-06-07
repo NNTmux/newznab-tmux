@@ -14,7 +14,7 @@
 		<a class="btn btn-sm btn-default" title="View a list of all releases in your shows"
 		   href="{$smarty.const.WWW_TOP}/myshows/browse">View releases for My Shows</a>
 		<a class="btn btn-sm btn-default" title="All releases in your shows as an RSS feed"
-		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS Feed for
+		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS Feed for
 			My Shows <i class="fa fa-rss"></i></a>
 	</div>
 	<hr>
@@ -44,11 +44,11 @@
 										<td>
 											<div class="btn-group">
 												<a class="btn btn-xs btn-warning myshows"
-												   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}"
+												   href="{$smarty.const.WWW_TOP}/myshows?action=edit&id={$show.videos_id}"
 												   rel="edit" name="series{$show.videos_id}"
 												   title="Edit Categories">Edit</a>
 												<a class="btn btn-xs btn-danger confirm_action myshows"
-												   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.videos_id}"
+												   href="{$smarty.const.WWW_TOP}/myshows?action=delete&id={$show.videos_id}"
 												   rel="remove" name="series{$show.videos_id}"
 												   title="Remove from My Shows">Remove</a>
 											</div>

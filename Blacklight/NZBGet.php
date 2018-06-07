@@ -76,14 +76,14 @@ class NZBGet
      * Construct.
      * Set up full URL.
      *
-     * @var \BasePage
+     * @var \App\Http\Controllers\BasePageController
      * @throws \Exception
      */
     public function __construct(&$page)
     {
         $this->serverurl = $page->serverurl;
         $this->uid = $page->userdata['id'];
-        $this->rsstoken = $page->userdata['rsstoken'];
+        $this->api_token = $page->userdata['api_token'];
 
         if (! empty($page->userdata['nzbgeturl'])) {
             $this->url = $page->userdata['nzbgeturl'];
@@ -171,12 +171,12 @@ class NZBGet
 						<value>
 							<string>'.
             $this->serverurl.
-            'getnzb/'.
+            'getnzb?id='.
             $guid.
             '%26i%3D'.
             $this->uid.
             '%26r%3D'.
-            $this->rsstoken
+            $this->api_token
             .
             '</string>
 						</value>

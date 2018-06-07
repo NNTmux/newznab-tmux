@@ -2,11 +2,12 @@
 
 namespace Blacklight\utility;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Utility.
@@ -317,20 +318,6 @@ class Utility
     }
 
     /**
-     * @param $path
-     *
-     * @return string
-     */
-    public static function trailingSlash($path): string
-    {
-        if (substr($path, \strlen($path) - 1) !== '/') {
-            $path .= '/';
-        }
-
-        return $path;
-    }
-
-    /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
      * @param string $filePath
@@ -339,12 +326,6 @@ class Utility
      */
     public static function unzipGzipFile($filePath)
     {
-        /* Potential issues with this, so commenting out.
-        $length = Utility::isGZipped($filePath);
-        if ($length === false || $length === null) {
-        	return false;
-        }*/
-
         $string = '';
         $gzFile = @gzopen($filePath, 'rb', 0);
         if ($gzFile) {
@@ -367,22 +348,19 @@ class Utility
     /**
      * @param $path
      */
-    public static function setCoversConstant($path)
+    public static function setCoversConstant($path): void
     {
         if (! \defined('NN_COVERS')) {
             switch (true) {
-                case substr($path, 0, 1) == '/' ||
-                    substr($path, 1, 1) == ':' ||
-                    substr($path, 0, 1) == '\\':
-                    \define('NN_COVERS', self::trailingSlash($path));
+                case $path[0] === '/' || $path[1] === ':' || $path[0] === '\\':
+                    \define('NN_COVERS', str_finish($path, '/'));
                     break;
-                case strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
-                    substr($path, 0, 1) != '\\':
-                    \define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
+                case \strlen($path) > 0 && $path[0] !== '/' && $path[1] !== ':' && $path[0] !== '\\':
+                    \define('NN_COVERS', realpath(NN_ROOT.str_finish($path, '/')));
                     break;
                 case empty($path): // Default to resources location.
                 default:
-                    \define('NN_COVERS', NN_RES.'covers'.DS);
+                    \define('NN_COVERS', NN_RES.'covers/');
             }
         }
     }
@@ -711,8 +689,8 @@ class Utility
     public static function fileInfo($path)
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
-        if (self::hasCommand('file') && (! self::isWin() || ! empty($magicPath))) {
-            $magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
+        if (self::hasCommand('file') && (! self::isWin() || $magicPath !== null)) {
+            $magicSwitch = $magicPath === null ? '' : " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
 
             if (\is_array($output)) {
@@ -731,7 +709,7 @@ class Utility
                 $output = '';
             }
         } else {
-            $fileInfo = empty($magicPath) ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
+            $fileInfo = $magicPath === null ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
 
             $output = finfo_file($fileInfo, $path);
             if (empty($output)) {
@@ -775,10 +753,8 @@ class Utility
     public static function imdb_trailers($imdbID): string
     {
         $xml = self::getUrl(['url' => 'http://api.traileraddict.com/?imdb='.$imdbID]);
-        if ($xml !== false) {
-            if (preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
-                return 'https://'.$html[1];
-            }
+        if ($xml !== false && preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
+            return 'https://'.$html[1];
         }
 
         return '';
@@ -877,91 +853,16 @@ class Utility
         return Str::uuid()->toString();
     }
 
-    public static function responseXmlToObject($input)
+    /**
+     * @param $input
+     *
+     * @return \SimpleXMLElement
+     */
+    public static function responseXmlToObject($input): \SimpleXMLElement
     {
         $input = str_replace('<newznab:', '<', $input);
 
         return @simplexml_load_string($input);
-    }
-
-    /**
-     * @note: Convert non-UTF-8 characters into UTF-8
-     * Function taken from http://stackoverflow.com/a/19366999
-     *
-     * @param $data
-     *
-     * @return array|string
-     */
-    public static function encodeAsUTF8($data)
-    {
-        if (\is_array($data)) {
-            foreach ($data as $key => $value) {
-                $data[$key] = self::encodeAsUTF8($value);
-            }
-        } else {
-            if (\is_string($data)) {
-                return utf8_encode($data);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * This function turns a roman numeral into an integer.
-     *
-     * @param string $string
-     *
-     * @return int $e
-     */
-    public static function convertRomanToInt($string): int
-    {
-        switch (strtolower($string)) {
-            case 'i': $e = 1;
-                break;
-            case 'ii': $e = 2;
-                break;
-            case 'iii': $e = 3;
-                break;
-            case 'iv': $e = 4;
-                break;
-            case 'v': $e = 5;
-                break;
-            case 'vi': $e = 6;
-                break;
-            case 'vii': $e = 7;
-                break;
-            case 'viii': $e = 8;
-                break;
-            case 'ix': $e = 9;
-                break;
-            case 'x': $e = 10;
-                break;
-            case 'xi': $e = 11;
-                break;
-            case 'xii': $e = 12;
-                break;
-            case 'xiii': $e = 13;
-                break;
-            case 'xiv': $e = 14;
-                break;
-            case 'xv': $e = 15;
-                break;
-            case 'xvi': $e = 16;
-                break;
-            case 'xvii': $e = 17;
-                break;
-            case 'xviii': $e = 18;
-                break;
-            case 'xix': $e = 19;
-                break;
-            case 'xx': $e = 20;
-                break;
-            default:
-                $e = 0;
-        }
-
-        return $e;
     }
 
     /**
@@ -1049,7 +950,7 @@ class Utility
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
         header('Content-type: text/xml');
-        header('Content-Length: '.strlen($response));
+        header('Content-Length: '.\strlen($response));
         header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
         header($errorHeader);
 
@@ -1069,63 +970,29 @@ class Utility
     }
 
     /**
-     * Convert multi to single dimensional array
-     * Code taken from http://stackoverflow.com/a/12309103.
-     *
-     * @param $array
-     *
-     * @param $separator
-     *
-     * @return string
-     */
-    public static function convertMultiArray($array, $separator): string
-    {
-        return implode("$separator", array_map(function ($a) {
-            return implode(',', $a);
-        }, $array));
-    }
-
-    /**
      * @param $tableName
-     * @param $start
-     * @param $num
      *
-     * @return array
-     * @throws \Exception
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getRange($tableName, $start, $num): array
+    public static function getRange($tableName): LengthAwarePaginator
     {
-        $pdo = new DB();
+        $range = DB::table($tableName);
+        if ($tableName === 'xxxinfo') {
+            $range->selectRaw('UNCOMPRESS(plot) AS plot');
+        }
 
-        return $pdo->query(
-            sprintf(
-                'SELECT * %s FROM %s ORDER BY created_at DESC %s',
-                ($tableName === 'xxxinfo' ? ', UNCOMPRESS(plot) AS plot' : ''),
-                $tableName,
-                ($start === false ? '' : ('LIMIT '.$num.' OFFSET '.$start))
-            )
-        );
+        return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
     }
 
     /**
      * @param $tableName
      *
      * @return int
-     * @throws \Exception
      */
     public static function getCount($tableName): int
     {
-        $pdo = new DB();
-        $res = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM %s', $tableName));
+        $res = DB::table($tableName)->count('id');
 
-        return $res === false ? 0 : $res['num'];
-    }
-
-    /**
-     * @return bool
-     */
-    public static function checkCSRFToken(): bool
-    {
-        return request()->has('_token') && hash_equals($_SESSION['_token'], request()->input('_token'));
+        return $res === false ? 0 : $res;
     }
 }

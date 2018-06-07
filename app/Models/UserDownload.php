@@ -2,9 +2,25 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserDownload.
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property string $hosthash
+ * @property string $timestamp
+ * @property int $releases_id FK to releases.id
+ * @property-read \App\Models\Release $release
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereHosthash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereReleasesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereTimestamp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserDownload whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class UserDownload extends Model
 {
     /**
@@ -42,8 +58,8 @@ class UserDownload extends Model
     public static function getDownloadRequests($userID): int
     {
         // Clear old requests.
-        self::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
-        $value = self::query()->where('users_id', $userID)->where('timestamp', '>', Carbon::now()->subDay())->count('id');
+        self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
+        $value = self::query()->where('users_id', $userID)->where('timestamp', '>', now()->subDay())->count('id');
 
         return $value === false ? 0 : $value;
     }
@@ -60,11 +76,11 @@ class UserDownload extends Model
     /**
      * If a user downloads a NZB, log it.
      *
-     * @param int $userID id of the user.
      *
-     * @param     $releaseID
+     * @param $userID
+     * @param $releaseID
      *
-     * @return bool|int
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
     public static function addDownloadRequest($userID, $releaseID)
     {
@@ -73,7 +89,7 @@ class UserDownload extends Model
                 [
                     'users_id' => $userID,
                     'releases_id' => $releaseID,
-                    'timestamp' => Carbon::now(),
+                    'timestamp' => now(),
                 ]
             );
     }

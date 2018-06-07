@@ -14,7 +14,10 @@ class CreateAnidbInfoTable extends Migration {
 	{
 		Schema::create('anidb_info', function(Blueprint $table)
 		{
-			$table->integer('anidbid')->unsigned()->primary()->comment('ID of title from AniDB');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('anidbid')->unsigned()->primary()->comment('ID of title from AniDB');
 			$table->string('type', 32)->nullable();
 			$table->date('startdate')->nullable();
 			$table->date('enddate')->nullable();

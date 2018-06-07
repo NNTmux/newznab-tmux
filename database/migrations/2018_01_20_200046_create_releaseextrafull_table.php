@@ -14,7 +14,10 @@ class CreateReleaseextrafullTable extends Migration {
 	{
 		Schema::create('releaseextrafull', function(Blueprint $table)
 		{
-			$table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
 			$table->text('mediainfo', 65535)->nullable();
             $table->foreign('releases_id', 'FK_ref_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});

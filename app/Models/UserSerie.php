@@ -2,9 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserSerie.
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property int $videos_id FK to videos.id
+ * @property string|null $categories List of categories for user tv shows
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCategories($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereUsersId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereVideosId($value)
+ * @mixin \Eloquent
+ */
 class UserSerie extends Model
 {
     /**
@@ -32,9 +49,9 @@ class UserSerie extends Model
      * @param $userId
      * @param $videoId
      * @param array $catID
-     * @return int
+     * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addShow($userId, $videoId, array $catID = []): int
+    public static function addShow($userId, $videoId, array $catID = [])
     {
         return self::query()
             ->insertGetId(
@@ -42,8 +59,8 @@ class UserSerie extends Model
                     'users_id' => $userId,
                     'videos_id' => $videoId,
                     'categories' => ! empty($catID) ? implode('|', $catID) : 'NULL',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
     }

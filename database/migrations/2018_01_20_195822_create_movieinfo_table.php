@@ -14,7 +14,10 @@ class CreateMovieinfoTable extends Migration {
 	{
 		Schema::create('movieinfo', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('imdbid')->unsigned()->unique('ix_movieinfo_imdbid');
 			$table->integer('tmdbid')->unsigned()->default(0);
 			$table->string('title')->default('')->index('ix_movieinfo_title');

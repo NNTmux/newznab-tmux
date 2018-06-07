@@ -21,7 +21,7 @@ class AccountChange extends Mailable
      */
     public function __construct($userId)
     {
-        $this->user = User::query()->where('id', $userId)->first();
+        $this->user = User::find($userId);
     }
 
     /**

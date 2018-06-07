@@ -14,7 +14,10 @@ class CreateSettingsTable extends Migration {
 	{
 		Schema::create('settings', function(Blueprint $table)
 		{
-			$table->string('section', 25)->default('');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->string('section', 25)->default('');
 			$table->string('subsection', 25)->default('');
 			$table->string('name', 25)->default('');
 			$table->string('value', 1000)->default('');

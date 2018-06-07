@@ -7,10 +7,41 @@ use Blacklight\NNTP;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\ReleaseImage;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Group.
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $backfill_target
+ * @property int $first_record
+ * @property string|null $first_record_postdate
+ * @property int $last_record
+ * @property string|null $last_record_postdate
+ * @property string|null $last_updated
+ * @property int|null $minfilestoformrelease
+ * @property int|null $minsizetoformrelease
+ * @property bool $active
+ * @property bool $backfill
+ * @property string|null $description
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfill($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfillTarget($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastUpdated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinfilestoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinsizetoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereName($value)
+ * @mixin \Eloquent
+ */
 class Group extends Model
 {
     /**
@@ -71,15 +102,13 @@ class Group extends Model
     public static function getGroupsForSelect(): array
     {
         $groups = self::getActive();
-        $temp_array = [];
 
+        $temp_array = [];
         $temp_array[-1] = '--Please Select--';
 
-        $grouped = $groups->mapToGroups(function ($group, $key) {
-            return [$group['name']];
-        });
-
-        $temp_array += array_collapse($grouped->toArray());
+        foreach ($groups as $group) {
+            $temp_array[$group['name']] = $group['name'];
+        }
 
         return $temp_array;
     }
@@ -116,10 +145,10 @@ class Group extends Model
         switch ($order) {
             case '':
             case 'normal':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '!=', 0)->orderBy('name')->get();
+                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get();
                 break;
             case 'date':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '!=', 0)->orderBy('first_record_postdate', 'DESC')->get();
+                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('first_record_postdate', 'DESC')->get();
                 break;
             default:
                 return [];
@@ -190,7 +219,7 @@ class Group extends Model
         $res = self::query();
 
         if ($groupname !== '') {
-            $res->where('name', 'LIKE', '%'.$groupname.'%');
+            $res->where('name', 'like', '%'.$groupname.'%');
         }
 
         if ($active > -1) {
@@ -201,21 +230,17 @@ class Group extends Model
     }
 
     /**
-     * Gets all groups and associated release counts.
-     *
-     *
-     * @param bool $offset
-     * @param bool $limit
      * @param string $groupname
-     * @param null|bool $active
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @param null   $active
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function getGroupsRange($offset = false, $limit = false, $groupname = '', $active = null)
+    public static function getGroupsRange($groupname = '', $active = null)
     {
         $groups = self::query()->groupBy('id')->orderBy('name');
 
         if ($groupname !== '') {
-            $groups->where('name', 'LIKE', '%'.$groupname.'%');
+            $groups->where('name', 'like', '%'.$groupname.'%');
         }
 
         if ($active === true) {
@@ -224,21 +249,18 @@ class Group extends Model
             $groups->where('active', '=', 0);
         }
 
-        if ($offset !== false) {
-            $groups->limit($limit)->offset($offset);
-        }
-
-        return $groups->get();
+        return $groups->paginate(config('nntmux.items_per_page'));
     }
 
     /**
      * Update an existing group.
      *
-     * @param array $group
      *
-     * @return bool
+     * @param $group
+     *
+     * @return int
      */
-    public static function updateGroup($group): bool
+    public static function updateGroup($group)
     {
         return self::query()->where('id', $group['id'])->update(
             [
@@ -247,7 +269,7 @@ class Group extends Model
                 'backfill_target' => $group['backfill_target'],
                 'first_record' => $group['first_record'],
                 'last_record' => $group['last_record'],
-                'last_updated' => Carbon::now(),
+                'last_updated' => now(),
                 'active' => $group['active'],
                 'backfill' => $group['backfill'],
                 'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
@@ -337,7 +359,7 @@ class Group extends Model
                 'first_record' => 0,
                 'first_record_postdate' => null,
                 'last_record' => 0,
-                'člast_record_postdate' => null,
+                'last_record_postdate' => null,
                 'last_updated' => null,
                 'active' => 0,
             ]

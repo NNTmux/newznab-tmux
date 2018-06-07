@@ -5,6 +5,8 @@ namespace Blacklight\http;
 use Blacklight\NZB;
 use App\Models\Category;
 use Blacklight\Releases;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class RSS -- contains specific functions for RSS.
@@ -36,21 +38,21 @@ class RSS extends Capabilities
     /**
      * Get releases for RSS.
      *
+     *
      * @param     $cat
-     * @param int $offset
+     * @param     $offset
+     * @param     $videosId
+     * @param     $aniDbID
      * @param int $userID
-     * @param int $videosId
-     * @param int $aniDbID
      * @param int $airDate
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
+     * @throws \Exception
      */
-    public function getRss($cat, $offset, $videosId, $aniDbID, $userID = 0, $airDate = -1): array
+    public function getRss($cat, $offset, $videosId, $aniDbID, $userID = 0, $airDate = -1)
     {
         $catSearch = $cartSearch = '';
-
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
-
         if (\count($cat)) {
             if ((int) $cat[0] === -2) {
                 $cartSearch = sprintf(
@@ -61,8 +63,7 @@ class RSS extends Capabilities
                 $catSearch = Category::getCategorySearch($cat);
             }
         }
-
-        $sql = $this->pdo->query(
+        $sql =
             sprintf(
                 "SELECT r.*,
 					m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors,
@@ -101,29 +102,33 @@ class RSS extends Capabilities
                 ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
                 ' LIMIT 0,'.($offset > 100 ? 100 : $offset)
-            ),
-            true,
-            config('nntmux.cache_expiry_medium')
-        );
+            );
 
-        return $sql;
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = DB::select($sql);
+        Cache::put(md5($sql), $result, $expiresAt);
+
+        return $result;
     }
 
     /**
-     * Get TV shows for RSS.
-     *
-     * @param int   $limit
+     * @param       $limit
      * @param int   $userID
      * @param array $excludedCats
      * @param int   $airDate
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @throws \Exception
      */
-    public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1): array
+    public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1)
     {
-        return $this->pdo->query(
-            sprintf(
-                "
+        $sql = sprintf(
+            "
 				SELECT r.*, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
@@ -139,47 +144,55 @@ class RSS extends Capabilities
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-                $this->releases->getConcatenatedCategoryIDs(),
-                $this->releases->uSQL(
-                    $this->pdo->query(
-                        sprintf(
-                            '
+            $this->releases->getConcatenatedCategoryIDs(),
+            $this->releases->uSQL(
+                DB::select(
+                    sprintf(
+                        '
 							SELECT videos_id, categories
 							FROM user_series
 							WHERE users_id = %d',
-                            $userID
-                        ),
-                        true
-                    ),
-                    'videos_id'
+                        $userID
+                    )
                 ),
-                (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-                NZB::NZB_ADDED,
-                Category::TV_ROOT,
-                Category::TV_OTHER,
-                $this->releases->showPasswords,
-                ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
+                'videos_id'
             ),
-            true,
-            config('nntmux.cache_expiry_medium')
+            (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
+            NZB::NZB_ADDED,
+            Category::TV_ROOT,
+            Category::TV_OTHER,
+            $this->releases->showPasswords,
+            ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
         );
+
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = DB::select($sql);
+        Cache::put(md5($sql), $result, $expiresAt);
+
+        return $result;
     }
 
     /**
      * Get movies for RSS.
      *
-     * @param int   $limit
+     *
+     * @param       $limit
      * @param int   $userID
      * @param array $excludedCats
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
+     * @throws \Exception
      */
-    public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = []): array
+    public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = [])
     {
-        return $this->pdo->query(
-            sprintf(
-                "
+        $sql = printf(
+            "
 				SELECT r.*, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
@@ -194,53 +207,52 @@ class RSS extends Capabilities
 				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-                $this->releases->getConcatenatedCategoryIDs(),
-                $this->releases->uSQL(
-                    $this->pdo->query(
-                        sprintf(
-                            '
+            $this->releases->getConcatenatedCategoryIDs(),
+            $this->releases->uSQL(
+                DB::select(
+                    sprintf(
+                        '
 							SELECT imdbid, categories
 							FROM user_movies
 							WHERE users_id = %d',
-                            $userID
-                        ),
-                        true
-                    ),
-                    'imdbid'
+                        $userID
+                    )
                 ),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
-                Category::MOVIE_ROOT,
-                Category::MOVIE_OTHER,
-                $this->releases->showPasswords,
-                ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
+                'imdbid'
             ),
-            true,
-            config('nntmux.cache_expiry_medium')
+            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            NZB::NZB_ADDED,
+            Category::MOVIE_ROOT,
+            Category::MOVIE_OTHER,
+            $this->releases->showPasswords,
+            ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
         );
+
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $result = Cache::get(md5($sql));
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = DB::select($sql);
+        Cache::put(md5($sql), $result, $expiresAt);
+
+        return $result;
     }
 
     /**
      * @param $column
      * @param $table
-     *
      * @param $order
      *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null
      */
     public function getFirstInstance($column, $table, $order)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT %1$s
-				FROM %2$s
-				WHERE %1$s > 0
-				ORDER BY %3$s ASC',
-                $column,
-                $table,
-                $order
-            )
-        );
+        return DB::table($table)
+            ->select([$column])
+            ->where($column, '>', 0)
+            ->orderBy($order, 'asc')
+            ->first();
     }
 }

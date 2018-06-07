@@ -155,10 +155,7 @@ function release_flag($text, $page)
     }
 
     if ($code !== '' && $page === 'browse') {
-        $www = WWW_TOP;
-        if (! in_array(substr($www, -1), ['\\', '/'], false)) {
-            $www .= DS;
-        }
+        $www = str_finish(WWW_TOP, '/');
 
         return
             '<img title="'.$language.'" alt="'.$language.'" src="'.$www.'assets/images/flags/'.$code.'.png"/>';

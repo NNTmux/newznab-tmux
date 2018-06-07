@@ -22,8 +22,7 @@
 							<li><a href="#tab2_3" data-toggle="tab"><i class="fa fa-cloud-download"></i> Downloaders</a>
 							</li>
 						</ul>
-						<form action="profileedit?action=submit" method="post">
-							<input type="hidden" name="_token" value="{$csrf_token}">
+						{{Form::open(['url' => 'profileedit?action=submit'])}}
 							<div class="tab-content">
 								<div class="tab-pane fade active in" id="tab2_1">
 									<table cellpadding="0" cellspacing="0" width="100%">
@@ -55,15 +54,15 @@
 													<tr>
 														<th width="200">Confirm password</th>
 														<td>
-															<input autocomplete="off" id="confirmpassword"
-																   name="confirmpassword" type="password"
+															<input autocomplete="off" id="password_confirmation"
+																   name="password_confirmation" type="password"
 																   class="form-control" value="">
 														</td>
 													</tr>
 													<tr>
 														<th width="200">API Key</th>
 														<td>
-															{$user.rsstoken}
+															{$user.api_token}
 														</td>
 													</tr>
 													</tbody>
@@ -141,11 +140,12 @@
 												<table class="data table table-striped responsive-utilities jambo-table">
 													<tbody>
 													<tr class="bg-aqua-active">
-														<td colspan="2" style="padding-left: 8px;"><strong>Site theme</strong></td>
+														<td colspan="2" style="padding-left: 8px;"><strong>Site
+																theme</strong></td>
 													</tr>
 													<tr>
 														<td>
-															{if $page->getSettingValue('site.main.userselstyle') == 1}
+															{if {{App\Models\Settings::settingValue('site.main.userselstyle')}} == 1}
 																{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 															{/if}
 														</td>
@@ -166,11 +166,12 @@
 												<div class="alert alert-info">
 													These settings are only needed if you want to be able to push NZB's
 													to your downloader straight from the website. You don't need this
-													for automation software like Sonarr, Sickbeard, SickRage, SickGear or Couchpotato to
+													for automation software like Sonarr, Sickbeard, SickRage, SickGear
+													or Couchpotato to
 													function.
 												</div>
 												<br>
-												{if $page->getSettingValue('apps.sabnzbplus.integrationtype') != 1}
+												{if {{App\Models\Settings::settingValue('apps.sabnzbplus.integrationtype')}} != 1}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -189,7 +190,7 @@
 														</tbody>
 													</table>
 												{/if}
-												{if $user.queuetype == 1 && $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2}
+												{if $user.queuetype == 1 && {{App\Models\Settings::settingValue('apps.sabnzbplus.integrationtype')}} == 2}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -227,20 +228,34 @@
 															<th width="200">Priority Level</th>
 															<td>
 																{html_options id="sabpriority" class="form-control" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$sabpriority_selected}
-																<div class="hint">Set the priority level for NZBs that are added to your queue</div>
+																<div class="hint">Set the priority level for NZBs that
+																	are added to your queue
+																</div>
 															</td>
 														</tr>
 														<tr>
-															<th width="200">Setting Storage </th>
+															<th width="200">Setting Storage</th>
 															<td>
-																{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>]{/if}
-																<div class="hint">Where to store the SAB setting.<br />&bull; <b>Cookie</b> will store the setting in your browsers coookies and will only work when using your current browser.<br/>&bull; <b>Site</b> will store the setting in your user account enabling it to work no matter where you are logged in from.<br /><span class="warning"><b>Please Note:</b></span> You should only store your full SAB api key with sites you trust.</div>
+																{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[
+																	<a class="confirm_action"
+																	   href="?action=clearcookies">Clear Cookies</a>
+																	]{/if}
+																<div class="hint">Where to store the SAB setting.<br/>&bull;
+																	<b>Cookie</b> will store the setting in your
+																	browsers coookies and will only work when using your
+																	current browser.<br/>&bull; <b>Site</b> will store
+																	the setting in your user account enabling it to work
+																	no matter where you are logged in from.<br/><span
+																			class="warning"><b>Please Note:</b></span>
+																	You should only store your full SAB api key with
+																	sites you trust.
+																</div>
 															</td>
 														</tr>
 														</tbody>
 													</table>
 												{/if}
-												{if $user.queuetype == 2 && ($page->getSettingValue('apps.sabnzbplus.integrationtype') == 0 || $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2)}
+												{if $user.queuetype == 2 && ({{App\Models\Settings::settingValue('apps.sabnzbplus.integrationtype')}} == 0 || {{App\Models\Settings::settingValue('apps.sabnzbplus.integrationtype')}} == 2)}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -283,7 +298,7 @@
 								</div>
 							</div>
 							<input type="submit" value="Save" class="btn btn-primary"/>
-						</form>
+						{{Form::close()}}
 					</div>
 				</div>
 			</div>

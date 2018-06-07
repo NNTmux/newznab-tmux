@@ -14,7 +14,10 @@ class CreateForumpostTable extends Migration {
 	{
 		Schema::create('forumpost', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->integer('forumid')->default(1);
 			$table->integer('parentid')->default(0)->index('parentid');
 			$table->integer('users_id')->unsigned()->index('userid');

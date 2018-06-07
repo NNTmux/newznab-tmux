@@ -14,9 +14,13 @@ class CreateUserRolesTable extends Migration {
 	{
 		Schema::create('user_roles', function(Blueprint $table)
 		{
-			$table->integer('id', true);
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->integer('id', true);
 			$table->string('name', 32);
 			$table->integer('apirequests')->unsigned();
+            $table->integer('rate_limit')->default(60);
 			$table->integer('downloadrequests')->unsigned();
 			$table->integer('defaultinvites')->unsigned();
 			$table->boolean('isdefault')->default(0);

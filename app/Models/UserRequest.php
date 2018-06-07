@@ -2,9 +2,24 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\UserRequest.
+ *
+ * @property int $id
+ * @property int $users_id
+ * @property string $hosthash
+ * @property string $request
+ * @property string $timestamp
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereHosthash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereRequest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereTimestamp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereUsersId($value)
+ * @mixin \Eloquent
+ */
 class UserRequest extends Model
 {
     /**
@@ -68,7 +83,7 @@ class UserRequest extends Model
      */
     public static function addApiRequest($userID, $request): void
     {
-        self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> Carbon::now()]);
+        self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> now()]);
     }
 
     /**
@@ -84,9 +99,9 @@ class UserRequest extends Model
     public static function clearApiRequests($userID): void
     {
         if ($userID === false) {
-            self::query()->where('timestamp', '<', Carbon::now()->subDay())->delete();
+            self::query()->where('timestamp', '<', now()->subDay())->delete();
         } else {
-            self::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
+            self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
         }
     }
 }

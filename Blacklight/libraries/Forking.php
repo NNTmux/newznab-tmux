@@ -8,7 +8,6 @@ use Blacklight\NNTP;
 use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Illuminate\Support\Carbon;
 use Blacklight\processing\PostProcess;
 
 /**
@@ -166,7 +165,7 @@ class Forking extends \fork_daemon
             $this->outputType = self::OUTPUT_REALTIME;
         }
 
-        $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run'.DS.'switch.php "php  ';
+        $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run/switch.php "php  ';
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -433,7 +432,7 @@ class Forking extends \fork_daemon
         $backfilldays = '';
         if ((int) $backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = Carbon::now()->subDays($days);
+            $backfilldays = now()->subDays((int) $days);
         } elseif ((int) $backfill_days === 2) {
             $backfilldays = Settings::settingValue('..safebackfilldate');
         }
@@ -751,7 +750,7 @@ class Forking extends \fork_daemon
     private function checkProcessAdditional()
     {
         $this->ppAddMinSize =
-            (Settings::settingValue('..minsizetopostprocess') !== '') ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
+            Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
         $this->ppAddMinSize = ($this->ppAddMinSize > 0 ? ('AND r.size > '.($this->ppAddMinSize * 1048576)) : '');
         $this->ppAddMaxSize =
             (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
@@ -814,7 +813,7 @@ class Forking extends \fork_daemon
     private function checkProcessNfo(): bool
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
-            $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
+            $this->nfoQueryString = Nfo::NfoQueryString();
 
             return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
         }

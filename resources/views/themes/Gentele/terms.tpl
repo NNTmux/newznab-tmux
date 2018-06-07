@@ -2,17 +2,17 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 </head>
 <body class="skin-blue layout-boxed">
 <div class="wrapper">
 	<div class="header">
-		<h2>View > <strong>{$page->title}</strong></h2>
+		<h2>View > <strong>{$title}</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
 				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-				/ {$page->title}
+				/ {$title}
 			</ol>
 		</div>
 	</div>

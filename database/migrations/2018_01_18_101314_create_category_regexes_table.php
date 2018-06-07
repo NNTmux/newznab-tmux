@@ -14,7 +14,10 @@ class CreateCategoryRegexesTable extends Migration {
 	{
 		Schema::create('category_regexes', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('group_regex', 255)->default('')->index('ix_category_regexes_group_regex')->comment('This is a regex to match against usenet groups');
 			$table->string('regex', 5000)->default('')->comment('Regex used to match a release name to categorize it');
 			$table->boolean('status')->default(1)->index('ix_category_regexes_status')->comment('1=ON 0=OFF');

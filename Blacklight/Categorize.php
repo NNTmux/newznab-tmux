@@ -56,8 +56,8 @@ class Categorize extends Category
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->categorizeForeign = (int) Settings::settingValue('indexer.categorise.categorizeforeign');
-        $this->catWebDL = (int) Settings::settingValue('indexer.categorise.catwebdl');
+        $this->categorizeForeign = (bool) Settings::settingValue('indexer.categorise.categorizeforeign');
+        $this->catWebDL = (bool) Settings::settingValue('indexer.categorise.catwebdl');
         $this->regexes = new Regexes(['Table_Name' => 'category_regexes']);
     }
 

@@ -16,14 +16,14 @@ class CollectionsCleaning
      * @const
      * @string
      */
-    const REGEX_END = '[-_\s]{0,3}yEnc$/ui';
+    public const REGEX_END = '[-_\s]{0,3}yEnc$/ui';
 
     /**
      * Used for matching file extension endings in article subjects.
      * @const
      * @string
      */
-    const REGEX_FILE_EXTENSIONS = '([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol\d+\+\d+.+?"|\.[A-Za-z0-9]{2,4}"|")';
+    public const REGEX_FILE_EXTENSIONS = '([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol\d+\+\d+.+?"|\.[A-Za-z0-9]{2,4}"|")';
 
     /**
      * Used for matching size strings in article subjects.
@@ -31,22 +31,22 @@ class CollectionsCleaning
      * @const
      * @string
      */
-    const REGEX_SUBJECT_SIZE = '[-_\s]{0,3}\d+([.,]\d+)? [kKmMgG][bB][-_\s]{0,3}';
+    public const REGEX_SUBJECT_SIZE = '[-_\s]{0,3}\d+([.,]\d+)? [kKmMgG][bB][-_\s]{0,3}';
 
     /**
      * Collection subject failed to match any regular expression.
      */
-    const REGEX_NO_MATCH = 0;
+    public const REGEX_NO_MATCH = 0;
 
     /**
      * Collection subject matched the Generic regular expression.
      */
-    const REGEX_GENERIC_MATCH = -10;
+    public const REGEX_GENERIC_MATCH = -10;
 
     /**
      * Collection subject matched the Music generic regular expression.
      */
-    const REGEX_MUSIC_MATCH = -20;
+    public const REGEX_MUSIC_MATCH = -20;
 
     /**
      * @var string
@@ -162,58 +162,57 @@ class CollectionsCleaning
                 'name' => utf8_encode(trim(preg_replace('/\s\s+/', ' ', $cleanSubject))),
             ];
         } // Music groups.
-        else {
-            // Try some music group regexes.
-            $musicSubject = $this->musicSubject();
-            if ($musicSubject !== false) {
-                return [
-                    'id'   => self::REGEX_MUSIC_MATCH,
-                    'name' => $musicSubject,
-                ];
-            // Parts/files
-            } else {
-                $cleanSubject = preg_replace('/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|(\(|\[|\s)\d{1,4}(\/|(\s|_)of(\s|_)|-)\d{1,4}(\)|\]|\s|$|:)|\(\d{1,3}\|\d{1,3}\)|-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i', ' ', $this->subject);
-            }
-            // Anything between the quotes. Too much variance within the quotes, so remove it completely.
-            $cleanSubject = preg_replace('/".+"/i', ' ', $cleanSubject);
-            // File extensions - If it was not in quotes.
-            $cleanSubject = preg_replace('/(-? [a-z0-9]+-?|\(?\d{4}\)?(_|-)[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=(\s|"))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i', ' ', $cleanSubject);
-            // File Sizes - Non unique ones.
-            $cleanSubject = preg_replace('/\d{1,3}(,|\.|\/)\d{1,3}\s(k|m|g)b|(\])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+[.,]?\d+\s(g|k|m)?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?(k|m|g)?b(ytes)?\) yEnc$/i', ' ', $cleanSubject);
-            // Random stuff.
-            $cleanSubject = preg_replace('/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i', ' ', $cleanSubject);
-            // Multi spaces.
-            $cleanSubject = utf8_encode(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)));
-            // If the subject is too similar to another because it is so short, try to extract info from the subject.
-            if (strlen($cleanSubject) <= 10 || preg_match('/^[-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
-                $x = '';
-                if (preg_match('/.*("[A-Z0-9]+).*?"/i', $this->subject, $match)) {
-                    $x = $match[1];
-                }
-                if (preg_match_all('/[^A-Z0-9]/i', $this->subject, $match1)) {
-                    $start = 0;
-                    foreach ($match1[0] as $add) {
-                        if ($start > 2) {
-                            break;
-                        }
-                        $x .= $add;
-                        $start++;
-                    }
-                }
-                $newName = preg_replace('/".+?"/', '', $this->subject);
-                $newName = preg_replace('/[a-z0-9]|'.$this->e0.'/i', '', $newName);
 
-                return [
-                    'id'   => self::REGEX_MUSIC_MATCH,
-                    'name' => $cleanSubject.$newName.$x,
-                ];
-            } else {
-                return [
-                    'id'   => self::REGEX_MUSIC_MATCH,
-                    'name' => $cleanSubject,
-                ];
-            }
+        // Try some music group regexes.
+        $musicSubject = $this->musicSubject();
+        if ($musicSubject !== false) {
+            return [
+                'id'   => self::REGEX_MUSIC_MATCH,
+                'name' => $musicSubject,
+            ];
+            // Parts/files
         }
+
+        $cleanSubject = preg_replace('/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|(\(|\[|\s)\d{1,4}(\/|(\s|_)of(\s|_)|-)\d{1,4}(\)|\]|\s|$|:)|\(\d{1,3}\|\d{1,3}\)|-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i', ' ', $this->subject);
+        // Anything between the quotes. Too much variance within the quotes, so remove it completely.
+        $cleanSubject = preg_replace('/".+"/i', ' ', $cleanSubject);
+        // File extensions - If it was not in quotes.
+        $cleanSubject = preg_replace('/(-? [a-z0-9]+-?|\(?\d{4}\)?(_|-)[a-z0-9]+)\.jpg"?| [a-z0-9]+\.mu3"?|((\d{1,3})?\.part(\d{1,5})?|\d{1,5} ?|sample|- Partie \d+)?\.(7z|\d{3}(?=(\s|"))|avi|diz|docx?|epub|idx|iso|jpg|m3u|m4a|mds|mkv|mobi|mp4|nfo|nzb|par(\s?2|")|pdf|rar|rev|rtf|r\d\d|sfv|srs|srr|sub|txt|vol.+(par2)|xls|zip|z{2,3})"?|(\s|(\d{2,3})?-)\d{2,3}\.mp3|\d{2,3}\.pdf|\.part\d{1,4}\./i', ' ', $cleanSubject);
+        // File Sizes - Non unique ones.
+        $cleanSubject = preg_replace('/\d{1,3}(,|\.|\/)\d{1,3}\s(k|m|g)b|(\])?\s\d+KB\s(yENC)?|"?\s\d+\sbytes?|[- ]?\d+[.,]?\d+\s(g|k|m)?B\s-?(\s?yenc)?|\s\(d{1,3},\d{1,3}\s{K,M,G}B\)\s|yEnc \d+k$|{\d+ yEnc bytes}|yEnc \d+ |\(\d+ ?(k|m|g)?b(ytes)?\) yEnc$/i', ' ', $cleanSubject);
+        // Random stuff.
+        $cleanSubject = preg_replace('/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i', ' ', $cleanSubject);
+        // Multi spaces.
+        $cleanSubject = utf8_encode(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)));
+        // If the subject is too similar to another because it is so short, try to extract info from the subject.
+        if (\strlen($cleanSubject) <= 10 || preg_match('/^[-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
+            $x = '';
+            if (preg_match('/.*("[A-Z0-9]+).*?"/i', $this->subject, $match)) {
+                $x = $match[1];
+            }
+            if (preg_match_all('/[^A-Z0-9]/i', $this->subject, $match1)) {
+                $start = 0;
+                foreach ($match1[0] as $add) {
+                    if ($start > 2) {
+                        break;
+                    }
+                    $x .= $add;
+                    $start++;
+                }
+            }
+            $newName = preg_replace('/".+?"/', '', $this->subject);
+            $newName = preg_replace('/[a-z0-9]|'.$this->e0.'/i', '', $newName);
+
+            return [
+                'id'   => self::REGEX_MUSIC_MATCH,
+                'name' => $cleanSubject.$newName.$x,
+            ];
+        }
+
+        return [
+            'id'   => self::REGEX_MUSIC_MATCH,
+            'name' => $cleanSubject,
+        ];
     }
 
     /**

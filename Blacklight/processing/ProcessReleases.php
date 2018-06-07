@@ -326,6 +326,8 @@ class ProcessReleases
 
     /**
      * @param $groupID
+     *
+     * @throws \Exception
      */
     public function processCollectionSizes($groupID): void
     {
@@ -575,7 +577,7 @@ class ProcessReleases
 
                     if (\is_array($cleanedName)) {
                         $properName = $cleanedName['properlynamed'];
-                        $preID = $cleanerName['predb'] ?? false;
+                        $preID = $cleanedName['predb'] ?? false;
                         $cleanedName = $cleanedName['cleansubject'];
                     } else {
                         $properName = true;

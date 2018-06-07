@@ -13,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $smarty = app('smarty.view');
+        view()->share('smarty', $smarty);
     }
 
     /**

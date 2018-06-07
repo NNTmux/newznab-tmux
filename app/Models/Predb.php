@@ -5,17 +5,48 @@ namespace App\Models;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Laravel\Scout\Searchable;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
+use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * App\Models\Predb.
+ *
  * @property mixed $release
  * @property mixed $hash
+ * @property int $id Primary key
+ * @property string $title
+ * @property string|null $nfo
+ * @property string|null $size
+ * @property string|null $category
+ * @property string|null $predate
+ * @property string $source
+ * @property int $requestid
+ * @property int $groups_id FK to groups
+ * @property bool $nuked Is this pre nuked? 0 no 2 yes 1 un nuked 3 mod nuked
+ * @property string|null $nukereason If this pre is nuked, what is the reason?
+ * @property string|null $files How many files does this pre have ?
+ * @property string $filename
+ * @property bool $searched
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereCategory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereFiles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereGroupsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereNfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereNuked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereNukereason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb wherePredate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereRequestid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSearched($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Predb whereTitle($value)
+ * @mixin \Eloquent
  */
 class Predb extends Model
 {
     use Searchable;
+    use Rememberable;
 
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
@@ -75,7 +106,7 @@ class Predb extends Model
             ->join('releases', 'predb.title', '=', 'releases.searchname')
             ->select(['predb.id as predb_id', 'releases.id as releases_id']);
         if ($dateLimit !== false && is_numeric($dateLimit)) {
-            $query->where('adddate', '>', Carbon::now()->subDays($dateLimit));
+            $query->where('adddate', '>', now()->subDays($dateLimit));
         }
 
         $res = $query->get();
@@ -143,45 +174,17 @@ class Predb extends Model
     }
 
     /**
-     * Get all PRE's in the DB.
-     *
-     *
-     * @param $offset
-     * @param $offset2
      * @param string|array $search
-     * @return array
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public static function getAll($offset, $offset2, $search = ''): array
+    public static function getAll($search = '')
     {
         if ($search !== '') {
             $search = explode(' ', trim($search));
         }
 
-        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
-        if ($search === '') {
-            $check = Cache::get('predbcount');
-            if ($check !== null) {
-                $count = $check;
-            } else {
-                $count = self::count();
-                Cache::put('predbcount', $count, $expiresAt);
-            }
-        } else {
-            $sql = self::query()->where(function ($query) use ($search) {
-                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->where('title', 'like', '%'.$search[$i].'%');
-                }
-            });
-            $check = Cache::get(md5(implode(',', $search)));
-            if ($check !== null) {
-                $count = $check;
-            } else {
-                $count = $sql->count('id');
-                Cache::put(md5(implode(',', $search)), $count, $expiresAt);
-            }
-        }
-
-        $sql = self::query()->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')->orderBy('predb.predate', 'desc')->limit($offset2)->offset($offset);
+        $sql = self::query()->remember(config('nntmux.cache_expiry_medium'))->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if ($search !== '') {
             $sql->where(function ($query) use ($search) {
                 for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
@@ -189,16 +192,8 @@ class Predb extends Model
                 }
             });
         }
-        $search = $search !== '' ? implode(',', $search) : '';
-        $check = Cache::get(md5($offset.$offset2.$search));
-        if ($check !== null) {
-            $parr = $check;
-        } else {
-            $parr = $sql->get();
-            Cache::put(md5($offset.$offset2.$search), $parr, $expiresAt);
-        }
 
-        return ['arr' => $parr, 'count' => $count ?? 0];
+        return $sql->paginate(config('nntmux.items_per_page'));
     }
 
     /**

@@ -14,7 +14,10 @@ class CreateSharingTable extends Migration {
 	{
 		Schema::create('sharing', function(Blueprint $table)
 		{
-			$table->string('site_guid', 40)->default('')->primary();
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->string('site_guid', 40)->default('')->primary();
 			$table->string('site_name')->default('');
 			$table->string('username')->default('');
 			$table->boolean('enabled')->default(0);

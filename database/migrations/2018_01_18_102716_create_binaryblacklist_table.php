@@ -14,7 +14,10 @@ class CreateBinaryblacklistTable extends Migration {
 	{
 		Schema::create('binaryblacklist', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
+		    $table->increments('id');
 			$table->string('groupname')->nullable()->index('ix_binaryblacklist_groupname');
 			$table->string('regex', 2000);
 			$table->integer('msgcol')->unsigned()->default(1);

@@ -40,6 +40,7 @@ class InstallNntmux extends Command
      * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
      * @throws \Symfony\Component\Process\Exception\LogicException
      * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Exception
      */
     public function handle()
     {
@@ -122,7 +123,7 @@ class InstallNntmux extends Command
                 }
 
                 if (! $error && $this->addAdminUser()) {
-                    @file_put_contents(base_path().'_install/install.lock', '');
+                    @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
                     $process = new Process('php artisan key:generate --force');
                     $process->setTimeout(600);
@@ -171,13 +172,14 @@ class InstallNntmux extends Command
 
     /**
      * @return array|bool
+     * @throws \Exception
      * @throws \RuntimeException
      */
     protected function updatePaths()
     {
-        $covers_path = base_path().'resources/covers/';
-        $nzb_path = base_path().'resources/nzb/';
-        $tmp_path = base_path().'resources/tmp/';
+        $covers_path = base_path().'/resources/covers/';
+        $nzb_path = base_path().'/resources/nzb/';
+        $tmp_path = base_path().'/resources/tmp/';
         $unrar_path = $tmp_path.'unrar/';
 
         $nzbPathCheck = is_writable($nzb_path);

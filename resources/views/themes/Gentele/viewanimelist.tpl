@@ -11,10 +11,10 @@
 	{$site->adbrowse}
 	<p><b>Jump to</b>:
 		&nbsp;&nbsp;[ {if $animeletter == '0-9'}<b><u>{/if}<a
-						href="{$smarty.const.WWW_TOP}/anime/0-9">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
+						href="{$smarty.const.WWW_TOP}/animelist/0-9">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
 		{foreach $animerange as $range}
 		{if $range == $animeletter}<b><u>{/if}<a
-		href="{$smarty.const.WWW_TOP}/anime/{$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
+		href="{$smarty.const.WWW_TOP}/animelist?id={$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
 		{/foreach}]
 	</p>
 	{$site->adbrowse}
@@ -24,13 +24,12 @@
 				<tr>
 					<td colspan="10">
 						<h2>{$aletter}...</h2>
-						<form name="anidbsearch" class="form pull-right" action="" method="get"
-							  style="margin-top:-35px;">
-							<label for="title">Search:</label>
-							<input class="form-control" style="width: 150px;" id="title appendedInputButton" type="text"
-								   name="title" value="{$animetitle}" placeholder="Search here"/>
-							<button type="submit" class="btn btn-default">GO</button>
-						</form>
+                        {{Form::open(['class' => 'form pull-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
+							{{Form::label('title', 'Search:')}}
+                            {{Form::text('title', $animetitle, ['class' => 'form-control', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
+                            'placeholder' => 'Search here'])}}
+                            {{Form::button('Search', ['class' => 'btn btn-default', 'type' => 'submit'])}}
+						{{Form::close()}}
 					</td>
 				</tr>
 				<tr>
@@ -43,9 +42,9 @@
 				{foreach $anime as $a}
 					<tr>
 						<td><a class="title" title="View anime"
-							   href="{$smarty.const.WWW_TOP}/anime/{$a.anidbid}">{$a.title|escape:"htmlall"}</a>{if {$a.startdate} != ''}
+							   href="{$smarty.const.WWW_TOP}/anime?id={$a.anidbid}">{$a.title|escape:"htmlall"}</a>{if {$a.startdate} != ''}
 							<br/><span class="label label-info">({$a.startdate|date_format}
-								- {/if}{if $a.enddate != ''}{$a.enddate|date_format}{/if})</span></td>
+								- {/if}{if $a.enddate != ''}{$a.enddate|date_format}){/if}</span></td>
 						<td>{if {$a.type} != ''}{$a.type|escape:"htmlall"}{/if}</td>
 						<td>{if {$a.categories} != ''}{$a.categories|escape:"htmlall"|replace:'|':', '}{/if}</td>
 						<td>{if {$a.rating} != ''}{$a.rating}{/if}</td>
