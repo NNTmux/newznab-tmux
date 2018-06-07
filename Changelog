@@ -1,4 +1,5 @@
 2018-06-07 DariusIII
+	* Chg: Check for empty response, not false in ReleaseRemover class
 	* Fix: Fix error in ReleaseRemover when deleting releases
 	* Chg: Adjust addate response
 	* Chg: Add added column to API v2 json response
