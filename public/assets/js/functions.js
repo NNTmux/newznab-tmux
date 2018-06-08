@@ -53,7 +53,7 @@ jQuery(function($){
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
         var guid = $(".guid").attr('id').substring(4);
-        var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Added to Queue');
@@ -80,7 +80,7 @@ jQuery(function($){
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
         var guid = $(".guid").attr('id').substring(4);
-        var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
@@ -398,7 +398,7 @@ jQuery(function($){
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
         var guid = $(this).attr('id').substring(4);
-        var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Release added to Queue');
@@ -425,7 +425,7 @@ jQuery(function($){
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
         var guid = $(this).attr('id').substring(4);
-        var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
@@ -565,7 +565,7 @@ jQuery(function($){
             var guid = $(row).val();
             //alert(guid);
             if (guid && !$sabIcon.hasClass('icon_sab_clicked')) {
-                var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+                var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
                 // alert(nzburl);
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
@@ -594,7 +594,7 @@ jQuery(function($){
             var $nzbgetIcon = $(row).parent().parent().children('td.icons').children('.icon_nzbget');
             var guid = $(row).val();
             if (guid && !$nzbgetIcon.hasClass('icon_nzbget_clicked')) {
-                var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+                var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title','Added to Queue');
                     PNotify.prototype.options.styling = "fontawesome";
@@ -720,7 +720,7 @@ jQuery(function($){
         var ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
-            var nzburl = SERVERROOT + "sendtoqueue/" + guid;
+            var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
             $.post( nzburl, function(){
                 PNotify.prototype.options.styling = "fontawesome";
                 PNotify.desktop.permission();

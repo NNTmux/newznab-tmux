@@ -1,4 +1,6 @@
 2018-06-08 DariusIII
+	* Fix: Revert breaking change in NNTP class that prevented proper binaries updating. Fixes issues #622 and #609
+	* Fix: Fix links to sendtoqueue, closes issue #623
 	* Fix: Add missing column to tv related search function
 2018-06-07 DariusIII
 	* Fix: Fix wrong return type in returnError function PHPDOC block

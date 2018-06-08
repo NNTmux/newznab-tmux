@@ -1040,7 +1040,7 @@ class NNTP extends \Net_NNTP_Client
             $data .= $buffer;
 
             // Check if we have the ending (.\r\n)
-            if (substr($buffer, -2) === ".\r\n") {
+            if (substr($buffer, -3) === ".\r\n") {
                 // We have a possible ending, next loop check if it is.
                 $possibleTerm = true;
             }
