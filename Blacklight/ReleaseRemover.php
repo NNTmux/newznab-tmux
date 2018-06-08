@@ -856,8 +856,6 @@ class ReleaseRemover
 
         if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
-                $dbRegex = $this->pdo->escapeString($regex->regex);
-
                 $regexSQL = sprintf(
                     'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 				WHERE rf.name REGEXP %s ',
@@ -1295,7 +1293,7 @@ class ReleaseRemover
      * Echo the error and return false if on CLI.
      * Return the error if on browser.
      *
-     * @return bool/string
+     * @return bool|string
      */
     protected function returnError()
     {
