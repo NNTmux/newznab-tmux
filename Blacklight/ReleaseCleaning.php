@@ -119,10 +119,10 @@ class ReleaseCleaning
                 foreach ($match as $val) {
                     $title = Predb::query()->where('title', trim($val))->first(['title', 'id']);
                     // don't match against ab.teevee if title is for just the season
-                    if ($this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
-                        $title = false;
+                    if (! empty($title) && $this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
+                        $title = null;
                     }
-                    if ($title !== false) {
+                    if ($title !== null) {
                         return [
                             'cleansubject'  => $title['title'],
                             'properlynamed' => true,
@@ -140,7 +140,7 @@ class ReleaseCleaning
             preg_match('/^(\d{4,6})-\d{1}\[/', $this->subject, $match) ||
             preg_match('/(\d{4,6}) -/', $this->subject, $match)
         ) {
-            $title = Predb::query()->where(['predb.requestid'=> $match[1], 'groups.name' => $this->groupName])->join('groups', 'groups.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+            $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $this->groupName])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             //check for predb title matches against other groups where it matches relative size / fromname
             //known crossposted requests only atm
             $reqGname = '';
@@ -163,14 +163,14 @@ class ReleaseCleaning
                     }
                     break;
             }
-            if ($title === false && ! empty($reqGname)) {
-                $title = Predb::query()->where(['predb.requestid'=> $match[1], 'groups.name' => $reqGname])->join('groups', 'groups.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+            if ($title === null && ! empty($reqGname)) {
+                $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $reqGname])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             }
             // don't match against ab.teevee if title is for just the season
             if ($this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
-                $title = false;
+                $title = null;
             }
-            if ($title !== false) {
+            if ($title !== null) {
                 return [
                     'cleansubject'  => $title['title'],
                     'properlynamed' => true,

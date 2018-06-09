@@ -1,3 +1,5 @@
+2018-06-09 DariusIII
+	* Fix: Potential fix for blank releases searchnames (issue #621)
 2018-06-08 DariusIII
 	* Fix: Revert breaking change in NNTP class that prevented proper binaries updating. Fixes issues #622 and #609
 	* Fix: Fix links to sendtoqueue, closes issue #623
