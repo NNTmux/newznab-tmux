@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use App\Models\Predb;
-use Blacklight\db\DB;
 
 /**
  * Cleans names for releases/imports/namefixer.
@@ -59,11 +58,6 @@ class ReleaseCleaning
     public $groupName = '';
 
     /**
-     * @var \Blacklight\db\DB|null
-     */
-    public $pdo;
-
-    /**
      * @var string
      */
     public $size = '';
@@ -79,7 +73,9 @@ class ReleaseCleaning
     protected $_regexes;
 
     /**
-     * @param DB $settings
+     * ReleaseCleaning constructor.
+     *
+     * @param null $settings
      * @throws \Exception
      */
     public function __construct($settings = null)
@@ -88,38 +84,32 @@ class ReleaseCleaning
         $this->e0 = CollectionsCleaning::REGEX_FILE_EXTENSIONS;
         $this->e1 = CollectionsCleaning::REGEX_FILE_EXTENSIONS.CollectionsCleaning::REGEX_END;
         $this->e2 = CollectionsCleaning::REGEX_FILE_EXTENSIONS.CollectionsCleaning::REGEX_SUBJECT_SIZE.CollectionsCleaning::REGEX_END;
-        $this->pdo = ($settings instanceof DB ? $settings : new DB());
-        $this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
+        $this->_regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
     }
 
     /**
      * @param      $subject
      * @param      $fromName
-     * @param      $size
      * @param      $groupName
-     * @param bool $usepre
+     * @param bool $usePre
      *
      * @return array|bool|null
      * @throws \Exception
      */
-    public function releaseCleaner($subject, $fromName, $size, $groupName, $usepre = false)
+    public function releaseCleaner($subject, $fromName, $groupName, $usePre = false)
     {
         $match = $matches = [];
-        $this->groupName = $groupName;
-        $this->subject = $subject;
-        $this->fromName = $fromName;
-        $this->size = $size;
         // Get pre style name from releases.name
         if (preg_match_all(
             '/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/',
-            $this->subject,
+            $subject,
             $matches
         )) {
             foreach ($matches as $match) {
                 foreach ($match as $val) {
                     $title = Predb::query()->where('title', trim($val))->first(['title', 'id']);
                     // don't match against ab.teevee if title is for just the season
-                    if (! empty($title) && $this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
+                    if (! empty($title) && $groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
                         $title = null;
                     }
                     if ($title !== null) {
@@ -135,30 +125,30 @@ class ReleaseCleaning
             }
         }
         // Get pre style name from requestid
-        if (preg_match('/^\[ ?(\d{4,6}) ?\]/', $this->subject, $match) ||
-            preg_match('/^REQ\s*(\d{4,6})/i', $this->subject, $match) ||
-            preg_match('/^(\d{4,6})-\d{1}\[/', $this->subject, $match) ||
-            preg_match('/(\d{4,6}) -/', $this->subject, $match)
+        if (preg_match('/^\[ ?(\d{4,6}) ?\]/', $subject, $match) ||
+            preg_match('/^REQ\s*(\d{4,6})/i', $subject, $match) ||
+            preg_match('/^(\d{4,6})-\d{1}\[/', $subject, $match) ||
+            preg_match('/(\d{4,6}) -/', $subject, $match)
         ) {
-            $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $this->groupName])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+            $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $groupName])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             //check for predb title matches against other groups where it matches relative size / fromname
             //known crossposted requests only atm
             $reqGname = '';
-            switch ($this->groupName) {
+            switch ($groupName) {
                 case 'alt.binaries.etc':
-                    if ($this->fromName === 'kingofpr0n (brian@iamking.ws)') {
+                    if ($fromName === 'kingofpr0n (brian@iamking.ws)') {
                         $reqGname = 'alt.binaries.teevee';
                     }
                     break;
                 case 'alt.binaries.mom':
-                    if ($this->fromName === 'Yenc@power-post.org (Yenc-PP-A&A)' ||
-                        $this->fromName === 'yEncBin@Poster.com (yEncBin)'
+                    if ($fromName === 'Yenc@power-post.org (Yenc-PP-A&A)' ||
+                        $fromName === 'yEncBin@Poster.com (yEncBin)'
                     ) {
                         $reqGname = 'alt.binaries.moovee';
                     }
                     break;
                 case 'alt.binaries.hdtv.x264':
-                    if ($this->fromName === 'moovee@4u.tv (moovee)') {
+                    if ($fromName === 'moovee@4u.tv (moovee)') {
                         $reqGname = 'alt.binaries.moovee';
                     }
                     break;
@@ -167,7 +157,7 @@ class ReleaseCleaning
                 $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $reqGname])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             }
             // don't match against ab.teevee if title is for just the season
-            if ($this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
+            if ($groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
                 $title = null;
             }
             if ($title !== null) {
@@ -180,7 +170,7 @@ class ReleaseCleaning
                 ];
             }
         }
-        if ($usepre === true) {
+        if ($usePre === true) {
             return false;
         }
 
@@ -195,7 +185,7 @@ class ReleaseCleaning
         }
 
         //if www.town.ag releases check against generic_town regexes
-        if (preg_match('/www\.town\.ag/i', $this->subject)) {
+        if (preg_match('/www\.town\.ag/i', $subject)) {
             return $this->generic_town();
         }
         if ($groupName === 'alt.binaries.teevee') {

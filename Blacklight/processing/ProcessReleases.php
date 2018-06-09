@@ -571,7 +571,6 @@ class ProcessReleases
                     $cleanedName = $this->releaseCleaning->releaseCleaner(
                         $collection['subject'],
                         $collection['fromname'],
-                        $collection['filesize'],
                         $collection['gname']
                     );
 
