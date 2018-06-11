@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserDownload;
 use Blacklight\XXX;
 use App\Models\User;
 use App\Models\Predb;
@@ -20,6 +19,7 @@ use App\Models\ReleaseNfo;
 use App\Models\DnzbFailure;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseRegex;
+use App\Models\UserDownload;
 use Blacklight\ReleaseExtra;
 use App\Models\ReleaseComment;
 use Illuminate\Support\Facades\Auth;
