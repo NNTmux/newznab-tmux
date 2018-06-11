@@ -30,36 +30,20 @@ DB::unprepared('TRUNCATE TABLE short_groups');
 DB::commit();
 
 // Put into an array all active groups
-$res = Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name'])->toArray();
+$result = Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']);
 
 foreach ($data as $newgroup) {
-    if (myInArray($res, $newgroup['group'], 'name')) {
-        ShortGroup::query()->insert(
-            [
-                'name' => $newgroup['group'],
-                'first_record' => $newgroup['first'],
-                'last_record' => $newgroup['last'],
-                'updated' => now(),
-            ]
-        );
-        ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
-    }
-}
-ColorCLI::doEcho(ColorCLI::header('Running time: '.$consoleTools->convertTimer(time() - $start)));
-
-function myInArray($array, $value, $key)
-{
-    //loop through the array
-    foreach ($array as $val) {
-        //if $val is an array cal myInArray again with $val as array input
-        if (is_array($val)) {
-            if (myInArray($val, $value, $key)) {
-                return true;
-            }
-        } elseif ($array[$key] === $value) {
-            return true;
+    foreach ($result as $res) {
+        if ($res['name'] === $newgroup['group']) {
+            ShortGroup::query()->insert([
+                    'name' => $newgroup['group'],
+                    'first_record' => $newgroup['first'],
+                    'last_record' => $newgroup['last'],
+                    'updated' => now(),
+                ]);
+            ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
         }
     }
-
-    return false;
 }
+
+ColorCLI::doEcho(ColorCLI::header('Running time: '.$consoleTools->convertTimer(time() - $start)));
