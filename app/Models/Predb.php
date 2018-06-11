@@ -89,7 +89,7 @@ class Predb extends Model
     /**
      * Attempts to match PreDB titles to releases.
      *
-     * @param $dateLimit
+     * @param string|int|bool $dateLimit
      * @throws \RuntimeException
      */
     public static function checkPre($dateLimit = false): void
@@ -115,7 +115,6 @@ class Predb extends Model
             $total = \count($res);
             echo ColorCLI::primary(number_format($total).' releases to match.');
 
-            if ($res instanceof \Traversable) {
                 foreach ($res as $row) {
                     Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
 
@@ -128,7 +127,6 @@ class Predb extends Model
                 if (config('nntmux.echocli')) {
                     echo PHP_EOL;
                 }
-            }
 
             if (config('nntmux.echocli')) {
                 echo ColorCLI::header(
