@@ -105,8 +105,8 @@ class Predb extends Model
             ->where('releases.predb_id', '<', 1)
             ->join('releases', 'predb.title', '=', 'releases.searchname')
             ->select(['predb.id as predb_id', 'releases.id as releases_id']);
-        if ($dateLimit !== false && is_numeric($dateLimit)) {
-            $query->where('adddate', '>', now()->subDays($dateLimit));
+        if ($dateLimit !== false && (int)$dateLimit > 0) {
+            $query->where('adddate', '>', now()->subDays((int)$dateLimit));
         }
 
         $res = $query->get();
