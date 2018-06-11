@@ -1,4 +1,5 @@
 2018-06-11 DariusIII
+	* Chg: Add additional info for admins on release details page
 	* Chg: Update Predb model checkPre function
 	* Chg: Update update_groups script
 	* Chg: Update psy/psysh and sebastian/diff to latest versions

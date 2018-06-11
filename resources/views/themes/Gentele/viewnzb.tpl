@@ -577,13 +577,14 @@
 																	Info
 																</th>
 																<td>
-																	{if $release.gid != ""}
-																		Global Id: {$release.gid}
-																	{/if}
-																	<br>
-																	{if !empty($regex->collection_regex_id)} Collection regex ID: {$regex->collection_regex_id}{/if}
-																	<br>
-																	{if !empty($regex->naming_regex_id)} Naming regex ID: {$regex->naming_regex_id}{/if}
+																	{if !empty($regex->collection_regex_id)} Collection regex ID: {$regex->collection_regex_id}<br>{/if}
+																	{if !empty($regex->naming_regex_id)} Naming regex ID: {$regex->naming_regex_id}<br>{/if}
+                                                                    {if !empty($downloadedby) && count($downloadedby)>0} Release downloaded by following users:
+                                                                        {foreach $downloadedby as $user}
+                                                                            <br>
+                                                                            <a href="{$smarty.const.WWW_TOP}/admin/user-edit?id={$user->user->id}">{$user->user->username}</a>
+                                                                        {/foreach}
+                                                                    {/if}
 																</td>
 															</tr>
 														{/if}
