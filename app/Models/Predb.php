@@ -115,18 +115,18 @@ class Predb extends Model
             $total = \count($res);
             echo ColorCLI::primary(number_format($total).' releases to match.');
 
-                foreach ($res as $row) {
-                    Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
+            foreach ($res as $row) {
+                Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
 
-                    if (config('nntmux.echocli')) {
-                        $consoleTools->overWritePrimary(
+                if (config('nntmux.echocli')) {
+                    $consoleTools->overWritePrimary(
                             'Matching up preDB titles with release searchnames: '.$consoleTools->percentString(++$updated, $total)
                         );
-                    }
                 }
-                if (config('nntmux.echocli')) {
-                    echo PHP_EOL;
-                }
+            }
+            if (config('nntmux.echocli')) {
+                echo PHP_EOL;
+            }
 
             if (config('nntmux.echocli')) {
                 echo ColorCLI::header(
