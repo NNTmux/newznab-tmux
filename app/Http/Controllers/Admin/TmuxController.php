@@ -43,8 +43,8 @@ class TmuxController extends BasePageController
         $this->smarty->assign('backfill_group', ['Newest', 'Oldest', 'Alphabetical', 'Alphabetical - Reverse', 'Most Posts', 'Fewest Posts']);
         $this->smarty->assign('backfill_days', ['Days per Group', 'Safe Backfill day']);
         $this->smarty->assign('backfill_days_ids', [1, 2]);
-        $this->smarty->assign('dehash_ids', [0, 1, 2, 3]);
-        $this->smarty->assign('dehash_names', ['Disabled', 'Decrypt Hashes', 'Predb', 'All']);
+        $this->smarty->assign('dehash_ids', [0, 1]);
+        $this->smarty->assign('dehash_names', ['Disabled', 'Enabled']);
         $this->smarty->assign('import_ids', [0, 1, 2]);
         $this->smarty->assign('import_names', ['Disabled', 'Import - Do Not Use Filenames', 'Import - Use Filenames']);
         $this->smarty->assign('releases_ids', [0, 1]);

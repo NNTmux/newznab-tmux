@@ -134,7 +134,6 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][3]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/decrypt_hashes.php 1000 $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 1000 show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
@@ -153,7 +152,6 @@ class TmuxRun extends Tmux
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/decrypt_hashes.php 1000 $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 1000 show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
