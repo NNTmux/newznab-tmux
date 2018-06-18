@@ -1,4 +1,5 @@
 2018-06-18 DariusIII
+	* Fix: Prevent insertion of blank searchnames for releases
 	* Chg: Update nunomaduro/collision to version 2.0.3
 2018-06-16 DariusIII
 	* Chg: Update used libraries to their latest versions
