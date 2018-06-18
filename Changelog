@@ -1,4 +1,5 @@
 2018-06-18 DariusIII
+	* Chg: Update minimum MySQL version to 5.7 and MariaDB version to 10.2
 	* Fix: Prevent insertion of blank searchnames for releases
 	* Chg: Update nunomaduro/collision to version 2.0.3
 2018-06-16 DariusIII
