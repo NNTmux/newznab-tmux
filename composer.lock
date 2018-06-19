@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ceaa3e1d0c023b26952070da0411a33d",
+    "content-hash": "016d2121392c4c0ea3207cfb7252f6b9",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -312,8 +312,7 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            },
-            "time": "2016-06-06T17:37:52+00:00"
+            }
         },
         {
             "name": "bower-asset/autosize",
@@ -342,8 +341,7 @@
                 "form",
                 "textarea",
                 "ui"
-            ],
-            "time": "2017-05-19T15:36:30+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap",
@@ -392,8 +390,7 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ],
-            "time": "2016-07-25T15:51:55+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-3.x",
@@ -442,8 +439,7 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ],
-            "time": "2016-07-25T15:51:55+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -472,8 +468,7 @@
             },
             "license": [
                 "Apache-2.0"
-            ],
-            "time": "2016-08-05T09:50:13+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -503,8 +498,7 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ],
-            "time": "2015-12-01T23:35:57+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -538,8 +532,7 @@
             },
             "license": [
                 "MIT"
-            ],
-            "time": "2015-05-15T18:56:17+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootswatch",
@@ -670,8 +663,7 @@
                 "modal",
                 "popup",
                 "ui"
-            ],
-            "time": "2016-05-10T22:21:33+00:00"
+            ]
         },
         {
             "name": "bower-asset/datatables",
@@ -786,8 +778,7 @@
                     "tests",
                     "examples"
                 ]
-            },
-            "time": "2015-01-26T21:19:01+00:00"
+            }
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -823,8 +814,7 @@
                 "css",
                 "flexbox",
                 "grid"
-            ],
-            "time": "2016-08-14T16:43:18+00:00"
+            ]
         },
         {
             "name": "bower-asset/font-awesome",
@@ -869,8 +859,7 @@
                     "src",
                     "build.xml"
                 ]
-            },
-            "time": "2015-07-20T20:04:00+00:00"
+            }
         },
         {
             "name": "bower-asset/icheck",
@@ -920,8 +909,7 @@
                 "replacement",
                 "skins",
                 "ui"
-            ],
-            "time": "2014-03-03T17:36:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery",
@@ -984,8 +972,7 @@
                 "javascript",
                 "jquery",
                 "library"
-            ],
-            "time": "2016-05-20T17:24:43+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery-3.2.x",
@@ -1052,8 +1039,7 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ],
-            "time": "2017-08-31T15:51:29+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
@@ -1072,8 +1058,7 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            },
-            "time": "2016-04-15T06:38:34+00:00"
+            }
         },
         {
             "name": "bower-asset/jquery-migrate-3.0.x",
@@ -1092,8 +1077,7 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            },
-            "time": "2016-06-10T14:28:59+00:00"
+            }
         },
         {
             "name": "bower-asset/jquery.nicescroll",
@@ -1123,8 +1107,7 @@
                     "demo",
                     "package.json"
                 ]
-            },
-            "time": "2016-03-01T20:38:24+00:00"
+            }
         },
         {
             "name": "bower-asset/material-design-iconic-font",
@@ -1163,8 +1146,7 @@
                 "font",
                 "icons",
                 "material"
-            ],
-            "time": "2015-11-08T04:50:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/materialize",
@@ -1223,8 +1205,7 @@
                 "responsive",
                 "sass",
                 "ux"
-            ],
-            "time": "2017-04-15T01:39:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/pace",
@@ -1270,8 +1251,7 @@
                 "progress",
                 "progress",
                 "spinner"
-            ],
-            "time": "2014-11-06T16:31:34+00:00"
+            ]
         },
         {
             "name": "bower-asset/pnotify",
@@ -1323,8 +1303,7 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin.",
-            "time": "2017-07-31T21:50:29+00:00"
+            "description": "JavaScript notification plugin."
         },
         {
             "name": "bower-asset/respond",
@@ -1348,8 +1327,7 @@
                     "test"
                 ]
             },
-            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
-            "time": "2013-12-19T04:44:31+00:00"
+            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
         },
         {
             "name": "bower-asset/responsive-tables-js",
@@ -1379,8 +1357,7 @@
                 "jquery",
                 "responsive",
                 "table"
-            ],
-            "time": "2015-10-08T14:18:04+00:00"
+            ]
         },
         {
             "name": "bower-asset/select2",
@@ -1448,8 +1425,7 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ],
-            "time": "2016-06-11T09:19:14+00:00"
+            ]
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -2843,20 +2819,21 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "79bce1d7b0d97204fd05be1dd1931d83561312cd"
+                "reference": "878de4fdb5c3cc75df2f51e74932ea4c6b06aebe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/79bce1d7b0d97204fd05be1dd1931d83561312cd",
-                "reference": "79bce1d7b0d97204fd05be1dd1931d83561312cd",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/878de4fdb5c3cc75df2f51e74932ea4c6b06aebe",
+                "reference": "878de4fdb5c3cc75df2f51e74932ea4c6b06aebe",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
+                "ext-dom": "*",
                 "php": ">=5.6",
                 "psr/log": "~1.0",
                 "psr/simple-cache": "^1.0"
@@ -2864,6 +2841,7 @@
             "require-dev": {
                 "cache/array-adapter": "^1.0",
                 "mockery/mockery": "~0.9",
+                "phpstan/phpstan": "^0.9.2",
                 "phpunit/phpunit": "5.4.8"
             },
             "type": "library",
@@ -2877,7 +2855,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-04-19T19:31:57+00:00"
+            "time": "2018-06-19T16:30:32+00:00"
         },
         {
             "name": "intervention/image",
@@ -9430,6 +9408,7 @@
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
         "dborsatto/php-giantbomb": 20,
+        "imdbphp/imdbphp": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "mayconbordin/l5-fixtures": 20,
         "nzedb/git.php": 20
