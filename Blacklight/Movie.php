@@ -658,7 +658,7 @@ class Movie
             $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
-        //RottenTomatoes rating from OmdbAPI
+        // RottenTomatoes rating from OmdbAPI
         if (! empty($omdb['rtRating'])) {
             $mov['rtrating'] = $omdb['rtRating'];
         }
@@ -901,7 +901,7 @@ class Movie
                         'title' => $result->title(),
                         'tagline' => $result->tagline(),
                         'plot' => array_get($result->plot_split(), '0.plot'),
-                        'rating' => $result->rating(),
+                        'rating' => ! empty($result->rating()) ? $result->rating() : '',
                         'year' => $result->year(),
                         'cover' => $result->photo(),
                         'genre' => $result->genre(),
