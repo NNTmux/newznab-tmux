@@ -1,14 +1,12 @@
 <?php
 /**
  * This script will convert releases table imdbid column
- * from zerofilled int to varchar(15)
+ * from zerofilled int to varchar(15).
  */
-
 use App\Models\Release;
 use Illuminate\Support\Facades\DB;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
-
 
 $sql = Release::query()->whereNotNull('imdbid')->where('imdbid', '<>', '0000000')->get(['imdbid', 'id']);
 
@@ -27,21 +25,21 @@ DB::commit();
 
 $count = $sql->count();
 
-echo 'Copying '.$count.' imdbid values' . PHP_EOL;
+echo 'Copying '.$count.' imdbid values'.PHP_EOL;
 
 foreach ($sql as $movie) {
     DB::table('movie_temp')->insert(['releases_id' => $movie['id'], 'imdbid' => str_pad($movie['imdbid'], 7, '0', STR_PAD_LEFT)]);
     echo '.';
 }
 
-echo PHP_EOL.'Finished copying '.$sql->count().' imdbid values' . PHP_EOL;
+echo PHP_EOL.'Finished copying '.$sql->count().' imdbid values'.PHP_EOL;
 
 DB::unprepared('ALTER TABLE releases DROP imdbid');
 DB::commit();
 DB::unprepared('ALTER TABLE releases ADD imdbid VARCHAR(15) DEFAULT NULL');
 DB::commit();
 
-echo 'Updating releases table with new values'. PHP_EOL;
+echo 'Updating releases table with new values'.PHP_EOL;
 
 foreach (DB::table('movie_temp')->get() as $imdbid) {
     DB::table('releases')->where('id', $imdbid->releases_id)->update(['imdbid' => $imdbid->imdbid]);
