@@ -9,6 +9,11 @@ use App\Http\Controllers\BasePageController;
 
 class SharingController extends BasePageController
 {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
     public function index(Request $request)
     {
         $this->setAdminPrefs();
@@ -63,6 +68,7 @@ class SharingController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );

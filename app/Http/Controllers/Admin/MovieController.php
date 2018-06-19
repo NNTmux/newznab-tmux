@@ -26,6 +26,7 @@ class MovieController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -61,6 +62,7 @@ class MovieController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -145,6 +147,7 @@ class MovieController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );

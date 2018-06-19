@@ -32,6 +32,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -69,6 +70,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -141,6 +143,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -176,6 +179,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -211,6 +215,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
