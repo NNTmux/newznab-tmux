@@ -356,6 +356,10 @@ class BasePageController extends Controller
     public function adminBasePage(): void
     {
         $this->setAdminPrefs();
+        $this->smarty->assign([
+            'meta_title' => 'Admin Home',
+            'meta_description' => 'Admin home page',
+        ]);
         $this->adminrender();
     }
 }
