@@ -1,3 +1,5 @@
+2018-06-19 DariusIII
+	* Chg: Update migrations for releases table, imdbid column is changed to varchar(15), add script to convert existing data
 2018-06-18 DariusIII
 	* Chg: Remove decrypt_hashes.php
 	* Chg: Update minimum MySQL version to 5.7 and MariaDB version to 10.2

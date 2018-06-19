@@ -34,7 +34,7 @@ class CreateReleasesTable extends Migration
             $table->integer('categories_id')->default(10);
             $table->integer('videos_id')->unsigned()->default(0)->index('ix_releases_videos_id')->comment('FK to videos.id of the parent series.');
             $table->integer('tv_episodes_id')->default(0)->index('ix_releases_tv_episodes_id')->comment('FK to tv_episodes.id for the episode.');
-            $table->integer('imdbid')->unsigned()->nullable()->index('ix_releases_imdbid');
+            $table->string('imdbid', 15)->nullable()->index('ix_releases_imdbid');
             $table->integer('xxxinfo_id')->default(0)->index('ix_releases_xxxinfo_id');
             $table->integer('musicinfo_id')->nullable()->comment('FK to musicinfo.id');
             $table->integer('consoleinfo_id')->nullable()->index('ix_releases_consoleinfo_id')->comment('FK to consoleinfo.id');
