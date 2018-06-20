@@ -10,8 +10,11 @@ use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Jrean\UserVerification\Traits\VerifiesUsers;
+use Jrean\UserVerification\Facades\UserVerification;
 
 class RegisterController extends Controller
 {
@@ -27,6 +30,7 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
+    use VerifiesUsers;
 
     /**
      * Where to redirect users after registration.
@@ -42,7 +46,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
     }
 
     /**
@@ -152,7 +156,7 @@ class RegisterController extends Controller
                             break;
                         }
 
-                        $ret = $this->create(
+                        $user = $this->create(
                             [
                                 'username' => $userName,
                                 'password' => $password,
@@ -164,12 +168,21 @@ class RegisterController extends Controller
                             ]
                         );
 
-                        if ($ret->id > 0) {
-                            Auth::loginUsingId($ret->id);
-                            User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                    event(new Registered($user));
 
-                            return redirect()->intended($this->redirectPath());
-                        }
+                    UserVerification::generate($user);
+
+                    UserVerification::send($user, 'User verification required');
+
+                    if ($user->id > 0 && (new User())->isVerified()) {
+                        Auth::loginUsingId($user->id);
+                        User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+
+                        return redirect()->intended($this->redirectPath());
+                    }
+
+                    return $this->registered($request, $user) ?: redirect($this->redirectPath());
+
                     break;
                 case 'view': {
                     $inviteCode = $request->input('invitecode') ?? null;

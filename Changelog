@@ -1,4 +1,10 @@
 2018-06-20 DariusIII
+	* Chg: Update user account change function logical order
+	* Chg: Add function to delete users that have not verified their accounts for 3 or more days
+	* Chg: Update users migration and add patch for existing users table
+	* Chg: Update routes, fix user verification
+	* Chg: Add isVerified middleware to routes
+	* Chg: Add user verification on registration
 	* Chg: Add check if rating is set in Movie class updateMovieInfo function
 2018-06-19 DariusIII
 	* Chg: Update imdbphp/imdbphp
