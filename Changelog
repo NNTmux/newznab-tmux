@@ -1,4 +1,5 @@
 2018-06-20 DariusIII
+	* Chg: Update user account change function logical order
 	* Chg: Add function to delete users that have not verified their accounts for 3 or more days
 	* Chg: Update users migration and add patch for existing users table
 	* Chg: Update routes, fix user verification

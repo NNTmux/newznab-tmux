@@ -445,8 +445,8 @@ class User extends Authenticatable
         $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
-            Mail::to($u['email'])->send(new AccountChange($u['id']));
             self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            Mail::to($u['email'])->send(new AccountChange($u['id']));
         }
 
         return self::SUCCESS;
