@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Mail\Accountexpired;
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
 use Illuminate\Support\Str;
@@ -446,7 +447,7 @@ class User extends Authenticatable
 
         foreach ($data as $u) {
             self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
-            Mail::to($u['email'])->send(new AccountChange($u['id']));
+            Mail::to($u['email'])->send(new Accountexpired($u['id']));
         }
 
         return self::SUCCESS;
