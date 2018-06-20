@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "016d2121392c4c0ea3207cfb7252f6b9",
+    "content-hash": "1dcf6a9645d4d8cccaaed914b8bf0ba8",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -3265,6 +3265,69 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "time": "2018-01-09T14:46:56+00:00"
+        },
+        {
+            "name": "jrean/laravel-user-verification",
+            "version": "v6.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jrean/laravel-user-verification.git",
+                "reference": "216ec2d003fa61092c129970d21b26b1774359f7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/216ec2d003fa61092c129970d21b26b1774359f7",
+                "reference": "216ec2d003fa61092c129970d21b26b1774359f7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.6.*",
+                "php": ">=7.1.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.12",
+                "fzaninotto/faker": "^1.6",
+                "mockery/mockery": "^0.9.5",
+                "phpunit/phpunit": "^5.5",
+                "satooshi/php-coveralls": "^1.0",
+                "sllh/php-cs-fixer-styleci-bridge": "^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Jrean\\UserVerification\\UserVerificationServiceProvider"
+                    ],
+                    "aliases": {
+                        "UserVerification": "Jrean\\UserVerification\\Facades\\UserVerification"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jrean\\UserVerification\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jean Ragouin",
+                    "email": "go@askjong.com"
+                }
+            ],
+            "description": "User Email Verification For Laravel 5.*",
+            "keywords": [
+                "email activation",
+                "email verification",
+                "framework",
+                "laravel",
+                "user activation",
+                "user verification"
+            ],
+            "time": "2018-05-22T05:58:48+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",
