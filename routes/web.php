@@ -22,7 +22,6 @@ Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestFo
 Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 
 Route::group(['middleware' => ['isVerified']], function () {
-
     Route::get('login', 'Auth\LoginController@showLoginForm');
     Route::post('login', 'Auth\LoginController@login')->name('login');
 

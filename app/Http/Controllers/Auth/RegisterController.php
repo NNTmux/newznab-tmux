@@ -9,7 +9,6 @@ use App\Models\Invitation;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
