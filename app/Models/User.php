@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use App\Mail\Accountexpired;
 use App\Mail\SendInvite;
-use App\Mail\AccountChange;
 use Illuminate\Support\Str;
+use App\Mail\Accountexpired;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
