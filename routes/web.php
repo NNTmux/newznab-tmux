@@ -15,19 +15,20 @@ Route::get('/', 'ContentController@show');
 
 Auth::routes();
 
-Route::get('login', 'Auth\LoginController@showLoginForm');
-Route::post('login', 'Auth\LoginController@login')->name('login');
-
 Route::get('register', 'Auth\RegisterController@showRegistrationForm');
 Route::post('register', 'Auth\RegisterController@register');
 
 Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 
-Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
-Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
-
 Route::group(['middleware' => ['isVerified']], function () {
+
+    Route::get('login', 'Auth\LoginController@showLoginForm');
+    Route::post('login', 'Auth\LoginController@login')->name('login');
+
+    Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
+    Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
+
     Route::get('profile', 'ProfileController@show');
 
     Route::prefix('browse')->group(function () {

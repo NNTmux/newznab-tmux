@@ -19,7 +19,7 @@ return [
         | Supported: "default", "markdown"
         |
         */
-        'type' => 'default',
+        'type' => 'markdown',
 
         /*
         |-----------------------------------------------------------------------

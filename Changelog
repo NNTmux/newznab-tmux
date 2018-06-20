@@ -1,4 +1,5 @@
 2018-06-20 DariusIII
+	* Chg: Update routes, fix user verification
 	* Chg: Add isVerified middleware to routes
 	* Chg: Add user verification on registration
 	* Chg: Add check if rating is set in Movie class updateMovieInfo function

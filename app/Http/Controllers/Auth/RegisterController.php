@@ -174,13 +174,9 @@ class RegisterController extends Controller
 
                     UserVerification::send($user, 'User verification required');
 
-                    if ($user->id > 0) {
-                        Auth::loginUsingId($user->id);
-                        User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                    return $this->registered($request, $user)
+                        ?: redirect($this->redirectPath());
 
-                        return $this->registered($request, $user)
-                            ?: redirect($this->redirectPath());
-                    }
                     break;
                 case 'view': {
                     $inviteCode = $request->input('invitecode') ?? null;
