@@ -6,15 +6,15 @@ use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\Invitation;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Jrean\UserVerification\Facades\UserVerification;
 use Jrean\UserVerification\Traits\VerifiesUsers;
+use Jrean\UserVerification\Facades\UserVerification;
 
 class RegisterController extends Controller
 {
@@ -30,7 +30,6 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
-
     use VerifiesUsers;
 
     /**
@@ -176,12 +175,12 @@ class RegisterController extends Controller
                     UserVerification::send($user, 'User verification required');
 
                     if ($user->id > 0) {
-                            Auth::loginUsingId($user->id);
-                            User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                        Auth::loginUsingId($user->id);
+                        User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
                         return $this->registered($request, $user)
                             ?: redirect($this->redirectPath());
-                        }
+                    }
                     break;
                 case 'view': {
                     $inviteCode = $request->input('invitecode') ?? null;
