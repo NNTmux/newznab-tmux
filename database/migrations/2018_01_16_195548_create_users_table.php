@@ -56,6 +56,8 @@ class CreateUsersTable extends Migration {
 			$table->string('cp_api')->nullable();
 			$table->string('style')->nullable();
 			$table->dateTime('rolechangedate')->nullable()->comment('When does the role expire');
+            $table->boolean('verified')->default(false);
+            $table->string('verification_token')->nullable();
 			$table->rememberToken();
 		});
 	}

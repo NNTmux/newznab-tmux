@@ -1,4 +1,5 @@
 2018-06-20 DariusIII
+	* Chg: Update users migration and add patch for existing users table
 	* Chg: Update routes, fix user verification
 	* Chg: Add isVerified middleware to routes
 	* Chg: Add user verification on registration
