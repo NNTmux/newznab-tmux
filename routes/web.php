@@ -34,7 +34,7 @@ Route::group(['middleware' => ['isVerified']], function () {
         Route::get('group', 'BrowseController@group');
         Route::get('all', 'BrowseController@index');
         Route::get('{parentCategory}/{id?}', 'BrowseController@show');
-    })->middleware('isVerified');
+    });
 
     Route::get('anime', 'AnimeController@showAnime');
     Route::post('anime', 'AnimeController@showAnime');
