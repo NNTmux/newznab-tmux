@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Jrean\UserVerification\Traits\UserVerification;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User.
@@ -1054,7 +1054,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Deletes users that have not verified their accounts for 3 or more days
+     * Deletes users that have not verified their accounts for 3 or more days.
      */
     public static function deleteUnVerified()
     {
