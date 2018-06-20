@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Mail\SendInvite;
 use Illuminate\Support\Str;
-use App\Mail\Accountexpired;
+use App\Mail\AccountExpired;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -446,7 +446,7 @@ class User extends Authenticatable
 
         foreach ($data as $u) {
             self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
-            Mail::to($u['email'])->send(new Accountexpired($u['id']));
+            Mail::to($u['email'])->send(new AccountExpired($u['id']));
         }
 
         return self::SUCCESS;

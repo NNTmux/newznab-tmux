@@ -8,7 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class Accountexpired extends Mailable
+class AccountExpired extends Mailable
 {
     use Queueable, SerializesModels;
 
