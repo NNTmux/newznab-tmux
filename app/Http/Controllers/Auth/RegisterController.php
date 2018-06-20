@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Jrean\UserVerification\Traits\VerifiesUsers;
@@ -173,8 +174,14 @@ class RegisterController extends Controller
 
                     UserVerification::send($user, 'User verification required');
 
-                    return $this->registered($request, $user)
-                        ?: redirect($this->redirectPath());
+                    if ($user->id > 0 && (new User())->isVerified()) {
+                        Auth::loginUsingId($user->id);
+                        User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+
+                        return redirect()->intended($this->redirectPath());
+                    }
+
+                    return $this->registered($request, $user) ?: redirect($this->redirectPath());
 
                     break;
                 case 'view': {
