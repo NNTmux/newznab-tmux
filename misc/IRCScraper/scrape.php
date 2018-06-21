@@ -25,4 +25,8 @@ $silent = (isset($argv[2]) && $argv[2] === 'true');
 $debug = (isset($argv[3]) && $argv[3] === 'true');
 
 // Start scraping.
-new IRCScraper($silent, $debug);
+try {
+    new IRCScraper($silent, $debug);
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
