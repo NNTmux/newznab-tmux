@@ -1,4 +1,5 @@
 2018-06-21 DariusIII
+	* Chg: Remove Check all checkbox from console and games cover view
 	* Chg: Don't show site theme if admin has not enabled theme change
 	* Chg: Update profile edit page with email change description
 	* Chg: Send email verification request if user has changed the email in profile edit page

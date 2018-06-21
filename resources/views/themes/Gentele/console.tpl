@@ -208,7 +208,6 @@
 								<div class="nzb_multi_operations">
 									View: <strong>Covers</strong> | <a
 											href="{$smarty.const.WWW_TOP}/Console/{$categorytitle}">List</a><br/>
-									Check all: <input type="checkbox" class="square-all"/> <br/>
 									With Selected:
 									<div class="btn-group">
 										<input type="button"
