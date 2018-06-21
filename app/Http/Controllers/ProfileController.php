@@ -16,6 +16,7 @@ use Blacklight\utility\Utility;
 use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController
 {
@@ -150,7 +151,6 @@ class ProfileController extends BasePageController
                 break;
             case 'submit':
 
-                $data['email'] = $request->input('email');
                 if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && \strlen(trim($request->input('saburl'))) > 0) {
                     $request->merge(['saburl' => $request->input('saburl').'/']);
                 }
@@ -208,6 +208,14 @@ class ProfileController extends BasePageController
 
                         if ($request->has('password') && ! empty($request->input('password'))) {
                             User::updatePassword($userid, $request->input('password'));
+                        }
+
+                        if ($data['email'] !== $request->input('email')) {
+                            $data['email'] = $request->input('email');
+
+                            UserVerification::generate($data);
+
+                            UserVerification::send($data, 'User email verification required');
                         }
 
                         return redirect('profile');
