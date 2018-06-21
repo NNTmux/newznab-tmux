@@ -1,3 +1,5 @@
+2018-06-21 DariusIII
+	* Chg: Update laravel/framework to version 5.6.26, font-awesome and phpunit to latest
 2018-06-20 DariusIII
 	* Chg: Simplify registration by using validation rules
 	* Chg: Add email for expired roles, update related functions

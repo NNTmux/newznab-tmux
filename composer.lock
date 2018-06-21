@@ -828,16 +828,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "5.0.13",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "bca574eca32c5a766b2a09fdcbedf382a78ebc38"
+                "reference": "4092d1e1a3f562626f51c31301df6164c01cd7b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/bca574eca32c5a766b2a09fdcbedf382a78ebc38",
-                "reference": "bca574eca32c5a766b2a09fdcbedf382a78ebc38",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/4092d1e1a3f562626f51c31301df6164c01cd7b5",
+                "reference": "4092d1e1a3f562626f51c31301df6164c01cd7b5",
                 "shasum": ""
             },
             "type": "bower-asset-library"
@@ -3457,16 +3457,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.6.25",
+            "version": "v5.6.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "a15efe4fbcd6b38ea76edc5c8939ffde4f4c7b7f"
+                "reference": "7047df295e77cecb6a2f84736a732af66cc6789c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/a15efe4fbcd6b38ea76edc5c8939ffde4f4c7b7f",
-                "reference": "a15efe4fbcd6b38ea76edc5c8939ffde4f4c7b7f",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/7047df295e77cecb6a2f84736a732af66cc6789c",
+                "reference": "7047df295e77cecb6a2f84736a732af66cc6789c",
                 "shasum": ""
             },
             "require": {
@@ -3592,7 +3592,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2018-06-12T14:39:24+00:00"
+            "time": "2018-06-20T14:21:11+00:00"
         },
         {
             "name": "laravel/scout",
@@ -8430,16 +8430,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.2.4",
+            "version": "7.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "00bc0b93f0ff4f557e9ea766557fde96da9a03dd"
+                "reference": "1dbfbe286dbbc194bb81b4a120415ebdf7db42c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/00bc0b93f0ff4f557e9ea766557fde96da9a03dd",
-                "reference": "00bc0b93f0ff4f557e9ea766557fde96da9a03dd",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1dbfbe286dbbc194bb81b4a120415ebdf7db42c3",
+                "reference": "1dbfbe286dbbc194bb81b4a120415ebdf7db42c3",
                 "shasum": ""
             },
             "require": {
@@ -8455,7 +8455,7 @@
                 "php": "^7.1",
                 "phpspec/prophecy": "^1.7",
                 "phpunit/php-code-coverage": "^6.0.7",
-                "phpunit/php-file-iterator": "^2.0",
+                "phpunit/php-file-iterator": "^2.0.1",
                 "phpunit/php-text-template": "^1.2.1",
                 "phpunit/php-timer": "^2.0",
                 "sebastian/comparator": "^3.0",
@@ -8510,7 +8510,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-06-05T03:40:05+00:00"
+            "time": "2018-06-21T04:05:21+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
