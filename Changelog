@@ -1,4 +1,5 @@
 2018-06-21 DariusIII
+	* Fix: Fix new line on renamed releases in NameFixer
 	* Chg: Remove Check all checkbox from console and games cover view
 	* Chg: Don't show site theme if admin has not enabled theme change
 	* Chg: Update profile edit page with email change description
