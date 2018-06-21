@@ -37,9 +37,13 @@
 													</tr>
 													<tr>
 														<th width="200">E-Mail</th>
-														<td><input id="email" class="form-control" name="email"
+														<td>
+                                                            <input id="email" class="form-control" name="email"
 																   type="text"
-																   value="{$user.email|escape:"htmlall"}"></td>
+																   value="{$user.email|escape:"htmlall"}">
+                                                            <div class="hint">If you change your email you will need to verify it. You will not be able to access the site until verification is complete.
+                                                            </div>
+                                                        </td>
 													</tr>
 													<tr>
 														<th width="200">Password</th>
