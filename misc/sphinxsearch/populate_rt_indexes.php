@@ -39,8 +39,6 @@ function populate_rt($table, $max)
         }
         $total = $totals['c'];
         $minId = $totals['min'];
-    } else {
-        exit();
     }
 
     try {
@@ -80,5 +78,6 @@ function populate_rt($table, $max)
         }
         echo "\n[Done]\n";
     } catch (Exception $e) {
+        echo $e->getMessage();
     }
 }
