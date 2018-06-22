@@ -1,4 +1,5 @@
 2018-06-22 DariusIII
+	* Chg: Update parseTraktTv function, update getTraktData script
 	* Chg: Update Movie class and add script to fetch trakt ids into movieinfo table
 	* Chg: Update moviesSearch function to use tmdb and trakt ids
 	* Chg: Update phpunit/phpunit to version 7.2.6

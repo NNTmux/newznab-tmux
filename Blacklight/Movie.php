@@ -465,8 +465,6 @@ class Movie
                 'https://',
                 str_ireplace('watch?v=', 'embed/', $data['trailer'])
             );
-
-            return $data['trailer'];
         }
         $imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
         $cover = 0;

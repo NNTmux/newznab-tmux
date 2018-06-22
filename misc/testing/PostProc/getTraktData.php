@@ -17,8 +17,16 @@ if ($count > 0) {
     foreach ($movies as $mov) {
         $startTime = microtime(true);
         $traktTv = new TraktTv(['Settings' => null]);
-        $mov = $traktTv->client->movieSummary('tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT), 'full');
-        $trakt = $movie->parseTraktTv($mov);
+        $traktmovie = $traktTv->client->movieSummary('tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT), 'full');
+        if ($traktmovie !== false) {
+            ColorCLI::doEcho(ColorCLI::info('Updating IMDb id: tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT)), true);
+            $trakt = $movie->parseTraktTv($traktmovie);
+            if ($trakt === true) {
+                ColorCLI::doEcho(ColorCLI::info('Added traktid: '.$traktmovie['ids']['trakt']), true);
+            } else {
+                ColorCLI::doEcho(ColorCLI::info('No traktid found.'), true);
+            }
+        }
     }
 } else {
     echo ColorCLI::header('No movies to update');
