@@ -48,7 +48,7 @@ class ApiV2Controller extends Controller
             'searching' => [
                 'search'       => ['available' => 'yes', 'supportedParams' => 'id'],
                 'tv-search'    => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid'],
+                'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => fractal($category, new CategoryTransformer()),
@@ -71,7 +71,7 @@ class ApiV2Controller extends Controller
         $maxAge = $api->maxAge();
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
 
-        $imdbId = $request->input('imdbid') ?? -1;
+        $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
         $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? $request->input('traktid') : -1;
 

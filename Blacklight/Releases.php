@@ -1154,26 +1154,26 @@ class Releases
             WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
+			%s %s %s %s %s %s',
+            $name !== '' ? $this->releaseSearch->getFullTextJoinString() : '',
             NZB::NZB_ADDED,
             $this->showPasswords,
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            (($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND r.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
-            (($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : ''),
-            (($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : ''),
+            $name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : '',
+            ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : '',
+            ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
+            ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
+            $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
+            $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
         );
         $baseSql = sprintf(
-            "SELECT r.*, m.tmdbid, m.traktid,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid,
 				concat(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid
 			FROM releases r
-			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
+			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
@@ -1190,6 +1190,7 @@ class Releases
             $limit,
             $offset
         );
+
         $releases = Cache::get(md5($sql));
         if ($releases !== null) {
             return $releases;
