@@ -521,7 +521,7 @@ class Movie
     {
         return [
             'actors', 'backdrop', 'cover', 'director', 'genre', 'imdbid', 'language',
-            'plot', 'rating', 'rtrating', 'tagline', 'title', 'tmdbid', 'trailer', 'type', 'year',
+            'plot', 'rating', 'rtrating', 'tagline', 'title', 'tmdbid', 'traktid', 'trailer', 'type', 'year',
         ];
     }
 
@@ -635,6 +635,7 @@ class Movie
 
         $mov['imdbid'] = $imdbId;
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
+        $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
         if (! empty($fanart['cover'])) {
@@ -718,6 +719,7 @@ class Movie
             'tagline'   => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
             'title'     => $mov['title'],
             'tmdbid'    => $mov['tmdbid'],
+            'traktid'   => $mov['traktid'],
             'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
             'year'      => $mov['year'],
         ]);
@@ -934,7 +936,7 @@ class Movie
      * @return bool|array
      * @throws \Exception
      */
-    protected function fetchTraktTVProperties($imdbId)
+    public function fetchTraktTVProperties($imdbId)
     {
         if ($this->traktcheck !== null) {
             $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
@@ -979,7 +981,7 @@ class Movie
      *
      * @return bool|array
      */
-    protected function fetchOmdbAPIProperties($imdbId)
+    public function fetchOmdbAPIProperties($imdbId)
     {
         if ($this->omdbapikey !== null) {
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
