@@ -72,9 +72,13 @@ class ApiV2Controller extends Controller
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
 
         $imdbId = $request->input('imdbid') ?? -1;
+        $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
+        $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? $request->input('traktid') : -1;
 
         $relData = $releases->moviesSearch(
             $imdbId,
+            $tmdbId,
+            $traktId,
             $api->offset(),
             $api->limit(),
             $request->input('id') ?? '',

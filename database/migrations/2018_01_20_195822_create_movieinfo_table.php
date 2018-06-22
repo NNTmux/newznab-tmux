@@ -20,6 +20,7 @@ class CreateMovieinfoTable extends Migration {
 		    $table->increments('id');
 			$table->integer('imdbid')->unsigned()->unique('ix_movieinfo_imdbid');
 			$table->integer('tmdbid')->unsigned()->default(0);
+            $table->integer('traktid')->unsigned()->default(0);
 			$table->string('title')->default('')->index('ix_movieinfo_title');
 			$table->string('tagline', 1024)->default('');
 			$table->string('rating', 4)->default('');
