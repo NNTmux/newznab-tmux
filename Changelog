@@ -1,3 +1,5 @@
+2018-06-22 DariusIII
+	* Chg: Update phpunit/phpunit to version 7.2.6
 2018-06-21 DariusIII
 	* Fix: Fix new line on renamed releases in NameFixer
 	* Chg: Remove Check all checkbox from console and games cover view
