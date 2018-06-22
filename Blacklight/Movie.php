@@ -483,6 +483,7 @@ class Movie
             'tagline'  => $this->checkTraktValue($data['tagline']),
             'title'    => $this->checkTraktValue($data['title']),
             'tmdbid'   => $this->checkTraktValue($data['ids']['tmdb']),
+            'traktid'  => $this->checkTraktValue($data['ids']['trakt']),
             'trailer'  => $this->checkTraktValue($data['trailer']),
             'cover'    => $cover,
             'year'     => $this->checkTraktValue($data['year']),

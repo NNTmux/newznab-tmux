@@ -41,6 +41,7 @@ class CreateReleasesTable extends Migration
             $table->integer('gamesinfo_id')->default(0)->index('ix_releases_gamesinfo_id');
             $table->integer('bookinfo_id')->nullable()->index('ix_releases_bookinfo_id')->comment('FK to bookinfo.id');
             $table->integer('anidbid')->nullable()->index('ix_releases_anidbid')->comment('FK to anidb_titles.anidbid');
+            $table->integer('movieinfo_id')->nullable()->index('ix_releases_movieinfo_id')->comment('FK to movieinfo.id');
             $table->integer('predb_id')->unsigned()->default(0)->comment('FK to predb.id');
             $table->integer('grabs')->unsigned()->default(0);
             $table->integer('comments')->default(0);

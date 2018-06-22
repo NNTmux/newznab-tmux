@@ -39,6 +39,8 @@ class ApiTransformer extends TransformerAbstract
                 'files' => $releases->totalpart,
                 'poster' => $releases->fromname,
                 'imdbid' => $releases->imdbid,
+                'tmdbid' => $releases->tmdbid,
+                'traktid' => $releases->traktid,
                 'grabs' => $releases->grabs,
                 'comments' => $releases->comments,
                 'password' => $releases->passwordstatus,

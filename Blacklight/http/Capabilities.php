@@ -145,7 +145,7 @@ abstract class Capabilities
             'searching' => [
                 'search'       => ['available' => 'yes', 'supportedParams' => 'q'],
                 'tv-search'    => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid'],
+                'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => $this->type === 'caps'
