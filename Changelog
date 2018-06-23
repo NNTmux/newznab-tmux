@@ -1,3 +1,5 @@
+2018-06-23 DariusIII
+	* Chg: Update movieinfo_id column on imdbid match
 2018-06-22 DariusIII
 	* Chg: Update parseTraktTv function, update getTraktData script
 	* Chg: Update Movie class and add script to fetch trakt ids into movieinfo table

@@ -1047,7 +1047,9 @@ class Movie
                 ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID), true);
             }
 
-            Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT)]);
+            $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
+
+            Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT), 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
