@@ -675,16 +675,16 @@
         },
         {
             "name": "bower-asset/datatables",
-            "version": "1.10.18",
+            "version": "1.10.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DataTables/DataTables.git",
-                "reference": "40a953edfb071b9c571a923995316f6591154af1"
+                "reference": "156faa83386460c578e00c460eca9766e38a0c5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/40a953edfb071b9c571a923995316f6591154af1",
-                "reference": "40a953edfb071b9c571a923995316f6591154af1",
+                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/156faa83386460c578e00c460eca9766e38a0c5f",
+                "reference": "156faa83386460c578e00c460eca9766e38a0c5f",
                 "shasum": ""
             },
             "require": {
@@ -720,7 +720,7 @@
                 "library",
                 "table"
             ],
-            "time": "2018-06-14T14:14:07+00:00"
+            "time": "2018-06-22T15:34:14+00:00"
         },
         {
             "name": "bower-asset/fancybox",
