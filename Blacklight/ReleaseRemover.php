@@ -439,7 +439,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
-            $this->pdo->quote('%.exe'),
+            $this->pdo->quote('LIKE %.exe'),
             Category::PC_0DAY,
             Category::PC_GAMES,
             Category::OTHER_MISC,
@@ -468,7 +468,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s %s',
-            $this->pdo->quote('%install.bin%'),
+            $this->pdo->quote('LIKE %install.bin%'),
             $this->crapTime
         );
 
@@ -493,7 +493,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s %s ',
-            $this->pdo->quote('%password.url%'),
+            $this->pdo->quote('LIKE %password.url%'),
             $this->crapTime
         );
 
@@ -526,13 +526,13 @@ class ReleaseRemover
 			AND r.nzbstatus = 1
 			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
             // Matches passwort / passworded / etc also.
-            $this->pdo->quote('%passwor%'),
-            $this->pdo->quote('%advanced%'),
-            $this->pdo->quote('%no password%'),
-            $this->pdo->quote('%not password%'),
-            $this->pdo->quote('%recovery%'),
-            $this->pdo->quote('%reset%'),
-            $this->pdo->quote('%unlocker%'),
+            $this->pdo->quote('LIKE %passwor%'),
+            $this->pdo->quote('LIKE %advanced%'),
+            $this->pdo->quote('LIKE %no password%'),
+            $this->pdo->quote('LIKE %not password%'),
+            $this->pdo->quote('LIKE %recovery%'),
+            $this->pdo->quote('LIKE %reset%'),
+            $this->pdo->quote('LIKE %unlocker%'),
             Category::PC_GAMES,
             Category::PC_0DAY,
             Category::PC_ISO,
@@ -624,7 +624,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
 			AND rf.name %s %s',
-            $this->pdo->quote('%.nzb%'),
+            $this->pdo->quote('LIKE %.nzb%'),
             $this->crapTime
         );
 
@@ -651,7 +651,7 @@ class ReleaseRemover
 			AND r.size < 40000000
 			AND r.name %s
 			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
-            $this->pdo->quote('%sample%'),
+            $this->pdo->quote('LIKE %sample%'),
             Category::TV_ANIME,
             Category::TV_DOCU,
             Category::TV_FOREIGN,
