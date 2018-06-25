@@ -1,4 +1,5 @@
 2018-06-26 DariusIII
+	* Chg: Add HasRole trait to User model
 	* Chg: Add permission tables migration
 	* Chg: Add spatie/laravel-permission
 2018-06-25 DariusIII

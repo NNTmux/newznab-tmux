@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Jrean\UserVerification\Traits\UserVerification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * App\Models\User.
@@ -113,6 +114,7 @@ class User extends Authenticatable
 {
     use Notifiable;
     use UserVerification;
+    use HasRoles;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
