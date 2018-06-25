@@ -437,9 +437,9 @@ class ReleaseRemover
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE rf.name %s
+			WHERE rf.name LIKE %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
-            $this->pdo->quote('LIKE %.exe'),
+            $this->pdo->quote('%.exe'),
             Category::PC_0DAY,
             Category::PC_GAMES,
             Category::OTHER_MISC,
@@ -467,8 +467,8 @@ class ReleaseRemover
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE rf.name %s %s',
-            $this->pdo->quote('LIKE %install.bin%'),
+			WHERE rf.name LIKE %s %s',
+            $this->pdo->quote('%install.bin%'),
             $this->crapTime
         );
 
@@ -492,8 +492,8 @@ class ReleaseRemover
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE rf.name %s %s ',
-            $this->pdo->quote('LIKE %password.url%'),
+			WHERE rf.name LIKE %s ',
+            $this->pdo->quote('%password.url%'),
             $this->crapTime
         );
 
@@ -516,23 +516,23 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			WHERE r.searchname %s
-			AND r.searchname NOT %s
-			AND r.searchname NOT %s
-			AND r.searchname NOT %s
-			AND r.searchname NOT %s
-			AND r.searchname NOT %s
-			AND r.searchname NOT %s
+			WHERE r.searchname LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
 			AND r.nzbstatus = 1
 			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
             // Matches passwort / passworded / etc also.
-            $this->pdo->quote('LIKE %passwor%'),
-            $this->pdo->quote('LIKE %advanced%'),
-            $this->pdo->quote('LIKE %no password%'),
-            $this->pdo->quote('LIKE %not password%'),
-            $this->pdo->quote('LIKE %recovery%'),
-            $this->pdo->quote('LIKE %reset%'),
-            $this->pdo->quote('LIKE %unlocker%'),
+            $this->pdo->quote('%passwor%'),
+            $this->pdo->quote('%advanced%'),
+            $this->pdo->quote('%no password%'),
+            $this->pdo->quote('%not password%'),
+            $this->pdo->quote('%recovery%'),
+            $this->pdo->quote('%reset%'),
+            $this->pdo->quote('%unlocker%'),
             Category::PC_GAMES,
             Category::PC_0DAY,
             Category::PC_ISO,
@@ -623,8 +623,8 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
-			AND rf.name %s %s',
-            $this->pdo->quote('LIKE %.nzb%'),
+			AND rf.name LIKE %s %s',
+            $this->pdo->quote('%.nzb%'),
             $this->crapTime
         );
 
@@ -649,9 +649,9 @@ class ReleaseRemover
 			FROM releases r
 			WHERE r.totalpart > 1
 			AND r.size < 40000000
-			AND r.name %s
+			AND r.name LIKE %s
 			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
-            $this->pdo->quote('LIKE %sample%'),
+            $this->pdo->quote('%sample%'),
             Category::TV_ANIME,
             Category::TV_DOCU,
             Category::TV_FOREIGN,
