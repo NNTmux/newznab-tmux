@@ -153,6 +153,7 @@
     "ramsey/uuid": "^3.7",
     "smarty/smarty": "^3.1",
     "spatie/laravel-fractal": "^5.3",
+    "spatie/laravel-permission": "^2.12",
     "vlucas/phpdotenv": "^2.4",
     "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",

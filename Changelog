@@ -1,3 +1,5 @@
+2018-06-26 DariusIII
+	* Chg: Add spatie/laravel-permission
 2018-06-25 DariusIII
 	* Chg: Update Symfony components
 	* Chg: Replace DB class with Laravel DB Facade in ReleaseRemover class
