@@ -13,7 +13,7 @@ $movie = new Movie(['Echo' => true]);
 $movies = MovieInfo::query()->where('imdbid', '<>', 0)->where('traktid', '=', 0)->get(['imdbid']);
 $count = $movies->count();
 if ($count > 0) {
-    echo ColorCLI::primary('Updating '.number_format($count).' movies.');
+    echo ColorCLI::primary('Updating '.number_format($count).' movies for TraktTV id.');
     foreach ($movies as $mov) {
         $startTime = microtime(true);
         $traktTv = new TraktTv(['Settings' => null]);
