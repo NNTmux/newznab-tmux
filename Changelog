@@ -1,4 +1,5 @@
 2018-06-25 DariusIII
+	* Chg: Update ApiTransformer to return null value where count of comments and grabs is 0
 	* Chg: Add script to non amazon pane to fetch trakt id's for added movies
 	* Chg: Update datatables to latest version
 2018-06-23 DariusIII
