@@ -175,42 +175,24 @@ class Releases
     }
 
     /**
-     * @param null $query
-     * @param bool $builder
-     *
-     * @return string|\Illuminate\Database\Query\Builder
-     * @throws \Exception
+     * @return string
      */
-    public static function showPasswords($query = null, $builder = false)
+    public static function showPasswords()
     {
         $setting = Settings::settingValue('..showpasswordedrelease');
         $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-                if ($builder === false) {
+
                     return '='.self::PASSWD_NONE;
-                }
-
-                return $query->where('r.passwordstatus', self::PASSWD_NONE);
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
-                if ($builder === false) {
+
                     return '<= '.self::PASSWD_POTENTIAL;
-                }
-
-                return $query->where('r.passwordstatus', '=<', self::PASSWD_POTENTIAL);
             case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
-                if ($builder === false) {
                     return '<= '.self::PASSWD_NONE;
-                }
-
-                return $query->where('r.passwordstatus', '=<', self::PASSWD_NONE);
             case 10: // Shows everything.
             default:
-                if ($builder === false) {
                     return '<= '.self::PASSWD_RAR;
-                }
-
-                return $query->where('r.passwordstatus', '=<', self::PASSWD_RAR);
         }
     }
 
