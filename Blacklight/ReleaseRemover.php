@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Handles removing of various unwanted releases.
@@ -74,7 +74,7 @@ class ReleaseRemover
     protected $method = '';
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     protected $pdo;
 
@@ -133,9 +133,9 @@ class ReleaseRemover
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => null]));
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
 
@@ -439,7 +439,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
-            $this->pdo->likeString('.exe', true, false),
+            $this->pdo->quote('%.exe'),
             Category::PC_0DAY,
             Category::PC_GAMES,
             Category::OTHER_MISC,
@@ -468,7 +468,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s %s',
-            $this->pdo->likeString('install.bin', true, true),
+            $this->pdo->quote('%install.bin%'),
             $this->crapTime
         );
 
@@ -493,7 +493,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s %s ',
-            $this->pdo->likeString('password.url', true, true),
+            $this->pdo->quote('%password.url%'),
             $this->crapTime
         );
 
@@ -526,13 +526,13 @@ class ReleaseRemover
 			AND r.nzbstatus = 1
 			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
             // Matches passwort / passworded / etc also.
-            $this->pdo->likeString('passwor', true, true),
-            $this->pdo->likeString('advanced', true, true),
-            $this->pdo->likeString('no password', true, true),
-            $this->pdo->likeString('not password', true, true),
-            $this->pdo->likeString('recovery', true, true),
-            $this->pdo->likeString('reset', true, true),
-            $this->pdo->likeString('unlocker', true, true),
+            $this->pdo->quote('%passwor%'),
+            $this->pdo->quote('%advanced%'),
+            $this->pdo->quote('%no password%'),
+            $this->pdo->quote('%not password%'),
+            $this->pdo->quote('%recovery%'),
+            $this->pdo->quote('%reset%'),
+            $this->pdo->quote('%unlocker%'),
             Category::PC_GAMES,
             Category::PC_0DAY,
             Category::PC_ISO,
@@ -624,7 +624,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
 			AND rf.name %s %s',
-            $this->pdo->likeString('.nzb', true, false),
+            $this->pdo->quote('%.nzb%'),
             $this->crapTime
         );
 
@@ -651,7 +651,7 @@ class ReleaseRemover
 			AND r.size < 40000000
 			AND r.name %s
 			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
-            $this->pdo->likeString('sample', true, true),
+            $this->pdo->quote('%sample%'),
             Category::TV_ANIME,
             Category::TV_DOCU,
             Category::TV_FOREIGN,
@@ -715,7 +715,7 @@ class ReleaseRemover
             $status = '';
         }
 
-        $regexList = \Illuminate\Support\Facades\DB::select(
+        $regexList = DB::select(
             sprintf(
                 'SELECT regex, id, groupname, msgcol
 				FROM binaryblacklist
@@ -733,7 +733,7 @@ class ReleaseRemover
         if (\count($regexList) > 0) {
             foreach ($regexList as $regex) {
                 $regexSQL = $ftMatch = $regexMatch = $opTypeName = '';
-                $dbRegex = $this->pdo->escapeString($regex->regex);
+                $dbRegex = $this->pdo->quote($regex->regex);
 
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
@@ -760,9 +760,9 @@ class ReleaseRemover
                 // Get the group ID if the regex is set to work against a group.
                 $groupID = '';
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
-                    $groupIDs = \Illuminate\Support\Facades\DB::select(
+                    $groupIDs = DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->escapeString($regex->groupname)
+                        $this->pdo->quote($regex->groupname)
                     );
 
                     $groupIDCount = \count($groupIDs);
@@ -840,7 +840,7 @@ class ReleaseRemover
      */
     protected function removeBlacklistFiles(): bool
     {
-        $allRegex = \Illuminate\Support\Facades\DB::select(
+        $allRegex = DB::select(
             sprintf(
                 'SELECT regex, id, groupname
 				FROM binaryblacklist
@@ -859,7 +859,7 @@ class ReleaseRemover
                 $regexSQL = sprintf(
                     'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 				WHERE rf.name REGEXP %s ',
-                    $this->pdo->escapeString($regex->regex)
+                    $this->pdo->quote($regex->regex)
                 );
 
                 if ($regexSQL === '') {
@@ -869,9 +869,9 @@ class ReleaseRemover
                 // Get the group ID if the regex is set to work against a group.
                 $groupID = '';
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
-                    $groupIDs = \Illuminate\Support\Facades\DB::select(
+                    $groupIDs = DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->escapeString($regex->groupname)
+                        $this->pdo->quote($regex->groupname)
                     );
                     $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
@@ -1043,7 +1043,7 @@ class ReleaseRemover
     protected function checkSelectQuery()
     {
         // Run the query, check if it picked up anything.
-        $result = \Illuminate\Support\Facades\DB::select($this->cleanSpaces($this->query));
+        $result = DB::select($this->cleanSpaces($this->query));
         if (\count($result) <= 0) {
             $this->error = '';
             if ($this->method === 'userCriteria') {
@@ -1119,7 +1119,7 @@ class ReleaseRemover
                 case 'fromname':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND fromname = '.$this->pdo->escapeString($args[2]);
+                            return ' AND fromname = '.$this->pdo->quote($args[2]);
                         case 'like':
                             return ' AND fromname '.$this->formatLike($args[2], 'fromname');
                     }
@@ -1127,7 +1127,7 @@ class ReleaseRemover
                 case 'groupname':
                     switch ($args[1]) {
                         case 'equals':
-                            $group = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name = '.$this->pdo->escapeString($args[2]));
+                            $group = DB::select('SELECT id FROM groups WHERE name = '.$this->pdo->quote($args[2]));
                             if (empty($group)) {
                                 $this->error = 'This group was not found in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1135,7 +1135,7 @@ class ReleaseRemover
 
                             return ' AND groups_id = '.$group[0]->id;
                         case 'like':
-                            $groups = \Illuminate\Support\Facades\DB::select('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
+                            $groups = DB::select('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
                             if (\count($groups) === 0) {
                                 $this->error = 'No groups were found with this pattern in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1153,13 +1153,13 @@ class ReleaseRemover
                     break;
                 case 'guid':
                     if ($args[1] === 'equals') {
-                        return ' AND guid = '.$this->pdo->escapeString($args[2]);
+                        return ' AND guid = '.$this->pdo->quote($args[2]);
                     }
                     break;
                 case 'name':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND name = '.$this->pdo->escapeString($args[2]);
+                            return ' AND name = '.$this->pdo->quote($args[2]);
                         case 'like':
                             return ' AND name '.$this->formatLike($args[2], 'name');
                         default:
@@ -1169,7 +1169,7 @@ class ReleaseRemover
                 case 'searchname':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND searchname = '.$this->pdo->escapeString($args[2]);
+                            return ' AND searchname = '.$this->pdo->quote($args[2]);
                         case 'like':
                             return ' AND searchname '.$this->formatLike($args[2], 'searchname');
                         default:
