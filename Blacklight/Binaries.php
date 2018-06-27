@@ -372,7 +372,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
+            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => $groupMySQL['first_record_postdate']]);
         }
 
         // Get first article we want aka the oldest.
@@ -1310,7 +1310,7 @@ class Binaries
      */
     public function daytopost($days, $data): string
     {
-        $goalTime = now()->subDays($days)->timestamp;
+        $goalTime = now()->subDays($days);
         // The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
         // times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
 
@@ -1391,8 +1391,8 @@ class Binaries
         if ($this->_echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::primary(
-                    PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
-                    ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
+                    PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.$articleTime.
+                    ', vs wanted date of '.$goalTime.'. Difference from goal is '.$goalTime->diffInDays($articleTime).'days.'
                 ), true
             );
         }
