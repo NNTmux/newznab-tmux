@@ -16,6 +16,9 @@ class CreatePermissionTables extends Migration
         $tableNames = config('permission.table_names');
 
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
@@ -23,13 +26,28 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['roles'], function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->increments('id');
             $table->string('name');
             $table->string('guard_name');
+            $table->integer('apirequests')->unsigned();
+            $table->integer('rate_limit')->default(60);
+            $table->integer('downloadrequests')->unsigned();
+            $table->integer('defaultinvites')->unsigned();
+            $table->boolean('isdefault')->default(0);
+            $table->boolean('canpreview')->default(0);
+            $table->boolean('hideads')->default(0);
+            $table->integer('donation')->default(0);
+            $table->integer('addyears')->default(0);
             $table->timestamps();
         });
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->unsignedInteger('permission_id');
             $table->morphs('model');
 
@@ -42,6 +60,9 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->unsignedInteger('role_id');
             $table->morphs('model');
 
@@ -54,6 +75,9 @@ class CreatePermissionTables extends Migration
         });
 
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->unsignedInteger('permission_id');
             $table->unsignedInteger('role_id');
 

@@ -2,7 +2,6 @@
 
 return [
     0 => [
-        'id' => 1,
         'name' => 'User',
         'apirequests' => 10,
         'downloadrequests' => 10,
@@ -14,7 +13,6 @@ return [
         'addyears' => 0,
     ],
     1 => [
-        'id' => 2,
         'name' => 'Admin',
         'apirequests' => 1000,
         'downloadrequests' => 1000,
@@ -26,7 +24,6 @@ return [
         'addyears' => 0,
     ],
     2 => [
-        'id' => 3,
         'name' => 'Disabled',
         'apirequests' => 0,
         'downloadrequests' => 0,
@@ -38,7 +35,6 @@ return [
         'addyears' => 0,
     ],
     3 => [
-        'id' => 4,
         'name' => 'Moderator',
         'apirequests' => 1000,
         'downloadrequests' => 1000,
@@ -50,7 +46,6 @@ return [
         'addyears' => 0,
     ],
     4 => [
-        'id' => 5,
         'name' => 'Friend',
         'apirequests' => 100,
         'downloadrequests' => 100,
