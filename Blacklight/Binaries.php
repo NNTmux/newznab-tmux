@@ -500,7 +500,7 @@ class Binaries
                             ->update(
                                 [
                                     'first_record' => $scanSummary['firstArticleNumber'],
-                                    'first_record_postdate' => $groupMySQL['first_record_postdate']
+                                    'first_record_postdate' => $groupMySQL['first_record_postdate'],
                                 ]
                             );
                     }
@@ -852,7 +852,6 @@ class Binaries
 
                 // If this header's collection key isn't in memory, attempt to insert the collection
                 if (! isset($collectionIDs[$this->header['CollectionKey']])) {
-
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > now() ? now() : $this->header['Date'];
 
