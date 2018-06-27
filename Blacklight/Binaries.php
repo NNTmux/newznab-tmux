@@ -1219,15 +1219,13 @@ class Binaries
     }
 
     /**
-     * Returns unix time for an article number.
+     * @param       $post
+     * @param array $groupData
      *
-     * @param int   $post      The article number to get the time from.
-     * @param array $groupData Usenet group info from NNTP selectGroup method.
-     *
-     * @return int    Timestamp.
+     * @return \Illuminate\Support\Carbon|int
      * @throws \Exception
      */
-    public function postdate($post, array $groupData): int
+    public function postdate($post, array $groupData)
     {
         // Set table names
         $groupID = Group::getIDByName($groupData['group']);
@@ -1265,12 +1263,9 @@ class Binaries
 
             // If we could not find it locally, try usenet.
             $header = $this->_nntp->getXOVER($currentPost);
-            if (! $this->_nntp->isError($header)) {
-                // Check if the date is set.
-                if (isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
-                    $date = $header[0]['Date'];
-                    break;
-                }
+            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
+                $date = $header[0]['Date'];
+                break;
             }
 
             // Try to get a different article number.
