@@ -21,6 +21,8 @@ Route::post('register', 'Auth\RegisterController@register');
 Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
 
+Route::get('terms-and-conditions', 'TermsController@terms');
+
 Route::group(['middleware' => ['isVerified']], function () {
     Route::get('login', 'Auth\LoginController@showLoginForm');
     Route::post('login', 'Auth\LoginController@login')->name('login');
@@ -198,8 +200,6 @@ Route::group(['middleware' => ['isVerified']], function () {
     Route::get('series/{id?}', 'SeriesController@index');
 
     Route::post('series/{id?}', 'SeriesController@index');
-
-    Route::get('terms-and-conditions', 'TermsController@index');
 
     Route::get('nzbvortex', 'QueueController@nzbvortex');
 

@@ -1,4 +1,5 @@
 2018-06-27 DariusIII
+	* Chg: Update terms and conditions page handling
 	* Chg: Change from timestamps to "normal" dates in some of the time conversion functions
 	* Chg: Remove needles date conversions to timestamp and back in Binaries and Backfill classes
 	* Chg: Update Movie processing handling
