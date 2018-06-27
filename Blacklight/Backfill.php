@@ -3,13 +3,13 @@
 namespace Blacklight;
 
 use App\Models\Group;
-use Blacklight\db\DB;
 use App\Models\Settings;
+use Illuminate\Support\Facades\DB;
 
 class Backfill
 {
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -79,13 +79,13 @@ class Backfill
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->_nntp = (
             $options['NNTP'] instanceof NNTP
-            ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo])
+            ? $options['NNTP'] : new NNTP(['Settings' => null])
         );
         $this->_binaries = new Binaries(
-            ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI, 'Settings' => $this->pdo]
+            ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI, 'Settings' => null]
         );
 
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
@@ -293,20 +293,21 @@ class Backfill
             // Get the oldest date.
             if (isset($lastMsg['firstArticleDate'])) {
                 // Try to get it from the oldest pulled article.
-                $newdate = strtotime($lastMsg['firstArticleDate']);
+                $newdate = $lastMsg['firstArticleDate'];
             } else {
                 // If above failed, try to get it with postdate method.
                 $newdate = $this->_binaries->postdate($first, $data);
             }
 
-            $this->pdo->queryExec(
+            DB::update(
                 sprintf(
                     '
 					UPDATE groups
-					SET first_record_postdate = %s, first_record = %s, last_updated = NOW()
+					SET first_record_postdate = %s, first_record = %s, last_updated = %s
 					WHERE id = %d',
-                    $this->pdo->from_unixtime($newdate),
-                    $this->pdo->escapeString($first),
+                    $newdate,
+                    $this->pdo->quote($first),
+                    now(),
                     $groupArr['id']
                 )
             );
@@ -348,14 +349,14 @@ class Backfill
      */
     public function safeBackfill($articles = ''): void
     {
-        $groupname = $this->pdo->queryOneRow(
+        $groupname = DB::select(
             sprintf(
                 '
 				SELECT name FROM groups
 				WHERE first_record_postdate BETWEEN %s AND NOW()
 				AND backfill = 1
-				ORDER BY name ASC',
-                $this->pdo->escapeString($this->_safeBackFillDate)
+				ORDER BY name ASC LIMIT 1',
+                $this->pdo->quote($this->_safeBackFillDate)
             )
         );
 

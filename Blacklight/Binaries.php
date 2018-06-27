@@ -490,7 +490,7 @@ class Binaries
                         $groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
 
                         if (isset($scanSummary['firstArticleDate'])) {
-                            $groupMySQL['first_record_postdate'] = strtotime($scanSummary['firstArticleDate']);
+                            $groupMySQL['first_record_postdate'] = $scanSummary['firstArticleDate'];
                         } else {
                             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
                         }
@@ -500,14 +500,12 @@ class Binaries
                             ->update(
                                 [
                                     'first_record' => $scanSummary['firstArticleNumber'],
-                                    'first_record_postdate' => Carbon::createFromTimestamp(
-                                        $groupMySQL['first_record_postdate']
-                                    ),
+                                    'first_record_postdate' => $groupMySQL['first_record_postdate']
                                 ]
                             );
                     }
 
-                    $scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? strtotime($scanSummary['lastArticleDate']) : false);
+                    $scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? $scanSummary['lastArticleDate'] : false);
                     if (! is_numeric($scanSummary['lastArticleDate'])) {
                         $scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
                     }
@@ -517,7 +515,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
-                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
+                                'last_record_postdate' => $scanSummary['lastArticleDate'],
                                 'last_updated' => now(),
                             ]
                         );
@@ -855,18 +853,8 @@ class Binaries
                 // If this header's collection key isn't in memory, attempt to insert the collection
                 if (! isset($collectionIDs[$this->header['CollectionKey']])) {
 
-                    /* Date from header should be a string this format:
-                     * 31 Mar 2014 15:36:04 GMT or 6 Oct 1998 04:38:40 -0500
-                     * Still make sure it's not unix time, convert it to unix time if it is.
-                     */
-                    $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
-
-                    // Get the current unixtime from PHP.
-                    $now = now()->timestamp;
-
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
-                    $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
-                    $unixtime = is_numeric($this->header['Date']) ? $date : $now;
+                    $date = $this->header['Date'] > now() ? now() : $this->header['Date'];
 
                     $random = random_bytes(16);
 
@@ -875,12 +863,12 @@ class Binaries
                             "
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
-							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
+							VALUES (%s, %s, %s, %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
                             $this->tableNames['cname'],
                             $this->_pdo->escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)),
                             $this->_pdo->escapeString(utf8_encode($this->header['From'])),
-                            $unixtime,
+                            $date,
                             $this->_pdo->escapeString(substr($this->header['Xref'], 0, 255)),
                             $this->groupMySQL['id'],
                             $fileCount[3],
@@ -1311,9 +1299,7 @@ class Binaries
 
         // If we didn't get a date, set it to now.
         if (! $date) {
-            $date = time();
-        } else {
-            $date = strtotime($date);
+            $date = now();
         }
 
         return $date;
