@@ -372,7 +372,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => $groupMySQL['first_record_postdate']]);
+            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
         }
 
         // Get first article we want aka the oldest.
@@ -490,7 +490,7 @@ class Binaries
                         $groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
 
                         if (isset($scanSummary['firstArticleDate'])) {
-                            $groupMySQL['first_record_postdate'] = $scanSummary['firstArticleDate'];
+                            $groupMySQL['first_record_postdate'] = strtotime($scanSummary['firstArticleDate']);
                         } else {
                             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
                         }
@@ -500,12 +500,14 @@ class Binaries
                             ->update(
                                 [
                                     'first_record' => $scanSummary['firstArticleNumber'],
-                                    'first_record_postdate' => $groupMySQL['first_record_postdate'],
+                                    'first_record_postdate' => Carbon::createFromTimestamp(
+                                        $groupMySQL['first_record_postdate']
+                                    ),
                                 ]
                             );
                     }
 
-                    $scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? $scanSummary['lastArticleDate'] : false);
+                    $scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? strtotime($scanSummary['lastArticleDate']) : false);
                     if (! is_numeric($scanSummary['lastArticleDate'])) {
                         $scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
                     }
@@ -515,7 +517,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
-                                'last_record_postdate' => $scanSummary['lastArticleDate'],
+                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
                                 'last_updated' => now(),
                             ]
                         );
@@ -852,8 +854,19 @@ class Binaries
 
                 // If this header's collection key isn't in memory, attempt to insert the collection
                 if (! isset($collectionIDs[$this->header['CollectionKey']])) {
+
+                    /* Date from header should be a string this format:
+                     * 31 Mar 2014 15:36:04 GMT or 6 Oct 1998 04:38:40 -0500
+                     * Still make sure it's not unix time, convert it to unix time if it is.
+                     */
+                    $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
+
+                    // Get the current unixtime from PHP.
+                    $now = now()->timestamp;
+
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
-                    $date = $this->header['Date'] > now() ? now() : $this->header['Date'];
+                    $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
+                    $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
                     $random = random_bytes(16);
 
@@ -862,12 +875,12 @@ class Binaries
                             "
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
-							VALUES (%s, %s, %s, %s, %d, %d, '%s', %d, NOW())
+							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
                             $this->tableNames['cname'],
                             $this->_pdo->escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)),
                             $this->_pdo->escapeString(utf8_encode($this->header['From'])),
-                            $date,
+                            $unixtime,
                             $this->_pdo->escapeString(substr($this->header['Xref'], 0, 255)),
                             $this->groupMySQL['id'],
                             $fileCount[3],
@@ -1219,13 +1232,15 @@ class Binaries
     }
 
     /**
-     * @param       $post
-     * @param array $groupData
+     * Returns unix time for an article number.
      *
-     * @return \Illuminate\Support\Carbon|int
+     * @param int   $post      The article number to get the time from.
+     * @param array $groupData Usenet group info from NNTP selectGroup method.
+     *
+     * @return int    Timestamp.
      * @throws \Exception
      */
-    public function postdate($post, array $groupData)
+    public function postdate($post, array $groupData): int
     {
         // Set table names
         $groupID = Group::getIDByName($groupData['group']);
@@ -1263,9 +1278,12 @@ class Binaries
 
             // If we could not find it locally, try usenet.
             $header = $this->_nntp->getXOVER($currentPost);
-            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
-                $date = $header[0]['Date'];
-                break;
+            if (! $this->_nntp->isError($header)) {
+                // Check if the date is set.
+                if (isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
+                    $date = $header[0]['Date'];
+                    break;
+                }
             }
 
             // Try to get a different article number.
@@ -1293,7 +1311,9 @@ class Binaries
 
         // If we didn't get a date, set it to now.
         if (! $date) {
-            $date = now();
+            $date = time();
+        } else {
+            $date = strtotime($date);
         }
 
         return $date;
@@ -1310,7 +1330,7 @@ class Binaries
      */
     public function daytopost($days, $data): string
     {
-        $goalTime = now()->subDays($days);
+        $goalTime = now()->subDays($days)->timestamp;
         // The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
         // times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
 
@@ -1391,8 +1411,8 @@ class Binaries
         if ($this->_echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::primary(
-                    PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.$articleTime.
-                    ', vs wanted date of '.$goalTime.'. Difference from goal is '.$goalTime->diffInDays($articleTime).'days.'
+                    PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
+                    ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
                 ), true
             );
         }

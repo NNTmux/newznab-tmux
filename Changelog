@@ -1,4 +1,5 @@
 2018-06-27 DariusIII
+	* Chg: Revert Backfill and Binaries to original state
 	* Fix: Fix terms and conditions page display
 	* Chg: Update terms and conditions page handling
 	* Chg: Change from timestamps to "normal" dates in some of the time conversion functions
