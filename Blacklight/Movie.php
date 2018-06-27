@@ -1055,8 +1055,13 @@ class Movie
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
                 if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
-                    if ($this->updateMovieInfo($imdbID) === false) {
+                    $info = $this->updateMovieInfo($imdbID);
+                    if ($info === false) {
                         Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
+                    } elseif ($info === true) {
+                        $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
+
+                        Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT), 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
                     }
                 }
             }
