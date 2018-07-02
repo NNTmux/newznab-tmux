@@ -1,4 +1,5 @@
 2018-07-02 DariusIII
+	* Fix: Fix links to categories browsing in details and search templates
 	* Chg: Update queries in Release model
 	* Chg: Update used libraries
 2018-06-30 DariusIII

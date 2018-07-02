@@ -436,6 +436,8 @@ class Release extends Model
                     'releases.postdate',
                     'releases.adddate',
                     'releases.grabs',
+                    'cp.title as parent_category',
+                    'c.title as sub_category',
                     DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
                 ]
             )
@@ -465,7 +467,7 @@ class Release extends Model
     {
         $sql = self::query()
             ->remember(config('nntmux.cache_expiry_short'))
-            ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")])
+            ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete', 'cp.title as parent_category', 'c.title as sub_category', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")])
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
@@ -499,7 +501,7 @@ class Release extends Model
     public static function getFailedRange()
     {
         $failedList = self::query()
-            ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
+            ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', 'cp.title as parent_category', 'c.title as sub_category', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
             ->rightJoin('dnzb_failures', 'dnzb_failures.release_id', '=', 'releases.id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
