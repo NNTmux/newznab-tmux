@@ -436,9 +436,9 @@ class Release extends Model
                     'releases.postdate',
                     'releases.adddate',
                     'releases.grabs',
+                    DB::raw('CONCAT(cp.title, ' > ', c.title) AS category_name'),
                 ]
             )
-            ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->orderByDesc('releases.postdate')
@@ -465,8 +465,7 @@ class Release extends Model
     {
         $sql = self::query()
             ->remember(config('nntmux.cache_expiry_short'))
-            ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete'])
-            ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
+            ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")])
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
