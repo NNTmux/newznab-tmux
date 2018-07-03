@@ -1,4 +1,5 @@
 2018-07-03 DariusIII
+	* Chg: Update NameFixer class
 	* Chg: Update swiftmailer/swiftmailer to version 6.1.0
 2018-07-02 DariusIII
 	* Fix: Fix links to categories browsing in details and search templates
