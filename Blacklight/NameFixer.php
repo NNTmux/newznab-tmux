@@ -7,8 +7,8 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\utility\Utility;
-use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB;
+use Blacklight\processing\PostProcess;
 
 /**
  * Class NameFixer.
