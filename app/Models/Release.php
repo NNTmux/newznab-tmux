@@ -309,8 +309,8 @@ class Release extends Model
     {
         $movieInfoId = null;
         if (! empty($imDbID)) {
-           $movieInfoId = MovieInfo::query()->where('imdbid', $imDbID)->first(['id']);
-       }
+            $movieInfoId = MovieInfo::query()->where('imdbid', $imDbID)->first(['id']);
+        }
         self::query()->where('id', $ID)->update(
             [
                 'name' => $name,
