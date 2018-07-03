@@ -307,6 +307,10 @@ class Release extends Model
      */
     public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID): void
     {
+        $movieInfoId = null;
+        if (! empty($imDbID)) {
+           $movieInfoId = MovieInfo::query()->where('imdbid', $imDbID)->first(['id']);
+       }
         self::query()->where('id', $ID)->update(
             [
                 'name' => $name,
@@ -322,6 +326,7 @@ class Release extends Model
                 'tv_episodes_id' => $episodeId,
                 'imdbid' => $imDbID,
                 'anidbid' => $aniDbID,
+                'movieinfo_id' => $movieInfoId !== null ? $movieInfoId->id : $movieInfoId,
             ]
         );
         (new SphinxSearch())->updateRelease($ID);
