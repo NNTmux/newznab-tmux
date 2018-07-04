@@ -175,7 +175,7 @@ function window_sharing($tmux_session)
     $sharing = DB::select('SELECT enabled, posting, fetching FROM sharing LIMIT 1');
     $tmux_share = Settings::settingValue('site.tmux.run_sharing') ?? 0;
 
-    if ($tmux_share && (int) $sharing['enabled'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1)) {
+    if ($tmux_share && (int) $sharing[0]->enabled === 1 && ((int) $sharing[0]->posting === 1 || (int) $sharing[0]->fetching === 1)) {
         exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
     }
 }
