@@ -1,3 +1,5 @@
+2018-07-04 DariusIII
+	* Chg: Update TmuxUIStart and run.php tmux related scripts
 2018-07-03 DariusIII
 	* Chg: Update all movies on adding new movie to database in admin area
 	* Chg: Better handling of movie releases updates
