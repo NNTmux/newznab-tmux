@@ -325,7 +325,6 @@ class DbUpdate
         }
     }
 
-
     /**
      * Attempts to determine if the Db is on the local machine.
      *
