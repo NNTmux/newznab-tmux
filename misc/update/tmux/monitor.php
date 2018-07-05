@@ -184,9 +184,9 @@ while ($runVar['counts']['iterations'] > 0) {
 
         if ($psTableRowCount === false) {
             echo 'Unable to prepare statement, skipping monitor updates!';
-        } elseif ($tables instanceof \Traversable) {
+        } else {
             foreach ($tables as $row) {
-                $tbl = $row['name'];
+                $tbl = $row->name;
                 $stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
                 switch (true) {
@@ -350,7 +350,6 @@ while ($runVar['counts']['iterations'] > 0) {
 function errorOnSQL()
 {
     echo ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
-    exit;
 }
 
 /**
