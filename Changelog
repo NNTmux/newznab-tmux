@@ -1,4 +1,5 @@
 2018-07-05 DariusIII
+	* Chg: Update DbUpdate class
 	* Chg: Fix tables count in monitor pane
 	* Chg: Use laravel DB facade in tmux related classes
 2018-07-04 DariusIII
