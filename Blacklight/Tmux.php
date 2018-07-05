@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Tmux.
@@ -13,7 +13,7 @@ use App\Extensions\util\Versions;
 class Tmux
 {
     /**
-     * @var \Blacklight\db\DB|null
+     * @var \PDO
      */
     public $pdo;
 
@@ -24,13 +24,10 @@ class Tmux
 
     /**
      * Tmux constructor.
-     *
-     * @param DB|null $pdo
-     * @throws \Exception
      */
-    public function __construct(DB $pdo = null)
+    public function __construct()
     {
-        $this->pdo = $pdo ?? new DB();
+        $this->pdo = DB::connection()->getPdo();
     }
 
     /**
@@ -81,8 +78,6 @@ class Tmux
                 $port = 'port';
                 break;
         }
-
-        $runVar['conncounts'][$which]['active'] = $runVar['conncounts'][$which]['total'] = 0;
 
         $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec('ss -n | grep '.$connections[$ip].':'.$connections[$port].' | grep -c ESTAB'));
         $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec('ss -n | grep -c '.$connections[$ip].':'.$connections[$port]));
@@ -254,7 +249,7 @@ class Tmux
      * @param $setting
      * @param $value
      *
-     * @return bool|\PDOStatement
+     * @return int
      */
     public function updateItem($setting, $value)
     {
@@ -314,13 +309,14 @@ class Tmux
      * @param $colors_exc
      *
      * @return int
+     * @throws \Exception
      */
     public function get_color($colors_start, $colors_end, $colors_exc): int
     {
         $exception = str_replace('.', '.', $colors_exc);
         $exceptions = explode(',', $exception);
         sort($exceptions);
-        $number = random_int($colors_start, $colors_end - count($exceptions));
+        $number = random_int($colors_start, $colors_end - \count($exceptions));
         foreach ($exceptions as $exception) {
             if ($number >= $exception) {
                 $number++;
@@ -332,9 +328,10 @@ class Tmux
         return $number;
     }
 
-    // Returns random bool, weighted by $chance
-
     /**
+     * Returns random bool, weighted by $chance
+     *
+     *
      * @param     $loop
      * @param int $chance
      *
@@ -369,8 +366,7 @@ class Tmux
 
         $return = '';
         $now = time();
-        $diff = ($now - ($_time >= $now ? $_time - 1 : $_time));
-        $secondsLeft = $diff;
+        $secondsLeft = $now - ($_time >= $now ? $_time - 1 : $_time);
 
         for ($i = 4; $i > -1; $i--) {
             $w[$i] = (int) ($secondsLeft / $d[$i][0]);
@@ -499,7 +495,7 @@ class Tmux
 					) AS backfill_groups_days,
 					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
 					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
-                    $this->pdo->escapeString($db_name)
+                    $this->pdo->quote($db_name)
                 );
             case 6:
                 return 'SELECT
@@ -556,21 +552,18 @@ class Tmux
     }
 
     /**
-     * Retrieves and returns ALL collections, binaries, parts, and missed parts table names from the Db.
-     *
-     * @return bool|\PDOStatement
-     * @throws \RuntimeException
+     * @return array
      */
     public function cbpmTableQuery()
     {
         $regstr = '^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$';
 
-        return $this->pdo->queryDirect(
+        return DB::select(
             "
 			SELECT TABLE_NAME AS name
       		FROM information_schema.TABLES
       		WHERE TABLE_SCHEMA = (SELECT DATABASE())
-			AND TABLE_NAME REGEXP {$this->pdo->escapeString($regstr)}
+			AND TABLE_NAME REGEXP {$this->pdo->quote($regstr)}
 			ORDER BY TABLE_NAME ASC"
         );
     }

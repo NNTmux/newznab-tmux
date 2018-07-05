@@ -35,19 +35,20 @@ class TmuxOutput extends Tmux
     /**
      * TmuxOutput constructor.
      *
-     * @param \Blacklight\db\DB|null $pdo
-     *
      * @throws \Exception
      */
-    public function __construct(DB $pdo = null)
+    public function __construct()
     {
-        parent::__construct($pdo);
+        parent::__construct();
         $this->_vers = Utility::getValidVersionsFile();
 
         $this->_setColourMasks();
     }
 
-    public function updateMonitorPane(&$runVar)
+    /**
+     * @param $runVar
+     */
+    public function updateMonitorPane(&$runVar): void
     {
         $this->runVar = $runVar;
         $this->tmpMasks = $this->_getFormatMasks($runVar['settings']['compressed']);
@@ -67,7 +68,10 @@ class TmuxOutput extends Tmux
         echo $buffer;
     }
 
-    protected function _getBackfill()
+    /**
+     * @return string
+     */
+    protected function _getBackfill(): string
     {
         $buffer = sprintf($this->tmpMasks[3], 'Groups', 'Active', 'Backfill');
         $buffer .= $this->_getSeparator();
@@ -107,7 +111,12 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    protected function _getFormatMasks($compressed)
+    /**
+     * @param $compressed
+     *
+     * @return array
+     */
+    protected function _getFormatMasks($compressed): array
     {
         $index = ((int) $compressed === 1 ? '2.1' : '2.0');
 
@@ -120,7 +129,10 @@ class TmuxOutput extends Tmux
         ];
     }
 
-    protected function _getHeader()
+    /**
+     * @return string
+     */
+    protected function _getHeader(): string
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
@@ -213,7 +225,10 @@ class TmuxOutput extends Tmux
         return $buffer.PHP_EOL;
     }
 
-    protected function _getMonitor()
+    /**
+     * @return string
+     */
+    protected function _getMonitor(): string
     {
         $buffer = $this->_getTableCounts();
         $buffer .= $this->_getPaths();
@@ -405,7 +420,10 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    protected function _getPaths()
+    /**
+     * @return string
+     */
+    protected function _getPaths(): string
     {
         $buffer = '';
 
@@ -414,14 +432,14 @@ class TmuxOutput extends Tmux
         $monitor_path_a = $this->runVar['settings']['monitor_path_a'];
         $monitor_path_b = $this->runVar['settings']['monitor_path_b'];
 
-        if ((isset($monitor_path) && file_exists($monitor_path))
-            || (isset($monitor_path_a) && file_exists($monitor_path_a))
-            || (isset($monitor_path_b) && file_exists($monitor_path_b))) {
+        if (($monitor_path !== null && file_exists($monitor_path))
+            || ($monitor_path_a !== null && file_exists($monitor_path_a))
+            || ($monitor_path_b !== null && file_exists($monitor_path_b))) {
             $buffer .= "\n";
             $buffer .= sprintf($this->tmpMasks[3], 'File System', 'Used', 'Free');
             $buffer .= $this->_getSeparator();
 
-            if (isset($monitor_path) && $monitor_path !== '' && file_exists($monitor_path)) {
+            if (! empty($monitor_path) && file_exists($monitor_path)) {
                 $disk_use = $this->decodeSize(disk_total_space($monitor_path) - disk_free_space($monitor_path));
                 $disk_free = $this->decodeSize(disk_free_space($monitor_path));
                 if (basename($monitor_path) === '') {
@@ -432,7 +450,7 @@ class TmuxOutput extends Tmux
                 $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
             }
 
-            if (isset($monitor_path_a) && $monitor_path_a !== '' && file_exists($monitor_path_a)) {
+            if (! empty($monitor_path_a) && file_exists($monitor_path_a)) {
                 $disk_use = $this->decodeSize(disk_total_space($monitor_path_a) - disk_free_space($monitor_path_a));
                 $disk_free = $this->decodeSize(disk_free_space($monitor_path_a));
                 if (basename($monitor_path_a) === '') {
@@ -443,7 +461,7 @@ class TmuxOutput extends Tmux
                 $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
             }
 
-            if (isset($monitor_path_b) && $monitor_path_b !== '' && file_exists($monitor_path_b)) {
+            if (! empty($monitor_path_b) && file_exists($monitor_path_b)) {
                 $disk_use = $this->decodeSize(disk_total_space($monitor_path_b) - disk_free_space($monitor_path_b));
                 $disk_free = $this->decodeSize(disk_free_space($monitor_path_b));
                 if (basename($monitor_path_b) === '') {
@@ -458,7 +476,10 @@ class TmuxOutput extends Tmux
         return $buffer.PHP_EOL;
     }
 
-    protected function _getQueries()
+    /**
+     * @return string
+     */
+    protected function _getQueries(): string
     {
         $buffer = PHP_EOL;
         $buffer .= sprintf($this->tmpMasks[3], 'Query Block', 'Time', 'Cumulative');
@@ -503,7 +524,10 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    protected function _getSeparator()
+    /**
+     * @return string
+     */
+    protected function _getSeparator(): string
     {
         return sprintf(
             $this->tmpMasks[3],
@@ -513,7 +537,10 @@ class TmuxOutput extends Tmux
         );
     }
 
-    protected function _getTableCounts()
+    /**
+     * @return string
+     */
+    protected function _getTableCounts(): string
     {
         $buffer = sprintf($this->tmpMasks[3], 'Collections', 'Binaries', 'Parts');
         $buffer .= $this->_getSeparator();
@@ -527,7 +554,10 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    protected function _setColourMasks()
+    /**
+     *
+     */
+    protected function _setColourMasks(): void
     {
         $this->_colourMasks[1] = ColorCLI::headerOver('%-18s').' '.ColorCLI::tmuxOrange('%-48.48s');
         $this->_colourMasks['2.0'] = ColorCLI::alternateOver('%-20s').' '.ColorCLI::tmuxOrange('%-33.33s');

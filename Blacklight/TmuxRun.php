@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Tmux pane shell exec functions for pane respawning.
@@ -15,13 +15,13 @@ class TmuxRun extends Tmux
     protected $_dateFormat;
 
     /**
-     * @param \Blacklight\db\DB $pdo
+     * TmuxRun constructor.
      *
      * @throws \Exception
      */
-    public function __construct(DB $pdo = null)
+    public function __construct()
     {
-        parent::__construct($pdo);
+        parent::__construct();
         $dateFormat = Settings::settingValue(
             [
                 'section'    => 'shell',
@@ -32,13 +32,16 @@ class TmuxRun extends Tmux
         $this->_dateFormat = $dateFormat ?? '%Y-%m-%d %T';
     }
 
-    // main switch for running tmux panes
-
     /**
+     * Main switch for running tmux panes
+     *
+     *
      * @param $cmdParam
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    public function runPane($cmdParam, &$runVar)
+    public function runPane($cmdParam, &$runVar): void
     {
         switch ((int) $runVar['constants']['sequential']) {
             case 0:
@@ -126,8 +129,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runDehash(&$runVar)
+    protected function _runDehash(&$runVar): void
     {
         switch ($runVar['settings']['dehash']) {
             case 1:
@@ -164,8 +169,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runFixReleaseNames(&$runVar)
+    protected function _runFixReleaseNames(&$runVar): void
     {
         if ((int) $runVar['settings']['fix_names'] === 1) {
             if ($runVar['counts']['now']['processrenames'] > 0) {
@@ -188,8 +195,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runAmazon(&$runVar)
+    protected function _runAmazon(&$runVar): void
     {
         switch (true) {
             case (int) $runVar['settings']['post_amazon'] === 1 &&
@@ -236,8 +245,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runAmazonFull(&$runVar)
+    protected function _runAmazonFull(&$runVar): void
     {
         switch (true) {
             case ((int) $runVar['settings']['post_amazon'] === 1) && (((int) $runVar['counts']['now']['processmusic'] > 0)
@@ -284,7 +295,12 @@ class TmuxRun extends Tmux
         }
     }
 
-    protected function _runNonAmazon(&$runVar)
+    /**
+     * @param $runVar
+     *
+     * @throws \Exception
+     */
+    protected function _runNonAmazon(&$runVar): void
     {
         switch (true) {
             case (int) $runVar['settings']['post_non'] !== 0 && ((int) $runVar['counts']['now']['processmovies'] > 0 || (int) $runVar['counts']['now']['processtv'] > 0 || $runVar['counts']['now']['processanime'] > 0):
@@ -313,8 +329,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runNonUpdateBinaries(&$runVar)
+    protected function _runNonUpdateBinaries(&$runVar): void
     {
         //run update_binaries
         //$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
@@ -335,8 +353,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runNonBackfill(&$runVar)
+    protected function _runNonBackfill(&$runVar): void
     {
         //run backfill
         $backsleep = (
@@ -362,8 +382,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runNonUpdateReleases(&$runVar)
+    protected function _runNonUpdateReleases(&$runVar): void
     {
         //run update_releases
         if ((int) $runVar['settings']['releases_run'] !== 0) {
@@ -380,8 +402,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runNZBImport(&$runVar)
+    protected function _runNZBImport(&$runVar): void
     {
         switch ($runVar['settings']['import']) {
             case 1:
@@ -411,11 +435,15 @@ class TmuxRun extends Tmux
     }
 
     /**
+     * Run postprocess_releases additional
+     *
+     *
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runPPAdditional(&$runVar)
+    protected function _runPPAdditional(&$runVar): void
     {
-        //run postprocess_releases additional
         switch (true) {
             case ((int) $runVar['settings']['post'] === 1) && ((int) $runVar['counts']['now']['work'] > 0):
                 $log = $this->writelog($runVar['panes']['two'][0]);
@@ -458,8 +486,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runRemoveCrap(&$runVar)
+    protected function _runRemoveCrap(&$runVar): void
     {
         switch ($runVar['settings']['fix_crap_opt']) {
 
@@ -477,7 +507,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][1]);
 
                 // Check how many types the user picked.
-                $runVar['modsettings']['fc']['max'] = count($runVar['modsettings']['fix_crap']);
+                $runVar['modsettings']['fc']['max'] = \count($runVar['modsettings']['fix_crap']);
 
                 // Make sure the user actually selected some.
                 if ($runVar['modsettings']['fc']['max'] > 0) {
@@ -521,8 +551,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runUpdateTv(&$runVar)
+    protected function _runUpdateTv(&$runVar): void
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.2 \
@@ -531,8 +563,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runUpdateTvFull(&$runVar)
+    protected function _runUpdateTvFull(&$runVar): void
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 \
@@ -541,8 +575,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runMainNon(&$runVar)
+    protected function _runMainNon(&$runVar): void
     {
         $this->_runNonUpdateBinaries($runVar);
         $this->_runNonUpdateReleases($runVar);
@@ -551,8 +587,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _runMainBasic(&$runVar)
+    protected function _runMainBasic(&$runVar): void
     {
         $log = $this->writelog($runVar['panes']['zero'][2]);
         if (($runVar['killswitch']['pp'] === false) && (time() - $runVar['timers']['timer5'] <= 4800)) {
@@ -654,8 +692,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _notRunningNon(&$runVar)
+    protected function _notRunningNon(&$runVar): void
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         for ($g = 1; $g <= 4; $g++) {
@@ -671,8 +711,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _notRunningBasic(&$runVar)
+    protected function _notRunningBasic(&$runVar): void
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         for ($g = 1; $g <= 2; $g++) {
@@ -688,8 +730,10 @@ class TmuxRun extends Tmux
 
     /**
      * @param $runVar
+     *
+     * @throws \Exception
      */
-    protected function _notRunningFull(&$runVar)
+    protected function _notRunningFull(&$runVar): void
     {
         $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
         for ($g = 1; $g <= 2; $g++) {
@@ -704,7 +748,7 @@ class TmuxRun extends Tmux
      * @param $pane
      * @param $runVar
      */
-    protected function _runIRCScraper($pane, &$runVar)
+    protected function _runIRCScraper($pane, &$runVar): void
     {
         if ((int) $runVar['constants']['run_ircscraper'] === 1) {
             //Check to see if the pane is dead, if so respawn it.
@@ -723,18 +767,16 @@ class TmuxRun extends Tmux
      * @param $pane
      * @param $runVar
      */
-    protected function _runSharing($pane, &$runVar)
+    protected function _runSharing($pane, &$runVar): void
     {
-        $sharing = $this->pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+        $sharing = (array) array_first(DB::select('SELECT enabled, posting, fetching FROM sharing'));
 
-        if ((int) $runVar['settings']['run_sharing'] === 1 && (int) $sharing['enabled'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1)) {
-            if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
-                shell_exec(
-                    "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/postprocess.php sharing true; \
-						{$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
-                );
-            }
+        if ((int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
+            shell_exec(
+                "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
+                    {$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/postprocess.php sharing true; \
+                    {$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
+            );
         }
     }
 }

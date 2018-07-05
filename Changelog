@@ -1,3 +1,5 @@
+2018-07-05 DariusIII
+	* Chg: Use laravel DB facade in tmux related classes
 2018-07-04 DariusIII
 	* Chg: Update TmuxUIStart and run.php tmux related scripts
 2018-07-03 DariusIII
