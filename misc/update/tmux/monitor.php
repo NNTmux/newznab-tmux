@@ -61,7 +61,6 @@ $tblCount = 'SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TAB
 $psTableRowCount = $pdo->prepare($tblCount);
 
 while ($runVar['counts']['iterations'] > 0) {
-
     $timer01 = time();
     // These queries are very fast, run every loop -- tmux and site settings
     $runVar['settings'] = (array) array_first(DB::select($tRun->getMonitorSettings()));
@@ -348,9 +347,6 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 }
 
-/**
- *
- */
 function errorOnSQL()
 {
     echo ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);

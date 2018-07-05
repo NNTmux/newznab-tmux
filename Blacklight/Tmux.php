@@ -329,7 +329,7 @@ class Tmux
     }
 
     /**
-     * Returns random bool, weighted by $chance
+     * Returns random bool, weighted by $chance.
      *
      *
      * @param     $loop
