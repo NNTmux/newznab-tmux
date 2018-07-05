@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use Blacklight\utility\Utility;
 
 /**
@@ -554,9 +553,6 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    /**
-     *
-     */
     protected function _setColourMasks(): void
     {
         $this->_colourMasks[1] = ColorCLI::headerOver('%-18s').' '.ColorCLI::tmuxOrange('%-48.48s');

@@ -33,7 +33,7 @@ class TmuxRun extends Tmux
     }
 
     /**
-     * Main switch for running tmux panes
+     * Main switch for running tmux panes.
      *
      *
      * @param $cmdParam
@@ -435,7 +435,7 @@ class TmuxRun extends Tmux
     }
 
     /**
-     * Run postprocess_releases additional
+     * Run postprocess_releases additional.
      *
      *
      * @param $runVar
