@@ -1141,21 +1141,21 @@ class Binaries
 
             // Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
             $ranges = $partList = [];
-            $firstPart = $lastNum = $missingParts[0]['numberid'];
+            $firstPart = $lastNum = $missingParts[0]->numberid;
 
             foreach ($missingParts as $part) {
-                if (($part['numberid'] - $firstPart) > ($this->messageBuffer / 4)) {
+                if (($part->numberid - $firstPart) > ($this->messageBuffer / 4)) {
                     $ranges[] = [
                         'partfrom' => $firstPart,
                         'partto'   => $lastNum,
                         'partlist' => $partList,
                     ];
 
-                    $firstPart = $part['numberid'];
+                    $firstPart = $part->numberid;
                     $partList = [];
                 }
-                $partList[] = $part['numberid'];
-                $lastNum = $part['numberid'];
+                $partList[] = $part->numberid;
+                $lastNum = $part->numberid;
             }
 
             $ranges[] = [
@@ -1188,7 +1188,7 @@ class Binaries
 					AND numberid <= %d',
                     $tableNames['prname'],
                     $groupArr['id'],
-                    $missingParts[$missingCount - 1]['numberid']
+                    $missingParts[$missingCount - 1]->numberid
                 )
             );
 
@@ -1198,7 +1198,7 @@ class Binaries
             }
 
             // Update attempts on remaining parts for active group
-            if (isset($missingParts[$missingCount - 1]['id'])) {
+            if (isset($missingParts[$missingCount - 1]->id)) {
                 DB::update(
                     sprintf(
                         '
@@ -1208,7 +1208,7 @@ class Binaries
 						AND numberid <= %d',
                         $tableNames['prname'],
                         $groupArr['id'],
-                        $missingParts[$missingCount - 1]['numberid']
+                        $missingParts[$missingCount - 1]->numberid
                     )
                 );
             }
