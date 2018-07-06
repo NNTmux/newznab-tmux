@@ -7,9 +7,9 @@ use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Blacklight\processing\ProcessReleasesMultiGroup;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Binaries.
