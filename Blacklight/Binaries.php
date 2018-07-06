@@ -3,13 +3,13 @@
 namespace Blacklight;
 
 use App\Models\Group;
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\Cache;
 use Blacklight\processing\ProcessReleasesMultiGroup;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Binaries.
@@ -71,7 +71,7 @@ class Binaries
     protected $_partRepair;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     protected $_pdo;
 
@@ -122,7 +122,7 @@ class Binaries
     protected $_partRepairMaxTries;
 
     /**
-     * An array of binaryblacklist IDs that should have their activity date updated.
+     * An array of BinaryBlacklist IDs that should have their activity date updated.
      * @var array(int)
      */
     protected $_binaryBlacklistIdsToUpdate = [];
@@ -244,10 +244,10 @@ class Binaries
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->_pdo = DB::connection()->getPdo();
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
-        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
-        $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
+        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'ColorCLI' => $this->_colorCLI]));
+        $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning());
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;
@@ -614,7 +614,7 @@ class Binaries
 
             // Increment if part repair and return false.
             if ($partRepair === true) {
-                $this->_pdo->queryExec(
+                DB::update(
                     sprintf(
                         'UPDATE %s SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
                         $this->tableNames['prname'],
@@ -864,38 +864,38 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
-                    $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
+                    $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->quote(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
                     $random = random_bytes(16);
 
-                    $collectionID = $this->_pdo->queryInsert(
-                        sprintf(
-                            "
+                    $collectionID = false;
+
+                    try {
+                        DB::insert(sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
-                            $this->tableNames['cname'],
-                            $this->_pdo->escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)),
-                            $this->_pdo->escapeString(utf8_encode($this->header['From'])),
-                            $unixtime,
-                            $this->_pdo->escapeString(substr($this->header['Xref'], 0, 255)),
-                            $this->groupMySQL['id'],
-                            $fileCount[3],
-                            sha1($this->header['CollectionKey']),
-                            $collMatch['id'],
-                            $xref,
-                            sodium_bin2hex($random)
-                        )
-                    );
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+
+                        $collectionID = $this->_pdo->lastInsertId();
+                    } catch (\PDOException $e) {
+                        if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
+                            DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
+                            DB::commit();
+                        }
+                        if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                            ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                            $this->_pdo->rollBack();
+                        }
+                    }
 
                     if ($collectionID === false) {
                         if ($this->addToPartRepair) {
                             $this->headersNotInserted[] = $this->header['Number'];
                         }
-                        $this->_pdo->Rollback();
+                        $this->_pdo->rollBack();
                         $this->_pdo->beginTransaction();
                         continue;
                     }
@@ -907,28 +907,29 @@ class Binaries
                 // MGR or Standard, Binary Hash should be unique to the group
                 $hash = md5($this->header['matches'][1].$this->header['From'].$this->groupMySQL['id']);
 
-                $binaryID = $this->_pdo->queryInsert(
-                    sprintf(
-                        "
+                $binaryID = false;
+                try {
+                    DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
-                        $this->tableNames['bname'],
-                        $hash,
-                        $this->_pdo->escapeString(utf8_encode($this->header['matches'][1])),
-                        $collectionID,
-                        $this->header['matches'][3],
-                        $fileCount[1],
-                        $this->header['Bytes'],
-                        $this->header['Bytes']
-                    )
-                );
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+                    $binaryID = $this->_pdo->lastInsertId();
+                } catch (\PDOException $e) {
+                    if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
+                        DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
+                        DB::commit();
+                    }
+                    if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                        ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                        $this->_pdo->rollBack();
+                    }
+                }
 
                 if ($binaryID === false) {
                     if ($this->addToPartRepair) {
                         $this->headersNotInserted[] = $this->header['Number'];
                     }
-                    $this->_pdo->Rollback();
+                    $this->_pdo->rollBack();
                     $this->_pdo->beginTransaction();
                     continue;
                 }
@@ -952,7 +953,7 @@ class Binaries
                 $this->header['matches'][2].','.$this->header['Bytes'].'),';
         }
 
-        unset($headers); // Reclaim memory.
+        //unset($headers); // Reclaim memory.
 
         // Start of inserting into SQL.
         $this->startUpdate = microtime(true);
@@ -967,7 +968,7 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->_pdo->queryExec($binariesQuery)) {
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) {
             if ($this->_debug) {
                 ColorCLI::doEcho(
                     ColorCLI::debug(
@@ -976,19 +977,19 @@ class Binaries
                     ), true
                 );
             }
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ','))) {
-                $this->_pdo->Commit();
+            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
+                $this->_pdo->commit();
             } else {
                 if ($this->addToPartRepair) {
                     $this->headersNotInserted += $this->headersReceived;
                 }
-                $this->_pdo->Rollback();
+                $this->_pdo->rollBack();
             }
         } else {
             if ($this->addToPartRepair) {
                 $this->headersNotInserted += $this->headersReceived;
             }
-            $this->_pdo->Rollback();
+            $this->_pdo->rollBack();
         }
     }
 
@@ -1086,7 +1087,7 @@ class Binaries
                 $headersNotInserted[] = $file['Parts']['number'];
             }
         }
-        $this->_pdo->Rollback();
+        $this->_pdo->rollBack();
 
         return $headersNotInserted;
     }
@@ -1108,18 +1109,22 @@ class Binaries
             $tableNames = (new Group())->getCBPTableNames($groupArr['id']);
         }
         // Get all parts in partrepair table.
-        $missingParts = $this->_pdo->query(
-            sprintf(
-                '
+        $missingParts = [];
+        try {
+            $missingParts = DB::select(sprintf('
 				SELECT * FROM %s
 				WHERE groups_id = %d AND attempts < %d
-				ORDER BY numberid ASC LIMIT %d',
-                $tableNames['prname'],
-                $groupArr['id'],
-                $this->_partRepairMaxTries,
-                $this->_partRepairLimit
-            )
-        );
+				ORDER BY numberid ASC LIMIT %d', $tableNames['prname'], $groupArr['id'], $this->_partRepairMaxTries, $this->_partRepairLimit));
+        } catch (\PDOException $e) {
+            if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
+                DB::unprepared("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
+                DB::commit();
+            }
+            if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                $this->_pdo->rollBack();
+            }
+        }
 
         $missingCount = \count($missingParts);
         if ($missingCount > 0) {
@@ -1174,7 +1179,7 @@ class Binaries
             }
 
             // Calculate parts repaired
-            $result = $this->_pdo->queryOneRow(
+            $result = DB::select(
                 sprintf(
                     '
 					SELECT COUNT(id) AS num
@@ -1188,13 +1193,13 @@ class Binaries
             );
 
             $partsRepaired = 0;
-            if ($result !== false) {
-                $partsRepaired = ($missingCount - $result['num']);
+            if ($result > 0) {
+                $partsRepaired = ($missingCount - $result[0]->num);
             }
 
             // Update attempts on remaining parts for active group
             if (isset($missingParts[$missingCount - 1]['id'])) {
-                $this->_pdo->queryExec(
+                DB::update(
                     sprintf(
                         '
 						UPDATE %s
@@ -1221,7 +1226,7 @@ class Binaries
         }
 
         // Remove articles that we cant fetch after x attempts.
-        $this->_pdo->queryExec(
+        DB::delete(
             sprintf(
                 'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
                 $tableNames['prname'],
@@ -1256,7 +1261,7 @@ class Binaries
             // Try to get the article date locally first.
             if ($groupID !== '') {
                 // Try to get locally.
-                $local = $this->_pdo->queryOneRow(
+                $local = DB::select(
                     sprintf(
                         '
 						SELECT c.date AS date
@@ -1270,20 +1275,17 @@ class Binaries
                         $currentPost
                     )
                 );
-                if ($local !== false) {
-                    $date = $local['date'];
+                if ($local > 0) {
+                    $date = $local[0]->date;
                     break;
                 }
             }
 
             // If we could not find it locally, try usenet.
             $header = $this->_nntp->getXOVER($currentPost);
-            if (! $this->_nntp->isError($header)) {
-                // Check if the date is set.
-                if (isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
-                    $date = $header[0]['Date'];
-                    break;
-                }
+            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
+                $date = $header[0]['Date'];
+                break;
             }
 
             // Try to get a different article number.
@@ -1421,18 +1423,6 @@ class Binaries
     }
 
     /**
-     * Convert unix time to days ago.
-     *
-     *
-     * @param $timestamp
-     * @return int
-     */
-    private function daysOld($timestamp): int
-    {
-        return Carbon::createFromTimestamp($timestamp)->diffInDays();
-    }
-
-    /**
      * Add article numbers from missing headers to DB.
      *
      * @param array  $numbers   The article numbers of the missing headers.
@@ -1448,7 +1438,9 @@ class Binaries
             $insertStr .= '('.$number.','.$groupID.'),';
         }
 
-        return $this->_pdo->queryInsert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
+        DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
+
+        return $this->_pdo->lastInsertId();
     }
 
     /**
@@ -1466,7 +1458,7 @@ class Binaries
         foreach ($numbers as $number) {
             $sql .= $number.',';
         }
-        $this->_pdo->queryExec(rtrim($sql, ',').') AND groups_id = '.$groupID);
+        DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
     }
 
     /**
@@ -1533,11 +1525,12 @@ class Binaries
         }
 
         // Check if the field is black listed.
+
         if (! $blackListed && $this->blackList[$groupName]) {
             foreach ($this->blackList[$groupName] as $blackList) {
-                if (preg_match('/'.$blackList['regex'].'/i', $field[$blackList['msgcol']])) {
+                if (preg_match('/'.$blackList->regex.'/i', $field[$blackList->msgcol])) {
                     $blackListed = true;
-                    $this->_binaryBlacklistIdsToUpdate[$blackList['id']] = $blackList['id'];
+                    $this->_binaryBlacklistIdsToUpdate[$blackList->id] = $blackList->id;
                     break;
                 }
             }
@@ -1570,7 +1563,7 @@ class Binaries
                 break;
         }
 
-        return $this->_pdo->query(
+        return DB::select(
             sprintf(
                 '
 				SELECT
@@ -1584,7 +1577,7 @@ class Binaries
                 ($groupRegex ? 'REGEXP' : '='),
                 ($activeOnly ? 'AND bb.status = 1' : ''),
                 $opType,
-                ($groupName ? ('AND g.name REGEXP '.$this->_pdo->escapeString($groupName)) : '')
+                ($groupName ? ('AND g.name REGEXP '.$this->_pdo->quote($groupName)) : '')
             )
         );
     }
@@ -1658,7 +1651,7 @@ class Binaries
      */
     public function delete($collectionID): void
     {
-        $this->_pdo->queryExec(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
+        DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
     }
 
     /**

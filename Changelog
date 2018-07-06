@@ -1,3 +1,5 @@
+2018-07-06 DariusIII
+	* Chg: Use Eloquent raw queries in Binaries class
 2018-07-05 DariusIII
 	* Chg: Update DbUpdate class
 	* Chg: Fix tables count in monitor pane
