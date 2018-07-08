@@ -350,7 +350,7 @@ class IRCClient
                     // We got 464, which means we need to send a password.
                 }
 
-                if ((int)$matches[2] === 464) {
+                if ((int) $matches[2] === 464) {
                     // Before the lower check, set the password : username:password
                     $tempPass = $userName.':'.$password;
 
