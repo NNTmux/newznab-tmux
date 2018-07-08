@@ -1,4 +1,5 @@
 2018-07-08 DariusIII
+	* Chg: Remove reference to MiscSorter in Tmux class
 	* Chg: Use Eloquent PDO in Movie, Music and Nfo classes
 	* Chg: Replace Blacklight\DB class with DB facade in Console, Games, Genres, IRCClient and IRCScraper classes
 2018-07-06 DariusIII
