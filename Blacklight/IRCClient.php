@@ -343,14 +343,14 @@ class IRCClient
                 $this->_pong($matches[1]);
             } elseif (preg_match('/^:(.*?)\s+(\d+).*?(:.+?)?$/', $this->_buffer, $matches)) {
                 // We found 001, which means we are logged in.
-                if ($matches[2] == 001) {
+                if ((int) $matches[2] === 1) {
                     $this->_remote_host_received = $matches[1];
                     break;
 
                     // We got 464, which means we need to send a password.
                 }
 
-                if ($matches[2] == 464) {
+                if ((int)$matches[2] === 464) {
                     // Before the lower check, set the password : username:password
                     $tempPass = $userName.':'.$password;
 

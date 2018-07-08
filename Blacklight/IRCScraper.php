@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Predb;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -219,7 +220,9 @@ class IRCScraper extends IRCClient
                 return;
             }
 
-            $this->_curPre['predate'] = 'FROM_UNIXTIME((strtotime($matches["time"]." UTC")))';
+            $utime = Carbon::createFromTimeString($matches['time'], 'UTC')->timestamp;
+
+            $this->_curPre['predate'] = 'FROM_UNIXTIME('.$utime.')';
             $this->_curPre['title'] = $matches['title'];
             $this->_curPre['source'] = $matches['source'];
             if ($matches['category'] !== 'N/A') {
