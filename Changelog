@@ -1,4 +1,5 @@
 2018-07-08 DariusIII
+	* Chg: Use Eloquent in Forking class
 	* Chg: Update Genres and Console classes
 	* Chg: Update NZBImport class, remove references to Blacklight\DB
 	* Chg: Remove unneeded nfostatus check in Tmux query
