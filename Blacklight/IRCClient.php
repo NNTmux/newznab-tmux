@@ -347,7 +347,7 @@ class IRCClient
                     $this->_remote_host_received = $matches[1];
                     break;
 
-                // We got 464, which means we need to send a password.
+                    // We got 464, which means we need to send a password.
                 }
 
                 if ($matches[2] === 464) {
