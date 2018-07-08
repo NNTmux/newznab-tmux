@@ -1,3 +1,5 @@
+2018-07-08 DariusIII
+	* Chg: Replace Blacklight\DB class with DB facade in Console, Games, Genres, IRCClient and IRCScraper classes
 2018-07-06 DariusIII
 	* Fix: Fix error in missing parts handling
 	* Chg: Use Eloquent raw queries in Binaries class

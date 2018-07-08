@@ -253,7 +253,7 @@ class IRCClient
 
         $socket_string = $transport.'://'.$hostname.':'.$port;
         if ($socket_string !== $this->_remote_socket_string || ! $this->_connected()) {
-            if (! is_string($hostname) || $hostname == '') {
+            if (! \is_string($hostname) || $hostname === '') {
                 echo 'ERROR: IRC host name must not be empty!'.PHP_EOL;
 
                 return false;
@@ -276,10 +276,10 @@ class IRCClient
                 $this->_initiateStream();
                 if ($this->_connected()) {
                     break;
-                } else {
-                    // Sleep between retries.
-                    sleep($this->_reconnectDelay);
                 }
+
+                // Sleep between retries.
+                sleep($this->_reconnectDelay);
             }
         } else {
             $this->_alreadyLoggedIn = true;
@@ -343,12 +343,14 @@ class IRCClient
                 $this->_pong($matches[1]);
             } elseif (preg_match('/^:(.*?)\s+(\d+).*?(:.+?)?$/', $this->_buffer, $matches)) {
                 // We found 001, which means we are logged in.
-                if ($matches[2] == 001) {
+                if ($matches[2] === 001) {
                     $this->_remote_host_received = $matches[1];
                     break;
 
                 // We got 464, which means we need to send a password.
-                } elseif ($matches[2] == 464) {
+                }
+
+                if ($matches[2] === 464) {
                     // Before the lower check, set the password : username:password
                     $tempPass = $userName.':'.$password;
 
@@ -359,7 +361,9 @@ class IRCClient
 
                     if ($password !== null && ! $this->_writeSocket('PASS '.$tempPass)) {
                         return false;
-                    } elseif (isset($matches[3]) && strpos(strtolower($matches[3]), 'invalid password')) {
+                    }
+
+                    if (isset($matches[3]) && stripos($matches[3], 'invalid password') !== false) {
                         echo 'Invalid password or username for ('.$this->_remote_host.').';
 
                         return false;
@@ -474,7 +478,7 @@ class IRCClient
      */
     protected function _joinChannel($channel, $password)
     {
-        $this->_writeSocket('JOIN '.$channel.($password === null ? '' : ' '.$password));
+        $this->_writeSocket('JOIN '.$channel.(empty($password) ? '' : ' '.$password));
     }
 
     /**
@@ -504,7 +508,7 @@ class IRCClient
         $pong = $this->_writeSocket('PING '.$host);
 
         // Check if there's a connection error.
-        if ($pong === false || ((time() - $this->_lastPing) > ($this->_socket_timeout / 2) && ! preg_match('/^PONG/', $this->_buffer))) {
+        if ($pong === false || ((time() - $this->_lastPing) > ($this->_socket_timeout / 2) && ! 0 === strpos($this->_buffer, 'PONG'))) {
             $this->_reconnect();
         }
 
@@ -559,7 +563,7 @@ class IRCClient
     protected function _writeSocket($command)
     {
         $command .= "\r\n";
-        for ($written = 0; $written < strlen($command); $written += $fWrite) {
+        for ($written = 0, $writtenMax = \strlen($command); $written < $writtenMax; $written += $fWrite) {
             stream_set_timeout($this->_socket, $this->_socket_timeout);
             $fWrite = $this->_writeSocketChar(substr($command, $written));
 
@@ -623,7 +627,7 @@ class IRCClient
      */
     protected function _closeStream()
     {
-        if (! is_null($this->_socket)) {
+        if ($this->_socket !== null) {
             $this->_socket = null;
         }
     }
@@ -635,7 +639,7 @@ class IRCClient
      */
     protected function _connected()
     {
-        return is_resource($this->_socket) && ! feof($this->_socket);
+        return \is_resource($this->_socket) && ! feof($this->_socket);
     }
 
     /**

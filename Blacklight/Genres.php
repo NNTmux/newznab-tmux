@@ -3,9 +3,9 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use Blacklight\db\DB;
 use App\Models\Category;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Genres
 {
@@ -31,8 +31,6 @@ class Genres
             'Settings' => null,
         ];
         $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
     }
 
     /**
@@ -47,7 +45,7 @@ class Genres
         if ($genres !== null) {
             return $genres;
         }
-        $genres = $this->pdo->query($sql);
+        $genres = (array) array_first(DB::select($sql));
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $genres, $expiresAt);
 
@@ -109,7 +107,7 @@ class Genres
         $sql = $this->getListQuery($type, $activeonly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
 
-        return $this->pdo->query($sql);
+        return (array) array_first(DB::select($sql));
     }
 
     /**
@@ -151,9 +149,9 @@ class Genres
             $sql = sprintf('SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title', $typesql);
         }
 
-        $res = $this->pdo->queryOneRow($sql);
+        $res = DB::select($sql);
 
-        return $res['num'];
+        return $res[0]->num;
     }
 
     /**
