@@ -598,8 +598,10 @@ class Console
 
         $defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
         $genreassoc = [];
-        foreach ($defaultGenres as $dg) {
-            $genreassoc[$dg['id']] = strtolower($dg['title']);
+        if (! empty($defaultGenres)) {
+            foreach ($defaultGenres as $dg) {
+                $genreassoc[$dg->id] = strtolower($dg->title);
+            }
         }
 
         return $genreassoc;

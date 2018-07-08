@@ -17,11 +17,6 @@ class Genres
     public const STATUS_DISABLED = 1;
 
     /**
-     * @var \Blacklight\db\DB;
-     */
-    public $pdo;
-
-    /**
      * @param array $options Class instances.
      * @throws \Exception
      */
@@ -45,7 +40,7 @@ class Genres
         if ($genres !== null) {
             return $genres;
         }
-        $genres = (array) array_first(DB::select($sql));
+        $genres = DB::select($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $genres, $expiresAt);
 
