@@ -32,7 +32,7 @@ class Movie
     protected const YEAR_MATCH_PERCENT = 80;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 

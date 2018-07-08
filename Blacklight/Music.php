@@ -23,6 +23,9 @@ class Music
 {
     protected const MATCH_PERCENT = 60;
 
+    /**
+     * @var \PDO
+     */
     protected $pdo;
 
     /**

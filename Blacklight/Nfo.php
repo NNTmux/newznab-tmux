@@ -114,7 +114,7 @@ class Nfo
     /**
      * Confirm this is an NFO file.
      *
-     * @param string $possibleNFO The nfo.
+     * @param string|bool $possibleNFO The nfo.
      * @param string $guid        The guid of the release.
      *
      * @return bool               True on success, False on failure.
@@ -359,9 +359,7 @@ class Nfo
             $qry->where('groups_id', $groupID);
         }
 
-        $releases = $qry->get(['id']);
-
-        foreach ($releases as $release) {
+        foreach ($qry->get(['id']) as $release) {
             // remove any releasenfo for failed
             ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
 
