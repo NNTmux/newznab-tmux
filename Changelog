@@ -1,4 +1,5 @@
 2018-07-09 DariusIII
+	* Fix: Fix search-filter.tpl
 	* Fix: Fix genres handling in Console, Games and Music controllers
 	* Chg: Update update_groups.php script
 2018-07-08 DariusIII
