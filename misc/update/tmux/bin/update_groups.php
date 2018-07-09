@@ -30,19 +30,17 @@ DB::unprepared('TRUNCATE TABLE short_groups');
 DB::commit();
 
 // Put into an array all active groups
-$result = Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']);
+$result = array_pluck(Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
 
 foreach ($data as $newgroup) {
-    foreach ($result as $res) {
-        if ($res['name'] === $newgroup['group']) {
-            ShortGroup::query()->insert([
+    if (\in_array($newgroup['group'], $result, false)) {
+        ShortGroup::query()->insert([
                     'name' => $newgroup['group'],
                     'first_record' => $newgroup['first'],
                     'last_record' => $newgroup['last'],
                     'updated' => now(),
                 ]);
-            ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
-        }
+        ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
     }
 }
 

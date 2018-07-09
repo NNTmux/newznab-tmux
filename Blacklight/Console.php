@@ -79,7 +79,7 @@ class Console
     public $failCache;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     protected $pdo;
 
@@ -95,7 +95,7 @@ class Console
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof \Blacklight\db\DB ? $options['Settings'] : new \Blacklight\db\DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
@@ -310,7 +310,7 @@ class Console
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
+                $browseBy .= 'AND con.'.$bbv.' LIKE '.$this->pdo->quote('%'.$bbs.'%');
             }
         }
 
@@ -598,8 +598,10 @@ class Console
 
         $defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
         $genreassoc = [];
-        foreach ($defaultGenres as $dg) {
-            $genreassoc[$dg['id']] = strtolower($dg['title']);
+        if (! empty($defaultGenres)) {
+            foreach ($defaultGenres as $dg) {
+                $genreassoc[$dg->id] = strtolower($dg->title);
+            }
         }
 
         return $genreassoc;

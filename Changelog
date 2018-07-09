@@ -1,5 +1,42 @@
+2018-07-09 DariusIII
+	* Fix: Fix search-filter.tpl
+	* Fix: Fix genres handling in Console, Games and Music controllers
+	* Chg: Update update_groups.php script
+2018-07-08 DariusIII
+	* Chg: Use Eloquent in Forking class
+	* Chg: Update Genres and Console classes
+	* Chg: Update NZBImport class, remove references to Blacklight\DB
+	* Chg: Remove unneeded nfostatus check in Tmux query
+	* Chg: Remove reference to MiscSorter in Tmux class
+	* Chg: Use Eloquent PDO in Movie, Music and Nfo classes
+	* Chg: Replace Blacklight\DB class with DB facade in Console, Games, Genres, IRCClient and IRCScraper classes
+2018-07-06 DariusIII
+	* Fix: Fix error in missing parts handling
+	* Chg: Use Eloquent raw queries in Binaries class
+2018-07-05 DariusIII
+	* Chg: Update DbUpdate class
+	* Chg: Fix tables count in monitor pane
+	* Chg: Use laravel DB facade in tmux related classes
+2018-07-04 DariusIII
+	* Chg: Update TmuxUIStart and run.php tmux related scripts
+2018-07-03 DariusIII
+	* Chg: Update all movies on adding new movie to database in admin area
+	* Chg: Better handling of movie releases updates
+	* Chg: Update NameFixer class
+	* Chg: Update swiftmailer/swiftmailer to version 6.1.0
+2018-07-02 DariusIII
+	* Fix: Fix links to categories browsing in details and search templates
+	* Chg: Update queries in Release model
+	* Chg: Update used libraries
+2018-06-30 DariusIII
+	* Chg: Update chosen to latest version
 2018-06-27 DariusIII
 	* Chg: Merge roles and user_roles tables for new permission system
+	* Chg: Revert Backfill and Binaries to original state
+	* Fix: Fix terms and conditions page display
+	* Chg: Update terms and conditions page handling
+	* Chg: Change from timestamps to "normal" dates in some of the time conversion functions
+	* Chg: Remove needles date conversions to timestamp and back in Binaries and Backfill classes
 	* Chg: Update Movie processing handling
 2018-06-26 DariusIII
 	* Chg: Add HasRole trait to User model

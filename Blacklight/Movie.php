@@ -32,7 +32,7 @@ class Movie
     protected const YEAR_MATCH_PERCENT = 80;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -1087,6 +1087,7 @@ class Movie
 
         // Get all releases without an IMDB id.
         $sql = Release::query()
+            ->select(['searchname', 'id'])
             ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
             ->whereNull('imdbid')
             ->where('nzbstatus', '=', 1);
@@ -1102,7 +1103,7 @@ class Movie
             $sql->where('isrenamed', '=', 1);
         }
 
-        $res = $sql->limit($this->movieqty)->get(['searchname', 'id'])->toArray();
+        $res = $sql->limit($this->movieqty)->get();
 
         $movieCount = \count($res);
 

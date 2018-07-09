@@ -3,19 +3,18 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\Tmux;
-use Blacklight\db\DB;
 use App\Models\Release;
 use Blacklight\TmuxRun;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\TmuxOutput;
-use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\DB;
 
-$pdo = new DB();
-$tMain = new Tmux($pdo);
-$tRun = new TmuxRun($pdo);
-$tOut = new TmuxOutput($pdo);
+$pdo = DB::connection()->getPdo();
+$tMain = new Tmux();
+$tRun = new TmuxRun();
+$tOut = new TmuxOutput();
 
 $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['cli'] = NN_ROOT.'cli/';
@@ -26,7 +25,7 @@ $dbtype = env('DB_SYSTEM', 'mysql');
 
 $tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
 
-$runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
+$runVar['constants'] = (array) array_first(DB::select($tRun->getConstantSettings()));
 
 $PHP = 'php';
 
@@ -53,33 +52,18 @@ $runVar['timers']['query']['proc2_time'] = $runVar['timers']['query']['proc3_tim
 $runVar['timers']['query']['proc11_time'] = $runVar['timers']['query']['proc21_time'] = $runVar['timers']['query']['proc31_time'] = $runVar['timers']['query']['tpg_time'] =
 $runVar['timers']['query']['tpg1_time'] = 0;
 
-// Analyze release table if not using innoDB (innoDB uses online analysis)
-$engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
-if (! in_array($engine['engine'], ['InnoDB', 'TokuDB'], false)) {
-    printf(ColorCLI::info(PHP_EOL.'Analyzing your tables to refresh your indexes.'));
-    $pdo->optimise(false, 'analyze', false, ['releases']);
-    Utility::clearScreen();
-}
-
 $runVar['settings']['monitor'] = 0;
 $runVar['counts']['iterations'] = 1;
 $runVar['modsettings']['fc']['firstrun'] = true;
 $runVar['modsettings']['fc']['num'] = 0;
 
-$tblCount = 'SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = '.$pdo->escapeString($db_name);
-$psTableRowCount = $pdo->Prepare($tblCount);
+$tblCount = 'SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = '.$pdo->quote($db_name);
+$psTableRowCount = $pdo->prepare($tblCount);
 
 while ($runVar['counts']['iterations'] > 0) {
-
-    //check the db connection
-    if ($pdo->ping(true) === false) {
-        unset($pdo);
-        $pdo = new DB();
-    }
-
     $timer01 = time();
     // These queries are very fast, run every loop -- tmux and site settings
-    $runVar['settings'] = $pdo->queryOneRow($tRun->getMonitorSettings(), false);
+    $runVar['settings'] = (array) array_first(DB::select($tRun->getMonitorSettings()));
     $runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
     $runVar['settings']['book_reqids'] = (! empty($runVar['settings']['book_reqids'])
@@ -129,13 +113,11 @@ while ($runVar['counts']['iterations'] > 0) {
         echo ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
-        $splitqry = $newOldqry = '';
-
         $splitqry = $tRun->proc_query(4, null, null, $db_name);
         $newOldqry = $tRun->proc_query(6, null, null, null);
 
-        $splitres = $pdo->queryOneRow($splitqry, false);
-        $runVar['timers']['newOld'] = $pdo->queryOneRow($newOldqry, false);
+        $splitres = (array) array_first(DB::select($splitqry));
+        $runVar['timers']['newOld'] = (array) array_first(DB::select($newOldqry));
 
         //assign split query results to main var
         if (is_array($splitres)) {
@@ -172,7 +154,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
         $timer04 = time();
         $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $db_name);
-        $proc1res = $pdo->queryOneRow(($proc1qry !== false ? $proc1qry : ''), $tRun->rand_bool($runVar['counts']['iterations']));
+        $proc1res = (array) array_first(DB::select($proc1qry));
         $runVar['timers']['query']['proc1_time'] = (time() - $timer04);
         $runVar['timers']['query']['proc11_time'] = (time() - $timer01);
 
@@ -184,7 +166,7 @@ while ($runVar['counts']['iterations'] > 0) {
             $runVar['settings']['maxsize_pp'],
             $runVar['settings']['minsize_pp']
         );
-        $proc2res = $pdo->queryOneRow(($proc2qry !== false ? $proc2qry : ''), $tRun->rand_bool($runVar['counts']['iterations']));
+        $proc2res = (array) array_first(DB::select($proc2qry));
         $runVar['timers']['query']['proc2_time'] = (time() - $timer05);
         $runVar['timers']['query']['proc21_time'] = (time() - $timer01);
 
@@ -203,47 +185,45 @@ while ($runVar['counts']['iterations'] > 0) {
         if ($psTableRowCount === false) {
             echo 'Unable to prepare statement, skipping monitor updates!';
         } else {
-            if ($tables instanceof \Traversable) {
-                foreach ($tables as $row) {
-                    $tbl = $row['name'];
-                    $stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
+            foreach ($tables as $row) {
+                $tbl = $row->name;
+                $stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
-                    switch (true) {
-                        case strpos($tbl, 'collections') !== false:
-                            $runVar['counts']['now']['collections_table'] +=
-                                getTableRowCount($psTableRowCount, $tbl);
-                            $added = $pdo->queryOneRow(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
-                            if (isset($added['dateadded']) && is_numeric($added['dateadded']) &&
-                                $added['dateadded'] < $age
-                            ) {
-                                $age = $added['dateadded'];
-                            }
-                            break;
-                        case strpos($tbl, 'binaries') !== false:
-                            $runVar['counts']['now']['binaries_table'] +=
-                                getTableRowCount($psTableRowCount, $tbl);
-                            break;
-                        // This case must come before the 'parts_' one.
-                        case strpos($tbl, 'missed_parts') !== false:
-                            $runVar['counts']['now']['missed_parts_table'] +=
-                                getTableRowCount($psTableRowCount, $tbl);
+                switch (true) {
+                    case strpos($tbl, 'collections') !== false:
+                        $runVar['counts']['now']['collections_table'] +=
+                            getTableRowCount($psTableRowCount, $tbl);
+                        $added = DB::select(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
+                        if (isset($added['dateadded']) && is_numeric($added['dateadded']) &&
+                            $added['dateadded'] < $age
+                        ) {
+                            $age = $added['dateadded'];
+                        }
+                        break;
+                    case strpos($tbl, 'binaries') !== false:
+                        $runVar['counts']['now']['binaries_table'] +=
+                            getTableRowCount($psTableRowCount, $tbl);
+                        break;
+                    // This case must come before the 'parts_' one.
+                    case strpos($tbl, 'missed_parts') !== false:
+                        $runVar['counts']['now']['missed_parts_table'] +=
+                            getTableRowCount($psTableRowCount, $tbl);
 
-                            break;
-                        case strpos($tbl, 'parts') !== false:
-                            $runVar['counts']['now']['parts_table'] +=
-                                getTableRowCount($psTableRowCount, $tbl);
-                            break;
-                        default:
-                    }
+                        break;
+                    case strpos($tbl, 'parts') !== false:
+                        $runVar['counts']['now']['parts_table'] +=
+                            getTableRowCount($psTableRowCount, $tbl);
+                        break;
+                    default:
                 }
-                $runVar['timers']['newOld']['oldestcollection'] = $age;
-
-                //free up memory used by now stale data
-                unset($age, $added, $tables);
-
-                $runVar['timers']['query']['tpg_time'] = (time() - $timer07);
-                $runVar['timers']['query']['tpg1_time'] = (time() - $timer01);
             }
+            $runVar['timers']['newOld']['oldestcollection'] = $age;
+
+            //free up memory used by now stale data
+            unset($age, $added, $tables);
+
+            $runVar['timers']['query']['tpg_time'] = (time() - $timer07);
+            $runVar['timers']['query']['tpg1_time'] = (time() - $timer01);
         }
         $runVar['timers']['timer2'] = time();
 
@@ -253,7 +233,7 @@ while ($runVar['counts']['iterations'] > 0) {
                 $runVar['counts']['now'][$proc1key] = $proc1;
             }
         } else {
-            errorOnSQL($pdo);
+            errorOnSQL();
         }
 
         if (is_array($proc2res)) {
@@ -261,7 +241,7 @@ while ($runVar['counts']['iterations'] > 0) {
                 $runVar['counts']['now'][$proc2key] = $proc2;
             }
         } else {
-            errorOnSQL($pdo);
+            errorOnSQL();
         }
 
         // now that we have merged our query data we can unset these to free up memory
@@ -367,12 +347,17 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 }
 
-function errorOnSQL($pdo)
+function errorOnSQL()
 {
     echo ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
-    exit;
 }
 
+/**
+ * @param \PDOStatement $ps
+ * @param               $table
+ *
+ * @return bool|int|string
+ */
 function getTableRowCount(\PDOStatement $ps, $table)
 {
     $success = $ps->execute([':table' => $table]);

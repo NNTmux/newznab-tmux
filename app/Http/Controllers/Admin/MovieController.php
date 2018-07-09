@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use Blacklight\Movie;
+use App\Models\Release;
+use App\Models\MovieInfo;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\BasePageController;
@@ -81,6 +83,7 @@ class MovieController extends BasePageController
         $this->setAdminPrefs();
 
         $movie = new Movie();
+        $title = 'Add Movie';
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -131,6 +134,11 @@ class MovieController extends BasePageController
                         'title'    => $request->input('title'),
                         'year'     => $request->input('year'),
                     ]);
+
+                    $movieInfo = MovieInfo::query()->where('imdbid', $id)->first(['id']);
+                    if ($movieInfo !== null) {
+                        Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
+                    }
 
                     return redirect('admin/movie-list');
                     break;

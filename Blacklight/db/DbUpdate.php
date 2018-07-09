@@ -25,13 +25,17 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Git;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\DB;
 
 class DbUpdate
 {
+    /**
+     * @var
+     */
     public $backedup;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -51,19 +55,12 @@ class DbUpdate
     public $settings;
 
     /**
-     * @var string
-     */
-    protected $_DbSystem;
-
-    /**
-     * @var bool    Has the Db been backed up?
+     * Has the Db been backed up?
+     *
+     *
+     * @var bool
      */
     private $backedUp = false;
-
-    /**
-     * @var bool    Should we perform a backup?
-     */
-    private $backup;
 
     /**
      * DbUpdate constructor.
@@ -80,12 +77,9 @@ class DbUpdate
             'logger' => new ColorCLI(),
         ];
 
-        $this->backup = $options['backup'];
         $this->git = $options['git'];
         $this->log = $options['logger'];
-        // Must be DB not Settings because the Settings table may not exist yet.
-        $this->pdo = (($options['db'] instanceof DB) ? $options['db'] : new DB());
-        $this->_DbSystem = strtolower($this->pdo->DbSystem());
+        $this->pdo = DB::connection()->getPdo();
     }
 
     /**
@@ -104,7 +98,7 @@ class DbUpdate
     {
         $defaults = [
             'ext'    => 'sql',
-            'path'    => NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
+            'path'    => NN_RES.'db'.DS.'patches'.DS.'mysql',
             'regex'    => '#^'.Utility::PATH_REGEX.'\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
             'safe'    => true,
         ];
@@ -120,7 +114,7 @@ class DbUpdate
         if ($count > 0) {
             ColorCLI::doEcho(ColorCLI::header('Processing...'), true);
             natsort($files);
-            $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
+            $local = $this->isLocalDb() ? '' : 'LOCAL ';
 
             foreach ($files as $file) {
                 if (! preg_match($options['regex'], $file, $matches)) {
@@ -156,7 +150,7 @@ class DbUpdate
         $patched = 0;
         $defaults = [
             'ext'    => 'sql',
-            'path'    => NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
+            'path'    => NN_RES.'db'.DS.'patches'.DS.'mysql',
             'regex'    => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
             'safe'    => true,
         ];
@@ -171,11 +165,11 @@ class DbUpdate
 
         if (\count($files)) {
             natsort($files);
-            $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
+            $local = $this->isLocalDb() ? '' : 'LOCAL ';
             ColorCLI::doEcho(ColorCLI::primary('Looking for unprocessed patches...'), true);
             foreach ($files as $file) {
                 $setPatch = false;
-                $fp = fopen($file, 'r');
+                $fp = fopen($file, 'rb');
                 $patch = fread($fp, filesize($file));
 
                 if (preg_match($options['regex'], str_replace('\\', '/', $file), $matches)) {
@@ -193,9 +187,6 @@ class DbUpdate
                 }
                 if ($patch > $currentVersion) {
                     ColorCLI::doEcho(ColorCLI::header('Processing patch file: '.$file), true);
-                    if (! $this->backedUp && $options['safe']) {
-                        $this->_backupDb();
-                    }
                     $this->splitSQL($file, ['local' => $local]);
                     if ($setPatch) {
                         Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $patch]);
@@ -279,8 +270,7 @@ class DbUpdate
                         }
 
                         try {
-                            $qry = $this->pdo->Prepare($query);
-                            $qry->execute();
+                            $this->pdo->exec($query);
                             ColorCLI::doEcho(ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query), true);
                         } catch (\PDOException $e) {
                             // Log the problem and the query.
@@ -308,18 +298,16 @@ class DbUpdate
                                         $e->errorInfo[1]."}.\n"
                                     ), true);
                                 }
-                            } else {
-                                if (preg_match('/ALTER IGNORE/i', $query)) {
-                                    $this->pdo->queryExec('SET SESSION old_alter_table = 1');
-                                    try {
-                                        $this->pdo->exec($query);
-                                        ColorCLI::doEcho(ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query));
-                                    } catch (\PDOException $e) {
-                                        exit(ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
-                                    }
-                                } else {
+                            } elseif (preg_match('/ALTER IGNORE/i', $query)) {
+                                $this->pdo->exec('SET SESSION old_alter_table = 1');
+                                try {
+                                    $this->pdo->exec($query);
+                                    ColorCLI::doEcho(ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query));
+                                } catch (\PDOException $e) {
                                     exit(ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
                                 }
+                            } else {
+                                exit(ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
                             }
                         }
 
@@ -337,12 +325,29 @@ class DbUpdate
         }
     }
 
-    protected function _backupDb(): void
+    /**
+     * Attempts to determine if the Db is on the local machine.
+     *
+     * If the method returns true, then the Db is definitely on the local machine. However,
+     * returning false only indicates that it could not positively be determined to be local - so
+     * assume remote.
+     *
+     * @return bool Whether the Db is definitely on the local machine.
+     */
+    public function isLocalDb(): bool
     {
-        $PHP = 'php';
+        $local = false;
+        if (! empty(config('database.connections.nntmux.port')) || config('database.connections.nntmux.host') === 'localhost') {
+            $local = true;
+        } else {
+            preg_match_all('/inet'.'6?'.' addr: ?([^ ]+)/', `ifconfig`, $ips);
 
-        system("$PHP ".NN_MISC.'testing'.DS.'DB'.DS.$this->_DbSystem.
-            'dump_tables.php db dump');
-        $this->backedup = true;
+            // Check for dotted quad - if exists compare against local IP number(s)
+            if (preg_match('#^\d+\.\d+\.\d+\.\d+$#', config('database.connections.nntmux.host')) && \in_array(config('database.connections.nntmux.host'), $ips[1], false)) {
+                $local = true;
+            }
+        }
+
+        return $local;
     }
 }

@@ -103,7 +103,7 @@ class Games
     protected $giantBomb;
 
     /**
-     * @var
+     * @var \PDO
      */
     protected $pdo;
 

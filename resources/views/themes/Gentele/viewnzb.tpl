@@ -515,11 +515,10 @@
 															<td>{if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 2}Passworded Rar Archive{elseif $release.passwordstatus == 1}Contains Cab/Ace/Rar Inside Archive{else}Unknown{/if}</td>
 														</tr>
 														<tr>
-															<th width="140">Category
-															</th>
+															<th width="140">Category</th>
 															<td>
-																<a title="Browse by {$release.category_name}"
-																   href="{$smarty.const.WWW_TOP}/browse?t={$release.categories_id}">{$release.category_name}</a>
+																<a title="Browse {$release.category_name}"
+																   href="{$smarty.const.WWW_TOP}/browse/{$release.parent_category}/{$release.sub_category}"> {$release.category_name}</a>
 															</td>
 														</tr>
 														<tr>

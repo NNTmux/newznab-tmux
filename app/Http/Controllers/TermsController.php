@@ -9,7 +9,7 @@ class TermsController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function terms()
     {
         $this->setPrefs();
         $title = 'Terms and Conditions';
@@ -17,7 +17,7 @@ class TermsController extends BasePageController
         $meta_keywords = 'terms,conditions';
         $meta_description = 'Terms and Conditions for '.Settings::settingValue('site.main.title');
 
-        $content = $this->smarty->fetch('terms.tpl');
+        $content = $this->smarty->fetch($this->theme.'/terms.tpl');
 
         $this->smarty->assign(
             [
@@ -29,6 +29,6 @@ class TermsController extends BasePageController
             ]
         );
 
-        $this->pagerender();
+        $this->smarty->display($this->theme.'/basepage.tpl');
     }
 }

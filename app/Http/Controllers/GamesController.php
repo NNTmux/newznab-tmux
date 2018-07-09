@@ -49,7 +49,7 @@ class GamesController extends BasePageController
         $genres = $gen->getGenres(Genres::GAME_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
-            $tmpgnr[$gn['id']] = $gn['title'];
+            $tmpgnr[$gn->id] = $gn->title;
         }
 
         $years = range(1903, date('Y') + 1);
