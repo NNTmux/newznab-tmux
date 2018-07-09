@@ -5,6 +5,7 @@ namespace App\Models;
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
 use Illuminate\Support\Facades\DB;
+use Spatie\Tags\HasTags;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -129,6 +130,7 @@ use Illuminate\Database\Eloquent\Model;
 class Release extends Model
 {
     use Rememberable;
+    use HasTags;
 
     /**
      * @var bool
@@ -257,6 +259,10 @@ class Release extends Model
     public static function insertRelease(array $parameters = [])
     {
         $passwordStatus = ((int) Settings::settingValue('..checkpasswordedrar') === 1 ? -1 : 0);
+        $category = Category::query()->where('id', $parameters['categories_id'])->select('title', 'parentid')->first()->toArray();
+        $parentCat = Category::query()->where('id', $category['parentid'])->select(['title'])->first()->toArray();
+
+        $tags = [$parentCat['title'], $category['title']];
         $parameters['id'] = self::query()
             ->insertGetId(
                 [
@@ -273,6 +279,7 @@ class Release extends Model
                     'passwordstatus' => $passwordStatus,
                     'haspreview' => -1,
                     'categories_id' => $parameters['categories_id'],
+                    'tags' => [$tags[0], $tags[1]],
                     'nfostatus' => -1,
                     'nzbstatus' => $parameters['nzbstatus'],
                     'isrenamed' => $parameters['isrenamed'],
@@ -311,7 +318,14 @@ class Release extends Model
         if (! empty($imDbID)) {
             $movieInfoId = MovieInfo::query()->where('imdbid', $imDbID)->first(['id']);
         }
-        self::query()->where('id', $ID)->update(
+
+        $category = Category::query()->where('id', $categoryID)->select('title', 'parentid')->first()->toArray();
+        $parentCat = Category::query()->where('id', $category['parentid'])->select(['title'])->first()->toArray();
+
+        $tags = [$parentCat['title'], $category['title']];
+
+
+        $release = self::query()->where('id', $ID)->update(
             [
                 'name' => $name,
                 'searchname' => $searchName,
@@ -330,6 +344,8 @@ class Release extends Model
             ]
         );
         (new SphinxSearch())->updateRelease($ID);
+
+        $release->syncTags($tags[0], $tags[1]);
     }
 
     /**
