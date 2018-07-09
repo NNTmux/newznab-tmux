@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Blacklight\NZB;
+use Spatie\Tags\HasTags;
 use Blacklight\SphinxSearch;
 use Illuminate\Support\Facades\DB;
-use Spatie\Tags\HasTags;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -323,7 +323,6 @@ class Release extends Model
         $parentCat = Category::query()->where('id', $category['parentid'])->select(['title'])->first()->toArray();
 
         $tags = [$parentCat['title'], $category['title']];
-
 
         $release = self::query()->where('id', $ID)->update(
             [
