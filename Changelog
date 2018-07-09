@@ -1,3 +1,5 @@
+2018-07-09 DariusIII
+	* Chg: Update update_groups.php script
 2018-07-08 DariusIII
 	* Chg: Use Eloquent in Forking class
 	* Chg: Update Genres and Console classes
