@@ -33,15 +33,15 @@ DB::commit();
 $result = array_pluck(Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
 
 foreach ($data as $newgroup) {
-        if (\in_array($newgroup['group'], $result, false)) {
-            ShortGroup::query()->insert([
+    if (\in_array($newgroup['group'], $result, false)) {
+        ShortGroup::query()->insert([
                     'name' => $newgroup['group'],
                     'first_record' => $newgroup['first'],
                     'last_record' => $newgroup['last'],
                     'updated' => now(),
                 ]);
-            ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
-        }
+        ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
+    }
 }
 
 ColorCLI::doEcho(ColorCLI::header('Running time: '.$consoleTools->convertTimer(time() - $start)));
