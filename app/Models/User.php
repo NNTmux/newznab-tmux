@@ -541,6 +541,9 @@ class User extends Authenticatable
             case 'rolechangedate':
                 $orderField = 'rolechangedate';
                 break;
+            case 'verification':
+                $orderField = 'verified';
+                break;
             default:
                 $orderField = 'username';
                 break;
