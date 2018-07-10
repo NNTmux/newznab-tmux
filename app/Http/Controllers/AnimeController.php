@@ -114,16 +114,16 @@ class AnimeController extends BasePageController
         $meta_description = 'View Anime List';
 
         $animelist = [];
-            foreach ($masterserieslist as $s) {
-                if (preg_match('/^[0-9]/', $s->title)) {
-                    $thisrange = '0-9';
-                } else {
-                    preg_match('/([A-Z]).*/i', $s->title, $matches);
-                    $thisrange = strtoupper($matches[1]);
-                }
-                $animelist[$thisrange][] = $s;
+        foreach ($masterserieslist as $s) {
+            if (preg_match('/^[0-9]/', $s->title)) {
+                $thisrange = '0-9';
+            } else {
+                preg_match('/([A-Z]).*/i', $s->title, $matches);
+                $thisrange = strtoupper($matches[1]);
             }
-            ksort($animelist);
+            $animelist[$thisrange][] = $s;
+        }
+        ksort($animelist);
 
         $this->smarty->assign('animelist', $animelist);
         $this->smarty->assign('animerange', range('A', 'Z'));
