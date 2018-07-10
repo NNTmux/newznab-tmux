@@ -1,3 +1,5 @@
+2018-07-10 DariusIII
+	* Chg: Update NZB class, remove usage of Blacklight\DB class
 2018-07-09 DariusIII
 	* Chg: Add sorting by verification to admin users list
 	* Fix: Fix search-filter.tpl
