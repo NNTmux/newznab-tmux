@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
 use App\Extensions\util\Yenc;
 
