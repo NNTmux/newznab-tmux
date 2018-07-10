@@ -2,8 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
-
 /**
  * Cleans names for collections/imports/namefixer.
  *
@@ -74,11 +72,6 @@ class CollectionsCleaning
     public $subject = '';
 
     /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
-
-    /**
      * @var \Blacklight\Regexes
      */
     protected $_regexes;
@@ -99,8 +92,7 @@ class CollectionsCleaning
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'collection_regexes']);
+        $this->_regexes = new Regexes(['Table_Name' => 'collection_regexes']);
     }
 
     /**

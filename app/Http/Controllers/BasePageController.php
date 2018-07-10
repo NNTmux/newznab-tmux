@@ -6,7 +6,6 @@ require_once NN_LIB.'utility/SmartyUtils.php';
 
 use App\Models\Menu;
 use App\Models\User;
-use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;

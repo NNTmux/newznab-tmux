@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
