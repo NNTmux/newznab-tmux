@@ -1387,9 +1387,9 @@ class NameFixer
         $total = \count($res);
         echo ColorCLI::primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
-            if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
+            if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $matches)) {
                 $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
-            } elseif (preg_match('/[a-fA-F0-9]{32,40}/i', $row['filename'], $matches)) {
+            } elseif (preg_match('/[a-fA-F0-9]{32,40}/i', $row->filename, $matches)) {
                 $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
             }
             if ($show === 2) {
@@ -2081,13 +2081,13 @@ class NameFixer
                 if ($floor >= -10 && $floor <= 10) {
                     $this->updateRelease(
                             $release,
-                            $res['searchname'],
+                            $res->searchname,
                             $method = 'uidCheck: Unique_ID',
                             $echo,
                             $type,
                             $nameStatus,
                             $show,
-                            $res['predb_id']
+                            $res->predb_id
                         );
 
                     return true;
@@ -2170,7 +2170,7 @@ class NameFixer
             );
 
             foreach ($result as $res) {
-                if (preg_match('/^.+?SDPORN/i', $res['textstring'], $match)) {
+                if (preg_match('/^.+?SDPORN/i', $res->textstring, $match)) {
                     $this->updateRelease(
                             $release,
                             $match['0'],
@@ -2223,7 +2223,7 @@ class NameFixer
             );
 
             foreach ($result as $res) {
-                if (preg_match('/^(.*)\.srr/i', $res['textstring'], $match)) {
+                if (preg_match('/^(.*)\.srr/i', $res->textstring, $match)) {
                     $this->updateRelease(
                             $release,
                             $match['1'],
