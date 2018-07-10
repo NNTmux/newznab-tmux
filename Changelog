@@ -1,4 +1,5 @@
 2018-07-10 DariusIII
+	* Chg: Update NZBContents and NNTP classes
 	* Chg: Update NZB class, remove usage of Blacklight\DB class
 2018-07-09 DariusIII
 	* Chg: Add sorting by verification to admin users list
