@@ -42,14 +42,14 @@
 				{foreach $anime as $a}
 					<tr>
 						<td><a class="title" title="View anime"
-							   href="{$smarty.const.WWW_TOP}/anime?id={$a.anidbid}">{$a.title|escape:"htmlall"}</a>{if {$a.startdate} != ''}
-							<br/><span class="label label-info">({$a.startdate|date_format}
-								- {/if}{if $a.enddate != ''}{$a.enddate|date_format}){/if}</span></td>
-						<td>{if {$a.type} != ''}{$a.type|escape:"htmlall"}{/if}</td>
-						<td>{if {$a.categories} != ''}{$a.categories|escape:"htmlall"|replace:'|':', '}{/if}</td>
-						<td>{if {$a.rating} != ''}{$a.rating}{/if}</td>
+							   href="{$smarty.const.WWW_TOP}/anime?id={$a->anidbid}">{$a->title|escape:"htmlall"}</a>{if {$a->startdate} != ''}
+							<br/><span class="label label-info">({$a->startdate|date_format}
+								- {/if}{if $a->enddate != ''}{$a->enddate|date_format}){/if}</span></td>
+						<td>{if {$a->type} != ''}{$a->type|escape:"htmlall"}{/if}</td>
+						<td>{if {$a->categories} != ''}{$a->categories|escape:"htmlall"|replace:'|':', '}{/if}</td>
+						<td>{if {$a->rating} != ''}{$a->rating}{/if}</td>
 						<td><a title="View at AniDB" target="_blank" class="label label-primary"
-							   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$a.anidbid}">AniDB</a>
+							   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$a->anidbid}">AniDB</a>
 						</td>
 					</tr>
 				{/foreach}

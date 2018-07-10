@@ -2,15 +2,14 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\AnidbTitle;
-use Illuminate\Support\Facades\DB as DBFacade;
+use Illuminate\Support\Facades\DB;
 
 class AniDB
 {
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -26,7 +25,7 @@ class AniDB
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
     }
 
     /**
@@ -50,7 +49,7 @@ class AniDB
      */
     public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE anidb_titles at
@@ -60,20 +59,20 @@ class AniDB
 					related = %s, similar = %s, creators = %s, description = %s, rating = %s,
 					categories = %s, characters = %s, epnos = %s, airdates = %s,
 					episodetitles = %s WHERE anidbid = %d',
-                $this->pdo->escapeString($title),
-                $this->pdo->escapeString($type),
-                $this->pdo->escapeString($startdate),
-                $this->pdo->escapeString($enddate),
-                $this->pdo->escapeString($related),
-                $this->pdo->escapeString($similar),
-                $this->pdo->escapeString($creators),
-                $this->pdo->escapeString($description),
-                $this->pdo->escapeString($rating),
-                $this->pdo->escapeString($categories),
-                $this->pdo->escapeString($characters),
-                $this->pdo->escapeString($epnos),
-                $this->pdo->escapeString($airdates),
-                $this->pdo->escapeString($episodetitles),
+                $this->pdo->quote($title),
+                $this->pdo->quote($type),
+                $this->pdo->quote($startdate),
+                $this->pdo->quote($enddate),
+                $this->pdo->quote($related),
+                $this->pdo->quote($similar),
+                $this->pdo->quote($creators),
+                $this->pdo->quote($description),
+                $this->pdo->quote($rating),
+                $this->pdo->quote($categories),
+                $this->pdo->quote($characters),
+                $this->pdo->quote($epnos),
+                $this->pdo->quote($airdates),
+                $this->pdo->quote($episodetitles),
                 $anidbID
             )
         );
@@ -86,7 +85,7 @@ class AniDB
      */
     public function deleteTitle($anidbID): void
     {
-        $this->pdo->queryExec(
+        DB::delete(
             sprintf(
                 '
 				DELETE at, ai, ae
@@ -115,14 +114,14 @@ class AniDB
             if ($letter === '0-9') {
                 $letter = '[0-9]';
             }
-            $rsql .= sprintf('AND at.title REGEXP %s', $this->pdo->escapeString('^'.$letter));
+            $rsql .= sprintf('AND at.title REGEXP %s', $this->pdo->quote('^'.$letter));
         }
 
         if ($animetitle !== '') {
-            $tsql .= sprintf('AND at.title %s', $this->pdo->likeString($animetitle, true, true));
+            $tsql .= sprintf('AND at.title LIKE %s', $this->pdo->quote('%'.$animetitle.'%'));
         }
 
-        return $this->pdo->queryDirect(
+        return DB::select(
             sprintf(
                 '
 				SELECT at.anidbid, at.title,
@@ -156,7 +155,7 @@ class AniDB
         if ($animetitle !== '') {
             $query->where('at.title', 'like', '%'.$animetitle.'%');
         }
-        $query->select(['at.anidbid', DBFacade::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
+        $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
                 ->from('anidb_titles as at')
                 ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
                 ->groupBy('at.anidbid')
@@ -168,12 +167,14 @@ class AniDB
     /**
      * Retrieves all info for a specific AniDB ID.
      *
-     * @param int $anidbID
-     * @return array|bool
+     *
+     * @param $anidbID
+     *
+     * @return mixed
      */
     public function getAnimeInfo($anidbID)
     {
-        $animeInfo = $this->pdo->query(
+        $animeInfo = DB::select(
             sprintf(
                 '
 				SELECT at.anidbid, at.lang, at.title,
