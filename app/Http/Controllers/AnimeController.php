@@ -114,7 +114,6 @@ class AnimeController extends BasePageController
         $meta_description = 'View Anime List';
 
         $animelist = [];
-        if ($masterserieslist instanceof \Traversable) {
             foreach ($masterserieslist as $s) {
                 if (preg_match('/^[0-9]/', $s->title)) {
                     $thisrange = '0-9';
@@ -125,7 +124,6 @@ class AnimeController extends BasePageController
                 $animelist[$thisrange][] = $s;
             }
             ksort($animelist);
-        }
 
         $this->smarty->assign('animelist', $animelist);
         $this->smarty->assign('animerange', range('A', 'Z'));

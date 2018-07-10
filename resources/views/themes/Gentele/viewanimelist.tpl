@@ -11,7 +11,7 @@
 	{$site->adbrowse}
 	<p><b>Jump to</b>:
 		&nbsp;&nbsp;[ {if $animeletter == '0-9'}<b><u>{/if}<a
-						href="{$smarty.const.WWW_TOP}/animelist/0-9">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
+						href="{$smarty.const.WWW_TOP}/animelist">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
 		{foreach $animerange as $range}
 		{if $range == $animeletter}<b><u>{/if}<a
 		href="{$smarty.const.WWW_TOP}/animelist?id={$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}

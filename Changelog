@@ -1,4 +1,5 @@
 2018-07-10 DariusIII
+	* Fix: Fix anime list display
 	* Chg: Update AniDB class and related Controller and view
 	* Fix: Fix couple of errors in NameFixer class
 	* Chg: Update NZBContents and NNTP classes
