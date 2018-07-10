@@ -1,4 +1,5 @@
 2018-07-10 DariusIII
+	* Chg: Remove references to Blacklight\db\DB from PostProcess class
 	* Chg: Remove usage of Blacklight\db\DB class where possible
 	* Fix: Fix anime list display
 	* Chg: Update AniDB class and related Controller and view
