@@ -29,7 +29,6 @@ use Blacklight\processing\post\ProcessAdditional;
 
 class PostProcess
 {
-
     /**
      * @var \Blacklight\NameFixer
      */
