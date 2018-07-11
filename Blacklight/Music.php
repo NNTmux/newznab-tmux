@@ -379,7 +379,6 @@ class Music
         // Load genres.
         $defaultGenres = $gen->loadGenres(Genres::MUSIC_TYPE);
 
-
         // Get album properties.
         $mus['coverurl'] = (string) $amaz->LargeImage->URL;
         if ($mus['coverurl'] !== '') {
