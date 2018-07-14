@@ -305,13 +305,13 @@ class Regexes
         if ($this->_regexCache[$groupName]['regex']) {
             foreach ($this->_regexCache[$groupName]['regex'] as $regex) {
                 if ($this->tableName === 'category_regexes') {
-                    $this->_categoriesID = $regex['categories_id'];
+                    $this->_categoriesID = $regex->categories_id;
                 }
 
-                $returnString = $this->_matchRegex($regex['regex'], $subject);
+                $returnString = $this->_matchRegex($regex->regex, $subject);
                 // If this regex found something, break and return, or else continue trying other regex.
                 if ($returnString) {
-                    $this->matchedRegex = $regex['id'];
+                    $this->matchedRegex = $regex->id;
                     break;
                 }
             }

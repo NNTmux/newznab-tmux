@@ -1,3 +1,5 @@
+2018-07-14 DariusIII
+	* Fix: Fix regex fetching error for release creation
 2018-07-11 DariusIII
 	* Chg: Remove usage of Blacklight\db\DB from Regexes class
 	* Chg: Use function for repeated genres array creation
