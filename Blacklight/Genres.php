@@ -3,8 +3,8 @@
 namespace Blacklight;
 
 use App\Models\Genre;
-use Blacklight\db\DB;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 class Genres
@@ -17,11 +17,6 @@ class Genres
     public const STATUS_DISABLED = 1;
 
     /**
-     * @var \Blacklight\db\DB;
-     */
-    public $pdo;
-
-    /**
      * @param array $options Class instances.
      * @throws \Exception
      */
@@ -31,8 +26,6 @@ class Genres
             'Settings' => null,
         ];
         $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
     }
 
     /**
@@ -47,11 +40,27 @@ class Genres
         if ($genres !== null) {
             return $genres;
         }
-        $genres = $this->pdo->query($sql);
+        $genres = DB::select($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $genres, $expiresAt);
 
         return $genres;
+    }
+
+    /**
+     * @param $type
+     *
+     * @return array
+     */
+    public function loadGenres($type): array
+    {
+        $genres = $this->getGenres($type);
+        $genresArray = [];
+        foreach ($genres as $genre) {
+            $genresArray[$genre->id] = strtolower($genre->title);
+        }
+
+        return $genresArray;
     }
 
     /**
@@ -109,7 +118,7 @@ class Genres
         $sql = $this->getListQuery($type, $activeonly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
 
-        return $this->pdo->query($sql);
+        return (array) array_first(DB::select($sql));
     }
 
     /**
@@ -151,9 +160,9 @@ class Genres
             $sql = sprintf('SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title', $typesql);
         }
 
-        $res = $this->pdo->queryOneRow($sql);
+        $res = DB::select($sql);
 
-        return $res['num'];
+        return $res[0]->num;
     }
 
     /**

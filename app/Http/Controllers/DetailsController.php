@@ -19,6 +19,7 @@ use App\Models\ReleaseNfo;
 use App\Models\DnzbFailure;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseRegex;
+use App\Models\UserDownload;
 use Blacklight\ReleaseExtra;
 use App\Models\ReleaseComment;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +59,7 @@ class DetailsController extends BasePageController
             $comments = ReleaseComment::getComments($data['id']);
             $similars = $releases->searchSimilar($data['id'], $data['searchname'], $this->userdata['categoryexclusions']);
             $failed = DnzbFailure::getFailedCount($data['id']);
+            $downloadedBy = UserDownload::query()->with('user')->where('releases_id', $data['id'])->get(['users_id']);
 
             $showInfo = '';
             if ($data['videos_id'] > 0) {
@@ -158,6 +160,7 @@ class DetailsController extends BasePageController
             $this->smarty->assign('cpapi', $cpapi);
             $this->smarty->assign('cpurl', $cpurl);
             $this->smarty->assign('regex', $releaseRegex);
+            $this->smarty->assign('downloadedby', $downloadedBy);
 
             $meta_title = 'View NZB';
             $meta_keywords = 'view,nzb,description,details';

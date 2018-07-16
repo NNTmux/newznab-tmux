@@ -157,6 +157,8 @@ if (! function_exists('makeFieldLinks')) {
                 'role_desc',
                 'rolechangedate_asc',
                 'rolechangedate_desc',
+                'verification_asc',
+                'verification_desc',
             ];
         }
     }

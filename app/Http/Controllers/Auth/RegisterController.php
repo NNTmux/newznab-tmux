@@ -9,9 +9,11 @@ use App\Models\Invitation;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Jrean\UserVerification\Traits\VerifiesUsers;
+use Jrean\UserVerification\Facades\UserVerification;
 
 class RegisterController extends Controller
 {
@@ -27,6 +29,7 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
+    use VerifiesUsers;
 
     /**
      * Where to redirect users after registration.
@@ -42,7 +45,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
     }
 
     /**
@@ -77,9 +80,9 @@ class RegisterController extends Controller
         $showRegister = 1;
 
         $this->validate($request, [
-            'username' => 'required|string|max:255',
+            'username' => 'required|string|min:5|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
         ]);
 
         if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
@@ -125,51 +128,26 @@ class RegisterController extends Controller
                             }
                         }
 
-                        if (! User::isValidUsername($userName)) {
-                            $error = 'Your username must be at least five characters.';
-                            break;
-                        }
-
-                        if (! User::isValidPassword($password)) {
-                            $error = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
-                            break;
-                        }
-
-                        if (! User::isValidEmail($email)) {
-                            $error = 'Your email is not a valid format.';
-                            break;
-                        }
-
-                        $res = User::getByUsername($userName);
-                        if ($res !== null) {
-                            $error = 'Sorry, the username is already taken.';
-                            break;
-                        }
-
-                        $res = User::getByEmail($email);
-                        if ($res !== null) {
-                            $error = 'Sorry, the email is already in use.';
-                            break;
-                        }
-
-                        $ret = $this->create(
+                        $user = $this->create(
                             [
                                 'username' => $userName,
                                 'password' => $password,
                                 'email' => $email,
                                 'host' => $request->ip(),
-                                'user_roles_id' => $userDefault['id'],
+                                'user_roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
                                 'notes' => '',
-                                'defaultinvites' => $userDefault['defaultinvites'],
+                                'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
                             ]
                         );
 
-                        if ($ret->id > 0) {
-                            Auth::loginUsingId($ret->id);
-                            User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                    event(new Registered($user));
 
-                            return redirect()->intended($this->redirectPath());
-                        }
+                    UserVerification::generate($user);
+
+                    UserVerification::send($user, 'User email verification required');
+
+                    return $this->registered($request, $user) ?: redirect($this->redirectPath());
+
                     break;
                 case 'view': {
                     $inviteCode = $request->input('invitecode') ?? null;

@@ -6,7 +6,6 @@ require_once NN_LIB.'utility/SmartyUtils.php';
 
 use App\Models\Menu;
 use App\Models\User;
-use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
@@ -80,7 +79,7 @@ class BasePageController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback', 'getNzb');
+        $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->smarty = app('smarty.view');
@@ -356,6 +355,10 @@ class BasePageController extends Controller
     public function adminBasePage(): void
     {
         $this->setAdminPrefs();
+        $this->smarty->assign([
+            'meta_title' => 'Admin Home',
+            'meta_description' => 'Admin home page',
+        ]);
         $this->adminrender();
     }
 }

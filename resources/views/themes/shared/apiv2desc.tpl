@@ -40,10 +40,13 @@
             (IMDB) &amp;tmdbid=1402 (TMDB).
         </dd>
         <br>
-        <dt>Movies <span style="font-family:courier;"><a
+        <dt>Movies by IMDb <span style="font-family:courier;"><a
                     href="{$smarty.const.WWW_TOP}/api/v2/movies?imdbid=1418646&amp;api_token={$userdata.api_token}">movies?imdbid=1418646</a></span>
         </dt>
-        <dd>Returns a list of nzbs matching a query, an imdbid and optionally a category. Filter by
+        <dt>Movies by TMDb <span style="font-family:courier;"><a
+                    href="{$smarty.const.WWW_TOP}/api/v2/movies?tmdbid=43418&amp;api_token={$userdata.api_token}">movies?tmdbid=43418</a></span>
+        </dt>
+        <dd>Returns a list of nzbs matching a query, an imdbid, tmdbid or traktid and optionally a category. Filter by
             site category by including a comma separated list of categories as follows <span
                 style="font-family:courier;"><a
                     href="{$smarty.const.WWW_TOP}/api/v2/movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;api_token={$userdata.api_token}">movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD}

@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
@@ -15,11 +14,6 @@ use Blacklight\processing\PostProcess;
  */
 class NZBContents
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
-
     /**
      * @var \Blacklight\NNTP
      */
@@ -83,13 +77,12 @@ class NZBContents
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput]));
         $this->nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
         $this->pp = (
         $options['PostProcess'] instanceof PostProcess
             ? $options['PostProcess']
-            : new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
+            : new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo])
         );
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->lookuppar2 = (int) Settings::settingValue('..lookuppar2') === 1;
@@ -181,26 +174,14 @@ class NZBContents
                     }
                 }
 
-                if ($foundNFO === false && $hiddenNFO === false) {
-                    if (preg_match('/\(1\/1\)$/i', $subject) &&
-                        ! preg_match(
-                            '/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini'.
-                            '|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}'.
-                            '|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i',
-                            $subject
-                        )) {
-                        $hiddenID = (string) $nzbcontents->segments->segment;
-                        $hiddenNFO = true;
-                    }
+                if ($foundNFO === false && $hiddenNFO === false && preg_match('/\(1\/1\)$/i', $subject) && ! preg_match('/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini'.'|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}'.'|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i', $subject)) {
+                    $hiddenID = (string) $nzbcontents->segments->segment;
+                    $hiddenNFO = true;
                 }
 
-                if ($foundPAR2 === false) {
-                    if (preg_match('/\.(par[&2" ]|\d{2,3}").+\(1\/1\)$/i', $subject)) {
-                        if ($this->pp->parsePAR2((string) $nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
-                            Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
-                            $foundPAR2 = true;
-                        }
-                    }
+                if ($foundPAR2 === false && preg_match('/\.(par[&2" ]|\d{2,3}").+\(1\/1\)$/i', $subject) && $this->pp->parsePAR2((string) $nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
+                    Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
+                    $foundPAR2 = true;
                 }
             }
 

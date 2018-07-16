@@ -3,18 +3,15 @@
 namespace Blacklight;
 
 use App\Models\Group;
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\CategoryRegex;
 use App\Models\CollectionRegex;
 use App\Models\ReleaseNamingRegex;
+use Illuminate\Support\Facades\DB;
 
 class Regexes
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
     public $pdo;
 
     /**
@@ -49,7 +46,7 @@ class Regexes
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->tableName = $options['Table_Name'];
     }
 
@@ -62,15 +59,15 @@ class Regexes
      */
     public function addRegex(array $data): bool
     {
-        return (bool) $this->pdo->queryInsert(
+        return (bool) DB::insert(
             sprintf(
                 'INSERT INTO %s (group_regex, regex, status, description, ordinal%s) VALUES (%s, %s, %d, %s, %d%s)',
                 $this->tableName,
                 ($this->tableName === 'category_regexes' ? ', categories_id' : ''),
-                trim($this->pdo->escapeString($data['group_regex'])),
-                trim($this->pdo->escapeString($data['regex'])),
+                trim($this->pdo->quote($data['group_regex'])),
+                trim($this->pdo->quote($data['regex'])),
                 $data['status'],
-                trim($this->pdo->escapeString($data['description'])),
+                trim($this->pdo->quote($data['description'])),
                 $data['ordinal'],
                 ($this->tableName === 'category_regexes' ? (', '.$data['categories_id']) : '')
             )
@@ -86,16 +83,16 @@ class Regexes
      */
     public function updateRegex(array $data): bool
     {
-        return (bool) $this->pdo->queryExec(
+        return (bool) DB::update(
             sprintf(
                 'UPDATE %s
 				SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
 				WHERE id = %d',
                 $this->tableName,
-                trim($this->pdo->escapeString($data['group_regex'])),
-                trim($this->pdo->escapeString($data['regex'])),
+                trim($this->pdo->quote($data['group_regex'])),
+                trim($this->pdo->quote($data['regex'])),
                 $data['status'],
-                trim($this->pdo->escapeString($data['description'])),
+                trim($this->pdo->quote($data['description'])),
                 $data['ordinal'],
                 ($this->tableName === 'category_regexes' ? (', categories_id = '.$data['categories_id']) : ''),
                 $data['id']
@@ -112,7 +109,7 @@ class Regexes
      */
     public function getRegexByID($id): array
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM %s WHERE id = %d', $this->tableName, $id));
+        return (array) array_first(DB::select(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 1', $this->tableName, $id)));
     }
 
     /**
@@ -148,7 +145,7 @@ class Regexes
      */
     public function getCount($group_regex = ''): int
     {
-        $query = $this->pdo->queryOneRow(
+        $query = DB::select(
             sprintf(
                 'SELECT COUNT(id) AS count FROM %s %s',
                 $this->tableName,
@@ -156,7 +153,7 @@ class Regexes
             )
         );
 
-        return (int) $query['count'];
+        return (int) $query[0]->count;
     }
 
     /**
@@ -166,7 +163,7 @@ class Regexes
      */
     public function deleteRegex($id): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
+        DB::delete(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
     }
 
     /**
@@ -191,7 +188,7 @@ class Regexes
 
         $tableNames = (new Group())->getCBPTableNames($groupID);
 
-        $rows = $this->pdo->query(
+        $rows = DB::select(
             sprintf(
                 'SELECT
 					b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
@@ -204,11 +201,11 @@ class Regexes
         );
 
         $data = [];
-        if ($rows) {
+        if (\count($rows) > 0) {
             $limit--;
             $hashes = [];
             foreach ($rows as $row) {
-                if (preg_match($regex, $row['name'], $matches)) {
+                if (preg_match($regex, $row->name, $matches)) {
                     ksort($matches);
                     $string = $string2 = '';
                     foreach ($matches as $key => $match) {
@@ -218,17 +215,17 @@ class Regexes
                         }
                     }
                     $files = 0;
-                    if (preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $row['name'], $fileCount)) {
+                    if (preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $row->name, $fileCount)) {
                         $files = $fileCount[3];
                     }
-                    $newCollectionHash = sha1($string.$row['fromname'].$groupID.$files);
-                    $data['New hash: '.$newCollectionHash.$string2][$row['binaryhash']] = [
+                    $newCollectionHash = sha1($string.$row->fromname.$groupID.$files);
+                    $data['New hash: '.$newCollectionHash.$string2][$row->binaryhash] = [
                         'new_collection_hash' => $newCollectionHash,
-                        'file_name'           => $row['name'],
-                        'file_total_parts'    => $row['totalparts'],
-                        'file_current_parts'  => $row['currentparts'],
-                        'collection_poster'   => $row['fromname'],
-                        'old_collection_hash' => $row['collectionhash'],
+                        'file_name'           => $row->name,
+                        'file_total_parts'    => $row->totalparts,
+                        'file_current_parts'  => $row->currentparts,
+                        'collection_poster'   => $row->fromname,
+                        'old_collection_hash' => $row->collectionhash,
                     ];
 
                     if ($limit > 0) {
@@ -308,13 +305,13 @@ class Regexes
         if ($this->_regexCache[$groupName]['regex']) {
             foreach ($this->_regexCache[$groupName]['regex'] as $regex) {
                 if ($this->tableName === 'category_regexes') {
-                    $this->_categoriesID = $regex['categories_id'];
+                    $this->_categoriesID = $regex->categories_id;
                 }
 
-                $returnString = $this->_matchRegex($regex['regex'], $subject);
+                $returnString = $this->_matchRegex($regex->regex, $subject);
                 // If this regex found something, break and return, or else continue trying other regex.
                 if ($returnString) {
-                    $this->matchedRegex = $regex['id'];
+                    $this->matchedRegex = $regex->id;
                     break;
                 }
             }
@@ -337,15 +334,13 @@ class Regexes
         }
 
         // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
-        $this->_regexCache[$groupName]['regex'] = $this->pdo->query(
+        $this->_regexCache[$groupName]['regex'] = DB::select(
             sprintf(
                 'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
                 ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
                 $this->tableName,
-                $this->pdo->escapeString($groupName)
-            ),
-            true,
-            config('nntmux.cache_expiry_long')
+                $this->pdo->quote($groupName)
+            )
         );
         // Set the TTL.
         $this->_regexCache[$groupName]['ttl'] = time();
@@ -397,6 +392,6 @@ class Regexes
      */
     protected function _groupQueryString($group_regex): string
     {
-        return $group_regex ? ('WHERE group_regex '.$this->pdo->likeString($group_regex)) : '';
+        return $group_regex ? ('WHERE group_regex LIKE '.$this->pdo->quote('%'.$group_regex.'%')) : '';
     }
 }

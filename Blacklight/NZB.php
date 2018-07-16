@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -43,7 +43,7 @@ class NZB
     protected $groupID;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -98,16 +98,11 @@ class NZB
      * @param array $options
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
+        $this->pdo = DB::connection()->getPdo();
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-
-        $nzbSplitLevel = Settings::settingValue('..nzbsplitlevel');
+        $nzbSplitLevel = (int) Settings::settingValue('..nzbsplitlevel');
         $this->nzbSplitLevel = $nzbSplitLevel ?? 1;
         $this->siteNzbPath = (string) Settings::settingValue('..nzbpath');
         if (substr($this->siteNzbPath, -1) !== DS) {
@@ -177,7 +172,7 @@ class NZB
      */
     public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle): bool
     {
-        $collections = $this->pdo->queryDirect($this->_collectionsQuery.$relID);
+        $collections = $this->pdo->query($this->_collectionsQuery.$relID);
 
         if (! $collections instanceof \Traversable) {
             return false;
@@ -209,7 +204,7 @@ class NZB
         $XMLWriter->endElement(); //head
 
         foreach ($collections as $collection) {
-            $binaries = $this->pdo->queryDirect(sprintf($this->_binariesQuery, $collection['id']));
+            $binaries = $this->pdo->query(sprintf($this->_binariesQuery, $collection['id']));
             if ($binaries === false) {
                 return false;
             }
@@ -217,7 +212,7 @@ class NZB
             $poster = $collection['fromname'];
 
             foreach ($binaries as $binary) {
-                $parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $binary['id']));
+                $parts = $this->pdo->query(sprintf($this->_partsQuery, $binary['id']));
                 if ($parts === false) {
                     return false;
                 }
@@ -269,17 +264,18 @@ class NZB
             return false;
         }
         // Mark release as having NZB.
-        $this->pdo->queryExec(
+        $this->pdo->exec(
             sprintf(
                 '
 				UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
                 self::NZB_ADDED,
-                ($nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.$this->pdo->escapeString(md5($nzb_guid)).' )'),
+                ($nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.$this->pdo->quote(md5($nzb_guid)).' )'),
                 $relID
             )
         );
+
         // Delete CBP for release that has its NZB created.
-        $this->pdo->queryExec(
+        $this->pdo->exec(
             sprintf(
                 '
 				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collections_id) STRAIGHT_JOIN %s p ON(b.id=p.binaries_id) WHERE c.releases_id = %d',
@@ -390,7 +386,7 @@ class NZB
             $title = (string) $file->attributes()->subject;
 
             // Amount of pars.
-            if (stripos($title, '.par2')) {
+            if (stripos($title, '.par2') !== false) {
                 $num_pars++;
             }
 

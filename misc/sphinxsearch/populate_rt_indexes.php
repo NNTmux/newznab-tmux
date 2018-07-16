@@ -39,44 +39,45 @@ function populate_rt($table, $max)
         }
         $total = $totals['c'];
         $minId = $totals['min'];
-    } else {
-        exit();
     }
 
-    $sphinx = new SphinxSearch();
-
-    $lastId = $minId - 1;
-    echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
-    for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
-        $rows = DB::select(sprintf($query, $lastId, $max));
-        DB::commit();
-        if (! $rows) {
-            continue;
-        }
-
-        $tempString = '';
-        foreach ($rows as $row) {
-            if ($row->id > $lastId) {
-                $lastId = $row->id;
+    try {
+        $sphinx = new SphinxSearch();
+        $lastId = $minId - 1;
+        echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
+        for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
+            $rows = DB::select(sprintf($query, $lastId, $max));
+            DB::commit();
+            if (! $rows) {
+                continue;
             }
-            switch ($table) {
-                case 'releases_rt':
-                    $sphinx->insertRelease(
-                        [
-                            'id' => $row->id,
-                            'name' => $row->name,
-                            'searchname' => $row->searchname,
-                            'fromname' => $row->fromname,
-                            'filename' => $row->filename,
-                        ]
-                    );
-                    break;
+
+            $tempString = '';
+            foreach ($rows as $row) {
+                if ($row->id > $lastId) {
+                    $lastId = $row->id;
+                }
+                switch ($table) {
+                    case 'releases_rt':
+                        $sphinx->insertRelease(
+                            [
+                                'id' => $row->id,
+                                'name' => $row->name,
+                                'searchname' => $row->searchname,
+                                'fromname' => $row->fromname,
+                                'filename' => $row->filename,
+                            ]
+                        );
+                        break;
+                }
             }
+            if (! $tempString) {
+                continue;
+            }
+            echo '.';
         }
-        if (! $tempString) {
-            continue;
-        }
-        echo '.';
+        echo "\n[Done]\n";
+    } catch (Exception $e) {
+        echo $e->getMessage();
     }
-    echo "\n[Done]\n";
 }

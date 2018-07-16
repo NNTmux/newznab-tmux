@@ -1,3 +1,115 @@
+2018-07-16 DariusIII
+	* Chg: Update used libraries to latest versions
+2018-07-14 DariusIII
+	* Chg: Update used libraries to latest versions
+	* Fix: Fix regex fetching error for release creation
+2018-07-11 DariusIII
+	* Chg: Remove usage of Blacklight\db\DB from Regexes class
+	* Chg: Use function for repeated genres array creation
+	* Chg: Update laravel/framework to version 5.6.27
+2018-07-10 DariusIII
+	* Chg: Remove references to Blacklight\db\DB from PostProcess class
+	* Chg: Remove usage of Blacklight\db\DB class where possible
+	* Fix: Fix anime list display
+	* Chg: Update AniDB class and related Controller and view
+	* Fix: Fix couple of errors in NameFixer class
+	* Chg: Update NZBContents and NNTP classes
+	* Chg: Update NZB class, remove usage of Blacklight\DB class
+2018-07-09 DariusIII
+	* Chg: Add sorting by verification to admin users list
+	* Fix: Fix search-filter.tpl
+	* Fix: Fix genres handling in Console, Games and Music controllers
+	* Chg: Update update_groups.php script
+2018-07-08 DariusIII
+	* Chg: Use Eloquent in Forking class
+	* Chg: Update Genres and Console classes
+	* Chg: Update NZBImport class, remove references to Blacklight\DB
+	* Chg: Remove unneeded nfostatus check in Tmux query
+	* Chg: Remove reference to MiscSorter in Tmux class
+	* Chg: Use Eloquent PDO in Movie, Music and Nfo classes
+	* Chg: Replace Blacklight\DB class with DB facade in Console, Games, Genres, IRCClient and IRCScraper classes
+2018-07-06 DariusIII
+	* Fix: Fix error in missing parts handling
+	* Chg: Use Eloquent raw queries in Binaries class
+2018-07-05 DariusIII
+	* Chg: Update DbUpdate class
+	* Chg: Fix tables count in monitor pane
+	* Chg: Use laravel DB facade in tmux related classes
+2018-07-04 DariusIII
+	* Chg: Update TmuxUIStart and run.php tmux related scripts
+2018-07-03 DariusIII
+	* Chg: Update all movies on adding new movie to database in admin area
+	* Chg: Better handling of movie releases updates
+	* Chg: Update NameFixer class
+	* Chg: Update swiftmailer/swiftmailer to version 6.1.0
+2018-07-02 DariusIII
+	* Fix: Fix links to categories browsing in details and search templates
+	* Chg: Update queries in Release model
+	* Chg: Update used libraries
+2018-06-30 DariusIII
+	* Chg: Update chosen to latest version
+2018-06-27 DariusIII
+	* Chg: Revert Backfill and Binaries to original state
+	* Fix: Fix terms and conditions page display
+	* Chg: Update terms and conditions page handling
+	* Chg: Change from timestamps to "normal" dates in some of the time conversion functions
+	* Chg: Remove needles date conversions to timestamp and back in Binaries and Backfill classes
+	* Chg: Update Movie processing handling
+2018-06-25 DariusIII
+	* Chg: Update Symfony components
+	* Chg: Replace DB class with Laravel DB Facade in ReleaseRemover class
+	* Chg: Simplify showPasswords function (revert to pre-queryBuilder function)
+	* Chg: Update ApiTransformer to return null value where count of comments and grabs is 0
+	* Chg: Add script to non amazon pane to fetch trakt id's for added movies
+	* Chg: Update datatables to latest version
+2018-06-23 DariusIII
+	* Chg: Update movieinfo_id column on imdbid match
+2018-06-22 DariusIII
+	* Chg: Update parseTraktTv function, update getTraktData script
+	* Chg: Update Movie class and add script to fetch trakt ids into movieinfo table
+	* Chg: Update moviesSearch function to use tmdb and trakt ids
+	* Chg: Update phpunit/phpunit to version 7.2.6
+2018-06-21 DariusIII
+	* Fix: Fix new line on renamed releases in NameFixer
+	* Chg: Remove Check all checkbox from console and games cover view
+	* Chg: Don't show site theme if admin has not enabled theme change
+	* Chg: Update profile edit page with email change description
+	* Chg: Send email verification request if user has changed the email in profile edit page
+	* Chg: Update some scripts, remove others
+	* Chg: Update laravel/framework to version 5.6.26, font-awesome and phpunit to latest
+2018-06-20 DariusIII
+	* Chg: Simplify registration by using validation rules
+	* Chg: Add email for expired roles, update related functions
+	* Chg: Update user account change function logical order
+	* Chg: Add function to delete users that have not verified their accounts for 3 or more days
+	* Chg: Update users migration and add patch for existing users table
+	* Chg: Update routes, fix user verification
+	* Chg: Add isVerified middleware to routes
+	* Chg: Add user verification on registration
+	* Chg: Add check if rating is set in Movie class updateMovieInfo function
+2018-06-19 DariusIII
+	* Chg: Update imdbphp/imdbphp
+	* Chg: Add titles to rest of the admin pages
+	* Chg: Add page title to admin/user related pages
+	* Chg: Add page title to admin index page
+	* Fix: Possible fix for undefined index 'rating' error when fetching movies info
+	* Chg: Update laravelcollective/html to version 5.6.10
+	* Chg: Update migrations for releases table, imdbid column is changed to varchar(15), add script to convert existing data
+2018-06-18 DariusIII
+	* Chg: Remove decrypt_hashes.php
+	* Chg: Update minimum MySQL version to 5.7 and MariaDB version to 10.2
+	* Fix: Prevent insertion of blank searchnames for releases
+	* Chg: Update nunomaduro/collision to version 2.0.3
+2018-06-16 DariusIII
+	* Chg: Update used libraries to their latest versions
+2018-06-11 DariusIII
+	* Chg: Add additional info for admins on release details page
+	* Chg: Update Predb model checkPre function
+	* Chg: Update update_groups script
+	* Chg: Update psy/psysh and sebastian/diff to latest versions
+2018-06-09 DariusIII
+	* Chg: Remove unused $size parameter from releaseCleaner function
+	* Fix: Potential fix for blank releases searchnames (issue #621)
 2018-06-08 DariusIII
 	* Fix: Revert breaking change in NNTP class that prevented proper binaries updating. Fixes issues #622 and #609
 	* Fix: Fix links to sendtoqueue, closes issue #623

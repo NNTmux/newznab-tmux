@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Settings;
 use App\Extensions\util\Yenc;
 
@@ -13,11 +12,6 @@ use App\Extensions\util\Yenc;
  */
 class NNTP extends \Net_NNTP_Client
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
-    public $pdo;
-
     /**
      * @var
      */
@@ -87,15 +81,12 @@ class NNTP extends \Net_NNTP_Client
         $defaults = [
             'Echo'      => true,
             'Logger' => null,
-            'Settings'  => null,
         ];
         $options += $defaults;
 
         parent::__construct();
 
         $this->_echo = ($options['Echo'] && config('nntmux.echocli'));
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
     }
@@ -500,7 +491,7 @@ class NNTP extends \Net_NNTP_Client
         $body = '';
 
         $aConnected = false;
-        $nntp = ($alternate === true ? new self(['Echo' => $this->_echo, 'Settings' => $this->pdo]) : null);
+        $nntp = ($alternate === true ? new self(['Echo' => $this->_echo]) : null);
 
         // Check if the msgIds are in an array.
         if (\is_array($identifiers)) {

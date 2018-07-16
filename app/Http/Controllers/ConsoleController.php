@@ -79,7 +79,7 @@ class ConsoleController extends BasePageController
         $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
-            $tmpgnr[$gn['id']] = $gn['title'];
+            $tmpgnr[$gn->id] = $gn->title;
         }
         $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
         $this->smarty->assign('genres', $genres);

@@ -2,13 +2,11 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Tmux;
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\DB;
 
-$pdo = new DB();
 $DIR = NN_TMUX;
 $patch = Settings::settingValue('..sqlpatch');
 $import = Settings::settingValue('site.tmux.import') ?? 0;
@@ -38,18 +36,20 @@ if (! empty($session)) {
 ColorCLI::doEcho(ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.'), true);
 
 $sql = 'SHOW table status';
-$tables = $pdo->queryDirect($sql);
+$tables = DB::select($sql);
+
 $ran = 0;
 foreach ($tables as $row) {
-    $tbl = $row['name'];
+    $tbl = $row->Name;
+
     if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
-        $run = $pdo->queryExec(
+        $run = DB::update(
             'UPDATE '.$tbl.
             ' SET dateadded = now() WHERE dateadded < now() - INTERVAL '.
             $delaytimet.' HOUR'
         );
-        if ($run !== false) {
-            $ran += $run->rowCount();
+        if ($run > 0) {
+            $ran += $run;
         }
     }
 }
@@ -172,11 +172,10 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-    $pdo = new Blacklight\db\DB();
-    $sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+    $sharing = DB::select('SELECT enabled, posting, fetching FROM sharing LIMIT 1');
     $tmux_share = Settings::settingValue('site.tmux.run_sharing') ?? 0;
 
-    if ($tmux_share && (int) $sharing['enabled'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1)) {
+    if ($tmux_share && (int) $sharing[0]->enabled === 1 && ((int) $sharing[0]->posting === 1 || (int) $sharing[0]->fetching === 1)) {
         exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
     }
 }

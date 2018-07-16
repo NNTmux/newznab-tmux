@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use App\Mail\SendInvite;
-use App\Mail\AccountChange;
 use Illuminate\Support\Str;
+use App\Mail\AccountExpired;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use Jrean\UserVerification\Traits\UserVerification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -111,6 +112,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
+    use UserVerification;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -443,8 +445,8 @@ class User extends Authenticatable
         $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
-            Mail::to($u['email'])->send(new AccountChange($u['id']));
             self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            Mail::to($u['email'])->send(new AccountExpired($u['id']));
         }
 
         return self::SUCCESS;
@@ -538,6 +540,9 @@ class User extends Authenticatable
                 break;
             case 'rolechangedate':
                 $orderField = 'rolechangedate';
+                break;
+            case 'verification':
+                $orderField = 'verified';
                 break;
             default:
                 $orderField = 'username';
@@ -1033,7 +1038,7 @@ class User extends Authenticatable
     }
 
     /**
-     * deletes old rows FROM the user_requests and user_downloads tables.
+     * Deletes old rows FROM the user_requests and user_downloads tables.
      * if site->userdownloadpurgedays SET to 0 then all release history is removed but
      * the download/request rows must remain for at least one day to allow the role based
      * limits to apply.
@@ -1049,5 +1054,13 @@ class User extends Authenticatable
 
         UserRequest::query()->where('timestamp', '<', now()->subDays($days))->delete();
         UserDownload::query()->where('timestamp', '<', now()->subDays($days))->delete();
+    }
+
+    /**
+     * Deletes users that have not verified their accounts for 3 or more days.
+     */
+    public static function deleteUnVerified()
+    {
+        static::query()->where('verified', '=', 0)->where('created_at', '<', now()->subDays(3))->delete();
     }
 }

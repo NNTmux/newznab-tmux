@@ -571,7 +571,6 @@ class ProcessReleases
                     $cleanedName = $this->releaseCleaning->releaseCleaner(
                         $collection['subject'],
                         $collection['fromname'],
-                        $collection['filesize'],
                         $collection['gname']
                     );
 
@@ -597,7 +596,7 @@ class ProcessReleases
                     $releaseID = Release::insertRelease(
                         [
                             'name' => $cleanRelName,
-                            'searchname' => utf8_encode($cleanedName),
+                            'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
                             'totalpart' => $collection['totalfiles'],
                             'groups_id' => $collection['groups_id'],
                             'guid' => createGUID(),
@@ -611,7 +610,7 @@ class ProcessReleases
                         ]
                     );
 
-                    if ($releaseID !== false) {
+                    if ($releaseID !== null) {
                         // Update collections table to say we inserted the release.
                         $this->pdo->queryExec(
                             sprintf(

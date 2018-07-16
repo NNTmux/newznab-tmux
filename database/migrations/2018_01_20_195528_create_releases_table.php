@@ -34,13 +34,14 @@ class CreateReleasesTable extends Migration
             $table->integer('categories_id')->default(10);
             $table->integer('videos_id')->unsigned()->default(0)->index('ix_releases_videos_id')->comment('FK to videos.id of the parent series.');
             $table->integer('tv_episodes_id')->default(0)->index('ix_releases_tv_episodes_id')->comment('FK to tv_episodes.id for the episode.');
-            $table->integer('imdbid')->unsigned()->nullable()->index('ix_releases_imdbid');
+            $table->string('imdbid', 15)->nullable()->index('ix_releases_imdbid');
             $table->integer('xxxinfo_id')->default(0)->index('ix_releases_xxxinfo_id');
             $table->integer('musicinfo_id')->nullable()->comment('FK to musicinfo.id');
             $table->integer('consoleinfo_id')->nullable()->index('ix_releases_consoleinfo_id')->comment('FK to consoleinfo.id');
             $table->integer('gamesinfo_id')->default(0)->index('ix_releases_gamesinfo_id');
             $table->integer('bookinfo_id')->nullable()->index('ix_releases_bookinfo_id')->comment('FK to bookinfo.id');
             $table->integer('anidbid')->nullable()->index('ix_releases_anidbid')->comment('FK to anidb_titles.anidbid');
+            $table->integer('movieinfo_id')->nullable()->index('ix_releases_movieinfo_id')->comment('FK to movieinfo.id');
             $table->integer('predb_id')->unsigned()->default(0)->comment('FK to predb.id');
             $table->integer('grabs')->unsigned()->default(0);
             $table->integer('comments')->default(0);

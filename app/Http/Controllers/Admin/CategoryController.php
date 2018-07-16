@@ -25,6 +25,7 @@ class CategoryController extends BasePageController
         $this->smarty->assign(
             [
                 'title' => $title,
+                'meta_title' => $title,
                 'content' => $content,
             ]
         );
@@ -76,31 +77,9 @@ class CategoryController extends BasePageController
         $this->smarty->assign(
             [
                 'content' => $content,
+                'meta_title' => 'View/Edit categories',
             ]
         );
         $this->adminrender();
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

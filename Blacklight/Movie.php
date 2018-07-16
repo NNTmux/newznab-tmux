@@ -32,7 +32,7 @@ class Movie
     protected const YEAR_MATCH_PERCENT = 80;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -465,8 +465,6 @@ class Movie
                 'https://',
                 str_ireplace('watch?v=', 'embed/', $data['trailer'])
             );
-
-            return $data['trailer'];
         }
         $imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
         $cover = 0;
@@ -483,6 +481,7 @@ class Movie
             'tagline'  => $this->checkTraktValue($data['tagline']),
             'title'    => $this->checkTraktValue($data['title']),
             'tmdbid'   => $this->checkTraktValue($data['ids']['tmdb']),
+            'traktid'  => $this->checkTraktValue($data['ids']['trakt']),
             'trailer'  => $this->checkTraktValue($data['trailer']),
             'cover'    => $cover,
             'year'     => $this->checkTraktValue($data['year']),
@@ -520,7 +519,7 @@ class Movie
     {
         return [
             'actors', 'backdrop', 'cover', 'director', 'genre', 'imdbid', 'language',
-            'plot', 'rating', 'rtrating', 'tagline', 'title', 'tmdbid', 'trailer', 'type', 'year',
+            'plot', 'rating', 'rtrating', 'tagline', 'title', 'tmdbid', 'traktid', 'trailer', 'type', 'year',
         ];
     }
 
@@ -634,6 +633,7 @@ class Movie
 
         $mov['imdbid'] = $imdbId;
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
+        $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
         if (! empty($fanart['cover'])) {
@@ -658,13 +658,13 @@ class Movie
             $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
-        //RottenTomatoes rating from OmdbAPI
+        // RottenTomatoes rating from OmdbAPI
         if (! empty($omdb['rtRating'])) {
             $mov['rtrating'] = $omdb['rtRating'];
         }
 
         $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title']);
-        $mov['rating'] = $this->setVariables($imdb['rating'], $tmdb['rating'], $trakt['rating'], $omdb['rating']);
+        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '');
         $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot']);
         $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline']);
         $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year']);
@@ -717,6 +717,7 @@ class Movie
             'tagline'   => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
             'title'     => $mov['title'],
             'tmdbid'    => $mov['tmdbid'],
+            'traktid'   => $mov['traktid'],
             'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
             'year'      => $mov['year'],
         ]);
@@ -901,7 +902,7 @@ class Movie
                         'title' => $result->title(),
                         'tagline' => $result->tagline(),
                         'plot' => array_get($result->plot_split(), '0.plot'),
-                        'rating' => $result->rating(),
+                        'rating' => ! empty($result->rating()) ? $result->rating() : '',
                         'year' => $result->year(),
                         'cover' => $result->photo(),
                         'genre' => $result->genre(),
@@ -933,7 +934,7 @@ class Movie
      * @return bool|array
      * @throws \Exception
      */
-    protected function fetchTraktTVProperties($imdbId)
+    public function fetchTraktTVProperties($imdbId)
     {
         if ($this->traktcheck !== null) {
             $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
@@ -978,7 +979,7 @@ class Movie
      *
      * @return bool|array
      */
-    protected function fetchOmdbAPIProperties($imdbId)
+    public function fetchOmdbAPIProperties($imdbId)
     {
         if ($this->omdbapikey !== null) {
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
@@ -1046,14 +1047,21 @@ class Movie
                 ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID), true);
             }
 
-            Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT)]);
+            $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
+
+            Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT), 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
                 if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
-                    if ($this->updateMovieInfo($imdbID) === false) {
+                    $info = $this->updateMovieInfo($imdbID);
+                    if ($info === false) {
                         Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
+                    } elseif ($info === true) {
+                        $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
+
+                        Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 7, '0', STR_PAD_LEFT), 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
                     }
                 }
             }
@@ -1079,6 +1087,7 @@ class Movie
 
         // Get all releases without an IMDB id.
         $sql = Release::query()
+            ->select(['searchname', 'id'])
             ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
             ->whereNull('imdbid')
             ->where('nzbstatus', '=', 1);
@@ -1094,7 +1103,7 @@ class Movie
             $sql->where('isrenamed', '=', 1);
         }
 
-        $res = $sql->limit($this->movieqty)->get(['searchname', 'id'])->toArray();
+        $res = $sql->limit($this->movieqty)->get();
 
         $movieCount = \count($res);
 

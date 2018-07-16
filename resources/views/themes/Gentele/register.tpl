@@ -20,25 +20,27 @@
 						<input autocomplete="off" id="username" name="username" value="{$username}" type="text"
 							   class="form-control" placeholder="Username"/>
 						<span class="glyphicon glyphicon-user form-control-feedback"></span>
-						<div class="hint">Should be at least three characters and start with a letter.</div>
+						<div class="hint">Should be at least five characters and start with a letter.</div>
 					</div>
 					<div class="form-group has-feedback">
 						<input autocomplete="off" id="email" name="email" value="{$email}" type="email"
 							   class="form-control"
 							   placeholder="Email"/>
 						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                        <div class="hint">Type your email address</div>
 					</div>
 					<div class="form-group has-feedback">
 						<input id="password" autocomplete="off" name="password" value="{$password}" type="password"
 							   class="form-control" placeholder="Password"/>
 						<span class="glyphicon glyphicon-lock form-control-feedback"></span>
-						<div class="hint">Should be at least six characters long.</div>
+						<div class="hint">Your password must be more than 8 characters long, should contain at-least 1 Uppercase, 1 Lowercase, 1 Numeric and 1 special character..</div>
 					</div>
 					<div class="form-group has-feedback">
 						<input autocomplete="off" id="password_confirmation" name="password_confirmation"
 							   value="{$confirmpassword}"
 							   type="password" class="form-control" placeholder="Retype password"/>
 						<span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+                        <div class="hint">Retype your password</div>
 					</div>
 					<div class="row">
 						<div class="col-xs-8">

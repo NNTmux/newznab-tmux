@@ -3,10 +3,10 @@
 namespace Blacklight;
 
 use App\Models\Group;
-use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Import NZB files into the database.
@@ -14,11 +14,6 @@ use Blacklight\utility\Utility;
  */
 class NZBImport
 {
-    /**
-     * @var \Blacklight\db\DB
-     */
-    protected $pdo;
-
     /**
      * @var \Blacklight\Binaries
      */
@@ -84,11 +79,6 @@ class NZBImport
     protected $nzbGuid;
 
     /**
-     * @var \Blacklight\Releases
-     */
-    private $releases;
-
-    /**
      * Construct.
      *
      * @param array $options Class instances / various options.
@@ -109,12 +99,10 @@ class NZBImport
         $options += $defaults;
 
         $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
-        $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
+        $this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Echo' => $this->echoCLI]));
+        $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
-        $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
+        $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
 
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
         $this->browser = $options['Browser'];
@@ -203,7 +191,6 @@ class NZBImport
                             @unlink($nzbFile);
                         }
                         $nzbsSkipped++;
-                        continue;
                     } else {
                         $this->updateNzbGuid();
 
@@ -213,7 +200,6 @@ class NZBImport
                         }
 
                         $nzbsImported++;
-                        continue;
                     }
                 } else {
                     $this->echoOut('ERROR: Failed to insert NZB!');
@@ -221,12 +207,10 @@ class NZBImport
                         @unlink($nzbFile);
                     }
                     $nzbsSkipped++;
-                    continue;
                 }
             } else {
                 $this->echoOut('ERROR: Unable to fetch: '.$nzbFile);
                 $nzbsSkipped++;
-                continue;
             }
         }
         $this->echoOut(
@@ -247,8 +231,8 @@ class NZBImport
     }
 
     /**
-     * @param object $nzbXML Reference of simpleXmlObject with NZB contents.
-     * @param bool|string $useNzbName Use the NZB file name as release name?
+     * @param $nzbXML
+     * @param bool $useNzbName
      * @return bool
      * @throws \Exception
      */
@@ -324,7 +308,7 @@ class NZBImport
             if ($groupID !== -1 && ! $isBlackListed) {
 
                 // Get the size of the release.
-                if (count($file->segments->segment) > 0) {
+                if (\count($file->segments->segment) > 0) {
                     foreach ($file->segments->segment as $segment) {
                         $totalSize += (int) $segment->attributes()->bytes;
                     }
@@ -342,10 +326,10 @@ class NZBImport
         }
 
         // Sort values alphabetically but keep the keys intact
-        if (count($binary_names) > 0) {
+        if (\count($binary_names) > 0) {
             asort($binary_names);
             foreach ($nzbXML->file as $file) {
-                if ($file['subject'] == $binary_names[0]) {
+                if ($file['subject'] === $binary_names[0]) {
                     $this->nzbGuid = md5($file->segments->segment);
                     break;
                 }
@@ -392,7 +376,7 @@ class NZBImport
             $renamed = 1;
         } else {
             // Pass the subject through release cleaner to get a nicer name.
-            $cleanName = $this->releaseCleaner->releaseCleaner($subject, $nzbDetails['from'], $nzbDetails['totalSize'], $nzbDetails['groupName']);
+            $cleanName = $this->releaseCleaner->releaseCleaner($subject, $nzbDetails['from'], $nzbDetails['groupName']);
             if (isset($cleanName['properlynamed'])) {
                 $cleanName = $cleanName['cleansubject'];
                 $renamed = (isset($cleanName['properlynamed']) && $cleanName['properlynamed'] === true ? 1 : 0);
@@ -455,7 +439,7 @@ class NZBImport
             }
         }
 
-        if (count($this->allGroups) === 0) {
+        if (\count($this->allGroups) === 0) {
             $this->echoOut('You have no groups in your database!');
 
             return false;

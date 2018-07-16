@@ -83,7 +83,7 @@ class Releases
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $qry = sprintf(
-            "SELECT r.*,
+            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				df.failed AS failed,
@@ -175,42 +175,24 @@ class Releases
     }
 
     /**
-     * @param null $query
-     * @param bool $builder
-     *
-     * @return string|\Illuminate\Database\Query\Builder
-     * @throws \Exception
+     * @return string
      */
-    public static function showPasswords($query = null, $builder = false)
+    public static function showPasswords()
     {
         $setting = Settings::settingValue('..showpasswordedrelease');
         $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-                if ($builder === false) {
+
                     return '='.self::PASSWD_NONE;
-                }
-
-                return $query->where('r.passwordstatus', self::PASSWD_NONE);
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
-                if ($builder === false) {
+
                     return '<= '.self::PASSWD_POTENTIAL;
-                }
-
-                return $query->where('r.passwordstatus', '=<', self::PASSWD_POTENTIAL);
             case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
-                if ($builder === false) {
                     return '<= '.self::PASSWD_NONE;
-                }
-
-                return $query->where('r.passwordstatus', '=<', self::PASSWD_NONE);
             case 10: // Shows everything.
             default:
-                if ($builder === false) {
                     return '<= '.self::PASSWD_RAR;
-                }
-
-                return $query->where('r.passwordstatus', '=<', self::PASSWD_RAR);
         }
     }
 
@@ -673,7 +655,7 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -759,7 +741,7 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -894,7 +876,7 @@ class Releases
 				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
 					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,
-				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary,
+				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1030,7 +1012,7 @@ class Releases
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id,
 				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
-				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired,
+				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name
@@ -1096,7 +1078,7 @@ class Releases
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1135,40 +1117,45 @@ class Releases
     }
 
     /**
-     * @param int $imDbId
-     * @param int $offset
-     * @param int $limit
+     * @param int    $imDbId
+     * @param int    $tmDbId
+     * @param int    $traktId
+     * @param int    $offset
+     * @param int    $limit
      * @param string $name
-     * @param array $cat
-     * @param int $maxAge
-     * @param int $minSize
+     * @param array  $cat
+     * @param int    $maxAge
+     * @param int    $minSize
      *
      * @return array
      */
-    public function moviesSearch($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
     {
         $whereSql = sprintf(
             '%s
             WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
+			%s %s %s %s %s %s',
+            $name !== '' ? $this->releaseSearch->getFullTextJoinString() : '',
             NZB::NZB_ADDED,
             $this->showPasswords,
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            (($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
+            $name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : '',
+            ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : '',
+            ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
+            ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
             Category::getCategorySearch($cat),
-            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
+            $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
+            $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
         );
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				concat(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid
 			FROM releases r
+			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
@@ -1185,6 +1172,7 @@ class Releases
             $limit,
             $offset
         );
+
         $releases = Cache::get(md5($sql));
         if ($releases !== null) {
             return $releases;

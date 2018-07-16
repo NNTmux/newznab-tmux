@@ -65,7 +65,7 @@ class MusicController extends BasePageController
         $genres = $gen->getGenres(Genres::MUSIC_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
-            $tmpgnr[$gn['id']] = $gn['title'];
+            $tmpgnr[$gn->id] = $gn->title;
         }
 
         foreach ($results as $result) {

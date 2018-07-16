@@ -23,6 +23,9 @@ class Music
 {
     protected const MATCH_PERCENT = 60;
 
+    /**
+     * @var \PDO
+     */
     protected $pdo;
 
     /**
@@ -374,11 +377,7 @@ class Music
         }
 
         // Load genres.
-        $defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
-        $genreassoc = [];
-        foreach ($defaultGenres as $dg) {
-            $genreassoc[$dg['id']] = strtolower($dg['title']);
-        }
+        $defaultGenres = $gen->loadGenres(Genres::MUSIC_TYPE);
 
         // Get album properties.
         $mus['coverurl'] = (string) $amaz->LargeImage->URL;
@@ -455,8 +454,8 @@ class Music
                 }
             }
 
-            if (\in_array(strtolower($genreName), $genreassoc, false)) {
-                $genreKey = array_search(strtolower($genreName), $genreassoc, false);
+            if (\in_array(strtolower($genreName), $defaultGenres, false)) {
+                $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
             } else {
                 $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
             }

@@ -97,8 +97,8 @@
 			<select class="form-control" style="width: 150px;" id="genre" name="genre">
 				<option class="grouping" value="">Genre...</option>
 				{foreach $genres as $gen}
-					<option {if $gen.id == $genre}selected="selected"{/if}
-							value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
+					<option {if $gen->id == $genre}selected="selected"{/if}
+							value="{$gen->id}">{$gen->title|escape:"htmlall"}</option>
 				{/foreach}
 			</select>
 			<select class="form-control" style="width: 150px;" id="year" name="year">
@@ -126,7 +126,7 @@
 			<select class="form-control" style="width: 150px;" id="genre" name="genre">
 				<option class="grouping" value="">Genre...</option>
 				{foreach $genres as $gen}
-					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+					<option {if $gen->id == $genre}selected="selected"{/if} value="{$gen->id}">{$gen->title}</option>
 				{/foreach}
 			</select>
 			<select class="form-control" style="width: 150px;" id="category" name="t">
@@ -145,7 +145,7 @@
 			<select class="form-control" style="width: 150px;" id="genre" name="genre">
 				<option class="grouping" value="">Genre...</option>
 				{foreach $genres as $gen}
-					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+					<option {if $gen->id == $genre}selected="selected"{/if} value="{$gen->id}">{$gen->title}</option>
 				{/foreach}
 			</select>
 			<select class="form-control" style="width: 150px;" id="year" name="year">
@@ -167,7 +167,7 @@
 		<select class="form-control" style="width: auto;" id="genre" name="genre">
 			<option class="grouping" value="">Genre...</option>
 			{foreach $genres as $gen}
-				<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+				<option {if $gen->id == $genre}selected="selected"{/if} value="{$gen->id}">{$gen->title}</option>
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="category" name="t">
@@ -186,7 +186,7 @@
 		<select class="form-control" style="width: auto;" id="genre" name="genre">
 			<option class="grouping" value="">Genre...</option>
 			{foreach $genres as $gen}
-				<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+				<option {if $gen->id == $genre}selected="selected"{/if} value="{$gen->id}">{$gen->title}</option>
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="year" name="year">
@@ -294,8 +294,8 @@
 		<select class="form-control" style="width: auto;" id="genre" name="genre">
 			<option class="grouping" value="">Genre...</option>
 			{foreach $genres as $gen}
-				<option {if $gen.id == $genre}selected="selected"{/if}
-						value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
+				<option {if $gen->id == $genre}selected="selected"{/if}
+						value="{$gen->id}">{$gen->title|escape:"htmlall"}</option>
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="year" name="year">

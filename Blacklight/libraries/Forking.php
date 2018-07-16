@@ -5,9 +5,9 @@ namespace Blacklight\libraries;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
 /**
@@ -84,7 +84,7 @@ class Forking extends \fork_daemon
     private $safeBackfillGroup = '';
 
     /**
-     * @var \Blacklight\db\DB
+     * @var
      */
     public $pdo;
 
@@ -192,7 +192,7 @@ class Forking extends \fork_daemon
         $this->work = [];
 
         // Init Settings here, as forking causes errors when it's destroyed.
-        $this->pdo = new DB();
+        $this->pdo = DB::connection()->getPdo();
 
         // Process extra work that should not be forked and done before forking.
         $this->processStartWork();
@@ -369,7 +369,7 @@ class Forking extends \fork_daemon
     {
         $this->register_child_run([0 => $this, 1 => 'backFillChildWorker']);
         // The option for backFill is for doing up to x articles. Else it's done by date.
-        $this->work = $this->pdo->query(
+        $this->work = DB::select(
             sprintf(
                 'SELECT name %s FROM groups WHERE backfill = 1',
                 ($this->workTypeOptions[0] === false ? '' : (', '.$this->workTypeOptions[0].' AS max'))
@@ -387,7 +387,7 @@ class Forking extends \fork_daemon
         foreach ($groups as $group) {
             $this->_executeCommand(
                 PHP_BINARY.' '.NN_UPDATE.'backfill.php '.
-                $group['name'].(isset($group['max']) ? (' '.$group['max']) : '')
+                $group->name.(isset($group->max) ? (' '.$group->max) : '')
             );
         }
     }
@@ -437,7 +437,7 @@ class Forking extends \fork_daemon
             $backfilldays = Settings::settingValue('..safebackfilldate');
         }
 
-        $data = $this->pdo->queryOneRow(
+        $data = DB::select(
             sprintf(
                 'SELECT g.name,
 				g.first_record AS our_first,
@@ -450,17 +450,17 @@ class Forking extends \fork_daemon
 				AND g.backfill = 1
 				AND %s < g.first_record_postdate
 				GROUP BY a.name, a.last_record, g.name, g.first_record
-				%s',
+				%s LIMIT 1',
                 $backfilldays,
                 $orderby
             )
         );
 
         $count = 0;
-        if ($data['name']) {
-            $this->safeBackfillGroup = $data['name'];
+        if ($data[0]->name) {
+            $this->safeBackfillGroup = $data[0]->name;
 
-            $count = ($data['our_first'] - $data['their_first']);
+            $count = ($data[0]->our_first - $data[0]->their_first);
         }
 
         if ($count > 0) {
@@ -472,7 +472,7 @@ class Forking extends \fork_daemon
 
             $queue = [];
             for ($i = 0; $i <= $geteach - 1; $i++) {
-                $queue[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data['name'], $data['our_first'] - $i * $maxmssgs - $maxmssgs, $data['our_first'] - $i * $maxmssgs - 1, $i + 1);
+                $queue[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
             $this->work = $queue;
         }
@@ -504,7 +504,7 @@ class Forking extends \fork_daemon
     private function binariesMainMethod()
     {
         $this->register_child_run([0 => $this, 1 => 'binariesChildWorker']);
-        $this->work = $this->pdo->query(
+        $this->work = DB::select(
             sprintf(
                 'SELECT name, %d AS max FROM groups WHERE active = 1',
                 $this->workTypeOptions[0]
@@ -522,7 +522,7 @@ class Forking extends \fork_daemon
     {
         foreach ($groups as $group) {
             $this->_executeCommand(
-                PHP_BINARY.' '.NN_UPDATE.'update_binaries.php '.$group['name'].' '.$group['max']
+                PHP_BINARY.' '.NN_UPDATE.'update_binaries.php '.$group->name.' '.$group->max
             );
         }
     }
@@ -539,7 +539,7 @@ class Forking extends \fork_daemon
         $maxmssgs = Settings::settingValue('..maxmssgs');
         $threads = Settings::settingValue('..binarythreads');
 
-        $groups = $this->pdo->query(
+        $groups = DB::select(
             '
 			SELECT g.name AS groupname, g.last_record AS our_last,
 				a.last_record AS their_last
@@ -552,28 +552,28 @@ class Forking extends \fork_daemon
             $i = 1;
             $queue = [];
             foreach ($groups as $group) {
-                if ((int) $group['our_last'] === 0) {
-                    $queue[$i] = sprintf('update_group_headers  %s', $group['groupname']);
+                if ((int) $group->our_last === 0) {
+                    $queue[$i] = sprintf('update_group_headers  %s', $group->groupname);
                     $i++;
                 } else {
                     //only process if more than 20k headers available and skip the first 20k
-                    $count = $group['their_last'] - $group['our_last'] - 20000;
+                    $count = $group->their_last - $group->our_last - 20000;
                     //echo "count: " . $count . "maxmsgs x2: " . ($maxmssgs * 2) . PHP_EOL;
                     if ($count <= $maxmssgs * 2) {
-                        $queue[$i] = sprintf('update_group_headers  %s', $group['groupname']);
+                        $queue[$i] = sprintf('update_group_headers  %s', $group->groupname);
                         $i++;
                     } else {
-                        $queue[$i] = sprintf('part_repair  %s', $group['groupname']);
+                        $queue[$i] = sprintf('part_repair  %s', $group->groupname);
                         $i++;
                         $geteach = floor(min($count, $maxheaders) / $maxmssgs);
                         $remaining = min($count, $maxheaders) - $geteach * $maxmssgs;
                         //echo "maxmssgs: " . $maxmssgs . " geteach: " . $geteach . " remaining: " . $remaining . PHP_EOL;
                         for ($j = 0; $j < $geteach; $j++) {
-                            $queue[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group['groupname'], $group['our_last'] + $j * $maxmssgs + 1, $group['our_last'] + $j * $maxmssgs + $maxmssgs, $i);
+                            $queue[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + $j * $maxmssgs + 1, $group->our_last + $j * $maxmssgs + $maxmssgs, $i);
                             $i++;
                         }
                         //add remainder to queue
-                        $queue[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group['groupname'], $group['our_last'] + ($j + 1) * $maxmssgs + 1, $group['our_last'] + ($j + 1) * $maxmssgs + $remaining + 1, $i);
+                        $queue[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + ($j + 1) * $maxmssgs + 1, $group->our_last + ($j + 1) * $maxmssgs + $remaining + 1, $i);
                         $i++;
                     }
                 }
@@ -623,7 +623,7 @@ class Forking extends \fork_daemon
 
         // Prevent PreDB FT from always running
         if ($this->workTypeOptions[0] === 'predbft') {
-            $preCount = $this->pdo->queryOneRow(
+            $preCount = DB::select(
                 sprintf(
                     "
 					SELECT COUNT(p.id) AS num
@@ -634,8 +634,8 @@ class Forking extends \fork_daemon
 					AND p.predate < (NOW() - INTERVAL 1 DAY)"
                 )
             );
-            if ($preCount['num'] > 0) {
-                $leftguids = \array_slice($leftguids, 0, (int) ceil($preCount['num'] / $maxperrun));
+            if ($preCount[0]->num > 0) {
+                $leftguids = \array_slice($leftguids, 0, (int) ceil($preCount[0]->num / $maxperrun));
             } else {
                 $leftguids = [];
             }
@@ -679,13 +679,13 @@ class Forking extends \fork_daemon
     {
         $this->register_child_run([0 => $this, 1 => 'releasesChildWorker']);
 
-        $groups = $this->pdo->queryDirect('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
+        $groups = DB::select('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
         if ($groups instanceof \Traversable) {
             foreach ($groups as $group) {
                 try {
-                    if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
-                        $this->work[] = ['id' => $group['id']];
+                    if (DB::select(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group->id)) !== false) {
+                        $this->work[] = ['id' => $group->id];
                     }
                 } catch (\PDOException $e) {
                     $e->getMessage();
@@ -733,7 +733,7 @@ class Forking extends \fork_daemon
         foreach ($groups as $group) {
             if ($type !== '') {
                 $this->_executeCommand(
-                    $this->dnr_path.$type.$group['id'].(isset($group['renamed']) ? ('  '.$group['renamed']) : '').'"'
+                    $this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"'
                 );
             }
         }
@@ -756,7 +756,7 @@ class Forking extends \fork_daemon
             (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
         $this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < '.($this->ppAddMaxSize * 1073741824)) : '');
 
-        return $this->pdo->queryOneRow(sprintf('
+        return DB::select(sprintf('
 					SELECT r.id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
@@ -765,7 +765,7 @@ class Forking extends \fork_daemon
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					LIMIT 1', NZB::NZB_ADDED, $this->ppAddMaxSize, $this->ppAddMinSize)) !== false;
+					LIMIT 1', NZB::NZB_ADDED, $this->ppAddMaxSize, $this->ppAddMinSize)) > 0;
     }
 
     /**
@@ -778,7 +778,7 @@ class Forking extends \fork_daemon
         if ($this->checkProcessAdditional() === true) {
             $this->processAdditional = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = $this->pdo->query(
+            $this->work = DB::select(
                 sprintf(
                     '
 					SELECT leftguid AS id
@@ -815,7 +815,7 @@ class Forking extends \fork_daemon
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $this->nfoQueryString = Nfo::NfoQueryString();
 
-            return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
+            return DB::select(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) > 0;
         }
 
         return false;
@@ -831,7 +831,7 @@ class Forking extends \fork_daemon
         if ($this->checkProcessNfo() === true) {
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = $this->pdo->query(
+            $this->work = DB::select(
                 sprintf('
 					SELECT leftguid AS id
 					FROM releases r
@@ -854,14 +854,14 @@ class Forking extends \fork_daemon
     private function checkProcessMovies(): bool
     {
         if (Settings::settingValue('..lookupimdb') > 0) {
-            return $this->pdo->queryOneRow(sprintf('
+            return DB::select(sprintf('
 						SELECT id
 						FROM releases
 						WHERE categories_id BETWEEN 5000 AND 5999
 						AND nzbstatus = %d
 						AND imdbid IS NULL
 						%s %s
-						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) !== false;
+						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) > 0;
         }
 
         return false;
@@ -877,7 +877,7 @@ class Forking extends \fork_daemon
         if ($this->checkProcessMovies() === true) {
             $this->processMovies = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = $this->pdo->query(
+            $this->work = DB::select(
                 sprintf(
                     '
 					SELECT leftguid AS id, %d AS renamed
@@ -908,7 +908,7 @@ class Forking extends \fork_daemon
     private function checkProcessTV()
     {
         if ((int) Settings::settingValue('..lookuptvrage') > 0) {
-            return $this->pdo->queryOneRow(sprintf('
+            return DB::select(sprintf('
 						SELECT id
 						FROM releases
 						WHERE categories_id BETWEEN 5000 AND 5999
@@ -916,7 +916,7 @@ class Forking extends \fork_daemon
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
-						', NZB::NZB_ADDED, (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) !== false;
+						', NZB::NZB_ADDED, (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) > 0;
         }
 
         return false;
@@ -932,7 +932,7 @@ class Forking extends \fork_daemon
         if ($this->checkProcessTV() === true) {
             $this->processTV = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = $this->pdo->query(
+            $this->work = DB::select(
                 sprintf(
                     '
 					SELECT leftguid AS id, %d AS renamed
@@ -963,11 +963,11 @@ class Forking extends \fork_daemon
      */
     private function processSharing()
     {
-        $sharing = $this->pdo->queryOneRow('SELECT enabled FROM sharing');
-        if ($sharing !== false && (int) $sharing['enabled'] === 1) {
+        $sharing = DB::select('SELECT enabled FROM sharing');
+        if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
             $nntp = new NNTP(['Settings' => $this->pdo]);
             if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
-                (new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
+                (new PostProcess(['ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
             }
 
             return true;
@@ -983,7 +983,7 @@ class Forking extends \fork_daemon
      */
     private function processSingle()
     {
-        $postProcess = new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]);
+        $postProcess = new PostProcess(['ColorCLI' => $this->_colorCLI]);
         //$postProcess->processAnime();
         $postProcess->processBooks();
         $postProcess->processConsoles();
@@ -1014,7 +1014,7 @@ class Forking extends \fork_daemon
     private function updatePerGroupMainMethod()
     {
         $this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
-        $this->work = $this->pdo->query('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = DB::select('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
         return (int) Settings::settingValue('..releasethreads');
     }
@@ -1027,7 +1027,7 @@ class Forking extends \fork_daemon
     {
         foreach ($groups as $group) {
             $this->_executeCommand(
-                $this->dnr_path.'update_per_group  '.$group['id'].'"'
+                $this->dnr_path.'update_per_group  '.$group->id.'"'
             );
         }
     }
