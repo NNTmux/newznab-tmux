@@ -62,7 +62,7 @@ $nntp = null;
 if ($args[$argv[1]] === true) {
     $nntp = new NNTP();
     if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-        echo('Unable to connect to usenet.'.PHP_EOL);
+        echo 'Unable to connect to usenet.'.PHP_EOL;
         exit;
     }
 }
