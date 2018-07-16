@@ -1,5 +1,6 @@
 2018-07-16 DariusIII
-	* CHg: Remove unused collectionCheck function from switch.php
+	* Chg: Update Releases passworded releases check for pages
+	* Chg: Remove unused collectionCheck function from switch.php
 	* Chg: Update various scripts in misc folder
 	* Chg: Update sphinx tables creation scripts
 	* Chg: Update used libraries to latest versions
