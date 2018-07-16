@@ -429,22 +429,6 @@ function charCheck($char)
 }
 
 /**
- * Check if the group should be processed.
- *
- * @param int                $groupID
- */
-function collectionCheck($groupID)
-{
-	try {
-		if (DB::select(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === 0) {
-			exit();
-		}
-	} catch (PDOException $e) {
-		$e->getMessage();
-	}
-}
-
-/**
  * Connect to usenet, return NNTP object.
  *
  * @param bool $alternate Use alternate NNTP provider.
