@@ -3,11 +3,9 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\processing\PostProcess;
 
-$pdo = new DB();
 /**
  * Array with possible arguments for run and
  * whether or not those methods of operation require NNTP.
@@ -36,7 +34,7 @@ $bool = [
     'false',
 ];
 
-if (! isset($argv[1]) || ! in_array($argv[1], $args, false) || ! isset($argv[2]) || ! in_array($argv[2], $bool, false)) {
+if (! isset($argv[1], $argv[2]) || ! in_array($argv[1], $args, false) || ! in_array($argv[2], $bool, false)) {
     exit(
     \Blacklight\ColorCLI::error(
         "\nIncorrect arguments.\n"
@@ -62,13 +60,14 @@ if (! isset($argv[1]) || ! in_array($argv[1], $args, false) || ! isset($argv[2])
 
 $nntp = null;
 if ($args[$argv[1]] === true) {
-    $nntp = new NNTP(['Settings' => $pdo]);
+    $nntp = new NNTP();
     if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-        exit($pdo->log->error('Unable to connect to usenet.'.PHP_EOL));
+        echo('Unable to connect to usenet.'.PHP_EOL);
+        exit;
     }
 }
 
-$postProcess = new PostProcess(['Settings' => $pdo, 'Echo' => $argv[2] === 'true']);
+$postProcess = new PostProcess(['Echo' => $argv[2] === 'true']);
 
 $charArray = ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 

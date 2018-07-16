@@ -4,21 +4,18 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
 use App\Models\Group;
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\Binaries;
 use Blacklight\ColorCLI;
 
-$pdo = new DB();
-
 $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
 
 // Create the connection here and pass
-$nntp = new NNTP(['Settings' => $pdo]);
+$nntp = new NNTP();
 if ($nntp->doConnect() !== true) {
     exit(ColorCLI::error('Unable to connect to usenet.'));
 }
-$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]);
+$binaries = new Binaries(['NNTP' => $nntp]);
 
 if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $groupName = $argv[1];

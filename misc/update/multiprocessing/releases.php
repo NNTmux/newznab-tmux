@@ -5,4 +5,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\libraries\Forking;
 
-(new Forking())->processWorkType('releases');
+try {
+    (new Forking())->processWorkType('releases');
+} catch (Exception $e) {
+    echo $e->getMessage();
+}

@@ -14,4 +14,8 @@ use Blacklight\libraries\Forking;
 
 declare(ticks=1);
 
-(new Forking())->processWorkType('fixRelNames_'.$argv[1], [0 => $argv[1]]);
+try {
+    (new Forking())->processWorkType('fixRelNames_'.$argv[1], [0 => $argv[1]]);
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
