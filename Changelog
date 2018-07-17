@@ -1,4 +1,5 @@
 2018-07-17 DariusIII
+	* Chg: Update ForkinImportNZB class, remove PopulateTitles class from Blacklight\db\populate folder
 	* Chg: Remove usage of Blacklight\db\DB class from Backfill
 2018-07-16 DariusIII
 	* Chg: Update Releases passworded releases check for pages
