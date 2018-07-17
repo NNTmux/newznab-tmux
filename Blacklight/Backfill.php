@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class Backfill
 {
+    /**
+     * @var \PDO
+     */
     public $pdo;
 
     /**
