@@ -259,8 +259,8 @@ class ProcessReleases
                 $where
             )
         );
-        if ($releases && \count($releases)) {
-            $total = \count($releases);
+        if ($releases > 0) {
+            $total = $releases;
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
                 Release::query()->where('id', $release->id)->update(['categories_id' => $catId, 'iscategorized' => 1]);
@@ -746,7 +746,7 @@ class ProcessReleases
 
         $nzbCount = 0;
 
-        if ($releases && $releases > 0) {
+        if ($releases > 0) {
             $total = $releases;
             // Init vars for writing the NZB's.
             $this->nzb->initiateForWrite($groupID);
@@ -1656,7 +1656,7 @@ class ProcessReleases
                 $where
             )
         );
-        if ($this->echoCLI && \is_object($obj) && $obj > 0) {
+        if ($this->echoCLI && $obj > 0) {
             ColorCLI::doEcho(
                 ColorCLI::primary('Deleted '.$obj.' broken/stuck collections.'),
                 true
