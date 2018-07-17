@@ -111,6 +111,7 @@ class ProcessReleases
      */
     private $collectionTimeout;
 
+
     /**
      * @param array $options Class instances / Echo to cli ?
      *
@@ -259,8 +260,8 @@ class ProcessReleases
                 $where
             )
         );
-        if ($releases > 0) {
-            $total = $releases;
+        if (\count($releases) > 0) {
+            $total = \count($releases);
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
                 Release::query()->where('id', $release->id)->update(['categories_id' => $catId, 'iscategorized' => 1]);
@@ -549,8 +550,9 @@ class ProcessReleases
             )
         );
 
-        if ($this->echoCLI && $collections > 0) {
-            echo ColorCLI::primary($collections.' Collections ready to be converted to releases.');
+
+        if ($this->echoCLI && \count($collections) > 0) {
+            echo ColorCLI::primary(\count($collections).' Collections ready to be converted to releases.');
         }
 
         foreach ($collections as $collection) {
@@ -746,8 +748,8 @@ class ProcessReleases
 
         $nzbCount = 0;
 
-        if ($releases > 0) {
-            $total = $releases;
+        if (\count($releases) > 0) {
+            $total = \count($releases);
             // Init vars for writing the NZB's.
             $this->nzb->initiateForWrite($groupID);
             foreach ($releases as $release) {
@@ -825,7 +827,7 @@ class ProcessReleases
     public function postProcessReleases($postProcess, &$nntp): void
     {
         if ((int) $postProcess === 1) {
-            (new PostProcess(['Echo' => $this->echoCLI, 'Groups' => $this->groups]))->processAll($nntp);
+            (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
         } elseif ($this->echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::info(
