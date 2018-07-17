@@ -1,3 +1,5 @@
+2018-07-17 DariusIII
+	* Chg: Remove usage of Blacklight\db\DB class from Backfill
 2018-07-16 DariusIII
 	* Chg: Update Releases passworded releases check for pages
 	* Chg: Remove unused collectionCheck function from switch.php
