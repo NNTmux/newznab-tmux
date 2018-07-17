@@ -1,4 +1,5 @@
 2018-07-17 DariusIII
+	* Chg: Update laravel/framework to latest version, fix wrong checks in selectOne results
 	* Fix: Fix wrong $release checks
 	* Chg: Remove usage of Blacklight\db\DB class from Backfill, PostProcess and ProcessReleases classes
 	* Chg: Update ForkinImportNZB class, remove PopulateTitles class from Blacklight\db\populate folder

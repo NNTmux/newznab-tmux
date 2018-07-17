@@ -316,7 +316,7 @@ class ProcessReleases
             );
             ColorCLI::doEcho(
                 ColorCLI::primary(
-                    ($count === 0 ? 0 : $count->complete).' collections were found to be complete. Time: '.
+                    ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
                     $this->consoleTools->convertTime(time() - $startTime)
                 ),
                 true
@@ -419,7 +419,7 @@ class ProcessReleases
                         $this->tables['cname'],
                         self::COLLFC_SIZED
                     )
-                ) > 0
+                ) !== null
             ) {
                 $deleteQuery = DB::delete(
                     sprintf(
