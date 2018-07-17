@@ -111,7 +111,6 @@ class ProcessReleases
      */
     private $collectionTimeout;
 
-
     /**
      * @param array $options Class instances / Echo to cli ?
      *
@@ -549,7 +548,6 @@ class ProcessReleases
                 $this->releaseCreationLimit
             )
         );
-
 
         if ($this->echoCLI && \count($collections) > 0) {
             echo ColorCLI::primary(\count($collections).' Collections ready to be converted to releases.');
