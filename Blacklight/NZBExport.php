@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
+use App\Models\Group;
 use Blacklight\utility\Utility;
 
 /**
@@ -49,18 +49,17 @@ class NZBExport
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Browser'  => false, // Started from browser?
-			'Echo'     => true, // Echo to CLI?
-			'NZB'      => null,
-			'Releases' => null,
-			'Settings' => null,
-		];
+            'Browser'  => false, // Started from browser?
+            'Echo'     => true, // Echo to CLI?
+            'NZB'      => null,
+            'Releases' => null,
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->browser = $options['Browser'];
         $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Setting'] : new DB());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
     }
 
@@ -124,14 +123,14 @@ class NZBExport
 
                 return $this->returnValue();
             }
-            $groups = $this->pdo->query('SELECT id, name FROM groups WHERE id = '.$params[3]);
-            if (\count($groups) === 0) {
+            $groups = Group::query()->where('id', $params['3'])->select(['id', 'name'])->get();
+            if ($groups === null) {
                 $this->echoOut('The group ID is not in the DB: '.$params[3]);
 
                 return $this->returnValue();
             }
         } else {
-            $groups = $this->pdo->query('SELECT id, name FROM groups');
+            $groups = Group::query()->select(['id', 'name'])->get();
         }
 
         $exported = 0;
@@ -158,7 +157,7 @@ class NZBExport
             }
             foreach ($releases as $release) {
 
-				// Get path to the NZB file.
+                // Get path to the NZB file.
                 $nzbFile = $this->nzb->NZBPath($release['guid']);
                 // Check if it exists.
                 if ($nzbFile === false) {
