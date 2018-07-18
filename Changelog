@@ -1,4 +1,5 @@
 2018-07-18 DariusIII
+	* Chg: Remove usage of Blacklight\db\DB class from populate_anidb.php script
 	* Chg: Remove usage of Blacklight\db\DB class from release postprocessing classes
 	* Chg: Remove usage of Blacklight\db\DB class from Capabilities and XMLResponse
 	* Chg: Change PHPDOC blocks on functions in NZBExport class
