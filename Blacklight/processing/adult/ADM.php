@@ -2,8 +2,6 @@
 
 namespace Blacklight\processing\adult;
 
-use Blacklight\db\DB;
-
 class ADM extends AdultMovies
 {
     /**
@@ -11,9 +9,9 @@ class ADM extends AdultMovies
      * Define Adult DVD Marketplace url
      * Needed Search Queries Constant.
      */
-    const ADMURL = 'http://www.adultdvdmarketplace.com';
-    const IF18 = 'http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=';
-    const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
+    protected const ADMURL = 'http://www.adultdvdmarketplace.com';
+    protected const IF18 = 'http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=';
+    protected const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
 
     /**
      * Define a cookie file location for curl.
@@ -67,7 +65,6 @@ class ADM extends AdultMovies
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->pdo = new DB();
     }
 
     /**
@@ -192,26 +189,24 @@ class ADM extends AdultMovies
             $this->_response = getRawHtml(self::ADMURL.$this->_trailUrl, $this->cookie);
             if ($this->_response !== false) {
                 $this->_html->load($this->_response);
-                if ($ret = $this->_html->find('img[rel=license]')) {
-                    if (count($ret) > 0) {
-                        foreach ($this->_html->find('img[rel=license]') as $ret) {
-                            if (isset($ret->alt)) {
-                                $title = trim($ret->alt, '"');
-                                $title = str_replace('/XXX/', '', $title);
-                                $comparetitle = preg_replace('/[\W]/', '', $title);
-                                $comparesearch = preg_replace('/[\W]/', '', $movie);
-                                similar_text($comparetitle, $comparesearch, $p);
-                                if ($p >= 90) {
-                                    if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
-                                        $this->_title = trim($title);
-                                        $this->_trailUrl = '/dvd_view_'.(string) $matches['sku'].'.html';
-                                        $this->_directUrl = self::ADMURL.$this->_trailUrl;
-                                        $this->_html->clear();
-                                        unset($this->_response);
-                                        $this->_response = getRawHtml($this->_directUrl, $this->cookie);
-                                        $this->_html->load($this->_response);
-                                        $result = true;
-                                    }
+                if ($ret = $this->_html->find('img[rel=license]') && \count($ret) > 0) {
+                    foreach ($this->_html->find('img[rel=license]') as $ret) {
+                        if (isset($ret->alt)) {
+                            $title = trim($ret->alt, '"');
+                            $title = str_replace('/XXX/', '', $title);
+                            $comparetitle = preg_replace('/[\W]/', '', $title);
+                            $comparesearch = preg_replace('/[\W]/', '', $movie);
+                            similar_text($comparetitle, $comparesearch, $p);
+                            if ($p >= 90) {
+                                if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
+                                    $this->_title = trim($title);
+                                    $this->_trailUrl = '/dvd_view_'.(string) $matches['sku'].'.html';
+                                    $this->_directUrl = self::ADMURL.$this->_trailUrl;
+                                    $this->_html->clear();
+                                    unset($this->_response);
+                                    $this->_response = getRawHtml($this->_directUrl, $this->cookie);
+                                    $this->_html->load($this->_response);
+                                    $result = true;
                                 }
                             }
                         }
