@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\SphinxSearch;
 use Blacklight\ReleaseCleaning;
+use Illuminate\Support\Facades\DB;
 
 $message =
     'Shows old searchname vs new searchname for releases in a group using the releaseCleaning class. (Good for testing new regex)'.
