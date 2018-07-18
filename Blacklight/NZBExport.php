@@ -6,9 +6,7 @@ use App\Models\Group;
 use Blacklight\utility\Utility;
 
 /**
- * Class NZBExport
- *
- * @package Blacklight
+ * Class NZBExport.
  */
 class NZBExport
 {
