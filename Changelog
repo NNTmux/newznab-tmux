@@ -1,3 +1,5 @@
+2018-07-18 DariusIII
+	* Chg: Update font-awesome to version 5.1.1
 2018-07-17 DariusIII
 	* Fix: Fix remaining issues in ProcessReleases class
 	* Chg: Update laravel/framework to latest version, fix wrong checks in selectOne results
