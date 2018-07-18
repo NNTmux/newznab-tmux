@@ -24,8 +24,8 @@ namespace Blacklight\processing;
 use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\VideoAlias;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
@@ -36,7 +36,6 @@ abstract class Videos
     protected const TYPE_TV = 0; // Type of video is a TV Programme/Show
     protected const TYPE_FILM = 1; // Type of video is a Film/Movie
     protected const TYPE_ANIME = 2; // Type of video is a Anime
-
 
     protected $pdo;
     /**
