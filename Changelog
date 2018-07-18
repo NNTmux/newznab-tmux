@@ -1,4 +1,5 @@
 2018-07-18 DariusIII
+	* Chg: Change PHPDOC blocks on functions in NZBExport class
 	* Chg: Don't use Blacklight\db\DB in NZBExport and Sharing classes
 	* Chg: Update font-awesome to version 5.1.1
 2018-07-17 DariusIII

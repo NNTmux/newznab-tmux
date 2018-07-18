@@ -6,26 +6,21 @@ use App\Models\Group;
 use Blacklight\utility\Utility;
 
 /**
- * Export NZB's to a folder.
- * Class NZBExport.
+ * Class NZBExport
+ *
+ * @package Blacklight
  */
 class NZBExport
 {
     /**
-     * Started from browser?
-     * @var bool
+     * @var mixed
      */
     protected $browser;
 
     /**
-     * @var string Return value on browser.
+     * @var
      */
     protected $retVal;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    protected $pdo;
 
     /**
      * @var NZB
@@ -43,7 +38,10 @@ class NZBExport
     protected $echoCLI;
 
     /**
-     * @param array $options Class instances / various options.
+     * NZBExport constructor.
+     *
+     * @param array $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -64,12 +62,9 @@ class NZBExport
     }
 
     /**
-     * Export to user specified folder.
+     * @param $params
      *
-     * @param array $params
-     *
-     * @return bool
-     * @throws \Exception
+     * @return bool|string
      */
     public function beginExport($params)
     {
@@ -211,7 +206,6 @@ class NZBExport
     }
 
     /**
-     * Return bool on CLI, string on browser.
      * @return bool|string
      */
     protected function returnValue()
@@ -220,13 +214,11 @@ class NZBExport
     }
 
     /**
-     * Check if date is in good format.
-     *
-     * @param string $date
+     * @param $date
      *
      * @return bool
      */
-    protected function checkDate($date)
+    protected function checkDate($date): bool
     {
         if (! preg_match('/^(\d{2}\/){2}\d{4}$/', $date)) {
             $this->echoOut('Wrong date format: '.$date);
@@ -238,11 +230,9 @@ class NZBExport
     }
 
     /**
-     * Echo message to browser or CLI.
-     *
-     * @param string $message
+     * @param $message
      */
-    protected function echoOut($message)
+    protected function echoOut($message): void
     {
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
@@ -252,13 +242,11 @@ class NZBExport
     }
 
     /**
-     * Remove unsafe chars from a filename.
-     *
-     * @param string $filename
+     * @param $filename
      *
      * @return string
      */
-    protected function safeFilename($filename)
+    protected function safeFilename($filename): string
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
     }
