@@ -448,7 +448,7 @@ class Sharing
                             continue;
                         }
 
-// Insert the site as enabled since the user has auto enabled on.
+                        // Insert the site as enabled since the user has auto enabled on.
                         DB::insert(
                             sprintf(
                                 '
