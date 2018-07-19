@@ -1,3 +1,5 @@
+2018-07-19 DariusIII
+	* Fix: Potential fix for ADM site processing error
 2018-07-18 DariusIII
 	* Chg: Remove usage of Blacklight\db\DB class from clean_nzbs and test-ReleaseCleaner scripts
 	* Chg: Remove usage of Blacklight\db\DB class from populate_anidb.php script

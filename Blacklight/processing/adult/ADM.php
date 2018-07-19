@@ -189,25 +189,24 @@ class ADM extends AdultMovies
             $this->_response = getRawHtml(self::ADMURL.$this->_trailUrl, $this->cookie);
             if ($this->_response !== false) {
                 $this->_html->load($this->_response);
-                if ($ret = $this->_html->find('img[rel=license]') && \count($ret) > 0) {
-                    foreach ($this->_html->find('img[rel=license]') as $ret) {
+                $check = $this->_html->find('img[rel=license]');
+                if (\count($check) > 0) {
+                    foreach ($check as $ret) {
                         if (isset($ret->alt)) {
                             $title = trim($ret->alt, '"');
                             $title = str_replace('/XXX/', '', $title);
                             $comparetitle = preg_replace('/[\W]/', '', $title);
                             $comparesearch = preg_replace('/[\W]/', '', $movie);
                             similar_text($comparetitle, $comparesearch, $p);
-                            if ($p >= 90) {
-                                if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
-                                    $this->_title = trim($title);
-                                    $this->_trailUrl = '/dvd_view_'.(string) $matches['sku'].'.html';
-                                    $this->_directUrl = self::ADMURL.$this->_trailUrl;
-                                    $this->_html->clear();
-                                    unset($this->_response);
-                                    $this->_response = getRawHtml($this->_directUrl, $this->cookie);
-                                    $this->_html->load($this->_response);
-                                    $result = true;
-                                }
+                            if ($p >= 90 && preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
+                                $this->_title = trim($title);
+                                $this->_trailUrl = '/dvd_view_'.(string) $matches['sku'].'.html';
+                                $this->_directUrl = self::ADMURL.$this->_trailUrl;
+                                $this->_html->clear();
+                                unset($this->_response);
+                                $this->_response = getRawHtml($this->_directUrl, $this->cookie);
+                                $this->_html->load($this->_response);
+                                $result = true;
                             }
                         }
                     }
