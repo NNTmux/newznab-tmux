@@ -1,4 +1,5 @@
 2018-07-19 DariusIII
+	* Chg: Remove Blacklight\db\DB class from many scripts in misc/testing folder
 	* Chg: Update ReleaseExtra class constructor
 	* Chg: Remove Blacklight\db\DB from ProcessAdditional class
 	* Fix: Potential fix for ADM site processing error

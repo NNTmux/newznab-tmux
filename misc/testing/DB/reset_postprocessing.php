@@ -2,12 +2,12 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
 use App\Models\Category;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
+use Illuminate\Support\Facades\DB;
 
-$pdo = new DB();
+$pdo = DB::connection()->getPdo();
 $consoletools = new ConsoleTools();
 $ran = false;
 
@@ -15,30 +15,30 @@ if ($argv[1] !== null && $argv[1] === 'all' && $argv[2] !== null && $argv[2] ===
     $ran = true;
     $where = '';
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        echo 'Truncating tables\n';
-        $pdo->queryExec('TRUNCATE TABLE consoleinfo');
-        $pdo->queryExec('TRUNCATE TABLE gamesinfo');
-        $pdo->queryExec('TRUNCATE TABLE movieinfo');
-        $pdo->queryExec('TRUNCATE TABLE video_data');
-        $pdo->queryExec('TRUNCATE TABLE musicinfo');
-        $pdo->queryExec('TRUNCATE TABLE bookinfo');
-        $pdo->queryExec('TRUNCATE TABLE release_nfos');
-        $pdo->queryExec('TRUNCATE TABLE releaseextrafull');
-        $pdo->queryExec('TRUNCATE TABLE xxxinfo');
-        $pdo->queryExec('TRUNCATE TABLE videos');
-        $pdo->queryExec('TRUNCATE TABLE videos_aliases');
-        $pdo->queryExec('TRUNCATE TABLE tv_info');
-        $pdo->queryExec('TRUNCATE TABLE tv_episodes');
-        $pdo->queryExec('TRUNCATE TABLE anidb_info');
-        $pdo->queryExec('TRUNCATE TABLE anidb_episodes');
+        echo 'Truncating tables';
+        $pdo->exec('TRUNCATE TABLE consoleinfo');
+        $pdo->exec('TRUNCATE TABLE gamesinfo');
+        $pdo->exec('TRUNCATE TABLE movieinfo');
+        $pdo->exec('TRUNCATE TABLE video_data');
+        $pdo->exec('TRUNCATE TABLE musicinfo');
+        $pdo->exec('TRUNCATE TABLE bookinfo');
+        $pdo->exec('TRUNCATE TABLE release_nfos');
+        $pdo->exec('TRUNCATE TABLE releaseextrafull');
+        $pdo->exec('TRUNCATE TABLE xxxinfo');
+        $pdo->exec('TRUNCATE TABLE videos');
+        $pdo->exec('TRUNCATE TABLE videos_aliases');
+        $pdo->exec('TRUNCATE TABLE tv_info');
+        $pdo->exec('TRUNCATE TABLE tv_episodes');
+        $pdo->exec('TRUNCATE TABLE anidb_info');
+        $pdo->exec('TRUNCATE TABLE anidb_episodes');
     }
     echo ColorCLI::header('Resetting all postprocessing');
-    $qry = $pdo->queryDirect('SELECT id FROM releases');
+    $qry = $pdo->query('SELECT id FROM releases');
     $affected = 0;
     if ($qry instanceof \Traversable) {
         $total = $qry->rowCount();
         foreach ($qry as $releases) {
-            $pdo->queryExec(
+            $pdo->exec(
                 sprintf(
                     '
 						UPDATE releases
@@ -56,7 +56,7 @@ if ($argv[1] !== null && $argv[1] === 'all' && $argv[2] !== null && $argv[2] ===
 if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE consoleinfo');
+        $pdo->exec('TRUNCATE TABLE consoleinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all Console postprocessing');
@@ -66,7 +66,7 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
         $where = ' WHERE consoleinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::GAME_ROOT.' AND '.Category::GAME_OTHER;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
         $total = $qry->rowCount();
     } else {
@@ -75,7 +75,7 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET consoleinfo_id = NULL WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET consoleinfo_id = NULL WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Console Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -84,7 +84,7 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE gamesinfo');
+        $pdo->exec('TRUNCATE TABLE gamesinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all Games postprocessing');
@@ -94,7 +94,7 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
         $where = ' WHERE gamesinfo_id IN (-2, 0) AND categories_id = 4050';
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
 
     $total = 0;
     if ($qry !== false) {
@@ -104,7 +104,7 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET gamesinfo_id = 0 WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET gamesinfo_id = 0 WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Games Releases:  '.$consoletools->percentString(++$concount, $total));
         }
         echo ColorCLI::header(PHP_EOL.number_format($concount).' gameinfo_IDs reset.');
@@ -113,7 +113,7 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE movieinfo');
+        $pdo->exec('TRUNCATE TABLE movieinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all Movie postprocessing');
@@ -123,7 +123,7 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
         $where = ' WHERE imdbid IN (-2, 0) AND categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
         $total = $qry->rowCount();
     } else {
@@ -132,7 +132,7 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET imdbid = NULL WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET imdbid = NULL WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Movie Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -141,7 +141,7 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE musicinfo');
+        $pdo->exec('TRUNCATE TABLE musicinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all Music postprocessing');
@@ -151,12 +151,12 @@ if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
         $where = ' WHERE musicinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::MUSIC_ROOT.' AND '.Category::MUSIC_OTHER;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     $total = $qry->rowCount();
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec(sprintf('UPDATE releases SET musicinfo_id = NULL WHERE id = %s ', $releases['id']));
+            $pdo->exec(sprintf('UPDATE releases SET musicinfo_id = NULL WHERE id = %s ', $releases['id']));
             $consoletools->overWritePrimary('Resetting Music Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -173,7 +173,7 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
     }
 
     echo ColorCLI::primary('SELECT id FROM releases'.$where);
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
         $total = $qry->rowCount();
     } else {
@@ -182,7 +182,7 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0 WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0 WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -191,9 +191,9 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('DELETE v, va FROM videos v INNER JOIN videos_aliases va ON v.id = va.videos_id WHERE type = 0');
-        $pdo->queryExec('TRUNCATE TABLE tv_info');
-        $pdo->queryExec('TRUNCATE TABLE tv_episodes');
+        $pdo->exec('DELETE v, va FROM videos v INNER JOIN videos_aliases va ON v.id = va.videos_id WHERE type = 0');
+        $pdo->exec('TRUNCATE TABLE tv_info');
+        $pdo->exec('TRUNCATE TABLE tv_episodes');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all TV postprocessing');
@@ -203,7 +203,7 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
         $where = ' WHERE tv_episodes_id < 0 AND categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
         $total = $qry->rowCount();
     } else {
@@ -212,7 +212,7 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET videos_id = 0, tv_episodes_id = 0 WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET videos_id = 0, tv_episodes_id = 0 WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting TV Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -221,8 +221,8 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE anidb_info');
-        $pdo->queryExec('TRUNCATE TABLE anidb_episodes');
+        $pdo->exec('TRUNCATE TABLE anidb_info');
+        $pdo->exec('TRUNCATE TABLE anidb_episodes');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all Anime postprocessing');
@@ -232,7 +232,7 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
         $where = ' WHERE anidbid BETWEEN -2 AND -1 AND categories_id = '.Category::TV_ANIME;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
         $total = $qry->rowCount();
     } else {
@@ -241,7 +241,7 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET anidbid = NULL WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET anidbid = NULL WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Anime Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -250,7 +250,7 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE bookinfo');
+        $pdo->exec('TRUNCATE TABLE bookinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all Book postprocessing');
@@ -260,12 +260,12 @@ if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
         $where = ' WHERE bookinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::BOOKS_ROOT.' AND '.Category::BOOKS_UNKNOWN;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     $total = $qry->rowCount();
     $concount = 0;
     if ($qry instanceof \Traversable) {
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET bookinfo_id = NULL WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET bookinfo_id = NULL WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Book Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
@@ -274,7 +274,7 @@ if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE xxxinfo');
+        $pdo->exec('TRUNCATE TABLE xxxinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all XXX postprocessing');
@@ -284,12 +284,12 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
         $where = ' WHERE xxxinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::XXX_ROOT.' AND '.Category::XXX_X264;
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     $concount = 0;
     if ($qry instanceof \Traversable) {
         $total = $qry->rowCount();
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET xxxinfo_id = 0 WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET xxxinfo_id = 0 WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting XXX Releases:  '.$consoletools->percentString(
                 ++$concount,
                     $total
@@ -301,7 +301,7 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
 if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
-        $pdo->queryExec('TRUNCATE TABLE release_nfos');
+        $pdo->exec('TRUNCATE TABLE release_nfos');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         echo ColorCLI::header('Resetting all NFO postprocessing');
@@ -311,12 +311,12 @@ if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
         $where = ' WHERE nfostatus < -1';
     }
 
-    $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);
+    $qry = $pdo->query('SELECT id FROM releases'.$where);
     $concount = 0;
     if ($qry instanceof \Traversable) {
         $total = $qry->rowCount();
         foreach ($qry as $releases) {
-            $pdo->queryExec('UPDATE releases SET nfostatus = -1 WHERE id = '.$releases['id']);
+            $pdo->exec('UPDATE releases SET nfostatus = -1 WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting NFO Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }

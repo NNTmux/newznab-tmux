@@ -2,13 +2,12 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
 use App\Models\Category;
 use Blacklight\ColorCLI;
 use Blacklight\Categorize;
 use Blacklight\ConsoleTools;
+use Illuminate\Support\Facades\DB;
 
-$pdo = new DB();
 
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
     exit(ColorCLI::error(
@@ -27,7 +26,6 @@ reCategorize($argv);
 
 function reCategorize($argv)
 {
-    global $pdo;
     $where = '';
     $othercats = implode(',', Category::OTHERS_GROUP);
     $update = true;
@@ -69,20 +67,19 @@ function reCategorize($argv)
 // Returns the quantity of categorized releases.
 function categorizeRelease($where, $update = true, $echooutput = false)
 {
-    global $pdo;
-    $cat = new Categorize(['Settings' => $pdo]);
-    $pdo->log = new ColorCLI();
+
+    $cat = new Categorize();
     $consoletools = new ConsoleTools();
     $relcount = $chgcount = 0;
     echo ColorCLI::primary('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
-    $resrel = $pdo->queryDirect('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
-    $total = $resrel->rowCount();
+    $resrel = DB::select('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
+    $total = \count($resrel);
     if ($total > 0) {
         foreach ($resrel as $rowrel) {
-            $catId = $cat->determineCategory($rowrel['groups_id'], $rowrel['searchname'], $rowrel['fromname']);
-            if ((int) $rowrel['categories_id'] !== $catId) {
+            $catId = $cat->determineCategory($rowrel->groups_id, $rowrel->searchname, $rowrel->fromname);
+            if ((int) $rowrel->categories_id !== $catId) {
                 if ($update === true) {
-                    $pdo->queryExec(
+                    DB::update(
                         sprintf(
                             '
 							UPDATE releases
@@ -99,7 +96,7 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 								categories_id = %d
 							WHERE id = %d',
                             $catId,
-                            $rowrel['id']
+                            $rowrel->id
                         )
                     );
                 }

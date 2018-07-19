@@ -4,14 +4,15 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
+use Blacklight\ColorCLI;
 use Blacklight\Console;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 
-$pdo = new DB();
-$console = new Console(['Echo' => true, 'Settings' => $pdo]);
+$pdo = DB::connection()->getPdo();
+$console = new Console(['Echo' => true]);
 
-$res = $pdo->queryDirect(
+$res = $pdo->query(
     sprintf(
         'SELECT searchname, id FROM releases WHERE consoleinfo_id IS NULL AND categories_id
 				BETWEEN %s AND %s ORDER BY id DESC',
@@ -20,7 +21,7 @@ $res = $pdo->queryDirect(
     )
 );
 if ($res instanceof \Traversable) {
-    echo $pdo->log->header('Updating console info for '.number_format($res->rowCount()).' releases.');
+    echo ColorCLI::header('Updating console info for '.number_format($res->rowCount()).' releases.');
 
     foreach ($res as $arr) {
         $starttime = microtime(true);
@@ -28,14 +29,14 @@ if ($res instanceof \Traversable) {
         if ($gameInfo !== false) {
             $game = $console->updateConsoleInfo($gameInfo);
             if ($game === false) {
-                echo $pdo->log->primary($gameInfo['release'].' not found');
+                echo ColorCLI::primary($gameInfo['release'].' not found');
             }
         }
 
         // amazon limits are 1 per 1 sec
         $diff = floor((microtime(true) - $starttime) * 1000000);
         if (1000000 - $diff > 0) {
-            echo $pdo->log->alternate('Sleeping');
+            echo ColorCLI::alternate('Sleeping');
             usleep(1000000 - $diff);
         }
     }

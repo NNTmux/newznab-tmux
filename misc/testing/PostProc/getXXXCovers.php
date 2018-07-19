@@ -4,19 +4,17 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\XXX;
-use Blacklight\db\DB;
 use Blacklight\ColorCLI;
 
-$pdo = new DB();
 $movie = new XXX();
 $c = new ColorCLI();
 
-$movies = $pdo->queryDirect('SELECT title FROM xxxinfo WHERE cover = 0');
-if ($movies instanceof Traversable) {
-    echo $c->primary('Updating '.number_format($movies->rowCount()).' XXX movie covers.');
+$movies = DB::select('SELECT title FROM xxxinfo WHERE cover = 0');
+
+    echo $c->primary('Updating '.number_format(\count($movies)).' XXX movie covers.');
     foreach ($movies as $mov) {
         $starttime = microtime(true);
-        $mov = $movie->updateXXXInfo($mov['title']);
+        $mov = $movie->updateXXXInfo($mov->title);
 
         // sleep so that it's not ddos' the site
         $diff = floor((microtime(true) - $starttime) * 1000000);
@@ -26,4 +24,3 @@ if ($movies instanceof Traversable) {
         }
     }
     echo "\n";
-}
