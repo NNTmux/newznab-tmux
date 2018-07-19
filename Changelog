@@ -1,4 +1,5 @@
 2018-07-19 DariusIII
+	* Fix: Fix usage of stdObject as array in ProcessAdditional class
 	* Chg: Cast $this->_release as array for addAlternateNfo function
 	* Chg: Update getXXXSamples script
 	* Chg: Remove Blacklight\db\DB class from many scripts in misc/testing folder

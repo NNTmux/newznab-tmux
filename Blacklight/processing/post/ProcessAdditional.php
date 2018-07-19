@@ -2178,7 +2178,7 @@ class ProcessAdditional
                 ) {
 
                     // Try to add the files to the DB.
-                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['hash_16K'], $file['size'], $releaseInfo['postdate'], 0)) {
+                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['hash_16K'], $file['size'], $releaseInfo->postdate, 0)) {
                         $filesAdded++;
                     }
                 }
