@@ -8,7 +8,6 @@ use Blacklight\Categorize;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
-
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
     exit(ColorCLI::error(
         "\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
@@ -67,7 +66,6 @@ function reCategorize($argv)
 // Returns the quantity of categorized releases.
 function categorizeRelease($where, $update = true, $echooutput = false)
 {
-
     $cat = new Categorize();
     $consoletools = new ConsoleTools();
     $relcount = $chgcount = 0;

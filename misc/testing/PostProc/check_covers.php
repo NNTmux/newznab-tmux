@@ -5,8 +5,8 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use Blacklight\Movie;
+use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
