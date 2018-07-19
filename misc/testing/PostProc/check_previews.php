@@ -5,9 +5,9 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use Blacklight\NZB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\NZB;
 use Blacklight\Releases;
 use Blacklight\ConsoleTools;
 use Blacklight\ReleaseImage;
