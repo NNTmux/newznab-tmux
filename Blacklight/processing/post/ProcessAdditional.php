@@ -2209,7 +2209,7 @@ class ProcessAdditional
         $data = @file_get_contents($fileLocation);
         if ($data !== false) {
             if ($this->_nfo->isNFO($data, $this->_release->guid) === true) {
-                if ($this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp) === true) {
+                if ($this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp) === true) {
                     $this->_releaseHasNoNFO = false;
                 }
             }
