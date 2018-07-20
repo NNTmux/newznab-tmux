@@ -2,11 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
 use Blacklight\ColorCLI;
 use App\Models\ConsoleInfo;
 
-$pdo = new DB();
 $covers = $updated = $deleted = 0;
 
 if ($argc === 1 || $argv[1] !== 'true') {
@@ -49,10 +47,10 @@ if ($qry instanceof \Traversable) {
                     ['id' => $rows['id']],
                 ]
             )->update(['cover' => 0]);
-            echo $pdo->log->info($path2covers.$rows['id'].'.jpg does not exist.');
+            echo ColorCLI::info($path2covers.$rows['id'].'.jpg does not exist.');
             $deleted++;
         }
     }
 }
-echo $pdo->log->header($covers.' covers set.');
-echo $pdo->log->header($deleted.' consoles unset.');
+echo ColorCLI::header($covers.' covers set.');
+echo ColorCLI::header($deleted.' consoles unset.');

@@ -312,7 +312,8 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            }
+            },
+            "time": "2016-06-06T17:37:52+00:00"
         },
         {
             "name": "bower-asset/autosize",
@@ -341,7 +342,8 @@
                 "form",
                 "textarea",
                 "ui"
-            ]
+            ],
+            "time": "2017-05-19T15:36:30+00:00"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -390,7 +392,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-3.x",
@@ -439,7 +442,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -468,7 +472,8 @@
             },
             "license": [
                 "Apache-2.0"
-            ]
+            ],
+            "time": "2016-08-05T09:50:13+00:00"
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -498,7 +503,8 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ]
+            ],
+            "time": "2015-12-01T23:35:57+00:00"
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -532,7 +538,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2015-05-15T18:56:17+00:00"
         },
         {
             "name": "bower-asset/bootswatch",
@@ -663,7 +670,8 @@
                 "modal",
                 "popup",
                 "ui"
-            ]
+            ],
+            "time": "2016-05-10T22:21:33+00:00"
         },
         {
             "name": "bower-asset/datatables",
@@ -778,7 +786,8 @@
                     "tests",
                     "examples"
                 ]
-            }
+            },
+            "time": "2015-01-26T21:19:01+00:00"
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -814,7 +823,8 @@
                 "css",
                 "flexbox",
                 "grid"
-            ]
+            ],
+            "time": "2016-08-14T16:43:18+00:00"
         },
         {
             "name": "bower-asset/font-awesome",
@@ -859,7 +869,8 @@
                     "src",
                     "build.xml"
                 ]
-            }
+            },
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "bower-asset/icheck",
@@ -909,7 +920,8 @@
                 "replacement",
                 "skins",
                 "ui"
-            ]
+            ],
+            "time": "2014-03-03T17:36:28+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -972,7 +984,8 @@
                 "javascript",
                 "jquery",
                 "library"
-            ]
+            ],
+            "time": "2016-05-20T17:24:43+00:00"
         },
         {
             "name": "bower-asset/jquery-3.2.x",
@@ -1039,7 +1052,8 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ]
+            ],
+            "time": "2017-08-31T15:51:29+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
@@ -1058,7 +1072,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-04-15T06:38:34+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-3.0.x",
@@ -1077,7 +1092,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-06-10T14:28:59+00:00"
         },
         {
             "name": "bower-asset/jquery.nicescroll",
@@ -1107,7 +1123,8 @@
                     "demo",
                     "package.json"
                 ]
-            }
+            },
+            "time": "2016-03-01T20:38:24+00:00"
         },
         {
             "name": "bower-asset/material-design-iconic-font",
@@ -1146,7 +1163,8 @@
                 "font",
                 "icons",
                 "material"
-            ]
+            ],
+            "time": "2015-11-08T04:50:28+00:00"
         },
         {
             "name": "bower-asset/materialize",
@@ -1205,7 +1223,8 @@
                 "responsive",
                 "sass",
                 "ux"
-            ]
+            ],
+            "time": "2017-04-15T01:39:28+00:00"
         },
         {
             "name": "bower-asset/pace",
@@ -1251,7 +1270,8 @@
                 "progress",
                 "progress",
                 "spinner"
-            ]
+            ],
+            "time": "2014-11-06T16:31:34+00:00"
         },
         {
             "name": "bower-asset/pnotify",
@@ -1303,7 +1323,8 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin."
+            "description": "JavaScript notification plugin.",
+            "time": "2017-07-31T21:50:29+00:00"
         },
         {
             "name": "bower-asset/respond",
@@ -1327,7 +1348,8 @@
                     "test"
                 ]
             },
-            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
+            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
+            "time": "2013-12-19T04:44:31+00:00"
         },
         {
             "name": "bower-asset/responsive-tables-js",
@@ -1357,7 +1379,8 @@
                 "jquery",
                 "responsive",
                 "table"
-            ]
+            ],
+            "time": "2015-10-08T14:18:04+00:00"
         },
         {
             "name": "bower-asset/select2",
@@ -1425,7 +1448,8 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ]
+            ],
+            "time": "2016-06-11T09:19:14+00:00"
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -4190,16 +4214,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.99.99",
+            "version": "v9.99.99",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "35469243ebbb9be5086cff57538cac6da2c36852"
+                "reference": "84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/35469243ebbb9be5086cff57538cac6da2c36852",
-                "reference": "35469243ebbb9be5086cff57538cac6da2c36852",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95",
+                "reference": "84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95",
                 "shasum": ""
             },
             "require": {
@@ -4213,11 +4237,6 @@
                 "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
             },
             "type": "library",
-            "autoload": {
-                "files": [
-                    "lib/random.php"
-                ]
-            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
@@ -4236,7 +4255,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2018-06-06T05:12:00+00:00"
+            "time": "2018-07-02T15:55:56+00:00"
         },
         {
             "name": "php-http/guzzle6-adapter",
@@ -4912,21 +4931,22 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "3.7.3",
+            "version": "3.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "44abcdad877d9a46685a3a4d221e3b2c4b87cb76"
+                "reference": "d09ea80159c1929d75b3f9c60504d613aeb4a1e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/44abcdad877d9a46685a3a4d221e3b2c4b87cb76",
-                "reference": "44abcdad877d9a46685a3a4d221e3b2c4b87cb76",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/d09ea80159c1929d75b3f9c60504d613aeb4a1e3",
+                "reference": "d09ea80159c1929d75b3f9c60504d613aeb4a1e3",
                 "shasum": ""
             },
             "require": {
-                "paragonie/random_compat": "^1.0|^2.0",
-                "php": "^5.4 || ^7.0"
+                "paragonie/random_compat": "^1.0|^2.0|9.99.99",
+                "php": "^5.4 || ^7.0",
+                "symfony/polyfill-ctype": "^1.8"
             },
             "replace": {
                 "rhumsaa/uuid": "self.version"
@@ -4934,16 +4954,17 @@
             "require-dev": {
                 "codeception/aspect-mock": "^1.0 | ~2.0.0",
                 "doctrine/annotations": "~1.2.0",
-                "goaop/framework": "1.0.0-alpha.2 | ^1.0 | ^2.1",
+                "goaop/framework": "1.0.0-alpha.2 | ^1.0 | ~2.1.0",
                 "ircmaxell/random-lib": "^1.1",
                 "jakub-onderka/php-parallel-lint": "^0.9.0",
                 "mockery/mockery": "^0.9.9",
                 "moontoast/math": "^1.1",
                 "php-mock/php-mock-phpunit": "^0.3|^1.1",
-                "phpunit/phpunit": "^4.7|^5.0",
+                "phpunit/phpunit": "^4.7|^5.0|^6.5",
                 "squizlabs/php_codesniffer": "^2.3"
             },
             "suggest": {
+                "ext-ctype": "Provides support for PHP Ctype functions",
                 "ext-libsodium": "Provides the PECL libsodium extension for use with the SodiumRandomGenerator",
                 "ext-uuid": "Provides the PECL UUID extension for use with the PeclUuidTimeGenerator and PeclUuidRandomGenerator",
                 "ircmaxell/random-lib": "Provides RandomLib for use with the RandomLibAdapter",
@@ -4988,7 +5009,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2018-01-20T00:28:24+00:00"
+            "time": "2018-07-19T23:38:55+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
