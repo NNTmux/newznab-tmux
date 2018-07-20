@@ -1,3 +1,5 @@
+2018-07-20 DariusIII
+	* Chg: Update paragonie/compat and ramsey/uuid to their latest versions
 2018-07-19 DariusIII
 	* Chg: Update spatie/laravel-fractal to version 5.4.0
 	* Fix: Fix usage of stdObject as array in ProcessAdditional class
