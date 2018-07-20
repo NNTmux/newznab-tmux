@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\MusicInfo;
 use Blacklight\ColorCLI;
+use App\Models\MusicInfo;
 
 $covers = $updated = $deleted = 0;
 
@@ -42,4 +42,3 @@ foreach ($qry as $rows) {
 }
 echo ColorCLI::header($covers.' covers set.');
 echo ColorCLI::header($deleted.' music unset.');
-
