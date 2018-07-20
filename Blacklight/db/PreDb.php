@@ -21,7 +21,9 @@
 
 namespace Blacklight\db;
 
-class PreDb extends DB
+use Illuminate\Support\Facades\DB;
+
+class PreDb
 {
     /**
      * @var array Prepared Statement objects
@@ -37,16 +39,27 @@ class PreDb extends DB
         'UpdateGroupID'    => null,
     ];
 
-    public function __construct(array $options = [])
-    {
-        $defaults = [];
-        $options += $defaults;
-        parent::__construct($options);
+    /**
+     * @var string
+     */
+    private $tableMain = 'predb';
 
-        $this->tableMain = 'predb';
-        $this->tableTemp = 'predb_imports';
+    /**
+     * @var \PDO
+     */
+    private $pdo;
+
+    /**
+     * PreDb constructor.
+     */
+    public function __construct()
+    {
+        $this->pdo = DB::connection()->getPdo();
     }
 
+    /**
+     * @return mixed
+     */
     public function executeAddGroups()
     {
         if (! isset($this->ps['AddGroups'])) {
@@ -56,6 +69,9 @@ class PreDb extends DB
         return $this->ps['AddGroups']->execute();
     }
 
+    /**
+     * @return mixed
+     */
     public function executeDeleteShort()
     {
         if (! isset($this->ps['DeleteShort'])) {
@@ -90,13 +106,15 @@ class PreDb extends DB
 
         if (empty($options['path'])) {
             return null;
-        } elseif (! is_numeric($options['limit'])) {
+        }
+
+        if (! is_numeric($options['limit'])) {
             return null;
         }
 
         $limit = $options['limit'] > 0 ? "LIMIT {$options['limit']}" : '';
 
-        $enclosedby = empty($options['enclosedby']) ? '' : "ENCLOSED BY {$this->escapeString($options['enclosedby'])}";
+        $enclosedby = empty($options['enclosedby']) ? '' : "ENCLOSED BY {$this->quote($options['enclosedby'])}";
 
         $sql = <<<SQL_EXPORT
 SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name
@@ -106,9 +124,12 @@ SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, 
 	LINES TERMINATED BY '{$options['lines']}';
 SQL_EXPORT;
 
-        return $this->queryDirect($sql);
+        return $this->pdo->query($sql);
     }
 
+    /**
+     * @return mixed
+     */
     public function executeInsert()
     {
         if (! isset($this->ps['Insert'])) {
@@ -118,6 +139,11 @@ SQL_EXPORT;
         return $this->ps['Insert']->execute();
     }
 
+    /**
+     * @param array|null $options
+     *
+     * @return null
+     */
     public function executeLoadData(array $options = null)
     {
         $defaults = [
@@ -137,6 +163,9 @@ SQL_EXPORT;
         return $this->ps['LoadData']->execute([':path' => $options['path']]);
     }
 
+    /**
+     * @return mixed
+     */
     public function executeTruncate()
     {
         if (! isset($this->ps['Truncate'])) {
@@ -146,6 +175,9 @@ SQL_EXPORT;
         return $this->ps['Truncate']->execute();
     }
 
+    /**
+     * @return mixed
+     */
     public function executeUpdateGroupID()
     {
         if (! isset($this->ps['UpdateGroupID'])) {
@@ -155,6 +187,10 @@ SQL_EXPORT;
         return $this->ps['UpdateGroupID']->execute();
     }
 
+    /**
+     * @param      $filespec
+     * @param bool $localDB
+     */
     public function import($filespec, $localDB = false)
     {
         if (! ($this->ps['AddGroups'] instanceof \PDOStatement)) {
@@ -174,6 +210,12 @@ SQL_EXPORT;
         $this->ps['Insert']->execute();
     }
 
+    /**
+     * @param null  $settings
+     * @param array $options
+     *
+     * @return mixed|null
+     */
     public function progress($settings = null, array $options = [])
     {
         $defaults = [
@@ -191,6 +233,10 @@ SQL_EXPORT;
         return $settings;
     }
 
+    /**
+     * @param bool   $localDB
+     * @param string $enclosedby
+     */
     protected function prepareImportSQL($localDB = false, $enclosedby = '')
     {
         $this->prepareSQLTruncate();
@@ -210,15 +256,15 @@ SQL_EXPORT;
      * @param $sql
      * @param string $index
      */
-    protected function prepareSQLStatement($sql, $index)
+    protected function prepareSQLStatement($sql, $index): void
     {
-        $this->ps[$index] = $this->prepare($sql);
+        $this->ps[$index] = $this->pdo->prepare($sql);
     }
 
     /**
      * Add any groups that are not in our current groups table.
      */
-    protected function prepareSQLAddGroups()
+    protected function prepareSQLAddGroups(): void
     {
         $sql = <<<'SQL_ADD_GROUPS'
 INSERT IGNORE INTO groups (name, description)
@@ -231,12 +277,18 @@ SQL_ADD_GROUPS;
         $this->prepareSQLStatement($sql, 'AddGroups');
     }
 
-    protected function prepareSQLDeleteShort()
+    /**
+     *
+     */
+    protected function prepareSQLDeleteShort(): void
     {
         $this->prepareSQLStatement('DELETE FROM predb_imports WHERE LENGTH(title) <= 8', 'DeleteShort');
     }
 
-    protected function prepareSQLInsert()
+    /**
+     *
+     */
+    protected function prepareSQLInsert(): void
     {
         $sql = <<<SQL_INSERT
 INSERT INTO {$this->tableMain} (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groups_id)
@@ -256,7 +308,10 @@ SQL_INSERT;
         $this->prepareSQLStatement($sql, 'Insert');
     }
 
-    protected function prepareSQLLoadData(array $options = [])
+    /**
+     * @param array $options
+     */
+    protected function prepareSQLLoadData(array $options = []): void
     {
         $enclosedby = '';
         $defaults = [
@@ -284,12 +339,18 @@ SQL_LOAD_DATA;
         $this->prepareSQLStatement($sql, 'LoadData');
     }
 
-    protected function prepareSQLTruncate()
+    /**
+     *
+     */
+    protected function prepareSQLTruncate(): void
     {
         $this->prepareSQLStatement('TRUNCATE TABLE predb_imports', 'Truncate');
     }
 
-    protected function prepareSQLUpdateGroupIDs()
+    /**
+     *
+     */
+    protected function prepareSQLUpdateGroupIDs(): void
     {
         $sql = 'UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL';
         $this->prepareSQLStatement($sql, 'UpdateGroupID');

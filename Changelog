@@ -1,4 +1,5 @@
 2018-07-20 DariusIII
+	* Chg: Update \Blacklight\db\PreDb class
 	* Chg: Update rest of the postproc scripts
 	* Chg: Update more postproc scripts
 	* Chg: Update paragonie/compat and ramsey/uuid to their latest versions
