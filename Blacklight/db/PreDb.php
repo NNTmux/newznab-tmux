@@ -277,17 +277,11 @@ SQL_ADD_GROUPS;
         $this->prepareSQLStatement($sql, 'AddGroups');
     }
 
-    /**
-     *
-     */
     protected function prepareSQLDeleteShort(): void
     {
         $this->prepareSQLStatement('DELETE FROM predb_imports WHERE LENGTH(title) <= 8', 'DeleteShort');
     }
 
-    /**
-     *
-     */
     protected function prepareSQLInsert(): void
     {
         $sql = <<<SQL_INSERT
@@ -339,17 +333,11 @@ SQL_LOAD_DATA;
         $this->prepareSQLStatement($sql, 'LoadData');
     }
 
-    /**
-     *
-     */
     protected function prepareSQLTruncate(): void
     {
         $this->prepareSQLStatement('TRUNCATE TABLE predb_imports', 'Truncate');
     }
 
-    /**
-     *
-     */
     protected function prepareSQLUpdateGroupIDs(): void
     {
         $sql = 'UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL';
