@@ -5,7 +5,6 @@ use Blacklight\ColorCLI;
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-
 $covers = $updated = $deleted = 0;
 
 if ($argc === 1 || $argv[1] !== 'true') {
