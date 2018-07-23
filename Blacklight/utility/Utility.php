@@ -48,11 +48,7 @@ class Utility
     public static function clearScreen(): void
     {
         if (self::isCLI()) {
-            if (self::isWin()) {
-                passthru('cls');
-            } else {
-                passthru('clear');
-            }
+            passthru('clear');
         }
     }
 
@@ -189,29 +185,16 @@ class Utility
     /**
      * Detect if the command is accessible on the system.
      *
+     *
      * @param $cmd
      *
-     * @return bool|null Returns true if found, false if not found, and null if which is not detected.
+     * @return bool
      */
-    public static function hasCommand($cmd): ?bool
+    public static function hasCommand($cmd): bool
     {
-        if ('HAS_WHICH') {
-            $returnVal = shell_exec("which $cmd");
+        $returnVal = shell_exec("which $cmd");
 
-            return empty($returnVal) ? false : true;
-        }
-
-        return null;
-    }
-
-    /**
-     * Check for availability of which command.
-     */
-    public static function hasWhich(): bool
-    {
-        exec('which which', $output, $error);
-
-        return ! $error;
+        return empty($returnVal) ? false : true;
     }
 
     /**
@@ -262,14 +245,6 @@ class Utility
         }
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isWin(): bool
-    {
-        return stripos(PHP_OS, 'win') === 0;
     }
 
     /**
@@ -689,7 +664,7 @@ class Utility
     public static function fileInfo($path)
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
-        if (self::hasCommand('file') && (! self::isWin() || $magicPath !== null)) {
+        if ($magicPath !== null && self::hasCommand('file')) {
             $magicSwitch = $magicPath === null ? '' : " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
 
@@ -758,16 +733,6 @@ class Utility
         }
 
         return '';
-    }
-
-    /**
-     * Check if O/S is windows.
-     *
-     * @return bool
-     */
-    public static function isWindows(): bool
-    {
-        return self::isWin();
     }
 
     /**
