@@ -1,4 +1,5 @@
 2018-07-23 DariusIII
+	* Chg: Update ZipFile class
 	* Chg: Update imdbphp/imdbphp to latest commit
 2018-07-20 DariusIII
 	* Chg: Update \Blacklight\db\PreDb class

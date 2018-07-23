@@ -33,28 +33,28 @@ class ZipFile
      *
      * @var  array    $datasec
      */
-    var $datasec      = array();
+    public $datasec      = [];
 
     /**
      * Central directory
      *
      * @var  array    $ctrl_dir
      */
-    var $ctrl_dir     = array();
+    public $ctrl_dir     = [];
 
     /**
      * End of central directory record
      *
      * @var  string   $eof_ctrl_dir
      */
-    var $eof_ctrl_dir = "\x50\x4b\x05\x06\x00\x00\x00\x00";
+    public $eof_ctrl_dir = "\x50\x4b\x05\x06\x00\x00\x00\x00";
 
     /**
      * Last offset position
      *
      * @var  integer  $old_offset
      */
-    var $old_offset   = 0;
+    public $old_offset   = 0;
 
 
     /**
@@ -67,8 +67,9 @@ class ZipFile
      *
      * @access private
      */
-    function unix2DosTime($unixtime = 0) {
-        $timearray = ($unixtime == 0) ? getdate() : getdate($unixtime);
+    private function unix2DosTime($unixtime = 0): int
+    {
+        $timearray = ($unixtime === 0) ? getdate() : getdate($unixtime);
 
         if ($timearray['year'] < 1980) {
             $timearray['year']    = 1980;
@@ -93,7 +94,7 @@ class ZipFile
      *
      * @access public
      */
-    function addFile($data, $name, $time = 0)
+    public function addFile($data, $name, $time = 0): void
     {
         $name     = str_replace('\\', '/', $name);
 
@@ -114,7 +115,7 @@ class ZipFile
         $unc_len = strlen($data);
         $crc     = crc32($data);
         $zdata   = gzcompress($data);
-        $zdata   = substr(substr($zdata, 0, strlen($zdata) - 4), 2); // fix crc bug
+        $zdata   = substr(substr($zdata, 0, -4), 2); // fix crc bug
         $c_len   = strlen($zdata);
         $fr      .= pack('V', $crc);             // crc32
         $fr      .= pack('V', $c_len);           // compressed filesize
@@ -125,14 +126,6 @@ class ZipFile
 
         // "file data" segment
         $fr .= $zdata;
-
-        // "data descriptor" segment (optional but necessary if archive is not
-        // served as file)
-        // nijel(2004-10-19): this seems not to be needed at all and causes
-        // problems in some cases (bug #1037737)
-        //$fr .= pack('V', $crc);                 // crc32
-        //$fr .= pack('V', $c_len);               // compressed filesize
-        //$fr .= pack('V', $unc_len);             // uncompressed filesize
 
         // add this entry to array
         $this -> datasec[] = $fr;
@@ -172,7 +165,7 @@ class ZipFile
      *
      * @access public
      */
-    function file()
+    public function file(): string
     {
         $data    = implode('', $this -> datasec);
         $ctrldir = implode('', $this -> ctrl_dir);
@@ -181,8 +174,8 @@ class ZipFile
             $data .
             $ctrldir .
             $this -> eof_ctrl_dir .
-            pack('v', sizeof($this -> ctrl_dir)) .  // total # of entries "on this disk"
-            pack('v', sizeof($this -> ctrl_dir)) .  // total # of entries overall
+            pack('v', count($this -> ctrl_dir)) .  // total # of entries "on this disk"
+            pack('v', count($this -> ctrl_dir)) .  // total # of entries overall
             pack('V', strlen($ctrldir)) .           // size of central dir
             pack('V', strlen($data)) .              // offset to start of central dir
             "\x00\x00";                             // .zip file comment length
