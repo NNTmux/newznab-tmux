@@ -665,7 +665,7 @@ class Utility
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
         if ($magicPath !== null && self::hasCommand('file')) {
-            $magicSwitch = $magicPath === null ? '' : " -m $magicPath";
+            $magicSwitch = " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
 
             if (\is_array($output)) {
@@ -779,9 +779,6 @@ class Utility
     public static function runCmd($command, $debug = false)
     {
         $nl = PHP_EOL;
-        if (self::isWindows() && strpos(PHP_VERSION, '5.3') !== false) {
-            $command = '"'.$command.'"';
-        }
 
         if ($debug) {
             echo '-Running Command: '.$nl.'   '.$command.$nl;
