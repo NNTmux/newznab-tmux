@@ -1,3 +1,5 @@
+2018-07-24 DariusIII
+	* Chg: Update font-awesome and symfony components to their latest versions
 2018-07-23 DariusIII
 	* Chg: Update Utility class
 	* Chg: Remove isWin/isWindows functions and remove HAS_WHICH definition and usage
