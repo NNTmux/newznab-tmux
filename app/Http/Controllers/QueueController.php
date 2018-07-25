@@ -126,11 +126,11 @@ class QueueController extends BasePageController
                 if ($status !== false) {
                     $output .=
                         "<div class='container text-center' style='display:block;'>
-				<div style='width:16.666666667%;float:left;'><b>Avg Speed:</b><br /> ".Utility::bytesToSizeString($status['AverageDownloadRate'], 2)."/s </div>
-				<div style='width:16.666666667%;float:left;'><b>Speed:</b><br /> ".Utility::bytesToSizeString($status['DownloadRate'], 2)."/s </div>
-				<div style='width:16.666666667%;float:left;'><b>Limit:</b><br /> ".Utility::bytesToSizeString($status['DownloadLimit'], 2)."/s </div>
-				<div style='width:16.666666667%;float:left;'><b>Queue Left(no pars):</b><br /> ".Utility::bytesToSizeString($status['RemainingSizeLo'], 2)." </div>
-				<div style='width:16.666666667%;float:left;'><b>Free Space:</b><br /> ".Utility::bytesToSizeString($status['FreeDiskSpaceMB'] * 1024000, 2)." </div>
+				<div style='width:16.666666667%;float:left;'><b>Avg Speed:</b><br /> ".human_filesize($status['AverageDownloadRate'], 2)."/s </div>
+				<div style='width:16.666666667%;float:left;'><b>Speed:</b><br /> ".human_filesize($status['DownloadRate'], 2)."/s </div>
+				<div style='width:16.666666667%;float:left;'><b>Limit:</b><br /> ".human_filesize($status['DownloadLimit'], 2)."/s </div>
+				<div style='width:16.666666667%;float:left;'><b>Queue Left(no pars):</b><br /> ".human_filesize($status['RemainingSizeLo'], 2)." </div>
+				<div style='width:16.666666667%;float:left;'><b>Free Space:</b><br /> ".human_filesize($status['FreeDiskSpaceMB'] * 1024000, 2)." </div>
 				<div style='width:16.666666667%;float:left;'><b>Status:</b><br /> ".($status['Download2Paused'] === 1 ? 'Paused' : 'Downloading').' </div>
 			</div>';
                 }

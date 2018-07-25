@@ -259,17 +259,6 @@ class Utility
     }
 
     /**
-     * @param $text
-     */
-    public static function stripBOM(&$text): void
-    {
-        $bom = pack('CCC', 0xef, 0xbb, 0xbf);
-        if (0 === strncmp($text, $bom, 3)) {
-            $text = substr($text, 3);
-        }
-    }
-
-    /**
      * Strips non-printing characters from a string.
      *
      * Operates directly on the text string, but also returns the result for situations requiring a
@@ -507,27 +496,6 @@ class Utility
         }
 
         return $buffer;
-    }
-
-    /**
-     * Get human readable size string from bytes.
-     *
-     * @param int $size     Bytes number to convert.
-     * @param int $precision How many floating point units to add.
-     *
-     * @return string
-     */
-    public static function bytesToSizeString($size, $precision = 0): string
-    {
-        static $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $step = 1024;
-        $i = 0;
-        while (($size / $step) > 0.9) {
-            $size /= $step;
-            $i++;
-        }
-
-        return round($size, $precision).$units[$i];
     }
 
     /**

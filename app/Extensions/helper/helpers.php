@@ -165,9 +165,8 @@ if (! function_exists('makeFieldLinks')) {
 
     if (! function_exists('createGUID')) {
         /**
-         * Create a GUID for a release.
-         *
          * @return string
+         * @throws \Exception
          */
         function createGUID(): string
         {
@@ -200,6 +199,23 @@ if (! function_exists('makeFieldLinks')) {
         function color($string = ''): Color
         {
             return new Color($string);
+        }
+    }
+
+    if (! function_exists('human_filesize')) {
+
+        /**
+         * @param     $bytes
+         * @param int $decimals
+         *
+         * @return string
+         */
+        function human_filesize($bytes, $decimals = 0): string
+        {
+            $size = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
+            $factor = floor((\strlen($bytes) - 1) / 3);
+
+            return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor))) . @$size[$factor];
         }
     }
 }

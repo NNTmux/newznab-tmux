@@ -532,7 +532,7 @@ class XML_Response
                 "src=\"{$this->server['server']['url']}/covers/{$dir}/{$this->release->$column}{$dcov}.jpg\" ".
                 "width=\"120\" alt=\"{$this->release->searchname}\" />\n";
         }
-        $size = Utility::bytesToSizeString($this->release->size);
+        $size = human_filesize($this->release->size);
         $this->cdata .=
             "\t<li>ID: <a href=\"{$this->server['server']['url']}/details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
             "\t<li>Name: {$this->release->searchname}</li>\n".
