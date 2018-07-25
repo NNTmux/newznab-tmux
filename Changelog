@@ -1,3 +1,5 @@
+2018-07-25 DariusIII
+	* Fix: Fix wrong namespace for Blacklight\utility\Utility class in XML_Response class
 2018-07-24 DariusIII
 	* Chg: Small updates/fixed for used regexes in Categorize class
 	* Chg: Update font-awesome and symfony components to their latest versions

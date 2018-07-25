@@ -22,7 +22,7 @@
 namespace Blacklight\http;
 
 use App\Models\Category;
-use Blacklight\Utility\Utility;
+use Blacklight\utility\Utility;
 
 /**
  * Class XMLReturn.
