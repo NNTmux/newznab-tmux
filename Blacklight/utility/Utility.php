@@ -53,29 +53,6 @@ class Utility
     }
 
     /**
-     * Replace all white space chars for a single space.
-     *
-     * @param string $text
-     *
-     * @return string
-     *
-     * @static
-     */
-    public static function collapseWhiteSpace($text): string
-    {
-        // Strip leading/trailing white space.
-        return trim(
-        // Replace 2 or more white space for a single space.
-            preg_replace(
-                '/\s{2,}/',
-                ' ',
-                // Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
-                str_replace(["\n", "\r"], ' ', $text)
-            )
-        );
-    }
-
-    /**
      * Removes the preceeding or proceeding portion of a string
      * relative to the last occurrence of the specified character.
      * The character selected may be retained or discarded.
@@ -245,17 +222,6 @@ class Utility
         }
 
         return true;
-    }
-
-    /**
-     * @param array  $elements
-     * @param string $prefix
-     *
-     * @return string
-     */
-    public static function pathCombine(array $elements, $prefix = ''): string
-    {
-        return $prefix.implode(DS, $elements);
     }
 
     /**

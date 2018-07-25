@@ -134,60 +134,6 @@ class Settings extends Model
     }
 
     /**
-     * @param $console
-     * @return bool
-     * @throws \Exception
-     */
-    public static function hasAllEntries($console): bool
-    {
-        $filepath = Utility::pathCombine(['db', 'schema', 'data', '10-settings.tsv'], NN_RES);
-        if (! file_exists($filepath)) {
-            throw new \InvalidArgumentException("Unable to find {$filepath}");
-        }
-        $settings = file($filepath);
-
-        if (! \is_array($settings)) {
-            throw new \InvalidArgumentException('Settings is not an array!');
-        }
-
-        $setting = [];
-        $dummy = array_shift($settings);
-        $result = false;
-        if ($dummy !== null) {
-            if ($console) {
-                $console->info('Verifying settings table...');
-                $console->info('(section, subsection, name):');
-            }
-            $result = true;
-            foreach ($settings as $line) {
-                $message = '';
-                [$setting['section'], $setting['subsection'], $setting['name']] =
-                    explode("\t", $line);
-
-                $value = self::settingValue(
-                    [
-                        'section'    => $setting['section'],
-                        'subsection' => $setting['subsection'],
-                        'name'       => $setting['name'],
-                    ]
-                );
-                if ($value === null) {
-                    $result = false;
-                    $message = 'error';
-                }
-
-                if ($message !== '' && $console !== null) {
-                    $console->error(" {$setting['section']}, {$setting['subsection']}, {$setting['name']}: "
-                        .'MISSING!');
-                }
-            }
-        }
-        $console->info('Settings table has all the required data');
-
-        return $result;
-    }
-
-    /**
      * Return a tree-like array of all or selected settings.
      *
      * @param bool $excludeUnsectioned If rows with empty 'section' field should be excluded.
