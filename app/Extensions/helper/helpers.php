@@ -212,10 +212,10 @@ if (! function_exists('makeFieldLinks')) {
          */
         function human_filesize($bytes, $decimals = 0): string
         {
-            $size = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
+            $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
             $factor = floor((\strlen($bytes) - 1) / 3);
 
-            return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor))) . @$size[$factor];
+            return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor))).@$size[$factor];
         }
     }
 }
