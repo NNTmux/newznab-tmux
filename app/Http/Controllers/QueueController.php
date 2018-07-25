@@ -8,7 +8,6 @@ use Blacklight\SABnzbd;
 use App\Models\Settings;
 use Blacklight\NZBVortex;
 use Illuminate\Http\Request;
-use Blacklight\utility\Utility;
 
 class QueueController extends BasePageController
 {
