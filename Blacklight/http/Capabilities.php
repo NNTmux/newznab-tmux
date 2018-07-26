@@ -32,6 +32,9 @@ use Illuminate\Support\Facades\DB;
  */
 abstract class Capabilities
 {
+    /**
+     * @var \PDO
+     */
     public $pdo;
 
     /**

@@ -34,7 +34,7 @@ class ApiTransformer extends TransformerAbstract
                 'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category_name' => $releases->category_name,
-                'added' => Carbon::parse($releases->adddate)->format('D, d M Y H:i:s O'),
+                'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
                 'poster' => $releases->fromname,
@@ -44,7 +44,7 @@ class ApiTransformer extends TransformerAbstract
                 'grabs' => $releases->grabs !== 0 ? $releases->grabs : $this->null(),
                 'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
                 'password' => $releases->passwordstatus,
-                'usenetdate' => Carbon::parse($releases->postdate)->format('D, d M Y H:i:s O'),
+                'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
                 'group' => $releases->group_name,
             ];
         }
@@ -56,7 +56,7 @@ class ApiTransformer extends TransformerAbstract
                 'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category_name' => $releases->category_name,
-                'added' => Carbon::parse($releases->adddate)->format('D, d M Y H:i:s O'),
+                'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
                 'poster' => $releases->fromname,
@@ -73,7 +73,7 @@ class ApiTransformer extends TransformerAbstract
                 'grabs' => $releases->grabs !== 0 ? $releases->grabs : $this->null(),
                 'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
                 'password' => $releases->passwordstatus,
-                'usenetdate' => Carbon::parse($releases->postdate)->format('D, d M Y H:i:s O'),
+                'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
                 'group' => $releases->group_name,
             ];
         }
@@ -84,14 +84,14 @@ class ApiTransformer extends TransformerAbstract
             'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
             'category' => $releases->categories_id,
             'category_name' => $releases->category_name,
-            'added' => Carbon::parse($releases->adddate)->format('D, d M Y H:i:s O'),
+            'added' => Carbon::parse($releases->adddate)->toRssString(),
             'size' => $releases->size,
             'files' => $releases->totalpart,
             'poster' => $releases->fromname,
             'grabs' => $releases->grabs !== 0 ? $releases->grabs : $this->null(),
             'comments' => $releases->comments !== 0 ? $releases->comments : $this->null(),
             'password' => $releases->passwordstatus,
-            'usenetdate' => Carbon::parse($releases->postdate)->format('D, d M Y H:i:s O'),
+            'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
             'group' => $releases->group_name,
         ];
     }

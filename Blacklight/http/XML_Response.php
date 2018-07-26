@@ -22,6 +22,7 @@
 namespace Blacklight\http;
 
 use App\Models\Category;
+use Illuminate\Support\Carbon;
 
 /**
  * Class XMLReturn.
@@ -440,7 +441,7 @@ class XML_Response
             $this->writeZedAttr('grabs', $this->release->grabs);
             $this->writeZedAttr('comments', $this->release->comments);
             $this->writeZedAttr('password', $this->release->passwordstatus);
-            $this->writeZedAttr('usenetdate', date_format(date_create($this->release->postdate), 'D, d M Y H:i:s O'));
+            $this->writeZedAttr('usenetdate', Carbon::parse($this->release->postdate)->toRssString());
             if (! empty($this->release->group_name)) {
                 $this->writeZedAttr('group', $this->release->group_name);
             }
