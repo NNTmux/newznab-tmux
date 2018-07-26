@@ -1,4 +1,5 @@
 2018-07-26 DariusIII
+	* Chg: Update laravel/framework to version 5.6.29
 	* Chg: Update Games class
 	* Chg: Update tests
 	* Chg: Update CreatesApplication class
