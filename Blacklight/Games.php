@@ -760,10 +760,8 @@ class Games
                     }
                 }
             }
-        } else {
-            if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('No games releases to process.'), true);
-            }
+        } elseif ($this->echoOutput) {
+            ColorCLI::doEcho(ColorCLI::header('No games releases to process.'), true);
         }
     }
 
