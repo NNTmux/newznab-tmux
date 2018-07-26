@@ -2,19 +2,20 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
+use App\Models\Settings;
+use Blacklight\ColorCLI;
+use App\Models\MovieInfo;
 use Blacklight\utility\Utility;
 
-$pdo = new DB();
 $covers = $updated = $deleted = 0;
 
-if ($argc == 1 || $argv[1] != 'true') {
-    exit($pdo->log->error("\nThis script will check all images in covers/movies and compare to db->movieinfo.\nTo run:\nphp $argv[0] true\n"));
+if ($argc === 1 || $argv[1] !== 'true') {
+    exit(ColorCLI::error("\nThis script will check all images in covers/movies and compare to db->movieinfo.\nTo run:\nphp $argv[0] true\n"));
 }
 
-$row = $pdo->queryOneRow("SELECT value FROM settings WHERE setting = 'coverspath'");
-if ($row !== false) {
-    Utility::setCoversConstant($row['value']);
+$row = Settings::settingValue('site.main.coverspath');
+if ($row !== null) {
+    Utility::setCoversConstant($row);
 } else {
     die("Unable to set Covers' constant!\n");
 }
@@ -26,13 +27,13 @@ foreach ($itr as $filePath) {
     if (is_file($filePath) && preg_match('/-cover\.jpg/', $filePath)) {
         preg_match('/(\d+)-cover\.jpg/', basename($filePath), $match);
         if (isset($match[1])) {
-            $run = $pdo->queryDirect('UPDATE movieinfo SET cover = 1 WHERE cover = 0 AND imdbid = '.$match[1]);
-            if ($run->rowCount() >= 1) {
+            $run = MovieInfo::query()->where('cover', '=', 0)->where('imdbid', $match[1])->update(['cover' => 1]);
+            if ($run >= 1) {
                 $covers++;
             } else {
-                $run = $pdo->queryDirect('SELECT imdbid FROM movieinfo WHERE imdbid = '.$match[1]);
-                if ($run->rowCount() == 0) {
-                    echo $pdo->log->info($filePath.' not found in db.');
+                $run = MovieInfo::query()->where('imdbid', '=', $match[1])->select(['imdbid'])->get();
+                if ($run->count() === 0) {
+                    echo ColorCLI::info($filePath.' not found in db.');
                 }
             }
         }
@@ -40,40 +41,35 @@ foreach ($itr as $filePath) {
     if (is_file($filePath) && preg_match('/-backdrop\.jpg/', $filePath)) {
         preg_match('/(\d+)-backdrop\.jpg/', basename($filePath), $match1);
         if (isset($match1[1])) {
-            $run = $pdo->queryDirect('UPDATE movieinfo SET backdrop = 1 WHERE backdrop = 0 AND imdbid = '.$match1[1]);
-            if ($run->rowCount() >= 1) {
+            $run = MovieInfo::query()->where(['backdrop' => 0, 'imdbid' => $match1[1]])->update(['backdrop' => 1]);
+            if ($run >= 1) {
                 $updated++;
-                printf('UPDATE movieinfo SET backdrop = 1 WHERE backdrop = 0 AND imdbid = '.$match1[1]."\n");
             } else {
-                $run = $pdo->queryDirect('SELECT imdbid FROM movieinfo WHERE imdbid = '.$match1[1]);
-                if ($run->rowCount() == 0) {
-                    echo $pdo->log->info($filePath.' not found in db.');
+                $run = MovieInfo::query()->where('imdbid', $match1[1])->select(['imdbid'])->get();
+                if ($run->count() === 0) {
+                    echo ColorCLI::info($filePath.' not found in db.');
                 }
             }
         }
     }
 }
 
-$qry = $pdo->queryDirect('SELECT imdbid FROM movieinfo WHERE cover = 1');
-if ($qry instanceof \Traversable) {
+$qry = MovieInfo::query()->where('cover', '=', 1)->select(['imdbid'])->get();
     foreach ($qry as $rows) {
         if (! is_file($path2covers.$rows['imdbid'].'-cover.jpg')) {
-            $pdo->queryDirect('UPDATE movieinfo SET cover = 0 WHERE cover = 1 AND imdbid = '.$rows['imdbid']);
-            echo $pdo->log->info($path2covers.$rows['imdbid'].'-cover.jpg does not exist.');
+            MovieInfo::query()->where('cover', '=', 1)->where('imdbid', $rows['imdbid'])->update(['cover' => 0]);
+            echo ColorCLI::info($path2covers.$rows['imdbid'].'-cover.jpg does not exist.');
             $deleted++;
         }
     }
-}
-$qry1 = $pdo->queryDirect('SELECT imdbid FROM movieinfo WHERE backdrop = 1');
-if ($qry1 instanceof \Traversable) {
+    $qry1 = MovieInfo::query()->where('backdrop', '=', 1)->select(['imdbid'])->get();
     foreach ($qry1 as $rows) {
         if (! is_file($path2covers.$rows['imdbid'].'-backdrop.jpg')) {
-            $pdo->queryDirect('UPDATE movieinfo SET backdrop = 0 WHERE backdrop = 1 AND imdbid = '.$rows['imdbid']);
-            echo $pdo->log->info($path2covers.$rows['imdbid'].'-backdrop.jpg does not exist.');
+            MovieInfo::query()->where('backdrop', '=', 1)->where('imdbid', $rows['imdbid'])->update(['backdrop' => 0]);
+            echo ColorCLI::info($path2covers.$rows['imdbid'].'-backdrop.jpg does not exist.');
             $deleted++;
         }
     }
-}
-echo $pdo->log->header($covers.' covers set.');
-echo $pdo->log->header($updated.' backdrops set.');
-echo $pdo->log->header($deleted.' movies unset.');
+echo ColorCLI::header($covers.' covers set.');
+echo ColorCLI::header($updated.' backdrops set.');
+echo ColorCLI::header($deleted.' movies unset.');

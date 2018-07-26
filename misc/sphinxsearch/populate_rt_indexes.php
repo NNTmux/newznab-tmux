@@ -33,7 +33,7 @@ function populate_rt($table, $max)
 				ORDER BY r.id ASC
 				LIMIT %d';
 
-        $totals = Release::query()->selectRaw('COUNT(id) AS c, MIN(id) AS min')->first();
+        $totals = Release::query()->select(DB::raw('COUNT(id) AS c, MIN(id) AS min'))->first();
         if (! $totals) {
             exit("Could not get database information for releases table.\n");
         }
@@ -47,8 +47,7 @@ function populate_rt($table, $max)
         echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
         for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
             $rows = DB::select(sprintf($query, $lastId, $max));
-            DB::commit();
-            if (! $rows) {
+            if ($rows === 0) {
                 continue;
             }
 

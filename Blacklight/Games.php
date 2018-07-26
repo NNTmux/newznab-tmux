@@ -574,11 +574,7 @@ class Games
         }
 
         // Load genres.
-        $defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
-        $genreAssoc = [];
-        foreach ($defaultGenres as $dg) {
-            $genreAssoc[$dg['id']] = strtolower($dg['title']);
-        }
+        $defaultGenres = $gen->loadGenres(Genres::GAME_TYPE);
 
         // Prepare database values.
         if (isset($game['coverurl'])) {
@@ -613,8 +609,8 @@ class Games
             $genreName = 'Unknown';
         }
 
-        if (\in_array(strtolower($genreName), $genreAssoc, false)) {
-            $genreKey = array_search(strtolower($genreName), $genreAssoc, false);
+        if (\in_array(strtolower($genreName), $defaultGenres, false)) {
+            $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
         } else {
             $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
         }

@@ -178,8 +178,7 @@ class API extends Capabilities
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
                 if (isset($release->id)) {
-                    $coverURL = $getCoverURL($release);
-                    $releases[$key]->coverurl = $coverURL;
+                    $releases[$key]->coverurl = $getCoverURL($release);
                 }
             }
         }

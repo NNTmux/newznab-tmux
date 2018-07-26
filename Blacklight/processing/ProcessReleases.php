@@ -6,7 +6,6 @@ use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Group;
 use App\Models\Predb;
-use Blacklight\db\DB;
 use Blacklight\Genres;
 use App\Models\Release;
 use App\Models\Category;
@@ -20,6 +19,7 @@ use Blacklight\ReleaseImage;
 use App\Models\ReleasesGroups;
 use Blacklight\ReleaseCleaning;
 use App\Models\MultigroupPoster;
+use Illuminate\Support\Facades\DB;
 
 class ProcessReleases
 {
@@ -61,7 +61,7 @@ class ProcessReleases
     public $echoCLI;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -132,11 +132,11 @@ class ProcessReleases
 
         $this->echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
-        $this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo, 'Groups' => null]));
+        $this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Groups' => null]));
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
 
         $dummy = Settings::settingValue('..delaytime');
@@ -232,7 +232,7 @@ class ProcessReleases
      */
     public function resetCategorize($where = ''): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf('UPDATE releases SET categories_id = %d, iscategorized = 0 %s', Category::OTHER_MISC, $where)
         );
     }
@@ -248,9 +248,9 @@ class ProcessReleases
      */
     public function categorizeRelease($type, $where = ''): int
     {
-        $cat = new Categorize(['Settings' => $this->pdo]);
+        $cat = new Categorize();
         $categorized = $total = 0;
-        $releases = $this->pdo->queryDirect(
+        $releases = DB::select(
             sprintf(
                 '
 				SELECT id, fromname, %s, groups_id
@@ -259,11 +259,11 @@ class ProcessReleases
                 $where
             )
         );
-        if ($releases && $releases->rowCount()) {
-            $total = $releases->rowCount();
+        if (\count($releases) > 0) {
+            $total = \count($releases);
             foreach ($releases as $release) {
-                $catId = $cat->determineCategory($release['groups_id'], $release[$type], $release['fromname']);
-                Release::query()->where('id', $release['id'])->update(['categories_id' => $catId, 'iscategorized' => 1]);
+                $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
+                Release::query()->where('id', $release->id)->update(['categories_id' => $catId, 'iscategorized' => 1]);
                 $categorized++;
                 if ($this->echoCLI) {
                     $this->consoleTools->overWritePrimary(
@@ -303,7 +303,7 @@ class ProcessReleases
         $this->collectionFileCheckStage6($where);
 
         if ($this->echoCLI) {
-            $count = $this->pdo->queryOneRow(
+            $count = DB::selectOne(
                 sprintf(
                     '
 					SELECT COUNT(c.id) AS complete
@@ -316,7 +316,7 @@ class ProcessReleases
             );
             ColorCLI::doEcho(
                 ColorCLI::primary(
-                    ($count === false ? 0 : $count['complete']).' collections were found to be complete. Time: '.
+                    ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
                     $this->consoleTools->convertTime(time() - $startTime)
                 ),
                 true
@@ -338,7 +338,7 @@ class ProcessReleases
             ColorCLI::doEcho(ColorCLI::header('Process Releases -> Calculating collection sizes (in bytes).'), true);
         }
         // Get the total size in bytes of the collection for collections where filecheck = 2.
-        $checked = $this->pdo->queryExec(
+        $checked = DB::update(
             sprintf(
                 '
 				UPDATE %s c
@@ -358,11 +358,12 @@ class ProcessReleases
                 (! empty($groupID) ? ' AND c.groups_id = '.$groupID : ' ')
             )
         );
-        if ($checked !== false && $this->echoCLI) {
+        if ($checked > 0 && $this->echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::primary(
-                    $checked->rowCount().' collections set to filecheck = 3(size calculated)'
-                ), true
+                    $checked.' collections set to filecheck = 3(size calculated)'
+                ),
+                true
             );
             ColorCLI::doEcho(ColorCLI::primary($this->consoleTools->convertTime(time() - $startTime)), true);
         }
@@ -382,7 +383,8 @@ class ProcessReleases
             ColorCLI::doEcho(
                 ColorCLI::header(
                     'Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.'
-                ), true
+                ),
+                true
             );
         }
 
@@ -407,7 +409,7 @@ class ProcessReleases
                 }
             }
 
-            if ($this->pdo->queryOneRow(
+            if (DB::selectOne(
                     sprintf(
                         '
 						SELECT SQL_NO_CACHE id
@@ -417,9 +419,9 @@ class ProcessReleases
                         $this->tables['cname'],
                         self::COLLFC_SIZED
                     )
-                ) !== false
+                ) !== null
             ) {
-                $deleteQuery = $this->pdo->queryExec(
+                $deleteQuery = DB::delete(
                     sprintf(
                         '
 						DELETE c FROM %s c
@@ -435,12 +437,12 @@ class ProcessReleases
                         $minSizeSetting
                     )
                 );
-                if ($deleteQuery !== false) {
-                    $minSizeDeleted += $deleteQuery->rowCount();
+                if ($deleteQuery > 0) {
+                    $minSizeDeleted += $deleteQuery;
                 }
 
                 if ($maxSizeSetting > 0) {
-                    $deleteQuery = $this->pdo->queryExec(
+                    $deleteQuery = DB::delete(
                         sprintf(
                             '
 							DELETE c FROM %s c
@@ -451,13 +453,13 @@ class ProcessReleases
                             $maxSizeSetting
                         )
                     );
-                    if ($deleteQuery !== false) {
-                        $maxSizeDeleted += $deleteQuery->rowCount();
+                    if ($deleteQuery > 0) {
+                        $maxSizeDeleted += $deleteQuery;
                     }
                 }
 
                 if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
-                    $deleteQuery = $this->pdo->queryExec(
+                    $deleteQuery = DB::delete(
                         sprintf(
                             '
 						DELETE c FROM %s c
@@ -472,8 +474,8 @@ class ProcessReleases
                             $minFilesSetting
                         )
                     );
-                    if ($deleteQuery !== false) {
-                        $minFilesDeleted += $deleteQuery->rowCount();
+                    if ($deleteQuery > 0) {
+                        $minFilesDeleted += $deleteQuery;
                     }
                 }
             }
@@ -524,16 +526,14 @@ class ProcessReleases
         $startTime = time();
         $this->initiateTableNames($groupID);
 
-        $categorize = new Categorize(['Settings' => $this->pdo]);
+        $categorize = new Categorize();
         $returnCount = $duplicate = 0;
 
         if ($this->echoCLI) {
             ColorCLI::doEcho(ColorCLI::header('Process Releases -> Create releases from complete collections.'), true);
         }
 
-        $this->pdo->ping(true);
-
-        $collections = $this->pdo->queryDirect(
+        $collections = DB::select(
             sprintf(
                 '
 				SELECT SQL_NO_CACHE c.*, g.name AS gname
@@ -549,70 +549,69 @@ class ProcessReleases
             )
         );
 
-        if ($this->echoCLI && $collections !== false) {
-            echo ColorCLI::primary($collections->rowCount().' Collections ready to be converted to releases.');
+        if ($this->echoCLI && \count($collections) > 0) {
+            echo ColorCLI::primary(\count($collections).' Collections ready to be converted to releases.');
         }
 
-        if ($collections instanceof \Traversable) {
-            foreach ($collections as $collection) {
-                $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject']));
-                $fromName = utf8_encode(
-                    trim($collection['fromname'], "'")
+        foreach ($collections as $collection) {
+            $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
+            $fromName = utf8_encode(
+                    trim($collection->fromname, "'")
                 );
 
-                // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
-                // A 1% variance in size is considered the same size when the subject and poster are the same
-                $dupeCheck = Release::query()
+            // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
+            // A 1% variance in size is considered the same size when the subject and poster are the same
+            $dupeCheck = Release::query()
                     ->where(['name' => $cleanRelName, 'fromname' => $fromName])
-                    ->whereBetween('size', [$collection['filesize'] * .99, $collection['filesize'] * 1.01])
+                    ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
                     ->first(['id']);
 
-                if ($dupeCheck === null) {
-                    $cleanedName = $this->releaseCleaning->releaseCleaner(
-                        $collection['subject'],
-                        $collection['fromname'],
-                        $collection['gname']
+            if ($dupeCheck === null) {
+                $cleanedName = $this->releaseCleaning->releaseCleaner(
+                        $collection->subject,
+                        $collection->fromname,
+                        $collection->gname
                     );
 
-                    if (\is_array($cleanedName)) {
-                        $properName = $cleanedName['properlynamed'];
-                        $preID = $cleanedName['predb'] ?? false;
-                        $cleanedName = $cleanedName['cleansubject'];
-                    } else {
+                if (\is_array($cleanedName)) {
+                    $properName = $cleanedName['properlynamed'];
+                    $preID = $cleanedName['predb'] ?? false;
+                    $cleanedName = $cleanedName['cleansubject'];
+                } else {
+                    $properName = true;
+                    $preID = false;
+                }
+
+                if ($preID === false && $cleanedName !== '') {
+                    // try to match the cleaned searchname to predb title or filename here
+                    $preMatch = Predb::matchPre($cleanedName);
+                    if ($preMatch !== false) {
+                        $cleanedName = $preMatch['title'];
+                        $preID = $preMatch['predb_id'];
                         $properName = true;
-                        $preID = false;
                     }
+                }
 
-                    if ($preID === false && $cleanedName !== '') {
-                        // try to match the cleaned searchname to predb title or filename here
-                        $preMatch = Predb::matchPre($cleanedName);
-                        if ($preMatch !== false) {
-                            $cleanedName = $preMatch['title'];
-                            $preID = $preMatch['predb_id'];
-                            $properName = true;
-                        }
-                    }
-
-                    $releaseID = Release::insertRelease(
+                $releaseID = Release::insertRelease(
                         [
                             'name' => $cleanRelName,
                             'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
-                            'totalpart' => $collection['totalfiles'],
-                            'groups_id' => $collection['groups_id'],
+                            'totalpart' => $collection->totalfiles,
+                            'groups_id' => $collection->groups_id,
                             'guid' => createGUID(),
-                            'postdate' => $collection['date'],
+                            'postdate' => $collection->date,
                             'fromname' => $fromName,
-                            'size' => $collection['filesize'],
-                            'categories_id' => $categorize->determineCategory($collection['groups_id'], $cleanedName),
+                            'size' => $collection->filesize,
+                            'categories_id' => $categorize->determineCategory($collection->groups_id, $cleanedName),
                             'isrenamed' => $properName === true ? 1 : 0,
                             'predb_id' => $preID === false ? 0 : $preID,
                             'nzbstatus' => NZB::NZB_NONE,
                         ]
                     );
 
-                    if ($releaseID !== null) {
-                        // Update collections table to say we inserted the release.
-                        $this->pdo->queryExec(
+                if ($releaseID !== null) {
+                    // Update collections table to say we inserted the release.
+                    DB::update(
                             sprintf(
                                 '
 								UPDATE %s
@@ -621,26 +620,26 @@ class ProcessReleases
                                 $this->tables['cname'],
                                 self::COLLFC_INSERTED,
                                 $releaseID,
-                                $collection['id']
+                                $collection->id
                             )
                         );
 
-                        // Add the id of regex that matched the collection and release name to release_regexes table
-                        ReleaseRegex::insertIgnore([
+                    // Add the id of regex that matched the collection and release name to release_regexes table
+                    ReleaseRegex::insertIgnore([
                             'releases_id'            => $releaseID,
-                            'collection_regex_id'    => $collection['collection_regexes_id'],
+                            'collection_regex_id'    => $collection->collection_regexes_id,
                             'naming_regex_id'        => $cleanedName['id'] ?? 0,
                         ]);
 
-                        if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
-                            foreach ($matches[1] as $grp) {
-                                //check if the group name is in a valid format
-                                $grpTmp = Group::isValidGroup($grp);
-                                if ($grpTmp !== false) {
-                                    //check if the group already exists in database
-                                    $xrefGrpID = Group::getIDByName($grpTmp);
-                                    if ($xrefGrpID === '') {
-                                        $xrefGrpID = Group::addGroup(
+                    if (preg_match_all('#(\S+):\S+#', $collection->xref, $matches)) {
+                        foreach ($matches[1] as $grp) {
+                            //check if the group name is in a valid format
+                            $grpTmp = Group::isValidGroup($grp);
+                            if ($grpTmp !== false) {
+                                //check if the group already exists in database
+                                $xrefGrpID = Group::getIDByName($grpTmp);
+                                if ($xrefGrpID === '') {
+                                    $xrefGrpID = Group::addGroup(
                                             [
                                                 'name'                  => $grpTmp,
                                                 'description'           => 'Added by Release processing',
@@ -653,47 +652,46 @@ class ProcessReleases
                                                 'minsizetoformrelease'  => '',
                                             ]
                                         );
-                                    }
+                                }
 
-                                    $relGroupsChk = ReleasesGroups::query()->where(
+                                $relGroupsChk = ReleasesGroups::query()->where(
                                         [
                                             ['releases_id', '=', $releaseID],
                                             ['groups_id', '=', $xrefGrpID],
                                         ]
                                     )->first();
 
-                                    if ($relGroupsChk === null) {
-                                        ReleasesGroups::query()->insert(
+                                if ($relGroupsChk === null) {
+                                    ReleasesGroups::query()->insert(
                                             [
                                                 'releases_id' => $releaseID,
                                                 'groups_id'   => $xrefGrpID,
                                             ]
                                         );
-                                    }
                                 }
                             }
                         }
-
-                        $returnCount++;
-
-                        if ($this->echoCLI) {
-                            echo "Added $returnCount releases.\r";
-                        }
                     }
-                } else {
-                    // The release was already in the DB, so delete the collection.
-                    $this->pdo->queryExec(
+
+                    $returnCount++;
+
+                    if ($this->echoCLI) {
+                        echo "Added $returnCount releases.\r";
+                    }
+                }
+            } else {
+                // The release was already in the DB, so delete the collection.
+                DB::delete(
                         sprintf(
                             '
 							DELETE c
 							FROM %s c
 							WHERE c.collectionhash = %s',
                             $this->tables['cname'],
-                            $this->pdo->escapeString($collection['collectionhash'])
+                            $this->pdo->quote($collection->collectionhash)
                         )
                     );
-                    $duplicate++;
-                }
+                $duplicate++;
             }
         }
 
@@ -731,7 +729,7 @@ class ProcessReleases
             ColorCLI::doEcho(ColorCLI::header('Process Releases -> Create the NZB, delete collections/binaries/parts.'), true);
         }
 
-        $releases = $this->pdo->queryDirect(
+        $releases = DB::select(
             sprintf(
                 "
 				SELECT SQL_NO_CACHE
@@ -748,12 +746,12 @@ class ProcessReleases
 
         $nzbCount = 0;
 
-        if ($releases && $releases->rowCount()) {
-            $total = $releases->rowCount();
+        if (\count($releases) > 0) {
+            $total = \count($releases);
             // Init vars for writing the NZB's.
             $this->nzb->initiateForWrite($groupID);
             foreach ($releases as $release) {
-                if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
+                if ($this->nzb->writeNZBforReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
                     if ($this->echoCLI) {
                         echo ColorCLI::primaryOver("Creating NZBs and deleting Collections:\t".$nzbCount.'/'.$total."\r");
@@ -770,7 +768,8 @@ class ProcessReleases
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
                     'Total time: '.ColorCLI::primary($this->consoleTools->convertTime($totalTime)).PHP_EOL
-                ), true
+                ),
+                true
             );
         }
 
@@ -826,16 +825,15 @@ class ProcessReleases
     public function postProcessReleases($postProcess, &$nntp): void
     {
         if ((int) $postProcess === 1) {
-            (new PostProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
-        } else {
-            if ($this->echoCLI) {
-                ColorCLI::doEcho(
-                    ColorCLI::info(
-                        "\nPost-processing is not running inside the Process Releases class.\n".
-                        'If you are using tmux or screen they might have their own scripts running Post-processing.'
-                    ), true
-                );
-            }
+            (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
+        } elseif ($this->echoCLI) {
+            ColorCLI::doEcho(
+                ColorCLI::info(
+                    "\nPost-processing is not running inside the Process Releases class.\n".
+                    'If you are using tmux or screen they might have their own scripts running Post-processing.'
+                ),
+                true
+            );
         }
     }
 
@@ -862,7 +860,7 @@ class ProcessReleases
         }
 
         $deleted = 0;
-        $deleteQuery = $this->pdo->queryExec(
+        $deleteQuery = DB::delete(
             sprintf(
                 '
 				DELETE c
@@ -873,8 +871,8 @@ class ProcessReleases
             )
         );
 
-        if ($deleteQuery !== false) {
-            $deleted = $deleteQuery->rowCount();
+        if ($deleteQuery > 0) {
+            $deleted = $deleteQuery;
             $deletedCount += $deleted;
         }
 
@@ -898,7 +896,7 @@ class ProcessReleases
             }
 
             $deleted = 0;
-            $deleteQuery = $this->pdo->queryExec(
+            $deleteQuery = DB::delete(
                 sprintf(
                     '
 					DELETE c, b, p
@@ -912,8 +910,8 @@ class ProcessReleases
                 )
             );
 
-            if ($deleteQuery !== false) {
-                $deleted = $deleteQuery->rowCount();
+            if ($deleteQuery > 0) {
+                $deleted = $deleteQuery;
                 $deletedCount += $deleted;
             }
 
@@ -933,7 +931,7 @@ class ProcessReleases
             }
 
             $deleted = 0;
-            $deleteQuery = $this->pdo->queryExec(
+            $deleteQuery = DB::delete(
                 sprintf(
                     'DELETE b, p FROM %s b
 					LEFT JOIN %s p ON b.id = p.binaries_id
@@ -947,8 +945,8 @@ class ProcessReleases
                 )
             );
 
-            if ($deleteQuery !== false) {
-                $deleted = $deleteQuery->rowCount();
+            if ($deleteQuery > 0) {
+                $deleted = $deleteQuery;
                 $deletedCount += $deleted;
             }
 
@@ -967,7 +965,7 @@ class ProcessReleases
                 echo ColorCLI::primary('Deleting orphaned parts with no binaries.');
             }
             $deleted = 0;
-            $deleteQuery = $this->pdo->queryExec(
+            $deleteQuery = DB::delete(
                 sprintf(
                     '
 					DELETE p
@@ -980,8 +978,8 @@ class ProcessReleases
                     $this->maxQueryFormulator($this->tables['bname'], 20000)
                 )
             );
-            if ($deleteQuery !== false) {
-                $deleted = $deleteQuery->rowCount();
+            if ($deleteQuery > 0) {
+                $deleted = $deleteQuery;
                 $deletedCount += $deleted;
             }
 
@@ -1003,7 +1001,7 @@ class ProcessReleases
 
         $deleted = 0;
         // Collections that were missing on NZB creation.
-        $collections = $this->pdo->queryDirect(
+        $collections = DB::select(
             sprintf(
                 '
 				SELECT SQL_NO_CACHE c.id
@@ -1014,22 +1012,20 @@ class ProcessReleases
             )
         );
 
-        if ($collections instanceof \Traversable) {
-            foreach ($collections as $collection) {
-                $deleted++;
-                $this->pdo->queryExec(
+        foreach ($collections as $collection) {
+            $deleted++;
+            DB::delete(
                     sprintf(
                         '
 						DELETE c
 						FROM %s c
 						WHERE c.id = %d',
                         $this->tables['cname'],
-                        $collection['id']
+                        $collection->id
                     )
                 );
-            }
-            $deletedCount += $deleted;
         }
+        $deletedCount += $deleted;
 
         if ($this->echoCLI) {
             ColorCLI::doEcho(
@@ -1040,7 +1036,8 @@ class ProcessReleases
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
                     $this->consoleTools->convertTime($fourthQuery - $startTime).PHP_EOL
-                ), true
+                ),
+                true
             );
         }
     }
@@ -1070,7 +1067,7 @@ class ProcessReleases
         $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     '
 					SELECT SQL_NO_CACHE r.guid, r.id
@@ -1084,15 +1081,13 @@ class ProcessReleases
                     $minSizeSetting
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $minSizeDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $minSizeDeleted++;
             }
 
             if ($maxSizeSetting > 0) {
-                $releases = $this->pdo->queryDirect(
+                $releases = DB::select(
                     sprintf(
                         '
 						SELECT SQL_NO_CACHE id, guid
@@ -1103,15 +1098,13 @@ class ProcessReleases
                         $maxSizeSetting
                     )
                 );
-                if ($releases instanceof \Traversable) {
-                    foreach ($releases as $release) {
-                        $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                        $maxSizeDeleted++;
-                    }
+                foreach ($releases as $release) {
+                    $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                    $maxSizeDeleted++;
                 }
             }
             if ($minFilesSetting > 0) {
-                $releases = $this->pdo->queryDirect(
+                $releases = DB::select(
                      sprintf(
                          '
 				SELECT SQL_NO_CACHE r.id, r.guid
@@ -1125,11 +1118,9 @@ class ProcessReleases
                          $minFilesSetting
                      )
                  );
-                if ($releases instanceof \Traversable) {
-                    foreach ($releases as $release) {
-                        $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                        $minFilesDeleted++;
-                    }
+                foreach ($releases as $release) {
+                    $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                    $minFilesDeleted++;
                 }
             }
         }
@@ -1158,7 +1149,7 @@ class ProcessReleases
     public function deleteReleases(): void
     {
         $startTime = time();
-        $genres = new Genres(['Settings' => $this->pdo]);
+        $genres = new Genres();
         $passwordDeleted = $duplicateDeleted = $retentionDeleted = $completionDeleted = $disabledCategoryDeleted = 0;
         $disabledGenreDeleted = $miscRetentionDeleted = $miscHashedDeleted = $categoryMinSizeDeleted = 0;
 
@@ -1169,77 +1160,67 @@ class ProcessReleases
 
         // Releases past retention.
         if ((int) Settings::settingValue('..releaseretentiondays') !== 0) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     'SELECT SQL_NO_CACHE id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
                     (int) Settings::settingValue('..releaseretentiondays')
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $retentionDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $retentionDeleted++;
             }
         }
 
         // Passworded releases.
         if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
                     Releases::PASSWD_RAR
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $passwordDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $passwordDeleted++;
             }
         }
 
         // Possibly passworded releases.
         if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
                     Releases::PASSWD_POTENTIAL
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $passwordDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $passwordDeleted++;
             }
         }
 
         if ((int) $this->crossPostTime !== 0) {
             // Crossposted releases.
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     'SELECT SQL_NO_CACHE id, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
                     $this->crossPostTime
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $duplicateDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $duplicateDeleted++;
             }
         }
 
         if ($this->completion > 0) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $completionDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $completionDeleted++;
             }
         }
 
@@ -1247,20 +1228,18 @@ class ProcessReleases
         $disabledCategories = Category::getDisabledIDs();
         if (\count($disabledCategories) > 0) {
             foreach ($disabledCategories as $disabledCategory) {
-                $releases = $this->pdo->queryDirect(
+                $releases = DB::select(
                     sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE categories_id = %d', (int) $disabledCategory['id'])
                 );
-                if ($releases instanceof \Traversable) {
-                    foreach ($releases as $release) {
-                        $disabledCategoryDeleted++;
-                        $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    }
+                foreach ($releases as $release) {
+                    $disabledCategoryDeleted++;
+                    $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 }
             }
         }
 
         // Delete smaller than category minimum sizes.
-        $categories = $this->pdo->queryDirect(
+        $categories = DB::select(
             '
 			SELECT SQL_NO_CACHE c.id AS id,
 			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
@@ -1269,10 +1248,9 @@ class ProcessReleases
 			WHERE c.parentid IS NOT NULL'
         );
 
-        if ($categories instanceof \Traversable) {
-            foreach ($categories as $category) {
-                if ((int) $category['minsize'] > 0) {
-                    $releases = $this->pdo->queryDirect(
+        foreach ($categories as $category) {
+            if ((int) $category->minsize > 0) {
+                $releases = DB::select(
                         sprintf(
                             '
 							SELECT SQL_NO_CACHE r.id, r.guid
@@ -1280,16 +1258,13 @@ class ProcessReleases
 							WHERE r.categories_id = %d
 							AND r.size < %d
 							LIMIT 1000',
-                            (int) $category['id'],
-                            (int) $category['minsize']
+                            (int) $category->id,
+                            (int) $category->minsize
                         )
                     );
-                    if ($releases instanceof \Traversable) {
-                        foreach ($releases as $release) {
-                            $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                            $categoryMinSizeDeleted++;
-                        }
-                    }
+                foreach ($releases as $release) {
+                    $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                    $categoryMinSizeDeleted++;
                 }
             }
         }
@@ -1298,7 +1273,7 @@ class ProcessReleases
         $genrelist = $genres->getDisabledIDs();
         if (\count($genrelist) > 0) {
             foreach ($genrelist as $genre) {
-                $releases = $this->pdo->queryDirect(
+                $releases = DB::select(
                     sprintf(
                         '
 						SELECT SQL_NO_CACHE id, guid
@@ -1312,18 +1287,16 @@ class ProcessReleases
                         (int) $genre['id']
                     )
                 );
-                if ($releases instanceof \Traversable) {
-                    foreach ($releases as $release) {
-                        $disabledGenreDeleted++;
-                        $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    }
+                foreach ($releases as $release) {
+                    $disabledGenreDeleted++;
+                    $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 }
             }
         }
 
         // Misc other.
         if (Settings::settingValue('..miscotherretentionhours') > 0) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     '
 					SELECT SQL_NO_CACHE id, guid
@@ -1334,17 +1307,15 @@ class ProcessReleases
                     (int) Settings::settingValue('..miscotherretentionhours')
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $miscRetentionDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $miscRetentionDeleted++;
             }
         }
 
         // Misc hashed.
         if ((int) Settings::settingValue('..mischashedretentionhours') > 0) {
-            $releases = $this->pdo->queryDirect(
+            $releases = DB::select(
                 sprintf(
                     '
 					SELECT SQL_NO_CACHE id, guid
@@ -1355,11 +1326,9 @@ class ProcessReleases
                     (int) Settings::settingValue('..mischashedretentionhours')
                 )
             );
-            if ($releases instanceof \Traversable) {
-                foreach ($releases as $release) {
-                    $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-                    $miscHashedDeleted++;
-                }
+            foreach ($releases as $release) {
+                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $miscHashedDeleted++;
             }
         }
 
@@ -1388,7 +1357,8 @@ class ProcessReleases
                         ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
                         : '.'
                     )
-                ), true
+                ),
+                true
             );
 
             $totalDeleted = (
@@ -1401,7 +1371,8 @@ class ProcessReleases
                     ColorCLI::primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
                         $this->consoleTools->convertTime(time() - $startTime)
-                    ), true
+                    ),
+                    true
                 );
             }
         }
@@ -1417,7 +1388,7 @@ class ProcessReleases
      */
     private function maxQueryFormulator($groupName, $difference): string
     {
-        $maxID = $this->pdo->queryOneRow(
+        $maxID = DB::selectOne(
             sprintf(
                 '
 				SELECT IFNULL(MAX(id),0) AS max
@@ -1426,7 +1397,7 @@ class ProcessReleases
             )
         );
 
-        return empty($maxID['max']) || $maxID['max'] < $difference ? 0 : $maxID['max'] - $difference;
+        return empty($maxID->max) || $maxID->max < $difference ? 0 : $maxID->max - $difference;
     }
 
     /**
@@ -1441,7 +1412,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage1(&$where): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s c
@@ -1480,7 +1451,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage2(&$where): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s c
@@ -1503,7 +1474,7 @@ class ProcessReleases
                 self::COLLFC_ZEROPART
             )
         );
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s c
@@ -1527,7 +1498,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage3($where): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s b
@@ -1551,7 +1522,7 @@ class ProcessReleases
                 self::FILE_COMPLETE
             )
         );
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s b
@@ -1588,7 +1559,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage4(&$where): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s c INNER JOIN
@@ -1618,7 +1589,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage5(&$where): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE %s c
@@ -1643,7 +1614,7 @@ class ProcessReleases
      */
     private function collectionFileCheckStage6(&$where): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 "
 				UPDATE %s c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM %s b WHERE b.collections_id = c.id)
@@ -1672,22 +1643,23 @@ class ProcessReleases
     {
         $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 
-        $obj = $this->pdo->queryExec(
+        $obj = DB::delete(
             sprintf(
                 "
                 DELETE c FROM %s c
                 WHERE
                     c.added <
-                    DATE_SUB({$this->pdo->escapeString($lastRun)}, INTERVAL %d HOUR)
+                    DATE_SUB({$this->pdo->quote($lastRun)}, INTERVAL %d HOUR)
                 %s",
                 $this->tables['cname'],
                 $this->collectionTimeout,
                 $where
             )
         );
-        if ($this->echoCLI && \is_object($obj) && $obj->rowCount()) {
+        if ($this->echoCLI && $obj > 0) {
             ColorCLI::doEcho(
-                ColorCLI::primary('Deleted '.$obj->rowCount().' broken/stuck collections.'), true
+                ColorCLI::primary('Deleted '.$obj.' broken/stuck collections.'),
+                true
             );
         }
     }

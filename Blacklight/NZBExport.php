@@ -2,30 +2,23 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
+use App\Models\Group;
 use Blacklight\utility\Utility;
 
 /**
- * Export NZB's to a folder.
  * Class NZBExport.
  */
 class NZBExport
 {
     /**
-     * Started from browser?
-     * @var bool
+     * @var mixed
      */
     protected $browser;
 
     /**
-     * @var string Return value on browser.
+     * @var
      */
     protected $retVal;
-
-    /**
-     * @var \Blacklight\db\DB
-     */
-    protected $pdo;
 
     /**
      * @var NZB
@@ -43,34 +36,33 @@ class NZBExport
     protected $echoCLI;
 
     /**
-     * @param array $options Class instances / various options.
+     * NZBExport constructor.
+     *
+     * @param array $options
+     *
      * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Browser'  => false, // Started from browser?
-			'Echo'     => true, // Echo to CLI?
-			'NZB'      => null,
-			'Releases' => null,
-			'Settings' => null,
-		];
+            'Browser'  => false, // Started from browser?
+            'Echo'     => true, // Echo to CLI?
+            'NZB'      => null,
+            'Releases' => null,
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->browser = $options['Browser'];
         $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Setting'] : new DB());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
     }
 
     /**
-     * Export to user specified folder.
+     * @param $params
      *
-     * @param array $params
-     *
-     * @return bool
-     * @throws \Exception
+     * @return bool|string
      */
     public function beginExport($params)
     {
@@ -124,14 +116,14 @@ class NZBExport
 
                 return $this->returnValue();
             }
-            $groups = $this->pdo->query('SELECT id, name FROM groups WHERE id = '.$params[3]);
-            if (\count($groups) === 0) {
+            $groups = Group::query()->where('id', $params['3'])->select(['id', 'name'])->get();
+            if ($groups === null) {
                 $this->echoOut('The group ID is not in the DB: '.$params[3]);
 
                 return $this->returnValue();
             }
         } else {
-            $groups = $this->pdo->query('SELECT id, name FROM groups');
+            $groups = Group::query()->select(['id', 'name'])->get();
         }
 
         $exported = 0;
@@ -158,7 +150,7 @@ class NZBExport
             }
             foreach ($releases as $release) {
 
-				// Get path to the NZB file.
+                // Get path to the NZB file.
                 $nzbFile = $this->nzb->NZBPath($release['guid']);
                 // Check if it exists.
                 if ($nzbFile === false) {
@@ -212,7 +204,6 @@ class NZBExport
     }
 
     /**
-     * Return bool on CLI, string on browser.
      * @return bool|string
      */
     protected function returnValue()
@@ -221,13 +212,11 @@ class NZBExport
     }
 
     /**
-     * Check if date is in good format.
-     *
-     * @param string $date
+     * @param $date
      *
      * @return bool
      */
-    protected function checkDate($date)
+    protected function checkDate($date): bool
     {
         if (! preg_match('/^(\d{2}\/){2}\d{4}$/', $date)) {
             $this->echoOut('Wrong date format: '.$date);
@@ -239,11 +228,9 @@ class NZBExport
     }
 
     /**
-     * Echo message to browser or CLI.
-     *
-     * @param string $message
+     * @param $message
      */
-    protected function echoOut($message)
+    protected function echoOut($message): void
     {
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
@@ -253,13 +240,11 @@ class NZBExport
     }
 
     /**
-     * Remove unsafe chars from a filename.
-     *
-     * @param string $filename
+     * @param $filename
      *
      * @return string
      */
-    protected function safeFilename($filename)
+    protected function safeFilename($filename): string
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
     }

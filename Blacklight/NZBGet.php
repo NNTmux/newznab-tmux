@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use GuzzleHttp\Psr7\Request;
@@ -93,7 +92,6 @@ class NZBGet
 
         $this->fullUrl = $this->verifyURL($this->url);
         $this->releases = new Releases();
-        $this->pdo = new DB();
         $this->nzb = new NZB();
         $this->client = new Client();
     }

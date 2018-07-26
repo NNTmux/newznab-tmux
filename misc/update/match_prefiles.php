@@ -17,6 +17,14 @@ if (! isset($argv[1]) && ($argv[1] !== 'full' || ! is_numeric($argv[1]))) {
     );
 }
 
-$nameFixer = new NameFixer();
+try {
+    $nameFixer = new NameFixer();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
 
-$nameFixer->getPreFileNames($argv);
+try {
+    $nameFixer->getPreFileNames($argv);
+} catch (Exception $e) {
+    echo $e->getMessage();
+}

@@ -45,10 +45,10 @@ class AnimeController extends BasePageController
             // force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
             $aniDbReleases = $this->releases->animeSearch($request->input('id'), 0, 1000, '', [Category::TV_ANIME], -1);
             $aniDbInfo = $this->aniDb->getAnimeInfo($request->input('id'));
-            $title = $aniDbInfo['title'];
-            $meta_title = 'View Anime '.$aniDbInfo['title'];
+            $title = $aniDbInfo->title;
+            $meta_title = 'View Anime '.$aniDbInfo->title;
             $meta_keywords = 'view,anime,anidb,description,details';
-            $meta_description = 'View '.$aniDbInfo['title'].' Anime';
+            $meta_description = 'View '.$aniDbInfo->title.' Anime';
 
             if (! $this->releases && ! $aniDbInfo) {
                 $this->show404();
@@ -57,22 +57,21 @@ class AnimeController extends BasePageController
             } elseif (! $aniDbReleases) {
                 $this->smarty->assign('nodata', 'No releases for this series.');
             } else {
-                $this->smarty->assign('anidb', $aniDbInfo);
                 $this->smarty->assign('animeEpisodeTitles', $aniDbReleases);
                 $this->smarty->assign([
-                    'animeAnidbid' => $aniDbInfo['anidbid'],
-                    'animeTitle' => $aniDbInfo['title'],
-                    'animeType' => $aniDbInfo['type'],
-                    'animePicture' => $aniDbInfo['picture'],
-                    'animeStartDate' => $aniDbInfo['startdate'],
-                    'animeEndDate' => $aniDbInfo['enddate'],
-                    'animeDescription' => $aniDbInfo['description'],
-                    'animeRating' => $aniDbInfo['rating'],
-                    'animeRelated' => $aniDbInfo['related'],
-                    'animeSimilar' => $aniDbInfo['similar'],
-                    'animeCategories' => $aniDbInfo['categories'],
-                    'animeCreators' => $aniDbInfo['creators'],
-                    'animeCharacters' => $aniDbInfo['characters'],
+                    'animeAnidbid' => $aniDbInfo->anidbid,
+                    'animeTitle' => $aniDbInfo->title,
+                    'animeType' => $aniDbInfo->type,
+                    'animePicture' => $aniDbInfo->picture,
+                    'animeStartDate' => $aniDbInfo->startdate,
+                    'animeEndDate' => $aniDbInfo->enddate,
+                    'animeDescription' => $aniDbInfo->description,
+                    'animeRating' => $aniDbInfo->rating,
+                    'animeRelated' => $aniDbInfo->related,
+                    'animeSimilar' => $aniDbInfo->similar,
+                    'animeCategories' => $aniDbInfo->categories,
+                    'animeCreators' => $aniDbInfo->creators,
+                    'animeCharacters' => $aniDbInfo->characters,
                 ]);
 
                 $this->smarty->assign('nodata', '');
@@ -115,18 +114,16 @@ class AnimeController extends BasePageController
         $meta_description = 'View Anime List';
 
         $animelist = [];
-        if ($masterserieslist instanceof \Traversable) {
-            foreach ($masterserieslist as $s) {
-                if (preg_match('/^[0-9]/', $s['title'])) {
-                    $thisrange = '0-9';
-                } else {
-                    preg_match('/([A-Z]).*/i', $s['title'], $matches);
-                    $thisrange = strtoupper($matches[1]);
-                }
-                $animelist[$thisrange][] = $s;
+        foreach ($masterserieslist as $s) {
+            if (preg_match('/^[0-9]/', $s->title)) {
+                $thisrange = '0-9';
+            } else {
+                preg_match('/([A-Z]).*/i', $s->title, $matches);
+                $thisrange = strtoupper($matches[1]);
             }
-            ksort($animelist);
+            $animelist[$thisrange][] = $s;
         }
+        ksort($animelist);
 
         $this->smarty->assign('animelist', $animelist);
         $this->smarty->assign('animerange', range('A', 'Z'));

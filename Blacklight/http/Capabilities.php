@@ -21,11 +21,11 @@
 
 namespace Blacklight\http;
 
-use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Output -- abstract class for printing web requests outside of Smarty.
@@ -33,7 +33,7 @@ use App\Extensions\util\Versions;
 abstract class Capabilities
 {
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -54,7 +54,7 @@ abstract class Capabilities
             'Settings' => null,
         ];
         $options += $defaults;
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
     }
 
     /**

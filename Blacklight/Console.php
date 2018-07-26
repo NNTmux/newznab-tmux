@@ -596,15 +596,7 @@ class Console
     {
         $gen = new Genres(['Settings' => null]);
 
-        $defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
-        $genreassoc = [];
-        if (! empty($defaultGenres)) {
-            foreach ($defaultGenres as $dg) {
-                $genreassoc[$dg->id] = strtolower($dg->title);
-            }
-        }
-
-        return $genreassoc;
+        return $gen->loadGenres(Genres::CONSOLE_TYPE);
     }
 
     /** This function sets the platform retrieved

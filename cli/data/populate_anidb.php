@@ -4,20 +4,17 @@
 */
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
 use Blacklight\ColorCLI;
 use Blacklight\db\populate\AniDB;
 
-$pdo = new DB();
-
 if ($argc > 1 && $argv[1] === 'true' && isset($argv[2])) {
     if ($argv[2] === 'full') {
-        (new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('full');
+        (new AniDB(['Echo' => true]))->populateTable('full');
     } elseif ($argv[2] === 'info') {
         if ($argv[3] !== null && is_numeric($argv[3])) {
-            (new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('info', $argv[3]);
+            (new AniDB(['Echo' => true]))->populateTable('info', $argv[3]);
         } else {
-            (new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('info');
+            (new AniDB(['Echo' => true]))->populateTable('info');
         }
     }
 } else {

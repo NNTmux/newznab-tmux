@@ -4,17 +4,16 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
 use Blacklight\Games;
 use Blacklight\ColorCLI;
 
-$pdo = new DB();
-$game = new Games(['Echo' => true, 'Settings' => $pdo]);
+$pdo = DB::connection()->getPdo();
+$game = new Games(['Echo' => true]);
 
 $res = $pdo->query(
     sprintf('SELECT id, title FROM gamesinfo WHERE cover = 0 ORDER BY id DESC LIMIT 100')
 );
-$total = count($res);
+$total = $res->rowCount();
 if ($total > 0) {
     echo ColorCLI::header('Updating game covers for '.number_format($total).' releases.');
 
@@ -28,7 +27,7 @@ if ($total > 0) {
                 echo ColorCLI::primary($gameInfo['release'].' not found');
             } else {
                 if (file_exists(NN_COVERS.'games'.DS.$gameData.'.jpg')) {
-                    $pdo->queryExec(sprintf('UPDATE gamesinfo SET cover = 1 WHERE id = %d', $arr['id']));
+                    $pdo->exec(sprintf('UPDATE gamesinfo SET cover = 1 WHERE id = %d', $arr['id']));
                 }
             }
         }

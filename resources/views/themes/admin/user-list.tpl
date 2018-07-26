@@ -71,6 +71,10 @@
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyrolechangedate_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
+            <th>Verified<br/><a title="Sort Descending" href="{$orderbyverification_desc}"><span><i
+                            class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
+                                                                         href="{$orderbyverification_asc}"><span><i
+                            class="fa fa-chevron-up"></i></span></a></th>
 			<th>options</th>
 		</tr>
 
@@ -94,9 +98,8 @@
 								alt=""/></a></td>
 				<td>{$user->rolename}</td>
 				<td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
-				<td>{if $user->user_roles_id !="2"}<a class="confirm_action"
-													 href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">
-							delete</a>{/if}
+                <td>{if {$user->verified} == 1} Yes {else} No {/if}</td>
+				<td>{if $user->user_roles_id !="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">delete</a>{/if}
 				</td>
 			</tr>
 		{/foreach}

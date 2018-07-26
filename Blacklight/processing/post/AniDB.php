@@ -3,11 +3,11 @@
 namespace Blacklight\processing\post;
 
 use Blacklight\NZB;
-use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use App\Models\AnidbEpisode;
+use Illuminate\Support\Facades\DB;
 use Blacklight\db\populate\AniDB as PaDb;
 
 class AniDB
@@ -23,12 +23,12 @@ class AniDB
     public $echooutput;
 
     /**
-     * @var
+     * @var \Blacklight\db\populate\AniDB
      */
     public $padb;
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     public $pdo;
 
@@ -55,7 +55,8 @@ class AniDB
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
+        $this->padb = new PaDb(['Echo' => $options['Echo']]);
 
         $qty = (int) Settings::settingValue('..maxanidbprocessed');
         $this->aniqty = $qty ?? 100;
@@ -70,7 +71,7 @@ class AniDB
      */
     public function processAnimeReleases(): void
     {
-        $results = $this->pdo->queryDirect(
+        $results = DB::select(
             sprintf(
                 '
 				SELECT searchname, id
@@ -86,27 +87,20 @@ class AniDB
             )
         );
 
-        if ($results instanceof \Traversable) {
+        if (\count($results) > 0) {
             $this->doRandomSleep();
-
-            $this->padb = new PaDb(
-                [
-                    'Echo'     => $this->echooutput,
-                    'Settings' => $this->pdo,
-                ]
-            );
 
             foreach ($results as $release) {
                 $matched = $this->matchAnimeRelease($release);
                 if ($matched === false) {
-                    $this->pdo->queryExec(
+                    DB::update(
                         sprintf(
                             '
 							UPDATE releases
 							SET anidbid = %d
 							WHERE id = %d',
                             $this->status,
-                            $release['id']
+                            $release->id
                         )
                     );
                 }
@@ -142,6 +136,9 @@ class AniDB
 
     /**
      * Sleeps between 10 and 15 seconds for AniDB API cooldown.
+     *
+     *
+     * @throws \Exception
      */
     private function doRandomSleep(): void
     {
@@ -196,13 +193,13 @@ class AniDB
      */
     private function getAnidbByName($searchName = '')
     {
-        return $this->pdo->queryOneRow(
+        return DB::selectOne(
             sprintf(
                 '
 				SELECT at.anidbid, at.title
 				FROM anidb_titles AS at
-				WHERE at.title %s',
-                $this->pdo->likeString($searchName, true, true)
+				WHERE at.title LIKE %s',
+                $this->pdo->quote('%'.$searchName.'%')
             )
         );
     }
@@ -211,18 +208,19 @@ class AniDB
      * Matches the anime release to AniDB Info
      * If no info is available locally the AniDB API is invoked.
      *
-     * @param array $release
+     *
+     * @param $release
      *
      * @return bool
      * @throws \Exception
      */
-    private function matchAnimeRelease(array $release = []): bool
+    private function matchAnimeRelease($release): bool
     {
         $matched = false;
         $type = 'Local';
 
         // clean up the release name to ensure we get a good chance at getting a valid title
-        $cleanArr = $this->extractTitleEpisode($release['searchname']);
+        $cleanArr = $this->extractTitleEpisode($release->searchname);
 
         if (\is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
             echo ColorCLI::header(PHP_EOL.'Looking Up: ').
@@ -241,7 +239,7 @@ class AniDB
                 $updatedAni = $this->checkAniDBInfo($anidbId['anidbid'], $cleanArr['epno']);
 
                 if ($updatedAni === false) {
-                    if ($this->updateTimeCheck($anidbId['anidbid']) !== false) {
+                    if ($this->updateTimeCheck($anidbId['anidbid']) !== null) {
                         $this->padb->populateTable('info', $anidbId['anidbid']);
                         $this->doRandomSleep();
                         $updatedAni = $this->checkAniDBInfo($anidbId['anidbid']);
@@ -281,7 +279,7 @@ class AniDB
      */
     private function updateRelease($anidbId, $relId): void
     {
-        $this->pdo->queryExec(
+        DB::update(
             sprintf(
                 '
 				UPDATE releases
@@ -296,13 +294,14 @@ class AniDB
     /**
      * Checks a specific Anime title's last update time.
      *
-     * @param int $anidbId
      *
-     * @return bool|\PDOStatement Has it been 7 days since we last updated this AniDB ID or not?
+     * @param $anidbId
+     *
+     * @return mixed
      */
     private function updateTimeCheck($anidbId)
     {
-        return $this->pdo->queryOneRow(
+        return DB::selectOne(
             sprintf(
                 '
 				SELECT anidbid

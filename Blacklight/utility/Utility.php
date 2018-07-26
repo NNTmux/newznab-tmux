@@ -48,35 +48,8 @@ class Utility
     public static function clearScreen(): void
     {
         if (self::isCLI()) {
-            if (self::isWin()) {
-                passthru('cls');
-            } else {
-                passthru('clear');
-            }
+            passthru('clear');
         }
-    }
-
-    /**
-     * Replace all white space chars for a single space.
-     *
-     * @param string $text
-     *
-     * @return string
-     *
-     * @static
-     */
-    public static function collapseWhiteSpace($text): string
-    {
-        // Strip leading/trailing white space.
-        return trim(
-        // Replace 2 or more white space for a single space.
-            preg_replace(
-                '/\s{2,}/',
-                ' ',
-                // Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
-                str_replace(["\n", "\r"], ' ', $text)
-            )
-        );
     }
 
     /**
@@ -189,29 +162,16 @@ class Utility
     /**
      * Detect if the command is accessible on the system.
      *
+     *
      * @param $cmd
      *
-     * @return bool|null Returns true if found, false if not found, and null if which is not detected.
+     * @return bool
      */
-    public static function hasCommand($cmd): ?bool
+    public static function hasCommand($cmd): bool
     {
-        if ('HAS_WHICH') {
-            $returnVal = shell_exec("which $cmd");
+        $returnVal = shell_exec("which $cmd");
 
-            return empty($returnVal) ? false : true;
-        }
-
-        return null;
-    }
-
-    /**
-     * Check for availability of which command.
-     */
-    public static function hasWhich(): bool
-    {
-        exec('which which', $output, $error);
-
-        return ! $error;
+        return empty($returnVal) ? false : true;
     }
 
     /**
@@ -262,36 +222,6 @@ class Utility
         }
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isWin(): bool
-    {
-        return stripos(PHP_OS, 'win') === 0;
-    }
-
-    /**
-     * @param array  $elements
-     * @param string $prefix
-     *
-     * @return string
-     */
-    public static function pathCombine(array $elements, $prefix = ''): string
-    {
-        return $prefix.implode(DS, $elements);
-    }
-
-    /**
-     * @param $text
-     */
-    public static function stripBOM(&$text): void
-    {
-        $bom = pack('CCC', 0xef, 0xbb, 0xbf);
-        if (0 === strncmp($text, $bom, 3)) {
-            $text = substr($text, 3);
-        }
     }
 
     /**
@@ -535,27 +465,6 @@ class Utility
     }
 
     /**
-     * Get human readable size string from bytes.
-     *
-     * @param int $size     Bytes number to convert.
-     * @param int $precision How many floating point units to add.
-     *
-     * @return string
-     */
-    public static function bytesToSizeString($size, $precision = 0): string
-    {
-        static $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $step = 1024;
-        $i = 0;
-        while (($size / $step) > 0.9) {
-            $size /= $step;
-            $i++;
-        }
-
-        return round($size, $precision).$units[$i];
-    }
-
-    /**
      * @param array $options
      *
      * @return string
@@ -689,8 +598,8 @@ class Utility
     public static function fileInfo($path)
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
-        if (self::hasCommand('file') && (! self::isWin() || $magicPath !== null)) {
-            $magicSwitch = $magicPath === null ? '' : " -m $magicPath";
+        if ($magicPath !== null && self::hasCommand('file')) {
+            $magicSwitch = " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
 
             if (\is_array($output)) {
@@ -761,16 +670,6 @@ class Utility
     }
 
     /**
-     * Check if O/S is windows.
-     *
-     * @return bool
-     */
-    public static function isWindows(): bool
-    {
-        return self::isWin();
-    }
-
-    /**
      * Convert obj to array.
      *
      * @param       $arrObjData
@@ -814,9 +713,6 @@ class Utility
     public static function runCmd($command, $debug = false)
     {
         $nl = PHP_EOL;
-        if (self::isWindows() && strpos(PHP_VERSION, '5.3') !== false) {
-            $command = '"'.$command.'"';
-        }
 
         if ($debug) {
             echo '-Running Command: '.$nl.'   '.$command.$nl;

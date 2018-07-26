@@ -10,6 +10,7 @@ use App\Models\Settings;
 use App\Models\TvEpisode;
 use Blacklight\utility\Country;
 use Blacklight\processing\Videos;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class TV -- abstract extension of Videos
@@ -305,7 +306,7 @@ abstract class TV extends Videos
         $ifStringID = 'IF(%s = 0, %s, %s)';
         $ifStringInfo = "IF(%s = '', %s, %s)";
 
-        $this->pdo->queryExec(
+        DB::update(
                 sprintf(
                     '
 				UPDATE videos v
@@ -314,16 +315,16 @@ abstract class TV extends Videos
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-                        sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($show['country']), 'v.countries_id'),
+                        sprintf($ifStringInfo, 'v.countries_id', $this->pdo->quote($show['country']), 'v.countries_id'),
                         sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
                         sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
                         sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
                         sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
                         sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
                         sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-                        sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($show['summary']), 'tvi.summary'),
-                        sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($show['publisher']), 'tvi.publisher'),
-                        sprintf($ifStringInfo, 'tvi.localzone', $this->pdo->escapeString($show['localzone']), 'tvi.localzone'),
+                        sprintf($ifStringInfo, 'tvi.summary', $this->pdo->quote($show['summary']), 'tvi.summary'),
+                        sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->quote($show['publisher']), 'tvi.publisher'),
+                        sprintf($ifStringInfo, 'tvi.localzone', $this->pdo->quote($show['localzone']), 'tvi.localzone'),
                         $videoId
                 )
         );
@@ -335,13 +336,14 @@ abstract class TV extends Videos
     /**
      * Deletes a TV show entirely from all child tables via the Video ID.
      *
+     *
      * @param $id
      *
-     * @return \PDOStatement|false
+     * @return int
      */
     public function delete($id)
     {
-        return $this->pdo->queryExec(
+        return DB::delete(
             sprintf(
                 '
 				DELETE v, tvi, tve, va
@@ -405,12 +407,12 @@ abstract class TV extends Videos
         if ($series > 0 && $episode > 0) {
             $queryString = sprintf('tve.series = %d AND tve.episode = %d', $series, $episode);
         } elseif (! empty($airdate)) {
-            $queryString = sprintf('DATE(tve.firstaired) = %s', $this->pdo->escapeString(date('Y-m-d', strtotime($airdate))));
+            $queryString = sprintf('DATE(tve.firstaired) = %s', $this->pdo->quote(date('Y-m-d', strtotime($airdate))));
         } else {
             return false;
         }
 
-        $episodeArr = $this->pdo->queryOneRow(
+        $episodeArr = DB::selectOne(
             sprintf(
                 '
 				SELECT tve.id
@@ -422,7 +424,7 @@ abstract class TV extends Videos
             )
         );
 
-        return $episodeArr['id'] ?? false;
+        return $episodeArr->id ?? false;
     }
 
     /**

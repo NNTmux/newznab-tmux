@@ -19,11 +19,8 @@ class ReleaseExtra
 
     /**
      * ReleaseExtra constructor.
-     *
-     * @param null $settings
-     * @throws \Exception
      */
-    public function __construct($settings = null)
+    public function __construct()
     {
         $this->pdo = DB::connection()->getPdo();
     }

@@ -32,7 +32,7 @@ class RSS extends Capabilities
         ];
         $options += $defaults;
 
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
     }
 
     /**

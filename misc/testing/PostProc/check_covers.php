@@ -5,17 +5,18 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\db\DB;
 use Blacklight\Movie;
+use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\DB;
 
-$pdo = new DB();
-$movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
+$pdo = DB::connection()->getPdo();
+$movie = new Movie(['Echo' => true]);
 
-$row = $pdo->queryOneRow("SELECT value FROM settings WHERE setting = 'coverspath'");
-if ($row !== false) {
-    Utility::setCoversConstant($row['value']);
+$row = Settings::settingValue('site.main.coverspath');
+if ($row !== null) {
+    Utility::setCoversConstant($row);
 } else {
     die('Unable to determine covers path!'.PHP_EOL);
 }
@@ -29,7 +30,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $limit = $argv[2];
     }
     echo ColorCLI::header('Scanning for releases missing covers');
-    $res = $pdo->queryDirect('SELECT r.id, r.imdbid
+    $res = $pdo->query('SELECT r.id, r.imdbid
 								FROM releases r
 								LEFT JOIN movieinfo m ON m.imdbid = r.imdbid
 								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 5 HOUR)');
@@ -42,7 +43,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
                 if ($argv[1] === 'true') {
                     $cover = $movie->updateMovieInfo($row['imdbid']);
                     if ($cover === false || ! file_exists($nzbpath)) {
-                        $pdo->queryExec('UPDATE movieinfo m SET m.cover = 0 WHERE m.imdbid = %d', $row['imdbid']);
+                        $pdo->exec('UPDATE movieinfo m SET m.cover = 0 WHERE m.imdbid = %d', $row['imdbid']);
                     }
                 }
             }

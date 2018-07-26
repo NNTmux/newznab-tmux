@@ -48,6 +48,22 @@ class Genres
     }
 
     /**
+     * @param $type
+     *
+     * @return array
+     */
+    public function loadGenres($type): array
+    {
+        $genres = $this->getGenres($type);
+        $genresArray = [];
+        foreach ($genres as $genre) {
+            $genresArray[$genre->id] = strtolower($genre->title);
+        }
+
+        return $genresArray;
+    }
+
+    /**
      * @param string $type
      * @param bool $activeonly
      * @return string
