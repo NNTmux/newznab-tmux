@@ -1,3 +1,5 @@
+2018-07-26 DariusIII
+	* Chg: Update tinymce to version 4.8.1
 2018-07-25 DariusIII
 	* Chg: Remove unused functions from Settings and Utility classes
 	* Chg: Rename and update bytesToSizeString function and move it to heleprs.php with human_filesize name

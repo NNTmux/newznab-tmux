@@ -1453,16 +1453,16 @@
         },
         {
             "name": "bower-asset/tinymce-dist",
-            "version": "4.8.0",
+            "version": "4.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "0ca397b293d81cfb83de39c0952091233f6a6977"
+                "reference": "66308359bd3ff09996ed0e4121ca777c7f4ab508"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/0ca397b293d81cfb83de39c0952091233f6a6977",
-                "reference": "0ca397b293d81cfb83de39c0952091233f6a6977",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/66308359bd3ff09996ed0e4121ca777c7f4ab508",
+                "reference": "66308359bd3ff09996ed0e4121ca777c7f4ab508",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1487,7 +1487,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2018-07-11T08:59:33+00:00"
+            "time": "2018-07-26T06:38:42+00:00"
         },
         {
             "name": "clue/stream-filter",
