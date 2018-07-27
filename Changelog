@@ -1,4 +1,5 @@
 2018-07-27 DariusIII
+	* Chg: Update composer.lock
 	* Chg: Update Release model getByGuid function
 	* Chg: Use now() helper in ProcessAdditional class
 	* Chg: Use human_filesize helper function in ProcessAdditional class
