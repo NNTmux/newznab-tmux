@@ -1,4 +1,5 @@
 2018-07-27 DariusIII
+	* Chg: Use human_filesize helper function in ProcessAdditional class
 	* Chg: Update phpunit.xml, move install test to front of testsuite block
 	* Fix: Fix checks for roles that can preview
 2018-07-26 DariusIII

@@ -668,7 +668,7 @@ class ProcessAdditional
         foreach ($this->_releases as $this->_release) {
             $this->_echo(
                 PHP_EOL.'['.$this->_release->id.']['.
-                $this->_readableBytesString($this->_release->size).']',
+                human_filesize($this->_release->size, 1).']',
                 'primaryOver',
                 false
             );
@@ -2207,12 +2207,8 @@ class ProcessAdditional
     protected function _processNfoFile($fileLocation): void
     {
         $data = @file_get_contents($fileLocation);
-        if ($data !== false) {
-            if ($this->_nfo->isNFO($data, $this->_release->guid) === true) {
-                if ($this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp) === true) {
-                    $this->_releaseHasNoNFO = false;
-                }
-            }
+        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) === true && $this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp) === true) {
+            $this->_releaseHasNoNFO = false;
         }
     }
 
@@ -2239,40 +2235,6 @@ class ProcessAdditional
         if ($this->_foundMediaInfo === false) {
             $this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
         }
-    }
-
-    /**
-     * Convert bytes to KB/MB/GB/TB and return in human readable format.
-     *
-     * @example 240640 would return 235KB
-     *
-     * @param int $bytes
-     *
-     * @return string
-     */
-    protected function _readableBytesString($bytes): ?string
-    {
-        $kb = 1024;
-        $mb = 1048576;
-        $gb = 1073741824;
-        $tb = $kb * $gb;
-        if ($bytes < $kb) {
-            return $bytes.'B';
-        }
-
-        if ($bytes < $mb) {
-            return round($bytes / $kb, 1).'KB';
-        }
-
-        if ($bytes < $gb) {
-            return round($bytes / $mb, 1).'MB';
-        }
-
-        if ($bytes < $tb) {
-            return round($bytes / $gb, 1).'GB';
-        }
-
-        return round($bytes / $tb, 1).'TB';
     }
 
     /**
