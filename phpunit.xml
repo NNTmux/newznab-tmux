@@ -9,6 +9,10 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
+        <testsuite name="Install">
+            <directory suffix="Test.php">./tests/Install</directory>
+        </testsuite>
+
         <testsuite name="Unit">
             <directory suffix="Test.php">./tests/Unit</directory>
         </testsuite>
@@ -16,9 +20,7 @@
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
-        <testsuite name="Install">
-            <directory suffix="Test.php">./tests/Install</directory>
-        </testsuite>
+
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
