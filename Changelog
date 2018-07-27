@@ -1,3 +1,5 @@
+2018-07-27 DariusIII
+	* Fix: Fix checks for roles that can preview
 2018-07-26 DariusIII
 	* Chg: Update laravel/framework to version 5.6.29
 	* Chg: Update Games class

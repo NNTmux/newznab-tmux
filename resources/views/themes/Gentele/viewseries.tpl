@@ -180,7 +180,7 @@
 																		<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 																		   class="modal_nfo label label-primary text-muted">NFO</a>
 																		</span>{/if}
-																	{if $result->image == 1 && $userdata.canpreview == 1}
+																	{if $result->image == 1 && $userdata->role->canpreview == 1}
 																	<a
 																			href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 																			name="name{$result->guid}"

@@ -152,11 +152,11 @@
 								{if isset($similars) && $similars|@count > 1}
 									<li role="presentation"><a href="#pane4" data-toggle="tab">Similar</a></li>
 								{/if}
-								{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+								{if $release.jpgstatus == 1 && $userdata->role->canpreview == 1}
 									<li role="presentation"><a href="#pane6" data-toggle="tab">Sample</a></li>
 								{/if}
 								<li role="presentation"><a href="#comments" data-toggle="tab">Comments</a></li>
-								{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
+								{if ($release.haspreview == 1 && $userdata->role->canpreview == 1) || ($release.haspreview == 2 && $userdata->role->canpreview == 1)}
 									<li role="presentation"><a href="#pane7" data-toggle="tab">Preview</a></li>
 								{/if}
 								{if $reVideo != false || $reAudio != false}
@@ -669,7 +669,7 @@
                                     {{Form::submit('Submit', ['class' => 'btn btn-default'])}}
 								{{Form::close()}}
 							</div>
-							{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+							{if $release.jpgstatus == 1 && $userdata->role->canpreview == 1}
 								<div id="pane6" class="tab-pane">
 									<img src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg"
 										 alt="{$release.searchname|escape:"htmlall"}"
@@ -677,7 +677,7 @@
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
-							{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
+							{if ($release.haspreview == 1 && $userdata->role->canpreview == 1) || ($release.haspreview == 2 && $userdata->role->canpreview == 1)}
 								<div id="pane7" class="tab-pane">
 									<img src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg"
 										 alt="{$release.searchname|escape:"htmlall"}"
