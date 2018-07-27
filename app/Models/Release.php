@@ -488,7 +488,7 @@ class Release extends Model
                     'tve.se_complete',
                     'cp.title as parent_category',
                     'c.title as sub_category',
-                    DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
+                    DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names"),
                 ]
             )
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
