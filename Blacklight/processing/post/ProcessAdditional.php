@@ -645,7 +645,7 @@ class ProcessAdditional
             $this->_echo(
                 PHP_EOL.
                 'Additional post-processing, started at: '.
-                date('D M d, Y G:i a').
+                now()->format('D M d, Y G:i a').
                 PHP_EOL.
                 'Downloaded: (xB) = yEnc article, f= Failed ;Processing: z = ZIP file, r = RAR file'.
                 PHP_EOL.
