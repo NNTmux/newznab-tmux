@@ -687,13 +687,13 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $username
+     * @param int $userId
      *
      * @return bool
      */
-    public static function isDisabled($username): bool
+    public static function isDisabled($userId): bool
     {
-        return self::roleCheck(self::ROLE_DISABLED, $username);
+        return self::roleCheck('Disabled', $userId);
     }
 
     /**
@@ -982,22 +982,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Checks if a user is a specific role.
-     *
-     * @notes Uses type of $user to denote identifier. if string: username, if int: users_id
-     * @param int $roleID
-     * @param string|int $user
+     * @param string $role
+     * @param int $userId
      * @return bool
      */
-    public static function roleCheck($roleID, $user): bool
+    public static function roleCheck($role, $userId): bool
     {
-        $result = self::query()->where('username', $user)->orWhere('id', $user)->first(['user_roles_id']);
+        $user = self::find($userId);
 
-        if ($result !== null) {
-            return $result['user_roles_id'] === $roleID;
-        }
-
-        return false;
+        return $user->hasRole($role);
     }
 
     /**
@@ -1008,7 +1001,7 @@ class User extends Authenticatable
      */
     public static function isAdmin($userID): bool
     {
-        return self::roleCheck(self::ROLE_ADMIN, (int) $userID);
+        return self::roleCheck('Admin', (int) $userID);
     }
 
     /**
@@ -1019,7 +1012,7 @@ class User extends Authenticatable
      */
     public static function isModerator($userId): bool
     {
-        return self::roleCheck(self::ROLE_MODERATOR, (int) $userId);
+        return self::roleCheck('Moderator', (int) $userId);
     }
 
     /**
@@ -1030,7 +1023,7 @@ class User extends Authenticatable
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $token = self::hashSHA1(uniqid('', true));
+        $token = static::hashSHA1(uniqid('', true));
         $url = $serverUrl.'register?invitecode='.$token;
 
         Mail::to($emailTo)->send(new SendInvite($uid, $url));
@@ -1061,7 +1054,7 @@ class User extends Authenticatable
     /**
      * Deletes users that have not verified their accounts for 3 or more days.
      */
-    public static function deleteUnVerified()
+    public static function deleteUnVerified(): void
     {
         static::query()->where('verified', '=', 0)->where('created_at', '<', now()->subDays(3))->delete();
     }

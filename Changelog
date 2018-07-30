@@ -1,4 +1,5 @@
 2018-07-30 DariusIII
+	* Chg: Update roleCheck function in User model
 	* Chg: Update roles handling
 	* Chg: Update User model, Utility and TmuxOutput classes and RegisterController
 	* Chg: Update vlucas/phpdotenv and imdbphp/imdbphp to latest versions
