@@ -8,6 +8,7 @@ use App\Mail\AccountExpired;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
@@ -158,7 +159,7 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'user_roles_id');
+        return $this->belongsTo(Role::class, 'user_roles_id');
     }
 
     /**
@@ -268,7 +269,7 @@ class User extends Authenticatable
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
         if ($role !== '') {
-            $res->where('user_roles_id', $role);
+            $res->where('roles_id', $role);
         }
 
         if ($username !== '') {
@@ -322,7 +323,7 @@ class User extends Authenticatable
         $userName = trim($userName);
         $email = trim($email);
 
-        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->value('rate_limit');
 
         if (! self::isValidUsername($userName)) {
             return self::ERR_SIGNUP_BADUNAME;
@@ -471,20 +472,18 @@ class User extends Authenticatable
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
             $query = "
-				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
+				SELECT users.*, COUNT(user_requests.id) AS apirequests
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
-				WHERE users.id != 0 %s %s %s %s
+				WHERE users.id != 0 %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
 				ORDER BY %s %s %s";
         } else {
             $query = '
-				SELECT users.*, user_roles.name AS rolename
+				SELECT users.*
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
-				WHERE 1=1 %s %s %s %s
+				WHERE 1=1 %s %s %s
 				ORDER BY %s %s %s';
         }
         $order = self::getBrowseOrder($orderBy);
@@ -495,7 +494,6 @@ class User extends Authenticatable
                 ! empty($userName) ? 'AND users.username '.'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
                 ! empty($email) ? 'AND users.email '.'LIKE '.DB::connection()->getPdo()->quote('%'.$email.'%') : '',
                 ! empty($host) ? 'AND users.host '.'LIKE '.DB::connection()->getPdo()->quote('%'.$host.'%') : '',
-                (! empty($role) ? ('AND users.user_roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
@@ -863,7 +861,7 @@ class User extends Authenticatable
      * @param     $userName
      * @param     $password
      * @param     $email
-     * @param     $role
+     * @param $role
      * @param     $notes
      * @param     $host
      * @param int $invites
@@ -879,7 +877,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->value('rate_limit');
 
         if (\defined('NN_INSTALLER')) {
             $storeips = '';
@@ -887,12 +885,11 @@ class User extends Authenticatable
             $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
         }
 
-        return self::create(
+        $user = self::create(
             [
                 'username' => $userName,
                 'password' => $password,
                 'email' => $email,
-                'user_roles_id' => $role,
                 'host' => $storeips,
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
@@ -901,7 +898,11 @@ class User extends Authenticatable
                 'notes' => $notes,
                 'rate_limit' => $rateLimit,
             ]
-        )->id;
+        );
+
+        $user->assignRole($role);
+
+        return $user->id;
     }
 
     /**
