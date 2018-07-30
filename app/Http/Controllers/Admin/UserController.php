@@ -231,6 +231,7 @@ class UserController extends BasePageController
     {
         if ($request->has('id')) {
             User::deleteUser($request->input('id'));
+            return redirect('admin/user-list');
         }
 
         if ($request->has('redir')) {
