@@ -1,3 +1,5 @@
+2018-07-30 DariusIII
+	* Chg: Update vlucas/phpdotenv and imdbphp/imdbphp to latest versions
 2018-07-27 DariusIII
 	* Chg: Update composer.lock
 	* Chg: Update Release model getByGuid function
