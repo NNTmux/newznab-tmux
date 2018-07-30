@@ -1,4 +1,18 @@
+2018-07-30 DariusIII
+	* Chg: Update vlucas/phpdotenv and imdbphp/imdbphp to latest versions
+2018-07-27 DariusIII
+	* Chg: Update composer.lock
+	* Chg: Update Release model getByGuid function
+	* Chg: Use now() helper in ProcessAdditional class
+	* Chg: Use human_filesize helper function in ProcessAdditional class
+	* Chg: Update phpunit.xml, move install test to front of testsuite block
+	* Fix: Fix checks for roles that can preview
 2018-07-26 DariusIII
+	* Chg: Update laravel/framework to version 5.6.29
+	* Chg: Update Games class
+	* Chg: Update tests
+	* Chg: Update CreatesApplication class
+	* Chg: Add missing tests
 	* Chg: Update releases date handling in RSS and API operations
 	* Chg: Update tinymce to version 4.8.1
 2018-07-25 DariusIII

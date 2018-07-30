@@ -20,6 +20,11 @@
       "database/seeds"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "config": {
     "discard-changes": true,
     "process-timeout": 3600,
