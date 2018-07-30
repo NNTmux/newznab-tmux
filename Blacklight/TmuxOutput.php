@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use Blacklight\utility\Utility;
+use Blacklight\utility\Versions;
 
 /**
  * Tmux output functions for printing monitor data.
@@ -39,7 +40,7 @@ class TmuxOutput extends Tmux
     public function __construct()
     {
         parent::__construct();
-        $this->_vers = Utility::getValidVersionsFile();
+        $this->_vers = (new Versions())->getValidVersionsFile();
 
         $this->_setColourMasks();
     }

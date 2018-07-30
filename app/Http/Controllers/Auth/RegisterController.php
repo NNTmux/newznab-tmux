@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Str;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 use Jrean\UserVerification\Facades\UserVerification;
 
@@ -65,7 +66,7 @@ class RegisterController extends Controller
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(Password::getRepository()->createNewToken()),
-            'userseed' => md5(Utility::generateUuid()),
+            'userseed' => md5(Str::uuid()->toString()),
         ]);
     }
 
