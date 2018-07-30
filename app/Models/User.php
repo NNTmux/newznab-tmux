@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Mail\SendInvite;
 use Illuminate\Support\Str;
 use App\Mail\AccountExpired;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;

@@ -6,13 +6,13 @@ use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\Invitation;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Str;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 use Jrean\UserVerification\Facades\UserVerification;
 
