@@ -220,9 +220,6 @@ class InstallNntmux extends Command
         ];
     }
 
-    /**
-     *
-     */
     private function createRoles()
     {
         Role::create(['name' =>'User']);
