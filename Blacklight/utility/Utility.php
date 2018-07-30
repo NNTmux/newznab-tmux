@@ -4,7 +4,6 @@ namespace Blacklight\utility;
 
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -154,11 +153,6 @@ class Utility
         return $themelist;
     }
 
-    public static function getValidVersionsFile()
-    {
-        return (new Versions())->getValidVersionsFile();
-    }
-
     /**
      * Detect if the command is accessible on the system.
      *
@@ -171,7 +165,7 @@ class Utility
     {
         $returnVal = shell_exec("which $cmd");
 
-        return empty($returnVal) ? false : true;
+        return $returnVal !== null;
     }
 
     /**
@@ -206,7 +200,7 @@ class Utility
      */
     public static function isPatched(): bool
     {
-        $versions = self::getValidVersionsFile();
+        $versions = (new Versions())->getValidVersionsFile();
 
         $patch = Settings::settingValue('..sqlpatch');
         $ver = $versions->versions->sql->file;
@@ -739,14 +733,6 @@ class Utility
     public static function safeFilename($filename)
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
-    }
-
-    /**
-     * @return string
-     */
-    public static function generateUuid(): string
-    {
-        return Str::uuid()->toString();
     }
 
     /**

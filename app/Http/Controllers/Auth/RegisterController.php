@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\Invitation;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\Controller;
@@ -65,7 +66,7 @@ class RegisterController extends Controller
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(Password::getRepository()->createNewToken()),
-            'userseed' => md5(Utility::generateUuid()),
+            'userseed' => md5(Str::uuid()->toString()),
         ]);
     }
 

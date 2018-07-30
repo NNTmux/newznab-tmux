@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Mail\SendInvite;
 use Illuminate\Support\Str;
 use App\Mail\AccountExpired;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -617,7 +616,7 @@ class User extends Authenticatable
      */
     public static function updatePassword(int $id, string $password): int
     {
-        self::query()->where('id', $id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Utility::generateUuid())]);
+        self::query()->where('id', $id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
 
         return self::SUCCESS;
     }
@@ -898,7 +897,7 @@ class User extends Authenticatable
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
                 'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
-                'userseed' => md5(Utility::generateUuid()),
+                'userseed' => md5(Str::uuid()->toString()),
                 'notes' => $notes,
                 'rate_limit' => $rateLimit,
             ]
