@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\utility\Utility;
 use Blacklight\utility\Versions;
 
 /**
