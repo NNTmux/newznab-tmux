@@ -119,7 +119,7 @@ class Forumpost extends Model
             ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
             ->orderBy('forumpost.created_at')
             ->limit(250)
-            ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
+            ->select(['forumpost.*', 'users.username', 'roles.name as rolename'])
             ->get();
     }
 
