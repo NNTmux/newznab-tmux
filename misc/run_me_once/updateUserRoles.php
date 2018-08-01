@@ -29,7 +29,7 @@ foreach ($oldRoles as $oldRole) {
 foreach ($users as $user) {
     if ($user->hasRole($user->role->name) === false) {
         $user->assignRole($user->role->name);
-        echo 'Role: '.$user->role->name.' assigned to user: '.$user->username;
+        echo 'Role: '.$user->role->name.' assigned to user: '.$user->username.PHP_EOL;
     } else {
         echo 'User '.$user->username.' already has the role: '.$user->role->name.PHP_EOL;
     }
