@@ -475,7 +475,7 @@ class User extends Authenticatable
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
             $query = "
-				SELECT users.*, COUNT(user_requests.id) AS apirequests
+				SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
@@ -485,7 +485,7 @@ class User extends Authenticatable
 				ORDER BY %s %s %s";
         } else {
             $query = '
-				SELECT users.*
+				SELECT users.*, roles.name AS rolename,
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
 				WHERE 1=1 %s %s %s
