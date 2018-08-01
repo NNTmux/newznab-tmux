@@ -323,7 +323,7 @@ class User extends Authenticatable
         $userName = trim($userName);
         $email = trim($email);
 
-        $rateLimit = Role::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->get();
 
         if (! self::isValidUsername($userName)) {
             return self::ERR_SIGNUP_BADUNAME;
@@ -369,10 +369,13 @@ class User extends Authenticatable
             'nzbvortex_api_key' => $nzbvortexApiKey,
             'cp_url' => $cp_url,
             'cp_api' => $cp_api,
-            'rate_limit' => $rateLimit,
+            'rate_limit' => $rateLimit[0]['rate_limit'],
         ];
 
         self::query()->where('id', $id)->update($sql);
+
+        $user = self::find($id);
+        $user->syncRoles([$rateLimit[0]['name']]);
 
         return self::SUCCESS;
     }

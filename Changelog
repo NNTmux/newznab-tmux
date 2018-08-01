@@ -1,4 +1,5 @@
 2018-08-01 DariusIII
+	* Chg: Sync/add roles on user registration/update and role changes
 	* Chg: Add patch to rename user_roles_id to roles_id, update related classes
 	* Chg: Update role related classes, rename user_roles to roles where used
 2018-07-30 DariusIII

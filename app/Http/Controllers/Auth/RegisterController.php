@@ -57,7 +57,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data): User
     {
-        return User::create([
+        $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
             'password' => User::hashPassword($data['password']),
@@ -68,6 +68,12 @@ class RegisterController extends Controller
             'api_token' => md5(Password::getRepository()->createNewToken()),
             'userseed' => md5(Str::uuid()->toString()),
         ]);
+
+        $roleName = Role::query()->where('id', $data['roles_id'])->value('name');
+
+        $user->assignRole($roleName);
+
+        return $user;
     }
 
     /**
