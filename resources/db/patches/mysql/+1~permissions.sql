@@ -12,8 +12,6 @@ CREATE TABLE roles (
 	downloadrequests int(10) unsigned NOT NULL,
 	defaultinvites int(10) unsigned NOT NULL,
 	isdefault tinyint(1) NOT NULL DEFAULT 0,
-	canpreview tinyint(1) NOT NULL DEFAULT 0,
-	hideads tinyint(1) NOT NULL DEFAULT 0,
 	donation int(11) NOT NULL DEFAULT 0,
 	addyears int(11) NOT NULL DEFAULT 0,
 	created_at timestamp NULL DEFAULT NULL,

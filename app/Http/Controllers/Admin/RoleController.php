@@ -81,25 +81,41 @@ class RoleController extends BasePageController
                         'apirequests' => $request->input('apirequests'),
                         'downloadrequests' => $request->input('downloadrequests'),
                         'defaultinvites' => $request->input('defaultinvites'),
-                        'canpreview' => $request->input('canpreview'),
-                        'hideads' => $request->input('hideads'),
                         'donation' => $request->input('donation'),
                         'addyears' => $request->input('addyears'),
                         'rate_limit' => $request->input('rate_limit'),
                     ]);
+                    if ((int) $request->input('canpreview') === 1) {
+                        $role->givePermissionTo('preview');
+                    }
+
+                    if ((int) $request->input('hideads') === 1) {
+                        $role->givePermissionTo('hideads');
+                    }
                 } else {
                     $title = 'Update User Role';
-                    $role = Role::query()->where('id', $request->input('id'))->update([
+                    $role = Role::find($request->input('id'));
+                    $role->update([
                         'name' => $request->input('name'),
                         'apirequests' => $request->input('apirequests'),
                         'downloadrequests' => $request->input('downloadrequests'),
                         'defaultinvites' => $request->input('defaultinvites'),
-                        'canpreview' => $request->input('canpreview'),
-                        'hideads' => $request->input('hideads'),
                         'donation' => $request->input('donation'),
                         'addyears' => $request->input('addyears'),
                         'rate_limit' => $request->input('rate_limit'),
                     ]);
+
+                    if ((int) $request->input('canpreview') === 1 && $role->hasPermissionTo('preview') === false) {
+                        $role->givePermissionTo('preview');
+                    } elseif ((int) $request->input('canpreview') === 0 && $role->hasPermissionTo('preview') === true) {
+                        $role->revokePermissionTo('preview');
+                    }
+
+                    if ((int) $request->input('hideads') === 1 && $role->hasPermissionTo('hideads') === false) {
+                        $role->givePermissionTo('hideads');
+                    } elseif ((int) $request->input('hideads') === 0 && $role->hasPermissionTo('hideads') === true) {
+                        $role->revokePermissionTo('hideads');
+                    }
 
                     $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
                     RoleExcludedCategory::addRoleCategoryExclusions($request->input('id'), $request->input('exccat'));
@@ -112,7 +128,7 @@ class RoleController extends BasePageController
             default:
                 if ($request->has('id')) {
                     $title = 'User Roles Edit';
-                    $role = Role::query()->where('id', $request->input('id'))->first();
+                    $role = Role::findById($request->input('id'));
                     $this->smarty->assign('role', $role);
                     $this->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($request->input('id')));
                 }

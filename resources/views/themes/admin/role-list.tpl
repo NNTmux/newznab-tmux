@@ -25,8 +25,8 @@
                 <td>{$role.rate_limit}</td>
 				<td>{$role.downloadrequests}</td>
 				<td>{$role.defaultinvites}</td>
-				<td>{if $role.canpreview == 1}Yes{else}No{/if}</td>
-				<td>{if $role.hideads == 1}Yes{else}No{/if}</td>
+				<td>{if $role->hasPermissionTo('preview') == true}Yes{else}No{/if}</td>
+				<td>{if $role->hasPermissionTo('hideads') == true}Yes{else}No{/if}</td>
 				<td>{$role.donation}</td>
 				<td>{$role.addyears}</td>
 				<td>{if $role.isdefault=="1"}Yes{else}No{/if}</td>

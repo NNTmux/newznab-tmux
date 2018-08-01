@@ -1,4 +1,5 @@
 2018-08-01 DariusIII
+	* Chg: Move canpreview and hideads from roles to permissions
 	* Fix: User account deletion from user profile
 	* Fix: Fix role and user excluded categories display
 	* Chg: Update user-list admin template

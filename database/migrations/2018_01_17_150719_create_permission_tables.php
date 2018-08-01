@@ -37,8 +37,6 @@ class CreatePermissionTables extends Migration
             $table->integer('downloadrequests')->unsigned();
             $table->integer('defaultinvites')->unsigned();
             $table->boolean('isdefault')->default(0);
-            $table->boolean('canpreview')->default(0);
-            $table->boolean('hideads')->default(0);
             $table->integer('donation')->default(0);
             $table->integer('addyears')->default(0);
             $table->timestamps();

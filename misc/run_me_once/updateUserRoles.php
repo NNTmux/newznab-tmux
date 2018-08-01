@@ -1,31 +1,42 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $users = User::all();
 
-$oldRoles = \Illuminate\Support\Facades\DB::table('user_roles')->get()->toArray();
+$oldRoles = DB::table('user_roles')->get()->toArray();
 
 $roles = array_pluck(Role::query()->get(['name'])->toArray(), 'name');
 
+Permission::create(['name' => 'preview']);
+Permission::create(['name' => 'hideads']);
+
 foreach ($oldRoles as $oldRole) {
     if (! in_array($oldRole->name, $roles, false)) {
-        Role::create(
+        $role = Role::create(
             [
                 'name' => $oldRole->name,
                 'apirequests' => $oldRole->apirequests,
                 'downloadrequests' => $oldRole->downloadrequests,
                 'defaultinvites' => $oldRole->defaultinvites,
-                'canpreview' => $oldRole->canpreview,
-                'hideads' => $oldRole->hideads,
                 'donation' => $oldRole->donation,
                 'addyears' => $oldRole->addyears,
                 'rate_limit' => $oldRole->rate_limit,
             ]
         );
+
+        if ((int) $oldRole->canpreview === 1) {
+            $role->givePermissionTo('preview');
+        }
+
+        if ((int) $oldRole->hideads === 1) {
+            $role->givePermissionTo('hideads');
+        }
     }
 }
 
