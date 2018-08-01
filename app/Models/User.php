@@ -482,14 +482,14 @@ class User extends Authenticatable
 				WHERE users.id != 0 %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
-				ORDER BY %s %s %s";
+				ORDER BY %s %s %s %s";
         } else {
             $query = '
 				SELECT users.*, roles.name AS rolename,
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
 				WHERE 1=1 %s %s %s
-				ORDER BY %s %s %s';
+				ORDER BY %s %s %s %s';
         }
         $order = self::getBrowseOrder($orderBy);
 
@@ -499,6 +499,7 @@ class User extends Authenticatable
                 ! empty($userName) ? 'AND users.username '.'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
                 ! empty($email) ? 'AND users.email '.'LIKE '.DB::connection()->getPdo()->quote('%'.$email.'%') : '',
                 ! empty($host) ? 'AND users.host '.'LIKE '.DB::connection()->getPdo()->quote('%'.$host.'%') : '',
+                (! empty($role) ? ('AND users.roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
