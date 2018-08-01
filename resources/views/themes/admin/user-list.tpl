@@ -5,16 +5,16 @@
 
 		<form name="usersearch" action="">
 			{{csrf_field()}}
-			<label for="username">username</label>
+			<label for="username">Username</label>
 			<input id="username" type="text" name="username" value="{$username}" size="10"/>
 			&nbsp;&nbsp;
-			<label for="email">email</label>
+			<label for="email">Email</label>
 			<input id="email" type="text" name="email" value="{$email}" size="10"/>
 			&nbsp;&nbsp;
-			<label for="host">host</label>
+			<label for="host">Host</label>
 			<input id="host" type="text" name="host" value="{$host}" size="10"/>
 			&nbsp;&nbsp;
-			<label for="role">role</label>
+			<label for="role">Role</label>
 			<select name="role">
 				<option value="">-- any --</option>
 				{html_options values=$role_ids output=$role_names selected=$role}
@@ -58,7 +58,7 @@
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyapirequests_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th class="mid">grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i
+			<th class="mid">Grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbygrabs_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>

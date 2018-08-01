@@ -1,4 +1,5 @@
 2018-08-01 DariusIII
+	* Chg: Update user-list admin template
 	* Chg: Add back removed parts of getRange function queries in User model
 	* Fix: Fix bad table reference in Forumpost model
 	* Chg: Sync/add roles on user registration/update and role changes
