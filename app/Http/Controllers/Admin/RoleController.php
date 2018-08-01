@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
-use App\Models\UserRole;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use App\Models\RoleExcludedCategory;
 use App\Http\Controllers\BasePageController;
-use Spatie\Permission\Models\Role;
 
 class RoleController extends BasePageController
 {
