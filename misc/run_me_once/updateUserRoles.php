@@ -13,16 +13,19 @@ $roles = array_pluck(Role::query()->get(['name'])->toArray(), 'name');
 
 foreach ($oldRoles as $oldRole) {
     if (! in_array($oldRole->name, $roles, false)) {
-        Role::create(['name' => $oldRole->name,
-            'apirequests' => $oldRole->apirequests,
-            'downloadrequests' => $oldRole->downloadrequests,
-            'defaultinvites' => $oldRole->defaultinvites,
-            'canpreview' => $oldRole->canpreview,
-            'hideads' => $oldRole->hideads,
-            'donation' => $oldRole->donation,
-            'addyears' => $oldRole->addyears,
-            'rate_limit' => $oldRole->rate_limit,
-            ]);
+        Role::create(
+            [
+                'name' => $oldRole->name,
+                'apirequests' => $oldRole->apirequests,
+                'downloadrequests' => $oldRole->downloadrequests,
+                'defaultinvites' => $oldRole->defaultinvites,
+                'canpreview' => $oldRole->canpreview,
+                'hideads' => $oldRole->hideads,
+                'donation' => $oldRole->donation,
+                'addyears' => $oldRole->addyears,
+                'rate_limit' => $oldRole->rate_limit,
+            ]
+        );
     }
 }
 
