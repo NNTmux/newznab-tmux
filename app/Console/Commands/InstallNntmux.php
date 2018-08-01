@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Process\Process;
 
@@ -220,13 +221,17 @@ class InstallNntmux extends Command
         ];
     }
 
+
     private function createRoles()
     {
-        Role::create(['name' =>'User']);
-        Role::create(['name' =>'Admin']);
+        Permission::create(['name' => 'preview']);
+        Permission::create(['name' => 'hideads']);
+
+        $user = Role::create(['name' =>'User']);
+        $admin = Role::create(['name' =>'Admin']);
         Role::create(['name' =>'Disabled']);
-        Role::create(['name' =>'Moderator']);
-        Role::create(['name' =>'Friend']);
+        $mod = Role::create(['name' =>'Moderator']);
+        $friend = Role::create(['name' =>'Friend']);
 
         Role::query()
             ->where('name', '=', 'User')
@@ -236,12 +241,12 @@ class InstallNntmux extends Command
                     'downloadrequests' => 10,
                     'defaultinvites' => 1,
                     'isdefault' => 1,
-                    'canpreview' => 1,
-                    'hideads' => 0,
                     'donation' => 0,
                     'addyears' => 0,
                 ]
         );
+
+        $user->givePermissionTo('preview');
 
         Role::query()
             ->where('name', '=', 'Admin')
@@ -251,12 +256,11 @@ class InstallNntmux extends Command
                     'downloadrequests' => 1000,
                     'defaultinvites' => 1000,
                     'isdefault' => 0,
-                    'canpreview' => 1,
-                    'hideads' => 0,
                     'donation' => 0,
                     'addyears' => 0,
                 ]
             );
+        $admin->givePermissionTo(['preview', 'hideads']);
 
         Role::query()
             ->where('name', '=', 'Disabled')
@@ -266,8 +270,6 @@ class InstallNntmux extends Command
                     'downloadrequests' => 0,
                     'defaultinvites' => 0,
                     'isdefault' => 0,
-                    'canpreview' => 0,
-                    'hideads' => 0,
                     'donation' => 0,
                     'addyears' => 0,
                 ]
@@ -281,12 +283,12 @@ class InstallNntmux extends Command
                     'downloadrequests' => 1000,
                     'defaultinvites' => 1000,
                     'isdefault' => 0,
-                    'canpreview' => 1,
-                    'hideads' => 0,
                     'donation' => 0,
                     'addyears' => 0,
                 ]
             );
+
+        $mod->givePermissionTo(['preview', 'hideads']);
 
         Role::query()
             ->where('name', '=', 'Friend')
@@ -296,12 +298,12 @@ class InstallNntmux extends Command
                     'downloadrequests' => 100,
                     'defaultinvites' => 5,
                     'isdefault' => 0,
-                    'canpreview' => 1,
-                    'hideads' => 0,
                     'donation' => 0,
                     'addyears' => 0,
                 ]
             );
+
+        $friend->givePermissionTo(['preview', 'hideads']);
     }
 
     /**
