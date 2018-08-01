@@ -479,17 +479,17 @@ class User extends Authenticatable
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
-				WHERE users.id != 0 %s %s %s
+				WHERE users.id != 0 %s %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
-				ORDER BY %s %s %s %s";
+				ORDER BY %s %s %s ";
         } else {
             $query = '
 				SELECT users.*, roles.name AS rolename,
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
-				WHERE 1=1 %s %s %s
-				ORDER BY %s %s %s %s';
+				WHERE 1=1 %s %s %s %s
+				ORDER BY %s %s %s';
         }
         $order = self::getBrowseOrder($orderBy);
 
