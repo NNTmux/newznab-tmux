@@ -10,8 +10,8 @@ use App\Models\Category;
 use App\Models\Settings;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
-use App\Http\Controllers\BasePageController;
 use Spatie\Permission\Models\Role;
+use App\Http\Controllers\BasePageController;
 
 class SiteController extends BasePageController
 {

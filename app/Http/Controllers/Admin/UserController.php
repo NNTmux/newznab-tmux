@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\BasePageController;
-use Spatie\Permission\Models\Role;
 
 class UserController extends BasePageController
 {

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BasePageController;
 use Spatie\Permission\Models\Role;
+use App\Http\Controllers\BasePageController;
 
 class MenuController extends BasePageController
 {
