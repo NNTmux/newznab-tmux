@@ -477,6 +477,7 @@ class User extends Authenticatable
             $query = "
 				SELECT users.*, COUNT(user_requests.id) AS apirequests
 				FROM users
+				INNER JOIN roles ON roles.id = users.roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
 				WHERE users.id != 0 %s %s %s
 				AND email != 'sharing@nZEDb.com'
@@ -486,6 +487,7 @@ class User extends Authenticatable
             $query = '
 				SELECT users.*
 				FROM users
+				INNER JOIN roles ON roles.id = users.roles_id
 				WHERE 1=1 %s %s %s
 				ORDER BY %s %s %s';
         }
