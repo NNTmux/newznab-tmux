@@ -62,7 +62,7 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => User::hashPassword($data['password']),
             'host' => $data['host'] ?? '',
-            'user_roles_id' => $data['user_roles_id'],
+            'roles_id' => $data['roles_id'],
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(Password::getRepository()->createNewToken()),
@@ -135,7 +135,7 @@ class RegisterController extends Controller
                                 'password' => $password,
                                 'email' => $email,
                                 'host' => $request->ip(),
-                                'user_roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
+                                'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
                                 'notes' => '',
                                 'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
                             ]

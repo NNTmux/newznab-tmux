@@ -99,7 +99,7 @@
 				<td>{$user->rolename}</td>
 				<td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
                 <td>{if {$user->verified} == 1} Yes {else} No {/if}</td>
-				<td>{if $user->user_roles_id !="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">delete</a>{/if}
+				<td>{if $user->roles_id !="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">delete</a>{/if}
 				</td>
 			</tr>
 		{/foreach}

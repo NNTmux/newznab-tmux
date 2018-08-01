@@ -45,7 +45,7 @@ class RoleExcludedCategory extends Model
     public static function getRoleCategoryExclusion($role): array
     {
         $ret = [];
-        $categories = self::query()->where('user_roles_id', $role)->get(['categories_id']);
+        $categories = self::query()->where('roles_id', $role)->get(['categories_id']);
         foreach ($categories as $category) {
             $ret[] = $category['categories_id'];
         }
@@ -62,7 +62,7 @@ class RoleExcludedCategory extends Model
         self::delRoleCategoryExclusions($role);
         if (\count($catids) > 0) {
             foreach ($catids as $catid) {
-                self::create(['user_roles_id' => $role, 'categories_id' => $catid]);
+                self::create(['roles_id' => $role, 'categories_id' => $catid]);
             }
         }
     }
@@ -72,6 +72,6 @@ class RoleExcludedCategory extends Model
      */
     public static function delRoleCategoryExclusions($role): void
     {
-        self::query()->where('user_roles_id', $role)->delete();
+        self::query()->where('roles_id', $role)->delete();
     }
 }

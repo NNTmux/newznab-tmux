@@ -159,7 +159,7 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo(Role::class, 'user_roles_id');
+        return $this->belongsTo(Role::class, 'roles_id');
     }
 
     /**
@@ -347,7 +347,7 @@ class User extends Authenticatable
             'username' => $userName,
             'email' => $email,
             'grabs' => $grabs,
-            'user_roles_id' => $role,
+            'roles_id' => $role,
             'notes' => substr($notes, 0, 255),
             'invites' => $invites,
             'movieview' => $movieview,
@@ -426,7 +426,7 @@ class User extends Authenticatable
      */
     public static function updateUserRole(int $uid, int $role): int
     {
-        return self::query()->where('id', $uid)->update(['user_roles_id' => $role]);
+        return self::query()->where('id', $uid)->update(['roles_id' => $role]);
     }
 
     /**
@@ -447,7 +447,7 @@ class User extends Authenticatable
         $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
-            self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            self::query()->where('id', $u['id'])->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
             Mail::to($u['email'])->send(new AccountExpired($u['id']));
         }
 

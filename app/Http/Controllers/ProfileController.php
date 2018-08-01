@@ -179,7 +179,7 @@ class ProfileController extends BasePageController
                             $data['username'],
                             $request->input('email'),
                             $data['grabs'],
-                            $data['user_roles_id'],
+                            $data['roles_id'],
                             $data['notes'],
                             $data['invites'],
                             $request->has('movieview') ? 1 : 0,

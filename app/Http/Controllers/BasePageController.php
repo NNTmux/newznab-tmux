@@ -225,7 +225,7 @@ class BasePageController extends Controller
     protected function setUserPreferences(): void
     {
         $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
-        $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
+        $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['roles_id']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
@@ -256,7 +256,7 @@ class BasePageController extends Controller
         if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
-        switch ((int) $this->userdata['user_roles_id']) {
+        switch ((int) $this->userdata['roles_id']) {
             case User::ROLE_ADMIN:
                 $this->smarty->assign('isadmin', 'true');
                 break;
@@ -272,7 +272,7 @@ class BasePageController extends Controller
 
         $role = User::ROLE_USER;
         if (! empty($this->userdata)) {
-            $role = $this->userdata['user_roles_id'];
+            $role = $this->userdata['roles_id'];
         }
 
         $content = new Contents();
