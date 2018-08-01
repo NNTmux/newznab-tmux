@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Process\Process;
+use Spatie\Permission\Models\Permission;
 
 class InstallNntmux extends Command
 {
@@ -220,7 +220,6 @@ class InstallNntmux extends Command
             'unrar_path' => str_finish($unrar_path, '/'),
         ];
     }
-
 
     private function createRoles()
     {
