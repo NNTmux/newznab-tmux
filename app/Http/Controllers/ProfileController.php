@@ -301,15 +301,14 @@ class ProfileController extends BasePageController
         $this->setPrefs();
         $userId = $request->input('id');
 
-        if ($userId !== null && $this->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === Auth::id()) {
+        if ($userId !== null && $this->userdata->hasRole('Admin') === false && (int) $userId === Auth::id()) {
             Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
-            Auth::logout();
             User::deleteUser($userId);
 
             return redirect('login');
         }
 
-        if ($this->userdata->role->id === User::ROLE_ADMIN) {
+        if ($this->userdata->hasRole('Admin')) {
             return redirect('profile');
         }
 

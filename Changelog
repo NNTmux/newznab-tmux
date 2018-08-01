@@ -1,4 +1,5 @@
 2018-08-01 DariusIII
+	* Fix: User account deletion from user profile
 	* Fix: Fix role and user excluded categories display
 	* Chg: Update user-list admin template
 	* Chg: Add back removed parts of getRange function queries in User model

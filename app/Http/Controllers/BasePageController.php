@@ -113,7 +113,7 @@ class BasePageController extends Controller
     protected function setPrefs(): void
     {
         if (Auth::check()) {
-            $this->userdata = Auth::user();
+            $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
         } else {
             $this->theme = Settings::settingValue('site.main.style');
