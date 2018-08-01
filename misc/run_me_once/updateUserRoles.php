@@ -12,7 +12,7 @@ $oldRoles = \Illuminate\Support\Facades\DB::table('user_roles')->get()->toArray(
 $roles = array_pluck(Role::query()->get(['name'])->toArray(), 'name');
 
 foreach ($oldRoles as $oldRole) {
-    if (!in_array($oldRole->name, $roles, false)) {
+    if (! in_array($oldRole->name, $roles, false)) {
         Role::create(['name' => $oldRole->name,
             'apirequests' => $oldRole->apirequests,
             'downloadrequests' => $oldRole->downloadrequests,
@@ -33,7 +33,4 @@ foreach ($users as $user) {
     } else {
         echo 'User '.$user->username.' already has the role: '.$user->role->name.PHP_EOL;
     }
-
 }
-
-
