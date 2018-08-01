@@ -24,7 +24,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $lastname
  * @property string $email
  * @property string $password
- * @property int $user_roles_id FK to user_roles.id
+ * @property int $user_roles_id FK to roles.id
  * @property string|null $host
  * @property int $grabs
  * @property string $rsstoken

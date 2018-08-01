@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Menu;
-use App\Models\UserRole;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
+use Spatie\Permission\Models\Role;
 
 class MenuController extends BasePageController
 {
@@ -35,6 +35,7 @@ class MenuController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -42,7 +43,7 @@ class MenuController extends BasePageController
         $this->setAdminPrefs();
 
         // Get the user roles.
-        $userroles = UserRole::getRoles();
+        $userroles = Role::all()->toArray();
         $roles = [];
         foreach ($userroles as $r) {
             $roles[$r['id']] = $r['name'];

@@ -1,3 +1,5 @@
+2018-08-01 DariusIII
+	* Chg: Update role related classes, rename user_roles to roles where used
 2018-07-30 DariusIII
 	* Chg: Update roleCheck function in User model
 	* Chg: Update roles handling

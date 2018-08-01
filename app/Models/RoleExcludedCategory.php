@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role;
 
 /**
  * App\Models\RoleExcludedCategory.
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $category
- * @property-read \App\Models\UserRole $role
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExcludedCategory whereCategoriesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExcludedCategory whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExcludedCategory whereId($value)
@@ -29,7 +29,7 @@ class RoleExcludedCategory extends Model
 
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'user_roles_id');
+        return $this->belongsTo(Role::class, 'roles_id');
     }
 
     public function category()

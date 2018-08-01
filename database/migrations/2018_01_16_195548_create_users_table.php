@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration {
 			$table->string('lastname')->nullable();
 			$table->string('email');
 			$table->string('password');
+            $table->integer('roles_id')->default(1)->index('ix_user_roles')->comment('FK to roles.id');
 			$table->string('host', 40)->nullable();
 			$table->integer('grabs')->default(0);
 			$table->string('api_token', 64);

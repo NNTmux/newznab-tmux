@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Settings;
-use App\Models\UserRole;
 use App\Models\Invitation;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -15,6 +14,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 use Jrean\UserVerification\Facades\UserVerification;
+use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
 {
@@ -114,7 +114,7 @@ class RegisterController extends Controller
                     }
 
                         // Get the default user role.
-                        $userDefault = UserRole::getDefaultRole();
+                        $userDefault = Role::query()->where('isdefault', '=', 1)->first();
 
                         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
                             if ($inviteCode === '') {
