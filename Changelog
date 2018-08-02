@@ -1,4 +1,5 @@
 2018-08-02 DariusIII
+	* Chg: Update install command
 	* Chg: Update role-list template to not allow deletion of built-in roles
 	* Chg: Update admin user-list
 	* Fix: Fix role edit template

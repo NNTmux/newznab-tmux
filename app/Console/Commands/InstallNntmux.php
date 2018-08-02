@@ -225,6 +225,7 @@ class InstallNntmux extends Command
     {
         Permission::create(['name' => 'preview']);
         Permission::create(['name' => 'hideads']);
+        Permission::create(['name' => 'edit release']);
 
         $user = Role::create(['name' =>'User']);
         $admin = Role::create(['name' =>'Admin']);
@@ -287,7 +288,7 @@ class InstallNntmux extends Command
                 ]
             );
 
-        $mod->givePermissionTo(['preview', 'hideads']);
+        $mod->givePermissionTo(['preview', 'hideads', 'edit release']);
 
         Role::query()
             ->where('name', '=', 'Friend')
