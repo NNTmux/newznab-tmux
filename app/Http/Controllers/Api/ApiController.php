@@ -14,7 +14,6 @@ use App\Http\Controllers\BasePageController;
 
 class ApiController extends BasePageController
 {
-
     /**
      * @param \Illuminate\Http\Request $request
      *

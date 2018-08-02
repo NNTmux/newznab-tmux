@@ -18,7 +18,7 @@ $permissions = array_pluck(Permission::query()->select('name')->get()->toArray()
 $neededPerms = ['preview', 'hideads', 'edit release'];
 
 foreach ($neededPerms as $neededPerm) {
-    if (!in_array($neededPerm, $permissions, false)) {
+    if (! in_array($neededPerm, $permissions, false)) {
         Permission::create(['name' => $neededPerm]);
     }
 }
