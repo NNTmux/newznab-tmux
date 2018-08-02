@@ -14,10 +14,6 @@ use App\Http\Controllers\BasePageController;
 
 class ApiController extends BasePageController
 {
-    public function __construct(Request $request)
-    {
-        parent::__construct($request);
-    }
 
     /**
      * @param \Illuminate\Http\Request $request
@@ -84,7 +80,7 @@ class ApiController extends BasePageController
                 }
             }
 
-            if (User::isDisabled($res['username'])) {
+            if (User::isDisabled($res['id'])) {
                 Utility::showApiError(101);
             }
 
