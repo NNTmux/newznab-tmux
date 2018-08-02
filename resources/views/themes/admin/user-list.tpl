@@ -42,15 +42,15 @@
 			<th>Host<br/><a title="Sort Descending" href="{$orderbyhost_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a
 						title="Sort Ascending" href="{$orderbyhost_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>Join date<br/><a title="Sort Descending" href="{$orderbycreatedat_desc}"><span><i
+			<th>Join Date<br/><a title="Sort Descending" href="{$orderbycreatedat_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbycreatedat_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>last login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i
+			<th>Last Login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbylastlogin_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>API access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i
+			<th>API Access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyapiaccess_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
@@ -67,7 +67,7 @@
 			<th>Role<br/><a title="Sort Descending" href="{$orderbyrole_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a
 						title="Sort Ascending" href="{$orderbyrole_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>Role expiration date<br/><a title="Sort Descending" href="{$orderbyrolechangedate_desc}"><span><i
+			<th>Role Expiration Date<br/><a title="Sort Descending" href="{$orderbyrolechangedate_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyrolechangedate_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
@@ -75,7 +75,7 @@
                             class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
                                                                          href="{$orderbyverification_asc}"><span><i
                             class="fa fa-chevron-up"></i></span></a></th>
-			<th>options</th>
+			<th>Options</th>
 		</tr>
 
 		{foreach $userlist as $user}
