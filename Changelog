@@ -1,3 +1,5 @@
+2018-08-02 DariusIII
+	* Chg: Update display of roles in role-list template
 2018-08-01 DariusIII
 	* Chg: Update install command
 	* Chg: Move canpreview and hideads from roles to permissions

@@ -4,17 +4,17 @@
 	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 
 		<tr>
-			<th>name</th>
-			<th>request limit</th>
-            <th>api rate limit</th>
-			<th>download limit</th>
-			<th>invites</th>
-			<th>can preview</th>
-			<th>hide ads</th>
-			<th>donation</th>
-			<th>add years</th>
-			<th>default roles</th>
-			<th>options</th>
+			<th>Name</th>
+			<th>Request Limit</th>
+            <th>API Rate Limit</th>
+			<th>Download Limit</th>
+			<th>Invites</th>
+			<th>Can Preview</th>
+			<th>Hide Ads</th>
+			<th>Donation</th>
+			<th>Add Years</th>
+			<th>Default Role</th>
+			<th>Options</th>
 		</tr>
 
 
