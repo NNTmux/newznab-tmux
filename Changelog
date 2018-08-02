@@ -1,4 +1,5 @@
 2018-08-02 DariusIII
+	* Fix: Fix nzb files download
 	* Chg: Update used libraries
 	* Fix: Fix API v1 response, wrong data used for function
 	* Chg: Update updateUserRoles script to account for users with missing roles
