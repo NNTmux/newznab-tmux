@@ -256,13 +256,14 @@ class BasePageController extends Controller
         if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
-        switch ((int) $this->userdata['roles_id']) {
-            case User::ROLE_ADMIN:
-                $this->smarty->assign('isadmin', 'true');
-                break;
-            case User::ROLE_MODERATOR:
-                $this->smarty->assign('ismod', 'true');
+        if ($this->userdata->hasRole('Admin') === true) {
+            $this->smarty->assign('isadmin', 'true');
         }
+
+        if ($this->userdata->hasRole('Moderator') === true) {
+            $this->smarty->assign('ismod', 'true');
+        }
+
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir([
             'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
