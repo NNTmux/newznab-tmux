@@ -30,7 +30,7 @@
 				<td>{$role.donation}</td>
 				<td>{$role.addyears}</td>
 				<td>{if $role.isdefault=="1"}Yes{else}No{/if}</td>
-				<td><a href="{$smarty.const.WWW_TOP}/admin/role-edit?id={$role.id}">edit</a>&nbsp;{if $role.id>"3"}<a
+				<td><a href="{$smarty.const.WWW_TOP}/admin/role-edit?id={$role.id}">edit</a>&nbsp;{if !in_array($role.name, ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'])}<a
 					class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/role-delete?id={$role.id}">
 						delete</a>{/if}
 				</td>
