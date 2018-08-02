@@ -13,9 +13,15 @@ $oldRoles = DB::table('user_roles')->get()->toArray();
 
 $roles = array_pluck(Role::query()->get(['name'])->toArray(), 'name');
 
-Permission::create(['name' => 'preview']);
-Permission::create(['name' => 'hideads']);
-Permission::create(['name' => 'edit release']);
+$permissions = array_pluck(Permission::query()->select('name')->get()->toArray(), 'name');
+
+$neededPerms = ['preview', 'hideads', 'edit release'];
+
+foreach ($neededPerms as $neededPerm) {
+    if (!in_array($neededPerm, $permissions, false)) {
+        Permission::create(['name' => $neededPerm]);
+    }
+}
 
 foreach ($oldRoles as $oldRole) {
     if (! in_array($oldRole->name, $roles, false)) {
@@ -42,9 +48,11 @@ foreach ($oldRoles as $oldRole) {
 }
 
 foreach ($users as $user) {
-    if ($user->hasRole($user->role->name) === false) {
+    if ($user->role !== null && $user->hasRole($user->role->name) === false) {
         $user->assignRole($user->role->name);
         echo 'Role: '.$user->role->name.' assigned to user: '.$user->username.PHP_EOL;
+    } elseif ($user->role === null) {
+        $user->assignRole('User');
     } else {
         echo 'User '.$user->username.' already has the role: '.$user->role->name.PHP_EOL;
     }

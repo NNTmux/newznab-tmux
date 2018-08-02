@@ -1,4 +1,5 @@
 2018-08-02 DariusIII
+	* Chg: Update updateUserRoles script to account for users with missing roles
 	* Chg: Allow moderator role to edit releases, fixes issue #123
 	* Chg: Update updateUserRoles.php script with new moderator 'edit release' permission
 	* Chg: Update app/Http/Kernel class with role and permission middleware
