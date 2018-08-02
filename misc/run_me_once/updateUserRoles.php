@@ -15,6 +15,7 @@ $roles = array_pluck(Role::query()->get(['name'])->toArray(), 'name');
 
 Permission::create(['name' => 'preview']);
 Permission::create(['name' => 'hideads']);
+Permission::create(['name' => 'edit release']);
 
 foreach ($oldRoles as $oldRole) {
     if (! in_array($oldRole->name, $roles, false)) {
