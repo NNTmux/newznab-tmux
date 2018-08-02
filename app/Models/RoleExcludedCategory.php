@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $category
- * @property-read \App\Models\UserRole $role
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExcludedCategory whereCategoriesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExcludedCategory whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RoleExcludedCategory whereId($value)
@@ -29,7 +29,7 @@ class RoleExcludedCategory extends Model
 
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'user_roles_id');
+        return $this->belongsTo(Role::class, 'roles_id');
     }
 
     public function category()
@@ -45,7 +45,7 @@ class RoleExcludedCategory extends Model
     public static function getRoleCategoryExclusion($role): array
     {
         $ret = [];
-        $categories = self::query()->where('user_roles_id', $role)->get(['categories_id']);
+        $categories = self::query()->where('roles_id', $role)->get(['categories_id']);
         foreach ($categories as $category) {
             $ret[] = $category['categories_id'];
         }
@@ -62,7 +62,7 @@ class RoleExcludedCategory extends Model
         self::delRoleCategoryExclusions($role);
         if (\count($catids) > 0) {
             foreach ($catids as $catid) {
-                self::create(['user_roles_id' => $role, 'categories_id' => $catid]);
+                self::create(['roles_id' => $role, 'categories_id' => $catid]);
             }
         }
     }
@@ -72,6 +72,6 @@ class RoleExcludedCategory extends Model
      */
     public static function delRoleCategoryExclusions($role): void
     {
-        self::query()->where('user_roles_id', $role)->delete();
+        self::query()->where('roles_id', $role)->delete();
     }
 }

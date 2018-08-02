@@ -23,11 +23,10 @@ class CreateUsersTable extends Migration {
 			$table->string('lastname')->nullable();
 			$table->string('email');
 			$table->string('password');
-			$table->integer('user_roles_id')->default(1)->index('ix_user_roles')->comment('FK to user_roles.id');
+            $table->integer('roles_id')->default(1)->index('ix_user_roles')->comment('FK to roles.id');
 			$table->string('host', 40)->nullable();
 			$table->integer('grabs')->default(0);
 			$table->string('api_token', 64);
-			$table->timestamps();
 			$table->string('resetguid', 50)->nullable();
 			$table->dateTime('lastlogin')->nullable();
 			$table->dateTime('apiaccess')->nullable();
@@ -59,6 +58,7 @@ class CreateUsersTable extends Migration {
             $table->boolean('verified')->default(false);
             $table->string('verification_token')->nullable();
 			$table->rememberToken();
+            $table->timestamps();
 		});
 	}
 

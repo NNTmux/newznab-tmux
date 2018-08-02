@@ -1,4 +1,26 @@
+2018-08-02 DariusIII
+	* Chg: Allow moderator role to edit releases, fixes issue #123
+	* Chg: Update updateUserRoles.php script with new moderator 'edit release' permission
+	* Chg: Update app/Http/Kernel class with role and permission middleware
+	* Chg: Update install command
+	* Chg: Update role-list template to not allow deletion of built-in roles
+	* Chg: Update admin user-list
+	* Fix: Fix role edit template
+	* Chg: Update display of roles in role-list template
+2018-08-01 DariusIII
+	* Chg: Update install command
+	* Chg: Move canpreview and hideads from roles to permissions
+	* Fix: User account deletion from user profile
+	* Fix: Fix role and user excluded categories display
+	* Chg: Update user-list admin template
+	* Chg: Add back removed parts of getRange function queries in User model
+	* Fix: Fix bad table reference in Forumpost model
+	* Chg: Sync/add roles on user registration/update and role changes
+	* Chg: Add patch to rename user_roles_id to roles_id, update related classes
+	* Chg: Update role related classes, rename user_roles to roles where used
 2018-07-30 DariusIII
+	* Chg: Update roleCheck function in User model
+	* Chg: Update roles handling
 	* Chg: Update Admin/UserController
 	* Chg: Update User model, Utility and TmuxOutput classes and RegisterController
 	* Chg: Update vlucas/phpdotenv and imdbphp/imdbphp to latest versions
@@ -113,12 +135,17 @@
 2018-06-30 DariusIII
 	* Chg: Update chosen to latest version
 2018-06-27 DariusIII
+	* Chg: Merge roles and user_roles tables for new permission system
 	* Chg: Revert Backfill and Binaries to original state
 	* Fix: Fix terms and conditions page display
 	* Chg: Update terms and conditions page handling
 	* Chg: Change from timestamps to "normal" dates in some of the time conversion functions
 	* Chg: Remove needles date conversions to timestamp and back in Binaries and Backfill classes
 	* Chg: Update Movie processing handling
+2018-06-26 DariusIII
+	* Chg: Add HasRole trait to User model
+	* Chg: Add permission tables migration
+    * Chg: Add spatie/laravel-permission
 2018-06-25 DariusIII
 	* Chg: Update Symfony components
 	* Chg: Replace DB class with Laravel DB Facade in ReleaseRemover class

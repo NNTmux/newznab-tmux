@@ -5,16 +5,16 @@
 
 		<form name="usersearch" action="">
 			{{csrf_field()}}
-			<label for="username">username</label>
+			<label for="username">Username</label>
 			<input id="username" type="text" name="username" value="{$username}" size="10"/>
 			&nbsp;&nbsp;
-			<label for="email">email</label>
+			<label for="email">Email</label>
 			<input id="email" type="text" name="email" value="{$email}" size="10"/>
 			&nbsp;&nbsp;
-			<label for="host">host</label>
+			<label for="host">Host</label>
 			<input id="host" type="text" name="host" value="{$host}" size="10"/>
 			&nbsp;&nbsp;
-			<label for="role">role</label>
+			<label for="role">Role</label>
 			<select name="role">
 				<option value="">-- any --</option>
 				{html_options values=$role_ids output=$role_names selected=$role}
@@ -42,15 +42,15 @@
 			<th>Host<br/><a title="Sort Descending" href="{$orderbyhost_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a
 						title="Sort Ascending" href="{$orderbyhost_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>Join date<br/><a title="Sort Descending" href="{$orderbycreatedat_desc}"><span><i
+			<th>Join Date<br/><a title="Sort Descending" href="{$orderbycreatedat_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbycreatedat_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>last login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i
+			<th>Last Login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbylastlogin_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>API access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i
+			<th>API Access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyapiaccess_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
@@ -58,7 +58,7 @@
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyapirequests_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th class="mid">grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i
+			<th class="mid">Grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbygrabs_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
@@ -67,7 +67,7 @@
 			<th>Role<br/><a title="Sort Descending" href="{$orderbyrole_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a
 						title="Sort Ascending" href="{$orderbyrole_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>Role expiration date<br/><a title="Sort Descending" href="{$orderbyrolechangedate_desc}"><span><i
+			<th>Role Expiration Date<br/><a title="Sort Descending" href="{$orderbyrolechangedate_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
 																			 href="{$orderbyrolechangedate_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
@@ -75,7 +75,7 @@
                             class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
                                                                          href="{$orderbyverification_asc}"><span><i
                             class="fa fa-chevron-up"></i></span></a></th>
-			<th>options</th>
+			<th>Options</th>
 		</tr>
 
 		{foreach $userlist as $user}
@@ -99,7 +99,7 @@
 				<td>{$user->rolename}</td>
 				<td>{if !empty($user->rolechangedate)}{$user->rolechangedate}{/if}</td>
                 <td>{if {$user->verified} == 1} Yes {else} No {/if}</td>
-				<td>{if $user->user_roles_id !="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">delete</a>{/if}
+				<td>{if $user->roles_id !="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user->id}">delete</a>{/if}
 				</td>
 			</tr>
 		{/foreach}

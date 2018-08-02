@@ -113,7 +113,7 @@ class BasePageController extends Controller
     protected function setPrefs(): void
     {
         if (Auth::check()) {
-            $this->userdata = Auth::user();
+            $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
         } else {
             $this->theme = Settings::settingValue('site.main.style');
@@ -225,7 +225,7 @@ class BasePageController extends Controller
     protected function setUserPreferences(): void
     {
         $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
-        $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
+        $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['roles_id']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
@@ -256,13 +256,14 @@ class BasePageController extends Controller
         if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
-        switch ((int) $this->userdata['user_roles_id']) {
-            case User::ROLE_ADMIN:
-                $this->smarty->assign('isadmin', 'true');
-                break;
-            case User::ROLE_MODERATOR:
-                $this->smarty->assign('ismod', 'true');
+        if ($this->userdata->hasRole('Admin') === true) {
+            $this->smarty->assign('isadmin', 'true');
         }
+
+        if ($this->userdata->hasRole('Moderator') === true) {
+            $this->smarty->assign('ismod', 'true');
+        }
+
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir([
             'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
@@ -272,7 +273,7 @@ class BasePageController extends Controller
 
         $role = User::ROLE_USER;
         if (! empty($this->userdata)) {
-            $role = $this->userdata['user_roles_id'];
+            $role = $this->userdata['roles_id'];
         }
 
         $content = new Contents();

@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\Process\Process;
+use Spatie\Permission\Models\Permission;
 
 class InstallNntmux extends Command
 {
@@ -122,6 +124,8 @@ class InstallNntmux extends Command
                     }
                 }
 
+                $this->createRoles();
+
                 if (! $error && $this->addAdminUser()) {
                     @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
@@ -149,7 +153,7 @@ class InstallNntmux extends Command
     /**
      * @return bool
      */
-    protected function updatePatch(): bool
+    private function updatePatch(): bool
     {
         $ver = new Versions();
         $patch = $ver->getSQLPatchFromFile();
@@ -175,7 +179,7 @@ class InstallNntmux extends Command
      * @throws \Exception
      * @throws \RuntimeException
      */
-    protected function updatePaths()
+    private function updatePaths()
     {
         $covers_path = base_path().'/resources/covers/';
         $nzb_path = base_path().'/resources/nzb/';
@@ -217,10 +221,95 @@ class InstallNntmux extends Command
         ];
     }
 
+    private function createRoles()
+    {
+        Permission::create(['name' => 'preview']);
+        Permission::create(['name' => 'hideads']);
+        Permission::create(['name' => 'edit release']);
+
+        $user = Role::create(['name' =>'User']);
+        $admin = Role::create(['name' =>'Admin']);
+        Role::create(['name' =>'Disabled']);
+        $mod = Role::create(['name' =>'Moderator']);
+        $friend = Role::create(['name' =>'Friend']);
+
+        Role::query()
+            ->where('name', '=', 'User')
+            ->update(
+                [
+                    'apirequests' => 10,
+                    'downloadrequests' => 10,
+                    'defaultinvites' => 1,
+                    'isdefault' => 1,
+                    'donation' => 0,
+                    'addyears' => 0,
+                ]
+        );
+
+        $user->givePermissionTo('preview');
+
+        Role::query()
+            ->where('name', '=', 'Admin')
+            ->update(
+                [
+                    'apirequests' => 1000,
+                    'downloadrequests' => 1000,
+                    'defaultinvites' => 1000,
+                    'isdefault' => 0,
+                    'donation' => 0,
+                    'addyears' => 0,
+                ]
+            );
+        $admin->givePermissionTo(['preview', 'hideads']);
+
+        Role::query()
+            ->where('name', '=', 'Disabled')
+            ->update(
+                [
+                    'apirequests' => 0,
+                    'downloadrequests' => 0,
+                    'defaultinvites' => 0,
+                    'isdefault' => 0,
+                    'donation' => 0,
+                    'addyears' => 0,
+                ]
+            );
+
+        Role::query()
+            ->where('name', '=', 'Moderator')
+            ->update(
+                [
+                    'apirequests' => 1000,
+                    'downloadrequests' => 1000,
+                    'defaultinvites' => 1000,
+                    'isdefault' => 0,
+                    'donation' => 0,
+                    'addyears' => 0,
+                ]
+            );
+
+        $mod->givePermissionTo(['preview', 'hideads', 'edit release']);
+
+        Role::query()
+            ->where('name', '=', 'Friend')
+            ->update(
+                [
+                    'apirequests' => 100,
+                    'downloadrequests' => 100,
+                    'defaultinvites' => 5,
+                    'isdefault' => 0,
+                    'donation' => 0,
+                    'addyears' => 0,
+                ]
+            );
+
+        $friend->givePermissionTo(['preview', 'hideads']);
+    }
+
     /**
      * @return bool
      */
-    protected function addAdminUser(): bool
+    private function addAdminUser(): bool
     {
         if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
             $this->error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!');
@@ -231,6 +320,7 @@ class InstallNntmux extends Command
         try {
             User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
         } catch (\Exception $e) {
+            echo $e->getMessage();
             $this->error('Unable to add admin user!');
 
             return false;

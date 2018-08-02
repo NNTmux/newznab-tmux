@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
-use App\Models\UserRole;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use App\Models\RoleExcludedCategory;
 use App\Http\Controllers\BasePageController;
 
@@ -20,7 +20,7 @@ class RoleController extends BasePageController
         $title = 'User Role List';
 
         //get the user roles
-        $userroles = UserRole::getRoles();
+        $userroles = Role::all();
 
         $this->smarty->assign('userroles', $userroles);
 
@@ -49,7 +49,7 @@ class RoleController extends BasePageController
         $title = 'User Roles';
 
         // Get the user roles.
-        $userRoles = UserRole::getRoles();
+        $userRoles = Role::all();
         $roles = [];
         foreach ($userRoles as $userRole) {
             $roles[$userRole['id']] = $userRole['name'];
@@ -76,10 +76,46 @@ class RoleController extends BasePageController
             case 'submit':
                 if (empty($request->input('id'))) {
                     $title = 'Add User Role';
-                    $role = UserRole::addRole($request->all());
+                    $role = Role::create([
+                        'name' => $request->input('name'),
+                        'apirequests' => $request->input('apirequests'),
+                        'downloadrequests' => $request->input('downloadrequests'),
+                        'defaultinvites' => $request->input('defaultinvites'),
+                        'donation' => $request->input('donation'),
+                        'addyears' => $request->input('addyears'),
+                        'rate_limit' => $request->input('rate_limit'),
+                    ]);
+                    if ((int) $request->input('canpreview') === 1) {
+                        $role->givePermissionTo('preview');
+                    }
+
+                    if ((int) $request->input('hideads') === 1) {
+                        $role->givePermissionTo('hideads');
+                    }
                 } else {
                     $title = 'Update User Role';
-                    $role = UserRole::updateRole($request->all());
+                    $role = Role::find($request->input('id'));
+                    $role->update([
+                        'name' => $request->input('name'),
+                        'apirequests' => $request->input('apirequests'),
+                        'downloadrequests' => $request->input('downloadrequests'),
+                        'defaultinvites' => $request->input('defaultinvites'),
+                        'donation' => $request->input('donation'),
+                        'addyears' => $request->input('addyears'),
+                        'rate_limit' => $request->input('rate_limit'),
+                    ]);
+
+                    if ((int) $request->input('canpreview') === 1 && $role->hasPermissionTo('preview') === false) {
+                        $role->givePermissionTo('preview');
+                    } elseif ((int) $request->input('canpreview') === 0 && $role->hasPermissionTo('preview') === true) {
+                        $role->revokePermissionTo('preview');
+                    }
+
+                    if ((int) $request->input('hideads') === 1 && $role->hasPermissionTo('hideads') === false) {
+                        $role->givePermissionTo('hideads');
+                    } elseif ((int) $request->input('hideads') === 0 && $role->hasPermissionTo('hideads') === true) {
+                        $role->revokePermissionTo('hideads');
+                    }
 
                     $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
                     RoleExcludedCategory::addRoleCategoryExclusions($request->input('id'), $request->input('exccat'));
@@ -92,7 +128,7 @@ class RoleController extends BasePageController
             default:
                 if ($request->has('id')) {
                     $title = 'User Roles Edit';
-                    $role = UserRole::getRoleById($request->input('id'));
+                    $role = Role::findById($request->input('id'));
                     $this->smarty->assign('role', $role);
                     $this->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($request->input('id')));
                 }
@@ -124,7 +160,7 @@ class RoleController extends BasePageController
     public function destroy(Request $request)
     {
         if ($request->has('id')) {
-            UserRole::deleteRole($request->input('id'));
+            Role::query()->where('id', $request->input('id'))->delete();
         }
 
         return redirect($request->server('HTTP_REFERER'));

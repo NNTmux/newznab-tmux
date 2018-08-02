@@ -11,16 +11,17 @@
 	<div class="col-lg-12 col-sm-12 col-xs-12">
 		<div class="panel panel-default">
 			<div class="panel-body pagination2">
-				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"
-																					 title="This release has failed to download for some users">
+				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"title="This release has failed to download for some users">
 						<i class="fa fa-thumbs-o-up"></i>
 						{$release.grabs} Grab{if $release.grabs != 1}s{/if} /
 						<i class="fa fa-thumbs-o-down"></i>
 						{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
-				{if isset($isadmin)}
+				{if $isadmin == true || $ismod == true}
 					<a class="label label-warning"
 					   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}"
 					   title="Edit release">Edit</a>
+                {/if}
+                {if isset($isadmin)}
 					<a class="label label-danger"
 					   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$release.guid}"
 					   title="Delete release">Delete</a>

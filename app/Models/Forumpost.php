@@ -116,10 +116,10 @@ class Forumpost extends Model
             ->where('forumpost.id', $parent)
             ->orWhere('forumpost.parentid', $parent)
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
-            ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
+            ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
             ->orderBy('forumpost.created_at')
             ->limit(250)
-            ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
+            ->select(['forumpost.*', 'users.username', 'roles.name as rolename'])
             ->get();
     }
 
@@ -148,8 +148,8 @@ class Forumpost extends Model
         return self::query()
             ->where('forumpost.parentid', '=', 0)
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
-            ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
-            ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
+            ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
+            ->select(['forumpost.*', 'users.username', 'roles.name as rolename'])
             ->orderBy('forumpost.updated_at', 'desc')
             ->paginate(config('nntmux.items_per_page'));
     }

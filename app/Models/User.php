@@ -6,8 +6,10 @@ use App\Mail\SendInvite;
 use Illuminate\Support\Str;
 use App\Mail\AccountExpired;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Jrean\UserVerification\Traits\UserVerification;
@@ -22,7 +24,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $lastname
  * @property string $email
  * @property string $password
- * @property int $user_roles_id FK to user_roles.id
+ * @property int $user_roles_id FK to roles.id
  * @property string|null $host
  * @property int $grabs
  * @property string $rsstoken
@@ -112,6 +114,7 @@ class User extends Authenticatable
 {
     use Notifiable;
     use UserVerification;
+    use HasRoles;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -156,7 +159,7 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'user_roles_id');
+        return $this->belongsTo(Role::class, 'roles_id');
     }
 
     /**
@@ -266,7 +269,7 @@ class User extends Authenticatable
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
         if ($role !== '') {
-            $res->where('user_roles_id', $role);
+            $res->where('roles_id', $role);
         }
 
         if ($username !== '') {
@@ -320,7 +323,7 @@ class User extends Authenticatable
         $userName = trim($userName);
         $email = trim($email);
 
-        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->get();
 
         if (! self::isValidUsername($userName)) {
             return self::ERR_SIGNUP_BADUNAME;
@@ -344,7 +347,7 @@ class User extends Authenticatable
             'username' => $userName,
             'email' => $email,
             'grabs' => $grabs,
-            'user_roles_id' => $role,
+            'roles_id' => $role,
             'notes' => substr($notes, 0, 255),
             'invites' => $invites,
             'movieview' => $movieview,
@@ -366,10 +369,13 @@ class User extends Authenticatable
             'nzbvortex_api_key' => $nzbvortexApiKey,
             'cp_url' => $cp_url,
             'cp_api' => $cp_api,
-            'rate_limit' => $rateLimit,
+            'rate_limit' => $rateLimit[0]['rate_limit'],
         ];
 
         self::query()->where('id', $id)->update($sql);
+
+        $user = self::find($id);
+        $user->syncRoles([$rateLimit[0]['name']]);
 
         return self::SUCCESS;
     }
@@ -423,7 +429,7 @@ class User extends Authenticatable
      */
     public static function updateUserRole(int $uid, int $role): int
     {
-        return self::query()->where('id', $uid)->update(['user_roles_id' => $role]);
+        return self::query()->where('id', $uid)->update(['roles_id' => $role]);
     }
 
     /**
@@ -444,7 +450,7 @@ class User extends Authenticatable
         $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
-            self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            self::query()->where('id', $u['id'])->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
             Mail::to($u['email'])->send(new AccountExpired($u['id']));
         }
 
@@ -469,19 +475,19 @@ class User extends Authenticatable
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
             $query = "
-				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
+				SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
+				INNER JOIN roles ON roles.id = users.roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
 				WHERE users.id != 0 %s %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
-				ORDER BY %s %s %s";
+				ORDER BY %s %s %s ";
         } else {
             $query = '
-				SELECT users.*, user_roles.name AS rolename
+				SELECT users.*, roles.name AS rolename,
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
+				INNER JOIN roles ON roles.id = users.roles_id
 				WHERE 1=1 %s %s %s %s
 				ORDER BY %s %s %s';
         }
@@ -493,7 +499,7 @@ class User extends Authenticatable
                 ! empty($userName) ? 'AND users.username '.'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
                 ! empty($email) ? 'AND users.email '.'LIKE '.DB::connection()->getPdo()->quote('%'.$email.'%') : '',
                 ! empty($host) ? 'AND users.host '.'LIKE '.DB::connection()->getPdo()->quote('%'.$host.'%') : '',
-                (! empty($role) ? ('AND users.user_roles_id = '.$role) : ''),
+                (! empty($role) ? ('AND users.roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
@@ -687,13 +693,13 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $username
+     * @param int $userId
      *
      * @return bool
      */
-    public static function isDisabled($username): bool
+    public static function isDisabled($userId): bool
     {
-        return self::roleCheck(self::ROLE_DISABLED, $username);
+        return self::roleCheck('Disabled', $userId);
     }
 
     /**
@@ -861,7 +867,7 @@ class User extends Authenticatable
      * @param     $userName
      * @param     $password
      * @param     $email
-     * @param     $role
+     * @param $role
      * @param     $notes
      * @param     $host
      * @param int $invites
@@ -877,7 +883,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->value('rate_limit');
 
         if (\defined('NN_INSTALLER')) {
             $storeips = '';
@@ -885,12 +891,11 @@ class User extends Authenticatable
             $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
         }
 
-        return self::create(
+        $user = self::create(
             [
                 'username' => $userName,
                 'password' => $password,
                 'email' => $email,
-                'user_roles_id' => $role,
                 'host' => $storeips,
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
@@ -899,7 +904,11 @@ class User extends Authenticatable
                 'notes' => $notes,
                 'rate_limit' => $rateLimit,
             ]
-        )->id;
+        );
+
+        $user->assignRole($role);
+
+        return $user->id;
     }
 
     /**
@@ -979,22 +988,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Checks if a user is a specific role.
-     *
-     * @notes Uses type of $user to denote identifier. if string: username, if int: users_id
-     * @param int $roleID
-     * @param string|int $user
+     * @param string $role
+     * @param int $userId
      * @return bool
      */
-    public static function roleCheck($roleID, $user): bool
+    public static function roleCheck($role, $userId): bool
     {
-        $result = self::query()->where('username', $user)->orWhere('id', $user)->first(['user_roles_id']);
+        $user = self::find($userId);
 
-        if ($result !== null) {
-            return $result['user_roles_id'] === $roleID;
-        }
-
-        return false;
+        return $user->hasRole($role);
     }
 
     /**
@@ -1005,7 +1007,7 @@ class User extends Authenticatable
      */
     public static function isAdmin($userID): bool
     {
-        return self::roleCheck(self::ROLE_ADMIN, (int) $userID);
+        return self::roleCheck('Admin', (int) $userID);
     }
 
     /**
@@ -1016,7 +1018,7 @@ class User extends Authenticatable
      */
     public static function isModerator($userId): bool
     {
-        return self::roleCheck(self::ROLE_MODERATOR, (int) $userId);
+        return self::roleCheck('Moderator', (int) $userId);
     }
 
     /**
@@ -1027,7 +1029,7 @@ class User extends Authenticatable
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $token = self::hashSHA1(uniqid('', true));
+        $token = static::hashSHA1(uniqid('', true));
         $url = $serverUrl.'register?invitecode='.$token;
 
         Mail::to($emailTo)->send(new SendInvite($uid, $url));
@@ -1058,7 +1060,7 @@ class User extends Authenticatable
     /**
      * Deletes users that have not verified their accounts for 3 or more days.
      */
-    public static function deleteUnVerified()
+    public static function deleteUnVerified(): void
     {
         static::query()->where('verified', '=', 0)->where('created_at', '<', now()->subDays(3))->delete();
     }

@@ -461,7 +461,7 @@ class Category extends Model
         if (\count($excludedCats) > 0 && \count($roleExcludedCats) === 0) {
             $sql->whereNotIn('id', $excludedCats);
         } elseif (\count($excludedCats) > 0 && \count($roleExcludedCats) > 0) {
-            $sql->whereNotIn('id', [$excludedCats, $roleExcludedCats]);
+            $sql->whereNotIn('id', $excludedCats += $roleExcludedCats);
         } elseif (\count($excludedCats) === 0 && \count($roleExcludedCats) > 0) {
             $sql->whereNotIn('id', $roleExcludedCats);
         }

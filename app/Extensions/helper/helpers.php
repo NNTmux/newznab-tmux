@@ -113,7 +113,7 @@ if (! function_exists('makeFieldLinks')) {
                 case 'grabs':
                     $orderField = 'grabs';
                     break;
-                case 'user_roles_id':
+                case 'roles_id':
                     $orderField = 'users_role_id';
                     break;
                 case 'rolechangedate':

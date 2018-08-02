@@ -55,7 +55,7 @@
 			<tr>
 				<td>Can Preview:</td>
 				<td>
-					{html_radios id="canpreview" name='canpreview' values=$yesno_ids output=$yesno_names selected=$role.canpreview separator='<br />'}
+					{html_radios id="canpreview" name='canpreview' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('preview')} separator='<br />'}
 					<div class="hint">Whether the role can preview screenshots</div>
 				</td>
 			</tr>
@@ -63,7 +63,7 @@
 			<tr>
 				<td>Hide Ads:</td>
 				<td>
-					{html_radios id="hideads" name='hideads' values=$yesno_ids output=$yesno_names selected=$role.hideads separator='<br />'}
+					{html_radios id="hideads" name='hideads' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('hideads')} separator='<br />'}
 					<div class="hint">Whether ad's are hidden</div>
 				</td>
 			</tr>

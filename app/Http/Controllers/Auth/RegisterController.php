@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Settings;
-use App\Models\UserRole;
 use App\Models\Invitation;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
@@ -57,17 +57,23 @@ class RegisterController extends Controller
      */
     protected function create(array $data): User
     {
-        return User::create([
+        $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
             'password' => User::hashPassword($data['password']),
             'host' => $data['host'] ?? '',
-            'user_roles_id' => $data['user_roles_id'],
+            'roles_id' => $data['roles_id'],
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(Password::getRepository()->createNewToken()),
             'userseed' => md5(Str::uuid()->toString()),
         ]);
+
+        $roleName = Role::query()->where('id', $data['roles_id'])->value('name');
+
+        $user->assignRole($roleName);
+
+        return $user;
     }
 
     /**
@@ -114,7 +120,7 @@ class RegisterController extends Controller
                     }
 
                         // Get the default user role.
-                        $userDefault = UserRole::getDefaultRole();
+                        $userDefault = Role::query()->where('isdefault', '=', 1)->first();
 
                         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
                             if ($inviteCode === '') {
@@ -135,7 +141,7 @@ class RegisterController extends Controller
                                 'password' => $password,
                                 'email' => $email,
                                 'host' => $request->ip(),
-                                'user_roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
+                                'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
                                 'notes' => '',
                                 'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
                             ]
