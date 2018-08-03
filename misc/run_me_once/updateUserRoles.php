@@ -31,6 +31,7 @@ foreach ($oldRoles as $oldRole) {
                 'apirequests' => $oldRole->apirequests,
                 'downloadrequests' => $oldRole->downloadrequests,
                 'defaultinvites' => $oldRole->defaultinvites,
+                'isdefault' => $oldRole->isdefault,
                 'donation' => $oldRole->donation,
                 'addyears' => $oldRole->addyears,
                 'rate_limit' => $oldRole->rate_limit,

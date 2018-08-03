@@ -100,6 +100,7 @@ class RoleController extends BasePageController
                         'apirequests' => $request->input('apirequests'),
                         'downloadrequests' => $request->input('downloadrequests'),
                         'defaultinvites' => $request->input('defaultinvites'),
+                        'isdefault' => $request->input('isdefault'),
                         'donation' => $request->input('donation'),
                         'addyears' => $request->input('addyears'),
                         'rate_limit' => $request->input('rate_limit'),

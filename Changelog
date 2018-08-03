@@ -1,4 +1,5 @@
 2018-08-03 DariusIII
+	* Fix: Fix setting role as default
 	* Chg: Update updateUserRoles script to add edit releases permission to Moderator role
 	* Chg: Replace isAdmin, isDisabled and isModerator functions with direct role checking and remove roleCheck function from User model
 	* Fix: Fix another instance of wrong isDisabled check
