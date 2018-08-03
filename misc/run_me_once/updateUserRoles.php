@@ -44,6 +44,10 @@ foreach ($oldRoles as $oldRole) {
         if ((int) $oldRole->hideads === 1) {
             $role->givePermissionTo('hideads');
         }
+
+        if ($oldRole->name === 'Moderator') {
+            $role->givePermissionTo('edit release');
+        }
     }
 }
 
