@@ -79,22 +79,22 @@ class ProcessAdditional
     protected $_archiveInfo;
 
     /**
-     * @var array|bool|string
+     * @var bool|null|string
      */
     protected $_innerFileBlacklist;
 
     /**
-     * @var array|bool|int|string
+     * @var int
      */
     protected $_maxNestedLevels;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     protected $_7zipPath;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     protected $_unrarPath;
 

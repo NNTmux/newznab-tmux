@@ -43,8 +43,7 @@ class IRCScraper extends IRCClient
     protected $_nuked;
 
     /**
-     * Array of old pre info.
-     * @var array|bool
+     * @var
      */
     protected $_oldPre;
 

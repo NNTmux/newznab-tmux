@@ -48,7 +48,7 @@ class Games
     public $maxHitRequest;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $publicKey;
 
@@ -56,11 +56,6 @@ class Games
      * @var string
      */
     public $renamed;
-
-    /**
-     * @var array|bool|int|string
-     */
-    public $sleepTime;
 
     /**
      * @var string
@@ -73,7 +68,7 @@ class Games
     protected $_gameID;
 
     /**
-     * @var array|bool
+     * @var array|false
      */
     protected $_gameResults;
 
@@ -88,7 +83,7 @@ class Games
     protected $_resultsFound = 0;
 
     /**
-     * @var array|bool|int|string
+     * @var string
      */
     public $catWhere;
 
@@ -153,7 +148,7 @@ class Games
     /**
      * @param string $title
      *
-     * @return array|bool
+     * @return array|false
      */
     public function getGamesInfoByName($title)
     {
@@ -770,7 +765,7 @@ class Games
      *
      * @param string $releaseName
      *
-     * @return array|bool
+     * @return array|false
      */
     public function parseTitle($releaseName)
     {

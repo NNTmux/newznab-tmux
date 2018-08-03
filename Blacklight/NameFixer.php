@@ -740,7 +740,7 @@ class NameFixer
      * @param        $query
      * @param string $limit
      *
-     * @return array|bool
+     * @return array|false
      */
     protected function _getReleases($time, $cats, $query, $limit = '')
     {

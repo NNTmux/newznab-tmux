@@ -349,8 +349,8 @@ class NZBGet
     /**
      * Get all items in download queue.
      *
-     * @return array|bool
-     * @throws \RuntimeException
+     *
+     * @return array|false
      */
     public function getQueue()
     {
@@ -380,7 +380,7 @@ class NZBGet
     /**
      * Request for current status (summary) information. Parts of informations returned by this method can be printed by command "nzbget -L".
      *
-     * @return array|bool The status.
+     * @return array|false The status.
      * @throws \RuntimeException
      */
     public function status()

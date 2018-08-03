@@ -234,9 +234,10 @@ class User extends Authenticatable
     /**
      * Get the users selected theme.
      *
-     * @param string|int $userID The id of the user.
      *
-     * @return array|bool The users selected theme.
+     * @param int $userID
+     *
+     * @return mixed|string
      */
     public static function getStyle($userID)
     {

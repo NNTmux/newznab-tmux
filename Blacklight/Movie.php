@@ -102,7 +102,7 @@ class Movie
     public $imdburl;
 
     /**
-     * @var array|bool|int|string
+     * @var int
      */
     public $movieqty;
 
@@ -225,7 +225,8 @@ class Movie
 
     /**
      * @param $imdbId
-     * @return array|bool|\Illuminate\Database\Eloquent\Model|null|static
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function getMovieInfo($imdbId)
     {
@@ -244,7 +245,7 @@ class Movie
      * @param int   $maxAge
      * @param array $excludedCats
      *
-     * @return array|bool
+     * @return array|mixed
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
@@ -744,7 +745,7 @@ class Movie
      *
      * @param $imdbId
      *
-     * @return bool|array
+     * @return array|false
      */
     protected function fetchFanartTVProperties($imdbId)
     {
@@ -792,7 +793,7 @@ class Movie
      * @param      $imdbId
      * @param bool $text
      *
-     * @return array|bool
+     * @return array|false
      */
     public function fetchTMDBProperties($imdbId, $text = false)
     {
@@ -888,7 +889,7 @@ class Movie
     /**
      * @param $imdbId
      *
-     * @return array|bool
+     * @return array|false
      */
     public function fetchIMDBProperties($imdbId)
     {
@@ -931,7 +932,7 @@ class Movie
      *
      * @param $imdbId
      *
-     * @return bool|array
+     * @return array|false
      * @throws \Exception
      */
     public function fetchTraktTVProperties($imdbId)
@@ -977,7 +978,7 @@ class Movie
      *
      * @param $imdbId
      *
-     * @return bool|array
+     * @return array|false
      */
     public function fetchOmdbAPIProperties($imdbId)
     {
@@ -1214,7 +1215,7 @@ class Movie
     }
 
     /**
-     * @return bool|mixed
+     * @return mixed|false
      */
     protected function localIMDBSearch()
     {

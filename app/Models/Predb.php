@@ -141,7 +141,7 @@ class Predb extends Model
      *
      * @param string $cleanerName
      *
-     * @return array|bool Array with title/id from PreDB if found, bool False if not found.
+     * @return array|false Array with title/id from PreDB if found, false if not found.
      */
     public static function matchPre($cleanerName)
     {

@@ -187,9 +187,10 @@ class AniDB
     /**
      * Retrieves AniDB Info using a cleaned name.
      *
+     *
      * @param string $searchName
      *
-     * @return array|bool
+     * @return mixed
      */
     private function getAnidbByName($searchName = '')
     {

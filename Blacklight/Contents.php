@@ -19,7 +19,7 @@ class Contents
     }
 
     /**
-     * @return array|bool
+     * @return array|false
      */
     public function get()
     {
@@ -37,7 +37,7 @@ class Contents
     }
 
     /**
-     * @return array|bool
+     * @return array|false
      */
     public function getAll()
     {
@@ -57,7 +57,7 @@ class Contents
     /**
      * Convert get all but from to object.
      *
-     * @return array|bool
+     * @return array|false
      */
     public function getAllButFront()
     {
@@ -75,7 +75,7 @@ class Contents
     }
 
     /**
-     * @return array|bool
+     * @return array|false
      */
     public function getFrontPage()
     {
@@ -96,7 +96,7 @@ class Contents
      * @param $id
      * @param $role
      *
-     * @return array|bool
+     * @return array|false
      */
     public function getForMenuByTypeAndRole($id, $role)
     {

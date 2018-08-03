@@ -1,4 +1,5 @@
 2018-08-03 DariusIII
+	* Chg: Update PHPDOC blocks defined return types where bool was declared and only false was returned
 	* Chg: Update phpunit/phpunit to version 7.3.0
 	* Chg: Update updateExpiredRoles function
 	* Fix: Fix setting role as default
