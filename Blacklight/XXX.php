@@ -61,7 +61,6 @@ class XXX
 
     /**
      * @var string
-     *
      */
     protected $cookie;
 
