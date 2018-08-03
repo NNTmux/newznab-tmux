@@ -66,7 +66,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $release
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
- * @property-read \App\Models\UserRole $role
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiaccess($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereBookview($value)
@@ -112,9 +111,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable;
-    use UserVerification;
-    use HasRoles;
+    use Notifiable, UserVerification, HasRoles;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -450,7 +447,9 @@ class User extends Authenticatable
         $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
-            self::query()->where('id', $u['id'])->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $user = self::find($u['id']);
+            $user->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $user->syncRoles('User');
             Mail::to($u['email'])->send(new AccountExpired($u['id']));
         }
 
