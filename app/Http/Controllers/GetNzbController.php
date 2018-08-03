@@ -31,7 +31,7 @@ class GetNzbController extends BasePageController
             $uid = Auth::id();
             $maxDownloads = $this->userdata->role->downloadrequests;
             $rssToken = $this->userdata['api_token'];
-            if (User::isDisabled($this->userdata['id'])) {
+            if ($this->userdata->hasRole('Disabled') === true) {
                 Utility::showApiError(101);
             }
         } else {
@@ -47,7 +47,7 @@ class GetNzbController extends BasePageController
             $uid = $res['id'];
             $rssToken = $res['api_token'];
             $maxDownloads = $res->role->downloadrequests;
-            if (User::isDisabled($res['id'])) {
+            if ($res->hasRole('Disabled') === true) {
                 Utility::showApiError(101);
             }
         }

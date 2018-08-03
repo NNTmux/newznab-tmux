@@ -30,8 +30,8 @@ class ProfileController extends BasePageController
         $this->setPrefs();
         $sab = new SABnzbd($this);
 
-        $userID = Auth::id();
-        $privileged = User::isAdmin($userID) || User::isModerator($userID);
+        $userID = $this->userdata->id;
+        $privileged = $this->userdata->hasRole('Admin') === true || $this->userdata->hasRole('Moderator');
         $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
         $publicView = false;
 
@@ -52,8 +52,8 @@ class ProfileController extends BasePageController
             }
         }
 
-        $downloadlist = UserDownload::getDownloadRequestsForUser($userID);
-        $this->smarty->assign('downloadlist', $downloadlist);
+        $downloadList = UserDownload::getDownloadRequestsForUser($userID);
+        $this->smarty->assign('downloadlist', $downloadList);
 
         $data = User::find($userID);
         if ($data === null) {
