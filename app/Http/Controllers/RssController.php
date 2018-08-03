@@ -86,7 +86,7 @@ class RssController extends BasePageController
                 $rssToken = $res['api_token'];
                 $maxRequests = $res->role->apirequests;
 
-                if (User::isDisabled($res['id'])) {
+                if ($res->hasRole('Disabled') === true) {
                     Utility::showApiError(101);
                 }
             }

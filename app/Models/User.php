@@ -693,16 +693,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int $userId
-     *
-     * @return bool
-     */
-    public static function isDisabled($userId): bool
-    {
-        return self::roleCheck('Disabled', $userId);
-    }
-
-    /**
      * @param $url
      *
      * @return bool
@@ -985,40 +975,6 @@ class User extends Authenticatable
         }
 
         return self::hashSHA1($siteseed.$host.$siteseed);
-    }
-
-    /**
-     * @param string $role
-     * @param int $userId
-     * @return bool
-     */
-    public static function roleCheck($role, $userId): bool
-    {
-        $user = self::find($userId);
-
-        return $user->hasRole($role);
-    }
-
-    /**
-     * Wrapper for roleCheck specifically for Admins.
-     *
-     * @param int $userID
-     * @return bool
-     */
-    public static function isAdmin($userID): bool
-    {
-        return self::roleCheck('Admin', (int) $userID);
-    }
-
-    /**
-     * Wrapper for roleCheck specifically for Moderators.
-     *
-     * @param int $userId
-     * @return bool
-     */
-    public static function isModerator($userId): bool
-    {
-        return self::roleCheck('Moderator', (int) $userId);
     }
 
     /**
