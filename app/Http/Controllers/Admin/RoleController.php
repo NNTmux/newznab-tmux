@@ -92,6 +92,42 @@ class RoleController extends BasePageController
                     if ((int) $request->input('hideads') === 1) {
                         $role->givePermissionTo('hideads');
                     }
+
+                    if ((int) $request->input('edit release') === 1) {
+                        $role->givePermissionTo('edit release');
+                    }
+
+                    if ((int) $request->input('view console') === 1) {
+                        $role->givePermissionTo('view console');
+                    }
+
+                    if ((int) $request->input('view movies') === 1) {
+                        $role->givePermissionTo('view movies');
+                    }
+
+                    if ((int) $request->input('view audio') === 1) {
+                        $role->givePermissionTo('view audio');
+                    }
+
+                    if ((int) $request->input('view pc') === 1) {
+                        $role->givePermissionTo('view pc');
+                    }
+
+                    if ((int) $request->input('view tv') === 1) {
+                        $role->givePermissionTo('view tv');
+                    }
+
+                    if ((int) $request->input('view adult') === 1) {
+                        $role->givePermissionTo('view adult');
+                    }
+
+                    if ((int) $request->input('view books') === 1) {
+                        $role->givePermissionTo('view books');
+                    }
+
+                    if ((int) $request->input('view other') === 1) {
+                        $role->givePermissionTo('view other');
+                    }
                 } else {
                     $title = 'Update User Role';
                     $role = Role::find($request->input('id'));
@@ -118,8 +154,59 @@ class RoleController extends BasePageController
                         $role->revokePermissionTo('hideads');
                     }
 
-                    $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
-                    RoleExcludedCategory::addRoleCategoryExclusions($request->input('id'), $request->input('exccat'));
+                    if ((int) $request->input('edit release') === 1 && $role->hasPermissionTo('edit release') === false) {
+                        $role->givePermissionTo('edit release');
+                    } elseif ((int) $request->input('edit release') === 0 && $role->hasPermissionTo('edit release') === true) {
+                        $role->revokePermissionTo('edit release');
+                    }
+
+                    if ((int) $request->input('view console') === 1 && $role->hasPermissionTo('view console') === false) {
+                        $role->givePermissionTo('view console');
+                    } elseif ((int) $request->input('view console') === 0 && $role->hasPermissionTo('view console') === true) {
+                        $role->revokePermissionTo('view console');
+                    }
+
+                    if ((int) $request->input('view movies') === 1 && $role->hasPermissionTo('view movies') === false) {
+                        $role->givePermissionTo('view movies');
+                    } elseif ((int) $request->input('view movies') === 0 && $role->hasPermissionTo('view movies') === true) {
+                        $role->revokePermissionTo('view movies');
+                    }
+
+                    if ((int) $request->input('view audio') === 1 && $role->hasPermissionTo('view audio') === false) {
+                        $role->givePermissionTo('view audio');
+                    } elseif ((int) $request->input('view audio') === 0 && $role->hasPermissionTo('view audio') === true) {
+                        $role->revokePermissionTo('view audio');
+                    }
+
+                    if ((int) $request->input('view pc') === 1 && $role->hasPermissionTo('view pc') === false) {
+                        $role->givePermissionTo('view pc');
+                    } elseif ((int) $request->input('view pc') === 0 && $role->hasPermissionTo('view pc') === true) {
+                        $role->revokePermissionTo('view pc');
+                    }
+
+                    if ((int) $request->input('view tv') === 1 && $role->hasPermissionTo('view tv') === false) {
+                        $role->givePermissionTo('view tv');
+                    } elseif ((int) $request->input('view tv') === 0 && $role->hasPermissionTo('view tv') === true) {
+                        $role->revokePermissionTo('view tv');
+                    }
+
+                    if ((int) $request->input('view adult') === 1 && $role->hasPermissionTo('view adult') === false) {
+                        $role->givePermissionTo('view adult');
+                    } elseif ((int) $request->input('view adult') === 0 && $role->hasPermissionTo('view adult') === true) {
+                        $role->revokePermissionTo('view adult');
+                    }
+
+                    if ((int) $request->input('view books') === 1 && $role->hasPermissionTo('view books') === false) {
+                        $role->givePermissionTo('view books');
+                    } elseif ((int) $request->input('view books') === 0 && $role->hasPermissionTo('view books') === true) {
+                        $role->revokePermissionTo('view books');
+                    }
+
+                    if ((int) $request->input('view other') === 1 && $role->hasPermissionTo('view other') === false) {
+                        $role->givePermissionTo('view other');
+                    } elseif ((int) $request->input('view other') === 0 && $role->hasPermissionTo('view other') === true) {
+                        $role->revokePermissionTo('view other');
+                    }
                 }
                 $this->smarty->assign('role', $role);
                 redirect()->to('admin/role-list')->sendHeaders();

@@ -1,3 +1,5 @@
+2018-08-04 DariusIII
+	* Chg: Update role permissions and seeding, install procedure, permissions for menu views
 2018-08-03 DariusIII
 	* Fix: Fix setting role as default
 	* Chg: Update updateUserRoles script to add edit releases permission to Moderator role

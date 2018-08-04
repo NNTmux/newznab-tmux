@@ -87,12 +87,45 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Excluded Categories</td>
+				<td>Can view Console releases</td>
 				<td>
-					{html_options style="height:105px;" multiple=multiple name="exccat[]" options=$catlist selected=$roleexccat}
-					<div class="hint">Use Ctrl and click to exclude multiple categories. This will prevent users
-						with this role from <br/>seeing these categories in the menu or search results.
-					</div>
+					{html_radios id="view console" name='view console' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view console')} separator='<br />'}
+					<div class="hint">Can this role view console releases</div>
+				</td>
+				<td>Can view Movie releases</td>
+				<td>
+					{html_radios id="view movie" name='view movie' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view movie')} separator='<br />'}
+					<div class="hint">Can this role view movie releases</div>
+				</td>
+				<td>Can view Audio releases</td>
+				<td>
+					{html_radios id="view audio" name='view audio' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view audio')} separator='<br />'}
+					<div class="hint">Can this role view audio releases</div>
+				</td>
+				<td>Can view PC releases</td>
+				<td>
+					{html_radios id="view pc" name='view pc' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view pc')} separator='<br />'}
+					<div class="hint">Can this role view pc releases</div>
+				</td>
+				<td>Can view TV releases</td>
+				<td>
+					{html_radios id="view tv" name='view tv' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view tv')} separator='<br />'}
+					<div class="hint">Can this role view tv releases</div>
+				</td>
+				<td>Can view Adult releases</td>
+				<td>
+					{html_radios id="view adult" name='view adult' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view adult')} separator='<br />'}
+					<div class="hint">Can this role view adult releases</div>
+				</td>
+				<td>Can view Book releases</td>
+				<td>
+					{html_radios id="view book" name='view book' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view book')} separator='<br />'}
+					<div class="hint">Can this role view book releases</div>
+				</td>
+				<td>Can view Other releases</td>
+				<td>
+					{html_radios id="view other" name='view other' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view other')} separator='<br />'}
+					<div class="hint">Can this role view other releases</div>
 				</td>
 			</tr>
 

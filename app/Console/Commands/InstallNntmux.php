@@ -89,19 +89,9 @@ class InstallNntmux extends Command
                         }
                     });
                 } else {
-                    $process = new Process('php artisan migrate:fresh --force');
+                    $process = new Process('php artisan migrate:fresh --force --seed');
                     $process->setTimeout(600);
                     $process->run(function ($type, $buffer) {
-                        if (Process::ERR === $type) {
-                            echo 'ERR > '.$buffer;
-                        } else {
-                            echo $buffer;
-                        }
-                    });
-
-                    $process2 = new Process('php artisan fixtures:up all');
-                    $process2->setTimeout(600);
-                    $process2->run(function ($type, $buffer) {
                         if (Process::ERR === $type) {
                             echo 'ERR > '.$buffer;
                         } else {
@@ -123,8 +113,6 @@ class InstallNntmux extends Command
                         }
                     }
                 }
-
-                $this->createRoles();
 
                 if (! $error && $this->addAdminUser()) {
                     @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
@@ -219,91 +207,6 @@ class InstallNntmux extends Command
             'covers_path' => str_finish($covers_path, '/'),
             'unrar_path' => str_finish($unrar_path, '/'),
         ];
-    }
-
-    private function createRoles()
-    {
-        Permission::create(['name' => 'preview']);
-        Permission::create(['name' => 'hideads']);
-        Permission::create(['name' => 'edit release']);
-
-        $user = Role::create(['name' =>'User']);
-        $admin = Role::create(['name' =>'Admin']);
-        Role::create(['name' =>'Disabled']);
-        $mod = Role::create(['name' =>'Moderator']);
-        $friend = Role::create(['name' =>'Friend']);
-
-        Role::query()
-            ->where('name', '=', 'User')
-            ->update(
-                [
-                    'apirequests' => 10,
-                    'downloadrequests' => 10,
-                    'defaultinvites' => 1,
-                    'isdefault' => 1,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-        );
-
-        $user->givePermissionTo('preview');
-
-        Role::query()
-            ->where('name', '=', 'Admin')
-            ->update(
-                [
-                    'apirequests' => 1000,
-                    'downloadrequests' => 1000,
-                    'defaultinvites' => 1000,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-        $admin->givePermissionTo(['preview', 'hideads']);
-
-        Role::query()
-            ->where('name', '=', 'Disabled')
-            ->update(
-                [
-                    'apirequests' => 0,
-                    'downloadrequests' => 0,
-                    'defaultinvites' => 0,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        Role::query()
-            ->where('name', '=', 'Moderator')
-            ->update(
-                [
-                    'apirequests' => 1000,
-                    'downloadrequests' => 1000,
-                    'defaultinvites' => 1000,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        $mod->givePermissionTo(['preview', 'hideads', 'edit release']);
-
-        Role::query()
-            ->where('name', '=', 'Friend')
-            ->update(
-                [
-                    'apirequests' => 100,
-                    'downloadrequests' => 100,
-                    'defaultinvites' => 5,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        $friend->givePermissionTo(['preview', 'hideads']);
     }
 
     /**
