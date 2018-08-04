@@ -1,4 +1,5 @@
 2018-08-04 DariusIII
+	* Fix: Fix role-edit template
 	* Chg: Update role permissions and seeding, install procedure, permissions for menu views
 2018-08-03 DariusIII
 	* Chg: Delete now unused Blacklight\db\DB class
