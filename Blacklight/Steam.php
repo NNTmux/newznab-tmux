@@ -54,7 +54,7 @@ class Steam
      *
      * @param int $appID
      *
-     * @return array|bool
+     * @return array|false
      */
     public function getAll($appID)
     {

@@ -214,7 +214,7 @@ class TraktTv extends TV
      * @param int $series
      * @param int $episode
      *
-     * @return array|bool False on failure, an array of information fields otherwise.
+     * @return array|false False on failure, an array of information fields otherwise.
      */
     public function getEpisodeInfo($siteId, $series, $episode)
     {

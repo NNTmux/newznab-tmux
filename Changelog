@@ -1,6 +1,10 @@
 2018-08-04 DariusIII
 	* Chg: Update role permissions and seeding, install procedure, permissions for menu views
 2018-08-03 DariusIII
+	* Chg: Delete now unused Blacklight\db\DB class
+	* Chg: Update PHPDOC blocks defined return types where bool was declared and only false was returned
+	* Chg: Update phpunit/phpunit to version 7.3.0
+	* Chg: Update updateExpiredRoles function
 	* Fix: Fix setting role as default
 	* Chg: Update updateUserRoles script to add edit releases permission to Moderator role
 	* Chg: Replace isAdmin, isDisabled and isModerator functions with direct role checking and remove roleCheck function from User model

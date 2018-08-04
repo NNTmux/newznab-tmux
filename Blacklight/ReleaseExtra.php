@@ -76,7 +76,7 @@ class ReleaseExtra
 
     /**
      * @param $id
-     * @return array|bool
+     * @return array|false
      */
     public function getVideo($id)
     {
@@ -91,7 +91,7 @@ class ReleaseExtra
 
     /**
      * @param $id
-     * @return array|bool
+     * @return array|false
      */
     public function getAudio($id)
     {
@@ -119,11 +119,11 @@ class ReleaseExtra
     }
 
     /**
-     * @param $guid
+     * @param string $guid
      *
-     * @return array|bool
+     * @return array
      */
-    public function getBriefByGuid($guid)
+    public function getBriefByGuid($guid): array
     {
         return DB::select(
             sprintf(

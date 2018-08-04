@@ -863,7 +863,7 @@ class Console
     /**
      * @param $releasename
      *
-     * @return array|bool
+     * @return array|false
      */
     public function parseTitle($releasename)
     {
@@ -910,10 +910,8 @@ class Console
                 $platform = 'PSX';
             }
 
-            if (! empty($title) && stripos('XBLA', $platform) === 0) {
-                if (stripos('dlc', $title) !== false) {
-                    $platform = 'XBOX360';
-                }
+            if (! empty($title) && stripos('XBLA', $platform) === 0 && stripos('dlc', $title) !== false) {
+                $platform = 'XBOX360';
             }
 
             $browseNode = $this->getBrowseNode($platform);
@@ -927,7 +925,7 @@ class Console
            Other option is to pass the $release->categories_id here if we don't find a platform but that
            would require an extra lookup to determine the name. In either case we should have a title at the minimum. */
 
-        return (isset($result['title']) && ! empty($result['title']) && isset($result['platform'])) ? $result : false;
+        return (isset($result['title'], $result['platform']) && ! empty($result['title'])) ? $result : false;
     }
 
     /**

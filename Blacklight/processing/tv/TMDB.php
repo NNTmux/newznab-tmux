@@ -230,7 +230,7 @@ class TMDB extends TV
      *
      * @param $cleanName
      *
-     * @return array|bool
+     * @return array|false
      */
     protected function getShowInfo($cleanName)
     {
@@ -255,7 +255,7 @@ class TMDB extends TV
      * @param array $shows
      * @param string $cleanName
      *
-     * @return array|bool
+     * @return array|false
      */
     private function matchShowInfo($shows, $cleanName)
     {
@@ -339,7 +339,7 @@ class TMDB extends TV
      * @param string  $airdate
      * @param int $videoId
      *
-     * @return array|bool
+     * @return array|false
      */
     protected function getEpisodeInfo($tmdbid, $season, $episode, $airdate = '', $videoId = 0)
     {

@@ -74,7 +74,8 @@ class AEBN extends AdultMovies
     /**
      * Gets Trailer URL .. will be processed in XXX insertswf.
      *
-     * @return array|bool
+     *
+     * @return array|mixed
      */
     protected function trailers()
     {

@@ -30,12 +30,13 @@ class Genres
 
     /**
      * @param string $type
-     * @param bool $activeonly
-     * @return array|bool
+     * @param bool   $activeOnly
+     *
+     * @return array|mixed
      */
-    public function getGenres($type = '', $activeonly = false)
+    public function getGenres($type = '', $activeOnly = false)
     {
-        $sql = $this->getListQuery($type, $activeonly);
+        $sql = $this->getListQuery($type, $activeOnly);
         $genres = Cache::get(md5($sql));
         if ($genres !== null) {
             return $genres;
@@ -65,10 +66,10 @@ class Genres
 
     /**
      * @param string $type
-     * @param bool $activeonly
+     * @param bool $activeOnly
      * @return string
      */
-    private function getListQuery($type = '', $activeonly = false): string
+    private function getListQuery($type = '', $activeOnly = false): string
     {
         if (! empty($type)) {
             $typesql = sprintf(' AND g.type = %d', $type);
@@ -76,7 +77,7 @@ class Genres
             $typesql = '';
         }
 
-        if ($activeonly) {
+        if ($activeOnly) {
             $sql = sprintf(
                 '
 						SELECT g.*
@@ -108,14 +109,15 @@ class Genres
 
     /**
      * @param string $type
-     * @param bool $activeonly
-     * @param $start
-     * @param $num
-     * @return array|bool
+     * @param bool   $activeOnly
+     * @param int    $start
+     * @param int    $num
+     *
+     * @return array
      */
-    public function getRange($type = '', $activeonly = false, $start, $num)
+    public function getRange($type = '', $activeOnly = false, $start, $num): array
     {
-        $sql = $this->getListQuery($type, $activeonly);
+        $sql = $this->getListQuery($type, $activeOnly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
 
         return (array) array_first(DB::select($sql));
@@ -123,10 +125,10 @@ class Genres
 
     /**
      * @param string $type
-     * @param bool $activeonly
+     * @param bool $activeOnly
      * @return mixed
      */
-    public function getCount($type = '', $activeonly = false)
+    public function getCount($type = '', $activeOnly = false)
     {
         if (! empty($type)) {
             $typesql = sprintf(' AND g.type = %d', $type);
@@ -134,7 +136,7 @@ class Genres
             $typesql = '';
         }
 
-        if ($activeonly) {
+        if ($activeOnly) {
             $sql = sprintf(
                 '
 						SELECT COUNT(id) AS num

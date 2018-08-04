@@ -73,7 +73,7 @@ abstract class AdultMovies
     /**
      * Gets all information.
      *
-     * @return array|bool
+     * @return array|false
      */
     public function getAll()
     {
@@ -84,32 +84,32 @@ abstract class AdultMovies
         }
 
         $dummy = $this->synopsis();
-        if (is_array($dummy)) {
+        if (\is_array($dummy)) {
             $results = array_merge($results, $dummy);
         }
 
         $dummy = $this->productInfo(true);
-        if (is_array($dummy)) {
+        if (\is_array($dummy)) {
             $results = array_merge($results, $dummy);
         }
 
         $dummy = $this->cast();
-        if (is_array($dummy)) {
+        if (\is_array($dummy)) {
             $results = array_merge($results, $dummy);
         }
 
         $dummy = $this->genres();
-        if (is_array($dummy)) {
+        if (\is_array($dummy)) {
             $results = array_merge($results, $dummy);
         }
 
         $dummy = $this->covers();
-        if (is_array($dummy)) {
+        if (\is_array($dummy)) {
             $results = array_merge($results, $dummy);
         }
 
         $dummy = $this->trailers();
-        if (is_array($dummy)) {
+        if (\is_array($dummy)) {
             $results = array_merge($results, $dummy);
         }
         if (empty($results)) {

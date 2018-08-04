@@ -101,10 +101,11 @@ class AniDB
     /**
      * Retrieves a list of Anime titles, optionally filtered by starting character and title.
      *
+     *
      * @param string $letter
      * @param string $animetitle
-     * @return array|bool
-     * @throws \RuntimeException
+     *
+     * @return array
      */
     public function getAnimeList($letter = '', $animetitle = '')
     {

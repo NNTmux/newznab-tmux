@@ -140,9 +140,10 @@ class Sharing
     /**
      * Initialise of reset sharing settings.
      *
+     *
      * @param string $siteGuid Optional hash (must be sha1) we can set the site guid to.
      *
-     * @return array|bool
+     * @return mixed
      */
     public function initSettings(&$siteGuid = '')
     {

@@ -166,9 +166,10 @@ class Settings extends Model
      * either the value is passed to Settings::dottedToArray() for conversion. Otherwise the
      * value is returned unchanged.
      *
-     * @param $setting array|bool
      *
-     * @return array|bool
+     * @param $setting
+     *
+     * @return array|false
      */
     public static function settingToArray($setting)
     {
@@ -207,7 +208,7 @@ class Settings extends Model
     /**
      * @param $setting
      *
-     * @return array|bool
+     * @return array|false
      */
     protected static function dottedToArray($setting)
     {

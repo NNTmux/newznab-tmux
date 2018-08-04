@@ -225,8 +225,9 @@ class TVMaze extends TV
      * Returns a formatted array of show data or false if no match.
      *
      *
-     * @param string|null|array $cleanName
-     * @return array|bool|false
+     * @param string $cleanName
+     *
+     * @return array|false
      */
     protected function getShowInfo($cleanName)
     {
@@ -263,7 +264,7 @@ class TVMaze extends TV
      * @param $shows
      * @param $cleanName
      *
-     * @return array|bool
+     * @return array|false
      */
     private function matchShowInfo(array $shows, $cleanName)
     {

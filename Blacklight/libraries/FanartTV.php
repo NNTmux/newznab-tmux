@@ -32,7 +32,7 @@ class FanartTV
      *
      * @param string $id
      *
-     * @return array|bool
+     * @return array|false
      */
     public function getMovieFanart($id)
     {
@@ -52,7 +52,7 @@ class FanartTV
      * Getting tv show pictures.
      *
      * @param string $id
-     * @return array|bool
+     * @return array|false
      */
     public function getTVFanart($id)
     {

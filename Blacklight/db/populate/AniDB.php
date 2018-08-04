@@ -97,14 +97,12 @@ class AniDB
     }
 
     /**
-     * Checks for an existing anime title in anidb table.
+     * @param $id
+     * @param $type
+     * @param $lang
+     * @param $title
      *
-     * @param int    $id    The AniDB ID to be inserted
-     * @param string $type  The title type
-     * @param string $lang  The title language
-     * @param string $title The title of the Anime
-     *
-     * @return array|bool
+     * @return array
      */
     private function checkDuplicateDbEntry($id, $type, $lang, $title)
     {
@@ -112,12 +110,9 @@ class AniDB
     }
 
     /**
-     * Retrieves supplemental anime info from the AniDB API.
-     *
      * @param $anidbId
      *
-     * @return array|bool
-     * @throws \Exception
+     * @return array|false
      */
     private function getAniDbAPI($anidbId)
     {
