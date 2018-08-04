@@ -94,7 +94,7 @@
 				</td>
 				<td>Can view Movie releases</td>
 				<td>
-					{html_radios id="view movie" name='view movies' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view movies')} separator='<br />'}
+					{html_radios id="view movies" name='view movies' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view movies')} separator='<br />'}
 					<div class="hint">Can this role view movie releases</div>
 				</td>
 				<td>Can view Audio releases</td>
@@ -119,7 +119,7 @@
 				</td>
 				<td>Can view Book releases</td>
 				<td>
-					{html_radios id="view book" name='view book' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view book')} separator='<br />'}
+					{html_radios id="view books" name='view books' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view books')} separator='<br />'}
 					<div class="hint">Can this role view book releases</div>
 				</td>
 				<td>Can view Other releases</td>
