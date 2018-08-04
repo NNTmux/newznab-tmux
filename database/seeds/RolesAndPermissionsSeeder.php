@@ -32,83 +32,73 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // create roles and assign created permissions
 
-        $role = Role::create(['name' => 'User']);
-        $role->givePermissionTo('preview');
+        $role = Role::create(
+            [
+                'name' => 'User',
+                'apirequests' => 10,
+                'downloadrequests' => 10,
+                'defaultinvites' => 1,
+                'isdefault' => 1,
+                'donation' => 0,
+                'addyears' => 0,
+                'rate_limit' => 60,
+            ]
+        );
+        $role->givePermissionTo(['preview', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books']);
 
-        $role = Role::create(['name' => 'Admin']);
+        $role = Role::create(
+            [
+                'name' => 'Admin',
+                'apirequests' => 1000,
+                'downloadrequests' => 1000,
+                'defaultinvites' => 1000,
+                'isdefault' => 0,
+                'donation' => 0,
+                'addyears' => 0,
+                'rate_limit' => 60,
+            ]
+        );
         $role->givePermissionTo(Permission::all());
 
-        Role::create(['name' => 'Disabled']);
+        Role::create(
+            [
+                'name' => 'Disabled',
+                'apirequests' => 0,
+                'downloadrequests' => 0,
+                'defaultinvites' => 0,
+                'isdefault' => 0,
+                'donation' => 0,
+                'addyears' => 0,
+                'rate_limit' => 0,
+            ]
+        );
 
-        $role = Role::create(['name' => 'Moderator']);
+        $role = Role::create(
+            [
+                'name' => 'Moderator',
+                'apirequests' => 1000,
+                'downloadrequests' => 1000,
+                'defaultinvites' => 1000,
+                'isdefault' => 0,
+                'donation' => 0,
+                'addyears' => 0,
+                'rate_limit' => 60,
+            ]
+        );
         $role->givePermissionTo(Permission::all());
 
-        $role = Role::create(['name' => 'Friend']);
+        $role = Role::create(
+            [
+                'name' => 'Friend',
+                'apirequests' => 100,
+                'downloadrequests' => 100,
+                'defaultinvites' => 5,
+                'isdefault' => 0,
+                'donation' => 0,
+                'addyears' => 0,
+                'rate_limit' => 60,
+            ]
+        );
         $role->givePermissionTo(['preview', 'hideads', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books', 'view other']);
-
-        Role::query()
-            ->where('name', '=', 'User')
-            ->update(
-                [
-                    'apirequests' => 10,
-                    'downloadrequests' => 10,
-                    'defaultinvites' => 1,
-                    'isdefault' => 1,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        Role::query()
-            ->where('name', '=', 'Admin')
-            ->update(
-                [
-                    'apirequests' => 1000,
-                    'downloadrequests' => 1000,
-                    'defaultinvites' => 1000,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        Role::query()
-            ->where('name', '=', 'Disabled')
-            ->update(
-                [
-                    'apirequests' => 0,
-                    'downloadrequests' => 0,
-                    'defaultinvites' => 0,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        Role::query()
-            ->where('name', '=', 'Moderator')
-            ->update(
-                [
-                    'apirequests' => 1000,
-                    'downloadrequests' => 1000,
-                    'defaultinvites' => 1000,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
-
-        Role::query()
-            ->where('name', '=', 'Friend')
-            ->update(
-                [
-                    'apirequests' => 100,
-                    'downloadrequests' => 100,
-                    'defaultinvites' => 5,
-                    'isdefault' => 0,
-                    'donation' => 0,
-                    'addyears' => 0,
-                ]
-            );
     }
 }
