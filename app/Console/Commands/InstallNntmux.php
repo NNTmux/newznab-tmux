@@ -6,9 +6,7 @@ use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;
-use Spatie\Permission\Models\Role;
 use Symfony\Component\Process\Process;
-use Spatie\Permission\Models\Permission;
 
 class InstallNntmux extends Command
 {
