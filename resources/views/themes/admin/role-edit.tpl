@@ -67,6 +67,14 @@
 					<div class="hint">Whether ad's are hidden</div>
 				</td>
 			</tr>
+
+			<tr>
+				<td>Edit Release:</td>
+				<td>
+					{html_radios id="editrelease" name='editrelease' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('edit release')} separator='<br />'}
+					<div class="hint">Can the role edit releases</div>
+				</td>
+			</tr>
 			<tr>
 				<td>Donation amount:</td>
 				<td>
@@ -89,46 +97,59 @@
 			<tr>
 				<td>Can view Console releases</td>
 				<td>
-					{html_radios id="view console" name='view console' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view console')} separator='<br />'}
+					{html_radios id="viewconsole" name='viewconsole' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view console')} separator='<br />'}
 					<div class="hint">Can this role view console releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view Movie releases</td>
 				<td>
-					{html_radios id="view movies" name='view movies' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view movies')} separator='<br />'}
+					{html_radios id="viewmovies" name='viewmovies' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view movies')} separator='<br />'}
 					<div class="hint">Can this role view movie releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view Audio releases</td>
 				<td>
-					{html_radios id="view audio" name='view audio' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view audio')} separator='<br />'}
+					{html_radios id="viewaudio" name='viewaudio' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view audio')} separator='<br />'}
 					<div class="hint">Can this role view audio releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view PC releases</td>
 				<td>
-					{html_radios id="view pc" name='view pc' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view pc')} separator='<br />'}
+					{html_radios id="viewpc" name='viewpc' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view pc')} separator='<br />'}
 					<div class="hint">Can this role view pc releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view TV releases</td>
 				<td>
-					{html_radios id="view tv" name='view tv' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view tv')} separator='<br />'}
+					{html_radios id="viewtv" name='viewtv' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view tv')} separator='<br />'}
 					<div class="hint">Can this role view tv releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view Adult releases</td>
 				<td>
-					{html_radios id="view adult" name='view adult' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view adult')} separator='<br />'}
+					{html_radios id="viewadult" name='viewadult' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view adult')} separator='<br />'}
 					<div class="hint">Can this role view adult releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view Book releases</td>
 				<td>
-					{html_radios id="view books" name='view books' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view books')} separator='<br />'}
+					{html_radios id="viewbooks" name='viewbooks' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view books')} separator='<br />'}
 					<div class="hint">Can this role view book releases</div>
 				</td>
+			</tr>
+			<tr>
 				<td>Can view Other releases</td>
 				<td>
-					{html_radios id="view other" name='view other' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view other')} separator='<br />'}
+					{html_radios id="viewother" name='viewother' values=$yesno_ids output=$yesno_names selected={(int)$role->hasPermissionTo('view other')} separator='<br />'}
 					<div class="hint">Can this role view other releases</div>
 				</td>
 			</tr>
-
 
 			<tr>
 				<td></td>

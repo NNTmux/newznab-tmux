@@ -154,57 +154,57 @@ class RoleController extends BasePageController
                         $role->revokePermissionTo('hideads');
                     }
 
-                    if ((int) $request->input('edit release') === 1 && $role->hasPermissionTo('edit release') === false) {
+                    if ((int) $request->input('editrelease') === 1 && $role->hasPermissionTo('edit release') === false) {
                         $role->givePermissionTo('edit release');
-                    } elseif ((int) $request->input('edit release') === 0 && $role->hasPermissionTo('edit release') === true) {
+                    } elseif ((int) $request->input('editrelease') === 0 && $role->hasPermissionTo('edit release') === true) {
                         $role->revokePermissionTo('edit release');
                     }
 
-                    if ((int) $request->input('view console') === 1 && $role->hasPermissionTo('view console') === false) {
+                    if ((int) $request->input('viewconsole') === 1 && $role->hasPermissionTo('view console') === false) {
                         $role->givePermissionTo('view console');
-                    } elseif ((int) $request->input('view console') === 0 && $role->hasPermissionTo('view console') === true) {
+                    } elseif ((int) $request->input('viewconsole') === 0 && $role->hasPermissionTo('view console') === true) {
                         $role->revokePermissionTo('view console');
                     }
 
-                    if ((int) $request->input('view movies') === 1 && $role->hasPermissionTo('view movies') === false) {
+                    if ((int) $request->input('viewmovies') === 1 && $role->hasPermissionTo('view movies') === false) {
                         $role->givePermissionTo('view movies');
-                    } elseif ((int) $request->input('view movies') === 0 && $role->hasPermissionTo('view movies') === true) {
+                    } elseif ((int) $request->input('viewmovies') === 0 && $role->hasPermissionTo('view movies') === true) {
                         $role->revokePermissionTo('view movies');
                     }
 
-                    if ((int) $request->input('view audio') === 1 && $role->hasPermissionTo('view audio') === false) {
+                    if ((int) $request->input('viewaudio') === 1 && $role->hasPermissionTo('view audio') === false) {
                         $role->givePermissionTo('view audio');
-                    } elseif ((int) $request->input('view audio') === 0 && $role->hasPermissionTo('view audio') === true) {
+                    } elseif ((int) $request->input('viewaudio') === 0 && $role->hasPermissionTo('view audio') === true) {
                         $role->revokePermissionTo('view audio');
                     }
 
-                    if ((int) $request->input('view pc') === 1 && $role->hasPermissionTo('view pc') === false) {
+                    if ((int) $request->input('viewpc') === 1 && $role->hasPermissionTo('view pc') === false) {
                         $role->givePermissionTo('view pc');
-                    } elseif ((int) $request->input('view pc') === 0 && $role->hasPermissionTo('view pc') === true) {
+                    } elseif ((int) $request->input('viewpc') === 0 && $role->hasPermissionTo('view pc') === true) {
                         $role->revokePermissionTo('view pc');
                     }
 
-                    if ((int) $request->input('view tv') === 1 && $role->hasPermissionTo('view tv') === false) {
+                    if ((int) $request->input('viewtv') === 1 && $role->hasPermissionTo('view tv') === false) {
                         $role->givePermissionTo('view tv');
-                    } elseif ((int) $request->input('view tv') === 0 && $role->hasPermissionTo('view tv') === true) {
+                    } elseif ((int) $request->input('viewtv') === 0 && $role->hasPermissionTo('view tv') === true) {
                         $role->revokePermissionTo('view tv');
                     }
 
-                    if ((int) $request->input('view adult') === 1 && $role->hasPermissionTo('view adult') === false) {
+                    if ((int) $request->input('viewadult') === 1 && $role->hasPermissionTo('view adult') === false) {
                         $role->givePermissionTo('view adult');
-                    } elseif ((int) $request->input('view adult') === 0 && $role->hasPermissionTo('view adult') === true) {
+                    } elseif ((int) $request->input('viewadult') === 0 && $role->hasPermissionTo('view adult') === true) {
                         $role->revokePermissionTo('view adult');
                     }
 
-                    if ((int) $request->input('view books') === 1 && $role->hasPermissionTo('view books') === false) {
+                    if ((int) $request->input('viewbooks') === 1 && $role->hasPermissionTo('view books') === false) {
                         $role->givePermissionTo('view books');
-                    } elseif ((int) $request->input('view books') === 0 && $role->hasPermissionTo('view books') === true) {
+                    } elseif ((int) $request->input('viewbooks') === 0 && $role->hasPermissionTo('view books') === true) {
                         $role->revokePermissionTo('view books');
                     }
 
-                    if ((int) $request->input('view other') === 1 && $role->hasPermissionTo('view other') === false) {
+                    if ((int) $request->input('viewother') === 1 && $role->hasPermissionTo('view other') === false) {
                         $role->givePermissionTo('view other');
-                    } elseif ((int) $request->input('view other') === 0 && $role->hasPermissionTo('view other') === true) {
+                    } elseif ((int) $request->input('viewother') === 0 && $role->hasPermissionTo('view other') === true) {
                         $role->revokePermissionTo('view other');
                     }
                 }
@@ -218,14 +218,12 @@ class RoleController extends BasePageController
                     $title = 'User Roles Edit';
                     $role = Role::findById($request->input('id'));
                     $this->smarty->assign('role', $role);
-                    $this->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($request->input('id')));
                 }
                 break;
         }
 
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
-        $this->smarty->assign('catlist', Category::getForSelect(false));
 
         $content = $this->smarty->fetch('role-edit.tpl');
 
