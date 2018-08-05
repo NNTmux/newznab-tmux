@@ -1,3 +1,5 @@
+2018-08-05 DariusIII
+	* Chg: Update handling of permissions
 2018-08-04 DariusIII
 	* Fix: Fix role-edit template
 	* Chg: Update role permissions and seeding, install procedure, permissions for menu views

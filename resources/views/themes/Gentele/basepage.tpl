@@ -77,20 +77,34 @@
 								<li><a><i class="fa fa-home"></i><span> Browse</span> <span
 												class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-										<li><a href="{$smarty.const.WWW_TOP}/Console"><i
+										{if $userdata->hasPermissionTo('view console') == true}
+											<li><a href="{$smarty.const.WWW_TOP}/Console"><i
 														class="fa fa-gamepad"></i><span> Console</span></a></li>
+										{/if}
+										{if $userdata->hasPermissionTo('view movies') == true}
 										<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
 														class="fa fa-film"></i><span> Movies</span></a></li>
+										{/if}
+										{if $userdata->hasPermissionTo('view audio') == true}
 										<li><a href="{$smarty.const.WWW_TOP}/Audio"><i
 														class="fa fa-music"></i><span> Audio</span></a></li>
+										{/if}
+										{if $userdata->hasPermissionTo('view pc') == true}
 										<li><a href="{$smarty.const.WWW_TOP}/Games"><i
 														class="fa fa-gamepad"></i><span> Games</span></a></li>
+										{/if}
+										{if $userdata->hasPermissionTo('view tv') == true}
 										<li><a href="{$smarty.const.WWW_TOP}/series"><i
 														class="fa fa-television"></i><span> TV</span></a></li>
+										{/if}
+										{if $userdata->hasPermissionTo('view adult') == true}
 										<li><a href="{$smarty.const.WWW_TOP}/XXX"><i class="fa fa-venus-mars"></i><span> Adult</span></a>
 										</li>
+										{/if}
+										{if $userdata->hasPermissionTo('view books') == true}
 										<li><a href="{$smarty.const.WWW_TOP}/Books"><i class="fa fa-book"></i><span> Books</span></a>
 										</li>
+										{/if}
 										<li><a href="{$smarty.const.WWW_TOP}/browse/All"><i
 														class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
 										</li>
