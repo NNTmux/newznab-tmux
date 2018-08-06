@@ -201,7 +201,6 @@ class Category extends Model
         return $this->hasMany(static::class, 'parentid');
     }
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
