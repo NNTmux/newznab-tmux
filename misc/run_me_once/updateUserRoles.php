@@ -11,9 +11,9 @@ $users = User::all();
 
 $oldRoles = DB::table('user_roles')->get()->toArray();
 
-$roles = array_pluck(Role::query()->get(['name'])->toArray(), 'name');
+$roles = Role::all()->pluck('name')->toArray();
 
-$permissions = array_pluck(Permission::query()->select('name')->get()->toArray(), 'name');
+$permissions = Permission::all()->pluck('name')->toArray();
 
 $neededPerms = ['preview', 'hideads', 'edit release', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books', 'view other'];
 

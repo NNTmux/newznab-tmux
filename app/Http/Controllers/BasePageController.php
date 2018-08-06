@@ -214,6 +214,7 @@ class BasePageController extends Controller
         abort(429, $retry);
     }
 
+
     public function render()
     {
         $this->smarty->display($this->page_template);
@@ -284,11 +285,7 @@ class BasePageController extends Controller
             $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
-        if (! empty($this->userdata)) {
-            $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
-        } else {
-            $parentcatlist = Category::getForMenu();
-        }
+        $parentcatlist = Category::getForMenu();
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
         $this->smarty->assign('catClass', Category::class);

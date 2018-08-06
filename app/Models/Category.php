@@ -446,27 +446,13 @@ class Category extends Model
     }
 
     /**
-     * @param array $excludedCats
-     *
-     * @param array $roleExcludedCats
-     *
      * @return array
      */
-    public static function getForMenu(array $excludedCats = [], array $roleExcludedCats = []): array
+    public static function getForMenu(): array
     {
         $ret = [];
 
-        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE);
-
-        if (\count($excludedCats) > 0 && \count($roleExcludedCats) === 0) {
-            $sql->whereNotIn('id', $excludedCats);
-        } elseif (\count($excludedCats) > 0 && \count($roleExcludedCats) > 0) {
-            $sql->whereNotIn('id', $excludedCats += $roleExcludedCats);
-        } elseif (\count($excludedCats) === 0 && \count($roleExcludedCats) > 0) {
-            $sql->whereNotIn('id', $roleExcludedCats);
-        }
-
-        $arr = $sql->get()->toArray();
+        $arr = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->get()->toArray();
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === self::OTHER_ROOT) {
