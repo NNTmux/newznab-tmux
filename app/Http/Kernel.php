@@ -61,5 +61,6 @@ class Kernel extends HttpKernel
         'isVerified' => \Jrean\UserVerification\Middleware\IsVerified::class,
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'clearance' => \App\Http\Middleware\ClearanceMiddleware::class,
     ];
 }
