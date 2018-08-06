@@ -1,4 +1,5 @@
 2018-08-05 DariusIII
+	* Chg: Add custom 401 error page
 	* Chg: Add custom permission error handling
 	* Chg: Update handling of permissions
 2018-08-04 DariusIII
