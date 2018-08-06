@@ -214,7 +214,6 @@ class BasePageController extends Controller
         abort(429, $retry);
     }
 
-
     public function render()
     {
         $this->smarty->display($this->page_template);

@@ -51,6 +51,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
             abort(401);
         }
+
         return parent::render($request, $exception);
     }
 }
