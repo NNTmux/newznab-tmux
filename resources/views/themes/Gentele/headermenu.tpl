@@ -1,7 +1,6 @@
 <div id="menucontainer" xmlns="http://www.w3.org/1999/html">
 	<div class="collapse navbar-collapse nav navbar-nav top-menu">
 		{if isset($userdata)}
-			{dd($parentcatlist)}
 			{foreach $parentcatlist as $parentcat}
 				{if $parentcat.id == {$catClass::TV_ROOT} && $userdata->hasPermissionTo('view tv') == true}
 					<li class="nav-parent">
