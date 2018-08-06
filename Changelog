@@ -1,3 +1,5 @@
+2018-08-06 DariusIII
+	* Chg: Update handling of user and role disabled categories
 2018-08-05 DariusIII
 	* Chg: Update Controllers and templates for user related permission changes
 	* Chg: Add custom ClearanceMiddleware

@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
  * @property-read \App\Models\Category|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
- * @property-read \App\Models\RoleExcludedCategory $roleExcludedCategory
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $userExcludedCategory
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDisablepreview($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereId($value)
@@ -203,21 +201,6 @@ class Category extends Model
         return $this->hasMany(static::class, 'parentid');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function userExcludedCategory()
-    {
-        return $this->hasMany(UserExcludedCategory::class, 'categories_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function roleExcludedCategory()
-    {
-        return $this->belongsTo(RoleExcludedCategory::class, 'categories_id');
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
@@ -452,7 +435,7 @@ class Category extends Model
     {
         $ret = [];
 
-        $arr = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->get()->toArray();
+        $arr = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->get(['id', 'title', 'parentid'])->toArray();
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === self::OTHER_ROOT) {

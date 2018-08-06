@@ -13,7 +13,6 @@ use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
-use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Jrean\UserVerification\Facades\UserVerification;
@@ -90,7 +89,6 @@ class ProfileController extends BasePageController
         $this->smarty->assign(
             [
                 'commentslist'  => ReleaseComment::getCommentsForUserRange($userID),
-                'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
                 'saburl'        => $sab->url,
                 'sabapikey'     => $sab->apikey,
                 'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',

@@ -60,7 +60,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $remember_token
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $excludedCategory
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failedRelease
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Invitation[] $invitation
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
@@ -205,14 +204,6 @@ class User extends Authenticatable
     public function failedRelease()
     {
         return $this->hasMany(DnzbFailure::class, 'users_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function excludedCategory()
-    {
-        return $this->hasMany(UserExcludedCategory::class, 'users_id');
     }
 
     /**
@@ -935,14 +926,52 @@ class User extends Authenticatable
     public static function getCategoryExclusion($userID): array
     {
         $ret = [];
-        $categories = self::query()->where('id', $userID)->first();
-        if ($categories !== null) {
-            foreach ($categories->excludedCategory as $category) {
-                $ret[] = $category['categories_id'];
+
+        $user = self::find($userID);
+
+        $userAllowed = $user->getDirectPermissions()->pluck('name')->toArray();
+        $roleAllowed = $user->getAllPermissions()->pluck('name')->toArray();
+
+        $allowed = array_intersect($roleAllowed, $userAllowed);
+
+        $cats = ['view console', 'view movies', 'view audio', 'view tv', 'view pc', 'view adult', 'view books', 'view other'];
+
+        if (! empty($allowed)) {
+            foreach ($cats as $cat) {
+                if (! \in_array($cat, $allowed, false)) {
+                    switch ($cat) {
+                        case 'view console':
+                            $ret[] = 1000;
+                            continue 2;
+                        case 'view movies':
+                            $ret[] = 2000;
+                            continue 2;
+                        case 'view audio':
+                            $ret[] = 3000;
+                            continue 2;
+                        case 'view tv':
+                            $ret[] = 4000;
+                            continue 2;
+                        case 'view pc':
+                            $ret[] = 5000;
+                            continue 2;
+                        case 'view adult':
+                            $ret[] = 6000;
+                            continue 2;
+                        case 'view books':
+                            $ret[] = 7000;
+                            continue 2;
+                        case 'view other':
+                            $ret[] = 1;
+
+                    }
+                }
             }
         }
 
-        return $ret;
+        $exclusion = Category::query()->whereIn('parentid', $ret)->pluck('id')->toArray();
+
+        return $exclusion;
     }
 
     /**
