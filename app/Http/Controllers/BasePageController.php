@@ -11,7 +11,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\Contents;
 use App\Models\Forumpost;
-use App\Models\RoleExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -225,7 +224,6 @@ class BasePageController extends Controller
     protected function setUserPreferences(): void
     {
         $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
-        $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['roles_id']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
@@ -284,11 +282,7 @@ class BasePageController extends Controller
             $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
-        if (! empty($this->userdata)) {
-            $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
-        } else {
-            $parentcatlist = Category::getForMenu();
-        }
+        $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions']);
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
         $this->smarty->assign('catClass', Category::class);

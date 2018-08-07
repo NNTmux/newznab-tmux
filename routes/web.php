@@ -32,20 +32,11 @@ Route::group(['middleware' => ['isVerified']], function () {
 
     Route::get('profile', 'ProfileController@show');
 
-    Route::prefix('browse')->group(function () {
+    Route::group(['prefix' => 'browse'], function () {
         Route::get('group', 'BrowseController@group');
         Route::get('all', 'BrowseController@index');
-        Route::get('{parentCategory}/{id?}', 'BrowseController@show');
+        Route::get('{parentCategory}/{id?}', 'BrowseController@show')->middleware('clearance');
     });
-
-    Route::get('anime', 'AnimeController@showAnime');
-    Route::post('anime', 'AnimeController@showAnime');
-
-    Route::get('animelist', 'AnimeController@showList');
-    Route::post('animelist', 'AnimeController@showList');
-
-    Route::get('Books/{id?}', 'BooksController@index');
-    Route::post('Books/{id?}', 'BooksController@index');
 
     Route::prefix('cart')->group(function () {
         Route::get('index', 'CartController@index');
@@ -73,10 +64,6 @@ Route::group(['middleware' => ['isVerified']], function () {
 
     Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-    Route::get('Console/{id?}', 'ConsoleController@show');
-
-    Route::post('Console/{id?}', 'ConsoleController@show');
-
     Route::get('browsegroup', 'BrowseGroupController@show');
 
     Route::get('content', 'ContentController@show');
@@ -87,32 +74,47 @@ Route::group(['middleware' => ['isVerified']], function () {
 
     Route::post('failed', 'FailedReleasesController@show');
 
-    Route::get('Games', 'GamesController@show');
-    Route::post('Games', 'GamesController@show');
+    Route::group(['middleware' => 'clearance'], function () {
+        Route::get('Games', 'GamesController@show');
+        Route::post('Games', 'GamesController@show');
 
-    Route::get('Movies/{id?}', 'MovieController@showMovies');
+        Route::get('Movies/{id?}', 'MovieController@showMovies');
 
-    Route::get('movie', 'MovieController@showMovie');
+        Route::get('movie', 'MovieController@showMovie');
 
-    Route::get('movietrailers', 'MovieController@showTrailer');
+        Route::get('movietrailers', 'MovieController@showTrailer');
 
-    Route::post('Movies/{id?}', 'MovieController@showMovies');
+        Route::post('Movies/{id?}', 'MovieController@showMovies');
 
-    Route::post('movie', 'MovieController@showMovie');
+        Route::post('movie', 'MovieController@showMovie');
 
-    Route::post('movietrailers', 'MovieController@showTrailer');
+        Route::post('movietrailers', 'MovieController@showTrailer');
 
-    Route::get('Audio/{id?}', 'MusicController@show');
+        Route::get('Audio/{id?}', 'MusicController@show');
 
-    Route::post('Audio/{id?}', 'MusicController@show');
+        Route::post('Audio/{id?}', 'MusicController@show');
+
+        Route::get('Console/{id?}', 'ConsoleController@show');
+
+        Route::post('Console/{id?}', 'ConsoleController@show');
+
+        Route::get('XXX/{id?}', 'AdultController@show');
+
+        Route::post('XXX/{id?}', 'AdultController@show');
+
+        Route::get('anime', 'AnimeController@showAnime');
+        Route::post('anime', 'AnimeController@showAnime');
+
+        Route::get('animelist', 'AnimeController@showList');
+        Route::post('animelist', 'AnimeController@showList');
+
+        Route::get('Books/{id?}', 'BooksController@index');
+        Route::post('Books/{id?}', 'BooksController@index');
+    });
 
     Route::get('nfo/{id?}', 'NfoController@showNfo');
 
     Route::post('nfo/{id?}', 'NfoController@showNfo');
-
-    Route::get('XXX/{id?}', 'AdultController@show');
-
-    Route::post('XXX/{id?}', 'AdultController@show');
 
     Route::get('contact-us', 'ContactUsController@showContactForm');
     Route::post('contact-us', 'ContactUsController@contact');

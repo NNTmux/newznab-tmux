@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
  * @property-read \App\Models\Category|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
- * @property-read \App\Models\RoleExcludedCategory $roleExcludedCategory
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $userExcludedCategory
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDisablepreview($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereId($value)
@@ -201,22 +199,6 @@ class Category extends Model
     public function children()
     {
         return $this->hasMany(static::class, 'parentid');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function userExcludedCategory()
-    {
-        return $this->hasMany(UserExcludedCategory::class, 'categories_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function roleExcludedCategory()
-    {
-        return $this->belongsTo(RoleExcludedCategory::class, 'categories_id');
     }
 
     /**
@@ -448,22 +430,16 @@ class Category extends Model
     /**
      * @param array $excludedCats
      *
-     * @param array $roleExcludedCats
-     *
      * @return array
      */
-    public static function getForMenu(array $excludedCats = [], array $roleExcludedCats = []): array
+    public static function getForMenu(array $excludedCats = []): array
     {
         $ret = [];
 
-        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE);
+        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->select(['id', 'title', 'parentid']);
 
-        if (\count($excludedCats) > 0 && \count($roleExcludedCats) === 0) {
+        if (! empty($excludedCats)) {
             $sql->whereNotIn('id', $excludedCats);
-        } elseif (\count($excludedCats) > 0 && \count($roleExcludedCats) > 0) {
-            $sql->whereNotIn('id', $excludedCats += $roleExcludedCats);
-        } elseif (\count($excludedCats) === 0 && \count($roleExcludedCats) > 0) {
-            $sql->whereNotIn('id', $roleExcludedCats);
         }
 
         $arr = $sql->get()->toArray();

@@ -69,6 +69,7 @@ class ApiV2Controller extends Controller
         $releases = new Releases();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $api->maxAge();
+        $catExclusions = User::getCategoryExclusion($user->id);
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
 
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
@@ -84,7 +85,8 @@ class ApiV2Controller extends Controller
             $request->input('id') ?? '',
             $api->categoryID(),
             $maxAge,
-            $minSize
+            $minSize,
+            $catExclusions
         );
 
         $response = [
@@ -159,6 +161,7 @@ class ApiV2Controller extends Controller
         $user = Auth::user();
         $api = new API();
         $releases = new Releases();
+        $catExclusions = User::getCategoryExclusion($user->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $api->verifyEmptyParameter('id');
         $api->verifyEmptyParameter('vid');
@@ -202,7 +205,8 @@ class ApiV2Controller extends Controller
             $request->input('id') ?? '',
             $api->categoryID(),
             $maxAge,
-            $minSize
+            $minSize,
+            $catExclusions
         );
 
         $response = [

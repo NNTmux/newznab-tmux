@@ -74,15 +74,77 @@
 												<table class="data table table-striped responsive-utilities jambo-table">
 													<tbody>
 													<tr class="bg-aqua-active">
-														<td colspan="2" style="padding-left: 8px;"><strong>Excluded
-																Categories</strong></td>
+														<th colspan="2" style="padding-left: 8px;"><strong>Excluded
+																Categories</strong></th>
 													</tr>
 													<tr>
-														<th width="200">Excluded Categories</th>
-														<td>
-															{html_options style="height:405px;" class="form-control" data-placeholder="Choose categories to exclude" multiple=multiple name="exccat[]" options=$catlist selected=$userexccat}
-														</td>
-													</tr>
+														<th width="200"></th>
+                                                    {if $user->role->hasPermissionTo('view console') == true}
+                                                    <tr>
+                                                        <td>View Console releases</td>
+                                                        <td>
+                                                            {html_radios id="viewconsole" name='viewconsole' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view console')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view movies') == true}
+                                                    <tr>
+                                                        <td>View Movie releases</td>
+                                                        <td>
+                                                            {html_radios id="viewmovies" name='viewmovies' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view movies')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view audio') == true}
+                                                    <tr>
+                                                        <td>View Audio releases</td>
+                                                        <td>
+                                                            {html_radios id="viewaudio" name='viewaudio' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view audio')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view pc') == true}
+                                                    <tr>
+                                                        <td>View PC releases</td>
+                                                        <td>
+                                                            {html_radios id="viewpc" name='viewpc' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view pc')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view tv') == true}
+                                                    <tr>
+                                                        <td>View TV releases</td>
+                                                        <td>
+                                                            {html_radios id="viewtv" name='viewtv' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view tv')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view adult') == true}
+                                                    <tr>
+                                                        <td>View Adult releases</td>
+                                                        <td>
+                                                            {html_radios id="viewadult" name='viewadult' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view adult')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view books') == true}
+                                                    <tr>
+                                                        <td>View Book releases</td>
+                                                        <td>
+                                                            {html_radios id="viewbooks" name='viewbooks' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view books')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+                                                    {if $user->role->hasPermissionTo('view other') == true}
+                                                    <tr>
+                                                        <td>View Other releases</td>
+                                                        <td>
+                                                            {html_radios id="viewother" name='viewother' values=$yesno_ids output=$yesno_names selected={(int)$user->hasDirectPermission('view other')} separator='<br />'}
+                                                        </td>
+                                                    </tr>
+                                                    {/if}
+
+                                                    </tr>
 													</tbody>
 												</table>
 												<table class="data table table-striped responsive-utilities jambo-table">

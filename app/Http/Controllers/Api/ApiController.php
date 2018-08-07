@@ -202,7 +202,8 @@ class ApiController extends BasePageController
                    $request->input('q') ?? '',
                    $api->categoryID(),
                    $maxAge,
-                   $minSize
+                   $minSize,
+                   $catExclusions
                );
 
                $api->addLanguage($relData);
@@ -229,7 +230,8 @@ class ApiController extends BasePageController
                    $request->input('q') ?? '',
                    $api->categoryID(),
                    $maxAge,
-                   $minSize
+                   $minSize,
+                   $catExclusions
                );
 
                $api->addCoverURL(
