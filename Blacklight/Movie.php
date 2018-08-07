@@ -502,7 +502,7 @@ class Movie
             $temp = '';
             foreach ($value as $val) {
                 if (! \is_array($val) && ! \is_object($val)) {
-                    $temp .= (string) $val;
+                    $temp .= $val;
                 }
             }
             $value = $temp;
@@ -529,7 +529,7 @@ class Movie
      *
      * @param array $values Array of keys/values to update. See $validKeys
      *
-     * @return int|bool
+     * @return bool|string
      */
     public function update(array $values)
     {
@@ -564,7 +564,9 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        return DB::insert($query[0].') '.$query[1].') '.$query[2]);
+        DB::insert($query[0].') '.$query[1].') '.$query[2]);
+
+        return $this->pdo->lastInsertId();
     }
 
     /**

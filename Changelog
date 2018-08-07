@@ -1,4 +1,5 @@
 2018-08-07 DariusIII
+	* Fix: Properly send lastInsertId when adding a movie to movieinfo table
 	* Chg: Use can instead of long hasPermissionTo
 	* Fix: Fix preview permission check in Gentele theme
 	* Fix: Fix error on missing description index in API v1 XML response
