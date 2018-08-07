@@ -803,11 +803,11 @@ class Releases
         $siteSQL = [];
         $showSql = '';
 
-            foreach ($siteIdArr as $column => $Id) {
-                if ($Id > 0) {
-                    $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
-                }
+        foreach ($siteIdArr as $column => $Id) {
+            if ($Id > 0) {
+                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
+        }
 
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
@@ -940,11 +940,11 @@ class Releases
     {
         $siteSQL = [];
         $showSql = '';
-            foreach ($siteIdArr as $column => $Id) {
-                if ($Id > 0) {
-                    $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
-                }
+        foreach ($siteIdArr as $column => $Id) {
+            if ($Id > 0) {
+                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
+        }
 
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
