@@ -719,7 +719,7 @@ class Releases
      *
      * @return array
      */
-    public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $excludedCategories = []): array
+    public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0): array
     {
         $searchOptions = [];
         if ($searchName !== -1) {
