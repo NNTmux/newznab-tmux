@@ -1,4 +1,5 @@
 2018-08-07 DariusIII
+	* Chg: Update used libraries to their latest versions
 	* Fix: Fix wrong $request->input keys check
 	* Chg: Remove unused parameter from apiSearch function
 	* Fix: Fix some more API related issues
