@@ -1,4 +1,5 @@
 2018-08-07 DariusIII
+	* Fix: Fix wrong $request->input keys check
 	* Chg: Remove unused parameter from apiSearch function
 	* Fix: Fix some more API related issues
 	* Chg: User can change only role allowed permissions (direct versus role based permissions)

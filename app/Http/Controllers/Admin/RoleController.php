@@ -91,39 +91,39 @@ class RoleController extends BasePageController
                         $role->givePermissionTo('hideads');
                     }
 
-                    if ((int) $request->input('edit release') === 1) {
+                    if ((int) $request->input('editrelease') === 1) {
                         $role->givePermissionTo('edit release');
                     }
 
-                    if ((int) $request->input('view console') === 1) {
+                    if ((int) $request->input('viewconsole') === 1) {
                         $role->givePermissionTo('view console');
                     }
 
-                    if ((int) $request->input('view movies') === 1) {
+                    if ((int) $request->input('viewmovies') === 1) {
                         $role->givePermissionTo('view movies');
                     }
 
-                    if ((int) $request->input('view audio') === 1) {
+                    if ((int) $request->input('viewaudio') === 1) {
                         $role->givePermissionTo('view audio');
                     }
 
-                    if ((int) $request->input('view pc') === 1) {
+                    if ((int) $request->input('viewpc') === 1) {
                         $role->givePermissionTo('view pc');
                     }
 
-                    if ((int) $request->input('view tv') === 1) {
+                    if ((int) $request->input('viewtv') === 1) {
                         $role->givePermissionTo('view tv');
                     }
 
-                    if ((int) $request->input('view adult') === 1) {
+                    if ((int) $request->input('viewadult') === 1) {
                         $role->givePermissionTo('view adult');
                     }
 
-                    if ((int) $request->input('view books') === 1) {
+                    if ((int) $request->input('viewbooks') === 1) {
                         $role->givePermissionTo('view books');
                     }
 
-                    if ((int) $request->input('view other') === 1) {
+                    if ((int) $request->input('viewother') === 1) {
                         $role->givePermissionTo('view other');
                     }
                 } else {
