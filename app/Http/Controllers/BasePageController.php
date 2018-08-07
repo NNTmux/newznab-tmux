@@ -282,7 +282,7 @@ class BasePageController extends Controller
             $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
-        $parentcatlist = Category::getForMenu();
+        $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions']);
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
         $this->smarty->assign('catClass', Category::class);

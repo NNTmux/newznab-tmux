@@ -2,7 +2,7 @@
 	<div class="collapse navbar-collapse nav navbar-nav top-menu">
 		{if isset($userdata)}
 			{foreach $parentcatlist as $parentcat}
-				{if $parentcat.id == {$catClass::TV_ROOT} && $userdata->hasDirectPermission('view tv') == true && $userdata->hasPermissionTo('view tv') == true}
+				{if $parentcat.id == {$catClass::TV_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -20,7 +20,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::MOVIE_ROOT} && $userdata->hasDirectPermission('view movies') == true && $userdata->hasPermissionTo('view movies') == true}
+				{if $parentcat.id == {$catClass::MOVIE_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -52,7 +52,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::GAME_ROOT} && $userdata->hasDirectPermission('view console') == true && $userdata->hasPermissionTo('view console') == true}
+				{if $parentcat.id == {$catClass::GAME_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -82,7 +82,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::PC_ROOT} && $userdata->hasDirectPermission('view pc') == true && $userdata->hasPermissionTo('view pc') == true}
+				{if $parentcat.id == {$catClass::PC_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -118,7 +118,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::MUSIC_ROOT} && $userdata->hasDirectPermission('view audio') == true && $userdata->hasPermissionTo('view audio') == true}
+				{if $parentcat.id == {$catClass::MUSIC_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -148,7 +148,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::BOOKS_ROOT} && $userdata->hasDirectPermission('view books') == true && $userdata->hasPermissionTo('view books') == true}
+				{if $parentcat.id == {$catClass::BOOKS_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -178,7 +178,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::XXX_ROOT} && $userdata->hasDirectPermission('view adult') == true && $userdata->hasPermissionTo('view adult') == true}
+				{if $parentcat.id == {$catClass::XXX_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
@@ -213,7 +213,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id == {$catClass::OTHER_ROOT} && $userdata->hasDirectPermission('view other') == true && $userdata->hasPermissionTo('view other') == true}
+				{if $parentcat.id == {$catClass::OTHER_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">

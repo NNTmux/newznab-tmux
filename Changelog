@@ -1,4 +1,5 @@
 2018-08-07 DariusIII
+	* Chg: User can change only role allowed permissions (direct versus role based permissions)
 	* Fix: Fix category exclusions for RSS feeds
 	* Chg: Update ApiTransformer to handle null values
 	* Fix: Fix ApiV2 responses
