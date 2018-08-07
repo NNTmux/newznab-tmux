@@ -1,4 +1,5 @@
 2018-08-07 DariusIII
+	* Fix: Fix category exclusions for RSS feeds
 	* Chg: Update ApiTransformer to handle null values
 	* Fix: Fix ApiV2 responses
 2018-08-06 DariusIII
