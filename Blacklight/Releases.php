@@ -747,7 +747,7 @@ class Releases
 				g.name AS group_name,
 				cp.id AS categoryparentid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.firstaired
+				tve.firstaired, tve.title, tve.series, tve.episode
 			FROM releases r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
@@ -802,13 +802,13 @@ class Releases
     {
         $siteSQL = [];
         $showSql = '';
-        if (\is_array($siteIdArr)) {
+
             foreach ($siteIdArr as $column => $Id) {
                 if ($Id > 0) {
                     $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
                 }
             }
-        }
+
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -940,13 +940,12 @@ class Releases
     {
         $siteSQL = [];
         $showSql = '';
-        if (\is_array($siteIdArr)) {
             foreach ($siteIdArr as $column => $Id) {
                 if ($Id > 0) {
                     $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
                 }
             }
-        }
+
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
