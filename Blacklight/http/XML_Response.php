@@ -242,14 +242,14 @@ class XML_Response
             $this->xml->startElement('category');
             $this->xml->writeAttribute('id', $this->parameters['id']);
             $this->xml->writeAttribute('name', html_entity_decode($this->parameters['title']));
-            if ($this->parameters['description'] !== '') {
+            if (! empty($this->parameters['description'])) {
                 $this->xml->writeAttribute('description', html_entity_decode($this->parameters['description']));
             }
             foreach ($this->parameters['subcatlist'] as $c) {
                 $this->xml->startElement('subcat');
                 $this->xml->writeAttribute('id', $c['id']);
                 $this->xml->writeAttribute('name', html_entity_decode($c['title']));
-                if ($c['description'] !== '') {
+                if (! empty($c['description'])) {
                     $this->xml->writeAttribute('description', html_entity_decode($c['description']));
                 }
                 $this->xml->endElement();

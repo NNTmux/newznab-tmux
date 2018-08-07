@@ -436,7 +436,7 @@ class Category extends Model
     {
         $ret = [];
 
-        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->select(['id', 'title', 'parentid']);
+        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->select(['id', 'title', 'parentid', 'description']);
 
         if (! empty($excludedCats)) {
             $sql->whereNotIn('id', $excludedCats);
