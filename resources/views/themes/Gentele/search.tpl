@@ -270,13 +270,13 @@
 													<a href="#" name="name{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View movie info"
 													   class="modal_imdb label label-primary" rel="movie">Cover</a>
 												{/if}
-												{if $result->haspreview == 1 && $userdata->role->canpreview == 1}
+												{if $result->haspreview == 1 && $userdata->hasPermissionTo('preview') == true}
 												<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Screenshot of {$result->searchname|escape:"htmlall"}"
 												   class="label label-primary" rel="preview">Preview</a>{/if}
-												{if $result->jpgstatus == 1 && $userdata->role->canpreview == 1}
+												{if $result->jpgstatus == 1 && $userdata->hasPermissionTo('preview') == true}
 												<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
 												   name="name{$result->guid}"
 												   data-fancybox

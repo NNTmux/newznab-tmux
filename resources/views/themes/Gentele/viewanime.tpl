@@ -123,7 +123,7 @@
 																href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 																class="modal_nfo label label-primary text-muted">NFO</a>
 														</span>{/if}
-													{if $result->haspreview == 1 && $userdata->role->canpreview == 1}<a
+													{if $result->haspreview == 1 && $userdata->hasPermissionTo('preview') == true}<a
 														href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 														name="name{$result->guid}"
 														title="Screenshot of {$result->searchname|escape:"htmlall"}"

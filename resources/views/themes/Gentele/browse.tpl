@@ -115,13 +115,13 @@
 															href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 															class="modal_nfo label label-primary" rel="nfo">NFO</a>
 													</span>{/if}
-												{if $result->jpgstatus == 1 && $userdata->role->canpreview == 1}<span><a
+												{if $result->jpgstatus == 1 && $userdata->hasPermissionTo('preview') == true}<span><a
 															href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
 															name="name{$result->guid}"
 															data-fancybox
 															class="label label-primary"
 															rel="preview">Sample</a></span>{/if}
-												{if $result->haspreview == 1 && $userdata->role->canpreview == 1}<span><a
+												{if $result->haspreview == 1 && $userdata->hasPermissionTo('preview') == true}<span><a
 															href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 															name="name{$result->guid}"
 															data-fancybox

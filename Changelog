@@ -1,4 +1,5 @@
 2018-08-07 DariusIII
+	* Fix: Fix preview permission check in Gentele theme
 	* Fix: Fix error on missing description index in API v1 XML response
 	* Chg: Update used libraries to their latest versions
 	* Fix: Fix wrong $request->input keys check
