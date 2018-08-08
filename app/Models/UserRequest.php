@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\UserRequest.
@@ -52,10 +53,14 @@ class UserRequest extends Model
 
     /**
      * @param $userID
+     *
+     * @throws \Throwable
      */
     public static function delApiRequests($userID): void
     {
-        self::query()->where('users_id', $userID)->delete();
+        DB::transaction(function () use ($userID) {
+            self::query()->where('users_id', $userID)->delete();
+        }, 3);
     }
 
     /**
@@ -65,6 +70,7 @@ class UserRequest extends Model
      *
      * @return int
      * @throws \Exception
+     * @throws \Throwable
      */
     public static function getApiRequests($userID): int
     {
@@ -95,13 +101,17 @@ class UserRequest extends Model
      *
      * @return void
      * @throws \Exception
+     * @throws \Throwable
      */
     public static function clearApiRequests($userID): void
     {
-        if ($userID === false) {
-            self::query()->where('timestamp', '<', now()->subDay())->delete();
-        } else {
-            self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
-        }
+        DB::transaction(function () use ($userID) {
+            if ($userID === false) {
+                self::query()->where('timestamp', '<', now()->subDay())->delete();
+            } else {
+                self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
+            }
+        }, 3);
+
     }
 }

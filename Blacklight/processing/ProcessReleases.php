@@ -373,6 +373,7 @@ class ProcessReleases
      * @param $groupID
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function deleteUnwantedCollections($groupID): void
     {
@@ -421,59 +422,68 @@ class ProcessReleases
                     )
                 ) !== null
             ) {
-                $deleteQuery = DB::delete(
-                    sprintf(
-                        '
+                $deleteQuery = DB::transaction(function () use ($minSizeSetting, $groupMinSizeSetting) {
+                    DB::delete(
+                        sprintf(
+                            '
 						DELETE c FROM %s c
 						WHERE c.filecheck = %d
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
 						AND c.filesize < GREATEST(%d, %d)',
-                        $this->tables['cname'],
-                        self::COLLFC_SIZED,
-                        $groupMinSizeSetting,
-                        $minSizeSetting,
-                        $groupMinSizeSetting,
-                        $minSizeSetting
-                    )
-                );
+                            $this->tables['cname'],
+                            self::COLLFC_SIZED,
+                            $groupMinSizeSetting,
+                            $minSizeSetting,
+                            $groupMinSizeSetting,
+                            $minSizeSetting
+                        )
+                    );
+                }, 3);
+
                 if ($deleteQuery > 0) {
                     $minSizeDeleted += $deleteQuery;
                 }
 
                 if ($maxSizeSetting > 0) {
-                    $deleteQuery = DB::delete(
-                        sprintf(
-                            '
+                    $deleteQuery = DB::transaction(function () use ($maxSizeSetting) {
+                        DB::delete(
+                            sprintf(
+                                '
 							DELETE c FROM %s c
 							WHERE c.filecheck = %d
 							AND c.filesize > %d',
-                            $this->tables['cname'],
-                            self::COLLFC_SIZED,
-                            $maxSizeSetting
-                        )
-                    );
+                                $this->tables['cname'],
+                                self::COLLFC_SIZED,
+                                $maxSizeSetting
+                            )
+                        );
+                    }, 3);
+
                     if ($deleteQuery > 0) {
                         $maxSizeDeleted += $deleteQuery;
                     }
                 }
 
                 if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
-                    $deleteQuery = DB::delete(
-                        sprintf(
-                            '
+                    $deleteQuery = DB::transaction(function () use ($minFilesSetting, $groupMinFilesSetting) {
+                        DB::delete(
+                            sprintf(
+                                '
 						DELETE c FROM %s c
 						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
-                            $this->tables['cname'],
-                            self::COLLFC_SIZED,
-                            $groupMinFilesSetting,
-                            $minFilesSetting,
-                            $groupMinFilesSetting,
-                            $minFilesSetting
-                        )
-                    );
+                                $this->tables['cname'],
+                                self::COLLFC_SIZED,
+                                $groupMinFilesSetting,
+                                $minFilesSetting,
+                                $groupMinFilesSetting,
+                                $minFilesSetting
+                            )
+                        );
+                    }, 3);
+
                     if ($deleteQuery > 0) {
                         $minFilesDeleted += $deleteQuery;
                     }
@@ -681,7 +691,8 @@ class ProcessReleases
                 }
             } else {
                 // The release was already in the DB, so delete the collection.
-                DB::delete(
+                DB::transaction(function () use ($collection) {
+                    DB::delete(
                         sprintf(
                             '
 							DELETE c
@@ -691,6 +702,8 @@ class ProcessReleases
                             $this->pdo->quote($collection->collectionhash)
                         )
                     );
+                }, 3);
+
                 $duplicate++;
             }
         }
@@ -841,6 +854,7 @@ class ProcessReleases
      * @param $groupID
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function deleteCollections($groupID): void
     {
@@ -860,16 +874,19 @@ class ProcessReleases
         }
 
         $deleted = 0;
-        $deleteQuery = DB::delete(
-            sprintf(
-                '
+        $deleteQuery = DB::transaction(function (){
+            DB::delete(
+                sprintf(
+                    '
 				DELETE c
 				FROM %s c
 				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
-                $this->tables['cname'],
-                Settings::settingValue('..partretentionhours')
-            )
-        );
+                    $this->tables['cname'],
+                    Settings::settingValue('..partretentionhours')
+                )
+            );
+        }, 3);
+
 
         if ($deleteQuery > 0) {
             $deleted = $deleteQuery;
@@ -896,19 +913,22 @@ class ProcessReleases
             }
 
             $deleted = 0;
-            $deleteQuery = DB::delete(
-                sprintf(
-                    '
+            $deleteQuery = DB::transaction(function (){
+                DB::delete(
+                    sprintf(
+                        '
 					DELETE c, b, p
 					FROM %s c
 					LEFT JOIN %s b ON c.id = b.collections_id
 					LEFT JOIN %s p ON b.id = p.binaries_id
 					WHERE (b.id IS NULL OR p.binaries_id IS NULL)',
-                    $this->tables['cname'],
-                    $this->tables['bname'],
-                    $this->tables['pname']
-                )
-            );
+                        $this->tables['cname'],
+                        $this->tables['bname'],
+                        $this->tables['pname']
+                    )
+                );
+            }, 3);
+
 
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
@@ -931,19 +951,22 @@ class ProcessReleases
             }
 
             $deleted = 0;
-            $deleteQuery = DB::delete(
-                sprintf(
-                    'DELETE b, p FROM %s b
+            $deleteQuery = DB::transaction(function (){
+                DB::delete(
+                    sprintf(
+                        'DELETE b, p FROM %s b
 					LEFT JOIN %s p ON b.id = p.binaries_id
 					LEFT JOIN %s c ON b.collections_id = c.id
 					WHERE (p.binaries_id IS NULL OR c.id IS NULL)
 					AND b.id < %d',
-                    $this->tables['bname'],
-                    $this->tables['pname'],
-                    $this->tables['cname'],
-                    $this->maxQueryFormulator($this->tables['bname'], 20000)
-                )
-            );
+                        $this->tables['bname'],
+                        $this->tables['pname'],
+                        $this->tables['cname'],
+                        $this->maxQueryFormulator($this->tables['bname'], 20000)
+                    )
+                );
+            }, 3);
+
 
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
@@ -965,19 +988,22 @@ class ProcessReleases
                 echo ColorCLI::primary('Deleting orphaned parts with no binaries.');
             }
             $deleted = 0;
-            $deleteQuery = DB::delete(
-                sprintf(
-                    '
+            $deleteQuery = DB::transaction(function (){
+                DB::delete(
+                    sprintf(
+                        '
 					DELETE p
 					FROM %s p
 					LEFT JOIN %s b ON p.binaries_id = b.id
 					WHERE b.id IS NULL
 					AND p.binaries_id < %d',
-                    $this->tables['pname'],
-                    $this->tables['bname'],
-                    $this->maxQueryFormulator($this->tables['bname'], 20000)
-                )
-            );
+                        $this->tables['pname'],
+                        $this->tables['bname'],
+                        $this->maxQueryFormulator($this->tables['bname'], 20000)
+                    )
+                );
+            }, 3);
+
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
                 $deletedCount += $deleted;
@@ -1014,7 +1040,8 @@ class ProcessReleases
 
         foreach ($collections as $collection) {
             $deleted++;
-            DB::delete(
+            DB::transaction(function () use ($collection) {
+                DB::delete(
                     sprintf(
                         '
 						DELETE c
@@ -1024,6 +1051,7 @@ class ProcessReleases
                         $collection->id
                     )
                 );
+            }, 3);
         }
         $deletedCount += $deleted;
 
@@ -1638,24 +1666,28 @@ class ProcessReleases
      *
      * @void
      * @throws \Exception
+     * @throws \Throwable
      */
     private function processStuckCollections($where): void
     {
         $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 
-        $obj = DB::delete(
-            sprintf(
-                "
+        $obj = DB::transaction(function () use ($where, $lastRun) {
+            DB::delete(
+                sprintf(
+                    "
                 DELETE c FROM %s c
                 WHERE
                     c.added <
                     DATE_SUB({$this->pdo->quote($lastRun)}, INTERVAL %d HOUR)
                 %s",
-                $this->tables['cname'],
-                $this->collectionTimeout,
-                $where
-            )
-        );
+                    $this->tables['cname'],
+                    $this->collectionTimeout,
+                    $where
+                )
+            );
+        }, 3);
+
         if ($this->echoCLI && $obj > 0) {
             ColorCLI::doEcho(
                 ColorCLI::primary('Deleted '.$obj.' broken/stuck collections.'),

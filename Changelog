@@ -1,3 +1,5 @@
+2018-08-08 DariusIII
+	* Chg: Wrap delete queries into transaction to prevent deadlock error messages
 2018-08-07 DariusIII
 	* Fix: Properly send lastInsertId when adding a movie to movieinfo table
 	* Chg: Use can instead of long hasPermissionTo

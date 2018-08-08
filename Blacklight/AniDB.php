@@ -79,13 +79,14 @@ class AniDB
     }
 
     /**
-     * Deletes stored AniDB entries in the database.
+     * @param $anidbID
      *
-     * @param int $anidbID
+     * @throws \Throwable
      */
     public function deleteTitle($anidbID): void
     {
-        DB::delete(
+        DB::transaction(function () use ($anidbID) {
+            DB::delete(
             sprintf(
                 '
 				DELETE at, ai, ae
@@ -95,7 +96,8 @@ class AniDB
 				WHERE anidbid = %d',
                 $anidbID
             )
-        );
+        );}, 3);
+
     }
 
     /**

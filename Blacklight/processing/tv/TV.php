@@ -339,22 +339,25 @@ abstract class TV extends Videos
      *
      * @param $id
      *
-     * @return int
+     * @return mixed
+     * @throws \Throwable
      */
     public function delete($id)
     {
-        return DB::delete(
-            sprintf(
-                '
+        return DB::transaction(function () use ($id) {
+            DB::delete(
+                sprintf(
+                    '
 				DELETE v, tvi, tve, va
 				FROM videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
 				LEFT JOIN videos_aliases va ON v.id = va.videos_id
 				WHERE v.id = %d',
-                $id
-            )
-        );
+                    $id
+                )
+            );
+        } , 3);
     }
 
     /**
