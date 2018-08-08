@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\UserRequest.
@@ -112,6 +112,5 @@ class UserRequest extends Model
                 self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
             }
         }, 3);
-
     }
 }

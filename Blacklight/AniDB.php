@@ -96,8 +96,8 @@ class AniDB
 				WHERE anidbid = %d',
                 $anidbID
             )
-        );}, 3);
-
+        );
+        }, 3);
     }
 
     /**
