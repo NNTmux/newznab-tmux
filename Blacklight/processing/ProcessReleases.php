@@ -874,7 +874,7 @@ class ProcessReleases
         }
 
         $deleted = 0;
-        $deleteQuery = DB::transaction(function (){
+        $deleteQuery = DB::transaction(function () {
             DB::delete(
                 sprintf(
                     '
@@ -886,7 +886,6 @@ class ProcessReleases
                 )
             );
         }, 3);
-
 
         if ($deleteQuery > 0) {
             $deleted = $deleteQuery;
@@ -913,7 +912,7 @@ class ProcessReleases
             }
 
             $deleted = 0;
-            $deleteQuery = DB::transaction(function (){
+            $deleteQuery = DB::transaction(function () {
                 DB::delete(
                     sprintf(
                         '
@@ -928,7 +927,6 @@ class ProcessReleases
                     )
                 );
             }, 3);
-
 
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
@@ -951,7 +949,7 @@ class ProcessReleases
             }
 
             $deleted = 0;
-            $deleteQuery = DB::transaction(function (){
+            $deleteQuery = DB::transaction(function () {
                 DB::delete(
                     sprintf(
                         'DELETE b, p FROM %s b
@@ -966,7 +964,6 @@ class ProcessReleases
                     )
                 );
             }, 3);
-
 
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
@@ -988,7 +985,7 @@ class ProcessReleases
                 echo ColorCLI::primary('Deleting orphaned parts with no binaries.');
             }
             $deleted = 0;
-            $deleteQuery = DB::transaction(function (){
+            $deleteQuery = DB::transaction(function () {
                 DB::delete(
                     sprintf(
                         '

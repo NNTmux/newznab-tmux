@@ -1241,7 +1241,8 @@ class Binaries
                 $this->_partRepairMaxTries,
                 $groupArr['id']
             )
-        );}, 3);
+        );
+        }, 3);
     }
 
     /**
@@ -1470,7 +1471,6 @@ class Binaries
         DB::transaction(function () use ($groupID, $sql) {
             DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
         }, 3);
-
     }
 
     /**
@@ -1667,7 +1667,6 @@ class Binaries
         DB::transaction(function () use ($collectionID) {
             DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
         }, 3);
-
     }
 
     /**
