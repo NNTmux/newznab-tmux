@@ -1,4 +1,5 @@
 2018-08-08 DariusIII
+	* Chg: Catch QueryExceptions in Binaries class and send them to log
 	* Chg: Wrap delete queries into transaction to prevent deadlock error messages
 2018-08-07 DariusIII
 	* Fix: Properly send lastInsertId when adding a movie to movieinfo table

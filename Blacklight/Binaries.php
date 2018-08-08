@@ -4,12 +4,14 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Settings;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Blacklight\processing\ProcessReleasesMultiGroup;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Binaries.
@@ -880,6 +882,8 @@ class Binaries
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
 
                         $collectionID = $this->_pdo->lastInsertId();
+                    } catch (QueryException $e) {
+                        Log::error($e->getMessage());
                     } catch (\PDOException $e) {
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
@@ -914,6 +918,8 @@ class Binaries
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
+                } catch (QueryException $e) {
+                    Log::error($e->getMessage());
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
