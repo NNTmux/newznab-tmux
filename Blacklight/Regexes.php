@@ -168,7 +168,6 @@ class Regexes
         DB::transaction(function () use ($id) {
             DB::delete(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
         }, 3);
-
     }
 
     /**

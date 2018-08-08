@@ -357,7 +357,7 @@ abstract class TV extends Videos
                     $id
                 )
             );
-        } , 3);
+        }, 3);
     }
 
     /**
