@@ -1,4 +1,5 @@
 2018-08-08 DariusIII
+	* Chg: Update dariusiii/rarinfo to version 2.6.0
 	* Chg: Wrap ReleaseFile model addReleaseFiles function query into try catch block
 	* Chg: Catch QueryExceptions in Binaries class and send them to log
 	* Chg: Wrap delete queries into transaction to prevent deadlock error messages
