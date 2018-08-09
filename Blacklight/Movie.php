@@ -1057,7 +1057,7 @@ class Movie
             // If set, scan for imdb info.
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
-                if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
+                if ($movCheck === null || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
                     $info = $this->updateMovieInfo($imdbID);
                     if ($info === false) {
                         Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
