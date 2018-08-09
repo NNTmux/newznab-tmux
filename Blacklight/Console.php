@@ -181,7 +181,7 @@ class Console
 					%s %s %s
 					GROUP BY con.id
 					ORDER BY %s %s %s",
-            Releases::showPasswords(),
+            (new Releases())->showPasswords(),
             $browseBy,
             $catsrch,
             $exccatlist,

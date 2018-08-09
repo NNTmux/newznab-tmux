@@ -173,7 +173,7 @@ class Books
 				%s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
-            Releases::showPasswords(),
+            (new Releases())->showPasswords(),
             $browseby,
             $catsrch,
             $exccatlist,

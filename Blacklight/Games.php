@@ -249,7 +249,7 @@ class Games
 				%s %s %s %s
 				GROUP BY gi.id
 				ORDER BY %s %s %s",
-                Releases::showPasswords(),
+                (new Releases())->showPasswords(),
                 $browseBy,
                 $catsrch,
                 $maxAge,
