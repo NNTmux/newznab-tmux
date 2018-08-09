@@ -37,11 +37,6 @@ class Releases
     public $sphinxSearch;
 
     /**
-     * @var string
-     */
-    public $showPasswords;
-
-    /**
      * @var int
      */
     public $passwordStatus;
@@ -61,7 +56,6 @@ class Releases
 
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch();
-        $this->showPasswords = self::showPasswords();
     }
 
     /**
@@ -111,7 +105,7 @@ class Releases
 			GROUP BY r.id
 			ORDER BY %8\$s %9\$s",
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
@@ -157,7 +151,7 @@ class Releases
 				%s %s %s %s',
             ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->quote($groupName)) : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
@@ -177,14 +171,14 @@ class Releases
     /**
      * @return string
      */
-    public static function showPasswords()
+    public function showPasswords()
     {
         $setting = (int) Settings::settingValue('..showpasswordedrelease');
         $setting = $setting ?? 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
-                    return '='.self::PASSWD_NONE;
+                    return '= '.self::PASSWD_NONE;
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
 
                     return '<= '.self::PASSWD_POTENTIAL;
@@ -421,7 +415,7 @@ class Releases
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
-                $this->showPasswords,
+                $this->showPasswords(),
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
                 $orderBy[0],
                 $orderBy[1],
@@ -465,7 +459,7 @@ class Releases
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
-                $this->showPasswords,
+                $this->showPasswords(),
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
             )
         );
@@ -639,7 +633,7 @@ class Releases
         $whereSql = sprintf(
             '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s',
             $this->releaseSearch->getFullTextJoinString(),
-            $this->showPasswords,
+            $this->showPasswords(),
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
@@ -731,7 +725,7 @@ class Releases
         $whereSql = sprintf(
             '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
             $this->releaseSearch->getFullTextJoinString(),
-            $this->showPasswords,
+            $this->showPasswords(),
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
@@ -865,7 +859,7 @@ class Releases
 			%s %s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             Category::getCategorySearch($cat),
@@ -1003,7 +997,7 @@ class Releases
 			%s %s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             Category::getCategorySearch($cat),
@@ -1072,7 +1066,7 @@ class Releases
 			AND r.nzbstatus = %d
 			%s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-            $this->showPasswords,
+            $this->showPasswords(),
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
@@ -1144,7 +1138,7 @@ class Releases
 			%s %s %s %s %s %s %s',
             $name !== '' ? $this->releaseSearch->getFullTextJoinString() : '',
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             $name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : '',
             ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',

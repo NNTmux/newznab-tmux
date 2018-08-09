@@ -86,7 +86,7 @@ class XXX
         $this->pdo = DB::connection()->getPdo();
 
         $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
-        $this->showPasswords = Releases::showPasswords();
+        $this->showPasswords = (new Releases())->showPasswords();
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->imgSavePath = NN_COVERS.'xxx'.DS;
         $this->cookie = NN_TMP.'xxx.cookie';
