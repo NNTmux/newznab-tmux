@@ -15,7 +15,6 @@ $count = $movies->count();
 if ($count > 0) {
     echo ColorCLI::primary('Updating '.number_format($count).' movies for TraktTV id.');
     foreach ($movies as $mov) {
-        $startTime = microtime(true);
         $traktTv = new TraktTv(['Settings' => null]);
         $traktmovie = $traktTv->client->movieSummary('tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT), 'full');
         if ($traktmovie !== false) {

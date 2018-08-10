@@ -1,4 +1,5 @@
 2018-08-10 DariusIII
+	* Chg: Update Movie class and remove getTraktData script from tmux loop
 	* Chg: Add ssl options to stream_context_create in saveImage function
 	* Chg: Change handling of TVDB poster image downloads, try to fix authorization to url
 	* Chg: Use less greedy parts of regexes and fix PHPDOC blocks for $release variable in functions in NameFixer class

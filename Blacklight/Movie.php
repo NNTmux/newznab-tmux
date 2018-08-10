@@ -612,53 +612,53 @@ class Movie
         }
 
         // Check TMDB for IMDB info.
-        $tmdb = $this->fetchTMDBProperties($imdbId);
+        $tmdb = $this->fetchTMDBProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         // Check IMDB for movie info.
-        $imdb = $this->fetchIMDBProperties($imdbId);
+        $imdb = $this->fetchIMDBProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         // Check TRAKT for movie info
-        $trakt = $this->fetchTraktTVProperties($imdbId);
+        $trakt = $this->fetchTraktTVProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         // Check OMDb for movie info
-        $omdb = $this->fetchOmdbAPIProperties($imdbId);
+        $omdb = $this->fetchOmdbAPIProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
         if (! $imdb && ! $tmdb && ! $trakt && ! $omdb) {
             return false;
         }
 
         // Check FanArt.tv for cover and background images.
-        $fanart = $this->fetchFanartTVProperties($imdbId);
+        $fanart = $this->fetchFanartTVProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         $mov = [];
 
         $mov['cover'] = $mov['backdrop'] = $mov['banner'] = 0;
         $mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
-        $mov['imdbid'] = $imdbId;
+        $mov['imdbid'] = str_pad($imdbId, 7, '0', STR_PAD_LEFT);
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
         if (! empty($fanart['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $fanart['cover'], $this->imgSavePath);
         } elseif (! empty($tmdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $tmdb['cover'], $this->imgSavePath);
         } elseif (! empty($imdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $imdb['cover'], $this->imgSavePath);
         } elseif (! empty($omdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $omdb['cover'], $this->imgSavePath);
         }
 
         // Backdrops.
         if (! empty($fanart['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
+            $mov['backdrop'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
         } elseif (! empty($tmdb['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
+            $mov['backdrop'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
         }
 
         // Banner
         if (! empty($fanart['banner'])) {
-            $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
+            $mov['banner'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
         // RottenTomatoes rating from OmdbAPI
