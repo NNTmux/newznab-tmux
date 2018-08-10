@@ -121,7 +121,6 @@ class ReleaseImage
         return $img;
     }
 
-
     /**
      * Save an image to disk, optionally resizing it.
      *
