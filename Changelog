@@ -1,4 +1,5 @@
 2018-08-10 DariusIII
+	* Fix: Fix check_covers.php
 	* Chg: Try to properly set poster/fanart URL for TheTVDB
 	* Chg: Update Movie class and remove getTraktData script from tmux loop
 	* Chg: Add ssl options to stream_context_create in saveImage function

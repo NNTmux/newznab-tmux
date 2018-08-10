@@ -11,7 +11,6 @@ use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
-$pdo = DB::connection()->getPdo();
 $movie = new Movie(['Echo' => true]);
 
 $row = Settings::settingValue('site.main.coverspath');
@@ -30,27 +29,26 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $limit = $argv[2];
     }
     echo ColorCLI::header('Scanning for releases missing covers');
-    $res = $pdo->query('SELECT r.id, r.imdbid
+    $res = DB::select('SELECT r.id, r.imdbid
 								FROM releases r
 								LEFT JOIN movieinfo m ON m.imdbid = r.imdbid
 								WHERE nzbstatus = 1 AND m.cover = 1 AND adddate >  (NOW() - INTERVAL 5 HOUR)');
-    if ($res instanceof \Traversable) {
-        foreach ($res as $row) {
-            $nzbpath = $path2cover.$row['imdbid'].'-cover.jpg';
-            if (! file_exists($nzbpath)) {
-                $counterfixed++;
-                echo ColorCLI::warning('Missing cover '.$nzbpath);
-                if ($argv[1] === 'true') {
-                    $cover = $movie->updateMovieInfo($row['imdbid']);
-                    if ($cover === false || ! file_exists($nzbpath)) {
-                        $pdo->exec('UPDATE movieinfo m SET m.cover = 0 WHERE m.imdbid = %d', $row['imdbid']);
-                    }
+
+    foreach ($res as $row) {
+        $nzbpath = $path2cover.$row->imdbid.'-cover.jpg';
+        if (! file_exists($nzbpath)) {
+            $counterfixed++;
+            echo ColorCLI::warning('Missing cover '.$nzbpath);
+            if ($argv[1] === 'true') {
+                $cover = $movie->updateMovieInfo($row->imdbid);
+                if ($cover === false || ! file_exists($nzbpath)) {
+                    DB::update(sprintf('UPDATE movieinfo m SET m.cover = 0 WHERE m.imdbid = %d', $row->imdbid));
                 }
             }
+        }
 
-            if (($limit > 0) && ($counterfixed >= $limit)) {
-                break;
-            }
+        if (($limit > 0) && ($counterfixed >= $limit)) {
+            break;
         }
     }
     echo ColorCLI::header('Total releases missing covers that '.$couldbe.'their covers fixed = '.number_format($counterfixed));
