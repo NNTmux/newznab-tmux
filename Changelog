@@ -1,3 +1,5 @@
+2018-08-10 DariusIII
+	* Chg: Use less greedy parts of regexes and fix PHPDOC blocks for $release variable in functions in NameFixer class
 2018-08-09 DariusIII
 	* Chg: Update TinyMCE and laravel/framework to latest versions
 	* Fix: Fix errors related to showPasswords function change
