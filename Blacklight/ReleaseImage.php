@@ -87,16 +87,20 @@ class ReleaseImage
                     false,
                     stream_context_create(
                     [
-                    'http' => [
-                        'method' => 'GET',
-                        'header' => [
-                            'Accept-language: en',
-                            'User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
-                            'Authorization: Bearer '.$token,
+                        'ssl' => [
+                            'verify_peer'      => false,
+                            'verify_peer_name' => false,
+                        ],
+                        'http' => [
+                            'method' => 'GET',
+                            'header' => [
+                                'Accept-language: en',
+                                'User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
+                                'Authorization: Bearer '.$token,
+                                ],
                             ],
-                    ],
-                ]
-                )
+                        ]
+                    )
                 );
             } else {
                 $file_data = $imgLoc;
