@@ -28,7 +28,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     if (isset($argv[2]) && is_numeric($argv[2])) {
         $limit = $argv[2];
     }
-    echo ColorCLI::header('Scanning for releases missing covers');
+    ColorCLI::doEcho(ColorCLI::header('Scanning for releases missing covers'), true);
     $res = DB::select('SELECT r.id, r.imdbid
 								FROM releases r
 								LEFT JOIN movieinfo m ON m.imdbid = r.imdbid
@@ -38,7 +38,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $nzbpath = $path2cover.$row->imdbid.'-cover.jpg';
         if (! file_exists($nzbpath)) {
             $counterfixed++;
-            echo ColorCLI::warning('Missing cover '.$nzbpath);
+            ColorCLI::doEcho(ColorCLI::warning('Missing cover '.$nzbpath), true);
             if ($argv[1] === 'true') {
                 $cover = $movie->updateMovieInfo($row->imdbid);
                 if ($cover === false || ! file_exists($nzbpath)) {
@@ -51,7 +51,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
             break;
         }
     }
-    echo ColorCLI::header('Total releases missing covers that '.$couldbe.'their covers fixed = '.number_format($counterfixed));
+    ColorCLI::doEcho(ColorCLI::header('Total releases missing covers that '.$couldbe.'their covers fixed = '.number_format($counterfixed)), true);
 } else {
     exit(ColorCLI::header("\nThis script checks if release covers actually exist on disk.\n\n"
         ."Releases without covers may be reset for post-processing, thus regenerating them and related meta data.\n\n"
