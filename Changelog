@@ -1,4 +1,5 @@
 2018-08-10 DariusIII
+	* Chg: Restore fethcImage function in ReleaseImage class
 	* Chg: Update output of check_covers.php
 	* Fix: Fix check_covers.php
 	* Chg: Try to properly set poster/fanart URL for TheTVDB

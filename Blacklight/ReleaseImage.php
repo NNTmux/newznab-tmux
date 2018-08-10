@@ -65,6 +65,64 @@ class ReleaseImage
     }
 
     /**
+     * @param        $imgLoc
+     * @param string $token
+     *
+     * @return bool|\Intervention\Image\Image
+     */
+    protected function fetchImage($imgLoc, $token = '')
+    {
+        try {
+            if ($token !== '') {
+                $file_data = file_get_contents(
+                    $imgLoc,
+                    false,
+                    stream_context_create(
+                        [
+                            'ssl' => [
+                                'verify_peer'      => false,
+                                'verify_peer_name' => false,
+                            ],
+                            'http' => [
+                                'method' => 'GET',
+                                'header' => [
+                                    'Accept-language: en',
+                                    'User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
+                                    'Authorization: Bearer '.$token,
+                                ],
+                            ],
+                        ]
+                    )
+                );
+            } else {
+                $file_data = $imgLoc;
+            }
+            $img = Image::make($file_data);
+        } catch (NotFoundException $e) {
+            if ($e->getCode() === 404) {
+                ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
+            } elseif ($e->getCode() === 503) {
+                ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
+            } else {
+                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
+            }
+
+            $img = false;
+        } catch (NotReadableException $e) {
+            ColorCLI::doEcho(ColorCLI::notice($e->getMessage()), true);
+
+            $img = false;
+        } catch (ImageException $e) {
+            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
+
+            $img = false;
+        }
+
+        return $img;
+    }
+
+
+    /**
      * Save an image to disk, optionally resizing it.
      *
      * @param string $imgName      What to name the new image.
@@ -80,51 +138,7 @@ class ReleaseImage
      */
     public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false, $token = ''): int
     {
-        try {
-            if ($token !== '') {
-                $file_data = file_get_contents(
-                    $imgLoc,
-                    false,
-                    stream_context_create(
-                    [
-                        'ssl' => [
-                            'verify_peer'      => false,
-                            'verify_peer_name' => false,
-                        ],
-                        'http' => [
-                            'method' => 'GET',
-                            'header' => [
-                                'Accept-language: en',
-                                'User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
-                                'Authorization: Bearer '.$token,
-                                ],
-                            ],
-                        ]
-                    )
-                );
-            } else {
-                $file_data = $imgLoc;
-            }
-            $cover = Image::make($file_data);
-        } catch (NotFoundException $e) {
-            if ($e->getCode() === 404) {
-                ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
-            } elseif ($e->getCode() === 503) {
-                ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
-            } else {
-                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
-            }
-
-            $cover = false;
-        } catch (NotReadableException $e) {
-            ColorCLI::doEcho(ColorCLI::notice($e->getMessage()), true);
-
-            $cover = false;
-        } catch (ImageException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
-
-            $cover = false;
-        }
+        $cover = $this->fetchImage($imgLoc, $token);
 
         if ($cover === false) {
             return 0;
