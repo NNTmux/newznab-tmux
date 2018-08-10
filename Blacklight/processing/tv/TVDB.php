@@ -332,11 +332,11 @@ class TVDB extends TV
         $ri = new ReleaseImage();
 
         // Try to get the Poster
-        $hasCover = $ri->saveImage($videoId, sprintf($this->posterUrl, $showId), $this->imgSavePath);
+        $hasCover = $ri->saveImage($videoId, sprintf($this->posterUrl, $showId), $this->imgSavePath, '', '', false, $this->token);
 
         // Couldn't get poster, try fan art instead
         if ($hasCover !== 1) {
-            $hasCover = $ri->saveImage($videoId, sprintf($this->fanartUrl, $showId), $this->imgSavePath);
+            $hasCover = $ri->saveImage($videoId, sprintf($this->fanartUrl, $showId), $this->imgSavePath, '', '', false, $this->token);
         }
         // Mark it retrieved if we saved an image
         if ($hasCover === 1) {

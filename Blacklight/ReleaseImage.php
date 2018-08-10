@@ -2,7 +2,8 @@
 
 namespace Blacklight;
 
-use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotFoundException;
@@ -64,37 +65,6 @@ class ReleaseImage
     }
 
     /**
-     * @param $imgLoc
-     * @return bool|\Intervention\Image\Image
-     */
-    protected function fetchImage($imgLoc)
-    {
-        try {
-            $img = (new ImageManager())->make($imgLoc);
-        } catch (NotFoundException $e) {
-            if ($e->getCode() === 404) {
-                ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
-            } elseif ($e->getCode() === 503) {
-                ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
-            } else {
-                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
-            }
-
-            return false;
-        } catch (NotReadableException $e) {
-            ColorCLI::doEcho(ColorCLI::notice($e->getMessage()), true);
-
-            return false;
-        } catch (ImageException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
-
-            return false;
-        }
-
-        return $img;
-    }
-
-    /**
      * Save an image to disk, optionally resizing it.
      *
      * @param string $imgName      What to name the new image.
@@ -104,12 +74,54 @@ class ReleaseImage
      * @param string $imgMaxHeight Max height to resize image to.  (OPTIONAL)
      * @param bool   $saveThumb    Save a thumbnail of this image? (OPTIONAL)
      *
+     * @param string $token
+     *
      * @return int 1 on success, 0 on failure Used on site to check if there is an image.
      */
-    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false): int
+    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false, $token = ''): int
     {
-        // Try to get the image as a string.
-        $cover = $this->fetchImage($imgLoc);
+        try {
+            if ($token !== '') {
+                $file_data = file_get_contents(
+                    $imgLoc,
+                    false,
+                    stream_context_create(
+                    [
+                    'http' => [
+                        'method' => 'GET',
+                        'header' => [
+                            'Accept-language: en',
+                            'User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
+                            'Authorization: Bearer '.$token,
+                            ],
+                    ],
+                ]
+                )
+                );
+            } else {
+                $file_data = $imgLoc;
+            }
+            $cover = Image::make($file_data);
+        } catch (NotFoundException $e) {
+            if ($e->getCode() === 404) {
+                ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
+            } elseif ($e->getCode() === 503) {
+                ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
+            } else {
+                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
+            }
+
+            $cover = false;
+        } catch (NotReadableException $e) {
+            ColorCLI::doEcho(ColorCLI::notice($e->getMessage()), true);
+
+            $cover = false;
+        } catch (ImageException $e) {
+            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
+
+            $cover = false;
+        }
+
         if ($cover === false) {
             return 0;
         }
@@ -138,7 +150,7 @@ class ReleaseImage
             return 0;
         }
         // Check if it's on the drive.
-        if (! is_file($coverPath)) {
+        if (! File::isReadable($coverPath)) {
             return 0;
         }
 
