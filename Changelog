@@ -1,3 +1,5 @@
+2018-08-11 DariusIII
+	* Chg: Update yab/laravel-scout-mysql-driver and psy/psysh to latest versions
 2018-08-10 DariusIII
 	* Chg: Restore fethcImage function in ReleaseImage class
 	* Chg: Update output of check_covers.php
