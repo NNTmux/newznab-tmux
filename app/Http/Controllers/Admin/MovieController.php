@@ -56,6 +56,7 @@ class MovieController extends BasePageController
             if ($movie->updateMovieInfo($id) === true && ($movCheck === null || ($request->has('update') && $request->input('update') === 1))) {
                 return redirect('admin/movie-list');
             }
+
             return redirect('admin/movie-list');
         }
 
