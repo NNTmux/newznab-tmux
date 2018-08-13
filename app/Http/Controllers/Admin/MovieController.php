@@ -92,8 +92,8 @@ class MovieController extends BasePageController
             $id = $request->input('id');
             $mov = $movie->getMovieInfo($id);
 
-            if (! $mov) {
-                $this->show404();
+            if ($mov === null) {
+                abort(404, 'Movie you requested does not exist in database');
             }
 
             switch ($action) {
