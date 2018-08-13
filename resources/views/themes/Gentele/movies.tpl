@@ -107,6 +107,11 @@
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
+                                                    {if (!empty($result->tmdbid))}
+                                                        <a class="label label-primary" rel="tmdb" target="_blank"
+                                                           href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
+                                                           name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
+                                                    {/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															title="View NFO" class="modal_nfo label label-primary"
@@ -247,6 +252,11 @@
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
+                                                    {if (!empty($result->tmdbid))}
+                                                        <a class="label label-primary" rel="tmdb" target="_blank"
+                                                           href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
+                                                           name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
+                                                    {/if}
 													{if $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 																title="View NFO" class="modal_nfo label label-primary">NFO</a>

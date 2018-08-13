@@ -29,6 +29,11 @@
 					<a class="btn btn-transparent btn-primary" target="_blank"
 					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 					   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page" rel="trakt">TRAKT</a>
+                    {if (!empty($result->tmdbid))}
+                        <a class="btn btn-transparent btn-primary" target="_blank"
+                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
+                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
+                    {/if}
 					<h4>{if $result->genre != ''}{$result->genre|replace:"|":" / "}{/if}</h4>
 					{if $result->tagline != ''}
 						<p class="lead" style="margin-right:300px;">"{$result->tagline|escape:"htmlall"}"</p>
