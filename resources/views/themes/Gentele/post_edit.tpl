@@ -4,7 +4,7 @@
 			<h3 id="myLabel">Edit Post</h3>
 		</div>
 		<div class="body">
-            {{Form::open(['id' => 'forum-post-edit', 'class' => 'form-horizontal'])}}
+            {{Form::open(['id' => 'forum-post-edit', 'class' => 'form-horizontal', 'url' => "forumpost/{$result.id}"])}}
 				<div class="control-group">
 					<label class="control-label" for="addMessage">Edit Post</label>
 					<div class="controls">
