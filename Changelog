@@ -1,4 +1,5 @@
 2018-08-13 DariusIII
+	* Chg: Update Admin/MovieController to properly do movie updates when click on update button.
 	* Chg: Update regexes in CollectionsCleaning to use less greedy parts
 	* Chg: Use less greedy parts of regexes in Books class
 	* Fix: Fix editing of forum posts
