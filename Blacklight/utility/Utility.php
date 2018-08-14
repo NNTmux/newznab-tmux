@@ -7,6 +7,7 @@ use Blacklight\ColorCLI;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\Process\Process;
 
 /**
  * Class Utility.
@@ -120,7 +121,7 @@ class Utility
             switch (true) {
                 case ! $options['dir'] && $fileInfo->isDir():
                     break;
-                case ! empty($options['ext']) && $fileInfo->getExtension() != $options['ext']:
+                case ! empty($options['ext']) && $fileInfo->getExtension() !== $options['ext']:
                     break;
                 case empty($options['regex']) || ! preg_match($options['regex'], $file):
                     break;
@@ -141,16 +142,16 @@ class Utility
     {
         $ignoredThemes = ['admin', 'shared'];
         $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
-        $themelist[] = 'None';
+        $themeList[] = 'None';
         foreach ($themes as $theme) {
             if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && is_dir(base_path().'/resources/views/themes/'.$theme)) {
-                $themelist[] = $theme;
+                $themeList[] = $theme;
             }
         }
 
-        sort($themelist);
+        sort($themeList);
 
-        return $themelist;
+        return $themeList;
     }
 
     /**
@@ -173,11 +174,16 @@ class Utility
      *
      * @return bool
      */
-    public static function isCLI()
+    public static function isCLI(): bool
     {
         return strtolower(PHP_SAPI) === 'cli';
     }
 
+    /**
+     * @param $filename
+     *
+     * @return bool|null|string
+     */
     public static function isGZipped($filename)
     {
         $gzipped = null;
@@ -589,7 +595,7 @@ class Utility
      * @return string File info. Empty string on failure.
      * @throws \Exception
      */
-    public static function fileInfo($path)
+    public static function fileInfo($path): string
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
         if ($magicPath !== null && self::hasCommand('file')) {
@@ -629,7 +635,7 @@ class Utility
      *
      * @return bool
      */
-    public function checkStatus($code)
+    public function checkStatus($code): bool
     {
         return $code === 0;
     }
@@ -699,25 +705,26 @@ class Utility
     /**
      * Run CLI command.
      *
+     *
      * @param string $command
-     * @param bool   $debug
+     * @param bool $debug
      *
      * @return array
      */
-    public static function runCmd($command, $debug = false)
+    public static function runCmd($command, $debug = false): array
     {
-        $nl = PHP_EOL;
 
         if ($debug) {
-            echo '-Running Command: '.$nl.'   '.$command.$nl;
+            echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
         }
 
         $output = [];
-        $status = 1;
-        @exec($command, $output, $status);
+        $process = new Process($command);
+        $process->run();
+        $output[] = $process->getOutput();
 
         if ($debug) {
-            echo '-Command Output: '.$nl.'   '.implode($nl.'  ', $output).$nl;
+            echo '-Command Output: '.PHP_EOL.'   '.implode(PHP_EOL.'  ', $output).PHP_EOL;
         }
 
         return $output;
@@ -730,7 +737,7 @@ class Utility
      *
      * @return string
      */
-    public static function safeFilename($filename)
+    public static function safeFilename($filename): string
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
     }
