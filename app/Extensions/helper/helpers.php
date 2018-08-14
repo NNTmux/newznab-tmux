@@ -234,6 +234,7 @@ if (! function_exists('makeFieldLinks')) {
                 $hex = dechex($last).$hex;
                 $dec = bcdiv(bcsub($dec, $last), 16);
             } while ($dec > 0);
+
             return $hex;
         }
     }
