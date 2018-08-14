@@ -1,4 +1,5 @@
 2018-08-14 DariusIII
+	* Chg: Update imdbphp/imdbphp to latest commit
 	* Chg: Recreate release_unique table, alter classes for new table
 	* Chg: Revert runCmd function
 	* Chg: Update Utility class, use Symfony Process class in runCmd function, declare return types where needed
