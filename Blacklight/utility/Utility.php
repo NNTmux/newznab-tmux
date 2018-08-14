@@ -7,6 +7,7 @@ use Blacklight\ColorCLI;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\Process\Process;
 
 /**
  * Class Utility.
@@ -717,8 +718,9 @@ class Utility
         }
 
         $output = [];
-        $status = 1;
-        @exec($command, $output, $status);
+        $process = new Process($command);
+        $process->run();
+        $output[] = $process->getOutput();
 
         if ($debug) {
             echo '-Command Output: '.PHP_EOL.'   '.implode(PHP_EOL.'  ', $output).PHP_EOL;
