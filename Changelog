@@ -1,3 +1,5 @@
+2018-08-14 DariusIII
+	* Chg: Update ReleaseExtra class, add MediaInfo 18 support
 2018-08-13 DariusIII
 	* Fix: Fix imdbid used in admin/movie-list
 	* Chg: Update Admin/MovieController to properly do movie updates when click on update button.

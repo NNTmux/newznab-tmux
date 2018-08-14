@@ -3,11 +3,11 @@
 namespace Blacklight;
 
 use App\Models\AudioData;
-use App\Models\VideoData;
-use App\Models\ReleaseUnique;
-use App\Models\ReleaseSubtitle;
-use Blacklight\utility\Utility;
 use App\Models\ReleaseExtraFull;
+use App\Models\ReleaseSubtitle;
+use App\Models\ReleaseUnique;
+use App\Models\VideoData;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
 class ReleaseExtra
@@ -76,6 +76,7 @@ class ReleaseExtra
 
     /**
      * @param $id
+     *
      * @return array|false
      */
     public function getVideo($id)
@@ -91,6 +92,7 @@ class ReleaseExtra
 
     /**
      * @param $id
+     *
      * @return array|false
      */
     public function getAudio($id)
@@ -111,11 +113,7 @@ class ReleaseExtra
      */
     public function getSubs($id)
     {
-        return ReleaseSubtitle::query()
-            ->where('releases_id', $id)
-            ->select([DB::raw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")])
-            ->orderBy('subsid')
-            ->first();
+        return ReleaseSubtitle::query()->where('releases_id', $id)->select([DB::raw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")])->orderBy('subsid')->first();
     }
 
     /**
@@ -125,9 +123,7 @@ class ReleaseExtra
      */
     public function getBriefByGuid($guid): array
     {
-        return DB::select(
-            sprintf(
-                "SELECT containerformat, videocodec, videoduration, videoaspect,
+        return DB::select(sprintf("SELECT containerformat, videocodec, videoduration, videoaspect,
                         CONCAT(video_data.videowidth,'x',video_data.videoheight,' @',format(videoframerate,0),'fps') AS size,
                         GROUP_CONCAT(DISTINCT audio_data.audiolanguage SEPARATOR ', ') AS audio,
                         GROUP_CONCAT(DISTINCT audio_data.audioformat,' (',SUBSTRING(audio_data.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat,
@@ -138,10 +134,7 @@ class ReleaseExtra
                         LEFT OUTER JOIN audio_data ON video_data.releases_id = audio_data.releases_id
                         INNER JOIN releases r ON r.id = video_data.releases_id
                         WHERE r.guid = %s
-                        GROUP BY r.id LIMIT 1",
-                $this->pdo->quote($guid)
-            )
-        );
+                        GROUP BY r.id LIMIT 1", $this->pdo->quote($guid)));
     }
 
     /**
@@ -168,172 +161,369 @@ class ReleaseExtra
      * @param $releaseID
      * @param $xml
      */
-    public function addFromXml($releaseID, $xml)
+    public function addFromXml($releaseID, $xml): void
     {
         $xmlObj = @simplexml_load_string($xml);
         $arrXml = Utility::objectsIntoArray($xmlObj);
-        $containerformat = '';
-        $overallbitrate = '';
+        $containerFormat = '';
+        $overallBitRate = '';
 
-        if (isset($arrXml['File']['track'])) {
-            foreach ($arrXml['File']['track'] as $track) {
-                if (isset($track['@attributes']['type'])) {
-                    if ($track['@attributes']['type'] === 'General') {
-                        if (isset($track['Format'])) {
-                            $containerformat = $track['Format'];
+        $mediaInfoVersion = 0;
+        if (\in_array('File', $arrXml, false) && \in_array('track', $arrXml['File'], false)) {
+            $mediaInfoVersion = 1;
+        }
+        if (\in_array('@attributes', $arrXml, false) && \in_array('@version', $arrXml['@attributes'], false)) {
+            $mediaInfoVersion = (int) $arrXml['@attributes']['version'];
+        }
+        if ($mediaInfoVersion < 1) {
+            if (isset($arrXml['File']['track'])) {
+                $mediaInfoVersion = 1;
+            }
+            if (isset($arrXml['@attributes']['version'])) {
+                $mediaInfoVersion = (int) $arrXml['@attributes']['version'];
+            }
+        }
+
+        switch ($mediaInfoVersion) {
+
+            /**
+             * MediaInfo Schema v1 (1.x - 7.99)
+             **/
+            case 1:
+                foreach ($arrXml['File']['track'] as $track) {
+                    if (isset($track['@attributes']['type'])) {
+                        if ($track['@attributes']['type'] === 'General') {
+                            if (isset($track['Format'])) {
+                                $containerFormat = $track['Format'];
+                            }
+                            if (isset($track['Overall_bit_rate'])) {
+                                $overallBitRate = $track['Overall_bit_rate'];
+                            }
+                            if (isset($track['Unique_ID']) && preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['Unique_ID'], $matches)) {
+                                $uniqueId = $matches['hash'];
+                                $this->addUID($releaseID, $uniqueId);
+                            }
+                        } elseif ($track['@attributes']['type'] === 'Video') {
+                            $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = '';
+                            if (isset($track['Duration'])) {
+                                $videoDuration = $track['Duration'];
+                            }
+                            if (isset($track['Format'])) {
+                                $videoFormat = $track['Format'];
+                            }
+                            if (isset($track['Codec_ID'])) {
+                                $videoCodec = $track['Codec_ID'];
+                            }
+                            if (isset($track['Width'])) {
+                                $videoWidth = preg_replace('/[^0-9]/', '', $track['Width']);
+                            }
+                            if (isset($track['Height'])) {
+                                $videoHeight = preg_replace('/[^0-9]/', '', $track['Height']);
+                            }
+                            if (isset($track['Display_aspect_ratio'])) {
+                                $videoAspect = $track['Display_aspect_ratio'];
+                            }
+                            if (isset($track['Frame_rate'])) {
+                                $videoFrameRate = str_replace(' fps', '', $track['Frame_rate']);
+                            }
+                            if (isset($track['Writing_library'])) {
+                                $videoLibrary = $track['Writing_library'];
+                            }
+                            $this->addVideo($releaseID, $containerFormat, $overallBitRate, $videoDuration, $videoFormat, $videoCodec, $videoWidth, $videoHeight, $videoAspect, $videoFrameRate, $videoLibrary);
+                        } elseif ($track['@attributes']['type'] === 'Audio') {
+                            $audioID = 1;
+                            $audioFormat = $audioMode = $audioBitRateMode = $audioBitRate = $audioChannels = $audioSampleRate = $audioLibrary = $audioLanguage = $audioTitle = '';
+                            if (isset($track['@attributes']['streamid'])) {
+                                $audioID = $track['@attributes']['streamid'];
+                            }
+                            if (isset($track['Format'])) {
+                                $audioFormat = $track['Format'];
+                            }
+                            if (isset($track['Mode'])) {
+                                $audioMode = $track['Mode'];
+                            }
+                            if (isset($track['Bit_rate_mode'])) {
+                                $audioBitRateMode = $track['Bit_rate_mode'];
+                            }
+                            if (isset($track['Bit_rate'])) {
+                                $audioBitRate = $track['Bit_rate'];
+                            }
+                            if (isset($track['Channel_s_'])) {
+                                $audioChannels = $track['Channel_s_'];
+                            }
+                            if (isset($track['Sampling_rate'])) {
+                                $audioSampleRate = $track['Sampling_rate'];
+                            }
+                            if (isset($track['Writing_library'])) {
+                                $audioLibrary = $track['Writing_library'];
+                            }
+                            if (isset($track['Language'])) {
+                                $audioLanguage = $track['Language'];
+                            }
+                            if (! empty($track['Title'])) {
+                                $audioTitle = $track['Title'];
+                            }
+                            $this->addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle);
+                        } elseif ($track['@attributes']['type'] === 'Text') {
+                            $subsID = 1;
+                            $subsLanguage = 'Unknown';
+                            if (isset($track['@attributes']['streamid'])) {
+                                $subsID = $track['@attributes']['streamid'];
+                            }
+                            if (isset($track['Language'])) {
+                                $subsLanguage = $track['Language'];
+                            }
+                            $this->addSubs($releaseID, $subsID, $subsLanguage);
                         }
-                        if (isset($track['Overall_bit_rate'])) {
-                            $overallbitrate = $track['Overall_bit_rate'];
-                        }
-                        if (isset($track['Unique_ID']) && preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['Unique_ID'], $matches)) {
-                            $uniqueid = $matches['hash'];
-                            $this->addUID($releaseID, $uniqueid);
-                        }
-                    } elseif ($track['@attributes']['type'] === 'Video') {
-                        $videoduration = $videoformat = $videocodec = $videowidth = $videoheight = $videoaspect = $videoframerate = $videolibrary = '';
-                        if (isset($track['Duration'])) {
-                            $videoduration = $track['Duration'];
-                        }
-                        if (isset($track['Format'])) {
-                            $videoformat = $track['Format'];
-                        }
-                        if (isset($track['Codec_ID'])) {
-                            $videocodec = $track['Codec_ID'];
-                        }
-                        if (isset($track['Width'])) {
-                            $videowidth = preg_replace('/[^0-9]/', '', $track['Width']);
-                        }
-                        if (isset($track['Height'])) {
-                            $videoheight = preg_replace('/[^0-9]/', '', $track['Height']);
-                        }
-                        if (isset($track['Display_aspect_ratio'])) {
-                            $videoaspect = $track['Display_aspect_ratio'];
-                        }
-                        if (isset($track['Frame_rate'])) {
-                            $videoframerate = str_replace(' fps', '', $track['Frame_rate']);
-                        }
-                        if (isset($track['Writing_library'])) {
-                            $videolibrary = $track['Writing_library'];
-                        }
-                        $this->addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary);
-                    } elseif ($track['@attributes']['type'] === 'Audio') {
-                        $audioID = 1;
-                        $audioformat = $audiomode = $audiobitratemode = $audiobitrate = $audiochannels = $audiosamplerate = $audiolibrary = $audiolanguage = $audiotitle = '';
-                        if (isset($track['@attributes']['streamid'])) {
-                            $audioID = $track['@attributes']['streamid'];
-                        }
-                        if (isset($track['Format'])) {
-                            $audioformat = $track['Format'];
-                        }
-                        if (isset($track['Mode'])) {
-                            $audiomode = $track['Mode'];
-                        }
-                        if (isset($track['Bit_rate_mode'])) {
-                            $audiobitratemode = $track['Bit_rate_mode'];
-                        }
-                        if (isset($track['Bit_rate'])) {
-                            $audiobitrate = $track['Bit_rate'];
-                        }
-                        if (isset($track['Channel_s_'])) {
-                            $audiochannels = $track['Channel_s_'];
-                        }
-                        if (isset($track['Sampling_rate'])) {
-                            $audiosamplerate = $track['Sampling_rate'];
-                        }
-                        if (isset($track['Writing_library'])) {
-                            $audiolibrary = $track['Writing_library'];
-                        }
-                        if (isset($track['Language'])) {
-                            $audiolanguage = $track['Language'];
-                        }
-                        if (! empty($track['Title'])) {
-                            $audiotitle = $track['Title'];
-                        }
-                        $this->addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle);
-                    } elseif ($track['@attributes']['type'] === 'Text') {
-                        $subsID = 1;
-                        $subslanguage = 'Unknown';
-                        if (isset($track['@attributes']['streamid'])) {
-                            $subsID = $track['@attributes']['streamid'];
-                        }
-                        if (isset($track['Language'])) {
-                            $subslanguage = $track['Language'];
-                        }
-                        $this->addSubs($releaseID, $subsID, $subslanguage);
                     }
                 }
-            }
+                break;
+            case 2:
+                /**
+                 * MediaInfo Schema v2 (mediaInfo version > 7.99)
+                 */
+                foreach ($arrXml['media']['track'] as $track) {
+
+                    $type = '';
+
+                    if (isset($track['@attributes']['type'])) {
+                        $type = $track['@attributes']['type'];
+                    }
+
+                    if (isset($track['type'])) {
+                        $type = $track['type'];
+                    }
+
+                    if ($type === 'General') {
+
+                        if (isset($track['UniqueID'])) {
+                            $uniqueId = $track['UniqueID'];
+                            if (! empty($uniqueId)) {
+                                $this->addUID($releaseID, $uniqueId);
+                            }
+                        }
+
+                        if (isset($track['Format'])) {
+                            $containerFormat = $track['Format'];
+                        }
+
+                        if (isset($track['OverallBitRate_Nominal'])) {
+                            $overallBitRate = $track['OverallBitRate_Nominal'];
+                        }
+
+                        if (isset($track['OverallBitRate'])) {
+                            $overallBitRate = $track['OverallBitRate'];
+                        }
+
+                    } elseif ($type === 'Video') {
+                        $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = $videoBitRate = '';
+
+                        if (isset($track['Duration'])) {
+                            $videoDuration = $track['Duration'];
+                        }
+
+                        if (isset($track['Format'])) {
+                            $videoFormat = $track['Format'];
+                        }
+
+                        if (isset($track['CodecID'])) {
+                            $videoCodec = $track['CodecID'];
+                        }
+
+                        if (isset($track['Width'])) {
+                            $videoWidth = $track['Width'];
+                        }
+
+                        if (isset($track['Height'])) {
+                            $videoHeight = $track['Height'];
+                        }
+
+                        if (isset($track['DisplayAspectRatio'])) {
+                            $videoAspect = $track['DisplayAspectRatio'];
+                        }
+
+                        if (isset($track['FrameRate'])) {
+                            $videoFrameRate = $track['FrameRate'];
+                        }
+
+                        if (isset($track['Encoded_Library_Version'])) {
+                            $videoLibrary = $track['Encoded_Library_Version'];
+                        }
+
+                        if (isset($track['Encoded_Library'])) {
+                            $videoLibrary = $track['Encoded_Library'];
+                        }
+
+                        if (isset($track['BitRate'])) {
+                            $videoBitRate = $track['BitRate'];
+                        }
+
+                        if (isset($track['BitRate_Nominal'])) {
+                            $videoBitRate = $track['BitRate_Nominal'];
+                        }
+
+                        if (! empty($videoBitRate)) {
+                            $overallBitRate = $videoBitRate;
+                        }
+
+                        $this->addVideo($releaseID, $containerFormat, $overallBitRate, $videoDuration, $videoFormat, $videoCodec, $videoWidth, $videoHeight, $videoAspect, $videoFrameRate, $videoLibrary);
+                    } elseif ($type === 'Audio') {
+                        $audioID = 1;
+                        $audioFormat = $audioMode = $audioBitRateMode = $audioBitRate = $audioChannels = $audioSampleRate = $audioLibrary = $audioLanguage = $audioTitle = '';
+
+                        if (isset($track['ID'])) {
+                            $audioID = $track['ID'];
+                        }
+
+                        if (isset($track['Format'])) {
+                            $audioFormat = $track['Format'];
+                        }
+
+                        if (isset($track['Mode'])) {
+                            $audioMode = $track['Mode'];
+                        }
+
+                        if (isset($track['Format_Settings_Mode'])) {
+                            $audioMode = $track['Format_Settings_Mode'];
+                        }
+
+                        if (isset($track['BitRate_Mode'])) {
+                            $audioBitRateMode = $track['BitRate_Mode'];
+                        }
+
+                        if (isset($track['BitRate'])) {
+                            $audioBitRate = $track['BitRate'];
+                        }
+
+                        if (isset($track['Channels'])) {
+                            $audioChannels = $track['Channels'];
+                        }
+
+                        if (isset($track['SamplingRate'])) {
+                            $audioSampleRate = $track['SamplingRate'];
+                        }
+
+                        if (isset($track['Encoded_Library'])) {
+                            $audioLibrary = $track['Encoded_Library'];
+                        }
+
+                        if (isset($track['Language'])) {
+                            $audioLanguage = $track['Language'];
+                        }
+
+                        if (isset($track['Title'])) {
+                            $audioTitle = $track['Title'];
+                        }
+
+                        $this->addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle);
+                    } elseif ($type === 'Text') {
+                        $subsID = 1;
+                        $subsLanguage = 'Unknown';
+
+                        if (isset($track['ID'])) {
+                            $subsID = $track['ID'];
+                        }
+
+                        if (isset($track['Language'])) {
+                            $subsLanguage = $track['Language'];
+                        }
+
+                        $this->addSubs($releaseID, $subsID, $subsLanguage);
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
     /**
      * @param $releaseID
-     * @param $containerformat
-     * @param $overallbitrate
-     * @param $videoduration
-     * @param $videoformat
-     * @param $videocodec
-     * @param $videowidth
-     * @param $videoheight
-     * @param $videoaspect
-     * @param $videoframerate
-     * @param $videolibrary
+     * @param $containerFormat
+     * @param $overallBitRate
+     * @param $videoDuration
+     * @param $videoFormat
+     * @param $videoCodec
+     * @param $videoWidth
+     * @param $videoHeight
+     * @param $videoAspect
+     * @param $videoFrameRate
+     * @param $videoLibrary
      */
-    public function addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary)
-    {
+    public function addVideo(
+        $releaseID,
+        $containerFormat,
+        $overallBitRate,
+        $videoDuration,
+        $videoFormat,
+        $videoCodec,
+        $videoWidth,
+        $videoHeight,
+        $videoAspect,
+        $videoFrameRate,
+        $videoLibrary
+    ): void {
         $ckid = VideoData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            VideoData::query()->insert(
-                [
+            VideoData::query()->insert([
                     'releases_id' => $releaseID,
-                    'containerformat' => $containerformat,
-                    'overallbitrate' => $overallbitrate,
-                    'videoduration' => $videoduration,
-                    'videoformat' => $videoformat,
-                    'videocodec' => $videocodec,
-                    'videowidth' => $videowidth,
-                    'videoheight' => $videoheight,
-                    'videoaspect' => $videoaspect,
-                    'videoframerate' => $videoframerate,
-                    'videolibrary' => substr($videolibrary, 0, 50),
-            ]
-            );
+                    'containerformat' => $containerFormat,
+                    'overallbitrate' => $overallBitRate,
+                    'videoduration' => $videoDuration,
+                    'videoformat' => $videoFormat,
+                    'videocodec' => $videoCodec,
+                    'videowidth' => $videoWidth,
+                    'videoheight' => $videoHeight,
+                    'videoaspect' => $videoAspect,
+                    'videoframerate' => $videoFrameRate,
+                    'videolibrary' => substr($videoLibrary, 0, 50),
+                ]);
         }
     }
 
     /**
      * @param $releaseID
      * @param $audioID
-     * @param $audioformat
-     * @param $audiomode
-     * @param $audiobitratemode
-     * @param $audiobitrate
-     * @param $audiochannels
-     * @param $audiosamplerate
-     * @param $audiolibrary
-     * @param $audiolanguage
-     * @param $audiotitle
+     * @param $audioFormat
+     * @param $audioMode
+     * @param $audioBitRateMode
+     * @param $audioBitRate
+     * @param $audioChannels
+     * @param $audioSampleRate
+     * @param $audioLibrary
+     * @param $audioLanguage
+     * @param $audioTitle
+     *
      * @return bool
      */
-    public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
-    {
+    public function addAudio(
+        $releaseID,
+        $audioID,
+        $audioFormat,
+        $audioMode,
+        $audioBitRateMode,
+        $audioBitRate,
+        $audioChannels,
+        $audioSampleRate,
+        $audioLibrary,
+        $audioLanguage,
+        $audioTitle
+    ): bool {
         $ckid = AudioData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            return AudioData::query()->insert(
-                [
+            return AudioData::query()->insert([
                     'releases_id' => $releaseID,
                     'audioid' => $audioID,
-                    'audioformat' => $audioformat,
-                    'audiomode' => $audiomode,
-                    'audiobitratemode' => $audiobitratemode,
-                    'audiobitrate' => substr($audiobitrate, 0, 10),
-                    'audiochannels' => $audiochannels,
-                    'audiosamplerate' => substr($audiosamplerate, 0, 25),
-                    'audiolibrary' => substr($audiolibrary, 0, 50),
-                    'audiolanguage' => $audiolanguage,
-                    'audiotitle' => substr($audiotitle, 0, 50),
-                ]
-            );
+                    'audioformat' => $audioFormat,
+                    'audiomode' => $audioMode,
+                    'audiobitratemode' => $audioBitRateMode,
+                    'audiobitrate' => substr($audioBitRate, 0, 10),
+                    'audiochannels' => $audioChannels,
+                    'audiosamplerate' => substr($audioSampleRate, 0, 25),
+                    'audiolibrary' => substr($audioLibrary, 0, 50),
+                    'audiolanguage' => $audioLanguage,
+                    'audiotitle' => substr($audioTitle, 0, 50),
+                ]);
         }
 
         return false;
@@ -342,14 +532,19 @@ class ReleaseExtra
     /**
      * @param $releaseID
      * @param $subsID
-     * @param $subslanguage
+     * @param $subsLanguage
+     *
      * @return bool
      */
-    public function addSubs($releaseID, $subsID, $subslanguage)
+    public function addSubs($releaseID, $subsID, $subsLanguage): bool
     {
         $ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            return ReleaseSubtitle::query()->insert(['releases_id' => $releaseID, 'subsid' => $subsID, 'subslanguage' => $subslanguage]);
+            return ReleaseSubtitle::query()->insert([
+                'releases_id' => $releaseID,
+                'subsid' => $subsID,
+                'subslanguage' => $subsLanguage,
+            ]);
         }
 
         return false;
@@ -357,26 +552,19 @@ class ReleaseExtra
 
     /**
      * @param $releaseID
-     * @param $uniqueid
+     * @param $uniqueId
      */
-    public function addUID($releaseID, $uniqueid): void
+    public function addUID($releaseID, $uniqueId): void
     {
-        $dupecheck = ReleaseUnique::query()
-            ->where('releases_id', $releaseID)
-            ->orWhere(
-                [
+        $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([
                     'releases_id' => $releaseID,
-                    'uniqueid' => sodium_hex2bin($uniqueid),
-                ]
-            )->first(['releases_id']);
+                    'uniqueid' => sodium_hex2bin($uniqueId),
+                ])->first(['releases_id']);
         if ($dupecheck === null) {
-            ReleaseUnique::query()
-                ->insert(
-                    [
+            ReleaseUnique::query()->insert([
                         'releases_id' => $releaseID,
-                        'uniqueid' => sodium_hex2bin($uniqueid),
-                    ]
-                );
+                        'uniqueid' => sodium_hex2bin($uniqueId),
+                    ]);
         }
     }
 
@@ -404,7 +592,7 @@ class ReleaseExtra
      * @param $id
      * @param $xml
      */
-    public function addFull($id, $xml)
+    public function addFull($id, $xml): void
     {
         $ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();
         if ($ckid === null) {
