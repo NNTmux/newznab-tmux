@@ -256,7 +256,7 @@ class ReleaseExtra
                     }
 
                     if ($type === 'General') {
-                        if (! empty($track['UniqueID']) && (int)$track['UniqueID'] !== 1) {
+                        if (! empty($track['UniqueID']) && (int) $track['UniqueID'] !== 1) {
                             $uniqueId = bcdechex($track['UniqueID']);
                             $this->addUID($releaseID, $uniqueId);
                         }
