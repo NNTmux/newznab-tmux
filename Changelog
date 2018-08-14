@@ -1,4 +1,5 @@
 2018-08-14 DariusIII
+	* Chg: Remove unused makeCodecPretty class, change some of the functions from public to private and change their reurn types
 	* Chg: Update ReleaseExtra class, add MediaInfo 18 support
 2018-08-13 DariusIII
 	* Chg: Update spatie/laravel-permission to version 2.14.0

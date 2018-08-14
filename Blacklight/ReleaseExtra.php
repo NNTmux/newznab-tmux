@@ -26,44 +26,6 @@ class ReleaseExtra
     }
 
     /**
-     * @param $codec
-     *
-     * @return string
-     */
-    public function makeCodecPretty($codec): string
-    {
-        switch (true) {
-            case preg_match('#(?:^36$|HEVC)#i', $codec):
-                $codec = 'HEVC';
-                break;
-            case preg_match('#(?:^(?:7|27|H264)$|AVC)#i', $codec):
-                $codec = 'h.264';
-                break;
-            case preg_match('#(?:^(?:20|FMP4|MP42|MP43|MPG4)$|ASP)#i', $codec):
-                $codec = 'MPEG-4';
-                break;
-            case preg_match('#^2$#i', $codec):
-                $codec = 'MPEG-2';
-                break;
-            case $codec === 'MPEG':
-                $codec = 'MPEG-1';
-                break;
-            case preg_match('#DX50|DIVX|DIV3#i', $codec):
-                $codec = 'DivX';
-                break;
-            case stripos($codec, 'XVID') !== false:
-                $codec = 'XviD';
-                break;
-            case preg_match('#(?:wmv|WVC1)#i', $codec):
-                $codec = 'wmv';
-                break;
-            default:
-        }
-
-        return $codec;
-    }
-
-    /**
      * @param $id
      *
      * @return \Illuminate\Database\Eloquent\Model|null|static
@@ -150,7 +112,7 @@ class ReleaseExtra
     /**
      * @param $id
      */
-    public function delete($id)
+    public function delete($id): void
     {
         AudioData::query()->where('releases_id', $id)->delete();
         ReleaseSubtitle::query()->where('releases_id', $id)->delete();
@@ -490,25 +452,12 @@ class ReleaseExtra
      * @param $audioLibrary
      * @param $audioLanguage
      * @param $audioTitle
-     *
-     * @return bool
      */
-    public function addAudio(
-        $releaseID,
-        $audioID,
-        $audioFormat,
-        $audioMode,
-        $audioBitRateMode,
-        $audioBitRate,
-        $audioChannels,
-        $audioSampleRate,
-        $audioLibrary,
-        $audioLanguage,
-        $audioTitle
-    ): bool {
+    private function addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle): void
+    {
         $ckid = AudioData::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            return AudioData::query()->insert([
+            AudioData::query()->insert([
                     'releases_id' => $releaseID,
                     'audioid' => $audioID,
                     'audioformat' => $audioFormat,
@@ -522,29 +471,23 @@ class ReleaseExtra
                     'audiotitle' => substr($audioTitle, 0, 50),
                 ]);
         }
-
-        return false;
     }
 
     /**
      * @param $releaseID
      * @param $subsID
      * @param $subsLanguage
-     *
-     * @return bool
      */
-    public function addSubs($releaseID, $subsID, $subsLanguage): bool
+    private function addSubs($releaseID, $subsID, $subsLanguage): void
     {
         $ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->first(['releases_id']);
         if ($ckid === null) {
-            return ReleaseSubtitle::query()->insert([
+            ReleaseSubtitle::query()->insert([
                 'releases_id' => $releaseID,
                 'subsid' => $subsID,
                 'subslanguage' => $subsLanguage,
             ]);
         }
-
-        return false;
     }
 
     /**
