@@ -6,8 +6,8 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Symfony\Component\Process\Process;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Utility.
@@ -713,7 +713,6 @@ class Utility
      */
     public static function runCmd($command, $debug = false): array
     {
-
         if ($debug) {
             echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
         }
