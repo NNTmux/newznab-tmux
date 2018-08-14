@@ -256,8 +256,8 @@ class ReleaseExtra
                     }
 
                     if ($type === 'General') {
-                        if (isset($track['UniqueID']) && preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['UniqueID'], $matches)) {
-                            $uniqueId = $matches['hash'];
+                        if (! empty($track['UniqueID']) && (int)$track['UniqueID'] !== 1) {
+                            $uniqueId = bcdechex($track['UniqueID']);
                             $this->addUID($releaseID, $uniqueId);
                         }
 

@@ -1,4 +1,5 @@
 2018-08-14 DariusIII
+	* Chg: Update ReleaseExtra class to handle MediaInfo v18 type UniqueID, add helper function and update composer.json to require bcmath extension
 	* Fix: Fix UniqueID matching for MediaInfo v18
 	* Chg: Remove unused makeCodecPretty class, change some of the functions from public to private and change their return types
 	* Chg: Update ReleaseExtra class, add MediaInfo 18 support

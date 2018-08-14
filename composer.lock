@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ea5eb84fc554141ddc2a2c9289a99f8",
+    "content-hash": "19a2dbdaf113ea9baee76f15483e9be6",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -9445,6 +9445,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2.0",
+        "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-exif": "*",
@@ -9467,7 +9468,5 @@
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": {
-        "ext-bcmath": "*"
-    }
+    "platform-dev": []
 }

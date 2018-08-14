@@ -218,4 +218,23 @@ if (! function_exists('makeFieldLinks')) {
             return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals).@$size[$factor];
         }
     }
+
+    if (! function_exists('bcdechex')) {
+
+        /**
+         * @param $dec
+         *
+         * @return string
+         */
+        function bcdechex($dec)
+        {
+            $hex = '';
+            do {
+                $last = bcmod($dec, 16);
+                $hex = dechex($last).$hex;
+                $dec = bcdiv(bcsub($dec, $last), 16);
+            } while ($dec > 0);
+            return $hex;
+        }
+    }
 }
