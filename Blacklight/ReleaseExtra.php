@@ -150,7 +150,7 @@ class ReleaseExtra
 
             /*
              * MediaInfo Schema v1 (1.x - 7.99)
-             **/
+             */
             case 1:
                 foreach ($arrXml['File']['track'] as $track) {
                     if (isset($track['@attributes']['type'])) {
@@ -161,8 +161,8 @@ class ReleaseExtra
                             if (isset($track['Overall_bit_rate'])) {
                                 $overallBitRate = $track['Overall_bit_rate'];
                             }
-                            if (isset($track['Unique_ID']) && preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['Unique_ID'], $matches)) {
-                                $uniqueId = $matches['hash'];
+                            if (isset($track['Unique_ID']) && preg_match('/(?P<uid>^\d+)/i', $track['Unique_ID'], $matches)) {
+                                $uniqueId = $matches['uid'];
                                 $this->addUID($releaseID, $uniqueId);
                             }
                         } elseif ($track['@attributes']['type'] === 'Video') {
@@ -257,7 +257,7 @@ class ReleaseExtra
 
                     if ($type === 'General') {
                         if (! empty($track['UniqueID']) && (int) $track['UniqueID'] !== 1) {
-                            $uniqueId = bcdechex($track['UniqueID']);
+                            $uniqueId = $track['UniqueID'];
                             $this->addUID($releaseID, $uniqueId);
                         }
 
@@ -489,19 +489,19 @@ class ReleaseExtra
     }
 
     /**
-     * @param $releaseID
-     * @param $uniqueId
+     * @param int $releaseID
+     * @param string $uniqueId
      */
     public function addUID($releaseID, $uniqueId): void
     {
         $dupecheck = ReleaseUnique::query()->where('releases_id', $releaseID)->orWhere([
                     'releases_id' => $releaseID,
-                    'uniqueid' => sodium_hex2bin($uniqueId),
+                    'uniqueid' => $uniqueId,
                 ])->first(['releases_id']);
         if ($dupecheck === null) {
             ReleaseUnique::query()->insert([
                         'releases_id' => $releaseID,
-                        'uniqueid' => sodium_hex2bin($uniqueId),
+                        'uniqueid' => $uniqueId,
                     ]);
         }
     }

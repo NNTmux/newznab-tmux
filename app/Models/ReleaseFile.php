@@ -43,7 +43,10 @@ class ReleaseFile extends Model
      */
     protected $primaryKey = 'releases_id';
 
-    public function release()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }

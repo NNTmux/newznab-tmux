@@ -546,7 +546,7 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					HEX(ru.uniqueid) AS uid
+					ru.uniqueid AS uid
 				FROM releases rel
 				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
@@ -562,7 +562,7 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					HEX(ru.uniqueid) AS uid
+					ru.uniqueid AS uid
 				FROM releases rel
 				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
@@ -2072,7 +2072,7 @@ class NameFixer
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
 				WHERE ru.releases_id IS NOT NULL
-				AND ru.uniqueid = UNHEX({$this->pdo->quote($release->uid)})
+				AND ru.uniqueid = {$this->pdo->quote($release->uid)}
 				AND ru.releases_id != {$release->releases_id}
 				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')"
             );
