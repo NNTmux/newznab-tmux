@@ -3,11 +3,11 @@
 namespace Blacklight;
 
 use App\Models\AudioData;
-use App\Models\ReleaseExtraFull;
-use App\Models\ReleaseSubtitle;
-use App\Models\ReleaseUnique;
 use App\Models\VideoData;
+use App\Models\ReleaseUnique;
+use App\Models\ReleaseSubtitle;
 use Blacklight\utility\Utility;
+use App\Models\ReleaseExtraFull;
 use Illuminate\Support\Facades\DB;
 
 class ReleaseExtra
@@ -186,7 +186,7 @@ class ReleaseExtra
 
         switch ($mediaInfoVersion) {
 
-            /**
+            /*
              * MediaInfo Schema v1 (1.x - 7.99)
              **/
             case 1:
@@ -279,11 +279,10 @@ class ReleaseExtra
                 }
                 break;
             case 2:
-                /**
+                /*
                  * MediaInfo Schema v2 (mediaInfo version > 7.99)
                  */
                 foreach ($arrXml['media']['track'] as $track) {
-
                     $type = '';
 
                     if (isset($track['@attributes']['type'])) {
@@ -295,7 +294,6 @@ class ReleaseExtra
                     }
 
                     if ($type === 'General') {
-
                         if (isset($track['UniqueID'])) {
                             $uniqueId = $track['UniqueID'];
                             if (! empty($uniqueId)) {
@@ -314,7 +312,6 @@ class ReleaseExtra
                         if (isset($track['OverallBitRate'])) {
                             $overallBitRate = $track['OverallBitRate'];
                         }
-
                     } elseif ($type === 'Video') {
                         $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = $videoBitRate = '';
 
