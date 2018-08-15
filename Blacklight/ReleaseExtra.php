@@ -177,10 +177,10 @@ class ReleaseExtra
                                 $videoCodec = $track['Codec_ID'];
                             }
                             if (isset($track['Width'])) {
-                                $videoWidth = preg_replace('/[^0-9]/', '', $track['Width']);
+                                $videoWidth = preg_replace('/\D/', '', $track['Width']);
                             }
                             if (isset($track['Height'])) {
-                                $videoHeight = preg_replace('/[^0-9]/', '', $track['Height']);
+                                $videoHeight = preg_replace('/\D/', '', $track['Height']);
                             }
                             if (isset($track['Display_aspect_ratio'])) {
                                 $videoAspect = $track['Display_aspect_ratio'];
