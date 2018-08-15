@@ -239,7 +239,7 @@ class AniDB
             if (! empty($anidbId) && is_numeric($anidbId->anidbid) && $anidbId->anidbid > 0) {
                 $updatedAni = $this->checkAniDBInfo($anidbId->anidbid, $cleanArr['epno']);
 
-                if ($updatedAni === false) {
+                if ($updatedAni === null) {
                     if ($this->updateTimeCheck($anidbId->anidbid) !== null) {
                         $this->padb->populateTable('info', $anidbId->anidbid);
                         $this->doRandomSleep();
@@ -252,7 +252,7 @@ class AniDB
                     }
                 }
 
-                $this->updateRelease($anidbId->anidbid, $release['id']);
+                $this->updateRelease($anidbId->anidbid, $release->id);
 
                 ColorCLI::doEcho(
                     ColorCLI::headerOver('Matched '.$type.' AniDB ID: ').
