@@ -4,8 +4,8 @@ namespace Blacklight;
 
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
+use Blacklight\processing\PostProcess;
 
 /**
  * Gets information contained within the NZB.

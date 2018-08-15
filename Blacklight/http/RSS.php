@@ -2,11 +2,11 @@
 
 namespace Blacklight\http;
 
-use App\Models\Category;
 use Blacklight\NZB;
+use App\Models\Category;
 use Blacklight\Releases;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class RSS -- contains specific functions for RSS.
