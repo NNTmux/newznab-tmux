@@ -1,3 +1,5 @@
+2018-08-15 DariusIII
+	* Fix: Fix anidb matching error
 2018-08-14 DariusIII
 	* Chg: Update imdbphp/imdbphp to latest commit
 	* Chg: Recreate release_unique table, alter classes for new table

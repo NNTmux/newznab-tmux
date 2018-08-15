@@ -236,14 +236,14 @@ class AniDB
                 $anidbId = $this->getAnidbByName($tmpName);
             }
 
-            if (! empty($anidbId) && is_numeric($anidbId['anidbid']) && $anidbId['anidbid'] > 0) {
-                $updatedAni = $this->checkAniDBInfo($anidbId['anidbid'], $cleanArr['epno']);
+            if (! empty($anidbId) && is_numeric($anidbId->anidbid) && $anidbId->anidbid > 0) {
+                $updatedAni = $this->checkAniDBInfo($anidbId->anidbid, $cleanArr['epno']);
 
                 if ($updatedAni === false) {
-                    if ($this->updateTimeCheck($anidbId['anidbid']) !== null) {
-                        $this->padb->populateTable('info', $anidbId['anidbid']);
+                    if ($this->updateTimeCheck($anidbId->anidbid) !== null) {
+                        $this->padb->populateTable('info', $anidbId->anidbid);
                         $this->doRandomSleep();
-                        $updatedAni = $this->checkAniDBInfo($anidbId['anidbid']);
+                        $updatedAni = $this->checkAniDBInfo($anidbId->anidbid);
                         $type = 'Remote';
                     } else {
                         echo PHP_EOL.
@@ -252,13 +252,13 @@ class AniDB
                     }
                 }
 
-                $this->updateRelease($anidbId['anidbid'], $release['id']);
+                $this->updateRelease($anidbId->anidbid, $release['id']);
 
                 ColorCLI::doEcho(
                     ColorCLI::headerOver('Matched '.$type.' AniDB ID: ').
-                    ColorCLI::primary($anidbId['anidbid']).
+                    ColorCLI::primary($anidbId->anidbid).
                     ColorCLI::alternateOver('   Title: ').
-                    ColorCLI::primary($anidbId['title']).
+                    ColorCLI::primary($anidbId->title).
                     ColorCLI::alternateOver('   Episode #: ').
                     ColorCLI::primary($cleanArr['epno']).
                     ColorCLI::alternateOver('   Episode Title: ').
