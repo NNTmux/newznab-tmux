@@ -2,8 +2,8 @@
 
 namespace Blacklight\libraries;
 
-use GuzzleHttp\Client;
 use Blacklight\ColorCLI;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
 /**

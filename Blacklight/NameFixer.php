@@ -2,13 +2,13 @@
 
 namespace Blacklight;
 
+use App\Models\Category;
 use App\Models\Group;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Models\Category;
+use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
-use Blacklight\processing\PostProcess;
 
 /**
  * Class NameFixer.

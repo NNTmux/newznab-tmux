@@ -2,24 +2,24 @@
 
 namespace Blacklight\processing\post;
 
-use Blacklight\Nfo;
-use Blacklight\NZB;
-use Blacklight\NNTP;
+use App\Models\Category;
 use App\Models\Group;
 use App\Models\Release;
-use App\Models\Category;
-use App\Models\Settings;
-use Blacklight\ColorCLI;
-use Blacklight\Releases;
-use Blacklight\NameFixer;
-use Blacklight\Categorize;
 use App\Models\ReleaseFile;
+use App\Models\Settings;
+use Blacklight\Categorize;
+use Blacklight\ColorCLI;
+use Blacklight\NameFixer;
+use Blacklight\Nfo;
+use Blacklight\NNTP;
+use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
+use Blacklight\Releases;
 use Blacklight\SphinxSearch;
 use Blacklight\utility\Utility;
-use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\ArchiveInfo;
+use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Facades\DB;
 
 class ProcessAdditional

@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use GuzzleHttp\Client;
 use App\Models\Release;
-use GuzzleHttp\Psr7\Request;
 use Blacklight\utility\Utility;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 
 /**
  * Class NZBGet.

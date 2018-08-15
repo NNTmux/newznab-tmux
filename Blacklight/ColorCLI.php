@@ -2,8 +2,6 @@
 
 namespace Blacklight;
 
-use Colors\Color;
-
 class ColorCLI
 {
     /**

@@ -2,8 +2,8 @@
 
 namespace Blacklight\processing;
 
-use Blacklight\NZBMultiGroup;
 use App\Models\MultigroupPoster;
+use Blacklight\NZBMultiGroup;
 
 class ProcessReleasesMultiGroup extends ProcessReleases
 {

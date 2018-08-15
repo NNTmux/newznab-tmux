@@ -3,10 +3,10 @@
 namespace Blacklight;
 
 use App\Models\Release;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
 use Illuminate\Support\Facades\DB;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxSearch
 {

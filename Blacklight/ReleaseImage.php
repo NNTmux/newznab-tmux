@@ -3,12 +3,12 @@
 namespace Blacklight;
 
 use Illuminate\Support\Facades\File;
-use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
+use Intervention\Image\Facades\Image;
 
 /**
  * Resize/save/delete images to disk.

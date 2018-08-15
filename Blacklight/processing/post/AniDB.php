@@ -2,13 +2,13 @@
 
 namespace Blacklight\processing\post;
 
-use Blacklight\NZB;
+use App\Models\AnidbEpisode;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use App\Models\AnidbEpisode;
-use Illuminate\Support\Facades\DB;
 use Blacklight\db\populate\AniDB as PaDb;
+use Blacklight\NZB;
+use Illuminate\Support\Facades\DB;
 
 class AniDB
 {

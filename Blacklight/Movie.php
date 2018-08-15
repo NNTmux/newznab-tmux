@@ -2,24 +2,24 @@
 
 namespace Blacklight;
 
-use Imdb\Title;
-use Imdb\Config;
-use Tmdb\ApiToken;
 use aharen\OMDbAPI;
-use GuzzleHttp\Client;
-use App\Models\Release;
 use App\Models\Category;
-use App\Models\Settings;
 use App\Models\MovieInfo;
-use Tmdb\Helper\ImageHelper;
-use Illuminate\Support\Carbon;
-use Tmdb\Client as TmdbClient;
-use Blacklight\utility\Utility;
+use App\Models\Release;
+use App\Models\Settings;
 use Blacklight\libraries\FanartTV;
-use Illuminate\Support\Facades\DB;
-use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
+use Blacklight\utility\Utility;
+use GuzzleHttp\Client;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Imdb\Config;
+use Imdb\Title;
+use Tmdb\ApiToken;
+use Tmdb\Client as TmdbClient;
+use Tmdb\Exception\TmdbApiException;
+use Tmdb\Helper\ImageHelper;
 use Tmdb\Repository\ConfigurationRepository;
 
 /**

@@ -2,16 +2,16 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
-use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
+use App\Models\Group;
 use App\Models\MultigroupPoster;
+use App\Models\Settings;
+use Blacklight\processing\ProcessReleasesMultiGroup;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\QueryException;
-use Blacklight\processing\ProcessReleasesMultiGroup;
 
 /**
  * Class Binaries.

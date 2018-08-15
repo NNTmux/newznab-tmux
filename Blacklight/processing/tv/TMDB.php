@@ -2,13 +2,13 @@
 
 namespace Blacklight\processing\tv;
 
-use Tmdb\Client;
-use Tmdb\ApiToken;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
-use Tmdb\Helper\ImageHelper;
+use Tmdb\ApiToken;
+use Tmdb\Client;
 use Tmdb\Exception\TmdbApiException;
+use Tmdb\Helper\ImageHelper;
 use Tmdb\Repository\ConfigurationRepository;
 
 class TMDB extends TV

@@ -2,12 +2,12 @@
 
 namespace Blacklight\utility;
 
+use App\Extensions\util\Versions;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use App\Extensions\util\Versions;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Utility.

@@ -3,18 +3,18 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
-use GuzzleHttp\Client;
-use App\Models\Release;
+use ApaiIO\Configuration\Country;
+use ApaiIO\Configuration\GenericConfiguration;
+use ApaiIO\Operations\Search;
+use ApaiIO\Request\GuzzleRequest;
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use App\Models\BookInfo;
 use App\Models\Category;
+use App\Models\Release;
 use App\Models\Settings;
-use ApaiIO\Operations\Search;
-use ApaiIO\Configuration\Country;
-use ApaiIO\Request\GuzzleRequest;
-use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
-use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use Illuminate\Support\Facades\DB;
 
 class Books
 {

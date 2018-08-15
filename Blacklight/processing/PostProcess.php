@@ -2,29 +2,29 @@
 
 namespace Blacklight\processing;
 
-use Blacklight\Nfo;
-use Blacklight\XXX;
-use Blacklight\NNTP;
+use App\Models\Category;
 use App\Models\Group;
+use App\Models\Release;
+use App\Models\ReleaseFile;
+use App\Models\Settings;
 use Blacklight\Books;
+use Blacklight\Console;
 use Blacklight\Games;
 use Blacklight\Movie;
 use Blacklight\Music;
-use App\Models\Release;
-use Blacklight\Console;
-use Blacklight\Sharing;
-use App\Models\Category;
-use App\Models\Settings;
 use Blacklight\NameFixer;
-use App\Models\ReleaseFile;
-use Illuminate\Support\Carbon;
-use dariusiii\rarinfo\Par2Info;
+use Blacklight\Nfo;
+use Blacklight\NNTP;
+use Blacklight\processing\post\AniDB;
+use Blacklight\processing\post\ProcessAdditional;
 use Blacklight\processing\tv\TMDB;
+use Blacklight\processing\tv\TraktTv;
 use Blacklight\processing\tv\TVDB;
 use Blacklight\processing\tv\TVMaze;
-use Blacklight\processing\post\AniDB;
-use Blacklight\processing\tv\TraktTv;
-use Blacklight\processing\post\ProcessAdditional;
+use Blacklight\Sharing;
+use Blacklight\XXX;
+use dariusiii\rarinfo\Par2Info;
+use Illuminate\Support\Carbon;
 
 class PostProcess
 {

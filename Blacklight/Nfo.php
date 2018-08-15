@@ -4,13 +4,13 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Models\ReleaseNfo;
-use dariusiii\rarinfo\SfvInfo;
+use App\Models\Settings;
+use Blacklight\processing\PostProcess;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
+use dariusiii\rarinfo\SfvInfo;
 use Illuminate\Support\Facades\DB;
-use Blacklight\processing\PostProcess;
 
 /**
  * Class Nfo

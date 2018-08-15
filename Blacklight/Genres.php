@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use App\Models\Genre;
 use App\Models\Category;
-use Illuminate\Support\Facades\DB;
+use App\Models\Genre;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Genres
 {

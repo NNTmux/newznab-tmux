@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use GuzzleHttp\Client;
 use App\Models\Settings;
+use GuzzleHttp\Client;
 
 /**
  * Class SABnzbd.
