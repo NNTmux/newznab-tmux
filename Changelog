@@ -1,4 +1,5 @@
 2018-08-15 DariusIII
+	* Chg: Update date handling of Games class
 	* Chg: Update regex for matching width/height in ReleaseExtra class
 	* Chg: Update used components to latest version
 	* Chg: Optimize imports in Blacklight namespace
