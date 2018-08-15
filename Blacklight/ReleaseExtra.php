@@ -3,11 +3,11 @@
 namespace Blacklight;
 
 use App\Models\AudioData;
-use App\Models\ReleaseExtraFull;
-use App\Models\ReleaseSubtitle;
-use App\Models\ReleaseUnique;
 use App\Models\VideoData;
+use App\Models\ReleaseUnique;
+use App\Models\ReleaseSubtitle;
 use Blacklight\utility\Utility;
+use App\Models\ReleaseExtraFull;
 use Illuminate\Support\Facades\DB;
 
 class ReleaseExtra

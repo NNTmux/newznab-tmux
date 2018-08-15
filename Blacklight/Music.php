@@ -3,18 +3,18 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
-use ApaiIO\Configuration\GenericConfiguration;
+use App\Models\Genre;
+use GuzzleHttp\Client;
+use App\Models\Release;
+use App\Models\Category;
+use App\Models\Settings;
+use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
 use ApaiIO\Request\GuzzleRequest;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
-use App\Models\Category;
-use App\Models\Genre;
-use App\Models\MusicInfo;
-use App\Models\Release;
-use App\Models\Settings;
-use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use ApaiIO\Configuration\GenericConfiguration;
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 /**
  * Class Music.

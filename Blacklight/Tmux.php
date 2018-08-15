@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Extensions\util\Versions;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 
 /**

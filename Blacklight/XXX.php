@@ -2,18 +2,18 @@
 
 namespace Blacklight;
 
-use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Release;
-use App\Models\Settings;
 use App\Models\XxxInfo;
+use App\Models\Category;
+use App\Models\Settings;
+use Illuminate\Support\Facades\DB;
 use Blacklight\processing\adult\ADE;
 use Blacklight\processing\adult\ADM;
 use Blacklight\processing\adult\AEBN;
-use Blacklight\processing\adult\Hotmovies;
-use Blacklight\processing\adult\Popporn;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
+use Blacklight\processing\adult\Popporn;
+use Blacklight\processing\adult\Hotmovies;
 
 /**
  * Class XXX.

@@ -2,14 +2,14 @@
 
 namespace Blacklight\processing\tv;
 
+use Blacklight\ColorCLI;
 use Adrenth\Thetvdb\Client;
+use Blacklight\ReleaseImage;
+use Adrenth\Thetvdb\Exception\UnauthorizedException;
 use Adrenth\Thetvdb\Exception\CouldNotLoginException;
+use Adrenth\Thetvdb\Exception\RequestFailedException;
 use Adrenth\Thetvdb\Exception\InvalidArgumentException;
 use Adrenth\Thetvdb\Exception\InvalidJsonInResponseException;
-use Adrenth\Thetvdb\Exception\RequestFailedException;
-use Adrenth\Thetvdb\Exception\UnauthorizedException;
-use Blacklight\ColorCLI;
-use Blacklight\ReleaseImage;
 
 /**
  * Class TVDB -- functions used to post process releases against TVDB.

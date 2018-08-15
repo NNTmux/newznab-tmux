@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use App\Extensions\util\Yenc;
 use App\Models\Settings;
+use App\Extensions\util\Yenc;
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
