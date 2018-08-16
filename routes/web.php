@@ -11,19 +11,19 @@
 |
 */
 
-Route::get('/', 'ContentController@show');
+Route::get('/', 'ContentController@show')->middleware('fw-block-blacklisted');
 
 Auth::routes();
 
-Route::get('register', 'Auth\RegisterController@showRegistrationForm');
-Route::post('register', 'Auth\RegisterController@register');
+Route::get('register', 'Auth\RegisterController@showRegistrationForm')->middleware('fw-block-blacklisted');
+Route::post('register', 'Auth\RegisterController@register')->middleware('fw-block-blacklisted');
 
-Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
-Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->middleware('fw-block-blacklisted');
+Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->middleware('fw-block-blacklisted');
 
 Route::get('terms-and-conditions', 'TermsController@terms');
 
-Route::group(['middleware' => ['isVerified']], function () {
+Route::group(['middleware' => ['isVerified|fw-block-blacklisted']], function () {
     Route::get('login', 'Auth\LoginController@showLoginForm');
     Route::post('login', 'Auth\LoginController@login')->name('login');
 
