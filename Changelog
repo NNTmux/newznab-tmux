@@ -1,3 +1,5 @@
+2018-08-17 DariusIII
+	* Chg: Update egulias/email-validator to version 2.1.5 and spatie/laravel-permission to version 2.15.0
 2018-08-15 DariusIII
 	* Chg: Update date handling of Games class
 	* Chg: Update regex for matching width/height in ReleaseExtra class

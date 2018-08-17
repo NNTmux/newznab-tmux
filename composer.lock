@@ -2038,16 +2038,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "2.1.4",
+            "version": "2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "8790f594151ca6a2010c6218e09d96df67173ad3"
+                "reference": "54859fabea8b3beecbb1a282888d5c990036b9e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/8790f594151ca6a2010c6218e09d96df67173ad3",
-                "reference": "8790f594151ca6a2010c6218e09d96df67173ad3",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/54859fabea8b3beecbb1a282888d5c990036b9e3",
+                "reference": "54859fabea8b3beecbb1a282888d5c990036b9e3",
                 "shasum": ""
             },
             "require": {
@@ -2091,7 +2091,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2018-04-10T10:11:19+00:00"
+            "time": "2018-08-16T20:49:45+00:00"
         },
         {
             "name": "erusev/parsedown",
@@ -5217,16 +5217,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.14.0",
+            "version": "2.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "5a40d8ba8b7af83ff149d075351616027a0b771f"
+                "reference": "40cd73d227da96fa31bb4905f1f37444dee6d74a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/5a40d8ba8b7af83ff149d075351616027a0b771f",
-                "reference": "5a40d8ba8b7af83ff149d075351616027a0b771f",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/40cd73d227da96fa31bb4905f1f37444dee6d74a",
+                "reference": "40cd73d227da96fa31bb4905f1f37444dee6d74a",
                 "shasum": ""
             },
             "require": {
@@ -5277,7 +5277,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-08-13T15:28:03+00:00"
+            "time": "2018-08-16T00:21:46+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
