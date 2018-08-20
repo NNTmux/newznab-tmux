@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19a2dbdaf113ea9baee76f15483e9be6",
+    "content-hash": "4e318da184af6bb8d7b8c778fe51c855",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2691,16 +2691,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "dev-master",
+            "version": "v6.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "7485c131a7c2a092e9945ce1532db3cf080c97bb"
+                "reference": "ce0cd847eaff39594f01f1f2ce28c4fea7b31f92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/7485c131a7c2a092e9945ce1532db3cf080c97bb",
-                "reference": "7485c131a7c2a092e9945ce1532db3cf080c97bb",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/ce0cd847eaff39594f01f1f2ce28c4fea7b31f92",
+                "reference": "ce0cd847eaff39594f01f1f2ce28c4fea7b31f92",
                 "shasum": ""
             },
             "require": {
@@ -2727,7 +2727,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-08-14T18:27:55+00:00"
+            "time": "2018-08-18T22:29:04+00:00"
         },
         {
             "name": "intervention/image",
@@ -5217,16 +5217,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.15.0",
+            "version": "2.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "40cd73d227da96fa31bb4905f1f37444dee6d74a"
+                "reference": "364b48d59eba89700bc413a71ad3763ce3140d40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/40cd73d227da96fa31bb4905f1f37444dee6d74a",
-                "reference": "40cd73d227da96fa31bb4905f1f37444dee6d74a",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/364b48d59eba89700bc413a71ad3763ce3140d40",
+                "reference": "364b48d59eba89700bc413a71ad3763ce3140d40",
                 "shasum": ""
             },
             "require": {
@@ -5277,7 +5277,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-08-16T00:21:46+00:00"
+            "time": "2018-08-20T18:54:54+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -9412,7 +9412,6 @@
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
         "dborsatto/php-giantbomb": 20,
-        "imdbphp/imdbphp": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "mayconbordin/l5-fixtures": 20,
         "nzedb/git.php": 20
