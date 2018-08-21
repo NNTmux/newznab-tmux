@@ -6,8 +6,8 @@ use GuzzleHttp\Client;
 use Blacklight\ColorCLI;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Process\Process;
+use GuzzleHttp\Exception\RequestException;
 
 if (! function_exists('getRawHtml')) {
 
