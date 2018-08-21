@@ -1,4 +1,5 @@
 2018-08-21 DariusIII
+	* Chg: Update NZB and ReleaseExtra classes
 	* Chg: Remove implode from time check in PPA
 	* Chg: Update composer.lock
 	* Chg: Move runCmd into helpers, return string instead an array

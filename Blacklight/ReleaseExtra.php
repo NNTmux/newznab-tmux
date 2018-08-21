@@ -433,7 +433,7 @@ class ReleaseExtra
                     'videoheight' => $videoHeight,
                     'videoaspect' => $videoAspect,
                     'videoframerate' => $videoFrameRate,
-                    'videolibrary' => substr($videoLibrary, 0, 50),
+                    'videolibrary' => $videoLibrary,
                 ]);
         }
     }
