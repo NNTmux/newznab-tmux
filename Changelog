@@ -1,4 +1,5 @@
 2018-08-21 DariusIII
+	* Fix: Fix wrong nzbpath check
 	* Chg: Update NZB and ReleaseExtra classes
 	* Chg: Remove implode from time check in PPA
 	* Chg: Update composer.lock
