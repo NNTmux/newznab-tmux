@@ -1,4 +1,5 @@
 2018-08-21 DariusIII
+	* Chg: Update composer.lock
 	* Chg: Move runCmd into helpers, return string instead an array
 	* Chg: Update laravel/framework, dborsato/php-giantbomb to latest versions
 2018-08-20 DariusIII

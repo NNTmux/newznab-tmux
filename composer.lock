@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e318da184af6bb8d7b8c778fe51c855",
+    "content-hash": "ca3891a0c5529c44d3f2fe9b6dd36b5e",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -9721,6 +9721,7 @@
         "ext-curl": "*",
         "ext-exif": "*",
         "ext-filter": "*",
+        "ext-fileinfo": "*",
         "ext-gd": "*",
         "ext-hash": "*",
         "ext-iconv": "*",
