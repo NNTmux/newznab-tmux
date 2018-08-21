@@ -7,6 +7,7 @@ use Blacklight\ColorCLI;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\Process\Process;
 
 if (! function_exists('getRawHtml')) {
 
@@ -236,6 +237,34 @@ if (! function_exists('makeFieldLinks')) {
             } while ($dec > 0);
 
             return $hex;
+        }
+    }
+
+    if (! function_exists('runCmd')) {
+        /**
+         * Run CLI command.
+         *
+         *
+         * @param string $command
+         * @param bool $debug
+         *
+         * @return string
+         */
+        function runCmd($command, $debug = false)
+        {
+            if ($debug) {
+                echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
+            }
+
+            $process = new Process($command);
+            $process->run();
+            $output = $process->getOutput();
+
+            if ($debug) {
+                echo '-Command Output: '.PHP_EOL.'   '.$output.PHP_EOL;
+            }
+
+            return $output;
         }
     }
 }

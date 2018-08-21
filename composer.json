@@ -73,6 +73,7 @@
     "ext-curl": "*",
     "ext-exif": "*",
     "ext-filter": "*",
+    "ext-fileinfo":"*",
     "ext-gd": "*",
     "ext-hash": "*",
     "ext-iconv": "*",
