@@ -1,3 +1,5 @@
+2018-08-22 DariusIII
+	* Chg: Update phpuint/phpunit, league/flysystem and Movies class
 2018-08-21 DariusIII
 	* Fix: Fix wrong nzbpath check
 	* Chg: Update NZB and ReleaseExtra classes

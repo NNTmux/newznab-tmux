@@ -830,8 +830,7 @@ class Movie
             $ret['title'] = $tmdbLookup['title'];
 
             $ret['tmdbid'] = $tmdbLookup['id'];
-            $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
-            $ret['imdbid'] = $ImdbID;
+            $ret['imdbid'] = str_replace('tt', '', $tmdbLookup['imdb_id']);
             $vote = $tmdbLookup['vote_average'];
             if ($vote !== null) {
                 $ret['rating'] = (int) $vote === 0 ? '' : $vote;
