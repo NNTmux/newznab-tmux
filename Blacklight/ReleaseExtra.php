@@ -461,12 +461,12 @@ class ReleaseExtra
                     'audioformat' => $audioFormat,
                     'audiomode' => $audioMode,
                     'audiobitratemode' => $audioBitRateMode,
-                    'audiobitrate' => \is_array($audioBitRate) ? $audioBitRate[0] : $audioBitRate,
+                    'audiobitrate' => $audioBitRate,
                     'audiochannels' => $audioChannels,
-                    'audiosamplerate' => \is_array($audioSampleRate) ? $audioSampleRate[0] : $audioSampleRate,
-                    'audiolibrary' => \is_array($audioLibrary) ? $audioLibrary[0] : $audioLibrary,
+                    'audiosamplerate' => ! empty($audioSampleRate) ? $audioSampleRate : '',
+                    'audiolibrary' => $audioLibrary,
                     'audiolanguage' => $audioLanguage,
-                    'audiotitle' => \is_array($audioTitle) ? $audioTitle[0] : $audioTitle,
+                    'audiotitle' => $audioTitle,
                 ]);
         }
     }
