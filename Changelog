@@ -1,4 +1,5 @@
 2018-08-22 DariusIII
+	* Chg: Update ReleaseExtra class, remove usage of substr() function
 	* Chg: Update phpuint/phpunit, league/flysystem and Movies class
 2018-08-21 DariusIII
 	* Fix: Fix wrong nzbpath check
