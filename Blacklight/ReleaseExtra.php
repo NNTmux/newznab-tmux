@@ -460,13 +460,13 @@ class ReleaseExtra
                     'audioid' => $audioID,
                     'audioformat' => $audioFormat,
                     'audiomode' => $audioMode,
-                    'audiobitratemode' => $audioBitRateMode,
+                    'audiobitratemode' => ! empty($audioBitRateMode) ? $audioBitRateMode : '',
                     'audiobitrate' => $audioBitRate,
                     'audiochannels' => $audioChannels,
                     'audiosamplerate' => ! empty($audioSampleRate) ? $audioSampleRate : '',
-                    'audiolibrary' => $audioLibrary,
+                    'audiolibrary' => ! empty($audioLibrary) ? $audioLibrary : '',
                     'audiolanguage' => $audioLanguage,
-                    'audiotitle' => $audioTitle,
+                    'audiotitle' => ! empty($audioTitle) ? $audioTitle : '',
                 ]);
         }
     }
