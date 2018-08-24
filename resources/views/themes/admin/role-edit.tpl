@@ -3,8 +3,7 @@
 
 	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/role-list"><i class="fa fa-arrow-left"></i> Go
 		back</a>
-	<form action="role-edit?action=submit" method="post">
-		{{csrf_field()}}
+    {{Form::open(['url' => 'admin/role-edit?action=submit', 'method' => 'post'])}}
 
 		<table class="input data table table-striped responsive-utilities jambo-table">
 
@@ -160,5 +159,5 @@
 
 		</table>
 
-	</form>
+    {{Form::close()}}
 </div>
