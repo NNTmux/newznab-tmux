@@ -149,7 +149,13 @@ class UserController extends BasePageController
                         User::updateUserRoleChangeDate($request->input('id'), $request->input('rolechangedate'));
                     }
                     if ($request->input('role') !== null) {
-                        Role::query()->where('id', $request->input('role'))->value('name');
+                        $roleName = Role::query()->where('id', $request->input('role'))->value('name');
+                        if ($roleName === 'Disabled') {
+                            $blockedUser = User::find($request->input('id'));
+                            if (\Firewall::isBlacklisted($blockedUser->host) === false) {
+                                \Firewall::blacklist($blockedUser->host);
+                            }
+                        }
                         $email = $request->input('email') ?? $request->input('email');
                         Mail::to($email)->send(new AccountChange($request->input('id')));
                     }

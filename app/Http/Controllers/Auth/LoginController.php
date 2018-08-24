@@ -52,33 +52,49 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
-            $this->validate($request, [
-                'g-recaptcha-response' => 'required|captcha',
+        $user = User::getByUsername($request->input('username'));
+
+        if ($user !== null && \Firewall::isBlacklisted($user->host) === false) {
+
+            if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
+                $this->validate($request, [
+                    'g-recaptcha-response' => 'required|captcha',
+                ]);
+            }
+
+            $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
+
+            $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+            $request->merge([
+                $login_type => $request->input('username'),
             ]);
+
+            if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
+                User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+
+                return redirect()->intended($this->redirectPath());
+            }
         }
 
-        $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
+        $theme = Settings::settingValue('site.main.style');
 
-        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL)
-            ? 'email'
-            : 'username';
+        $meta_title = 'Login';
+        $meta_keywords = 'Login';
+        $meta_description = 'Login';
+        $content = app('smarty.view')->fetch($theme.'/login.tpl');
 
-        $request->merge([
-            $login_type => $request->input('username'),
-        ]);
+        app('smarty.view')->assign('error', 'These credentials do not match our records.');
 
-        if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-            User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
-
-            return redirect()->intended($this->redirectPath());
-        }
-
-        return redirect()->back()
-            ->withInput()
-            ->withErrors([
-                'login' => 'These credentials do not match our records.',
-            ]);
+        app('smarty.view')->assign(
+            [
+                'content' => $content,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]
+        );
+        app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
     /**
@@ -95,7 +111,6 @@ class LoginController extends Controller
         $content = app('smarty.view')->fetch($theme.'/login.tpl');
         app('smarty.view')->assign(
             [
-                'error' => 'These credentials do not match our records.',
                 'content' => $content,
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
@@ -105,7 +120,7 @@ class LoginController extends Controller
         app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         Auth::logout();
 

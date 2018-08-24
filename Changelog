@@ -1,3 +1,5 @@
+2018-08-24 DariusIII
+	* Chg: Add checks for blacklisted users
 2018-08-22 DariusIII
 	* Chg: Update ReleaseExtra class, remove usage of substr() function
 	* Chg: Update phpuint/phpunit, league/flysystem and Movies class
