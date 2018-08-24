@@ -1,4 +1,5 @@
 2018-08-24 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.17.0
 	* Fix: Fix adding new roles
 	* Chg: Update spatie/laravel-fractal to version 5.4.1
 	* Chg: Add additional checks to audio related data in ReleaseExtra class
