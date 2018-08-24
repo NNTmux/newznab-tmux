@@ -100,7 +100,7 @@ class RoleController extends BasePageController
                 redirect()->to('admin/role-list')->sendHeaders();
                 break;
             case 'view':
-            default :
+            default:
             $title = 'Add User Role';
             $role = [
             ];
@@ -118,7 +118,7 @@ class RoleController extends BasePageController
                 'title' => $title,
                 'meta_title' => $title,
                 'content' => $content,
-                'role' => $role
+                'role' => $role,
             ]
         );
 
