@@ -27,7 +27,6 @@ Route::get('login', 'Auth\LoginController@showLoginForm');
 Route::post('login', 'Auth\LoginController@login')->name('login');
 
 Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function () {
-
     Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
     Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
 
