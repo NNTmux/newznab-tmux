@@ -77,24 +77,7 @@ class LoginController extends Controller
             }
         }
 
-        $theme = Settings::settingValue('site.main.style');
-
-        $meta_title = 'Login';
-        $meta_keywords = 'Login';
-        $meta_description = 'Login';
-        $content = app('smarty.view')->fetch($theme.'/login.tpl');
-
-        app('smarty.view')->assign('error', 'These credentials do not match our records.');
-
-        app('smarty.view')->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
-        app('smarty.view')->display($theme.'/basepage.tpl');
+        return redirect()->back();
     }
 
     /**
