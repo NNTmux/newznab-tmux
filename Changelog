@@ -1,3 +1,8 @@
+2018-08-24 DariusIII
+	* Chg: Update firewall config, allow 10 requests per minute
+	* Chg: Add blocking of blacklisted IP's to api routes
+	* Chg: Update web routes and revert LoginController action on blacklisted IP
+	* Chg: Add checks for blacklisted users
 2018-08-22 DariusIII
 	* Chg: Update ReleaseExtra class, remove usage of substr() function
 	* Chg: Update phpuint/phpunit, league/flysystem and Movies class
@@ -12,6 +17,8 @@
 	* Chg: Update spatie/laravel-permission and imdbphp/imdbphp to latest versions
 2018-08-17 DariusIII
 	* Chg: Update egulias/email-validator to version 2.1.5 and spatie/laravel-permission to version 2.15.0
+2018-08-16 DariusIII
+   	* Chg: Add soft firewall to manage access to site
 2018-08-15 DariusIII
 	* Chg: Update date handling of Games class
 	* Chg: Update regex for matching width/height in ReleaseExtra class

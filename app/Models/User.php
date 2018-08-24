@@ -788,12 +788,12 @@ class User extends Authenticatable
         }
 
         $res = self::getByUsername($userName);
-        if ($res) {
+        if ($res !== null) {
             return self::ERR_SIGNUP_UNAMEINUSE;
         }
 
         $res = self::getByEmail($email);
-        if ($res) {
+        if ($res !== null) {
             return self::ERR_SIGNUP_EMAILINUSE;
         }
 

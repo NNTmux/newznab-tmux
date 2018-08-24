@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca3891a0c5529c44d3f2fe9b6dd36b5e",
+    "content-hash": "7de586d532aaeef1c7306e16bb028c37",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -105,16 +105,16 @@
         },
         {
             "name": "anhskohbo/no-captcha",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/anhskohbo/no-captcha.git",
-                "reference": "f6c3a006b8c74f692d232d861c3e104621f50dcc"
+                "reference": "821a256c692392941ab165893bb642557f94f918"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/f6c3a006b8c74f692d232d861c3e104621f50dcc",
-                "reference": "f6c3a006b8c74f692d232d861c3e104621f50dcc",
+                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/821a256c692392941ab165893bb642557f94f918",
+                "reference": "821a256c692392941ab165893bb642557f94f918",
                 "shasum": ""
             },
             "require": {
@@ -160,7 +160,7 @@
                 "no-captcha",
                 "recaptcha"
             ],
-            "time": "2018-02-09T02:04:49+00:00"
+            "time": "2018-08-10T11:44:19+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",
@@ -312,7 +312,8 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            }
+            },
+            "time": "2016-06-06T17:37:52+00:00"
         },
         {
             "name": "bower-asset/autosize",
@@ -341,7 +342,8 @@
                 "form",
                 "textarea",
                 "ui"
-            ]
+            ],
+            "time": "2017-05-19T15:36:30+00:00"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -390,7 +392,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-3.x",
@@ -439,7 +442,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -468,7 +472,8 @@
             },
             "license": [
                 "Apache-2.0"
-            ]
+            ],
+            "time": "2016-08-05T09:50:13+00:00"
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -498,7 +503,8 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ]
+            ],
+            "time": "2015-12-01T23:35:57+00:00"
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -532,7 +538,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2015-05-15T18:56:17+00:00"
         },
         {
             "name": "bower-asset/bootswatch",
@@ -663,7 +670,8 @@
                 "modal",
                 "popup",
                 "ui"
-            ]
+            ],
+            "time": "2016-05-10T22:21:33+00:00"
         },
         {
             "name": "bower-asset/datatables",
@@ -778,7 +786,8 @@
                     "tests",
                     "examples"
                 ]
-            }
+            },
+            "time": "2015-01-26T21:19:01+00:00"
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -814,7 +823,8 @@
                 "css",
                 "flexbox",
                 "grid"
-            ]
+            ],
+            "time": "2016-08-14T16:43:18+00:00"
         },
         {
             "name": "bower-asset/font-awesome",
@@ -859,7 +869,8 @@
                     "src",
                     "build.xml"
                 ]
-            }
+            },
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "bower-asset/icheck",
@@ -909,7 +920,8 @@
                 "replacement",
                 "skins",
                 "ui"
-            ]
+            ],
+            "time": "2014-03-03T17:36:28+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -972,7 +984,8 @@
                 "javascript",
                 "jquery",
                 "library"
-            ]
+            ],
+            "time": "2016-05-20T17:24:43+00:00"
         },
         {
             "name": "bower-asset/jquery-3.2.x",
@@ -1039,7 +1052,8 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ]
+            ],
+            "time": "2017-08-31T15:51:29+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
@@ -1058,7 +1072,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-04-15T06:38:34+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-3.0.x",
@@ -1077,7 +1092,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-06-10T14:28:59+00:00"
         },
         {
             "name": "bower-asset/jquery.nicescroll",
@@ -1107,7 +1123,8 @@
                     "demo",
                     "package.json"
                 ]
-            }
+            },
+            "time": "2016-03-01T20:38:24+00:00"
         },
         {
             "name": "bower-asset/material-design-iconic-font",
@@ -1146,7 +1163,8 @@
                 "font",
                 "icons",
                 "material"
-            ]
+            ],
+            "time": "2015-11-08T04:50:28+00:00"
         },
         {
             "name": "bower-asset/materialize",
@@ -1205,7 +1223,8 @@
                 "responsive",
                 "sass",
                 "ux"
-            ]
+            ],
+            "time": "2017-04-15T01:39:28+00:00"
         },
         {
             "name": "bower-asset/pace",
@@ -1251,7 +1270,8 @@
                 "progress",
                 "progress",
                 "spinner"
-            ]
+            ],
+            "time": "2014-11-06T16:31:34+00:00"
         },
         {
             "name": "bower-asset/pnotify",
@@ -1303,7 +1323,8 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin."
+            "description": "JavaScript notification plugin.",
+            "time": "2017-07-31T21:50:29+00:00"
         },
         {
             "name": "bower-asset/respond",
@@ -1327,7 +1348,8 @@
                     "test"
                 ]
             },
-            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
+            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
+            "time": "2013-12-19T04:44:31+00:00"
         },
         {
             "name": "bower-asset/responsive-tables-js",
@@ -1357,7 +1379,8 @@
                 "jquery",
                 "responsive",
                 "table"
-            ]
+            ],
+            "time": "2015-10-08T14:18:04+00:00"
         },
         {
             "name": "bower-asset/select2",
@@ -1425,7 +1448,8 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ]
+            ],
+            "time": "2016-06-11T09:19:14+00:00"
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -1762,6 +1786,62 @@
                 "stream_filter_register"
             ],
             "time": "2017-08-18T09:54:01+00:00"
+        },
+        {
+            "name": "composer/ca-bundle",
+            "version": "1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/ca-bundle.git",
+                "reference": "46afded9720f40b9dc63542af4e3e43a1177acb0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/46afded9720f40b9dc63542af4e3e43a1177acb0",
+                "reference": "46afded9720f40b9dc63542af4e3e43a1177acb0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "ext-pcre": "*",
+                "php": "^5.3.2 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5",
+                "psr/log": "^1.0",
+                "symfony/process": "^2.5 || ^3.0 || ^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\CaBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Lets you find a path to the system CA bundle, and includes a fallback to the Mozilla CA bundle.",
+            "keywords": [
+                "cabundle",
+                "cacert",
+                "certificate",
+                "ssl",
+                "tls"
+            ],
+            "time": "2018-08-08T08:57:40+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
@@ -2710,6 +2790,58 @@
             ],
             "description": "Keeping Your Laravel Forms Awake",
             "time": "2018-08-05T18:19:41+00:00"
+        },
+        {
+            "name": "geoip2/geoip2",
+            "version": "v2.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maxmind/GeoIP2-php.git",
+                "reference": "a807fbf65212eef5d8d2db1a1b31082b53633d77"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/a807fbf65212eef5d8d2db1a1b31082b53633d77",
+                "reference": "a807fbf65212eef5d8d2db1a1b31082b53633d77",
+                "shasum": ""
+            },
+            "require": {
+                "maxmind-db/reader": "~1.0",
+                "maxmind/web-service-common": "~0.5",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "2.*",
+                "phpunit/phpunit": "4.*",
+                "squizlabs/php_codesniffer": "3.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GeoIp2\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Gregory J. Oschwald",
+                    "email": "goschwald@maxmind.com",
+                    "homepage": "http://www.maxmind.com/"
+                }
+            ],
+            "description": "MaxMind GeoIP2 PHP API",
+            "homepage": "https://github.com/maxmind/GeoIP2-php",
+            "keywords": [
+                "IP",
+                "geoip",
+                "geoip2",
+                "geolocation",
+                "maxmind"
+            ],
+            "time": "2018-04-10T15:32:59+00:00"
         },
         {
             "name": "google/recaptcha",
@@ -4094,6 +4226,108 @@
             "time": "2017-06-12T11:04:56+00:00"
         },
         {
+            "name": "maxmind-db/reader",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maxmind/MaxMind-DB-Reader-php.git",
+                "reference": "e042b4f8a2dff41e19019faf16427178b07fbd58"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maxmind/MaxMind-DB-Reader-php/zipball/e042b4f8a2dff41e19019faf16427178b07fbd58",
+                "reference": "e042b4f8a2dff41e19019faf16427178b07fbd58",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "2.*",
+                "phpunit/phpunit": "4.* || 5.*",
+                "satooshi/php-coveralls": "1.0.*",
+                "squizlabs/php_codesniffer": "3.*"
+            },
+            "suggest": {
+                "ext-bcmath": "bcmath or gmp is required for decoding larger integers with the pure PHP decoder",
+                "ext-gmp": "bcmath or gmp is required for decoding larger integers with the pure PHP decoder",
+                "ext-maxminddb": "A C-based database decoder that provides significantly faster lookups"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MaxMind\\Db\\": "src/MaxMind/Db"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Gregory J. Oschwald",
+                    "email": "goschwald@maxmind.com",
+                    "homepage": "http://www.maxmind.com/"
+                }
+            ],
+            "description": "MaxMind DB Reader API",
+            "homepage": "https://github.com/maxmind/MaxMind-DB-Reader-php",
+            "keywords": [
+                "database",
+                "geoip",
+                "geoip2",
+                "geolocation",
+                "maxmind"
+            ],
+            "time": "2018-02-21T21:23:33+00:00"
+        },
+        {
+            "name": "maxmind/web-service-common",
+            "version": "v0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maxmind/web-service-common-php.git",
+                "reference": "61a9836fa3bb1743ab89752bae5005d71e78c73b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maxmind/web-service-common-php/zipball/61a9836fa3bb1743ab89752bae5005d71e78c73b",
+                "reference": "61a9836fa3bb1743ab89752bae5005d71e78c73b",
+                "shasum": ""
+            },
+            "require": {
+                "composer/ca-bundle": "^1.0.3",
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "2.*",
+                "phpunit/phpunit": "4.*",
+                "squizlabs/php_codesniffer": "3.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MaxMind\\Exception\\": "src/Exception",
+                    "MaxMind\\WebService\\": "src/WebService"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Gregory Oschwald",
+                    "email": "goschwald@maxmind.com"
+                }
+            ],
+            "description": "Internal MaxMind Web Service API",
+            "homepage": "https://github.com/maxmind/web-service-common-php",
+            "time": "2018-02-12T22:31:54+00:00"
+        },
+        {
             "name": "mayconbordin/l5-fixtures",
             "version": "dev-master",
             "source": {
@@ -4840,6 +5074,130 @@
                 "wrapper"
             ],
             "time": "2018-05-03T18:05:46+00:00"
+        },
+        {
+            "name": "pragmarx/firewall",
+            "version": "v2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/antonioribeiro/firewall.git",
+                "reference": "fd840bec09ed4c3de67d5d350c3f6d5f8a8eaec4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/antonioribeiro/firewall/zipball/fd840bec09ed4c3de67d5d350c3f6d5f8a8eaec4",
+                "reference": "fd840bec09ed4c3de67d5d350c3f6d5f8a8eaec4",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=5.3",
+                "php": ">=5.6",
+                "pragmarx/support": "~0.8.0"
+            },
+            "require-dev": {
+                "geoip2/geoip2": "~2.0",
+                "guzzlehttp/guzzle": "^6.2",
+                "orchestra/testbench": "~3.6",
+                "phpunit/phpunit": "~7"
+            },
+            "suggest": {
+                "geoip/geoip": "~1.14",
+                "geoip2/geoip2": "~2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "PragmaRX\\Firewall\\Vendor\\Laravel\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "Firewall": "PragmaRX\\Firewall\\Vendor\\Laravel\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PragmaRX\\Firewall\\": "src/",
+                    "PragmaRX\\Firewall\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Antonio Carlos Ribeiro",
+                    "email": "acr@antoniocarlosribeiro.com",
+                    "role": "Creator"
+                }
+            ],
+            "description": "A Laravel IP whitelisting and blacklisting",
+            "keywords": [
+                "blacklist",
+                "firewall",
+                "laravel",
+                "whitelist"
+            ],
+            "time": "2018-07-31T23:07:56+00:00"
+        },
+        {
+            "name": "pragmarx/support",
+            "version": "v0.8.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/antonioribeiro/support.git",
+                "reference": "ba6e3a245f50c5a00b3ee99fae542af00585f77c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/antonioribeiro/support/zipball/ba6e3a245f50c5a00b3ee99fae542af00585f77c",
+                "reference": "ba6e3a245f50c5a00b3ee99fae542af00585f77c",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "~4.0|~5.0",
+                "php": ">=5.4.0",
+                "symfony/var-dumper": "~2.6|~3.0|~4.0"
+            },
+            "suggest": {
+                "laravel/framework": "Laravel framework.",
+                "symfony/yaml": "The Yaml class needs it"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PragmaRX\\Support\\": "src/"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Antonio Carlos Ribeiro",
+                    "email": "acr@antoniocarlosribeiro.com",
+                    "role": "Creator"
+                }
+            ],
+            "description": "PragmaRX components support package",
+            "keywords": [
+                "laravel",
+                "pragmarx"
+            ],
+            "time": "2018-02-10T15:05:53+00:00"
         },
         {
             "name": "predis/predis",

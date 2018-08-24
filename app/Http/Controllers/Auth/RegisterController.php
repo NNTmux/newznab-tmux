@@ -79,7 +79,7 @@ class RegisterController extends Controller
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @throws \Exception
+     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
     public function register(Request $request)
     {
