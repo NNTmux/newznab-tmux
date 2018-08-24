@@ -465,7 +465,7 @@ class ReleaseExtra
                     'audiochannels' => $audioChannels,
                     'audiosamplerate' => ! empty($audioSampleRate) ? $audioSampleRate : '',
                     'audiolibrary' => ! empty($audioLibrary) ? $audioLibrary : '',
-                    'audiolanguage' => $audioLanguage,
+                    'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage : '',
                     'audiotitle' => ! empty($audioTitle) ? $audioTitle : '',
                 ]);
         }
