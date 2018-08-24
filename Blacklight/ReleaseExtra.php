@@ -433,7 +433,7 @@ class ReleaseExtra
                     'videoheight' => $videoHeight,
                     'videoaspect' => $videoAspect,
                     'videoframerate' => $videoFrameRate,
-                    'videolibrary' => substr($videoLibrary, 0, 50),
+                    'videolibrary' => $videoLibrary,
                 ]);
         }
     }
@@ -461,12 +461,12 @@ class ReleaseExtra
                     'audioformat' => $audioFormat,
                     'audiomode' => $audioMode,
                     'audiobitratemode' => $audioBitRateMode,
-                    'audiobitrate' => substr($audioBitRate, 0, 10),
+                    'audiobitrate' => $audioBitRate,
                     'audiochannels' => $audioChannels,
-                    'audiosamplerate' => substr($audioSampleRate, 0, 25),
-                    'audiolibrary' => substr($audioLibrary, 0, 50),
+                    'audiosamplerate' => ! empty($audioSampleRate) ? $audioSampleRate : '',
+                    'audiolibrary' => $audioLibrary,
                     'audiolanguage' => $audioLanguage,
-                    'audiotitle' => substr($audioTitle, 0, 50),
+                    'audiotitle' => $audioTitle,
                 ]);
         }
     }

@@ -1072,7 +1072,7 @@ class ProcessAdditional
                 if ($this->_extractUsingRarInfo === false && $this->_unrarPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.rar';
                     file_put_contents($fileName, $compressedData);
-                    Utility::runCmd(
+                    runCmd(
                         $this->_killString.$this->_unrarPath.
                         '" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.
                         $fileName.'" "'.$this->tmpPath.'unrar/"'
@@ -1088,7 +1088,7 @@ class ProcessAdditional
                 if ($this->_extractUsingRarInfo === false && $this->_7zipPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     file_put_contents($fileName, $compressedData);
-                    Utility::runCmd(
+                    runCmd(
                         $this->_killString.$this->_7zipPath.'" x "'.
                         $fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"'
                     );
@@ -1700,40 +1700,39 @@ class ProcessAdditional
             if ($retVal === false) {
 
                 // Get the media info for the file.
-                $xmlArray = Utility::runCmd(
+                $xmlArray = runCmd(
                     $this->_killString.Settings::settingValue('apps..mediainfopath').'" --Output=XML "'.$fileLocation.'"'
                 );
-                if (\is_array($xmlArray)) {
 
-                    // Convert to array.
-                    $arrXml = Utility::objectsIntoArray(@simplexml_load_string(implode("\n", $xmlArray)));
+                // Convert to array.
+                $arrXml = Utility::objectsIntoArray(@simplexml_load_string($xmlArray));
 
-                    if (isset($arrXml['File']['track'])) {
-                        foreach ($arrXml['File']['track'] as $track) {
-                            if (isset($track['Album'], $track['Performer'])) {
-                                if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
-                                    // Make the extension upper case.
-                                    $ext = strtoupper($fileExtension);
+                if (isset($arrXml['File']['track'])) {
+                    foreach ($arrXml['File']['track'] as $track) {
+                        if (isset($track['Album'], $track['Performer'])) {
+                            if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
+                                // Make the extension upper case.
+                                $ext = strtoupper($fileExtension);
 
-                                    // Form a new search name.
-                                    if (! empty($track['Recorded_date']) && preg_match('/(?:19|20)\d\d/', $track['Recorded_date'], $Year)) {
-                                        $newName = $track['Performer'].' - '.$track['Album'].' ('.$Year[0].') '.$ext;
-                                    } else {
-                                        $newName = $track['Performer'].' - '.$track['Album'].' '.$ext;
-                                    }
+                                // Form a new search name.
+                                if (! empty($track['Recorded_date']) && preg_match('/(?:19|20)\d\d/', $track['Recorded_date'], $Year)) {
+                                    $newName = $track['Performer'].' - '.$track['Album'].' ('.$Year[0].') '.$ext;
+                                } else {
+                                    $newName = $track['Performer'].' - '.$track['Album'].' '.$ext;
+                                }
 
-                                    // Get the category or try to determine it.
-                                    if ($ext === 'MP3') {
-                                        $newCat = Category::MUSIC_MP3;
-                                    } elseif ($ext === 'FLAC') {
-                                        $newCat = Category::MUSIC_LOSSLESS;
-                                    } else {
-                                        $newCat = $this->_categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname);
-                                    }
+                                // Get the category or try to determine it.
+                                if ($ext === 'MP3') {
+                                    $newCat = Category::MUSIC_MP3;
+                                } elseif ($ext === 'FLAC') {
+                                    $newCat = Category::MUSIC_LOSSLESS;
+                                } else {
+                                    $newCat = $this->_categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname);
+                                }
 
-                                    $newTitle = $this->pdo->quote(substr($newName, 0, 255));
-                                    // Update the search name.
-                                    DB::update(
+                                $newTitle = $this->pdo->quote(substr($newName, 0, 255));
+                                // Update the search name.
+                                DB::update(
                                         sprintf(
                                             '
 											UPDATE releases
@@ -1744,11 +1743,11 @@ class ProcessAdditional
                                             $this->_release->id
                                         )
                                     );
-                                    $this->sphinx->updateRelease($this->_release->id);
+                                $this->sphinx->updateRelease($this->_release->id);
 
-                                    // Echo the changed name.
-                                    if ($this->_echoCLI) {
-                                        NameFixer::echoChangedReleaseName(
+                                // Echo the changed name.
+                                if ($this->_echoCLI) {
+                                    NameFixer::echoChangedReleaseName(
                                             [
                                                 'new_name' => $newName,
                                                 'old_name' => $rQuery['searchname'],
@@ -1759,19 +1758,18 @@ class ProcessAdditional
                                                 'method' => 'ProcessAdditional->_getAudioInfo',
                                             ]
                                         );
-                                    }
                                 }
-
-                                // Add the media info.
-                                $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
-
-                                $retVal = true;
-                                $this->_foundAudioInfo = true;
-                                if ($this->_echoCLI) {
-                                    $this->_echo('a', 'primaryOver', false);
-                                }
-                                break;
                             }
+
+                            // Add the media info.
+                            $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
+
+                            $retVal = true;
+                            $this->_foundAudioInfo = true;
+                            if ($this->_echoCLI) {
+                                $this->_echo('a', 'primaryOver', false);
+                            }
+                            break;
                         }
                     }
                 }
@@ -1784,7 +1782,7 @@ class ProcessAdditional
                 $audioFileName = ($this->_release->guid.'.ogg');
 
                 // Create an audio sample.
-                Utility::runCmd(
+                runCmd(
                     $this->_killString.
                     Settings::settingValue('apps..ffmpegpath').
                     '" -t 30 -i "'.
@@ -1871,7 +1869,7 @@ class ProcessAdditional
 
         $tmpVideo = ($this->tmpPath.uniqid('', true).$extension);
         // Get the real duration of the file.
-        $time = Utility::runCmd(
+        $time = runCmd(
             $this->_killString.
             Settings::settingValue('apps..ffmpegpath').
             '" -i "'.$videoLocation.
@@ -1881,7 +1879,7 @@ class ProcessAdditional
         );
         @unlink($tmpVideo);
 
-        if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', implode(' ', $time), $numbers)) {
+        if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
             return '';
         }
 
@@ -1916,7 +1914,7 @@ class ProcessAdditional
             $time = $this->getVideoTime($fileLocation);
 
             // Create the image.
-            Utility::runCmd(
+            runCmd(
                 $this->_killString.
                 Settings::settingValue('apps..ffmpegpath').
                 '" -i "'.
@@ -2009,7 +2007,7 @@ class ProcessAdditional
                     }
 
                     // Try to get the sample (from the end instead of the start).
-                    Utility::runCmd(
+                    runCmd(
                         $this->_killString.
                         Settings::settingValue('apps..ffmpegpath').
                         '" -i "'.
@@ -2026,7 +2024,7 @@ class ProcessAdditional
 
             if ($newMethod === false) {
                 // If longer than 60 or we could not get the video length, run the old way.
-                Utility::runCmd(
+                runCmd(
                     $this->_killString.
                     Settings::settingValue('apps..ffmpegpath').
                     '" -i "'.
@@ -2092,30 +2090,25 @@ class ProcessAdditional
         if (is_file($fileLocation)) {
 
             // Run media info on it.
-            $xmlArray = Utility::runCmd(
+            $xmlArray = runCmd(
                 $this->_killString.Settings::settingValue('apps..mediainfopath').'" --Output=XML "'.$fileLocation.'"'
             );
 
             // Check if we got it.
-            if (\is_array($xmlArray)) {
 
-                // Convert it to string.
-                $xmlArray = implode("\n", $xmlArray);
-
-                if (! preg_match('/<track type="(Audio|Video)">/i', $xmlArray)) {
-                    return false;
-                }
-
-                // Insert it into the DB.
-                $this->_releaseExtra->addFull($this->_release->id, $xmlArray);
-                $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
-
-                if ($this->_echoCLI) {
-                    $this->_echo('m', 'primaryOver', false);
-                }
-
-                return true;
+            if (! preg_match('/<track type="(Audio|Video)">/i', $xmlArray)) {
+                return false;
             }
+
+            // Insert it into the DB.
+            $this->_releaseExtra->addFull($this->_release->id, $xmlArray);
+            $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
+
+            if ($this->_echoCLI) {
+                $this->_echo('m', 'primaryOver', false);
+            }
+
+            return true;
         }
 
         return false;

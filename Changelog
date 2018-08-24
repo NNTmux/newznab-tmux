@@ -1,5 +1,19 @@
+2018-08-22 DariusIII
+	* Chg: Update ReleaseExtra class, remove usage of substr() function
+	* Chg: Update phpuint/phpunit, league/flysystem and Movies class
+2018-08-21 DariusIII
+	* Fix: Fix wrong nzbpath check
+	* Chg: Update NZB and ReleaseExtra classes
+	* Chg: Remove implode from time check in PPA
+	* Chg: Update composer.lock
+	* Chg: Move runCmd into helpers, return string instead an array
+	* Chg: Update laravel/framework, dborsato/php-giantbomb to latest versions
+2018-08-20 DariusIII
+	* Chg: Update spatie/laravel-permission and imdbphp/imdbphp to latest versions
+2018-08-17 DariusIII
+	* Chg: Update egulias/email-validator to version 2.1.5 and spatie/laravel-permission to version 2.15.0
 2018-08-16 DariusIII
-	* Chg: Add soft firewall to manage access to site
+   	* Chg: Add soft firewall to manage access to site
 2018-08-15 DariusIII
 	* Chg: Update date handling of Games class
 	* Chg: Update regex for matching width/height in ReleaseExtra class

@@ -6,7 +6,6 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
@@ -600,23 +599,7 @@ class Utility
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
         if ($magicPath !== null && self::hasCommand('file')) {
             $magicSwitch = " -m $magicPath";
-            $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
-
-            if (\is_array($output)) {
-                switch (\count($output)) {
-                    case 0:
-                        $output = '';
-                        break;
-                    case 1:
-                        $output = $output[0];
-                        break;
-                    default:
-                        $output = implode(' ', $output);
-                        break;
-                }
-            } else {
-                $output = '';
-            }
+            $output = runCmd('file'.$magicSwitch.' -b "'.$path.'"');
         } else {
             $fileInfo = $magicPath === null ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
 
@@ -700,33 +683,6 @@ class Utility
         }
 
         return $arrData;
-    }
-
-    /**
-     * Run CLI command.
-     *
-     *
-     * @param string $command
-     * @param bool $debug
-     *
-     * @return array
-     */
-    public static function runCmd($command, $debug = false): array
-    {
-        if ($debug) {
-            echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
-        }
-
-        $output = [];
-        $process = new Process($command);
-        $process->run();
-        $output[] = $process->getOutput();
-
-        if ($debug) {
-            echo '-Command Output: '.PHP_EOL.'   '.implode(PHP_EOL.'  ', $output).PHP_EOL;
-        }
-
-        return $output;
     }
 
     /**
