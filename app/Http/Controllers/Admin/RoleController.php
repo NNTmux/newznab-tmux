@@ -24,13 +24,11 @@ class RoleController extends BasePageController
 
         $content = $this->smarty->fetch('role-list.tpl');
 
-        $this->smarty->assign(
-            [
+        $this->smarty->assign([
                 'title' => $title,
                 'meta_title' => $title,
                 'content' => $content,
-            ]
-        );
+            ]);
 
         $this->adminrender();
     }
@@ -40,47 +38,20 @@ class RoleController extends BasePageController
      *
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function create(Request $request): void
     {
         $this->setAdminPrefs();
 
-        $title = 'User Roles';
-
-        // Get the user roles.
-        $userRoles = Role::all();
-        $roles = [];
-        foreach ($userRoles as $userRole) {
-            $roles[$userRole['id']] = $userRole['name'];
-        }
-
         switch ($request->input('action') ?? 'view') {
-            case 'add':
-                $title = 'Add User Role';
-                $role = [
-                    'id'               => '',
-                    'name'             => '',
-                    'apirequests'      => '',
-                    'downloadrequests' => '',
-                    'defaultinvites'   => '',
-                    'isdefault'        => 0,
-                    'canpreview'       => 0,
-                    'hideads'          => 0,
-                    'donation'         => 0,
-                    'addyears'         => 0,
-                ];
-                $this->smarty->assign('role', $role);
-                break;
-
             case 'submit':
-                if (empty($request->input('id'))) {
-                    $title = 'Add User Role';
+                $title = 'Add User Role';
                     $role = Role::create([
                         'name' => $request->input('name'),
                         'apirequests' => $request->input('apirequests'),
                         'downloadrequests' => $request->input('downloadrequests'),
                         'defaultinvites' => $request->input('defaultinvites'),
-                        'donation' => $request->input('donation'),
-                        'addyears' => $request->input('addyears'),
+                        'donation' => $request->input('donation') ?? 0,
+                        'addyears' => $request->input('addyears') ?? 0,
                         'rate_limit' => $request->input('rate_limit'),
                     ]);
                     if ((int) $request->input('canpreview') === 1) {
@@ -126,7 +97,54 @@ class RoleController extends BasePageController
                     if ((int) $request->input('viewother') === 1) {
                         $role->givePermissionTo('view other');
                     }
-                } else {
+                redirect()->to('admin/role-list')->sendHeaders();
+                break;
+            case 'view':
+            default :
+            $title = 'Add User Role';
+            $role = [
+            ];
+
+            break;
+        }
+
+        $this->smarty->assign('yesno_ids', [1, 0]);
+        $this->smarty->assign('yesno_names', ['Yes', 'No']);
+
+        $content = $this->smarty->fetch('role-add.tpl');
+
+        $this->smarty->assign(
+            [
+                'title' => $title,
+                'meta_title' => $title,
+                'content' => $content,
+                'role' => $role
+            ]
+        );
+
+        $this->adminrender();
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
+    public function edit(Request $request): void
+    {
+        $this->setAdminPrefs();
+
+        $title = 'User Roles';
+
+        // Get the user roles.
+        $userRoles = Role::all();
+        $roles = [];
+        foreach ($userRoles as $userRole) {
+            $roles[$userRole['id']] = $userRole['name'];
+        }
+
+        switch ($request->input('action') ?? 'view') {
+            case 'submit':
                     $title = 'Update User Role';
                     $role = Role::find($request->input('id'));
                     $role->update([
@@ -205,7 +223,7 @@ class RoleController extends BasePageController
                     } elseif ((int) $request->input('viewother') === 0 && $role->hasPermissionTo('view other') === true) {
                         $role->revokePermissionTo('view other');
                     }
-                }
+
                 $this->smarty->assign('role', $role);
                 redirect()->to('admin/role-list')->sendHeaders();
                 break;

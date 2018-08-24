@@ -1,4 +1,5 @@
 2018-08-24 DariusIII
+	* Fix: Fix adding new roles
 	* Chg: Update spatie/laravel-fractal to version 5.4.1
 	* Chg: Add additional checks to audio related data in ReleaseExtra class
 	* Chg: Update firewall config, allow 10 requests per minute

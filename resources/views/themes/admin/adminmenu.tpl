@@ -107,7 +107,7 @@
 					<li><a href="{$smarty.const.WWW_TOP}/admin/user-list">View Users</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/user-edit?action=add">Add Users</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/admin/role-list">View User Roles</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/admin/role-edit?action=add">Add User Roles</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/admin/role-add">Add User Roles</a></li>
 				</ul>
 			</li>
 			<li><a><i class="fa fa-linux"></i><span> Tmux</span><span class="fa fa-chevron-down"></span></a>

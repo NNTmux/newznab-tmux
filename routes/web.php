@@ -244,6 +244,8 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('site-stats', 'SiteController@stats');
     Route::get('role-list', 'RoleController@index');
     Route::post('role-list', 'RoleController@index');
+    Route::get('role-add', 'RoleController@create');
+    Route::post('role-add', 'RoleController@create');
     Route::get('role-edit', 'RoleController@edit');
     Route::post('role-edit', 'RoleController@edit');
     Route::get('role-delete', 'RoleController@destroy');
