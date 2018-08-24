@@ -1,4 +1,5 @@
 2018-08-24 DariusIII
+	* Chg: Update firewall config, allow 10 requests per minute
 	* Chg: Add blocking of blacklisted IP's to api routes
 	* Chg: Update web routes and revert LoginController action on blacklisted IP
 	* Chg: Add checks for blacklisted users
