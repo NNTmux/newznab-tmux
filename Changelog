@@ -1,3 +1,5 @@
+2018-08-26 DariusIIi
+	* Fix: Fix adding new groups from admin interface
 2018-08-24 DariusIII
 	* Chg: Update spatie/laravel-permission to version 2.17.0
 	* Fix: Fix adding new roles
