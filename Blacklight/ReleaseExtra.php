@@ -368,7 +368,7 @@ class ReleaseExtra
                             $audioLanguage = $track['Language'];
                         }
 
-                        if (isset($track['Title'])) {
+                        if (! empty($track['Title'])) {
                             $audioTitle = $track['Title'];
                         }
 
