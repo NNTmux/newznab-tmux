@@ -687,6 +687,8 @@ class Movie
             $mov['actors'] = \is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
         } elseif (! empty($omdb['actors'])) {
             $mov['actors'] = \is_array($omdb['actors']) ? implode(', ', array_unique($omdb['actors'])) : $omdb['actors'];
+        } elseif (! empty($tmdb['actors'])) {
+            $mov['actors'] = \is_array($tmdb['actors']) ? implode(', ', array_unique($tmdb['actors'])) : $tmdb['actors'];
         }
 
         if (! empty($imdb['language'])) {
@@ -802,7 +804,7 @@ class Movie
         $lookupId = $text === false && \strlen($imdbId) === 7 ? 'tt'.$imdbId : $imdbId;
 
         try {
-            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
+            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
         } catch (TmdbApiException $error) {
             ColorCLI::doEcho(ColorCLI::error($error->getMessage()), true);
 
@@ -836,6 +838,17 @@ class Movie
                 $ret['rating'] = (int) $vote === 0 ? '' : $vote;
             } else {
                 $ret['rating'] = '';
+            }
+            $actors = array_pluck($tmdbLookup['credits']['cast'], 'name');
+            if (! empty($actors)) {
+                $ret['actors'] = $actors;
+            } else {
+                $ret['actors'] = '';
+            }
+            foreach ($tmdbLookup['credits']['crew'] as $crew) {
+                if ($crew['department'] === 'Directing' && $crew['job'] === 'Director') {
+                    $ret['director'] = $crew['name'];
+                }
             }
             $overview = $tmdbLookup['overview'];
             if (! empty($overview)) {
