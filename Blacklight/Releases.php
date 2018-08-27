@@ -37,11 +37,6 @@ class Releases
     public $sphinxSearch;
 
     /**
-     * @var string
-     */
-    public $showPasswords;
-
-    /**
      * @var int
      */
     public $passwordStatus;
@@ -61,7 +56,6 @@ class Releases
 
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch();
-        $this->showPasswords = self::showPasswords();
     }
 
     /**
@@ -111,7 +105,7 @@ class Releases
 			GROUP BY r.id
 			ORDER BY %8\$s %9\$s",
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
@@ -157,7 +151,7 @@ class Releases
 				%s %s %s %s',
             ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->quote($groupName)) : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
@@ -177,14 +171,14 @@ class Releases
     /**
      * @return string
      */
-    public static function showPasswords()
+    public function showPasswords()
     {
-        $setting = Settings::settingValue('..showpasswordedrelease');
-        $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
+        $setting = (int) Settings::settingValue('..showpasswordedrelease');
+        $setting = $setting ?? 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
-                    return '='.self::PASSWD_NONE;
+                    return '= '.self::PASSWD_NONE;
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
 
                     return '<= '.self::PASSWD_POTENTIAL;
@@ -421,7 +415,7 @@ class Releases
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
-                $this->showPasswords,
+                $this->showPasswords(),
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
                 $orderBy[0],
                 $orderBy[1],
@@ -465,7 +459,7 @@ class Releases
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
                 Category::TV_OTHER,
-                $this->showPasswords,
+                $this->showPasswords(),
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
             )
         );
@@ -639,7 +633,7 @@ class Releases
         $whereSql = sprintf(
             '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s',
             $this->releaseSearch->getFullTextJoinString(),
-            $this->showPasswords,
+            $this->showPasswords(),
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
@@ -731,7 +725,7 @@ class Releases
         $whereSql = sprintf(
             '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
             $this->releaseSearch->getFullTextJoinString(),
-            $this->showPasswords,
+            $this->showPasswords(),
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
@@ -741,16 +735,17 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				cp.id AS categoryparentid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.firstaired
+				tve.firstaired, tve.title, tve.series, tve.episode
 			FROM releases r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
@@ -798,17 +793,17 @@ class Releases
      *
      * @return array
      */
-    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = []): array
     {
         $siteSQL = [];
         $showSql = '';
-        if (\is_array($siteIdArr)) {
-            foreach ($siteIdArr as $column => $Id) {
-                if ($Id > 0) {
-                    $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
-                }
+
+        foreach ($siteIdArr as $column => $Id) {
+            if ($Id > 0) {
+                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
         }
+
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -861,15 +856,16 @@ class Releases
             '%s
 			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s',
+			%s %s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
+            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
@@ -936,17 +932,16 @@ class Releases
      *
      * @return array
      */
-    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = []): array
     {
         $siteSQL = [];
         $showSql = '';
-        if (\is_array($siteIdArr)) {
-            foreach ($siteIdArr as $column => $Id) {
-                if ($Id > 0) {
-                    $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
-                }
+        foreach ($siteIdArr as $column => $Id) {
+            if ($Id > 0) {
+                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
             }
         }
+
         if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -999,15 +994,16 @@ class Releases
             '%s
 			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s',
+			%s %s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
+            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id,
@@ -1062,18 +1058,19 @@ class Releases
      *
      * @return array
      */
-    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
+    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = []): array
     {
         $whereSql = sprintf(
             '%s
 			WHERE r.passwordstatus %s
 			AND r.nzbstatus = %d
-			%s %s %s %s',
+			%s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-            $this->showPasswords,
+            $this->showPasswords(),
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
@@ -1127,23 +1124,26 @@ class Releases
      * @param int    $maxAge
      * @param int    $minSize
      *
+     * @param array  $excludedCategories
+     *
      * @return array
      */
-    public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = []): array
     {
         $whereSql = sprintf(
             '%s
             WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s',
+			%s %s %s %s %s %s %s',
             $name !== '' ? $this->releaseSearch->getFullTextJoinString() : '',
             NZB::NZB_ADDED,
-            $this->showPasswords,
+            $this->showPasswords(),
             $name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : '',
             ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
+            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
             Category::getCategorySearch($cat),
             $maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '',
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''

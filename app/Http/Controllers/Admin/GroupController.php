@@ -106,7 +106,7 @@ class GroupController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                if ($request->input('id') === '') {
+                if (empty($request->input('id'))) {
                     // Add a new group.
                     $request->merge(['name' => Group::isValidGroup($request->input('name'))]);
                     if ($request->input('name') !== false) {

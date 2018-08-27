@@ -10,13 +10,11 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
-use Blacklight\db\DB;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 
-$pdo = new DB();
-$namefixer = new NameFixer(['Settings' => $pdo]);
+$namefixer = new NameFixer();
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $update = $argv[2] === 'true';
@@ -32,7 +30,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
 
     $nntp = null;
     if ($argv[1] === 7 || $argv[1] === 8) {
-        $nntp = new NNTP(['Settings' => $pdo]);
+        $nntp = new NNTP();
         if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
             echo ColorCLI::error('Unable to connect to usenet.'.PHP_EOL);
 

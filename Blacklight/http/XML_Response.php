@@ -22,7 +22,7 @@
 namespace Blacklight\http;
 
 use App\Models\Category;
-use Blacklight\Utility\Utility;
+use Illuminate\Support\Carbon;
 
 /**
  * Class XMLReturn.
@@ -242,14 +242,14 @@ class XML_Response
             $this->xml->startElement('category');
             $this->xml->writeAttribute('id', $this->parameters['id']);
             $this->xml->writeAttribute('name', html_entity_decode($this->parameters['title']));
-            if ($this->parameters['description'] !== '') {
+            if (! empty($this->parameters['description'])) {
                 $this->xml->writeAttribute('description', html_entity_decode($this->parameters['description']));
             }
             foreach ($this->parameters['subcatlist'] as $c) {
                 $this->xml->startElement('subcat');
                 $this->xml->writeAttribute('id', $c['id']);
                 $this->xml->writeAttribute('name', html_entity_decode($c['title']));
-                if ($c['description'] !== '') {
+                if (! empty($c['description'])) {
                     $this->xml->writeAttribute('description', html_entity_decode($c['description']));
                 }
                 $this->xml->endElement();
@@ -441,7 +441,7 @@ class XML_Response
             $this->writeZedAttr('grabs', $this->release->grabs);
             $this->writeZedAttr('comments', $this->release->comments);
             $this->writeZedAttr('password', $this->release->passwordstatus);
-            $this->writeZedAttr('usenetdate', date_format(date_create($this->release->postdate), 'D, d M Y H:i:s O'));
+            $this->writeZedAttr('usenetdate', Carbon::parse($this->release->postdate)->toRssString());
             if (! empty($this->release->group_name)) {
                 $this->writeZedAttr('group', $this->release->group_name);
             }
@@ -532,7 +532,7 @@ class XML_Response
                 "src=\"{$this->server['server']['url']}/covers/{$dir}/{$this->release->$column}{$dcov}.jpg\" ".
                 "width=\"120\" alt=\"{$this->release->searchname}\" />\n";
         }
-        $size = Utility::bytesToSizeString($this->release->size);
+        $size = human_filesize($this->release->size);
         $this->cdata .=
             "\t<li>ID: <a href=\"{$this->server['server']['url']}/details/{$this->release->guid}\">{$this->release->guid}</a></li>\n".
             "\t<li>Name: {$this->release->searchname}</li>\n".

@@ -13,7 +13,6 @@ use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
-use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Jrean\UserVerification\Facades\UserVerification;
@@ -30,8 +29,8 @@ class ProfileController extends BasePageController
         $this->setPrefs();
         $sab = new SABnzbd($this);
 
-        $userID = Auth::id();
-        $privileged = User::isAdmin($userID) || User::isModerator($userID);
+        $userID = $this->userdata->id;
+        $privileged = $this->userdata->hasRole('Admin') === true || $this->userdata->hasRole('Moderator');
         $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
         $publicView = false;
 
@@ -52,8 +51,8 @@ class ProfileController extends BasePageController
             }
         }
 
-        $downloadlist = UserDownload::getDownloadRequestsForUser($userID);
-        $this->smarty->assign('downloadlist', $downloadlist);
+        $downloadList = UserDownload::getDownloadRequestsForUser($userID);
+        $this->smarty->assign('downloadlist', $downloadList);
 
         $data = User::find($userID);
         if ($data === null) {
@@ -90,7 +89,6 @@ class ProfileController extends BasePageController
         $this->smarty->assign(
             [
                 'commentslist'  => ReleaseComment::getCommentsForUserRange($userID),
-                'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
                 'saburl'        => $sab->url,
                 'sabapikey'     => $sab->apikey,
                 'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',
@@ -174,12 +172,14 @@ class ProfileController extends BasePageController
                             $sab->setCookie($request->input('saburl'), $request->input('sabapikey'), $request->input('sabpriority'), $request->input('sabapikeytype'));
                         }
 
+                        $user = User::find($userid);
+
                         User::updateUser(
                             $userid,
                             $data['username'],
                             $request->input('email'),
                             $data['grabs'],
-                            $data['user_roles_id'],
+                            $data['roles_id'],
                             $data['notes'],
                             $data['invites'],
                             $request->has('movieview') ? 1 : 0,
@@ -203,8 +203,69 @@ class ProfileController extends BasePageController
                             (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
                         );
 
-                        $request->merge(['exccat' => (! $request->has('exccat') || ! \is_array($request->input('exccat'))) ? [] : $request->input('exccat')]);
-                        UserExcludedCategory::addCategoryExclusions($userid, $request->input('exccat'));
+                        if ((int) $request->input('viewconsole') === 1 && $user->role->hasPermissionTo('view console') === true && $user->hasDirectPermission('view console') === false) {
+                            $user->givePermissionTo('view console');
+                        } elseif ((int) $request->input('viewconsole') === 0 && $user->role->hasPermissionTo('view console') === true && $user->hasPermissionTo('view console') === true) {
+                            $user->revokePermissionTo('view console');
+                        } elseif ($user->role->hasPermissionTo('view console') === false && $user->hasDirectPermission('view console') === true && ((int) $request->input('viewconsole') === 0 || (int) $request->input('viewconsole') === 1)) {
+                            $user->revokePermissionTo('view console');
+                        }
+
+                        if ((int) $request->input('viewmovies') === 1 && $user->role->hasPermissionTo('view movies') === true && $user->hasDirectPermission('view movies') === false) {
+                            $user->givePermissionTo('view movies');
+                        } elseif ((int) $request->input('viewmovies') === 0 && $user->role->hasPermissionTo('view movies') === true && $user->hasDirectPermission('view movies') === true) {
+                            $user->revokePermissionTo('view movies');
+                        } elseif ($user->role->hasPermissionTo('view movies') === false && $user->hasDirectPermission('view movies') === true && ((int) $request->input('viewmovies') === 0 || (int) $request->input('viewmovies') === 1)) {
+                            $user->revokePermissionTo('view movies');
+                        }
+
+                        if ((int) $request->input('viewaudio') === 1 && $user->role->hasPermissionTo('view audio') === true && $user->hasDirectPermission('view audio') === false) {
+                            $user->givePermissionTo('view audio');
+                        } elseif ((int) $request->input('viewaudio') === 0 && $user->role->hasPermissionTo('view audio') === true && $user->hasDirectPermission('view audio') === true) {
+                            $user->revokePermissionTo('view audio');
+                        } elseif ($user->role->hasPermissionTo('view audio') === false && $user->hasDirectPermission('view audio') === true && ((int) $request->input('viewaudio') === 0 || (int) $request->input('viewaudio') === 1)) {
+                            $user->revokePermissionTo('view audio');
+                        }
+
+                        if ((int) $request->input('viewpc') === 1 && $user->role->hasPermissionTo('view pc') === true && $user->hasDirectPermission('view pc') === false) {
+                            $user->givePermissionTo('view pc');
+                        } elseif ((int) $request->input('viewpc') === 0 && $user->role->hasPermissionTo('view pc') === true && $user->hasDirectPermission('view pc') === true) {
+                            $user->revokePermissionTo('view pc');
+                        } elseif ($user->role->hasPermissionTo('view pc') === false && $user->hasDirectPermission('view pc') === true && ((int) $request->input('viewpc') === 0 || (int) $request->input('viewpc') === 1)) {
+                            $user->revokePermissionTo('view pc');
+                        }
+
+                        if ((int) $request->input('viewtv') === 1 && $user->role->hasPermissionTo('view tv') === true && $user->hasDirectPermission('view tv') === false) {
+                            $user->givePermissionTo('view tv');
+                        } elseif ((int) $request->input('viewtv') === 0 && $user->role->hasPermissionTo('view tv') === true && $user->hasDirectPermission('view tv') === true) {
+                            $user->revokePermissionTo('view tv');
+                        } elseif ($user->role->hasPermissionTo('view tv') === false && $user->hasDirectPermission('view tv') === true && ((int) $request->input('viewtv') === 0 || (int) $request->input('viewtv') === 1)) {
+                            $user->revokePermissionTo('view tv');
+                        }
+
+                        if ((int) $request->input('viewadult') === 1 && $user->role->hasPermissionTo('view adult') === true && $user->hasDirectPermission('view adult') === false) {
+                            $user->givePermissionTo('view adult');
+                        } elseif ((int) $request->input('viewadult') === 0 && $user->role->hasPermissionTo('view adult') === true && $user->hasDirectPermission('view adult') === true) {
+                            $user->revokePermissionTo('view adult');
+                        } elseif ($user->role->hasPermissionTo('view adult') === false && $user->hasDirectPermission('view adult') === true && ((int) $request->input('viewadult') === 0 || (int) $request->input('viewadult') === 1)) {
+                            $user->revokePermissionTo('view adult');
+                        }
+
+                        if ((int) $request->input('viewbooks') === 1 && $user->role->hasPermissionTo('view books') === true && $user->hasDirectPermission('view books') === false) {
+                            $user->givePermissionTo('view books');
+                        } elseif ((int) $request->input('viewbooks') === 0 && $user->role->hasPermissionTo('view books') === true && $user->hasDirectPermission('view books') === true) {
+                            $user->revokePermissionTo('view books');
+                        } elseif ($user->role->hasPermissionTo('view books') === false && $user->hasDirectPermission('view books') === true && ((int) $request->input('viewbooks') === 0 || (int) $request->input('viewbooks') === 1)) {
+                            $user->revokePermissionTo('view books');
+                        }
+
+                        if ((int) $request->input('viewother') === 1 && $user->role->hasPermissionTo('view other') === true && $user->hasDirectPermission('view other') === false) {
+                            $user->givePermissionTo('view other');
+                        } elseif ((int) $request->input('viewother') === 0 && $user->role->hasPermissionTo('view other') === true && $user->hasDirectPermission('view other') === true) {
+                            $user->revokePermissionTo('view other');
+                        } elseif ($user->role->hasPermissionTo('view other') === false && $user->hasDirectPermission('view other') === true && ((int) $request->input('viewother') === 0 || (int) $request->input('viewother') === 1)) {
+                            $user->revokePermissionTo('view other');
+                        }
 
                         if ($request->has('password') && ! empty($request->input('password'))) {
                             User::updatePassword($userid, $request->input('password'));
@@ -275,6 +336,8 @@ class ProfileController extends BasePageController
 
         $this->smarty->assign('cp_url_selected', $data['cp_url']);
         $this->smarty->assign('cp_api_selected', $data['cp_api']);
+        $this->smarty->assign('yesno_ids', [1, 0]);
+        $this->smarty->assign('yesno_names', ['Yes', 'No']);
 
         $this->smarty->assign('catlist', Category::getForSelect(false));
 
@@ -301,15 +364,14 @@ class ProfileController extends BasePageController
         $this->setPrefs();
         $userId = $request->input('id');
 
-        if ($userId !== null && $this->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === Auth::id()) {
+        if ($userId !== null && $this->userdata->hasRole('Admin') === false && (int) $userId === Auth::id()) {
             Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
-            Auth::logout();
             User::deleteUser($userId);
 
             return redirect('login');
         }
 
-        if ($this->userdata->role->id === User::ROLE_ADMIN) {
+        if ($this->userdata->hasRole('Admin')) {
             return redirect('profile');
         }
 

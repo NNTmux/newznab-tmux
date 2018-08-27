@@ -87,19 +87,9 @@ class InstallNntmux extends Command
                         }
                     });
                 } else {
-                    $process = new Process('php artisan migrate:fresh --force');
+                    $process = new Process('php artisan migrate:fresh --force --seed');
                     $process->setTimeout(600);
                     $process->run(function ($type, $buffer) {
-                        if (Process::ERR === $type) {
-                            echo 'ERR > '.$buffer;
-                        } else {
-                            echo $buffer;
-                        }
-                    });
-
-                    $process2 = new Process('php artisan fixtures:up all');
-                    $process2->setTimeout(600);
-                    $process2->run(function ($type, $buffer) {
                         if (Process::ERR === $type) {
                             echo 'ERR > '.$buffer;
                         } else {
@@ -149,7 +139,7 @@ class InstallNntmux extends Command
     /**
      * @return bool
      */
-    protected function updatePatch(): bool
+    private function updatePatch(): bool
     {
         $ver = new Versions();
         $patch = $ver->getSQLPatchFromFile();
@@ -175,7 +165,7 @@ class InstallNntmux extends Command
      * @throws \Exception
      * @throws \RuntimeException
      */
-    protected function updatePaths()
+    private function updatePaths()
     {
         $covers_path = base_path().'/resources/covers/';
         $nzb_path = base_path().'/resources/nzb/';
@@ -220,7 +210,7 @@ class InstallNntmux extends Command
     /**
      * @return bool
      */
-    protected function addAdminUser(): bool
+    private function addAdminUser(): bool
     {
         if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
             $this->error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!');
@@ -231,6 +221,7 @@ class InstallNntmux extends Command
         try {
             User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
         } catch (\Exception $e) {
+            echo $e->getMessage();
             $this->error('Unable to add admin user!');
 
             return false;

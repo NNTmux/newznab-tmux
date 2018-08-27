@@ -22,7 +22,6 @@ class FixturesUp extends Command
       'release_naming_regexes',
       'settings',
       'tmux',
-      'user_roles',
     ];
     /**
      * The name and signature of the console command.
@@ -48,8 +47,7 @@ class FixturesUp extends Command
     menu
     release_naming_regexes
     settings
-    tmux
-    user_roles';
+    tmux';
 
     /**
      * Create a new command instance.

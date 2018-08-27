@@ -58,7 +58,7 @@ class TraktAPI
      * @param string $ep
      * @param string $type
      *
-     * @return array|bool
+     * @return array|false
      * @see    http://docs.trakt.apiary.io/#reference/episodes/summary/get-a-single-episode-for-a-show
      */
     public function episodeSummary($id, $season = '', $ep = '', $type = 'min')
@@ -86,7 +86,7 @@ class TraktAPI
     /**
      * Fetches weekend box office data from trakt.tv, updated every monday.
      *
-     * @return array|bool
+     * @return array|false
      * @see    http://docs.trakt.apiary.io/#reference/movies/box-office/get-the-weekend-box-office
      */
     public function getBoxOffice()
@@ -107,7 +107,7 @@ class TraktAPI
      * @param string $start Start date of calendar ie. 2015-09-01.Default value is today.
      * @param int    $days  Number of days to lookup ahead. Default value is 7 days
      *
-     * @return array|bool
+     * @return array|false
      * @see    http://docs.trakt.apiary.io/#reference/calendars/all-shows/get-shows
      */
     public function getCalendar($start = '', $days = 7)
@@ -194,7 +194,7 @@ class TraktAPI
      *
      * @see    http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
      *
-     * @return bool|array|string
+     * @return array|string|false
      */
     public function movieSummary($movie = '', $type = 'imdbid')
     {
@@ -259,7 +259,7 @@ class TraktAPI
      *
      * @see    http://docs.trakt.apiary.io/#reference/search/get-text-query-results
      *
-     * @return bool|array|string
+     * @return array|false
      */
     public function showSearch($show = '', $type = 'show')
     {
@@ -274,12 +274,12 @@ class TraktAPI
      * Fetches summary from trakt.tv for the show.
      * Accepts a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
      *
-     * @param string $show  Title or IMDB id.
-     * @param string $type  full:        Return all extended properties. (returns array)
+     * @param string $show Title or IMDB id.
+     * @param string $type full:        Return all extended properties. (returns array)
      *
      * @see    http://docs.trakt.apiary.io/#reference/shows/summary/get-a-single-show
      *
-     * @return bool|array|string
+     * @return array|false|null
      */
     public function showSummary($show = '', $type = 'full')
     {

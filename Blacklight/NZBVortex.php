@@ -214,7 +214,7 @@ final class NZBVortex
      * get filelist for nzb.
      *
      * @param int $id
-     * @return array|bool
+     * @return array|false
      * @throws \Exception
      */
     public function getFilelist($id = 0)
@@ -222,9 +222,8 @@ final class NZBVortex
         if ($id > 0) {
             // ﬁle/(nzbid)
             $params = ['sessionid' => $this->session];
-            $response = $this->sendRequest(sprintf('file/%s', $id), $params);
 
-            return $response;
+            return $this->sendRequest(sprintf('file/%s', $id), $params);
         }
 
         return false;

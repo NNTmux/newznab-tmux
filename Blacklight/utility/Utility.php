@@ -4,7 +4,6 @@ namespace Blacklight\utility;
 
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -48,35 +47,8 @@ class Utility
     public static function clearScreen(): void
     {
         if (self::isCLI()) {
-            if (self::isWin()) {
-                passthru('cls');
-            } else {
-                passthru('clear');
-            }
+            passthru('clear');
         }
-    }
-
-    /**
-     * Replace all white space chars for a single space.
-     *
-     * @param string $text
-     *
-     * @return string
-     *
-     * @static
-     */
-    public static function collapseWhiteSpace($text): string
-    {
-        // Strip leading/trailing white space.
-        return trim(
-        // Replace 2 or more white space for a single space.
-            preg_replace(
-                '/\s{2,}/',
-                ' ',
-                // Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
-                str_replace(["\n", "\r"], ' ', $text)
-            )
-        );
     }
 
     /**
@@ -148,7 +120,7 @@ class Utility
             switch (true) {
                 case ! $options['dir'] && $fileInfo->isDir():
                     break;
-                case ! empty($options['ext']) && $fileInfo->getExtension() != $options['ext']:
+                case ! empty($options['ext']) && $fileInfo->getExtension() !== $options['ext']:
                     break;
                 case empty($options['regex']) || ! preg_match($options['regex'], $file):
                     break;
@@ -169,49 +141,31 @@ class Utility
     {
         $ignoredThemes = ['admin', 'shared'];
         $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
-        $themelist[] = 'None';
+        $themeList[] = 'None';
         foreach ($themes as $theme) {
             if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && is_dir(base_path().'/resources/views/themes/'.$theme)) {
-                $themelist[] = $theme;
+                $themeList[] = $theme;
             }
         }
 
-        sort($themelist);
+        sort($themeList);
 
-        return $themelist;
-    }
-
-    public static function getValidVersionsFile()
-    {
-        return (new Versions())->getValidVersionsFile();
+        return $themeList;
     }
 
     /**
      * Detect if the command is accessible on the system.
      *
+     *
      * @param $cmd
      *
-     * @return bool|null Returns true if found, false if not found, and null if which is not detected.
+     * @return bool
      */
-    public static function hasCommand($cmd): ?bool
+    public static function hasCommand($cmd): bool
     {
-        if ('HAS_WHICH') {
-            $returnVal = shell_exec("which $cmd");
+        $returnVal = shell_exec("which $cmd");
 
-            return empty($returnVal) ? false : true;
-        }
-
-        return null;
-    }
-
-    /**
-     * Check for availability of which command.
-     */
-    public static function hasWhich(): bool
-    {
-        exec('which which', $output, $error);
-
-        return ! $error;
+        return $returnVal !== null;
     }
 
     /**
@@ -219,11 +173,16 @@ class Utility
      *
      * @return bool
      */
-    public static function isCLI()
+    public static function isCLI(): bool
     {
         return strtolower(PHP_SAPI) === 'cli';
     }
 
+    /**
+     * @param $filename
+     *
+     * @return bool|null|string
+     */
     public static function isGZipped($filename)
     {
         $gzipped = null;
@@ -246,7 +205,7 @@ class Utility
      */
     public static function isPatched(): bool
     {
-        $versions = self::getValidVersionsFile();
+        $versions = (new Versions())->getValidVersionsFile();
 
         $patch = Settings::settingValue('..sqlpatch');
         $ver = $versions->versions->sql->file;
@@ -262,36 +221,6 @@ class Utility
         }
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isWin(): bool
-    {
-        return stripos(PHP_OS, 'win') === 0;
-    }
-
-    /**
-     * @param array  $elements
-     * @param string $prefix
-     *
-     * @return string
-     */
-    public static function pathCombine(array $elements, $prefix = ''): string
-    {
-        return $prefix.implode(DS, $elements);
-    }
-
-    /**
-     * @param $text
-     */
-    public static function stripBOM(&$text): void
-    {
-        $bom = pack('CCC', 0xef, 0xbb, 0xbf);
-        if (0 === strncmp($text, $bom, 3)) {
-            $text = substr($text, 3);
-        }
     }
 
     /**
@@ -535,27 +464,6 @@ class Utility
     }
 
     /**
-     * Get human readable size string from bytes.
-     *
-     * @param int $size     Bytes number to convert.
-     * @param int $precision How many floating point units to add.
-     *
-     * @return string
-     */
-    public static function bytesToSizeString($size, $precision = 0): string
-    {
-        static $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $step = 1024;
-        $i = 0;
-        while (($size / $step) > 0.9) {
-            $size /= $step;
-            $i++;
-        }
-
-        return round($size, $precision).$units[$i];
-    }
-
-    /**
      * @param array $options
      *
      * @return string
@@ -686,28 +594,12 @@ class Utility
      * @return string File info. Empty string on failure.
      * @throws \Exception
      */
-    public static function fileInfo($path)
+    public static function fileInfo($path): string
     {
         $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
-        if (self::hasCommand('file') && (! self::isWin() || $magicPath !== null)) {
-            $magicSwitch = $magicPath === null ? '' : " -m $magicPath";
-            $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
-
-            if (\is_array($output)) {
-                switch (\count($output)) {
-                    case 0:
-                        $output = '';
-                        break;
-                    case 1:
-                        $output = $output[0];
-                        break;
-                    default:
-                        $output = implode(' ', $output);
-                        break;
-                }
-            } else {
-                $output = '';
-            }
+        if ($magicPath !== null && self::hasCommand('file')) {
+            $magicSwitch = " -m $magicPath";
+            $output = runCmd('file'.$magicSwitch.' -b "'.$path.'"');
         } else {
             $fileInfo = $magicPath === null ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
 
@@ -726,7 +618,7 @@ class Utility
      *
      * @return bool
      */
-    public function checkStatus($code)
+    public function checkStatus($code): bool
     {
         return $code === 0;
     }
@@ -758,16 +650,6 @@ class Utility
         }
 
         return '';
-    }
-
-    /**
-     * Check if O/S is windows.
-     *
-     * @return bool
-     */
-    public static function isWindows(): bool
-    {
-        return self::isWin();
     }
 
     /**
@@ -804,53 +686,15 @@ class Utility
     }
 
     /**
-     * Run CLI command.
-     *
-     * @param string $command
-     * @param bool   $debug
-     *
-     * @return array
-     */
-    public static function runCmd($command, $debug = false)
-    {
-        $nl = PHP_EOL;
-        if (self::isWindows() && strpos(PHP_VERSION, '5.3') !== false) {
-            $command = '"'.$command.'"';
-        }
-
-        if ($debug) {
-            echo '-Running Command: '.$nl.'   '.$command.$nl;
-        }
-
-        $output = [];
-        $status = 1;
-        @exec($command, $output, $status);
-
-        if ($debug) {
-            echo '-Command Output: '.$nl.'   '.implode($nl.'  ', $output).$nl;
-        }
-
-        return $output;
-    }
-
-    /**
      * Remove unsafe chars from a filename.
      *
      * @param string $filename
      *
      * @return string
      */
-    public static function safeFilename($filename)
+    public static function safeFilename($filename): string
     {
         return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
-    }
-
-    /**
-     * @return string
-     */
-    public static function generateUuid(): string
-    {
-        return Str::uuid()->toString();
     }
 
     /**

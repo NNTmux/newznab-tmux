@@ -3,14 +3,14 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NZB;
-use Blacklight\db\DB;
 use Blacklight\ConsoleTools;
+use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1]) || ! isset($argv[2])) {
     exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");
 }
 
-$pdo = new DB();
+$pdo = DB::connection()->getPdo();
 $nzb = new NZB();
 $consoleTools = new ConsoleTools();
 
@@ -44,8 +44,7 @@ foreach ($objects as $filestoprocess => $nzbFile) {
     }
 }
 
-$pdo->ping(true);
-$pdo->queryExec(sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbsplitlevel'", $argv[1]));
+$pdo->exec(sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbsplitlevel'", $argv[1]));
 $consoleTools->overWrite("Processed $iFilesProcessed nzbs in ".relativeTime($time)."\n");
 
 function relativeTime($_time)
@@ -65,7 +64,7 @@ function relativeTime($_time)
     $secondsLeft = $diff;
 
     for ($i = 4; $i > -1; $i--) {
-        $w[$i] = intval($secondsLeft / $d[$i][0]);
+        $w[$i] = (int) ($secondsLeft / $d[$i][0]);
         $secondsLeft -= ($w[$i] * $d[$i][0]);
         if ($w[$i] != 0) {
             $return .= $w[$i].' '.$d[$i][1].(($w[$i] > 1) ? 's' : '').' ';

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Blacklight\libraries\Geary;
+use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController
 {
@@ -20,7 +20,7 @@ class BtcPaymentController extends BasePageController
         $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 
         $action = $request->input('action') ?? 'view';
-        $donation = UserRole::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
+        $donation = Role::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
         $this->smarty->assign('donation', $donation);
 
         switch ($action) {

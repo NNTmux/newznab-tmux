@@ -107,12 +107,17 @@
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
+                                                    {if (!empty($result->tmdbid))}
+                                                        <a class="label label-primary" rel="tmdb" target="_blank"
+                                                           href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
+                                                           name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
+                                                    {/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															title="View NFO" class="modal_nfo label label-primary"
 															rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
@@ -247,12 +252,17 @@
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
+                                                    {if (!empty($result->tmdbid))}
+                                                        <a class="label label-primary" rel="tmdb" target="_blank"
+                                                           href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
+                                                           name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
+                                                    {/if}
 													{if $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 																title="View NFO" class="modal_nfo label label-primary">NFO</a>
 														</span>{/if}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>

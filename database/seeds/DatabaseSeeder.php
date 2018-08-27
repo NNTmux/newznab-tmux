@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call(UsersTableSeeder::class);
-        $this->call(UserRolesTableSeeder::class);
         $this->call(CountriesSeeder::class);
         $this->call(CategoriesTableSeeder::class);
         $this->call(CategoryRegexesTableSeeder::class);
@@ -24,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(MenuTableSeeder::class);
         $this->call(ReleaseNamingRegexesTableSeeder::class);
         $this->call(SettingsTableSeeder::class);
+        $this->call(RolesAndPermissionsSeeder::class);
     }
 }

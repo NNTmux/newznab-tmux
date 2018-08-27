@@ -14,11 +14,6 @@ use App\Http\Controllers\BasePageController;
 
 class ApiController extends BasePageController
 {
-    public function __construct(Request $request)
-    {
-        parent::__construct($request);
-    }
-
     /**
      * @param \Illuminate\Http\Request $request
      *
@@ -84,7 +79,7 @@ class ApiController extends BasePageController
                 }
             }
 
-            if (User::isDisabled($res['username'])) {
+            if ($res->hasRole('Disabled') === true) {
                 Utility::showApiError(101);
             }
 
@@ -207,7 +202,8 @@ class ApiController extends BasePageController
                    $request->input('q') ?? '',
                    $api->categoryID(),
                    $maxAge,
-                   $minSize
+                   $minSize,
+                   $catExclusions
                );
 
                $api->addLanguage($relData);
@@ -234,7 +230,8 @@ class ApiController extends BasePageController
                    $request->input('q') ?? '',
                    $api->categoryID(),
                    $maxAge,
-                   $minSize
+                   $minSize,
+                   $catExclusions
                );
 
                $api->addCoverURL(

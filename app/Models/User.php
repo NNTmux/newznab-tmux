@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Mail\SendInvite;
 use Illuminate\Support\Str;
 use App\Mail\AccountExpired;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Jrean\UserVerification\Traits\UserVerification;
@@ -23,7 +24,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $lastname
  * @property string $email
  * @property string $password
- * @property int $user_roles_id FK to user_roles.id
+ * @property int $user_roles_id FK to roles.id
  * @property string|null $host
  * @property int $grabs
  * @property string $rsstoken
@@ -59,13 +60,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $remember_token
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserExcludedCategory[] $excludedCategory
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failedRelease
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Invitation[] $invitation
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $release
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserRequest[] $request
- * @property-read \App\Models\UserRole $role
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserSerie[] $series
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiaccess($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereBookview($value)
@@ -111,8 +110,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable;
-    use UserVerification;
+    use Notifiable, UserVerification, HasRoles;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -157,7 +155,7 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'user_roles_id');
+        return $this->belongsTo(Role::class, 'roles_id');
     }
 
     /**
@@ -211,14 +209,6 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function excludedCategory()
-    {
-        return $this->hasMany(UserExcludedCategory::class, 'users_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function comment()
     {
         return $this->hasMany(ReleaseComment::class, 'users_id');
@@ -235,9 +225,10 @@ class User extends Authenticatable
     /**
      * Get the users selected theme.
      *
-     * @param string|int $userID The id of the user.
      *
-     * @return array|bool The users selected theme.
+     * @param int $userID
+     *
+     * @return mixed|string
      */
     public static function getStyle($userID)
     {
@@ -267,7 +258,7 @@ class User extends Authenticatable
         $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
 
         if ($role !== '') {
-            $res->where('user_roles_id', $role);
+            $res->where('roles_id', $role);
         }
 
         if ($username !== '') {
@@ -321,7 +312,7 @@ class User extends Authenticatable
         $userName = trim($userName);
         $email = trim($email);
 
-        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->get();
 
         if (! self::isValidUsername($userName)) {
             return self::ERR_SIGNUP_BADUNAME;
@@ -345,7 +336,7 @@ class User extends Authenticatable
             'username' => $userName,
             'email' => $email,
             'grabs' => $grabs,
-            'user_roles_id' => $role,
+            'roles_id' => $role,
             'notes' => substr($notes, 0, 255),
             'invites' => $invites,
             'movieview' => $movieview,
@@ -367,10 +358,13 @@ class User extends Authenticatable
             'nzbvortex_api_key' => $nzbvortexApiKey,
             'cp_url' => $cp_url,
             'cp_api' => $cp_api,
-            'rate_limit' => $rateLimit,
+            'rate_limit' => $rateLimit[0]['rate_limit'],
         ];
 
         self::query()->where('id', $id)->update($sql);
+
+        $user = self::find($id);
+        $user->syncRoles([$rateLimit[0]['name']]);
 
         return self::SUCCESS;
     }
@@ -424,7 +418,7 @@ class User extends Authenticatable
      */
     public static function updateUserRole(int $uid, int $role): int
     {
-        return self::query()->where('id', $uid)->update(['user_roles_id' => $role]);
+        return self::query()->where('id', $uid)->update(['roles_id' => $role]);
     }
 
     /**
@@ -445,7 +439,9 @@ class User extends Authenticatable
         $data = self::query()->whereDate('rolechangedate', '<', now())->get();
 
         foreach ($data as $u) {
-            self::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $user = self::find($u['id']);
+            $user->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $user->syncRoles('User');
             Mail::to($u['email'])->send(new AccountExpired($u['id']));
         }
 
@@ -470,19 +466,19 @@ class User extends Authenticatable
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
             $query = "
-				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
+				SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
+				INNER JOIN roles ON roles.id = users.roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
 				WHERE users.id != 0 %s %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
-				ORDER BY %s %s %s";
+				ORDER BY %s %s %s ";
         } else {
             $query = '
-				SELECT users.*, user_roles.name AS rolename
+				SELECT users.*, roles.name AS rolename,
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
+				INNER JOIN roles ON roles.id = users.roles_id
 				WHERE 1=1 %s %s %s %s
 				ORDER BY %s %s %s';
         }
@@ -494,7 +490,7 @@ class User extends Authenticatable
                 ! empty($userName) ? 'AND users.username '.'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
                 ! empty($email) ? 'AND users.email '.'LIKE '.DB::connection()->getPdo()->quote('%'.$email.'%') : '',
                 ! empty($host) ? 'AND users.host '.'LIKE '.DB::connection()->getPdo()->quote('%'.$host.'%') : '',
-                (! empty($role) ? ('AND users.user_roles_id = '.$role) : ''),
+                (! empty($role) ? ('AND users.roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
@@ -615,7 +611,7 @@ class User extends Authenticatable
      */
     public static function updatePassword(int $id, string $password): int
     {
-        self::query()->where('id', $id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Utility::generateUuid())]);
+        self::query()->where('id', $id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
 
         return self::SUCCESS;
     }
@@ -685,16 +681,6 @@ class User extends Authenticatable
     public static function getByRssToken(string $rssToken)
     {
         return self::query()->where('api_token', $rssToken)->first();
-    }
-
-    /**
-     * @param $username
-     *
-     * @return bool
-     */
-    public static function isDisabled($username): bool
-    {
-        return self::roleCheck(self::ROLE_DISABLED, $username);
     }
 
     /**
@@ -802,12 +788,12 @@ class User extends Authenticatable
         }
 
         $res = self::getByUsername($userName);
-        if ($res) {
+        if ($res !== null) {
             return self::ERR_SIGNUP_UNAMEINUSE;
         }
 
         $res = self::getByEmail($email);
-        if ($res) {
+        if ($res !== null) {
             return self::ERR_SIGNUP_EMAILINUSE;
         }
 
@@ -862,7 +848,7 @@ class User extends Authenticatable
      * @param     $userName
      * @param     $password
      * @param     $email
-     * @param     $role
+     * @param $role
      * @param     $notes
      * @param     $host
      * @param int $invites
@@ -878,7 +864,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $rateLimit = UserRole::query()->where('id', $role)->value('rate_limit');
+        $rateLimit = Role::query()->where('id', $role)->value('rate_limit');
 
         if (\defined('NN_INSTALLER')) {
             $storeips = '';
@@ -886,21 +872,24 @@ class User extends Authenticatable
             $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
         }
 
-        return self::create(
+        $user = self::create(
             [
                 'username' => $userName,
                 'password' => $password,
                 'email' => $email,
-                'user_roles_id' => $role,
                 'host' => $storeips,
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
                 'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
-                'userseed' => md5(Utility::generateUuid()),
+                'userseed' => md5(Str::uuid()->toString()),
                 'notes' => $notes,
                 'rate_limit' => $rateLimit,
             ]
-        )->id;
+        );
+
+        $user->assignRole($role);
+
+        return $user->id;
     }
 
     /**
@@ -937,14 +926,52 @@ class User extends Authenticatable
     public static function getCategoryExclusion($userID): array
     {
         $ret = [];
-        $categories = self::query()->where('id', $userID)->first();
-        if ($categories !== null) {
-            foreach ($categories->excludedCategory as $category) {
-                $ret[] = $category['categories_id'];
+
+        $user = self::find($userID);
+
+        $userAllowed = $user->getDirectPermissions()->pluck('name')->toArray();
+        $roleAllowed = $user->getAllPermissions()->pluck('name')->toArray();
+
+        $allowed = array_intersect($roleAllowed, $userAllowed);
+
+        $cats = ['view console', 'view movies', 'view audio', 'view tv', 'view pc', 'view adult', 'view books', 'view other'];
+
+        if (! empty($allowed)) {
+            foreach ($cats as $cat) {
+                if (! \in_array($cat, $allowed, false)) {
+                    switch ($cat) {
+                        case 'view console':
+                            $ret[] = 1000;
+                            continue 2;
+                        case 'view movies':
+                            $ret[] = 2000;
+                            continue 2;
+                        case 'view audio':
+                            $ret[] = 3000;
+                            continue 2;
+                        case 'view tv':
+                            $ret[] = 4000;
+                            continue 2;
+                        case 'view pc':
+                            $ret[] = 5000;
+                            continue 2;
+                        case 'view adult':
+                            $ret[] = 6000;
+                            continue 2;
+                        case 'view books':
+                            $ret[] = 7000;
+                            continue 2;
+                        case 'view other':
+                            $ret[] = 1;
+
+                    }
+                }
             }
         }
 
-        return $ret;
+        $exclusion = Category::query()->whereIn('parentid', $ret)->pluck('id')->toArray();
+
+        return $exclusion;
     }
 
     /**
@@ -980,47 +1007,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Checks if a user is a specific role.
-     *
-     * @notes Uses type of $user to denote identifier. if string: username, if int: users_id
-     * @param int $roleID
-     * @param string|int $user
-     * @return bool
-     */
-    public static function roleCheck($roleID, $user): bool
-    {
-        $result = self::query()->where('username', $user)->orWhere('id', $user)->first(['user_roles_id']);
-
-        if ($result !== null) {
-            return $result['user_roles_id'] === $roleID;
-        }
-
-        return false;
-    }
-
-    /**
-     * Wrapper for roleCheck specifically for Admins.
-     *
-     * @param int $userID
-     * @return bool
-     */
-    public static function isAdmin($userID): bool
-    {
-        return self::roleCheck(self::ROLE_ADMIN, (int) $userID);
-    }
-
-    /**
-     * Wrapper for roleCheck specifically for Moderators.
-     *
-     * @param int $userId
-     * @return bool
-     */
-    public static function isModerator($userId): bool
-    {
-        return self::roleCheck(self::ROLE_MODERATOR, (int) $userId);
-    }
-
-    /**
      * @param $serverUrl
      * @param $uid
      * @param $emailTo
@@ -1028,7 +1014,7 @@ class User extends Authenticatable
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $token = self::hashSHA1(uniqid('', true));
+        $token = static::hashSHA1(uniqid('', true));
         $url = $serverUrl.'register?invitecode='.$token;
 
         Mail::to($emailTo)->send(new SendInvite($uid, $url));
@@ -1059,7 +1045,7 @@ class User extends Authenticatable
     /**
      * Deletes users that have not verified their accounts for 3 or more days.
      */
-    public static function deleteUnVerified()
+    public static function deleteUnVerified(): void
     {
         static::query()->where('verified', '=', 0)->where('created_at', '<', now()->subDays(3))->delete();
     }

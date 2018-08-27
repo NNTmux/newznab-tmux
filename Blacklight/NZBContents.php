@@ -145,7 +145,7 @@ class NZBContents
      * @param $relID
      * @param $groupID
      * @param bool $nfoCheck
-     * @return array|bool
+     * @return array|false
      * @throws \Exception
      */
     public function parseNZB($guid, $relID, $groupID, $nfoCheck = false)

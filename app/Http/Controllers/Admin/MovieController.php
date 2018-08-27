@@ -49,14 +49,15 @@ class MovieController extends BasePageController
 
         $title = 'Movie Add';
 
-        if ($request->has('id') && ctype_digit($request->input('id')) && \strlen($request->input('id')) === 7) {
-            $id = $request->input('id');
+        $id = str_pad($request->input('id'), 7, '0', STR_PAD_LEFT);
 
+        if ($request->has('id') && \strlen($id) === 7) {
             $movCheck = $movie->getMovieInfo($id);
-            if (
-                $movie->updateMovieInfo($id) && (! $movCheck || ($request->has('update') && $request->input('update') === 1))) {
+            if ($movie->updateMovieInfo($id) === true && ($movCheck === null || ($request->has('update') && $request->input('update') === 1))) {
                 return redirect('admin/movie-list');
             }
+
+            return redirect('admin/movie-list');
         }
 
         $content = $this->smarty->fetch('movie-add.tpl');
@@ -92,8 +93,8 @@ class MovieController extends BasePageController
             $id = $request->input('id');
             $mov = $movie->getMovieInfo($id);
 
-            if (! $mov) {
-                $this->show404();
+            if ($mov === null) {
+                abort(404, 'Movie you requested does not exist in database');
             }
 
             switch ($action) {

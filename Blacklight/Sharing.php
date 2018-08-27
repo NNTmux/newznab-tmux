@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class Sharing.
@@ -44,7 +44,7 @@ class Sharing
      */
 
     /**
-     * @var \Blacklight\db\DB
+     * @var \PDO
      */
     protected $pdo;
 
@@ -81,10 +81,11 @@ class Sharing
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = DB::connection()->getPdo();
+        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo]));
 
         // Get all sharing info from DB.
-        $check = $this->pdo->queryOneRow('SELECT * FROM sharing');
+        $check = DB::selectOne('SELECT * FROM sharing');
 
         // Initiate sharing settings if this is the first time..
         if (empty($check)) {
@@ -96,19 +97,17 @@ class Sharing
             return;
         }
 
-        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo]));
-
         // Cache sharing settings.
         $this->siteSettings = $check;
         unset($check);
 
         // Convert to bool to speed up checking.
-        $this->siteSettings['hide_users'] = (int) $this->siteSettings['hide_users'] === 1;
-        $this->siteSettings['auto_enable'] = (int) $this->siteSettings['auto_enable'] === 1;
-        $this->siteSettings['posting'] = (int) $this->siteSettings['posting'] === 1;
-        $this->siteSettings['fetching'] = (int) $this->siteSettings['fetching'] === 1;
-        $this->siteSettings['enabled'] = (int) $this->siteSettings['enabled'] === 1;
-        $this->siteSettings['start_position'] = (int) $this->siteSettings['start_position'] === 1;
+        $this->siteSettings->hide_users = (int) $this->siteSettings->hide_users === 1;
+        $this->siteSettings->auto_enable = (int) $this->siteSettings->auto_enable === 1;
+        $this->siteSettings->posting = (int) $this->siteSettings->posting === 1;
+        $this->siteSettings->fetching = (int) $this->siteSettings->fetching === 1;
+        $this->siteSettings->enabled = (int) $this->siteSettings->enabled === 1;
+        $this->siteSettings->start_position = (int) $this->siteSettings->start_position === 1;
     }
 
     /**
@@ -119,7 +118,7 @@ class Sharing
     public function start(): void
     {
         // Admin has disabled sharing so return.
-        if ($this->siteSettings['enabled'] === false) {
+        if ($this->siteSettings->enabled === false) {
             return;
         }
 
@@ -128,11 +127,11 @@ class Sharing
             $this->nntp->doConnect();
         }
 
-        if ($this->siteSettings['fetching']) {
+        if ($this->siteSettings->fetching) {
             $this->fetchAll();
         }
         $this->matchComments();
-        if ($this->siteSettings['posting']) {
+        if ($this->siteSettings->posting) {
             $this->postAll();
             $this->postSC();
         }
@@ -141,26 +140,28 @@ class Sharing
     /**
      * Initialise of reset sharing settings.
      *
+     *
      * @param string $siteGuid Optional hash (must be sha1) we can set the site guid to.
      *
-     * @return array|bool
+     * @return mixed
      */
     public function initSettings(&$siteGuid = '')
     {
-        $this->pdo->queryExec('TRUNCATE TABLE sharing');
-        $siteName = uniqid('newznab_', true);
-        $this->pdo->queryExec(
+        DB::unprepared('TRUNCATE TABLE sharing');
+        DB::commit();
+        $siteName = uniqid('nntmux_', true);
+        DB::insert(
             sprintf(
                 '
 				INSERT INTO sharing
 				(site_name, site_guid, max_push, max_pull, hide_users, start_position, auto_enable, fetching, max_download)
 				VALUES (%s, %s, 40 , 20000, 1, 1, 1, 1, 150)',
-                $this->pdo->escapeString($siteName),
-                $this->pdo->escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
+                $this->pdo->quote($siteName),
+                $this->pdo->quote(($siteGuid === '' ? sha1($siteName) : $siteGuid))
             )
         );
 
-        return $this->pdo->queryOneRow('SELECT * FROM sharing');
+        return DB::selectOne('SELECT * FROM sharing');
     }
 
     /**
@@ -169,20 +170,19 @@ class Sharing
     protected function postAll()
     {
         // Get all comments that we have not posted yet.
-        $newComments = $this->pdo->query(
+        $newComments = DB::select(
             sprintf(
-                'SELECT rc.text, rc.id, %s, u.username, HEX(r.nzb_guid) AS nzb_guid
+                'SELECT rc.text, rc.id, UNIX_TIMESTAMP(rc.created_at) AS unix_time, u.username, HEX(r.nzb_guid) AS nzb_guid
 				FROM release_comments rc
 				INNER JOIN users u ON rc.users_id = u.id
 				INNER JOIN releases r on rc.releases_id = r.id
 				WHERE (rc.shared = 0 or issynced = 1) LIMIT %d',
-                $this->pdo->unix_timestamp_column('rc.created_at'),
                 $this->siteSettings['max_push']
             )
         );
 
         // Check if we have any comments to push.
-        if (count($newComments) === 0) {
+        if (\count($newComments) === 0) {
             return;
         }
 
@@ -197,12 +197,12 @@ class Sharing
     }
 
     /**
-     * Post all new comments to usenet.
+     * @throws \Exception
      */
     protected function postSC()
     {
         // Get all comments from spotnab that we have not posted yet.
-        $newComments = $this->pdo->query(
+        $newComments = DB::select(
             sprintf(
                 'SELECT id, text, UNIX_TIMESTAMP(created_at) AS unix_time,
 				username, nzb_guid FROM release_comments
@@ -212,7 +212,7 @@ class Sharing
         );
 
         // Check if we have any comments to push.
-        if (count($newComments) === 0) {
+        if (\count($newComments) === 0) {
             return;
         }
 
@@ -227,50 +227,49 @@ class Sharing
     }
 
     /**
-     * Post a comment to usenet.
+     * @param $row
      *
-     * @param array $row
+     * @throws \Exception
      */
     protected function postComment(&$row)
     {
         // Create a unique identifier for this comment.
-        $sid = sha1($row['unix_time'].$row['text'].$row['nzb_guid']);
+        $sid = sha1($row->unix_time.$row->text.$row->nzb_guid);
 
         // Check if the comment is already shared.
-        $check = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_comments WHERE shareid = %s', $this->pdo->escapeString($sid)));
-        if ($check === false) {
+        $check = DB::selectOne(sprintf('SELECT id FROM release_comments WHERE shareid = %s', $this->pdo->quote($sid)));
+        if ($check === null) {
 
             // Example of a subject.
             //(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 
             // Attempt to upload the comment to usenet.
             $success = $this->nntp->postArticle(
-                self::group,
-                ('(_nZEDb_)'.$this->siteSettings['site_name'].'_'.$this->siteSettings['site_guid'].' - [1/1] "'.$sid.'" yEnc (1/1)'),
+                self::group, '(_nZEDb_)'.$this->siteSettings->site_name.'_'.$this->siteSettings->site_guid.' - [1/1] "'.$sid.'" yEnc (1/1)',
                 json_encode(
                     [
-                        'USER' => ($this->siteSettings['hide_users'] ? 'ANON' : $row['username']),
-                        'TIME' => $row['unix_time'],
+                        'USER' => $this->siteSettings->hide_users ? 'ANON' : $row->username,
+                        'TIME' => $row->unix_time,
                         'SID'  => $sid,
-                        'RID'  => $row['nzb_guid'],
-                        'BODY' => $row['text'],
+                        'RID'  => $row->nzb_guid,
+                        'BODY' => $row->text,
                     ]
                 ),
                 '<anon@anon.com>'
             );
 
             // Check if we succesfully uploaded it.
-            if ($this->nntp->isError($success) === false && $success === true) {
+            if ($success === true && $this->nntp->isError($success) === false) {
 
                 // Update DB to say we posted the article.
-                $this->pdo->queryExec(
+                DB::update(
                     sprintf(
                         '
 						UPDATE release_comments
 						SET shared = 1, shareid = %s
 						WHERE id = %d',
-                        $this->pdo->escapeString($sid),
-                        $row['id']
+                        $this->pdo->quote($sid),
+                        $row->id
                     )
                 );
 
@@ -278,7 +277,7 @@ class Sharing
             }
         } else {
             // Update the DB to say it's shared.
-            $this->pdo->queryExec(sprintf('UPDATE release_comments SET shared = 1 WHERE id = %d', $row['id']));
+            DB::update(sprintf('UPDATE release_comments SET shared = 1 WHERE id = %d', $row->id));
         }
     }
 
@@ -287,17 +286,17 @@ class Sharing
      */
     protected function matchComments()
     {
-        $res = $this->pdo->query(
+        $res = DB::select(
             '
 			SELECT r.id
 			FROM release_comments rc
 			INNER JOIN releases r USING (nzb_guid)
 			WHERE rc.releases_id = 0'
         );
-        $found = count($res);
+        $found = \count($res);
         if ($found > 0) {
             foreach ($res as $row) {
-                $this->pdo->queryExec(
+                DB::update(
                     sprintf(
                         '
 						UPDATE release_comments rc
@@ -305,8 +304,8 @@ class Sharing
 						SET rc.releases_id = %d, r.comments = r.comments + 1
 						WHERE r.id = %d
 						AND rc.releases_id = 0',
-                        $row['id'],
-                        $row['id']
+                        $row->id,
+                        $row->id
                     )
                 );
             }
@@ -316,7 +315,7 @@ class Sharing
         }
 
         // Update first time seen.
-        $this->pdo->queryExec(
+        DB::update(
         sprintf(
             "
 					UPDATE sharing_sites ss
@@ -347,23 +346,23 @@ class Sharing
         }
 
         // Check if this is the first time, set our oldest article.
-        if ($this->siteSettings['last_article'] == 0) {
+        if ((int) $this->siteSettings->last_article === 0) {
             // If the user picked to start from the oldest, get the oldest.
-            if ($this->siteSettings['start_position'] === true) {
-                $this->siteSettings['last_article'] = $ourOldest = $group['first'];
+            if ($this->siteSettings->start_position === true) {
+                $this->siteSettings->last_article = $ourOldest = $group['first'];
             // Else get the newest.
             } else {
-                $this->siteSettings['last_article'] = $ourOldest = (string) ($group['last'] - $this->siteSettings['max_download']);
+                $this->siteSettings->last_article = $ourOldest = (string) ($group['last'] - $this->siteSettings->max_download);
                 if ($ourOldest < $group['first']) {
-                    $this->siteSettings['last_article'] = $ourOldest = $group['first'];
+                    $this->siteSettings->last_article = $ourOldest = $group['first'];
                 }
             }
         } else {
-            $ourOldest = (string) ($this->siteSettings['last_article'] + 1);
+            $ourOldest = (string) ($this->siteSettings->last_article + 1);
         }
 
         // Set our newest to our oldest wanted + max pull setting.
-        $newest = (string) ($ourOldest + $this->siteSettings['max_pull']);
+        $newest = (string) ($ourOldest + $this->siteSettings->max_pull);
 
         // Check if our newest wanted is newer than the group's newest, set to group's newest.
         if ($newest >= $group['last']) {
@@ -383,7 +382,7 @@ class Sharing
         $headers = $this->nntp->getOverview($ourOldest.'-'.$newest, true, false);
 
         // Check if we received nothing or there was an error.
-        if ($this->nntp->isError($headers) || count($headers) === 0) {
+        if ($this->nntp->isError($headers) || \count($headers) === 0) {
             return;
         }
 
@@ -400,7 +399,7 @@ class Sharing
             $currentArticle = $header['Number'];
 
             // Break out of the loop if we have downloaded more comments than the user wants.
-            if ($found > $this->siteSettings['max_download']) {
+            if ($found > $this->siteSettings->max_download) {
                 break;
             }
 
@@ -410,78 +409,75 @@ class Sharing
                 preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)) {
 
                 // Check if this is from our own site.
-                if ($matches['guid'] === $this->siteSettings['site_guid']) {
+                if ($matches['guid'] === $this->siteSettings->site_guid) {
                     continue;
                 }
 
                 // Check if we already have the comment.
-                $check = $this->pdo->queryOneRow(
+                $check = DB::selectOne(
                     sprintf(
                         'SELECT id FROM release_comments WHERE shareid = %s',
-                        $this->pdo->escapeString($matches['sid'])
+                        $this->pdo->quote($matches['sid'])
                     )
                 );
 
                 // We don't have it, so insert it.
-                if ($check === false) {
+                if ($check === null) {
 
                     // Check if we have the site and if it is enabled.
-                    $check = $this->pdo->queryOneRow(
+                    $check = DB::selectOne(
                         sprintf(
                             'SELECT enabled FROM sharing_sites WHERE site_guid = %s',
-                            $this->pdo->escapeString($matches['guid'])
+                            $this->pdo->quote($matches['guid'])
                         )
                     );
 
-                    if ($check === false) {
+                    if ($check === null) {
                         // Check if the user has auto enable on.
-                        if ($this->siteSettings['auto_enable'] === false) {
+                        if ($this->siteSettings->auto_enable === false) {
                             // Insert the site so the admin can enable it later on.
-                            $this->pdo->queryExec(
+                            DB::insert(
                                 sprintf(
                                     '
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
 									VALUES (%s, %s, NOW(), NOW(), 0, 0)',
-                                    $this->pdo->escapeString($matches['site']),
-                                    $this->pdo->escapeString($matches['guid'])
+                                    $this->pdo->quote($matches['site']),
+                                    $this->pdo->quote($matches['guid'])
                                 )
                             );
                             continue;
-                        } else {
-                            // Insert the site as enabled since the user has auto enabled on.
-                            $this->pdo->queryExec(
-                                sprintf(
-                                    '
-									INSERT INTO sharing_sites
-									(site_name, site_guid, last_time, first_time, enabled, comments)
-									VALUES (%s, %s, NOW(), NOW(), 1, 0)',
-                                    $this->pdo->escapeString($matches['site']),
-                                    $this->pdo->escapeString($matches['guid'])
-                                )
-                            );
                         }
-                    } else {
-                        // The user has disabled this site, so continue.
-                        if ($check['enabled'] == 0) {
-                            continue;
-                        }
+
+                        // Insert the site as enabled since the user has auto enabled on.
+                        DB::insert(
+                            sprintf(
+                                '
+                                INSERT INTO sharing_sites
+                                (site_name, site_guid, last_time, first_time, enabled, comments)
+                                VALUES (%s, %s, NOW(), NOW(), 1, 0)',
+                                $this->pdo->quote($matches['site']),
+                                $this->pdo->quote($matches['guid'])
+                            )
+                        );
+                    } elseif ((int) $check->enabled === 0) {
+                        continue;
                     }
 
                     // Insert the comment, if we got it, update the site to increment comment count.
                     if ($this->insertNewComment($header['Message-ID'], $matches['guid'])) {
-                        $this->pdo->queryExec(
+                        DB::update(
                             sprintf(
                                 '
 								UPDATE sharing_sites SET comments = comments + 1, last_time = NOW(), site_name = %s WHERE site_guid = %s',
-                                $this->pdo->escapeString($matches['site']),
-                                $this->pdo->escapeString($matches['guid'])
+                                $this->pdo->quote($matches['site']),
+                                $this->pdo->quote($matches['guid'])
                             )
                         );
                         $found++;
                         if (config('nntmux.echocli')) {
                             echo '.';
-                            if ($found % 40 == 0) {
+                            if ($found % 40 === 0) {
                                 echo '['.$found.']'.PHP_EOL;
                             }
                         }
@@ -489,16 +485,16 @@ class Sharing
                 }
             }
             // Update once in a while in case the user cancels the script.
-            if ($total++ % 10 == 0) {
-                $this->siteSettings['lastarticle'] = $currentArticle;
-                $this->pdo->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
+            if ($total++ % 10 === 0) {
+                $this->siteSettings->lastarticle = $currentArticle;
+                DB::update(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
             }
         }
 
         if ($currentArticle > 0) {
             // Update sharing's last article number.
             $this->siteSettings['lastarticle'] = $currentArticle;
-            $this->pdo->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
+            DB::update(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
         }
 
         if (config('nntmux.echocli')) {
@@ -542,26 +538,27 @@ class Sharing
         }
 
         // Just in case.
-        if (! isset($body['USER']) || ! isset($body['SID']) || ! isset($body['RID']) || ! isset($body['TIME']) | ! isset($body['BODY'])) {
+        if (! isset($body['USER'], $body['SID']) || ! isset($body['RID']) || ! isset($body['TIME']) | ! isset($body['BODY'])) {
             return false;
         }
         $cid = md5($body['SID'].$body['USER'].$body['TIME'].$siteID);
 
         // Insert the comment.
-        if ($this->pdo->queryExec(
+        $unixTime = $body['TIME'] > time() ? time() : $body['TIME'];
+        if (DB::insert(
             sprintf(
                 '
 				INSERT IGNORE INTO release_comments
 				(text, created_at, issynced, shareid, cid, gid, nzb_guid, siteid, username, users_id, releases_id, shared, host, sourceID)
-				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
-                $this->pdo->escapeString($body['BODY']),
-                $this->pdo->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
-                $this->pdo->escapeString($body['SID']),
-                $this->pdo->escapeString($cid),
-                $this->pdo->escapeString($body['RID']),
-                $this->pdo->escapeString($body['RID']),
-                $this->pdo->escapeString($siteID),
-                $this->pdo->escapeString((strpos($body['USER'] === 0, 'sn-') ? 'SH_ANON' : 'SH_'.$body['USER']))
+				VALUES (%s, FROM_UNIXTIME(%s), 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
+                $this->pdo->quote($body['BODY']),
+                $unixTime,
+                $this->pdo->quote($body['SID']),
+                $this->pdo->quote($cid),
+                $this->pdo->quote($body['RID']),
+                $this->pdo->quote($body['RID']),
+                $this->pdo->quote($siteID),
+                $this->pdo->quote((strpos($body['USER'] === 0, 'sn-') !== false ? 'SH_ANON' : 'SH_'.$body['USER']))
             )
         )
         ) {

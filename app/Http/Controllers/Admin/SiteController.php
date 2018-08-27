@@ -8,9 +8,9 @@ use App\Models\Release;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
-use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\BasePageController;
 
 class SiteController extends BasePageController
@@ -214,7 +214,7 @@ class SiteController extends BasePageController
         $usersbymonth = User::getUsersByMonth();
         $this->smarty->assign('usersbymonth', $usersbymonth);
 
-        $usersbyrole = UserRole::getUsersByRole();
+        $usersbyrole = Role::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderBy('users_count', 'desc')->get();
         $this->smarty->assign('usersbyrole', $usersbyrole);
         $this->smarty->assign('totusers', 0);
         $this->smarty->assign('totrusers', 0);

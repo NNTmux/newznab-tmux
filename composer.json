@@ -20,6 +20,11 @@
       "database/seeds"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "config": {
     "discard-changes": true,
     "process-timeout": 3600,
@@ -63,10 +68,12 @@
   ],
   "require": {
     "php": ">=7.2.0",
+    "ext-bcmath": "*",
     "ext-ctype": "*",
     "ext-curl": "*",
     "ext-exif": "*",
     "ext-filter": "*",
+    "ext-fileinfo":"*",
     "ext-gd": "*",
     "ext-hash": "*",
     "ext-iconv": "*",
@@ -129,9 +136,10 @@
     "foolz/sphinxql-query-builder": "^1.2",
     "fxp/composer-asset-plugin": "~1.1",
     "genealabs/laravel-caffeine": "^0.6.11",
+    "geoip2/geoip2": "^2.9",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
-    "imdbphp/imdbphp": "dev-master",
+    "imdbphp/imdbphp": "^6.0",
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
@@ -149,10 +157,12 @@
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
     "php-tmdb/api": "~2.1",
+    "pragmarx/firewall": "^2.2",
     "predis/predis": "^1.1",
     "ramsey/uuid": "^3.7",
     "smarty/smarty": "^3.1",
     "spatie/laravel-fractal": "^5.3",
+    "spatie/laravel-permission": "^2.12",
     "vlucas/phpdotenv": "^2.4",
     "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",
@@ -162,7 +172,6 @@
   },
 
   "require-dev": {
-    "ext-bcmath": "*",
     "barryvdh/laravel-debugbar": "^3.1",
     "barryvdh/laravel-ide-helper": "^2.4",
     "filp/whoops": "~2.0",

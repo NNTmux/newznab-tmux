@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use App\Models\UserRole;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\BasePageController;
 
@@ -24,7 +24,7 @@ class UserController extends BasePageController
         $title = 'User List';
 
         $roles = [];
-        foreach (UserRole::getRoles() as $userRole) {
+        foreach (Role::all()->toArray() as $userRole) {
             $roles[$userRole['id']] = $userRole['name'];
         }
 
@@ -103,9 +103,9 @@ class UserController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         //get the user roles
-        $userRoles = UserRole::getRoles();
+        $userRoles = Role::all()->toArray();
         $roles = [];
-        $defaultRole = User::ROLE_USER;
+        $defaultRole = 'User';
         $defaultInvites = Invitation::DEFAULT_INVITES;
         foreach ($userRoles as $r) {
             $roles[$r['id']] = $r['name'];
@@ -149,7 +149,13 @@ class UserController extends BasePageController
                         User::updateUserRoleChangeDate($request->input('id'), $request->input('rolechangedate'));
                     }
                     if ($request->input('role') !== null) {
-                        UserRole::query()->where('id', $request->input('role'))->value('name');
+                        $roleName = Role::query()->where('id', $request->input('role'))->value('name');
+                        if ($roleName === 'Disabled') {
+                            $blockedUser = User::find($request->input('id'));
+                            if (\Firewall::isBlacklisted($blockedUser->host) === false) {
+                                \Firewall::blacklist($blockedUser->host);
+                            }
+                        }
                         $email = $request->input('email') ?? $request->input('email');
                         Mail::to($email)->send(new AccountChange($request->input('id')));
                     }
@@ -231,6 +237,8 @@ class UserController extends BasePageController
     {
         if ($request->has('id')) {
             User::deleteUser($request->input('id'));
+
+            return redirect('admin/user-list');
         }
 
         if ($request->has('redir')) {

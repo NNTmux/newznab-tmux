@@ -262,7 +262,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][1]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/postprocess.php amazon true $log; \
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php ama $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -311,7 +311,6 @@ class TmuxRun extends Tmux
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php mov $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/postprocess.php anime true $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/getTraktData.php $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -752,7 +751,7 @@ class TmuxRun extends Tmux
     {
         if ((int) $runVar['constants']['run_ircscraper'] === 1) {
             //Check to see if the pane is dead, if so respawn it.
-            if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
+            if ((int) shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") === 1) {
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
 					{$runVar['commands']['_phpn']} {$runVar['paths']['scraper']} true'"
@@ -774,7 +773,7 @@ class TmuxRun extends Tmux
         if ((int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
             shell_exec(
                 "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
-                    {$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/postprocess.php sharing true; \
+                    {$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/multiprocessing/postprocess.php sha; \
                     {$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
             );
         }

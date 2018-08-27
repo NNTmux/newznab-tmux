@@ -8,7 +8,9 @@ use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\QueryException;
 use Blacklight\processing\ProcessReleasesMultiGroup;
 
 /**
@@ -814,7 +816,7 @@ class Binaries
         $this->multiGroup = $multiGroup;
         $binariesUpdate = $collectionIDs = $articles = [];
 
-        $this->_pdo->beginTransaction();
+        DB::beginTransaction();
 
         $partsQuery = $partsCheck =
             "INSERT IGNORE INTO {$this->tableNames['pname']} (binaries_id, number, messageid, partnumber, size) VALUES ";
@@ -880,6 +882,8 @@ class Binaries
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
 
                         $collectionID = $this->_pdo->lastInsertId();
+                    } catch (QueryException $e) {
+                        Log::error($e->getMessage());
                     } catch (\PDOException $e) {
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
@@ -887,7 +891,7 @@ class Binaries
                         }
                         if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                             ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                            $this->_pdo->rollBack();
+                            DB::rollBack();
                         }
                     }
 
@@ -895,8 +899,8 @@ class Binaries
                         if ($this->addToPartRepair) {
                             $this->headersNotInserted[] = $this->header['Number'];
                         }
-                        $this->_pdo->rollBack();
-                        $this->_pdo->beginTransaction();
+                        DB::rollBack();
+                        DB::beginTransaction();
                         continue;
                     }
                     $collectionIDs[$this->header['CollectionKey']] = $collectionID;
@@ -914,6 +918,8 @@ class Binaries
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
+                } catch (QueryException $e) {
+                    Log::error($e->getMessage());
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
@@ -921,7 +927,7 @@ class Binaries
                     }
                     if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                         ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                        $this->_pdo->rollBack();
+                        DB::rollBack();
                     }
                 }
 
@@ -929,8 +935,8 @@ class Binaries
                     if ($this->addToPartRepair) {
                         $this->headersNotInserted[] = $this->header['Number'];
                     }
-                    $this->_pdo->rollBack();
-                    $this->_pdo->beginTransaction();
+                    DB::rollBack();
+                    DB::beginTransaction();
                     continue;
                 }
 
@@ -983,13 +989,13 @@ class Binaries
                 if ($this->addToPartRepair) {
                     $this->headersNotInserted += $this->headersReceived;
                 }
-                $this->_pdo->rollBack();
+                DB::rollBack();
             }
         } else {
             if ($this->addToPartRepair) {
                 $this->headersNotInserted += $this->headersReceived;
             }
-            $this->_pdo->rollBack();
+            DB::rollBack();
         }
     }
 
@@ -1087,7 +1093,7 @@ class Binaries
                 $headersNotInserted[] = $file['Parts']['number'];
             }
         }
-        $this->_pdo->rollBack();
+        DB::rollBack();
 
         return $headersNotInserted;
     }
@@ -1100,6 +1106,7 @@ class Binaries
      *
      * @return void
      * @throws \Exception
+     * @throws \Throwable
      */
     public function partRepair($groupArr, $tables = ''): void
     {
@@ -1122,7 +1129,7 @@ class Binaries
             }
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                 ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                $this->_pdo->rollBack();
+                DB::rollBack();
             }
         }
 
@@ -1226,7 +1233,8 @@ class Binaries
         }
 
         // Remove articles that we cant fetch after x attempts.
-        DB::delete(
+        DB::transaction(function () use ($groupArr, $tableNames) {
+            DB::delete(
             sprintf(
                 'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
                 $tableNames['prname'],
@@ -1234,6 +1242,7 @@ class Binaries
                 $groupArr['id']
             )
         );
+        }, 3);
     }
 
     /**
@@ -1451,6 +1460,7 @@ class Binaries
      * @param int    $groupID   The ID of the group.
      *
      * @return void
+     * @throws \Throwable
      */
     private function removeRepairedParts(array $numbers, $tableName, $groupID): void
     {
@@ -1458,7 +1468,9 @@ class Binaries
         foreach ($numbers as $number) {
             $sql .= $number.',';
         }
-        DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
+        DB::transaction(function () use ($groupID, $sql) {
+            DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
+        }, 3);
     }
 
     /**
@@ -1648,10 +1660,13 @@ class Binaries
      * @note A trigger automatically deletes the parts/binaries.
      *
      * @return void
+     * @throws \Throwable
      */
     public function delete($collectionID): void
     {
-        DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
+        DB::transaction(function () use ($collectionID) {
+            DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
+        }, 3);
     }
 
     /**

@@ -32,7 +32,7 @@ class RSS extends Capabilities
         ];
         $options += $defaults;
 
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
     }
 
     /**
@@ -95,7 +95,7 @@ class RSS extends Capabilities
 				ORDER BY postdate DESC %s",
                 $this->releases->getConcatenatedCategoryIDs(),
                 $cartSearch,
-                $this->releases->showPasswords,
+                $this->releases->showPasswords(),
                 NZB::NZB_ADDED,
                 $catSearch,
                 ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
@@ -162,7 +162,7 @@ class RSS extends Capabilities
             NZB::NZB_ADDED,
             Category::TV_ROOT,
             Category::TV_OTHER,
-            $this->releases->showPasswords,
+            $this->releases->showPasswords(),
             ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
         );
 
@@ -224,7 +224,7 @@ class RSS extends Capabilities
             NZB::NZB_ADDED,
             Category::MOVIE_ROOT,
             Category::MOVIE_OTHER,
-            $this->releases->showPasswords,
+            $this->releases->showPasswords(),
             ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
         );
 

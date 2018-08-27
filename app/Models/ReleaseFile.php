@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\SphinxSearch;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -42,7 +43,10 @@ class ReleaseFile extends Model
      */
     protected $primaryKey = 'releases_id';
 
-    public function release()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
@@ -106,15 +110,17 @@ class ReleaseFile extends Model
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
 
         if ($duplicateCheck === null) {
-            $insert = self::create(
-                [
-                    'releases_id' => $id,
-                    'name' => utf8_encode($name),
-                    'size' => $size,
-                    'created_at' => $createdTime,
-                    'passworded' => $hasPassword,
-                ]
-            )->id;
+            try {
+                $insert = self::create([
+                        'releases_id' => $id,
+                        'name' => utf8_encode($name),
+                        'size' => $size,
+                        'created_at' => $createdTime,
+                        'passworded' => $hasPassword,
+                    ])->id;
+            } catch (\PDOException $e) {
+                Log::alert($e->getMessage());
+            }
 
             if (\strlen($hash) === 32) {
                 ParHash::insertIgnore(['releases_id' => $id, 'hash' => $hash]);

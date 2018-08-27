@@ -546,7 +546,7 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					HEX(ru.uniqueid) AS uid
+					ru.uniqueid AS uid
 				FROM releases rel
 				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
@@ -562,7 +562,7 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					HEX(ru.uniqueid) AS uid
+					ru.uniqueid AS uid
 				FROM releases rel
 				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
@@ -740,7 +740,7 @@ class NameFixer
      * @param        $query
      * @param string $limit
      *
-     * @return array|bool
+     * @return array|false
      */
     protected function _getReleases($time, $cats, $query, $limit = '')
     {
@@ -1538,7 +1538,7 @@ class NameFixer
                 $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.acodec.source.res.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -]((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
                 $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.year.###(season/episode).source.group', $echo, $type, $nameStatus, $show);
-            } elseif (preg_match('/\w(19|20)\d\d[._ -]\d{2}[._ -]\d{2}[._ -](IndyCar|NBA|NCW(T|Y)S|NNS|NSCS?)([._ -](19|20)\d\d)?[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
+            } elseif (preg_match('/\w(19|20)\d\d[._ -]\d{2}[._ -]\d{2}[._ -](IndyCar|NBA|NCW([TY])S|NNS|NSCS?)([._ -](19|20)\d\d)?[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
                 $this->updateRelease($release, $result['0'], $method = 'tvCheck: Sports', $echo, $type, $nameStatus, $show);
             }
         }
@@ -1934,7 +1934,7 @@ class NameFixer
                     $releaseName = $releaseName.'.'.$result[1];
                 } elseif (preg_match('/\s\[\*\] (DT?S [2567][._ -][0-2]( MONO)?)\b/i', $release->textstring, $result)) {
                     $releaseName = $releaseName.'.'.$result[2];
-                } elseif (preg_match('/Format.+(DVD(5|9|R)?|[HX][._ -]?264)\b/i', $release->textstring, $result)) {
+                } elseif (preg_match('/Format.+(DVD([59R])?|[HX][._ -]?264)\b/i', $release->textstring, $result)) {
                     $releaseName = $releaseName.'.'.$result[1];
                 } elseif (preg_match('/\[(640x.+|1280x.+|1920x.+)\] Resolution\b/i', $release->textstring, $result)) {
                     if ($result[1] === '640x.+') {
@@ -2053,13 +2053,14 @@ class NameFixer
     /**
      * Look for a name based on mediainfo xml Unique_ID.
      *
-     * @param array $release The release to be matched
-     * @param bool $echo Should we show CLI output
-     * @param string $type The rename type
-     * @param int $nameStatus Should we rename the release if match is found
-     * @param int $show Should we show the rename results
      *
-     * @return bool Whether or not we matched the release
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
      * @throws \Exception
      */
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2071,7 +2072,7 @@ class NameFixer
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
 				WHERE ru.releases_id IS NOT NULL
-				AND ru.uniqueid = UNHEX({$this->pdo->quote($release->uid)})
+				AND ru.uniqueid = {$this->pdo->quote($release->uid)}
 				AND ru.releases_id != {$release->releases_id}
 				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')"
             );
@@ -2102,13 +2103,14 @@ class NameFixer
     /**
      * Look for a name based on mediainfo xml Unique_ID.
      *
-     * @param array $release The release to be matched
-     * @param bool $echo Should we show CLI output
-     * @param string $type The rename type
-     * @param int $nameStatus Should we rename the release if match is found
-     * @param int $show Should we show the rename results
      *
-     * @return bool Whether or not we matched the release
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
      * @throws \Exception
      */
     public function mediaMovieNameCheck($release, $echo, $type, $nameStatus, $show): bool
@@ -2140,15 +2142,15 @@ class NameFixer
     /**
      * Look for a name based on xxx release filename.
      *
-     * @param array $release The release to be matched
-     * @param bool $echo Should we show CLI output
-     * @param string $type The rename type
-     * @param int $nameStatus Should we rename the release if match is found
-     * @param int $show Should we show the rename results
      *
-     * @return bool Whether or not we matched the release
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
      * @throws \Exception
-     * @throws \RuntimeException
      */
     public function xxxNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
@@ -2193,15 +2195,15 @@ class NameFixer
     /**
      * Look for a name based on .srr release files extension.
      *
-     * @param array $release The release to be matched
-     * @param bool $echo Should we show CLI output
-     * @param string $type The rename type
-     * @param int $nameStatus Should we rename the release if match is found
-     * @param int $show Should we show the rename results
      *
-     * @return bool Whether or not we matched the release
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
      * @throws \Exception
-     * @throws \RuntimeException
      */
     public function srrNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
@@ -2246,15 +2248,15 @@ class NameFixer
     /**
      * Look for a name based on par2 hash_16K block.
      *
-     * @param array $release The release to be matched
-     * @param bool $echo Should we show CLI output
-     * @param string $type The rename type
-     * @param int $nameStatus Should we rename the release if match is found
-     * @param int $show Should we show the rename results
      *
-     * @return bool Whether or not we matched the release
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
      * @throws \Exception
-     * @throws \RuntimeException
      */
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
     {

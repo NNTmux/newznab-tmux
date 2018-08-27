@@ -18,10 +18,10 @@ class CreateRoleExcludedCategoriesTable extends Migration {
             $table->charset = 'utf8';
             $table->collation = 'utf8_unicode_ci';
 		    $table->increments('id');
-			$table->integer('user_roles_id');
+			$table->integer('roles_id');
 			$table->integer('categories_id')->nullable();
 			$table->timestamps();
-			$table->unique(['user_roles_id','categories_id'], 'ix_roleexcat_rolecat');
+			$table->unique(['roles_id','categories_id'], 'ix_roleexcat_rolecat');
 		});
 	}
 

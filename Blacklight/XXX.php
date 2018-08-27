@@ -50,11 +50,6 @@ class XXX
     protected $releaseImage;
 
     /**
-     * @var
-     */
-    protected $currentRelID;
-
-    /**
      * @var int|null|string
      */
     protected $movieqty;
@@ -64,13 +59,14 @@ class XXX
      */
     protected $showPasswords;
 
+    /**
+     * @var string
+     */
     protected $cookie;
 
     /**
-     * @var array|bool|int|string
+     * @var \PDO
      */
-    public $catWhere;
-
     protected $pdo;
 
     /**
@@ -90,7 +86,7 @@ class XXX
         $this->pdo = DB::connection()->getPdo();
 
         $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
-        $this->showPasswords = Releases::showPasswords();
+        $this->showPasswords = (new Releases())->showPasswords();
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->imgSavePath = NN_COVERS.'xxx'.DS;
         $this->cookie = NN_TMP.'xxx.cookie';
@@ -664,7 +660,6 @@ class XXX
                 if ($this->parseXXXSearchName($arr['searchname']) !== false) {
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
-                        $this->currentRelID = $arr['id'];
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($this->currentTitle), true);
                         }

@@ -11,11 +11,9 @@ use App\Http\Controllers\BasePageController;
 class ReleasesController extends BasePageController
 {
     /**
-     * @param \Illuminate\Http\Request $request
-     *
      * @throws \Exception
      */
-    public function index()
+    public function index(): void
     {
         $this->setAdminPrefs();
 
@@ -107,10 +105,10 @@ class ReleasesController extends BasePageController
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\RedirectResponse
     {
         if ($id) {
-            $releases = new Releases(['Settings' => null]);
+            $releases = new Releases();
             $releases->deleteMultiple($id);
         }
 

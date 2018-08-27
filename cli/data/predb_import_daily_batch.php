@@ -28,13 +28,11 @@ use Blacklight\ColorCLI;
 use Blacklight\db\PreDb;
 use Blacklight\utility\Utility;
 
-if (! Utility::isWin()) {
-    $canExeRead = Utility::canExecuteRead(NN_RES);
+$canExeRead = Utility::canExecuteRead(NN_RES);
     if (is_string($canExeRead)) {
         exit($canExeRead);
     }
     unset($canExeRead);
-}
 
 if (! is_writable(NN_RES)) {
     exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);

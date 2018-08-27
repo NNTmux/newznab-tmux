@@ -160,10 +160,14 @@ class Regexes
      * Delete a regex using its id.
      *
      * @param int $id
+     *
+     * @throws \Throwable
      */
     public function deleteRegex($id): void
     {
-        DB::delete(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
+        DB::transaction(function () use ($id) {
+            DB::delete(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
+        }, 3);
     }
 
     /**

@@ -200,7 +200,9 @@ class Hotmovies extends AdultMovies
 
     /**
      * Get Box Cover Images.
-     * @return bool|array - boxcover,backcover
+     *
+     *
+     * @return array|false|mixed
      */
     protected function covers()
     {

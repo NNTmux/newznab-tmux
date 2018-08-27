@@ -34,27 +34,27 @@ class Music
     public $echooutput;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $pubkey;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $privkey;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $asstag;
 
     /**
-     * @var array|bool|int|string
+     * @var int
      */
     public $musicqty;
 
     /**
-     * @var array|bool|int|string
+     * @var int
      */
     public $sleeptime;
 
@@ -173,7 +173,7 @@ class Music
 				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-                Releases::showPasswords(),
+                (new Releases())->showPasswords(),
                 $browseby,
                 $catsrch,
                 $exccatlist,
@@ -706,13 +706,13 @@ class Music
     }
 
     /**
-     * @param $releasename
+     * @param string $releaseName
      *
-     * @return array|bool
+     * @return array|false
      */
-    public function parseArtist($releasename)
+    public function parseArtist($releaseName)
     {
-        if (preg_match('/(.+?)(\d{1,2} \d{1,2} )?\(?(19\d{2}|20[0-1][\d])\b/', $releasename, $name)) {
+        if (preg_match('/(.+?)(\d{1,2} \d{1,2} )?\(?(19\d{2}|20[0-1][\d])\b/', $releaseName, $name)) {
             $result = [];
             $result['year'] = $name[3];
 
@@ -730,12 +730,12 @@ class Music
                 $result['name'] = $newname;
 
                 return $result;
-            } else {
-                return false;
             }
-        } else {
+
             return false;
         }
+
+        return false;
     }
 
     /**

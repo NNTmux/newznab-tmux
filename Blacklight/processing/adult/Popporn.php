@@ -92,9 +92,7 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * Gets the synopsis.
-     *
-     * @return array|bool
+     * @return array|mixed
      */
     protected function synopsis()
     {
@@ -116,9 +114,7 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * Gets trailer video.
-     *
-     * @return array|bool
+     * @return array|mixed
      */
     protected function trailers()
     {
@@ -144,11 +140,9 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * Process ProductInfo And/or Extras.
-     *
      * @param bool $extras
      *
-     * @return array|bool
+     * @return array|mixed
      */
     protected function productInfo($extras = false)
     {
@@ -198,9 +192,7 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * Gets the cast members and director.
-     *
-     * @return array|bool
+     * @return array|mixed
      */
     protected function cast()
     {

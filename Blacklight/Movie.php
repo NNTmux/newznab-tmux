@@ -102,7 +102,7 @@ class Movie
     public $imdburl;
 
     /**
-     * @var array|bool|int|string
+     * @var int
      */
     public $movieqty;
 
@@ -216,7 +216,7 @@ class Movie
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
-        $this->showPasswords = Releases::showPasswords();
+        $this->showPasswords = (new Releases())->showPasswords();
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->imgSavePath = NN_COVERS.'movies/';
@@ -225,7 +225,8 @@ class Movie
 
     /**
      * @param $imdbId
-     * @return array|bool|\Illuminate\Database\Eloquent\Model|null|static
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function getMovieInfo($imdbId)
     {
@@ -244,7 +245,7 @@ class Movie
      * @param int   $maxAge
      * @param array $excludedCats
      *
-     * @return array|bool
+     * @return array|mixed
      */
     public function getMovieRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
@@ -501,7 +502,7 @@ class Movie
             $temp = '';
             foreach ($value as $val) {
                 if (! \is_array($val) && ! \is_object($val)) {
-                    $temp .= (string) $val;
+                    $temp .= $val;
                 }
             }
             $value = $temp;
@@ -528,7 +529,7 @@ class Movie
      *
      * @param array $values Array of keys/values to update. See $validKeys
      *
-     * @return int|bool
+     * @return bool|string
      */
     public function update(array $values)
     {
@@ -563,7 +564,9 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        return DB::insert($query[0].') '.$query[1].') '.$query[2]);
+        DB::insert($query[0].') '.$query[1].') '.$query[2]);
+
+        return $this->pdo->lastInsertId();
     }
 
     /**
@@ -609,53 +612,53 @@ class Movie
         }
 
         // Check TMDB for IMDB info.
-        $tmdb = $this->fetchTMDBProperties($imdbId);
+        $tmdb = $this->fetchTMDBProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         // Check IMDB for movie info.
-        $imdb = $this->fetchIMDBProperties($imdbId);
+        $imdb = $this->fetchIMDBProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         // Check TRAKT for movie info
-        $trakt = $this->fetchTraktTVProperties($imdbId);
+        $trakt = $this->fetchTraktTVProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         // Check OMDb for movie info
-        $omdb = $this->fetchOmdbAPIProperties($imdbId);
+        $omdb = $this->fetchOmdbAPIProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
         if (! $imdb && ! $tmdb && ! $trakt && ! $omdb) {
             return false;
         }
 
         // Check FanArt.tv for cover and background images.
-        $fanart = $this->fetchFanartTVProperties($imdbId);
+        $fanart = $this->fetchFanartTVProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
 
         $mov = [];
 
         $mov['cover'] = $mov['backdrop'] = $mov['banner'] = 0;
         $mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
-        $mov['imdbid'] = $imdbId;
+        $mov['imdbid'] = str_pad($imdbId, 7, '0', STR_PAD_LEFT);
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
         if (! empty($fanart['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $fanart['cover'], $this->imgSavePath);
         } elseif (! empty($tmdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $tmdb['cover'], $this->imgSavePath);
         } elseif (! empty($imdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $imdb['cover'], $this->imgSavePath);
         } elseif (! empty($omdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $omdb['cover'], $this->imgSavePath);
         }
 
         // Backdrops.
         if (! empty($fanart['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
+            $mov['backdrop'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
         } elseif (! empty($tmdb['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
+            $mov['backdrop'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
         }
 
         // Banner
         if (! empty($fanart['banner'])) {
-            $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
+            $mov['banner'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
         // RottenTomatoes rating from OmdbAPI
@@ -678,12 +681,16 @@ class Movie
             $mov['director'] = \is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
         } elseif (! empty($omdb['director'])) {
             $mov['director'] = \is_array($omdb['director']) ? implode(', ', array_unique($omdb['director'])) : $omdb['director'];
+        } elseif (! empty($tmdb['director'])) {
+            $mov['director'] = \is_array($tmdb['director']) ? implode(', ', array_unique($tmdb['director'])) : $tmdb['director'];
         }
 
         if (! empty($imdb['actors'])) {
             $mov['actors'] = \is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
         } elseif (! empty($omdb['actors'])) {
             $mov['actors'] = \is_array($omdb['actors']) ? implode(', ', array_unique($omdb['actors'])) : $omdb['actors'];
+        } elseif (! empty($tmdb['actors'])) {
+            $mov['actors'] = \is_array($tmdb['actors']) ? implode(', ', array_unique($tmdb['actors'])) : $tmdb['actors'];
         }
 
         if (! empty($imdb['language'])) {
@@ -744,7 +751,7 @@ class Movie
      *
      * @param $imdbId
      *
-     * @return bool|array
+     * @return array|false
      */
     protected function fetchFanartTVProperties($imdbId)
     {
@@ -792,14 +799,14 @@ class Movie
      * @param      $imdbId
      * @param bool $text
      *
-     * @return array|bool
+     * @return array|false
      */
     public function fetchTMDBProperties($imdbId, $text = false)
     {
         $lookupId = $text === false && \strlen($imdbId) === 7 ? 'tt'.$imdbId : $imdbId;
 
         try {
-            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
+            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
         } catch (TmdbApiException $error) {
             ColorCLI::doEcho(ColorCLI::error($error->getMessage()), true);
 
@@ -827,13 +834,23 @@ class Movie
             $ret['title'] = $tmdbLookup['title'];
 
             $ret['tmdbid'] = $tmdbLookup['id'];
-            $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
-            $ret['imdbid'] = $ImdbID;
+            $ret['imdbid'] = str_replace('tt', '', $tmdbLookup['imdb_id']);
             $vote = $tmdbLookup['vote_average'];
             if ($vote !== null) {
                 $ret['rating'] = (int) $vote === 0 ? '' : $vote;
             } else {
                 $ret['rating'] = '';
+            }
+            $actors = array_pluck($tmdbLookup['credits']['cast'], 'name');
+            if (! empty($actors)) {
+                $ret['actors'] = $actors;
+            } else {
+                $ret['actors'] = '';
+            }
+            foreach ($tmdbLookup['credits']['crew'] as $crew) {
+                if ($crew['department'] === 'Directing' && $crew['job'] === 'Director') {
+                    $ret['director'] = $crew['name'];
+                }
             }
             $overview = $tmdbLookup['overview'];
             if (! empty($overview)) {
@@ -888,7 +905,7 @@ class Movie
     /**
      * @param $imdbId
      *
-     * @return array|bool
+     * @return array|false
      */
     public function fetchIMDBProperties($imdbId)
     {
@@ -931,7 +948,7 @@ class Movie
      *
      * @param $imdbId
      *
-     * @return bool|array
+     * @return array|false
      * @throws \Exception
      */
     public function fetchTraktTVProperties($imdbId)
@@ -977,7 +994,7 @@ class Movie
      *
      * @param $imdbId
      *
-     * @return bool|array
+     * @return array|false
      */
     public function fetchOmdbAPIProperties($imdbId)
     {
@@ -1054,7 +1071,7 @@ class Movie
             // If set, scan for imdb info.
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
-                if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
+                if ($movCheck === null || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
                     $info = $this->updateMovieInfo($imdbID);
                     if ($info === false) {
                         Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
@@ -1214,7 +1231,7 @@ class Movie
     }
 
     /**
-     * @return bool|mixed
+     * @return mixed|false
      */
     protected function localIMDBSearch()
     {

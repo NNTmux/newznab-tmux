@@ -30,13 +30,13 @@ class CouchPotato
 {
     /**
      * URL to the CP server.
-     * @var string|array|bool
+     * @var string
      */
     public $cpurl = '';
 
     /**
      * The CP key.
-     * @var string|array|bool
+     * @var string
      */
     public $cpapi = '';
 

@@ -8,15 +8,15 @@ require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php
 
 use App\Models\Group;
 use App\Models\Settings;
-use \Blacklight\db\DB;
-use \Blacklight\processing\PostProcess;
-use \Blacklight\processing\ProcessReleases;
-use \Blacklight\processing\post\ProcessAdditional;
+use Blacklight\processing\PostProcess;
+use Blacklight\processing\ProcessReleases;
+use Blacklight\processing\post\ProcessAdditional;
 use Blacklight\Backfill;
 use Blacklight\Binaries;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
 use Blacklight\processing\ProcessReleasesMultiGroup;
+use Illuminate\Support\Facades\DB;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -29,12 +29,19 @@ switch ($options[1]) {
 	// $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
 	case 'backfill':
 		if (in_array((int)$options[3], [1, 2], false)) {
-			$pdo = new DB();
 			$value = Settings::settingValue('site.tmux.backfill_qty');
 			if ($value !== false) {
-				$nntp = nntp($pdo);
-				(new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
-			}
+                try {
+                    $nntp = nntp();
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                }
+                try {
+                    (new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                }
+            }
 		}
 		break;
 
@@ -44,18 +51,32 @@ switch ($options[1]) {
 	 * $options[3] => (int)    Quantity of articles to download.
 	 */
 	case 'backfill_all_quantity':
-		$pdo = new DB();
-		$nntp = nntp($pdo);
-		(new Backfill())->backfillAllGroups($options[2], $options[3]);
-		break;
+        try {
+            $nntp = nntp();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            (new Backfill())->backfillAllGroups($options[2], $options[3]);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        break;
 
 	// BackFill a single group, 10000 parts.
 	// $options[2] => (string)group name, Name of group to work on.
 	case 'backfill_all_quick':
-		$pdo = new DB();
-		$nntp = nntp($pdo);
-		(new Backfill())->backfillAllGroups($options[2], 10000, 'normal');
-		break;
+        try {
+            $nntp = nntp();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            (new Backfill())->backfillAllGroups($options[2], 10000, 'normal');
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        break;
 
 	/* Get a range of article headers for a group.
 	 *
@@ -66,17 +87,30 @@ switch ($options[1]) {
 	 * $options[6] => (int)    Number of threads.
 	 */
 	case 'get_range':
-		$pdo = new DB();
-		$nntp = nntp($pdo);
-		$groupMySQL = Group::getByName($options[3]);
-		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
-			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
-				return;
-			}
-		}
-		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => null]);
-		$return = $binaries->scan($groupMySQL, $options[4], $options[5], (Settings::settingValue('..safepartrepair') == 1 ? 'update' : 'backfill'));
-		if (empty($return)) {
+        try {
+            $nntp = nntp();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        $groupMySQL = Group::getByName($options[3]);
+        try {
+            if ($nntp->isError($nntp->selectGroup($groupMySQL['name'])) && $nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
+                return;
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill'));
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        if (empty($return)) {
 			exit();
 		}
 		$columns = [];
@@ -85,11 +119,10 @@ switch ($options[1]) {
 				if ($return['lastArticleNumber'] <= $groupMySQL['last_record']){
 					exit();
 				}
+				$unixTime = is_numeric($return['lastArticleDate']) ? $return['lastArticleDate'] : strtotime($return['lastArticleDate']);
 				$columns[1] = sprintf(
-					'last_record_postdate = %s',
-					$pdo->from_unixtime(
-						(is_numeric($return['lastArticleDate']) ? $return['lastArticleDate'] : strtotime($return['lastArticleDate']))
-					)
+					'last_record_postdate = FROM_UNIXTIME(%s)',
+					$unixTime
 				);
 				$columns[2] = sprintf('last_record = %s', $return['lastArticleNumber']);
 				$query = sprintf(
@@ -104,11 +137,10 @@ switch ($options[1]) {
 				if ($return['firstArticleNumber'] >= $groupMySQL['first_record']){
 					exit();
 				}
+				$unixTime = is_numeric($return['firstArticleDate']) ? $return['firstArticleDate'] : strtotime($return['firstArticleDate']);
 				$columns[1] = sprintf(
-					'first_record_postdate = %s',
-					$pdo->from_unixtime(
-						(is_numeric($return['firstArticleDate']) ? $return['firstArticleDate'] : strtotime($return['firstArticleDate']))
-					)
+					'first_record_postdate = FROM_UNIXTIME(%s)',
+					$unixTime
 				);
 				$columns[2] = sprintf('first_record = %s', $return['firstArticleNumber']);
 				$query = sprintf(
@@ -122,7 +154,7 @@ switch ($options[1]) {
 			default:
 				exit();
 		}
-		$pdo->queryExec($query);
+		DB::update($query);
 		break;
 
 	/* Do part repair for a group.
@@ -130,46 +162,86 @@ switch ($options[1]) {
 	 * $options[2] => (string) Group name.
 	 */
 	case 'part_repair':
-		$pdo = new DB();
 		$groupMySQL = Group::getByName($options[2]);
-		$nntp = nntp($pdo);
-		// Select group, here, only once
-		$data = $nntp->selectGroup($groupMySQL['name']);
-		if ($nntp->isError($data)) {
-			if ($nntp->dataError($nntp, $groupMySQL['name']) === false) {
-				exit();
-			}
-		}
-		(new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]))->partRepair($groupMySQL);
-		break;
+        try {
+            $nntp = nntp();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        // Select group, here, only once
+        try {
+            $data = $nntp->selectGroup($groupMySQL['name']);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            if ($nntp->isError($data) && $nntp->dataError($nntp, $groupMySQL['name']) === false) {
+                exit();
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            (new Binaries(['NNTP' => $nntp]))->partRepair($groupMySQL);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        break;
 
 	// Process releases.
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
-		$pdo = new DB();
-		$releases = new ProcessReleases(['Settings' => $pdo]);
-		$mgrreleases = new ProcessReleasesMultiGroup(['Settings' => $pdo]);
+        try {
+            $releases = new ProcessReleases();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        try {
+            $mgrreleases = new ProcessReleasesMultiGroup();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
 
-		//Runs function that are per group
+        //Runs function that are per group
 		if (is_numeric($options[2])) {
 
-			processReleases($releases, $options[2]);
-		} else {
+            try {
+                processReleases($releases, $options[2]);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        } else {
 
 			// Run MGR once after all other release updates for standard groups
-			processReleases(new ProcessReleasesMultiGroup(['Settings' => $pdo]), '');
+            try {
+                processReleases(new ProcessReleasesMultiGroup(), '');
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
 
-			// Run functions that run on releases table after all others completed.
+            // Run functions that run on releases table after all others completed.
 			$groupCount = rtrim($options[2], '_');
 			if (!is_numeric($groupCount)) {
 				$groupCount = 1;
 			}
-			$releases->deletedReleasesByGroup();
-			$releases->deleteReleases();
-			//$releases->processRequestIDs('', (5000 * $groupCount), true);
+            try {
+                $releases->deletedReleasesByGroup();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+            try {
+                $releases->deleteReleases();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+            //$releases->processRequestIDs('', (5000 * $groupCount), true);
 			//$releases->processRequestIDs('', (1000 * $groupCount), false);
-			$releases->categorizeReleases(2);
-		}
+            try {
+                $releases->categorizeReleases(2);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
 		break;
 
 	/* Update a single group's article headers.
@@ -177,46 +249,83 @@ switch ($options[1]) {
 	 * $options[2] => (string) Group name.
 	 */
 	case 'update_group_headers':
-		$pdo = new DB();
-		$nntp = nntp($pdo);
-		$groupMySQL = Group::getByName($options[2]);
-		(new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]))->updateGroup($groupMySQL);
-		break;
+        try {
+            $nntp = nntp();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        $groupMySQL = Group::getByName($options[2]);
+        try {
+            (new Binaries(['NNTP' => $nntp]))->updateGroup($groupMySQL);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+        break;
 
 
 	// Do a single group (update_binaries/backFill/update_releases/postprocess).
 	// $options[2] => (int)groupid, group to work on
 	case 'update_per_group':
 		if (is_numeric($options[2])) {
-
-			$pdo = new DB();
-
 			// Get the group info from MySQL.
-			$groupMySQL = $pdo->queryOneRow(sprintf('SELECT * FROM groups WHERE id = %d', $options[2]));
+			$groupMySQL = Group::find($options[2]);
 
-			if ($groupMySQL === false) {
+			if ($groupMySQL === null) {
 				exit('ERROR: Group not found with id ' . $options[2] . PHP_EOL);
 			}
 
 			// Connect to NNTP.
-			$nntp = nntp($pdo);
-			$backFill = new Backfill();
+            try {
+                $nntp = nntp();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+            try {
+                $backFill = new Backfill();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
 
-			// Update the group for new binaries.
-			(new Binaries())->updateGroup($groupMySQL);
+            // Update the group for new binaries.
+            try {
+                (new Binaries())->updateGroup($groupMySQL);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
 
-			// BackFill the group with 20k articles.
-			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
+            // BackFill the group with 20k articles.
+            try {
+                $backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
 
-			// Create releases.
-			processReleases(new ProcessReleases(['Settings' => $pdo]), $options[2]);
-			processReleases(new ProcessReleasesMultiGroup(['Settings' => $pdo]), $options[2]);
+            // Create releases.
+            try {
+                processReleases(new ProcessReleases(), $options[2]);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+            try {
+                processReleases(new ProcessReleasesMultiGroup(), $options[2]);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
 
-			// Post process the releases.
-			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
-			(new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
-
-		}
+            // Post process the releases.
+            try {
+                (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start($options[2]);
+            } catch (\Blacklight\processing\post\ProcessAdditionalException $e) {
+                echo $e->getMessage();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+            try {
+                (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
 		break;
 
 	// Post process additional and NFO.
@@ -224,16 +333,29 @@ switch ($options[1]) {
 	case 'pp_additional':
 	case 'pp_nfo':
 		if (charCheck($options[2])) {
-			$pdo = new DB();
 
 			// Create the connection here and pass, this is for post processing, so check for alternate.
-			$nntp = nntp($pdo, true);
+            try {
+                $nntp = nntp(true);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
 
-			if ($options[1] === 'pp_nfo') {
-				(new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
-			} else {
-				(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start('', $options[2]);
-			}
+            if ($options[1] === 'pp_nfo') {
+                try {
+                    (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                }
+            } else {
+                try {
+                    (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start('', $options[2]);
+                } catch (\Blacklight\processing\post\ProcessAdditionalException $e) {
+                    echo $e->getMessage();
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                }
+            }
 		}
 		break;
 
@@ -244,9 +366,12 @@ switch ($options[1]) {
 	 */
 	case 'pp_movie':
 		if (charCheck($options[2])) {
-			$pdo = new DB();
-			(new PostProcess(['Settings' => $pdo]))->processMovies('', $options[2], $options[3] ?? '');
-		}
+            try {
+                (new PostProcess())->processMovies('', $options[2], $options[3] ?? '');
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
 		break;
 
 	/* Post process TV.
@@ -256,9 +381,12 @@ switch ($options[1]) {
 	 */
 	case 'pp_tv':
 		if (charCheck($options[2])) {
-			$pdo = new DB();
-			(new PostProcess(['Settings' => $pdo]))->processTv('', $options[2], $options[3] ?? '');
-		}
+            try {
+                (new PostProcess())->processTv('', $options[2], $options[3] ?? '');
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
 		break;
 }
 
@@ -301,34 +429,16 @@ function charCheck($char)
 }
 
 /**
- * Check if the group should be processed.
- *
- * @param \Blacklight\db\DB $pdo
- * @param int                $groupID
- */
-function collectionCheck(&$pdo, $groupID)
-{
-	try {
-		if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
-			exit();
-		}
-	} catch (PDOException $e) {
-		$e->getMessage();
-	}
-}
-
-/**
  * Connect to usenet, return NNTP object.
  *
- * @param DB $pdo
  * @param bool $alternate Use alternate NNTP provider.
  *
  * @return NNTP
  * @throws \Exception
  */
-function &nntp(&$pdo, $alternate = false)
+function &nntp($alternate = false)
 {
-	$nntp = new NNTP(['Settings' => $pdo]);
+	$nntp = new NNTP();
 	if (($alternate && (int)Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
 	}

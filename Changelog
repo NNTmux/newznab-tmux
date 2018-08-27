@@ -1,4 +1,211 @@
+2018-08-27 DariusIII
+	* Chg: Update yab/laravel-scout-mysql-driver to version 2.0.5
+	* Fix: Fix array to string conversion in ReleaseExtra addAudio function
+	* Fix: Fix display of movie covers on release details page
+	* Chg: Update TMDB movie lookups to return actors and director
+	* Chg: Update anhskohbo/no-captcha to version 3.0.2
+2018-08-26 DariusIIi
+	* Fix: Fix adding new groups from admin interface
+2018-08-24 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.17.0
+	* Fix: Fix adding new roles
+	* Chg: Update spatie/laravel-fractal to version 5.4.1
+	* Chg: Add additional checks to audio related data in ReleaseExtra class
+	* Chg: Update firewall config, allow 10 requests per minute
+	* Chg: Add blocking of blacklisted IP's to api routes
+	* Chg: Update web routes and revert LoginController action on blacklisted IP
+	* Chg: Add checks for blacklisted users
+2018-08-22 DariusIII
+	* Chg: Update ReleaseExtra class, remove usage of substr() function
+	* Chg: Update phpuint/phpunit, league/flysystem and Movies class
+2018-08-21 DariusIII
+	* Fix: Fix wrong nzbpath check
+	* Chg: Update NZB and ReleaseExtra classes
+	* Chg: Remove implode from time check in PPA
+	* Chg: Update composer.lock
+	* Chg: Move runCmd into helpers, return string instead an array
+	* Chg: Update laravel/framework, dborsato/php-giantbomb to latest versions
+2018-08-20 DariusIII
+	* Chg: Update spatie/laravel-permission and imdbphp/imdbphp to latest versions
+2018-08-17 DariusIII
+	* Chg: Update egulias/email-validator to version 2.1.5 and spatie/laravel-permission to version 2.15.0
+2018-08-16 DariusIII
+   	* Chg: Add soft firewall to manage access to site
+2018-08-15 DariusIII
+	* Chg: Update date handling of Games class
+	* Chg: Update regex for matching width/height in ReleaseExtra class
+	* Chg: Update used components to latest version
+	* Chg: Optimize imports in Blacklight namespace
+	* Fix: Fix another error and bad match check
+	* Fix: Fix anidb matching error
+2018-08-14 DariusIII
+	* Chg: Update imdbphp/imdbphp to latest commit
+	* Chg: Recreate release_unique table, alter classes for new table
+	* Chg: Revert runCmd function
+	* Chg: Update Utility class, use Symfony Process class in runCmd function, declare return types where needed
+	* Chg: Update ReleaseExtra class to handle MediaInfo v18 type UniqueID, add helper function and update composer.json to require bcmath extension
+	* Fix: Fix UniqueID matching for MediaInfo v18
+	* Chg: Remove unused makeCodecPretty class, change some of the functions from public to private and change their return types
+	* Chg: Update ReleaseExtra class, add MediaInfo 18 support
+2018-08-13 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.14.0
+	* Fix: Fix imdbid used in admin/movie-list
+	* Chg: Update Admin/MovieController to properly do movie updates when click on update button.
+	* Chg: Update regexes in CollectionsCleaning to use less greedy parts
+	* Chg: Use less greedy parts of regexes in Books class
+	* Fix: Fix editing of forum posts
+	* Chg: Remove logoutOtherDevices for now, causes too much PITA
+	* Chg: Add tmdb links for movies
+2018-08-12 DariusIII
+	* Chg: Update imdbphp/imdbphp to latest version
+2018-08-11 DariusIII
+	* Chg: Update yab/laravel-scout-mysql-driver and psy/psysh to latest versions
+2018-08-10 DariusIII
+	* Chg: Restore fethcImage function in ReleaseImage class
+	* Chg: Update output of check_covers.php
+	* Fix: Fix check_covers.php
+	* Chg: Try to properly set poster/fanart URL for TheTVDB
+	* Chg: Update Movie class and remove getTraktData script from tmux loop
+	* Chg: Add ssl options to stream_context_create in saveImage function
+	* Chg: Change handling of TVDB poster image downloads, try to fix authorization to url
+	* Chg: Use less greedy parts of regexes and fix PHPDOC blocks for $release variable in functions in NameFixer class
+2018-08-09 DariusIII
+	* Chg: Update TinyMCE and laravel/framework to latest versions
+	* Fix: Fix errors related to showPasswords function change
+	* Chg: Use showPasswords function directly
+	* Fix: Fix bad check for returned movie information
+	* Chg: Update laravel/framework to version 5.6.31
+2018-08-08 DariusIII
+	* Chg: Update dariusiii/rarinfo to version 2.6.1 and laravel/framework to version 5.6.30
+	* Chg: Update dariusiii/rarinfo to version 2.6.0
+	* Chg: Wrap ReleaseFile model addReleaseFiles function query into try catch block
+	* Chg: Catch QueryExceptions in Binaries class and send them to log
+	* Chg: Wrap delete queries into transaction to prevent deadlock error messages
+2018-08-07 DariusIII
+	* Fix: Properly send lastInsertId when adding a movie to movieinfo table
+	* Chg: Use can instead of long hasPermissionTo
+	* Fix: Fix preview permission check in Gentele theme
+	* Fix: Fix error on missing description index in API v1 XML response
+	* Chg: Update used libraries to their latest versions
+	* Fix: Fix wrong $request->input keys check
+	* Chg: Remove unused parameter from apiSearch function
+	* Fix: Fix some more API related issues
+	* Chg: User can change only role allowed permissions (direct versus role based permissions)
+	* Fix: Fix category exclusions for RSS feeds
+	* Chg: Update ApiTransformer to handle null values
+	* Fix: Fix ApiV2 responses
+2018-08-06 DariusIII
+	* Chg: Update handling of user and role disabled categories
+2018-08-05 DariusIII
+	* Chg: Update Controllers and templates for user related permission changes
+	* Chg: Add custom ClearanceMiddleware
+	* Chg: Add custom 401 error page
+	* Chg: Add custom permission error handling
+	* Chg: Update handling of permissions
+2018-08-04 DariusIII
+	* Fix: Fix role-edit template
+	* Chg: Update role permissions and seeding, install procedure, permissions for menu views
+2018-08-03 DariusIII
+	* Chg: Delete now unused Blacklight\db\DB class
+	* Chg: Update PHPDOC blocks defined return types where bool was declared and only false was returned
+	* Chg: Update phpunit/phpunit to version 7.3.0
+	* Chg: Update updateExpiredRoles function
+	* Fix: Fix setting role as default
+	* Chg: Update updateUserRoles script to add edit releases permission to Moderator role
+	* Chg: Replace isAdmin, isDisabled and isModerator functions with direct role checking and remove roleCheck function from User model
+	* Fix: Fix another instance of wrong isDisabled check
+2018-08-02 DariusIII
+	* Fix: Fix wrong links to group browsing page in movie and xxx cover views
+	* Fix: Fix nzb files download
+	* Chg: Update used libraries
+	* Fix: Fix API v1 response, wrong data used for function
+	* Chg: Update updateUserRoles script to account for users with missing roles
+	* Chg: Allow moderator role to edit releases, fixes issue #123
+	* Chg: Update updateUserRoles.php script with new moderator 'edit release' permission
+	* Chg: Update app/Http/Kernel class with role and permission middleware
+	* Chg: Update install command
+	* Chg: Update role-list template to not allow deletion of built-in roles
+	* Chg: Update admin user-list
+	* Fix: Fix role edit template
+	* Chg: Update display of roles in role-list template
+2018-08-01 DariusIII
+	* Chg: Update install command
+	* Chg: Move canpreview and hideads from roles to permissions
+	* Fix: User account deletion from user profile
+	* Fix: Fix role and user excluded categories display
+	* Chg: Update user-list admin template
+	* Chg: Add back removed parts of getRange function queries in User model
+	* Fix: Fix bad table reference in Forumpost model
+	* Chg: Sync/add roles on user registration/update and role changes
+	* Chg: Add patch to rename user_roles_id to roles_id, update related classes
+	* Chg: Update role related classes, rename user_roles to roles where used
+2018-07-30 DariusIII
+	* Chg: Update roleCheck function in User model
+	* Chg: Update roles handling
+	* Chg: Update Admin/UserController
+	* Chg: Update User model, Utility and TmuxOutput classes and RegisterController
+	* Chg: Update vlucas/phpdotenv and imdbphp/imdbphp to latest versions
+2018-07-27 DariusIII
+	* Chg: Update composer.lock
+	* Chg: Update Release model getByGuid function
+	* Chg: Use now() helper in ProcessAdditional class
+	* Chg: Use human_filesize helper function in ProcessAdditional class
+	* Chg: Update phpunit.xml, move install test to front of testsuite block
+	* Fix: Fix checks for roles that can preview
+2018-07-26 DariusIII
+	* Chg: Update laravel/framework to version 5.6.29
+	* Chg: Update Games class
+	* Chg: Update tests
+	* Chg: Update CreatesApplication class
+	* Chg: Add missing tests
+	* Chg: Update releases date handling in RSS and API operations
+	* Chg: Update tinymce to version 4.8.1
+2018-07-25 DariusIII
+	* Chg: Remove unused functions from Settings and Utility classes
+	* Chg: Rename and update bytesToSizeString function and move it to heleprs.php with human_filesize name
+	* Fix: Fix wrong namespace for Blacklight\utility\Utility class in XML_Response class
+2018-07-24 DariusIII
+	* Chg: Small updates/fixed for used regexes in Categorize class
+	* Chg: Update font-awesome and symfony components to their latest versions
+2018-07-23 DariusIII
+	* Chg: Update Utility class
+	* Chg: Remove isWin/isWindows functions and remove HAS_WHICH definition and usage
+	* Chg: Update ZipFile class
+	* Chg: Update imdbphp/imdbphp to latest commit
+2018-07-20 DariusIII
+	* Chg: Update \Blacklight\db\PreDb class
+	* Chg: Update rest of the postproc scripts
+	* Chg: Update more postproc scripts
+	* Chg: Update paragonie/compat and ramsey/uuid to their latest versions
+2018-07-19 DariusIII
+	* Chg: Update spatie/laravel-fractal to version 5.4.0
+	* Fix: Fix usage of stdObject as array in ProcessAdditional class
+	* Chg: Cast $this->_release as array for addAlternateNfo function
+	* Chg: Update getXXXSamples script
+	* Chg: Remove Blacklight\db\DB class from many scripts in misc/testing folder
+	* Chg: Update ReleaseExtra class constructor
+	* Chg: Remove Blacklight\db\DB from ProcessAdditional class
+	* Fix: Potential fix for ADM site processing error
+2018-07-18 DariusIII
+	* Chg: Remove usage of Blacklight\db\DB class from clean_nzbs and test-ReleaseCleaner scripts
+	* Chg: Remove usage of Blacklight\db\DB class from populate_anidb.php script
+	* Chg: Remove usage of Blacklight\db\DB class from release postprocessing classes
+	* Chg: Remove usage of Blacklight\db\DB class from Capabilities and XMLResponse
+	* Chg: Change PHPDOC blocks on functions in NZBExport class
+	* Chg: Don't use Blacklight\db\DB in NZBExport and Sharing classes
+	* Chg: Update font-awesome to version 5.1.1
+2018-07-17 DariusIII
+	* Fix: Fix remaining issues in ProcessReleases class
+	* Chg: Update laravel/framework to latest version, fix wrong checks in selectOne results
+	* Fix: Fix wrong $release checks
+	* Chg: Remove usage of Blacklight\db\DB class from Backfill, PostProcess and ProcessReleases classes
+	* Chg: Update ForkinImportNZB class, remove PopulateTitles class from Blacklight\db\populate folder
+	* Chg: Remove usage of Blacklight\db\DB class from Backfill
 2018-07-16 DariusIII
+	* Chg: Update Releases passworded releases check for pages
+	* Chg: Remove unused collectionCheck function from switch.php
+	* Chg: Update various scripts in misc folder
+	* Chg: Update sphinx tables creation scripts
 	* Chg: Update used libraries to latest versions
 2018-07-14 DariusIII
 	* Chg: Update used libraries to latest versions
@@ -49,12 +256,17 @@
 2018-06-30 DariusIII
 	* Chg: Update chosen to latest version
 2018-06-27 DariusIII
+	* Chg: Merge roles and user_roles tables for new permission system
 	* Chg: Revert Backfill and Binaries to original state
 	* Fix: Fix terms and conditions page display
 	* Chg: Update terms and conditions page handling
 	* Chg: Change from timestamps to "normal" dates in some of the time conversion functions
 	* Chg: Remove needles date conversions to timestamp and back in Binaries and Backfill classes
 	* Chg: Update Movie processing handling
+2018-06-26 DariusIII
+	* Chg: Add HasRole trait to User model
+	* Chg: Add permission tables migration
+    * Chg: Add spatie/laravel-permission
 2018-06-25 DariusIII
 	* Chg: Update Symfony components
 	* Chg: Replace DB class with Laravel DB Facade in ReleaseRemover class

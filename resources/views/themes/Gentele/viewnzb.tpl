@@ -11,16 +11,17 @@
 	<div class="col-lg-12 col-sm-12 col-xs-12">
 		<div class="panel panel-default">
 			<div class="panel-body pagination2">
-				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"
-																					 title="This release has failed to download for some users">
+				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"title="This release has failed to download for some users">
 						<i class="fa fa-thumbs-o-up"></i>
 						{$release.grabs} Grab{if $release.grabs != 1}s{/if} /
 						<i class="fa fa-thumbs-o-down"></i>
 						{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
-				{if isset($isadmin)}
+				{if $isadmin == true || $ismod == true}
 					<a class="label label-warning"
 					   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}"
 					   title="Edit release">Edit</a>
+                {/if}
+                {if isset($isadmin)}
 					<a class="label label-danger"
 					   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$release.guid}"
 					   title="Delete release">Delete</a>
@@ -152,11 +153,11 @@
 								{if isset($similars) && $similars|@count > 1}
 									<li role="presentation"><a href="#pane4" data-toggle="tab">Similar</a></li>
 								{/if}
-								{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+								{if $release.jpgstatus == 1 && $userdata->can('preview') == true}
 									<li role="presentation"><a href="#pane6" data-toggle="tab">Sample</a></li>
 								{/if}
 								<li role="presentation"><a href="#comments" data-toggle="tab">Comments</a></li>
-								{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
+								{if ($release.haspreview == 1 && $userdata->can('preview') == true) || ($release.haspreview == 2 && $userdata->can('preview') == true)}
 									<li role="presentation"><a href="#pane7" data-toggle="tab">Preview</a></li>
 								{/if}
 								{if $reVideo != false || $reAudio != false}
@@ -175,7 +176,7 @@
 								<div class="row small-gutter-left">
 									<div class="col-md-3 small-gutter-left">
 										{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
+											<img src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($movie.imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"
 												 width="185"
 												 alt="{$movie.title|escape:"htmlall"}"
 												 data-toggle="modal"
@@ -669,7 +670,7 @@
                                     {{Form::submit('Submit', ['class' => 'btn btn-default'])}}
 								{{Form::close()}}
 							</div>
-							{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+							{if $release.jpgstatus == 1 && $userdata->can('preview') == true}
 								<div id="pane6" class="tab-pane">
 									<img src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg"
 										 alt="{$release.searchname|escape:"htmlall"}"
@@ -677,7 +678,7 @@
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
-							{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
+							{if ($release.haspreview == 1 && $userdata->can('preview') == true) || ($release.haspreview == 2 && $userdata->can('preview') == true)}
 								<div id="pane7" class="tab-pane">
 									<img src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg"
 										 alt="{$release.searchname|escape:"htmlall"}"
@@ -867,7 +868,7 @@
 			</div>
 			<div class="modal-body">
 				{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
-					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
+					<img src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($movie.imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
 				{if $show && $release.videos_id > 0 && $show.image != "0"}

@@ -56,8 +56,6 @@ class TVDB extends TV
         parent::__construct($options);
         $this->client = new Client();
         $this->client->setLanguage('en');
-        $this->posterUrl = self::TVDB_URL.DS.'graphical/%s-g.jpg';
-        $this->fanartUrl = self::TVDB_URL.DS.'_cache/fanart/original/%s-3.jpg';
         $this->local = false;
 
         // Check if we can get the time for API status
@@ -160,7 +158,17 @@ class TVDB extends TV
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
                         // Now that we have valid video and tvdb ids, try to get the poster
-                        $this->getPoster($videoId, $tvDbId);
+                        if (! empty($tvdbShow['banner'])) {
+                            $this->posterUrl = self::TVDB_URL.'/'.$tvdbShow['banner'];
+                        }
+
+                        if (! empty($tvdbShow['fanart'])) {
+                            $this->fanartUrl = self::TVDB_URL.'/'.$tvdbShow['fanart'];
+                        }
+
+                        if (! empty($tvdbShow['banner']) || ! empty($tvdbShow['fanart'])) {
+                            $this->getPoster($videoId, $tvDbId);
+                        }
 
                         $seasonNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', $release['season']) : '');
                         $episodeNo = (! empty($release['episode']) ? preg_replace('/^E0*/i', '', $release['episode']) : '');
@@ -332,11 +340,11 @@ class TVDB extends TV
         $ri = new ReleaseImage();
 
         // Try to get the Poster
-        $hasCover = $ri->saveImage($videoId, sprintf($this->posterUrl, $showId), $this->imgSavePath);
+        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '', false, $this->token);
 
         // Couldn't get poster, try fan art instead
         if ($hasCover !== 1) {
-            $hasCover = $ri->saveImage($videoId, sprintf($this->fanartUrl, $showId), $this->imgSavePath);
+            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '', false, $this->token);
         }
         // Mark it retrieved if we saved an image
         if ($hasCover === 1) {

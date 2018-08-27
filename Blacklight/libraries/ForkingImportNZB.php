@@ -2,7 +2,6 @@
 
 namespace Blacklight\libraries;
 
-use Blacklight\db\DB;
 use Blacklight\ColorCLI;
 
 /**
@@ -13,47 +12,66 @@ use Blacklight\ColorCLI;
 class ForkingImportNZB extends Forking
 {
     /**
-     * @param array $options
+     * @var string
      */
-    public function __construct(array $options = [])
-    {
-        $defaults = [
-			'settings' => new DB(),
-		];
-        $options += $defaults;
+    private $importPath;
 
-        parent::__construct();
-        $this->importPath = (PHP_BINARY.' '.NN_MISC.'testing'.DS.'nzb-import.php ');
-        $this->pdo = $options['settings'];
-    }
-
-    public function __destruct()
-    {
-        parent::__destruct();
-    }
-
+    /**
+     * @var
+     */
     private $deleteComplete;
+
+    /**
+     * @var
+     */
     private $deleteFailed;
+
+    /**
+     * @var
+     */
     private $useFileName;
+
+    /**
+     * @var
+     */
     private $maxPerProcess;
 
-    public function start($folder, $maxProcesses, $deleteComplete, $deleteFailed, $useFileName, $maxPerProcess)
+    /**
+     * ForkingImportNZB constructor.
+     *
+     * @throws \Exception
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->importPath = (PHP_BINARY.' '.NN_MISC.'testing'.DS.'nzb-import.php ');
+    }
+
+    /**
+     * @param $folder
+     * @param $maxProcesses
+     * @param $deleteComplete
+     * @param $deleteFailed
+     * @param $useFileName
+     * @param $maxPerProcess
+     */
+    public function start($folder, $maxProcesses, $deleteComplete, $deleteFailed, $useFileName, $maxPerProcess): void
     {
         $startTime = microtime(true);
         $directories = glob($folder.'/*', GLOB_ONLYDIR);
 
-        $this->_workCount = count($directories);
+        $this->_workCount = \count($directories);
 
-        if ($this->_workCount == 0) {
+        if ((int) $this->_workCount === 0) {
             echo ColorCLI::error('No sub-folders were found in your specified folder ('.$folder.').');
             exit();
         }
 
         if (config('nntmux.echocli')) {
             ColorCLI::doEcho(ColorCLI::header(
-				'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
-				' job(s) to do using a max of '.$maxProcesses.' child process(es).'
-			), true);
+                'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
+                ' job(s) to do using a max of '.$maxProcesses.' child process(es).'
+            ), true);
         }
 
         $this->deleteComplete = $deleteComplete;
@@ -69,25 +87,30 @@ class ForkingImportNZB extends Forking
 
         if (config('nntmux.echocli')) {
             ColorCLI::doEcho(
-				ColorCLI::header(
-					'Multi-processing for import finished in '.(microtime(true) - $startTime).
-					' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
-				), true
-			);
+                ColorCLI::header(
+                    'Multi-processing for import finished in '.(microtime(true) - $startTime).
+                    ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
+                ),
+                true
+            );
         }
     }
 
+    /**
+     * @param        $directories
+     * @param string $identifier
+     */
     public function importChildWorker($directories, $identifier = '')
     {
         foreach ($directories as $directory) {
             $this->_executeCommand(
-				$this->importPath.'"'.
-				$directory.'" '.
-				$this->deleteComplete.' '.
-				$this->deleteFailed.' '.
-				$this->useFileName.' '.
-				$this->maxPerProcess
-			);
+                $this->importPath.'"'.
+                $directory.'" '.
+                $this->deleteComplete.' '.
+                $this->deleteFailed.' '.
+                $this->useFileName.' '.
+                $this->maxPerProcess
+            );
         }
     }
 }

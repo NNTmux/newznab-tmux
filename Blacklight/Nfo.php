@@ -78,7 +78,7 @@ class Nfo
      *
      * @param string  $str   The string with a Show ID.
      *
-     * @return array|bool   Return array with show ID and site source or false on failure.
+     * @return array|false  Return array with show ID and site source or false on failure.
      */
     public function parseShowId($str)
     {

@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Blacklight\ColorCLI;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
+use Symfony\Component\Process\Process;
 use GuzzleHttp\Exception\RequestException;
 
 if (! function_exists('getRawHtml')) {
@@ -113,7 +114,7 @@ if (! function_exists('makeFieldLinks')) {
                 case 'grabs':
                     $orderField = 'grabs';
                     break;
-                case 'user_roles_id':
+                case 'roles_id':
                     $orderField = 'users_role_id';
                     break;
                 case 'rolechangedate':
@@ -165,9 +166,8 @@ if (! function_exists('makeFieldLinks')) {
 
     if (! function_exists('createGUID')) {
         /**
-         * Create a GUID for a release.
-         *
          * @return string
+         * @throws \Exception
          */
         function createGUID(): string
         {
@@ -200,6 +200,71 @@ if (! function_exists('makeFieldLinks')) {
         function color($string = ''): Color
         {
             return new Color($string);
+        }
+    }
+
+    if (! function_exists('human_filesize')) {
+
+        /**
+         * @param     $bytes
+         * @param int $decimals
+         *
+         * @return string
+         */
+        function human_filesize($bytes, $decimals = 0): string
+        {
+            $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            $factor = floor((\strlen($bytes) - 1) / 3);
+
+            return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals).@$size[$factor];
+        }
+    }
+
+    if (! function_exists('bcdechex')) {
+
+        /**
+         * @param $dec
+         *
+         * @return string
+         */
+        function bcdechex($dec)
+        {
+            $hex = '';
+            do {
+                $last = bcmod($dec, 16);
+                $hex = dechex($last).$hex;
+                $dec = bcdiv(bcsub($dec, $last), 16);
+            } while ($dec > 0);
+
+            return $hex;
+        }
+    }
+
+    if (! function_exists('runCmd')) {
+        /**
+         * Run CLI command.
+         *
+         *
+         * @param string $command
+         * @param bool $debug
+         *
+         * @return string
+         */
+        function runCmd($command, $debug = false)
+        {
+            if ($debug) {
+                echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
+            }
+
+            $process = new Process($command);
+            $process->run();
+            $output = $process->getOutput();
+
+            if ($debug) {
+                echo '-Command Output: '.PHP_EOL.'   '.$output.PHP_EOL;
+            }
+
+            return $output;
         }
     }
 }

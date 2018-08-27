@@ -6,7 +6,6 @@ use App\Models\Group;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Import NZB files into the database.
