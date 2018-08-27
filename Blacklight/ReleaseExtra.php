@@ -201,7 +201,7 @@ class ReleaseExtra
                             if (isset($track['Format'])) {
                                 $audioFormat = $track['Format'];
                             }
-                            if (isset($track['Mode'])) {
+                            if (! empty($track['Mode'])) {
                                 $audioMode = $track['Mode'];
                             }
                             if (isset($track['Bit_rate_mode'])) {
@@ -336,11 +336,11 @@ class ReleaseExtra
                             $audioFormat = $track['Format'];
                         }
 
-                        if (isset($track['Mode'])) {
+                        if (! empty($track['Mode'])) {
                             $audioMode = $track['Mode'];
                         }
 
-                        if (isset($track['Format_Settings_Mode'])) {
+                        if (! empty($track['Format_Settings_Mode'])) {
                             $audioMode = $track['Format_Settings_Mode'];
                         }
 
