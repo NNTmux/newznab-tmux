@@ -681,6 +681,8 @@ class Movie
             $mov['director'] = \is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
         } elseif (! empty($omdb['director'])) {
             $mov['director'] = \is_array($omdb['director']) ? implode(', ', array_unique($omdb['director'])) : $omdb['director'];
+        } elseif (! empty($tmdb['director'])) {
+            $mov['director'] = \is_array($tmdb['director']) ? implode(', ', array_unique($tmdb['director'])) : $tmdb['director'];
         }
 
         if (! empty($imdb['actors'])) {
