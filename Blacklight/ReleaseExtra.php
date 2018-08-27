@@ -216,10 +216,10 @@ class ReleaseExtra
                             if (isset($track['Sampling_rate'])) {
                                 $audioSampleRate = $track['Sampling_rate'];
                             }
-                            if (isset($track['Writing_library'])) {
+                            if (! empty($track['Writing_library'])) {
                                 $audioLibrary = $track['Writing_library'];
                             }
-                            if (isset($track['Language'])) {
+                            if (! empty($track['Language'])) {
                                 $audioLanguage = $track['Language'];
                             }
                             if (! empty($track['Title'])) {
@@ -360,11 +360,11 @@ class ReleaseExtra
                             $audioSampleRate = $track['SamplingRate'];
                         }
 
-                        if (isset($track['Encoded_Library'])) {
+                        if (! empty($track['Encoded_Library'])) {
                             $audioLibrary = $track['Encoded_Library'];
                         }
 
-                        if (isset($track['Language'])) {
+                        if (! empty($track['Language'])) {
                             $audioLanguage = $track['Language'];
                         }
 
