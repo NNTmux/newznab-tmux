@@ -459,7 +459,7 @@ class ReleaseExtra
                     'releases_id' => $releaseID,
                     'audioid' => $audioID,
                     'audioformat' => $audioFormat,
-                    'audiomode' => $audioMode,
+                    'audiomode' => ! empty($audioMode) ? $audioMode : '',
                     'audiobitratemode' => ! empty($audioBitRateMode) ? $audioBitRateMode : '',
                     'audiobitrate' => $audioBitRate,
                     'audiochannels' => $audioChannels,
