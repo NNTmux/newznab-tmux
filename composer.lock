@@ -7427,20 +7427,20 @@
         },
         {
             "name": "yab/laravel-scout-mysql-driver",
-            "version": "v2.0.4",
+            "version": "v2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/YABhq/laravel-scout-mysql-driver.git",
-                "reference": "15104c5f4ea5eb4c68d4f2774598664d0f34b61f"
+                "reference": "b6a2ff42337fd97557b9633867f9bd88a86019d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/YABhq/laravel-scout-mysql-driver/zipball/15104c5f4ea5eb4c68d4f2774598664d0f34b61f",
-                "reference": "15104c5f4ea5eb4c68d4f2774598664d0f34b61f",
+                "url": "https://api.github.com/repos/YABhq/laravel-scout-mysql-driver/zipball/b6a2ff42337fd97557b9633867f9bd88a86019d1",
+                "reference": "b6a2ff42337fd97557b9633867f9bd88a86019d1",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "5.3.*|5.4.*|5.5.*|5.6.*",
+                "laravel/framework": "5.3.*|5.4.*|5.5.*|5.6.*|5.7.*",
                 "laravel/scout": "^2.0|^3.0|^4.0",
                 "php": ">=5.6.4"
             },
@@ -7475,7 +7475,7 @@
                 }
             ],
             "description": "MySQL driver for Laravel Scout.",
-            "time": "2018-06-25T13:13:54+00:00"
+            "time": "2018-08-27T07:27:01+00:00"
         },
         {
             "name": "yadakhov/insert-on-duplicate-key",
