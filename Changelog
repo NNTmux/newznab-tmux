@@ -1,3 +1,5 @@
+2018-09-02 DariusIII
+	* Chg: Update symfony components, laravel/framework to their latest versions
 2018-08-27 DariusIII
 	* Chg: Update font-awesome and laravel/framework to latest versions
 	* Fix: Fix failed releases returned responses
