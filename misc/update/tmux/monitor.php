@@ -113,8 +113,8 @@ while ($runVar['counts']['iterations'] > 0) {
         echo ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
-        $splitqry = $tRun->proc_query(4, null, null, $db_name);
-        $newOldqry = $tRun->proc_query(6, null, null, null);
+        $splitqry = $tRun->proc_query(4, null, $db_name);
+        $newOldqry = $tRun->proc_query(6, null, null);
 
         $splitres = (array) array_first(DB::select($splitqry));
         $runVar['timers']['newOld'] = (array) array_first(DB::select($newOldqry));
@@ -273,8 +273,8 @@ while ($runVar['counts']['iterations'] > 0) {
             $runVar['counts']['diff'][$key] = number_format($proc - $runVar['counts']['start'][$key]);
 
             //calculate percentages -- if user has no releases, set 0 for each key or this will fail on divide by zero
-            $runVar['counts']['percent'][$key] = ($runVar['counts']['now']['releases'] > 0
-                ? sprintf('%02s', floor(($proc / $runVar['counts']['now']['releases']) * 100)) : 0);
+            $runVar['counts']['percent'][$key] = $runVar['counts']['now']['releases'] > 0
+                ? sprintf('%02s', floor(($proc / $runVar['counts']['now']['releases']) * 100)) : 0;
         }
 
         $runVar['counts']['now']['total_work'] += $runVar['counts']['now']['work'];

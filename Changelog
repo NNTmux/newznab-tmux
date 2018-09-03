@@ -1,4 +1,5 @@
 2018-09-03 DariusIII
+	* Fix: Fix monitor counts and percentages displayed in main monitor pane
 	* Chg: Update ReleaseRemover class
 	* Chg: Check for array before inserting audio data from mediainfo
 	* Chg: Add checks before inserting audio data from mediainfo
