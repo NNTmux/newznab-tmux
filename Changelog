@@ -1,4 +1,5 @@
 2018-09-03 DariusIII
+	* Chg: Check for array before inserting audio data from mediainfo
 	* Chg: Add checks before inserting audio data from mediainfo
 	* Chg: Update handling of allAsMgr tables
 2018-09-02 DariusIII
