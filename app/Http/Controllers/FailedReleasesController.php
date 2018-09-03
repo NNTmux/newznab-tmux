@@ -42,7 +42,7 @@ class FailedReleasesController extends BasePageController
                 return response('Error!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
             }
 
-            return response('Success', 200)->header('Location:'.$this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken);
+            return response('Success', 200)->withHeaders(['Location' => $this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
         }
     }
 }
