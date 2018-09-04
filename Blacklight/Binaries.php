@@ -272,6 +272,7 @@ class Binaries
      *
      * @return void
      * @throws \Exception
+     * @throws \Throwable
      */
     public function updateAllGroups($maxHeaders = 100000): void
     {
@@ -329,6 +330,7 @@ class Binaries
      *
      * @return void
      * @throws \Exception
+     * @throws \Throwable
      */
     public function updateGroup($groupMySQL, $maxHeaders = 0): void
     {
@@ -575,6 +577,7 @@ class Binaries
      *
      * @return array Empty on failure.
      * @throws \Exception
+     * @throws \Throwable
      */
     public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null): array
     {
@@ -1084,6 +1087,7 @@ class Binaries
      * @param array $headers Array of headers containing sub-arrays with parts.
      *
      * @return array Array of article numbers to add to part repair.
+     * @throws \Exception
      */
     protected function _rollbackAddToPartRepair(array $headers): array
     {

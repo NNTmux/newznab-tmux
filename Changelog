@@ -1,4 +1,16 @@
+2018-09-04 DariusIII
+	* Fix: Add check for empty sharing table when running tmux
+2018-09-03 DariusIII
+	* Fix: Fix monitor counts and percentages displayed in main monitor pane
+	* Chg: Update ReleaseRemover class
+	* Chg: Check for array before inserting audio data from mediainfo
+	* Chg: Add checks before inserting audio data from mediainfo
+	* Chg: Update handling of allAsMgr tables
+2018-09-02 DariusIII
+	* Chg: Update symfony components, laravel/framework to their latest versions
 2018-08-27 DariusIII
+	* Chg: Update font-awesome and laravel/framework to latest versions
+	* Fix: Fix failed releases returned responses
 	* Chg: Update yab/laravel-scout-mysql-driver to version 2.0.5
 	* Fix: Fix array to string conversion in ReleaseExtra addAudio function
 	* Fix: Fix display of movie covers on release details page

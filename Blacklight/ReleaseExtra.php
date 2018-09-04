@@ -458,15 +458,15 @@ class ReleaseExtra
             AudioData::query()->insert([
                     'releases_id' => $releaseID,
                     'audioid' => $audioID,
-                    'audioformat' => $audioFormat,
-                    'audiomode' => ! empty($audioMode) ? $audioMode : '',
-                    'audiobitratemode' => ! empty($audioBitRateMode) ? $audioBitRateMode : '',
-                    'audiobitrate' => $audioBitRate,
-                    'audiochannels' => $audioChannels,
-                    'audiosamplerate' => ! empty($audioSampleRate) ? $audioSampleRate : '',
-                    'audiolibrary' => ! empty($audioLibrary) ? $audioLibrary : '',
-                    'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage : '',
-                    'audiotitle' => ! empty($audioTitle) ? $audioTitle : '',
+                    'audioformat' => \is_array($audioFormat) ? implode($audioFormat) : $audioFormat,
+                    'audiomode' => \is_array($audioMode) ? implode($audioMode) : $audioMode,
+                    'audiobitratemode' => \is_array($audioBitRateMode) ? implode($audioBitRateMode) : $audioBitRateMode,
+                    'audiobitrate' => \is_array($audioBitRate) ? implode($audioBitRate) : $audioBitRate,
+                    'audiochannels' => \is_array($audioChannels) ? implode($audioChannels) : $audioChannels,
+                    'audiosamplerate' => \is_array($audioSampleRate) ? implode($audioSampleRate) : $audioSampleRate,
+                    'audiolibrary' => \is_array($audioLibrary) ? implode($audioLibrary) : $audioLibrary,
+                    'audiolanguage' => \is_array($audioLanguage) ? implode($audioLanguage) : $audioLanguage,
+                    'audiotitle' => \is_array($audioTitle) ? implode($audioTitle) : $audioTitle,
                 ]);
         }
     }

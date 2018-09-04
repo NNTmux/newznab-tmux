@@ -13,11 +13,6 @@ use Illuminate\Support\Facades\DB;
 class ReleaseRemover
 {
     /**
-     * @const New line.
-     */
-    private const N = PHP_EOL;
-
-    /**
      * @var string
      */
     protected $blacklistID;
@@ -150,7 +145,7 @@ class ReleaseRemover
      * Remove releases using user criteria.
      *
      * @param array $arguments Array of criteria used to delete unwanted releases.
-     *                         Criteria muse look like this : columnName=modifier="content"
+     *                         Criteria must look like this : columnName=modifier="content"
      *                         columnName is a column name from the releases table.
      *                         modifiers are : equals,like,bigger,smaller
      *                         content is what to change the column content to
@@ -492,7 +487,7 @@ class ReleaseRemover
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE rf.name LIKE %s ',
+			WHERE rf.name LIKE %s %s',
             $this->pdo->quote('%password.url%'),
             $this->crapTime
         );
@@ -857,8 +852,7 @@ class ReleaseRemover
         if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
                 $regexSQL = sprintf(
-                    'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-				WHERE rf.name REGEXP %s ',
+                    'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
                     $this->pdo->quote($regex->regex)
                 );
 
@@ -1014,8 +1008,10 @@ class ReleaseRemover
 
     /**
      * Delete releases from the database.
+     *
+     * @return true
      */
-    protected function deleteReleases()
+    protected function deleteReleases(): bool
     {
         $deletedCount = 0;
         foreach ($this->result as $release) {
@@ -1040,7 +1036,7 @@ class ReleaseRemover
      *
      * @return bool False on failure, true on success after setting a count of found releases.
      */
-    protected function checkSelectQuery()
+    protected function checkSelectQuery(): bool
     {
         // Run the query, check if it picked up anything.
         $result = DB::select($this->cleanSpaces($this->query));
@@ -1073,7 +1069,7 @@ class ReleaseRemover
             return '';
         }
 
-        $this->error = 'Invalid argument supplied: '.$argument.self::N;
+        $this->error = 'Invalid argument supplied: '.$argument.PHP_EOL;
         $args = explode('=', $argument);
         if (\count($args) === 3) {
             $args[0] = $this->cleanSpaces($args[0]);
@@ -1244,7 +1240,7 @@ class ReleaseRemover
         // Print the query to the user, ask them if they want to continue using it.
         echo ColorCLI::primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
-            self::N.$this->query.';'.self::N.
+            PHP_EOL.$this->query.';'.PHP_EOL.
             'If you are satisfied, type yes and press enter. Anything else will exit.'
         );
 
@@ -1308,6 +1304,11 @@ class ReleaseRemover
         return false;
     }
 
+    /**
+     * @param string $dbRegex
+     *
+     * @return bool|mixed|string
+     */
     protected function extractSrchFromRegx($dbRegex = '')
     {
         $regexMatch = '';

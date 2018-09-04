@@ -534,15 +534,25 @@ class Group extends Model
             return self::$cbppTableNames[$groupKey];
         }
 
-        if (config('nntmux.echocli') && $this->allasmgr === false && self::createNewTPGTables($groupID) === false) {
+        if ($this->allasmgr === false && config('nntmux.echocli') && self::createNewTPGTables($groupID) === false) {
             exit('There is a problem creating new TPG tables for this group ID: '.$groupID.PHP_EOL);
         }
 
-        $tables = [];
-        $tables['cname'] = 'collections_'.$groupID;
-        $tables['bname'] = 'binaries_'.$groupID;
-        $tables['pname'] = 'parts_'.$groupID;
-        $tables['prname'] = 'missed_parts_'.$groupID;
+        if ($this->allasmgr === false) {
+            $tables = [
+                'cname' => 'collections_'.$groupID,
+                'bname' => 'binaries_'.$groupID,
+                'pname' => 'parts_'.$groupID,
+                'prname' => 'missed_parts_'.$groupID,
+            ];
+        } else {
+            $tables = [
+                'cname' => 'multigroup_collections',
+                'bname' => 'multigroup_binaries',
+                'pname' => 'multigroup_parts',
+                'prname' => 'multigroup_missed_parts',
+            ];
+        }
 
         // Buffer.
         self::$cbppTableNames[$groupKey] = $tables;
