@@ -42,13 +42,7 @@ class TmuxUIStart extends Command
     public function handle()
     {
         $process = new Process('php misc/update/tmux/start.php');
-        $process->setTty(Process::isTtySupported());
-        $process->run(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                echo 'ERR > '.$buffer;
-            } else {
-                echo $buffer;
-            }
-        });
+        $process->setPty(Process::isPtySupported());
+        $process->run();
     }
 }
