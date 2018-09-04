@@ -44,5 +44,7 @@ class FailedReleasesController extends BasePageController
 
             return response('Success', 200)->withHeaders(['Location' => $this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
         }
+
+        return response('Error!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
     }
 }
