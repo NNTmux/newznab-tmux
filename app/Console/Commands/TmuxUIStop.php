@@ -38,7 +38,7 @@ class TmuxUIStop extends Command
      */
     public function handle()
     {
-        if ($this->argument('type') === 'false' || $this->argument('type') === 'true') {
+        if ($this->argument('type') !== null) {
             $process = new Process('php misc/update/tmux/stop.php');
             $process->setTimeout(600);
             $process->run(
