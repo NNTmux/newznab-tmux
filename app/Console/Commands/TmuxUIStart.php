@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Settings;
 use Illuminate\Console\Command;
 use Symfony\Component\Process\Process;
 
@@ -34,15 +35,16 @@ class TmuxUIStart extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     public function handle()
     {
+        $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
         $process = new Process('php misc/update/tmux/start.php');
         $process->setPty(Process::isPtySupported());
         $process->run();
+        if ($process->isSuccessful()) {
+            $process->setCommandLine('tmux attach-session -t '.$tmux_session);
+            $process->run();
+        }
     }
 }

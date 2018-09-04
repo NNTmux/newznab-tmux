@@ -16,19 +16,22 @@ $powerline = Settings::settingValue('site.tmux.powerline') ?? 0;
 $delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
 
-Utility::isPatched();
+try {
+    Utility::isPatched();
+} catch (Exception $e) {
+    echo $e;
+}
 Utility::clearScreen();
 
 echo 'Starting Tmux...'.PHP_EOL;
 // Create a placeholder session so tmux commands do not throw server not found errors.
 exec('tmux new-session -ds placeholder 2>/dev/null');
-exec('tmux list-session', $session);
 
 //check if session exists
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
-if (! empty($session)) {
+if ($session !== null) {
     exit(ColorCLI::error("tmux session: '".$tmux_session."' is already running, aborting.\n"));
 }
 
@@ -131,7 +134,6 @@ function start_apps($tmux_session)
     if ((int) $showprocesslist === 1) {
         exec("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .5 \"mysql -e \\\"SELECT time, state, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
     }
-    //exec("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .2 \"mysql -e \\\"SELECT time, state, rows_examined, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
 
     if ((int) $console_bash === 1) {
         exec("tmux new-window -t $tmux_session -n bash 'printf \"\033]2;Bash\033\" && bash -i'");

@@ -13,8 +13,16 @@ use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $tMain = new Tmux();
-$tRun = new TmuxRun();
-$tOut = new TmuxOutput();
+try {
+    $tRun = new TmuxRun();
+} catch (Exception $e) {
+    echo $e;
+}
+try {
+    $tOut = new TmuxOutput();
+} catch (Exception $e) {
+    echo $e;
+}
 
 $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['cli'] = NN_ROOT.'cli/';
@@ -35,7 +43,11 @@ $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 
 //spawn IRCScraper as soon as possible
-$tRun->runPane('scraper', $runVar);
+try {
+    $tRun->runPane('scraper', $runVar);
+} catch (Exception $e) {
+    echo $e;
+}
 
 //get list of panes by name
 $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
@@ -105,7 +117,7 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 
     //run queries only after time exceeded, these queries can take awhile
-    if ((int) $runVar['counts']['iterations'] === 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && $runVar['settings']['is_running'] == 1)) {
+    if ((int) $runVar['counts']['iterations'] === 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && (int)$runVar['settings']['is_running'] === 1)) {
         $runVar['counts']['proc1'] = $runVar['counts']['proc2'] = $runVar['counts']['proc3'] = $splitqry = $newOldqry = false;
         $runVar['counts']['now']['total_work'] = 0;
         $runVar['modsettings']['fix_crap'] = explode(', ', $runVar['settings']['fix_crap']);
@@ -113,8 +125,16 @@ while ($runVar['counts']['iterations'] > 0) {
         echo ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
-        $splitqry = $tRun->proc_query(4, null, $db_name);
-        $newOldqry = $tRun->proc_query(6, null, null);
+        try {
+            $splitqry = $tRun->proc_query(4, null, $db_name);
+        } catch (Exception $e) {
+            echo $e;
+        }
+        try {
+            $newOldqry = $tRun->proc_query(6, null, null);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         $splitres = (array) array_first(DB::select($splitqry));
         $runVar['timers']['newOld'] = (array) array_first(DB::select($newOldqry));
@@ -153,19 +173,21 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['timers']['query']['init1_time'] = (time() - $timer01);
 
         $timer04 = time();
-        $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $db_name);
+        try {
+            $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $db_name);
+        } catch (Exception $e) {
+            echo $e;
+        }
         $proc1res = (array) array_first(DB::select($proc1qry));
         $runVar['timers']['query']['proc1_time'] = (time() - $timer04);
         $runVar['timers']['query']['proc11_time'] = (time() - $timer01);
 
         $timer05 = time();
-        $proc2qry = $tRun->proc_query(
-            2,
-            $runVar['settings']['book_reqids'],
-            $db_name,
-            $runVar['settings']['maxsize_pp'],
-            $runVar['settings']['minsize_pp']
-        );
+        try {
+            $proc2qry = $tRun->proc_query(2, $runVar['settings']['book_reqids'], $db_name, $runVar['settings']['maxsize_pp'], $runVar['settings']['minsize_pp']);
+        } catch (Exception $e) {
+            echo $e;
+        }
         $proc2res = (array) array_first(DB::select($proc2qry));
         $runVar['timers']['query']['proc2_time'] = (time() - $timer05);
         $runVar['timers']['query']['proc21_time'] = (time() - $timer01);
@@ -298,43 +320,91 @@ while ($runVar['counts']['iterations'] > 0) {
     if ($runVar['settings']['is_running'] === '1') {
 
         //run main updating function(s)
-        $tRun->runPane('main', $runVar);
+        try {
+            $tRun->runPane('main', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         //run nzb-import
-        $tRun->runPane('import', $runVar);
+        try {
+            $tRun->runPane('import', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         //run postprocess_releases amazon
-        $tRun->runPane('amazon', $runVar);
+        try {
+            $tRun->runPane('amazon', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         //respawn IRCScraper if it has been killed
-        $tRun->runPane('scraper', $runVar);
+        try {
+            $tRun->runPane('scraper', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         //run sharing regardless of sequential setting
-        $tRun->runPane('sharing', $runVar);
+        try {
+            $tRun->runPane('sharing', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         //update tv and theaters
-        $tRun->runPane('updatetv', $runVar);
+        try {
+            $tRun->runPane('updatetv', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
 
         //run these if complete sequential not set
         if ((int) $runVar['constants']['sequential'] !== 2) {
 
             //fix names
-            $tRun->runPane('fixnames', $runVar);
+            try {
+                $tRun->runPane('fixnames', $runVar);
+            } catch (Exception $e) {
+                echo $e;
+            }
 
             //dehash releases
-            $tRun->runPane('dehash', $runVar);
+            try {
+                $tRun->runPane('dehash', $runVar);
+            } catch (Exception $e) {
+                echo $e;
+            }
 
             // Remove crap releases.
-            $tRun->runPane('removecrap', $runVar);
+            try {
+                $tRun->runPane('removecrap', $runVar);
+            } catch (Exception $e) {
+                echo $e;
+            }
 
             //run postprocess_releases additional
-            $tRun->runPane('ppadditional', $runVar);
+            try {
+                $tRun->runPane('ppadditional', $runVar);
+            } catch (Exception $e) {
+                echo $e;
+            }
 
             //run postprocess_releases non amazon
-            $tRun->runPane('nonamazon', $runVar);
+            try {
+                $tRun->runPane('nonamazon', $runVar);
+            } catch (Exception $e) {
+                echo $e;
+            }
         }
     } elseif ((int) $runVar['settings']['is_running'] === 0) {
-        $tRun->runPane('notrunning', $runVar);
+        try {
+            $tRun->runPane('notrunning', $runVar);
+        } catch (Exception $e) {
+            echo $e;
+        }
     }
 
     $exit = Settings::settingValue('tmux.running.exit');

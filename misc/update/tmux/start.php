@@ -12,16 +12,6 @@ use Blacklight\Tmux;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 
-// Ensure compatible tmux version is installed $tmux_version == "tmux 2.1\n" || $tmux_version == "tmux 2.2\n"
-if (`which tmux`) {
-    $tmux_version = trim(str_replace('tmux ', '', shell_exec('tmux -V')));
-    if (version_compare($tmux_version, '2.0', '>') && version_compare($tmux_version, '2.4', '<')) {
-        exit(ColorCLI::error('tmux versions above 2.0 are not compatible with NNTmux. Aborting'.PHP_EOL));
-    }
-} else {
-    exit(ColorCLI::error('tmux binary not found. Aborting'.PHP_EOL));
-}
-
 $tmux = new Tmux();
 $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $path = __DIR__;
@@ -36,7 +26,7 @@ exec('tmux new-session -ds placeholder 2>/dev/null');
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
-if (empty($session)) {
+if ($session === null) {
     echo ColorCLI::info("Starting the tmux server and monitor script.\n");
     passthru("php $path/run.php");
 }
