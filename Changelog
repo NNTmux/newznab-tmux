@@ -1,3 +1,5 @@
+2018-09-04 DariusIII
+	* Fix: Add check for empty sharing table when running tmux
 2018-09-03 DariusIII
 	* Fix: Fix monitor counts and percentages displayed in main monitor pane
 	* Chg: Update ReleaseRemover class

@@ -770,7 +770,7 @@ class TmuxRun extends Tmux
     {
         $sharing = (array) array_first(DB::select('SELECT enabled, posting, fetching FROM sharing'));
 
-        if ((int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
+        if (! empty($sharing) && (int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
             shell_exec(
                 "tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
                     {$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/multiprocessing/postprocess.php sha; \
