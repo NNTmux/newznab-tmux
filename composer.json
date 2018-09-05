@@ -135,7 +135,6 @@
     "fideloper/proxy": "~4.0",
     "foolz/sphinxql-query-builder": "^1.2",
     "fxp/composer-asset-plugin": "~1.1",
-    "genealabs/laravel-caffeine": "^0.6.11",
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
@@ -172,6 +171,7 @@
   },
 
   "require-dev": {
+    "beyondcode/laravel-dump-server": "^1.0",
     "barryvdh/laravel-debugbar": "^3.1",
     "barryvdh/laravel-ide-helper": "^2.4",
     "filp/whoops": "~2.0",
