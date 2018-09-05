@@ -197,7 +197,6 @@ function attach($DIR, $tmux_session)
 
 $tmuxconfig = $DIR.'tmux.conf';
 
-
 if ((int) $seq === 1) {
     exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
     exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
