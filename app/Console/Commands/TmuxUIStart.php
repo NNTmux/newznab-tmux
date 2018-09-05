@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use Blacklight\Tmux;
+use App\Models\Settings;
+use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
-use Symfony\Component\Process\Process;
 
 class TmuxUIStart extends Command
 {
@@ -19,36 +21,29 @@ class TmuxUIStart extends Command
      *
      * @var string
      */
-    protected $description = 'Start the processing of tmux scripts. This is functionally equivalent to setting the
-\'tmux running\' setting in admin.';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Start the processing of tmux scripts.';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     public function handle()
     {
-        $process = new Process('php misc/update/tmux/start.php');
-        $process->setTty(Process::isTtySupported());
-        $process->run(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                echo 'ERR > '.$buffer;
-            } else {
-                echo $buffer;
-            }
-        });
+        $tmux = new Tmux();
+        $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
+
+        // Set running value to on.
+        $tmux->startRunning();
+
+        // Create a placeholder session so tmux commands do not throw server not found errors.
+        exec('tmux new-session -ds placeholder 2>/dev/null');
+
+        //check if session exists
+        $session = shell_exec("tmux list-session | grep $tmux_session");
+        // Kill the placeholder
+        exec('tmux kill-session -t placeholder');
+        if ($session === null) {
+            ColorCLI::doEcho(ColorCLI::info('Starting the tmux server and monitor script.'), true);
+            passthru('php '.app()->path().'/../misc/update/tmux/run.php');
+        }
     }
 }
