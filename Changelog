@@ -1,4 +1,5 @@
 2018-09-05 DariusIII
+	* Chg: Update tmux.conf, add credit where credit is due
 	* Chg: Update tmux theme and remove powerline support
 	* Chg: Remove now unused packages folder
 	* Chg: Add beyondcode/laravel-dump-server to dev requirements
