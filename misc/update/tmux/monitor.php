@@ -35,11 +35,9 @@ $tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
 
 $runVar['constants'] = (array) array_first(DB::select($tRun->getConstantSettings()));
 
-$PHP = 'php';
-
 //assign shell commands
-$runVar['commands']['_php'] = " nice -n{$tmux_niceness} $PHP";
-$runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
+$runVar['commands']['_php'] = " nice -n{$tmux_niceness} php";
+$runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} php";
 $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 
 //spawn IRCScraper as soon as possible
