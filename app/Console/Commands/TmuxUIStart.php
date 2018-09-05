@@ -3,8 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Settings;
+use Blacklight\ColorCLI;
+use Blacklight\Tmux;
 use Illuminate\Console\Command;
-use Symfony\Component\Process\Process;
 
 class TmuxUIStart extends Command
 {
@@ -20,31 +21,29 @@ class TmuxUIStart extends Command
      *
      * @var string
      */
-    protected $description = 'Start the processing of tmux scripts. This is functionally equivalent to setting the
-\'tmux running\' setting in admin.';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Start the processing of tmux scripts.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
+        $tmux = new Tmux();
         $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
-        $process = new Process('php misc/update/tmux/start.php');
-        $process->setPty(Process::isPtySupported());
-        $process->run();
-        if ($process->isSuccessful()) {
-            $process->setCommandLine('tmux attach-session -t '.$tmux_session);
-            $process->run();
+
+        // Set running value to on.
+        $tmux->startRunning();
+
+        // Create a placeholder session so tmux commands do not throw server not found errors.
+        exec('tmux new-session -ds placeholder 2>/dev/null');
+
+        //check if session exists
+        $session = shell_exec("tmux list-session | grep $tmux_session");
+        // Kill the placeholder
+        exec('tmux kill-session -t placeholder');
+        if ($session === null) {
+            ColorCLI::doEcho(ColorCLI::info('Starting the tmux server and monitor script.'), true);
+            passthru('php '.app()->path().'/../misc/update/tmux/run.php');
         }
     }
 }
