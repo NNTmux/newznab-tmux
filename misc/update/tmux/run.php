@@ -12,7 +12,6 @@ $patch = Settings::settingValue('..sqlpatch');
 $import = Settings::settingValue('site.tmux.import') ?? 0;
 $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;
-$powerline = Settings::settingValue('site.tmux.powerline') ?? 0;
 $delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
 
@@ -195,11 +194,9 @@ function attach($DIR, $tmux_session)
 }
 
 //create tmux session
-if ((int) $powerline === 1) {
-    $tmuxconfig = $DIR.'powerline/tmux.conf';
-} else {
-    $tmuxconfig = $DIR.'tmux.conf';
-}
+
+$tmuxconfig = $DIR.'tmux.conf';
+
 
 if ((int) $seq === 1) {
     exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
