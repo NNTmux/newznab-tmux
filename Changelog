@@ -1,4 +1,5 @@
 2018-09-05 DariusIII
+	* Chg: Add powerline directly from ubuntu repo and use it in tmux
 	* Chg: Update tmux.conf, add credit where credit is due
 	* Chg: Update tmux theme and remove powerline support
 	* Chg: Remove now unused packages folder
