@@ -1,4 +1,5 @@
 2018-09-06 DariusIII
+	* Chg: Remove unused hostHash function from User model
 	* Chg: Remove unused code from GetNzbController
 	* Chg: Update psy/psysh to latest version
 2018-09-05 DariusIII

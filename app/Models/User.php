@@ -991,22 +991,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param        $host
-     * @param string|null $siteseed
-     *
-     * @return string
-     * @throws \Exception
-     */
-    public static function getHostHash($host, string $siteseed = ''): string
-    {
-        if ($siteseed === '') {
-            $siteseed = Settings::settingValue('..siteseed');
-        }
-
-        return self::hashSHA1($siteseed.$host.$siteseed);
-    }
-
-    /**
      * @param $serverUrl
      * @param $uid
      * @param $emailTo
