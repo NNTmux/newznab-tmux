@@ -57,7 +57,6 @@ class GetNzbController extends BasePageController
             str_ireplace('.nzb', '', $request->input('id'));
         }
 
-
         // Check download limit on user role.
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests > $maxDownloads) {
