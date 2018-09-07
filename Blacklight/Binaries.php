@@ -969,9 +969,14 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::transaction(function () use ($binariesQuery) {
-            DB::insert($binariesQuery);
-        }, 3)) {
+        if (\strlen($binariesCheck.$binariesEnd) !== \strlen($binariesQuery)) {
+            try {
+                DB::transaction(function () use ($binariesQuery) {
+                    DB::insert($binariesQuery);
+                }, 3);
+            } catch (\PDOException $e) {
+                Log::error($e->errorInfo);
+            }
             if ($this->_debug) {
                 ColorCLI::doEcho(
                     ColorCLI::debug(
@@ -981,10 +986,14 @@ class Binaries
                     true
                 );
             }
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::transaction(function () use ($partsQuery) {
-                DB::insert(rtrim($partsQuery, ','));
-            }, 3)) {
-                $this->_pdo->commit();
+            if (\strlen($partsQuery) !== \strlen($partsCheck)) {
+                try {
+                    DB::transaction(function () use ($partsQuery) {
+                        DB::insert(rtrim($partsQuery, ','));
+                    }, 3);
+                } catch (\PDOException $e) {
+                    Log::error($e->errorInfo);
+                }
             } else {
                 if ($this->addToPartRepair) {
                     $this->headersNotInserted += $this->headersReceived;
