@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
