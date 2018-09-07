@@ -1,4 +1,5 @@
 2018-09-07 DariusIII
+	* Fix: Display login errors
 	* Chg: Update ytake/laravel-smarty to version 2.4.0
 2018-09-06 DariusIII
 	* Chg: Update spatie/laravel-permission and barryvdh/laravel-ide-helper to latest versions

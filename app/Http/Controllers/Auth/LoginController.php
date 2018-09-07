@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,7 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
+        $error = '';
         $user = User::getByUsername($request->input('username'));
 
         if ($user !== null && \Firewall::isBlacklisted($user->host) === false) {
@@ -74,18 +76,23 @@ class LoginController extends Controller
 
                 return redirect()->intended($this->redirectPath());
             }
+
+            $error = 'Username/email and password combination used does not match our records!';
+        } else {
+            $error = 'Username or email used do not match our records!';
         }
 
-        return redirect()->back();
+        return $this->showLoginForm($error);
     }
 
     /**
-     * @throws \Exception
+     * @param string $error
+     * @param string $notice
      */
-    public function showLoginForm()
+    public function showLoginForm($error = '', $notice = '')
     {
         $theme = Settings::settingValue('site.main.style');
-        app('smarty.view')->assign(['error' => '', 'username' => '', 'rememberme' => '']);
+        app('smarty.view')->assign(['error' => $error, 'notice' => $notice, 'username' => '', 'rememberme' => '']);
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';
