@@ -922,8 +922,8 @@ class Binaries
                         DB::commit();
                     }
 
-                    if (preg_match('/SQLSTATE\[23000\]/i', $e->getMessage())) {
-                        ColorCLI::doEcho(ColorCLI::notice('Binary data not inserted'));
+                    if ($e->errorInfo[1] === 1452) {
+                        Log::debug('Binary data not inserted because of FK constraint violation');
                     }
                 }
 
