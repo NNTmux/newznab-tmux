@@ -395,7 +395,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-        // If this is not a new group, go from our newest to the servers newest.
+            // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];
@@ -813,7 +813,6 @@ class Binaries
      * @param bool  $multiGroup
      *
      * @throws \Exception
-     * @throws \Throwable
      */
     protected function storeHeaders(array $headers = [], $multiGroup = false): void
     {
@@ -879,13 +878,11 @@ class Binaries
                     $collectionID = false;
 
                     try {
-                        DB::transaction(function () use ($collMatch, $xref, $random, $fileCount, $unixtime) {
-                            DB::insert(sprintf("
+                        DB::insert(sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
-                        }, 3);
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
@@ -895,10 +892,19 @@ class Binaries
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
                             DB::commit();
                         }
+                        if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                            ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                            DB::rollBack();
+                        }
                     }
 
-                    if ($collectionID === false && $this->addToPartRepair) {
-                        $this->headersNotInserted[] = $this->header['Number'];
+                    if ($collectionID === false) {
+                        if ($this->addToPartRepair) {
+                            $this->headersNotInserted[] = $this->header['Number'];
+                        }
+                        DB::rollBack();
+                        DB::beginTransaction();
+                        continue;
                     }
                     $collectionIDs[$this->header['CollectionKey']] = $collectionID;
                 } else {
@@ -910,12 +916,10 @@ class Binaries
 
                 $binaryID = false;
                 try {
-                    DB::transaction(function () use ($hash, $collectionID, $fileCount) {
-                        DB::insert(sprintf("
+                    DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
-                    }, 3);
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
                     Log::error($e->getMessage());
@@ -924,10 +928,19 @@ class Binaries
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
                         DB::commit();
                     }
+                    if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                        ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                        DB::rollBack();
+                    }
                 }
 
-                if ($binaryID === false && $this->addToPartRepair) {
-                    $this->headersNotInserted[] = $this->header['Number'];
+                if ($binaryID === false) {
+                    if ($this->addToPartRepair) {
+                        $this->headersNotInserted[] = $this->header['Number'];
+                    }
+                    DB::rollBack();
+                    DB::beginTransaction();
+                    continue;
                 }
 
                 $binariesUpdate[$binaryID]['Size'] = 0;
@@ -964,21 +977,16 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::transaction(function () use ($binariesQuery) {
-            DB::insert($binariesQuery);
-        }, 3)) {
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) {
             if ($this->_debug) {
                 ColorCLI::doEcho(
                     ColorCLI::debug(
                         'Sending '.round(\strlen($partsQuery) / 1024, 2).
                         ' KB of'.($this->multiGroup ? ' MGR' : '').' parts to MySQL'
-                    ),
-                    true
+                    ), true
                 );
             }
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::transaction(function () use ($partsQuery) {
-                DB::insert(rtrim($partsQuery, ','));
-            }, 3)) {
+            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
                 $this->_pdo->commit();
             } else {
                 if ($this->addToPartRepair) {
@@ -1048,8 +1056,7 @@ class Binaries
                 'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
-            ),
-            true
+            ), true
         );
     }
 
@@ -1070,9 +1077,7 @@ class Binaries
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
                 ColorCLI::primaryOver(' for part repair, ').
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
-                ColorCLI::primary(' total.'),
-                true
-            );
+                ColorCLI::primary(' total.'), true);
         }
     }
 
@@ -1125,6 +1130,10 @@ class Binaries
             if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                 DB::unprepared("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
                 DB::commit();
+            }
+            if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                DB::rollBack();
             }
         }
 
@@ -1358,8 +1367,7 @@ class Binaries
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
-                ),
-                true
+                ), true
             );
         }
 
@@ -1420,8 +1428,7 @@ class Binaries
                 ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
-                ),
-                true
+                ), true
             );
         }
 
@@ -1436,7 +1443,6 @@ class Binaries
      * @param int    $groupID   The ID of this groups.
      *
      * @return bool
-     * @throws \Throwable
      */
     private function addMissingParts($numbers, $tableName, $groupID): bool
     {
@@ -1445,9 +1451,7 @@ class Binaries
             $insertStr .= '('.$number.','.$groupID.'),';
         }
 
-        DB::transaction(function () use ($insertStr) {
-            DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
-        }, 3);
+        DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
 
         return $this->_pdo->lastInsertId();
     }
