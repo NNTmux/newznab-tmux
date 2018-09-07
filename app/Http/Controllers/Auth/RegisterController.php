@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\Invitation;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
@@ -13,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 use Jrean\UserVerification\Facades\UserVerification;
@@ -105,6 +105,7 @@ class RegisterController extends Controller
 
         if (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! $request->has('invitecode') || empty($request->input('invitecode')))) {
             $error = 'Registrations are currently invite only.';
+
             return $this->showRegistrationForm($error);
         }
 
@@ -136,7 +137,7 @@ class RegisterController extends Controller
                                 break;
                             }
                         }
-                        if (!empty($error)) {
+                        if (! empty($error)) {
                             return $this->showRegistrationForm($error);
                         }
 

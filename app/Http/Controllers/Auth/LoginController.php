@@ -74,7 +74,6 @@ class LoginController extends Controller
                 return $this->showLoginForm('You have not verified your email address!');
             }
 
-
             if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
                 User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
