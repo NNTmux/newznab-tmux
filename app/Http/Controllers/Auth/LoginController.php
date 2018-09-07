@@ -70,8 +70,13 @@ class LoginController extends Controller
                 $login_type => $request->input('username'),
             ]);
 
+            if ($user->isVerified() === false || $user->isPendingVerification()) {
+                return $this->showLoginForm('You have not verified your email address!');
+            }
+
+
             if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
                 return redirect()->intended($this->redirectPath());
             }

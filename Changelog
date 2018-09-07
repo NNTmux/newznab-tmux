@@ -1,4 +1,5 @@
 2018-09-07 DariusIII
+	* Chg: Add email verification message to login page for non-verified users
 	* Fix: Fix displaying errors on registration page
 	* Fix: Display login errors
 	* Chg: Update ytake/laravel-smarty to version 2.4.0
