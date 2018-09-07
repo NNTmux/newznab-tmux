@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\Invitation;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
@@ -86,7 +87,7 @@ class RegisterController extends Controller
         $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
         $showRegister = 1;
 
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'username' => 'required|string|min:5|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
@@ -98,12 +99,13 @@ class RegisterController extends Controller
             ]);
         }
 
-        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
-            session()->flash('status', 'Registrations are currently disabled.');
-            $showRegister = 0;
-        } elseif (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! $request->has('invitecode') || empty($request->input('invitecode')))) {
-            session()->flash('status', 'Registrations are currently invite only.');
-            $showRegister = 0;
+        if ($validator->fails()) {
+            return $this->showRegistrationForm($validator->errors()->first());
+        }
+
+        if (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! $request->has('invitecode') || empty($request->input('invitecode')))) {
+            $error = 'Registrations are currently invite only.';
+            return $this->showRegistrationForm($error);
         }
 
         if ($showRegister === 1) {
@@ -133,6 +135,9 @@ class RegisterController extends Controller
                                 $error = 'Sorry, the invite code is old or has been used.';
                                 break;
                             }
+                        }
+                        if (!empty($error)) {
+                            return $this->showRegistrationForm($error);
                         }
 
                         $user = $this->create(
@@ -181,16 +186,28 @@ class RegisterController extends Controller
                 'invitecode'        => Utility::htmlfmt($inviteCode),
                 'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
                 'showregister'      => $showRegister,
-                'error'             => $error,
             ]
         );
+
+        return $this->showRegistrationForm($error);
     }
 
     /**
-     * @throws \Exception
+     * @param string $error
      */
-    public function showRegistrationForm()
+    public function showRegistrationForm($error = '')
     {
+        $showRegister = 1;
+        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
+            $error = 'Registrations are currently disabled.';
+            $showRegister = 0;
+        }
+        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+            $error = 'Registrations are currently invite only.';
+            $showRegister = 0;
+        }
+        app('smarty.view')->assign('showregister', $showRegister);
+        app('smarty.view')->assign('error', $error);
         $theme = Settings::settingValue('site.main.style');
 
         $nocaptcha = env('NOCAPTCHA_ENABLED');
