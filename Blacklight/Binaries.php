@@ -850,10 +850,7 @@ class Binaries
                     $ckId = $this->groupMySQL['id'];
                 }
 
-                $collMatch = $this->_collectionsCleaning->collectionsCleaner(
-                    $this->header['matches'][1],
-                    $ckName
-                );
+                $collMatch = $this->_collectionsCleaning->collectionsCleaner($this->header['matches'][1], $ckName);
 
                 // Used to group articles together when forming the release.  MGR requires this to be group irrespective
                 $this->header['CollectionKey'] = $collMatch['name'].$ckId.$fileCount[3];
@@ -923,6 +920,10 @@ class Binaries
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
                         DB::commit();
+                    }
+
+                    if (preg_match('/SQLSTATE\[23000\]/i', $e->getMessage())) {
+                        ColorCLI::doEcho(ColorCLI::notice('Binary data not inserted'));
                     }
                 }
 
