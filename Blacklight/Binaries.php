@@ -395,7 +395,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-        // If this is not a new group, go from our newest to the servers newest.
+            // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];
@@ -440,10 +440,10 @@ class Binaries
                 ColorCLI::doEcho(
                     ColorCLI::primary(
                         (
-                            (int) $groupMySQL['last_record'] === 0
+                        (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
                             (
-                                $this->_newGroupScanByDays
+                            $this->_newGroupScanByDays
                                 ? $this->_newGroupDaysToScan.' days'
                                 : number_format($this->_newGroupMessagesToScan).' messages'
                             ).' worth.'
@@ -850,7 +850,10 @@ class Binaries
                     $ckId = $this->groupMySQL['id'];
                 }
 
-                $collMatch = $this->_collectionsCleaning->collectionsCleaner($this->header['matches'][1], $ckName);
+                $collMatch = $this->_collectionsCleaning->collectionsCleaner(
+                    $this->header['matches'][1],
+                    $ckName
+                );
 
                 // Used to group articles together when forming the release.  MGR requires this to be group irrespective
                 $this->header['CollectionKey'] = $collMatch['name'].$ckId.$fileCount[3];
@@ -886,7 +889,7 @@ class Binaries
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
-                        Log::error($e->errorInfo);
+                        Log::error($e->getMessage());
                     } catch (\PDOException $e) {
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
@@ -896,9 +899,6 @@ class Binaries
 
                     if ($collectionID === false && $this->addToPartRepair) {
                         $this->headersNotInserted[] = $this->header['Number'];
-                        DB::rollBack();
-                        DB::beginTransaction();
-                        continue;
                     }
                     $collectionIDs[$this->header['CollectionKey']] = $collectionID;
                 } else {
@@ -918,21 +918,16 @@ class Binaries
                     }, 3);
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
-                    Log::error($e->errorInfo);
+                    Log::error($e->getMessage());
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
                         DB::commit();
-                    } else {
-                        Log::debug($e->errorInfo);
                     }
                 }
 
                 if ($binaryID === false && $this->addToPartRepair) {
                     $this->headersNotInserted[] = $this->header['Number'];
-                    DB::rollBack();
-                    DB::beginTransaction();
-                    continue;
                 }
 
                 $binariesUpdate[$binaryID]['Size'] = 0;
@@ -969,7 +964,9 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) !== \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) {
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::transaction(function () use ($binariesQuery) {
+            DB::insert($binariesQuery);
+        }, 3)) {
             if ($this->_debug) {
                 ColorCLI::doEcho(
                     ColorCLI::debug(
@@ -979,7 +976,9 @@ class Binaries
                     true
                 );
             }
-            if (\strlen($partsQuery) !== \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
+            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::transaction(function () use ($partsQuery) {
+                DB::insert(rtrim($partsQuery, ','));
+            }, 3)) {
                 $this->_pdo->commit();
             } else {
                 if ($this->addToPartRepair) {
@@ -1231,13 +1230,13 @@ class Binaries
         // Remove articles that we cant fetch after x attempts.
         DB::transaction(function () use ($groupArr, $tableNames) {
             DB::delete(
-            sprintf(
-                'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
-                $tableNames['prname'],
-                $this->_partRepairMaxTries,
-                $groupArr['id']
-            )
-        );
+                sprintf(
+                    'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
+                    $tableNames['prname'],
+                    $this->_partRepairMaxTries,
+                    $groupArr['id']
+                )
+            );
         }, 3);
     }
 
