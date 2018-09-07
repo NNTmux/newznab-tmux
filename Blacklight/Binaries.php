@@ -926,7 +926,6 @@ class Binaries
                     } else {
                         Log::debug($e->errorInfo);
                     }
-
                 }
 
                 if ($binaryID === false && $this->addToPartRepair) {
