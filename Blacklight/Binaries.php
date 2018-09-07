@@ -886,7 +886,7 @@ class Binaries
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
-                        Log::error($e->getMessage());
+                        Log::error($e->errorInfo);
                     } catch (\PDOException $e) {
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
@@ -896,6 +896,9 @@ class Binaries
 
                     if ($collectionID === false && $this->addToPartRepair) {
                         $this->headersNotInserted[] = $this->header['Number'];
+                        DB::rollBack();
+                        DB::beginTransaction();
+                        continue;
                     }
                     $collectionIDs[$this->header['CollectionKey']] = $collectionID;
                 } else {
@@ -915,20 +918,22 @@ class Binaries
                     }, 3);
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
-                    Log::error($e->getMessage());
+                    Log::error($e->errorInfo);
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
                         DB::commit();
+                    } else {
+                        Log::debug($e->errorInfo);
                     }
 
-                    if ($e->errorInfo[1] === 1452) {
-                        Log::debug('Binary data not inserted because of FK constraint violation');
-                    }
                 }
 
                 if ($binaryID === false && $this->addToPartRepair) {
                     $this->headersNotInserted[] = $this->header['Number'];
+                    DB::rollBack();
+                    DB::beginTransaction();
+                    continue;
                 }
 
                 $binariesUpdate[$binaryID]['Size'] = 0;
