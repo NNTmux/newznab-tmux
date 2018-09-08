@@ -1,3 +1,5 @@
+2018-09-08 DariusIII
+	* Fix: Fix failed releases handling
 2018-09-07 DariusIII
 	* Chg: Use transaction function for inserts in Binaries class
 	* Chg: Add email verification message to login page for non-verified users

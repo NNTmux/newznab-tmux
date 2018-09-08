@@ -24,27 +24,28 @@ class FailedReleasesController extends BasePageController
             $rssToken = $this->userdata['api_token'];
         } else {
             if (! $request->has('userid') || ! $request->has('api_token')) {
-                return response('Error!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
+                return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
             }
 
             $res = User::getByIdAndRssToken($request->input('userid'), $request->input('api_token'));
             if ($res === null) {
-                return response('Error!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong user ID or rss key!']);
+                return response('Unauthorised, wrong user ID or rss key!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong user ID or rss key!']);
             }
 
             $uid = $res['id'];
             $rssToken = $res['api_token'];
         }
 
-        if (isset($uid, $rssToken) && is_numeric($uid) && $request->has('guid')) {
+        if (isset($uid, $rssToken) && $request->has('guid')) {
             $alt = Release::getAlternate($request->input('guid'), $uid);
-            if ($alt === null) {
-                return response('Error!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
+
+            if (empty($alt)) {
+                return response('No NZB found for alternate match!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
             }
 
             return response('Success', 200)->withHeaders(['Location' => $this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
         }
 
-        return response('Error!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
+        return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
     }
 }
