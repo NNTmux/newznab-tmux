@@ -24,7 +24,7 @@ namespace App\Extensions\util\yenc\adapter;
  */
 class Php
 {
-    public static function decode(&$text, $ignore = false)
+    public static function decode(&$text, $ignore = false): string
     {
         $crc = '';
         // Extract the yEnc string itself.
@@ -37,9 +37,7 @@ class Php
                 $crc = trim($trailer[1]);
             }
 
-            $headerSize = $encoded[1];
-            $trailerSize = $encoded[3];
-            $encoded = $encoded[2];
+            [$headerSize, $encoded, $trailerSize] = $encoded;
         } else {
             return false;
         }
@@ -48,25 +46,25 @@ class Php
         $encoded = trim(str_replace("\r\n", '', $encoded));
 
         // Make sure the header and trailer file sizes match up.
-        if ($headerSize != $trailerSize) {
+        if ($headerSize !== $trailerSize) {
             $message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
             throw new \RuntimeException($message);
         }
 
         // Decode.
         $decoded = '';
-        $encodedLength = strlen($encoded);
+        $encodedLength = \strlen($encoded);
         for ($chr = 0; $chr < $encodedLength; $chr++) {
             $decoded .= (
-                $encoded[$chr] == '=' ?
-                    chr((ord($encoded[$chr]) - 42) % 256) :
-                    chr((((ord($encoded[++$chr]) - 64) % 256) - 42) % 256)
+                $encoded[$chr] === '=' ?
+                    \chr((\ord($encoded[$chr]) - 42) % 256) :
+                    \chr((((\ord($encoded[++$chr]) - 64) % 256) - 42) % 256)
             );
         }
 
         // Make sure the decoded file size is the same as the size specified in the header.
-        if (strlen($decoded) != $headerSize) {
-            $message = 'Header file size ('.$headerSize.') and actual file size ('.strlen($decoded).') do not match. The file is probably corrupt.';
+        if (\strlen($decoded) !== $headerSize) {
+            $message = 'Header file size ('.$headerSize.') and actual file size ('.\strlen($decoded).') do not match. The file is probably corrupt.';
 
             throw new \RuntimeException($message);
         }
@@ -88,7 +86,7 @@ class Php
      *
      * @return string The decoded yEnc string, or the input string, if it's not yEnc.
      */
-    public static function decodeIgnore(&$text)
+    public static function decodeIgnore(&$text): string
     {
         if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input)) {
             $text = '';
@@ -111,12 +109,12 @@ class Php
                     )
                 );
 
-            $length = strlen($input);
+            $length = \strlen($input);
             for ($chr = 0; $chr < $length; $chr++) {
                 $text .= (
-                    $input[$chr] == '=' ?
-                        chr((((ord($input[++$chr]) - 64) % 256) - 42) % 256) :
-                        chr((ord($input[$chr]) - 42) % 256)
+                    $input[$chr] === '=' ?
+                        \chr((((\ord($input[++$chr]) - 64) % 256) - 42) % 256) :
+                        \chr((\ord($input[$chr]) - 42) % 256)
                 );
             }
         }
@@ -124,12 +122,23 @@ class Php
         return $text;
     }
 
-    public static function enabled()
+    /**
+     * @return bool
+     */
+    public static function enabled(): bool
     {
         return true;
     }
 
-    public static function encode($data, $filename, $lineLength = 128, $crc32 = true)
+    /**
+     * @param      $data
+     * @param      $filename
+     * @param int  $lineLength
+     * @param bool $crc32
+     *
+     * @return string
+     */
+    public static function encode($data, $filename, $lineLength = 128, $crc32 = true): string
     {
         // yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
         if ($lineLength > 254) {
@@ -143,10 +152,10 @@ class Php
         }
 
         $encoded = '';
-        $stringLength = strlen($data);
+        $stringLength = \strlen($data);
         // Encode each character of the string one at a time.
-        for ($i = 0; $i < $stringLength; $i++) {
-            $value = ((ord($data[$i]) + 42) % 256);
+        foreach ($data as $i => $iValue) {
+            $value = ((\ord($data[$i]) + 42) % 256);
 
             // Escape NULL, TAB, LF, CR, space, . and = characters.
             switch ($value) {
@@ -154,10 +163,10 @@ class Php
                 case 10:
                 case 13:
                 case 61:
-                    $encoded .= ('='.chr(($value + 64) % 256));
+                    $encoded .= ('='.\chr(($value + 64) % 256));
                     break;
                 default:
-                    $encoded .= chr($value);
+                    $encoded .= \chr($value);
                     break;
             }
         }
