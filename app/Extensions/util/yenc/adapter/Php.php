@@ -20,9 +20,7 @@
 namespace App\Extensions\util\yenc\adapter;
 
 /**
- * Class Php
- *
- * @package App\Extensions\util\yenc\adapter
+ * Class Php.
  */
 class Php
 {
