@@ -730,8 +730,8 @@ class Console
     /**
      * @param $title
      * @param $node
-     * @return bool|mixed
-     * @throws \Exception
+     *
+     * @return false|mixed
      */
     public function fetchAmazonProperties($title, $node)
     {
@@ -747,7 +747,7 @@ class Console
                 ->setAssociateTag($this->asstag)
                 ->setRequest($request)
                 ->setResponseTransformer(new XmlToSimpleXmlObject());
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             echo $e->getMessage();
         }
 

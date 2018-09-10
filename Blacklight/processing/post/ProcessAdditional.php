@@ -1622,7 +1622,7 @@ class ProcessAdditional
     /**
      * @param string $pattern
      * @param string $path
-     * @return bool|\RecursiveIteratorIterator|\RegexIterator
+     * @return false|\RecursiveIteratorIterator|\RegexIterator
      */
     protected function _getTempDirectoryContents($pattern = '', $path = '')
     {
@@ -1643,7 +1643,7 @@ class ProcessAdditional
             return new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($path)
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage().PHP_EOL);
 
             return false;
