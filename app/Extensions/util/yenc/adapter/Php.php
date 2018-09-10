@@ -20,11 +20,19 @@
 namespace App\Extensions\util\yenc\adapter;
 
 /**
- * Class Php.
+ * Class Php
+ *
+ * @package App\Extensions\util\yenc\adapter
  */
 class Php
 {
-    public static function decode(&$text, $ignore = false): string
+    /**
+     * @param      $text
+     * @param bool $ignore
+     *
+     * @return bool|string
+     */
+    public static function decode(&$text, $ignore = false)
     {
         $crc = '';
         // Extract the yEnc string itself.

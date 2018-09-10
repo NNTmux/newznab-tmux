@@ -1,4 +1,5 @@
 2018-09-10 DariusIII
+	* Chg: Update return types for Php yenc decode function
 	* Chg: Update Php yenc adapter
 	* Fix: Fix wrong check for result from query in password reset controller
 2018-09-09 DariusIII
