@@ -129,7 +129,7 @@ class DetailsController extends BasePageController
 
             $AniDBAPIArray = '';
             if ($data['anidbid'] > 0) {
-                $AniDB = new AniDB(['Settings' => $releases->pdo]);
+                $AniDB = new AniDB();
                 $AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
             }
 
