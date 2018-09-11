@@ -1,4 +1,5 @@
 2018-09-11 DariusIII
+	* Chg: Update ReleaseSearch class remove unused constants and add return type declarations
 	* Chg: Update Releases class, add return type declarations and update PHPDOC blocks
 	* Chg: Update spatie/laravel-permission to version 2.19.0
 2018-09-10 DariusIII
