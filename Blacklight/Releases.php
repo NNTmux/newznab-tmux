@@ -383,7 +383,7 @@ class Releases
      *
      * @return array
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, $excludedCats = [])
+    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = []): array
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
@@ -443,7 +443,7 @@ class Releases
      *
      * @return int
      */
-    public function getShowsCount($userShows, $maxAge = -1, $excludedCats = [])
+    public function getShowsCount($userShows, $maxAge = -1, array $excludedCats = []): int
     {
         return $this->getPagerCount(
             sprintf(
@@ -544,7 +544,7 @@ class Releases
      *
      * @return string
      */
-    public function uSQL($userQuery, $type)
+    public function uSQL($userQuery, $type): string
     {
         $sql = '(1=2 ';
         foreach ($userQuery as $query) {
@@ -1200,7 +1200,7 @@ class Releases
     {
         // Get the category for the parent of this release.
         $currRow = Release::getCatByRelId($currentID);
-        $catRow = (new Category)->find($currRow['categories_id']);
+        $catRow = Category::find($currRow['categories_id']);
         $parentCat = $catRow['parentid'];
 
         $results = $this->search(
