@@ -409,7 +409,8 @@ class NZBImport
                 ]
             );
         } else {
-            $this->echoOut('This release is already in our DB so skipping: ' . $subject);
+            $this->echoOut('This release is already in our DB so skipping: '.$subject);
+
             return false;
         }
 
