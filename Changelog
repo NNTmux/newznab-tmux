@@ -1,4 +1,5 @@
 2018-09-11 DariusIII
+	* Chg: Update NZBImport class
 	* Chg: Update swiftmailer/swiftmailer to version 6.1.3
 	* Chg: Update XXX class
 	* Chg: Update ReleaseSearch class remove unused constants and add return type declarations

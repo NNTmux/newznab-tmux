@@ -409,7 +409,7 @@ class NZBImport
                 ]
             );
         } else {
-            //$this->echoOut('This release is already in our DB so skipping: ' . $subject);
+            $this->echoOut('This release is already in our DB so skipping: ' . $subject);
             return false;
         }
 
@@ -457,7 +457,7 @@ class NZBImport
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
         } elseif ($this->echoCLI) {
-            echo $message.PHP_EOL;
+            ColorCLI::doEcho(ColorCLI::notice($message), true);
         }
     }
 
