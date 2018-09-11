@@ -1,4 +1,5 @@
 2018-09-11 DariusIII
+	* Chg: Update barracudanetworks/forkdaemon-php to version 1.1.1
 	* Fix: Fix AniDB initialization in DetailsController
 	* Chg: Remove $page variable from AnidbController
 	* Chg: Update Blacklight\AniDB class
