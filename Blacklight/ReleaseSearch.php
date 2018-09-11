@@ -4,7 +4,6 @@ namespace Blacklight;
 
 class ReleaseSearch
 {
-
     /**
      * Array where keys are the column name, and value is the search string.
      * @var array
