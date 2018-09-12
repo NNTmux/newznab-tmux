@@ -93,13 +93,6 @@ class ReleaseRemover
     protected $result;
 
     /**
-     * Time we started.
-     *
-     * @var int
-     */
-    protected $timeStart;
-
-    /**
      * @var \Blacklight\NZB
      */
     private $nzb;
@@ -157,7 +150,7 @@ class ReleaseRemover
         $this->delete = true;
         $this->ignoreUserCheck = false;
         // Time we started.
-        $this->timeStart = now();
+        $timeStart = now();
 
         // Start forming the query.
         $this->query = 'SELECT id, guid, searchname FROM releases WHERE 1=1';
@@ -191,7 +184,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            echo ColorCLI::header(now()->diffInSeconds($this->timeStart).' seconds');
+            echo ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
         }
 
         return $this->browser
@@ -200,7 +193,7 @@ class ReleaseRemover
             ($this->delete ? 'Deleted ' : 'Would have deleted ').
             $this->deletedCount.
             ' release(s) in '.
-            now()->diffInSeconds($this->timeStart).' seconds'
+            now()->diffInSeconds($timeStart).' seconds'
             :
             true;
     }
@@ -218,7 +211,7 @@ class ReleaseRemover
      */
     public function removeCrap($delete, $time, $type = '', $blacklistID = '')
     {
-        $this->timeStart = now();
+        $timeStart = now();
         $this->delete = $delete;
         $this->blacklistID = '';
 
@@ -320,7 +313,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            echo ColorCLI::header(now()->diffInSeconds($this->timeStart).' seconds');
+            echo ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
         }
 
         return $this->browser
@@ -329,7 +322,7 @@ class ReleaseRemover
             ($this->delete ? 'Deleted ' : 'Would have deleted ').
             $this->deletedCount.
             ' release(s) in '.
-            now()->diffInSeconds($this->timeStart).' seconds'
+            now()->diffInSeconds($timeStart).' seconds'
             :
             true;
     }

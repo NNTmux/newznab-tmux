@@ -1150,7 +1150,7 @@ class NameFixer
         ColorCLI::doEcho(ColorCLI::primary('Matching predb filename to cleaned release_files.name.'), true);
 
         $counter = $counted = 0;
-        $timestart = time();
+        $timestart = now();
 
         $query = DB::select(
             sprintf(
@@ -1184,7 +1184,7 @@ class NameFixer
                         $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
                     }
                 }
-                echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.$this->consoletools->convertTime(time() - $timestart).'.');
+                echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
             } else {
                 ColorCLI::doEcho(ColorCLI::info($n.'Nothing to do.'), true);
             }
