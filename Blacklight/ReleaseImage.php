@@ -67,22 +67,13 @@ class ReleaseImage
 
     /**
      * @param        $imgLoc
-     * @param string $token
      *
      * @return bool|\Intervention\Image\Image
      */
-    protected function fetchImage($imgLoc, $token = '')
+    protected function fetchImage($imgLoc)
     {
         try {
-            if ($token !== '') {
-                $client = new Client();
-                $file_data = $client->get($imgLoc, ['headers' => [
-                    'Authorization' => 'Bearer '.$token,
-                ]])->getBody();
-            } else {
-                $file_data = $imgLoc;
-            }
-            $img = Image::make($file_data);
+            $img = Image::make($imgLoc);
         } catch (NotFoundException $e) {
             if ($e->getCode() === 404) {
                 ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
@@ -116,13 +107,12 @@ class ReleaseImage
      * @param string $imgMaxHeight Max height to resize image to.  (OPTIONAL)
      * @param bool   $saveThumb    Save a thumbnail of this image? (OPTIONAL)
      *
-     * @param string $token
      *
      * @return int 1 on success, 0 on failure Used on site to check if there is an image.
      */
-    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false, $token = ''): int
+    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false): int
     {
-        $cover = $this->fetchImage($imgLoc, $token);
+        $cover = $this->fetchImage($imgLoc);
 
         if ($cover === false) {
             return 0;

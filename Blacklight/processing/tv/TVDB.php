@@ -14,6 +14,7 @@ use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 class TVDB extends TV
 {
     private const TVDB_URL = 'https://api.thetvdb.com';
+    private const TVDB_IMAGES_URL = 'https://www.thetvdb.com/banners/';
     private const TVDB_API_KEY = '31740C28BAC74DEF';
     private const MATCH_PROBABILITY = 75;
 
@@ -151,11 +152,11 @@ class TVDB extends TV
                 if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
                     // Now that we have valid video and tvdb ids, try to get the poster
                     if (! empty($tvdbShow['poster'])) {
-                        $this->posterUrl = self::TVDB_URL.'/'.$tvdbShow['poster'];
+                        $this->posterUrl = self::TVDB_IMAGES_URL.'/'.$tvdbShow['poster'];
                     }
 
                     if (! empty($tvdbShow['fanart'])) {
-                        $this->fanartUrl = self::TVDB_URL.'/'.$tvdbShow['fanart'];
+                        $this->fanartUrl = self::TVDB_IMAGES_URL.'/'.$tvdbShow['fanart'];
                     }
 
                     if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
@@ -313,11 +314,11 @@ class TVDB extends TV
         $ri = new ReleaseImage();
 
         // Try to get the Poster
-        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '', false, $this->token);
+        $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '', false);
 
         // Couldn't get poster, try fan art instead
         if ($hasCover !== 1) {
-            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '', false, $this->token);
+            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath, '', '', false);
         }
         // Mark it retrieved if we saved an image
         if ($hasCover === 1) {
