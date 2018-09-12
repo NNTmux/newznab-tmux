@@ -180,20 +180,21 @@ abstract class Videos
             if (isset($res['id'])) {
                 return $res['id'];
             }
-        }
+        } else {
 
-        // If there was not an exact title match, look for title with missing chars
-        // example release name :Zorro 1990, tvrage name Zorro (1990)
-        // Only search if the title contains more than one word to prevent incorrect matches
-        $pieces = explode(' ', $title);
-        if (\count($pieces) > 1) {
-            $title2 = '%';
-            foreach ($pieces as $piece) {
-                $title2 .= str_replace(["'", '!'], '', $piece).'%';
-            }
-            $res = $this->getTitleLoose($title2, $type, $source);
-            if (isset($res['id'])) {
-                return $res['id'];
+            // If there was not an exact title match, look for title with missing chars
+            // example release name :Zorro 1990, tvrage name Zorro (1990)
+            // Only search if the title contains more than one word to prevent incorrect matches
+            $pieces = explode(' ', $title);
+            if (\count($pieces) > 1) {
+                $title2 = '%';
+                foreach ($pieces as $piece) {
+                    $title2 .= str_replace(["'", '!'], '', $piece).'%';
+                }
+                $res = $this->getTitleLoose($title2, $type, $source);
+                if (isset($res['id'])) {
+                    return $res['id'];
+                }
             }
         }
 
@@ -216,7 +217,7 @@ abstract class Videos
             }
             $return = $sql->first(['id']);
             // Try for an alias
-            if ($return === false) {
+            if (empty($return)) {
                 $sql = Video::query()
                     ->join('videos_aliases', 'videos.id', '=', 'videos_aliases.videos_id')
                     ->where(['videos.title' => $title, 'videos.type' => $type]);
@@ -252,7 +253,7 @@ abstract class Videos
             }
             $return = $sql->first(['id']);
             // Try for an alias
-            if ($return === null) {
+            if (empty($return)) {
                 $sql = Video::query()
                     ->join('videos_aliases', 'videos.id', '=', 'videos_aliases.videos_id')
                     ->where('videos_aliases.title', '=', rtrim($title, '%'))

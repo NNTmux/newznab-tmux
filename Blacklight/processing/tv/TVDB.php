@@ -87,8 +87,6 @@ class TVDB extends TV
         if ($this->echooutput && $tvCount > 0) {
             echo ColorCLI::header('Processing TVDB lookup for '.number_format($tvCount).' release(s).');
         }
-
-        if ($res instanceof \Traversable) {
             $this->titleCache = [];
 
             foreach ($res as $row) {
@@ -152,15 +150,15 @@ class TVDB extends TV
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
                         // Now that we have valid video and tvdb ids, try to get the poster
-                        if (! empty($tvdbShow['banner'])) {
-                            $this->posterUrl = self::TVDB_URL.'/'.$tvdbShow['banner'];
+                        if (! empty($tvdbShow['poster'])) {
+                            $this->posterUrl = self::TVDB_URL.'/'.$tvdbShow['poster'];
                         }
 
                         if (! empty($tvdbShow['fanart'])) {
                             $this->fanartUrl = self::TVDB_URL.'/'.$tvdbShow['fanart'];
                         }
 
-                        if (! empty($tvdbShow['banner']) || ! empty($tvdbShow['fanart'])) {
+                        if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
                             $this->getPoster($videoId, $tvDbId);
                         }
 
@@ -217,7 +215,6 @@ class TVDB extends TV
                     $this->titleCache[] = $release['cleanname'];
                 }
             }
-        }
     }
 
     /**
@@ -251,6 +248,7 @@ class TVDB extends TV
             $response = $this->client->search()->searchByName($cleanName);
         } catch (ResourceNotFoundException $e) {
             $response = false;
+            ColorCLI::doEcho(ColorCLI::notice('Show not found on TVDB'), true);
         }
 
         if ($response === false && $country !== '') {
@@ -392,7 +390,10 @@ class TVDB extends TV
      */
     protected function formatShowInfo($show): array
     {
-        //preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
+        $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
+        $fanart  = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
+        $imdbid = $this->client->series()->getById($show->id);
+        preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
 
         return [
             'type'      => parent::TYPE_TV,
@@ -400,8 +401,10 @@ class TVDB extends TV
             'summary'   => (string) $show->overview,
             'started'   => $show->firstAired,
             'publisher' => (string) $show->network,
+            'poster'    => $poster[0]->thumbnail ?? '',
+            'fanart'    => $fanart[0]->thumbnail ?? '',
             'source'    => parent::SOURCE_TVDB,
-            'imdb'      => 0,
+            'imdb'      => (int) ($imdb['imdbid'] ?? 0),
             'tvdb'      => (int) $show->id,
             'trakt'     => 0,
             'tvrage'    => 0,

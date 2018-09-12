@@ -1,4 +1,5 @@
 2018-09-12 DariusIII
+	* Chg: Update TVDB results handling
 	* Chg: Comment out the imdbid part of formatShowInfo function in TVDB class
 	* Chg: Switch to canihavesomecoffee/thetvdbapi for TheTVDB API searches
 	* Chg: Small cosmetic changes in some of the classes
