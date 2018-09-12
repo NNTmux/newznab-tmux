@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
@@ -74,26 +75,10 @@ class ReleaseImage
     {
         try {
             if ($token !== '') {
-                $file_data = file_get_contents(
-                    $imgLoc,
-                    false,
-                    stream_context_create(
-                        [
-                            'ssl' => [
-                                'verify_peer'      => false,
-                                'verify_peer_name' => false,
-                            ],
-                            'http' => [
-                                'method' => 'GET',
-                                'headers' => [
-                                    'Accept-language' => 'en',
-                                    'User-Agent' => 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
-                                    'Authorization'  => 'Bearer '.$token,
-                                ],
-                            ],
-                        ]
-                    )
-                );
+                $client = new Client();
+                $file_data = $client->get($imgLoc, ['headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                ]])->getBody();
             } else {
                 $file_data = $imgLoc;
             }
