@@ -4,63 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf04baca76c76e5d906867a4b7ffe011",
+    "content-hash": "2cf3b8208972ca72588c381e5900df5a",
     "packages": [
-        {
-            "name": "adrenth/thetvdb2",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/adrenth/thetvdb2.git",
-                "reference": "1b3f549497bfe7c032fdc026f7b45b700b313156"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/adrenth/thetvdb2/zipball/1b3f549497bfe7c032fdc026f7b45b700b313156",
-                "reference": "1b3f549497bfe7c032fdc026f7b45b700b313156",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^6.0",
-                "illuminate/support": "^5.3",
-                "php": ">=7.1",
-                "symfony/serializer": "^2.7|^3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8",
-                "symfony/var-dumper": "^3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Adrenth\\Thetvdb\\": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Alwin Drenth",
-                    "email": "adrenth@gmail.com"
-                }
-            ],
-            "description": "API v2 Client for thetvdb.com",
-            "homepage": "http://github.com/adrenth/thetvdb2",
-            "keywords": [
-                "api",
-                "library",
-                "thetvdb",
-                "thetvdb.com"
-            ],
-            "time": "2017-06-07T18:13:11+00:00"
-        },
         {
             "name": "aharen/omdbapi",
             "version": "v2.0.8",
@@ -1734,6 +1679,49 @@
                 "void"
             ],
             "time": "2017-07-16T21:09:25+00:00"
+        },
+        {
+            "name": "canihavesomecoffee/thetvdbapi",
+            "version": "1.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
+                "reference": "e50a0203335896eb925f61a12855bca1c0be703a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/e50a0203335896eb925f61a12855bca1c0be703a",
+                "reference": "e50a0203335896eb925f61a12855bca1c0be703a",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "php": ">=7.1",
+                "symfony/property-access": "^3.3",
+                "symfony/property-info": "^3.3",
+                "symfony/serializer": "^3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CanIHaveSomeCoffee\\TheTVDbAPI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "ISC"
+            ],
+            "authors": [
+                {
+                    "name": "Willem Van Iseghem (canihavesomecoffee)",
+                    "email": "thetvdbapi@canihavesome.coffee"
+                }
+            ],
+            "description": "PHP implementation for the 2nd version of the TheTVDb API.",
+            "time": "2018-05-19T09:06:38+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -6419,6 +6407,64 @@
             "time": "2018-08-28T06:17:42+00:00"
         },
         {
+            "name": "symfony/inflector",
+            "version": "v4.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/inflector.git",
+                "reference": "07810b5c88ec0c2e98972571a40a126b44664e13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/inflector/zipball/07810b5c88ec0c2e98972571a40a126b44664e13",
+                "reference": "07810b5c88ec0c2e98972571a40a126b44664e13",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Inflector\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bschussek@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Inflector Component",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "inflection",
+                "pluralize",
+                "singularize",
+                "string",
+                "symfony",
+                "words"
+            ],
+            "time": "2018-07-26T08:55:25+00:00"
+        },
+        {
             "name": "symfony/options-resolver",
             "version": "v4.1.4",
             "source": {
@@ -6646,6 +6692,65 @@
             "time": "2018-08-06T14:22:27+00:00"
         },
         {
+            "name": "symfony/polyfill-php70",
+            "version": "v1.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php70.git",
+                "reference": "1e24b0c4a56d55aaf368763a06c6d1c7d3194934"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/1e24b0c4a56d55aaf368763a06c6d1c7d3194934",
+                "reference": "1e24b0c4a56d55aaf368763a06c6d1c7d3194934",
+                "shasum": ""
+            },
+            "require": {
+                "paragonie/random_compat": "~1.0|~2.0|~9.99",
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php70\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ],
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 7.0+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2018-08-06T14:22:27+00:00"
+        },
+        {
             "name": "symfony/polyfill-php72",
             "version": "v1.9.0",
             "source": {
@@ -6800,6 +6905,150 @@
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
             "time": "2018-08-03T11:13:38+00:00"
+        },
+        {
+            "name": "symfony/property-access",
+            "version": "v3.4.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/property-access.git",
+                "reference": "8c892ce455ef55b3e22769cc27a7aa2e0983bff1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/property-access/zipball/8c892ce455ef55b3e22769cc27a7aa2e0983bff1",
+                "reference": "8c892ce455ef55b3e22769cc27a7aa2e0983bff1",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8",
+                "symfony/inflector": "~3.1|~4.0",
+                "symfony/polyfill-php70": "~1.0"
+            },
+            "require-dev": {
+                "symfony/cache": "~3.1|~4.0"
+            },
+            "suggest": {
+                "psr/cache-implementation": "To cache access methods."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\PropertyAccess\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony PropertyAccess Component",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "access",
+                "array",
+                "extraction",
+                "index",
+                "injection",
+                "object",
+                "property",
+                "property path",
+                "reflection"
+            ],
+            "time": "2018-08-24T10:16:13+00:00"
+        },
+        {
+            "name": "symfony/property-info",
+            "version": "v3.4.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/property-info.git",
+                "reference": "d6f72692e3bcfb263eaa1bdd04d15ddf0a32024e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/property-info/zipball/d6f72692e3bcfb263eaa1bdd04d15ddf0a32024e",
+                "reference": "d6f72692e3bcfb263eaa1bdd04d15ddf0a32024e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8",
+                "symfony/inflector": "~3.1|~4.0"
+            },
+            "conflict": {
+                "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
+                "phpdocumentor/type-resolver": "<0.3.0",
+                "symfony/dependency-injection": "<3.3"
+            },
+            "require-dev": {
+                "doctrine/annotations": "~1.0",
+                "phpdocumentor/reflection-docblock": "^3.0|^4.0",
+                "symfony/cache": "~3.1|~4.0",
+                "symfony/dependency-injection": "~3.3|~4.0",
+                "symfony/serializer": "~2.8|~3.0|~4.0"
+            },
+            "suggest": {
+                "phpdocumentor/reflection-docblock": "To use the PHPDoc",
+                "psr/cache-implementation": "To cache results",
+                "symfony/doctrine-bridge": "To use Doctrine metadata",
+                "symfony/serializer": "To use Serializer metadata"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\PropertyInfo\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kévin Dunglas",
+                    "email": "dunglas@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Property Info Component",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "doctrine",
+                "phpdoc",
+                "property",
+                "symfony",
+                "type",
+                "validator"
+            ],
+            "time": "2018-08-03T08:56:54+00:00"
         },
         {
             "name": "symfony/routing",
