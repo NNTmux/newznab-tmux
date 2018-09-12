@@ -401,7 +401,7 @@ class TVDB extends TV
             'started'   => $show->firstAired,
             'publisher' => (string) $show->network,
             'source'    => parent::SOURCE_TVDB,
-            //'imdb'      => (int) ($imdb['imdbid'] ?? 0),
+            'imdb'      => 0,
             'tvdb'      => (int) $show->id,
             'trakt'     => 0,
             'tvrage'    => 0,
