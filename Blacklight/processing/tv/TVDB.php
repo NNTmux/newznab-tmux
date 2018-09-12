@@ -392,7 +392,7 @@ class TVDB extends TV
      */
     protected function formatShowInfo($show): array
     {
-        preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
+        //preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
         return [
             'type'      => parent::TYPE_TV,
@@ -401,7 +401,7 @@ class TVDB extends TV
             'started'   => $show->firstAired,
             'publisher' => (string) $show->network,
             'source'    => parent::SOURCE_TVDB,
-            'imdb'      => (int) ($imdb['imdbid'] ?? 0),
+            //'imdb'      => (int) ($imdb['imdbid'] ?? 0),
             'tvdb'      => (int) $show->id,
             'trakt'     => 0,
             'tvrage'    => 0,
