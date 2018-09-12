@@ -87,134 +87,134 @@ class TVDB extends TV
         if ($this->echooutput && $tvCount > 0) {
             echo ColorCLI::header('Processing TVDB lookup for '.number_format($tvCount).' release(s).');
         }
-            $this->titleCache = [];
+        $this->titleCache = [];
 
-            foreach ($res as $row) {
-                $tvDbId = false;
+        foreach ($res as $row) {
+            $tvDbId = false;
 
-                // Clean the show name for better match probability
-                $release = $this->parseInfo($row['searchname']);
-                if (\is_array($release) && $release['name'] !== '') {
-                    if (\in_array($release['cleanname'], $this->titleCache, false)) {
-                        if ($this->echooutput) {
-                            echo ColorCLI::headerOver('Title: ').
+            // Clean the show name for better match probability
+            $release = $this->parseInfo($row['searchname']);
+            if (\is_array($release) && $release['name'] !== '') {
+                if (\in_array($release['cleanname'], $this->titleCache, false)) {
+                    if ($this->echooutput) {
+                        echo ColorCLI::headerOver('Title: ').
                                     ColorCLI::warningOver($release['cleanname']).
                                     ColorCLI::header(' already failed lookup for this site.  Skipping.');
-                        }
-                        $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
-                        continue;
                     }
+                    $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+                    continue;
+                }
 
-                    // Find the Video ID if it already exists by checking the title.
-                    $videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
+                // Find the Video ID if it already exists by checking the title.
+                $videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
 
-                    if ($videoId !== false) {
-                        $tvDbId = $this->getSiteByID('tvdb', $videoId);
-                    }
+                if ($videoId !== false) {
+                    $tvDbId = $this->getSiteByID('tvdb', $videoId);
+                }
 
-                    // Force local lookup only
-                    $lookupSetting = true;
-                    if ($local === true || $this->local === true) {
-                        $lookupSetting = false;
-                    }
+                // Force local lookup only
+                $lookupSetting = true;
+                if ($local === true || $this->local === true) {
+                    $lookupSetting = false;
+                }
 
-                    if ($tvDbId === false && $lookupSetting) {
+                if ($tvDbId === false && $lookupSetting) {
 
                         // If it doesnt exist locally and lookups are allowed lets try to get it.
-                        if ($this->echooutput) {
-                            echo ColorCLI::primaryOver('Video ID for ').
+                    if ($this->echooutput) {
+                        echo ColorCLI::primaryOver('Video ID for ').
                                 ColorCLI::headerOver($release['cleanname']).
                                 ColorCLI::primary(' not found in local db, checking web.');
-                        }
+                    }
 
-                        // Check if we have a valid country and set it in the array
-                        $country = (
+                    // Check if we have a valid country and set it in the array
+                    $country = (
                             isset($release['country']) && \strlen($release['country']) === 2
                             ? (string) $release['country']
                             : ''
                         );
 
-                        // Get the show from TVDB
-                        $tvdbShow = $this->getShowInfo((string) $release['cleanname'], $country);
+                    // Get the show from TVDB
+                    $tvdbShow = $this->getShowInfo((string) $release['cleanname'], $country);
 
-                        if (\is_array($tvdbShow)) {
-                            $tvdbShow['country'] = $country;
-                            $videoId = $this->add($tvdbShow);
-                            $tvDbId = (int) $tvdbShow['tvdb'];
-                        }
-                    } elseif ($this->echooutput && $tvDbId !== false) {
-                        echo ColorCLI::primaryOver('Video ID for ').
+                    if (\is_array($tvdbShow)) {
+                        $tvdbShow['country'] = $country;
+                        $videoId = $this->add($tvdbShow);
+                        $tvDbId = (int) $tvdbShow['tvdb'];
+                    }
+                } elseif ($this->echooutput && $tvDbId !== false) {
+                    echo ColorCLI::primaryOver('Video ID for ').
                             ColorCLI::headerOver($release['cleanname']).
                             ColorCLI::primary(' found in local db, attempting episode match.');
+                }
+
+                if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
+                    // Now that we have valid video and tvdb ids, try to get the poster
+                    if (! empty($tvdbShow['poster'])) {
+                        $this->posterUrl = self::TVDB_URL.'/'.$tvdbShow['poster'];
                     }
 
-                    if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
-                        // Now that we have valid video and tvdb ids, try to get the poster
-                        if (! empty($tvdbShow['poster'])) {
-                            $this->posterUrl = self::TVDB_URL.'/'.$tvdbShow['poster'];
-                        }
+                    if (! empty($tvdbShow['fanart'])) {
+                        $this->fanartUrl = self::TVDB_URL.'/'.$tvdbShow['fanart'];
+                    }
 
-                        if (! empty($tvdbShow['fanart'])) {
-                            $this->fanartUrl = self::TVDB_URL.'/'.$tvdbShow['fanart'];
-                        }
+                    if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
+                        $this->getPoster($videoId, $tvDbId);
+                    }
 
-                        if (! empty($tvdbShow['poster']) || ! empty($tvdbShow['fanart'])) {
-                            $this->getPoster($videoId, $tvDbId);
-                        }
+                    $seasonNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', $release['season']) : '');
+                    $episodeNo = (! empty($release['episode']) ? preg_replace('/^E0*/i', '', $release['episode']) : '');
 
-                        $seasonNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', $release['season']) : '');
-                        $episodeNo = (! empty($release['episode']) ? preg_replace('/^E0*/i', '', $release['episode']) : '');
+                    if ($episodeNo === 'all') {
+                        // Set the video ID and leave episode 0
+                        $this->setVideoIdFound($videoId, $row['id'], 0);
+                        echo ColorCLI::primary('Found TVDB Match for Full Season!');
+                        continue;
+                    }
 
-                        if ($episodeNo === 'all') {
-                            // Set the video ID and leave episode 0
-                            $this->setVideoIdFound($videoId, $row['id'], 0);
-                            echo ColorCLI::primary('Found TVDB Match for Full Season!');
-                            continue;
-                        }
+                    // Download all episodes if new show to reduce API/bandwidth usage
+                    if ($this->countEpsByVideoID($videoId) === false) {
+                        $this->getEpisodeInfo($tvDbId, -1, -1, '', $videoId);
+                    }
 
-                        // Download all episodes if new show to reduce API/bandwidth usage
-                        if ($this->countEpsByVideoID($videoId) === false) {
-                            $this->getEpisodeInfo($tvDbId, -1, -1, '', $videoId);
-                        }
+                    // Check if we have the episode for this video ID
+                    $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
-                        // Check if we have the episode for this video ID
-                        $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
-
-                        if ($episode === false && $lookupSetting) {
-                            // Send the request for the episode to TVDB
-                            $tvdbEpisode = $this->getEpisodeInfo(
+                    if ($episode === false && $lookupSetting) {
+                        // Send the request for the episode to TVDB
+                        $tvdbEpisode = $this->getEpisodeInfo(
                                 $tvDbId,
                                 $seasonNo,
                                 $episodeNo,
                                 $release['airdate']
                             );
 
-                            if ($tvdbEpisode) {
-                                $episode = $this->addEpisode($videoId, $tvdbEpisode);
-                            }
+                        if ($tvdbEpisode) {
+                            $episode = $this->addEpisode($videoId, $tvdbEpisode);
                         }
+                    }
 
-                        if ($episode !== false && is_numeric($episode) && $episode > 0) {
-                            // Mark the releases video and episode IDs
-                            $this->setVideoIdFound($videoId, $row['id'], $episode);
-                            if ($this->echooutput) {
-                                echo ColorCLI::primary('Found TVDB Match!');
-                            }
-                        } else {
-                            //Processing failed, set the episode ID to the next processing group
-                            $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+                    if ($episode !== false && is_numeric($episode) && $episode > 0) {
+                        // Mark the releases video and episode IDs
+                        $this->setVideoIdFound($videoId, $row['id'], $episode);
+                        if ($this->echooutput) {
+                            echo ColorCLI::primary('Found TVDB Match!');
                         }
                     } else {
                         //Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
-                        $this->titleCache[] = $release['cleanname'];
                     }
                 } else {
-                    //Parsing failed, take it out of the queue for examination
-                    $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
+                    //Processing failed, set the episode ID to the next processing group
+                    $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     $this->titleCache[] = $release['cleanname'];
                 }
+            } else {
+                //Parsing failed, take it out of the queue for examination
+                $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
+                $this->titleCache[] = $release['cleanname'];
             }
+        }
     }
 
     /**
@@ -391,7 +391,7 @@ class TVDB extends TV
     protected function formatShowInfo($show): array
     {
         $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-        $fanart  = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
+        $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
         $imdbid = $this->client->series()->getById($show->id);
         preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
 
