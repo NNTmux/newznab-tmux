@@ -157,7 +157,7 @@ class ReleaseRemover
         $this->delete = true;
         $this->ignoreUserCheck = false;
         // Time we started.
-        $this->timeStart = time();
+        $this->timeStart = now();
 
         // Start forming the query.
         $this->query = 'SELECT id, guid, searchname FROM releases WHERE 1=1';
@@ -191,7 +191,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            echo ColorCLI::header($this->consoleTools->convertTime(time() - $this->timeStart));
+            echo ColorCLI::header(now()->diffInSeconds($this->timeStart).' seconds');
         }
 
         return $this->browser
@@ -200,7 +200,7 @@ class ReleaseRemover
             ($this->delete ? 'Deleted ' : 'Would have deleted ').
             $this->deletedCount.
             ' release(s) in '.
-            $this->consoleTools->convertTime(time() - $this->timeStart)
+            now()->diffInSeconds($this->timeStart).' seconds'
             :
             true;
     }
@@ -218,7 +218,7 @@ class ReleaseRemover
      */
     public function removeCrap($delete, $time, $type = '', $blacklistID = '')
     {
-        $this->timeStart = time();
+        $this->timeStart = now();
         $this->delete = $delete;
         $this->blacklistID = '';
 
@@ -320,7 +320,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            echo ColorCLI::header($this->consoleTools->convertTime(time() - $this->timeStart));
+            echo ColorCLI::header(now()->diffInSeconds($this->timeStart).' seconds');
         }
 
         return $this->browser
@@ -329,7 +329,7 @@ class ReleaseRemover
             ($this->delete ? 'Deleted ' : 'Would have deleted ').
             $this->deletedCount.
             ' release(s) in '.
-            $this->consoleTools->convertTime(time() - $this->timeStart)
+            now()->diffInSeconds($this->timeStart).' seconds'
             :
             true;
     }
