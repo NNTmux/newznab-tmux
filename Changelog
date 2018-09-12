@@ -1,4 +1,5 @@
 2018-09-12 DariusIII
+	* Chg: Update some of the regexes in NameFixer to prevent bypassing of file extensions (ie. file.jpg.php)
 	* Chg: Use Carbon in place of time() for time calculations in ReleaseRemover class
 2018-09-11 DariusIII
 	* Chg: Update barracudanetworks/forkdaemon-php to version 1.1.1

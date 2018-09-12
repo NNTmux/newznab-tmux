@@ -1988,11 +1988,11 @@ class NameFixer
                 case preg_match('/^(.+?(19|20)\d\d\-([a-z0-9]{3}|[a-z]{2,}|C4))\\\\/i', $release->textstring, $result):
                     $this->updateRelease($release, $result['1'], $method = 'fileCheck: music groups', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/.+\\\\(.+\((19|20)\d\d\)\.avi)/i', $release->textstring, $result):
+                case preg_match('/.+\\\\(.+\((19|20)\d\d\)\.avi)$/i', $release->textstring, $result):
                     $newname = str_replace('.avi', ' DVDRip XVID NoGroup', $result['1']);
                     $this->updateRelease($release, $newname, $method = 'fileCheck: Movie (year) avi', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/.+\\\\(.+\((19|20)\d\d\)\.iso)/i', $release->textstring, $result):
+                case preg_match('/.+\\\\(.+\((19|20)\d\d\)\.iso)$/i', $release->textstring, $result):
                     $newname = str_replace('.iso', ' DVD NoGroup', $result['1']);
                     $this->updateRelease($release, $newname, $method = 'fileCheck: Movie (year) iso', $echo, $type, $nameStatus, $show);
                     break;
@@ -2005,14 +2005,14 @@ class NameFixer
                 case preg_match('/^.+?SDPORN/i', $release->textstring, $result):
                     $this->updateRelease($release, $result['0'], $method = 'fileCheck: XXX SDPORN', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/\w[-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)/i', $release->textstring, $result):
+                case preg_match('/\w[-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)$/i', $release->textstring, $result):
                     $result = str_replace('MPEG2', 'MPEG2.HDTV', $result['0']);
                     $this->updateRelease($release, $result, $method = 'fileCheck: R&C', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](480|720|1080)[ip][._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -]nSD[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[._ -]NhaNC3[-\w.\',;& ]+\w/i', $release->textstring, $result):
                     $this->updateRelease($release, $result['0'], $method = 'fileCheck: NhaNc3', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/\wtvp-[\w.\-\',;]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](720p|1080p|xvid)(?=\.(avi|mkv))/i', $release->textstring, $result):
+                case preg_match('/\wtvp-[\w.\-\',;]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](720p|1080p|xvid)(?=\.(avi|mkv))$/i', $release->textstring, $result):
                     $result = str_replace('720p', '720p.HDTV.X264', $result['0']);
                     $result = str_replace('1080p', '1080p.Bluray.X264', $result['0']);
                     $result = str_replace('xvid', 'XVID.DVDrip', $result['0']);
@@ -2027,7 +2027,7 @@ class NameFixer
                 case preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}[ex]\d{2}\s\-\s[\w.\-\',;].+\./i', $release->textstring, $result):
                     $this->updateRelease($release, $result['0'], $method = 'fileCheck: Title - SxxExx - Eptitle', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/\w.+?\)\.nds/i', $release->textstring, $result):
+                case preg_match('/\w.+?\)\.nds$/i', $release->textstring, $result):
                     $this->updateRelease($release, $result['0'], $method = 'fileCheck: ).nds Nintendo DS', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/3DS_\d{4}.+\d{4} - (.+?)\.3ds/i', $release->textstring, $result):
@@ -2121,7 +2121,7 @@ class NameFixer
                 $media = $match[1];
                 if (preg_match(self::PREDB_REGEX, $media, $match)) {
                     $newName = $match[1];
-                } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?/i', $media, $match)) {
+                } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?$/i', $media, $match)) {
                     $newName = $match[1];
                 } else {
                     $newName = $media;
@@ -2225,7 +2225,7 @@ class NameFixer
             );
 
             foreach ($result as $res) {
-                if (preg_match('/^(.*)\.srr/i', $res->textstring, $match)) {
+                if (preg_match('/^(.*)\.srr$/i', $res->textstring, $match)) {
                     $this->updateRelease(
                             $release,
                             $match['1'],
