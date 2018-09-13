@@ -144,7 +144,7 @@
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
-    "jrean/laravel-user-verification": "dev-master",
+    "jrean/laravel-user-verification": "^7.0",
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.7.*",
     "laravel/scout": "^4.0",

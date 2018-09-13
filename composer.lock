@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb91b5941bd60f9d7a23fbf5aa130611",
+    "content-hash": "9b5fcf01653d5163e9d17ea57e79cc2c",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3439,16 +3439,16 @@
         },
         {
             "name": "jrean/laravel-user-verification",
-            "version": "dev-master",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jrean/laravel-user-verification.git",
-                "reference": "56139df949d71bd02c0443ada7ec563da288cca4"
+                "reference": "492b55be1593de844295094b16666d583c144020"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/56139df949d71bd02c0443ada7ec563da288cca4",
-                "reference": "56139df949d71bd02c0443ada7ec563da288cca4",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/492b55be1593de844295094b16666d583c144020",
+                "reference": "492b55be1593de844295094b16666d583c144020",
                 "shasum": ""
             },
             "require": {
@@ -3498,7 +3498,7 @@
                 "user activation",
                 "user verification"
             ],
-            "time": "2018-09-12T13:20:35+00:00"
+            "time": "2018-09-13T10:21:07+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",
@@ -10606,7 +10606,6 @@
         "b3rs3rk/steamfront": 20,
         "dborsatto/php-giantbomb": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "jrean/laravel-user-verification": 20,
         "mayconbordin/l5-fixtures": 20,
         "nzedb/git.php": 20
     },

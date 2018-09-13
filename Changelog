@@ -1,4 +1,5 @@
 2018-09-13 DariusIII
+	* Chg: Update jrean/laravel-user-verification to version 7.0.0
 	* Chg: Update README
 	* Chg: Fix misplaced seconds word in ProcessReleases class
 	* Chg: Prevent errors on missing images on TVDB
