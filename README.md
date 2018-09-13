@@ -49,9 +49,9 @@ The installation guides have more detailed software requirements.
 
 Most (if not all) distributions ship MySQL with a default configuration that will perform well on a Raspberry Pi. If you wish to store more that 500K releases, these default settings will quickly lead to poor performance. Expect this.
 
-As a general rule of thumb the database will need a minimum of 1-2G buffer RAM for every million releases you intend to store. That RAM should be assigned to either of these two parameters:
-- key_buffer_size			(MyISAM)
-- innodb_buffer_pool_size	(InnoDB)
+As a general rule of thumb the database will need a minimum of 1-2G buffer RAM for every million releases you intend to store. That RAM should be assigned to this parameter:
+
+- innodb_buffer_pool_size
 
 Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommendations for these and other important tuner parameters. Also refer to the nZEDb project's wiki page: https://github.com/nZEDb/nZEDb/wiki/Database-tuning. This is particularly important before you start any large imports or backfills.
 
@@ -72,35 +72,11 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
 
 ### Licenses
 
- NNTmux is GPL v3. See /docs/LICENSE.txt for the full license.
+ NNTmux is GPL v3. See LICENSE.txt for the full license.
 
  Other licenses by various software used by NNTmux:
 
- Git.php => MIT and GPL v3
-
  Net_NNTP => W3C
-
- PHPMailer => GNU Lesser General Public License
-
- forkdaemon-php => Barracuda Networks, Inc.
-
- getid3 => GPL v3
-
- password_compat => Anthony Ferrara
-
- rarinfo => Modified BSD
-
- smarty => GNU Lesser General Public v2.1
-
- AmazonProductAPI.php => Sameer Borate
-
- GiantBombAPI.php => MIT
-
- TMDb PHP API class => BSD
-
- TVDB PHP API => Moinax
-
- TVMaze PHP API => JPinkney
 
  Zip file creation class => No license specified.
 
@@ -108,11 +84,7 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
 
  All external libraries will have their full licenses in their respectful folders.
 
- Some licenses might have been missed in this document for various external software, they will be included in their respectful folders.
- 
- 
-### Support this project
-<a href="https://flattr.com/submit/auto?fid=jegg95&url=https%3A%2F%2Fgithub.com%2FNNTmux%2Fnewznab-tmux" target="_blank"><img src="http://button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
 
-<a href="https://www.patreon.com/DariusIII" target="_blank"><img src="https://github.com/discourse/discourse-patreon/blob/master/public/images/patreon-wordmark-navy.png" alt="Support us on Patreon" title="Support us on Patreon" border="0" style="max-width:20%;"></a>
+
+
 
