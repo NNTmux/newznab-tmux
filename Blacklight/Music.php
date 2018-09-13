@@ -544,8 +544,7 @@ class Music
     /**
      * @param $title
      *
-     * @return bool|mixed
-     * @throws \Exception
+     * @return false|mixed
      */
     public function fetchAmazonProperties($title)
     {
@@ -562,7 +561,7 @@ class Music
                 ->setAssociateTag($this->asstag)
                 ->setRequest($request)
                 ->setResponseTransformer(new XmlToSimpleXmlObject());
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             echo $e->getMessage();
         }
 
@@ -574,7 +573,7 @@ class Music
             $search->setKeywords($title);
             $search->setResponseGroup(['Large']);
             $responses = $apaiIo->runOperation($search);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Empty because we try another method.
         }
 
@@ -587,7 +586,7 @@ class Music
                 $search->setKeywords($title);
                 $search->setResponseGroup(['Large']);
                 $responses = $apaiIo->runOperation($search);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Empty because we try another method.
             }
         }
@@ -601,7 +600,7 @@ class Music
                 $search->setKeywords($title);
                 $search->setResponseGroup(['Large']);
                 $responses = $apaiIo->runOperation($search);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Empty because we try another method.
             }
         }
@@ -615,7 +614,7 @@ class Music
                 $search->setKeywords($title);
                 $search->setResponseGroup(['Large']);
                 $responses = $apaiIo->runOperation($search);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Empty because we exhausted all possibilities.
             }
         }

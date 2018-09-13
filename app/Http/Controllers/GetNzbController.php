@@ -56,13 +56,6 @@ class GetNzbController extends BasePageController
         if ($request->has('id')) {
             str_ireplace('.nzb', '', $request->input('id'));
         }
-        //
-        // A hash of the users ip to record against the download
-        //
-        $hosthash = '';
-        if ((int) Settings::settingValue('..storeuserips') === 1) {
-            $hosthash = User::getHostHash($request->ip(), Settings::settingValue('..siteseed'));
-        }
 
         // Check download limit on user role.
         $requests = UserDownload::getDownloadRequests($uid);

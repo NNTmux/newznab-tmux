@@ -52,6 +52,7 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
+        $error = '';
         $user = User::getByUsername($request->input('username'));
 
         if ($user !== null && \Firewall::isBlacklisted($user->host) === false) {
@@ -69,23 +70,32 @@ class LoginController extends Controller
                 $login_type => $request->input('username'),
             ]);
 
+            if ($user->isVerified() === false || $user->isPendingVerification()) {
+                return $this->showLoginForm('You have not verified your email address!');
+            }
+
             if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                User::updateSiteAccessed(Auth::id(), (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
                 return redirect()->intended($this->redirectPath());
             }
+
+            $error = 'Username/email and password combination used does not match our records!';
+        } else {
+            $error = 'Username or email used do not match our records!';
         }
 
-        return redirect()->back();
+        return $this->showLoginForm($error);
     }
 
     /**
-     * @throws \Exception
+     * @param string $error
+     * @param string $notice
      */
-    public function showLoginForm()
+    public function showLoginForm($error = '', $notice = '')
     {
         $theme = Settings::settingValue('site.main.style');
-        app('smarty.view')->assign(['error' => '', 'username' => '', 'rememberme' => '']);
+        app('smarty.view')->assign(['error' => $error, 'notice' => $notice, 'username' => '', 'rememberme' => '']);
 
         $meta_title = 'Login';
         $meta_keywords = 'Login';

@@ -281,11 +281,13 @@ class ProcessReleases
 
     /**
      * @param $groupID
+     *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function processIncompleteCollections($groupID): void
     {
-        $startTime = time();
+        $startTime = now();
         $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
@@ -317,7 +319,7 @@ class ProcessReleases
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    $this->consoleTools->convertTime(time() - $startTime)
+                    now()->diffInSeconds($startTime).' seconds'
                 ),
                 true
             );
@@ -331,7 +333,7 @@ class ProcessReleases
      */
     public function processCollectionSizes($groupID): void
     {
-        $startTime = time();
+        $startTime = now();
         $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
@@ -365,7 +367,7 @@ class ProcessReleases
                 ),
                 true
             );
-            ColorCLI::doEcho(ColorCLI::primary($this->consoleTools->convertTime(time() - $startTime)), true);
+            ColorCLI::doEcho(ColorCLI::primary(now()->diffInSeconds($startTime).' seconds'), true);
         }
     }
 
@@ -377,7 +379,7 @@ class ProcessReleases
      */
     public function deleteUnwantedCollections($groupID): void
     {
-        $startTime = time();
+        $startTime = now();
         $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
@@ -498,7 +500,7 @@ class ProcessReleases
                     $minSizeDeleted.' smaller than, '.
                     $maxSizeDeleted.' bigger than, '.
                     $minFilesDeleted.' with less files than site/group settings in: '.
-                    $this->consoleTools->convertTime(time() - $startTime)
+                    now()->diffInSeconds($startTime).' seconds'
                 ),
                 true
             );
@@ -533,7 +535,7 @@ class ProcessReleases
      */
     public function createReleases($groupID): array
     {
-        $startTime = time();
+        $startTime = now();
         $this->initiateTableNames($groupID);
 
         $categorize = new Categorize();
@@ -716,7 +718,7 @@ class ProcessReleases
                     ' Releases added and '.
                     number_format($duplicate).
                     ' duplicate collections deleted in '.
-                    $this->consoleTools->convertTime(time() - $startTime)
+                    now()->diffInSeconds($startTime).' seconds'
                 ),
                 true
             );
@@ -735,7 +737,7 @@ class ProcessReleases
      */
     public function createNZBs($groupID): int
     {
-        $startTime = time();
+        $startTime = now();
         $this->formFromNamesQuery();
 
         if ($this->echoCLI) {
@@ -773,14 +775,14 @@ class ProcessReleases
             }
         }
 
-        $totalTime = (time() - $startTime);
+        $totalTime = now()->diffInSeconds($startTime);
 
         if ($this->echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
-                    'Total time: '.ColorCLI::primary($this->consoleTools->convertTime($totalTime)).PHP_EOL
+                    'Total time: '.ColorCLI::primary($totalTime.' seconds')
                 ),
                 true
             );
@@ -800,7 +802,7 @@ class ProcessReleases
      */
     public function categorizeReleases($categorize, $groupID = ''): void
     {
-        $startTime = time();
+        $startTime = now();
         if ($this->echoCLI) {
             echo ColorCLI::header('Process Releases -> Categorize releases.');
         }
@@ -822,7 +824,7 @@ class ProcessReleases
         );
 
         if ($this->echoCLI) {
-            ColorCLI::doEcho(ColorCLI::primary($this->consoleTools->convertTime(time() - $startTime)), true);
+            ColorCLI::doEcho(ColorCLI::primary(now()->diffInSeconds($startTime).' seconds'), true);
         }
     }
 
@@ -858,7 +860,7 @@ class ProcessReleases
      */
     public function deleteCollections($groupID): void
     {
-        $startTime = time();
+        $startTime = now();
         $this->initiateTableNames($groupID);
 
         $deletedCount = 0;
@@ -892,12 +894,12 @@ class ProcessReleases
             $deletedCount += $deleted;
         }
 
-        $firstQuery = $fourthQuery = time();
+        $firstQuery = $fourthQuery = now();
 
         if ($this->echoCLI) {
             echo ColorCLI::primary(
                 'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                ($firstQuery - $startTime).' seconds.'.PHP_EOL
+                $firstQuery->diffInSeconds($startTime).' seconds.'.PHP_EOL
             );
         }
 
@@ -933,12 +935,12 @@ class ProcessReleases
                 $deletedCount += $deleted;
             }
 
-            $secondQuery = time();
+            $secondQuery = now();
 
             if ($this->echoCLI) {
                 echo ColorCLI::primary(
                     'Finished deleting '.$deleted.' orphaned collections in '.
-                    ($secondQuery - $firstQuery).' seconds.'.PHP_EOL
+                    $secondQuery->diffInSeconds($firstQuery).' seconds.'.PHP_EOL
                 );
             }
 
@@ -970,12 +972,12 @@ class ProcessReleases
                 $deletedCount += $deleted;
             }
 
-            $thirdQuery = time();
+            $thirdQuery = now();
 
             if ($this->echoCLI) {
                 echo ColorCLI::primary(
                     'Finished deleting '.$deleted.' binaries with no collections or parts in '.
-                    ($thirdQuery - $secondQuery).' seconds.'
+                    $thirdQuery->diffInSeconds($secondQuery).' seconds.'
                 );
             }
 
@@ -1006,12 +1008,12 @@ class ProcessReleases
                 $deletedCount += $deleted;
             }
 
-            $fourthQuery = time();
+            $fourthQuery = now();
 
             if ($this->echoCLI) {
                 echo ColorCLI::primary(
                     'Finished deleting '.$deleted.' parts with no binaries in '.
-                    ($fourthQuery - $thirdQuery).' seconds.'.PHP_EOL
+                    $fourthQuery->diffInSeconds($thirdQuery).' seconds.'.PHP_EOL
                 );
             }
         } // done cleaning up Binaries/Parts orphans
@@ -1056,11 +1058,11 @@ class ProcessReleases
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     'Finished deleting '.$deleted.' collections missed after NZB creation in '.
-                    (time() - $fourthQuery).' seconds.'.PHP_EOL.
+                    now()->diffInSeconds($fourthQuery).' seconds.'.PHP_EOL.
                     'Removed '.
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
-                    $this->consoleTools->convertTime($fourthQuery - $startTime).PHP_EOL
+                    $fourthQuery->diffInSeconds($startTime).' seconds'
                 ),
                 true
             );
@@ -1078,7 +1080,7 @@ class ProcessReleases
      */
     public function deletedReleasesByGroup($groupID = ''): void
     {
-        $startTime = time();
+        $startTime = now();
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
         if ($this->echoCLI) {
@@ -1157,7 +1159,7 @@ class ProcessReleases
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
-                    $this->consoleTools->convertTime(time() - $startTime)
+                    now()->diffInSeconds($startTime).' seconds'
                 ),
                 true
             );
@@ -1173,7 +1175,7 @@ class ProcessReleases
      */
     public function deleteReleases(): void
     {
-        $startTime = time();
+        $startTime = now();
         $genres = new Genres();
         $passwordDeleted = $duplicateDeleted = $retentionDeleted = $completionDeleted = $disabledCategoryDeleted = 0;
         $disabledGenreDeleted = $miscRetentionDeleted = $miscHashedDeleted = $categoryMinSizeDeleted = 0;
@@ -1395,7 +1397,7 @@ class ProcessReleases
                 ColorCLI::doEcho(
                     ColorCLI::primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
-                        $this->consoleTools->convertTime(time() - $startTime)
+                        now()->diffInSeconds($startTime).' seconds'
                     ),
                     true
                 );

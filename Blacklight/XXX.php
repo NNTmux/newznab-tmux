@@ -25,7 +25,7 @@ class XXX
      *
      * @var string
      */
-    protected $whichclass = '';
+    protected $whichClass = '';
 
     /**
      * Current title being passed through various sites/api's.
@@ -37,7 +37,7 @@ class XXX
     /**
      * @var bool
      */
-    protected $echooutput;
+    protected $echoOutput;
 
     /**
      * @var string
@@ -52,7 +52,7 @@ class XXX
     /**
      * @var int|null|string
      */
-    protected $movieqty;
+    protected $movieQty;
 
     /**
      * @var string
@@ -85,9 +85,9 @@ class XXX
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->pdo = DB::connection()->getPdo();
 
-        $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
+        $this->movieQty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = (new Releases())->showPasswords();
-        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->imgSavePath = NN_COVERS.'xxx'.DS;
         $this->cookie = NN_TMP.'xxx.cookie';
     }
@@ -118,9 +118,9 @@ class XXX
      */
     public function getXXXRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
     {
-        $catsrch = '';
+        $catSrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = Category::getCategorySearch($cat);
+            $catSrch = Category::getCategorySearch($cat);
         }
         $order = $this->getXXXOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -140,7 +140,7 @@ class XXX
 				ORDER BY %s %s %s",
                 $this->showPasswords,
                 $this->getBrowseBy(),
-                $catsrch,
+                $catSrch,
                 (
                 $maxAge > 0
                     ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
@@ -204,7 +204,7 @@ class XXX
             (\is_array($xxxIDs) ? implode(',', $xxxIDs) : -1),
             $this->showPasswords,
             $this->getBrowseBy(),
-            $catsrch,
+            $catSrch,
             (
             $maxAge > 0
                 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
@@ -431,33 +431,29 @@ class XXX
     /**
      * Inserts Trailer Code by Class.
      *
-     * @param $whichclass
+     * @param $whichClass
      * @param $res
      *
      * @return string
      */
-    public function insertSwf($whichclass, $res): string
+    public function insertSwf($whichClass, $res): string
     {
         $ret = '';
-        if ($whichclass === 'ade') {
-            if (! empty($res)) {
-                $trailers = unserialize($res, 'ade');
-                $ret .= "<object width='360' height='240' type='application/x-shockwave-flash' id='EmpireFlashPlayer' name='EmpireFlashPlayer' data='".$trailers['url']."'>";
-                $ret .= "<param name='flashvars' value= 'streamID=".$trailers['streamid'].'&amp;autoPlay=false&amp;BaseStreamingUrl='.$trailers['baseurl']."'>";
-                $ret .= '</object>';
+        if (($whichClass === 'ade') && ! empty($res)) {
+            $trailers = unserialize($res, 'ade');
+            $ret .= "<object width='360' height='240' type='application/x-shockwave-flash' id='EmpireFlashPlayer' name='EmpireFlashPlayer' data='".$trailers['url']."'>";
+            $ret .= "<param name='flashvars' value= 'streamID=".$trailers['streamid'].'&amp;autoPlay=false&amp;BaseStreamingUrl='.$trailers['baseurl']."'>";
+            $ret .= '</object>';
 
-                return $ret;
-            }
+            return $ret;
         }
-        if ($whichclass === 'pop') {
-            if (! empty($res)) {
-                $trailers = unserialize($res, 'pop');
-                $ret .= "<embed id='trailer' width='480' height='360'";
-                $ret .= "flashvars='".$trailers['flashvars']."' allowfullscreen='true' allowscriptaccess='always' quality='high' name='trailer' style='undefined'";
-                $ret .= "src='".$trailers['baseurl']."' type='application/x-shockwave-flash'>";
+        if (($whichClass === 'pop') && ! empty($res)) {
+            $trailers = unserialize($res, 'pop');
+            $ret .= "<embed id='trailer' width='480' height='360'";
+            $ret .= "flashvars='".$trailers['flashvars']."' allowfullscreen='true' allowscriptaccess='always' quality='high' name='trailer' style='undefined'";
+            $ret .= "src='".$trailers['baseurl']."' type='application/x-shockwave-flash'>";
 
-                return $ret;
-            }
+            return $ret;
         }
 
         return $ret;
@@ -473,14 +469,14 @@ class XXX
     {
         $cover = $backdrop = 0;
         $xxxID = -2;
-        $this->whichclass = 'aebn';
+        $this->whichClass = 'aebn';
         $mov = new AEBN();
         $mov->cookie = $this->cookie;
         ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'), true);
         $res = $mov->processSite($movie);
 
         if ($res === false) {
-            $this->whichclass = 'pop';
+            $this->whichClass = 'pop';
             $mov = new Popporn();
             $mov->cookie = $this->cookie;
             ColorCLI::doEcho(ColorCLI::info('Checking PopPorn for movie info'), true);
@@ -488,7 +484,7 @@ class XXX
         }
 
         if ($res === false) {
-            $this->whichclass = 'adm';
+            $this->whichClass = 'adm';
             $mov = new ADM();
             $mov->cookie = $this->cookie;
             ColorCLI::doEcho(ColorCLI::info('Checking ADM for movie info'), true);
@@ -496,14 +492,14 @@ class XXX
         }
 
         if ($res === false) {
-            $this->whichclass = 'ade';
+            $this->whichClass = 'ade';
             $mov = new ADE();
             ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'), true);
             $res = $mov->processSite($movie);
         }
 
         if ($res === false) {
-            $this->whichclass = 'hotm';
+            $this->whichClass = 'hotm';
             $mov = new Hotmovies();
             $mov->cookie = $this->cookie;
             ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'), true);
@@ -512,8 +508,8 @@ class XXX
 
         // If a result is true getAll information.
         if ($res) {
-            if ($this->echooutput) {
-                switch ($this->whichclass) {
+            if ($this->echoOutput) {
+                switch ($this->whichClass) {
                     case 'aebn':
                         $fromstr = 'Adult Entertainment Broadcast Network';
                         break;
@@ -556,7 +552,7 @@ class XXX
             'director'    => ! empty($res['director']) ? html_entity_decode($res['director'], ENT_QUOTES, 'UTF-8') : '',
             'actors'      => ! empty($res['cast']) ? html_entity_decode($res['cast'], ENT_QUOTES, 'UTF-8') : '',
             'directurl'   => ! empty($res['directurl']) ? html_entity_decode($res['directurl'], ENT_QUOTES, 'UTF-8') : '',
-            'classused'   => $this->whichclass,
+            'classused'   => $this->whichClass,
         ];
 
         $check = XxxInfo::query()->where('title', $mov['title'])->first(['id']);
@@ -610,7 +606,7 @@ class XXX
             XxxInfo::query()->where('id', $xxxID)->update(['cover' => $cover, 'backdrop' => $backdrop]);
         }
 
-        if ($this->echooutput) {
+        if ($this->echoOutput) {
             ColorCLI::doEcho(
                 ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))),
                 true
@@ -642,13 +638,13 @@ class XXX
                 Category::XXX_WEBDL,
             ]
             )
-            ->limit($this->movieqty)
+            ->limit($this->movieQty)
             ->get(['searchname', 'id']);
 
         $movieCount = \count($res);
 
         if ($movieCount > 0) {
-            if ($this->echooutput) {
+            if ($this->echoOutput) {
                 ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' XXX releases.'), true);
             }
 
@@ -660,7 +656,7 @@ class XXX
                 if ($this->parseXXXSearchName($arr['searchname']) !== false) {
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
-                        if ($this->echooutput) {
+                        if ($this->echoOutput) {
                             ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($this->currentTitle), true);
                         }
 
@@ -678,7 +674,7 @@ class XXX
                     ->whereIn('categories_id', [Category::XXX_DVD, Category::XXX_WMV, Category::XXX_XVID, Category::XXX_X264, Category::XXX_SD, Category::XXX_CLIPHD, Category::XXX_CLIPSD, Category::XXX_WEBDL])
                     ->update(['xxxinfo_id' => $idcheck]);
             }
-        } elseif ($this->echooutput) {
+        } elseif ($this->echoOutput) {
             ColorCLI::doEcho(ColorCLI::header('No xxx releases to process.'), true);
         }
     }

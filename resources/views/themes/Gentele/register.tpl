@@ -8,7 +8,7 @@
 	{if isset($sent) && $sent != ''}
 		<div class="alert alert-info">A link to reset your password has been sent to your e-mail account.</div>
 	{/if}
-	{if $showregister != "0"}
+	{if $showregister == 1}
 		<div class="register-box">
 			<div class="register-logo">
 				<a href="{$serverroot}"><b>{$site->title}</b></a>

@@ -76,8 +76,7 @@ class Git extends \GitRepo
     /**
      * @param $gitObject
      *
-     * @return bool
-     * @throws \Exception
+     * @return false|bool
      */
     public function isCommited($gitObject)
     {
@@ -85,12 +84,12 @@ class Git extends \GitRepo
 
         try {
             $result = $this->run($cmd);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $message = explode("\n", $e->getMessage());
             if ($message[0] === "fatal: Not a valid object name $gitObject") {
                 $result = false;
             } else {
-                throw new \Exception($message);
+                throw new \RuntimeException($message);
             }
         }
 

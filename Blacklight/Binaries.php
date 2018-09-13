@@ -440,10 +440,10 @@ class Binaries
                 ColorCLI::doEcho(
                     ColorCLI::primary(
                         (
-                            (int) $groupMySQL['last_record'] === 0
+                        (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
                             (
-                                $this->_newGroupScanByDays
+                            $this->_newGroupScanByDays
                                 ? $this->_newGroupDaysToScan.' days'
                                 : number_format($this->_newGroupMessagesToScan).' messages'
                             ).' worth.'
@@ -1239,13 +1239,13 @@ class Binaries
         // Remove articles that we cant fetch after x attempts.
         DB::transaction(function () use ($groupArr, $tableNames) {
             DB::delete(
-            sprintf(
-                'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
-                $tableNames['prname'],
-                $this->_partRepairMaxTries,
-                $groupArr['id']
-            )
-        );
+                sprintf(
+                    'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
+                    $tableNames['prname'],
+                    $this->_partRepairMaxTries,
+                    $groupArr['id']
+                )
+            );
         }, 3);
     }
 

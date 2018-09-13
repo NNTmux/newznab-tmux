@@ -208,9 +208,7 @@ class CollectionsCleaning
     }
 
     /**
-     * Generic regexes for music groups.
-     *
-     * @return bool
+     * @return string|false
      */
     protected function musicSubject()
     {

@@ -14,17 +14,10 @@ class AniDB
     public $pdo;
 
     /**
-     * @param array $options Class instances / Echo to cli.
-     * @throws \Exception
+     * AniDB constructor.
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo'     => false,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
         $this->pdo = DB::connection()->getPdo();
     }
 
@@ -109,7 +102,7 @@ class AniDB
      *
      * @return array
      */
-    public function getAnimeList($letter = '', $animetitle = '')
+    public function getAnimeList($letter = '', $animetitle = ''): array
     {
         $rsql = $tsql = '';
 
@@ -151,7 +144,7 @@ class AniDB
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getAnimeRange($animetitle = '')
+    public function getAnimeRange($animetitle = ''): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = AnidbTitle::query()
             ->where('at.lang', '=', 'en');

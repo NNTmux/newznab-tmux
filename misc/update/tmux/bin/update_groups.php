@@ -9,7 +9,7 @@ use App\Models\ShortGroup;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
-$start = time();
+$start = now();
 $consoleTools = new ConsoleTools();
 
 // Create the connection here and pass
@@ -44,4 +44,4 @@ foreach ($data as $newgroup) {
     }
 }
 
-ColorCLI::doEcho(ColorCLI::header('Running time: '.$consoleTools->convertTimer(time() - $start)));
+ColorCLI::doEcho(ColorCLI::header('Running time: '.now()->diffInSeconds($start).' seconds'), true);

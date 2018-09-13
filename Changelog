@@ -1,3 +1,54 @@
+2018-09-13 DariusIII
+	* Chg: Update jrean/laravel-user-verification to version 7.0.0
+	* Chg: Update README
+	* Chg: Fix misplaced seconds word in ProcessReleases class
+	* Chg: Prevent errors on missing images on TVDB
+	* Chg: Update scripts to use now() helper
+	* Chg: Use now() helper and related functions for time calculations in ProcessReleases class
+	* Chg: Update laravel/framework to version 5.7
+	* Chg: Update smarty/smarty to version 3.1.33
+2018-09-12 DariusIII
+	* Fix: Fix fetching of images from TheTVDB
+	* Chg: Update TVDB results handling
+	* Chg: Comment out the imdbid part of formatShowInfo function in TVDB class
+	* Chg: Switch to canihavesomecoffee/thetvdbapi for TheTVDB API searches
+	* Chg: Small cosmetic changes in some of the classes
+	* Chg: Add genealabs/laravel-caffeine again, update to version 0.7.1
+	* Chg: Update some of the regexes in NameFixer to prevent bypassing of file extensions (ie. file.jpg.php)
+	* Chg: Use Carbon in place of time() for time calculations in ReleaseRemover class
+2018-09-11 DariusIII
+	* Chg: Update barracudanetworks/forkdaemon-php to version 1.1.1
+	* Fix: Fix AniDB initialization in DetailsController
+	* Chg: Remove $page variable from AnidbController
+	* Chg: Update Blacklight\AniDB class
+	* Chg: Update NZBImport class
+	* Chg: Update swiftmailer/swiftmailer to version 6.1.3
+	* Chg: Update XXX class
+	* Chg: Update ReleaseSearch class remove unused constants and add return type declarations
+	* Chg: Update Releases class, add return type declarations and update PHPDOC blocks
+	* Chg: Update spatie/laravel-permission to version 2.19.0
+2018-09-10 DariusIII
+	* Chg: Catch Throwable in place of Exceptions
+	* Chg: Update return types for Php yenc decode function
+	* Chg: Update Php yenc adapter
+	* Fix: Fix wrong check for result from query in password reset controller
+2018-09-09 DariusIII
+	* Chg: Update filp/whoops to version 2.2.1
+2018-09-08 DariusIII
+	* Fix: Fix failed releases handling
+2018-09-07 DariusIII
+	* Chg: Use transaction function for inserts in Binaries class
+	* Chg: Add email verification message to login page for non-verified users
+	* Fix: Fix displaying errors on registration page
+	* Fix: Display login errors
+	* Chg: Update ytake/laravel-smarty to version 2.4.0
+2018-09-06 DariusIII
+	* Chg: Update spatie/laravel-permission and barryvdh/laravel-ide-helper to latest versions
+	* Fix: Fix wrong Category model function usage in rest of controllers
+	* Fix: Fix wrong Category model function usage in BookController
+	* Chg: Remove unused hostHash function from User model
+	* Chg: Remove unused code from GetNzbController
+	* Chg: Update psy/psysh to latest version
 2018-09-05 DariusIII
 	* Chg: Add powerline directly from ubuntu repo and use it in tmux
 	* Chg: Update tmux.conf, add credit where credit is due

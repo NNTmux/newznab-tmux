@@ -28,7 +28,7 @@ class AnidbController extends BasePageController
 
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
 
-        $anidblist = $AniDB->getAnimeRange($page, $aname);
+        $anidblist = $AniDB->getAnimeRange($aname);
         $this->smarty->assign('anidblist', $anidblist);
 
         $content = $this->smarty->fetch('anidb-list.tpl');
@@ -42,38 +42,6 @@ class AnidbController extends BasePageController
         );
 
         $this->adminrender();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**

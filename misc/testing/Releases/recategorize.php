@@ -46,18 +46,17 @@ function reCategorize($argv)
     } else {
         echo ColorCLI::header('Categorizing all releases using searchname. This can take a while, be patient.');
     }
-    $timestart = time();
+    $timestart = now();
     if (isset($argv[1]) && (is_numeric($argv[1]) || $argv[1] === 'misc')) {
         $chgcount = categorizeRelease(str_replace(' AND', 'WHERE', $where), $update, true);
     } else {
         $chgcount = categorizeRelease('', $update, true);
     }
-    $consoletools = new ConsoleTools();
-    $time = $consoletools->convertTime(time() - $timestart);
+    $time = now()->diffInSeconds($timestart);
     if ($update === true) {
         echo ColorCLI::header('Finished re-categorizing '.number_format($chgcount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
     } else {
-        echo ColorCLI::header('Finished re-categorizing in '.$time.' , using the searchname.'.PHP_EOL
+        echo ColorCLI::header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
             .'This would have changed '.number_format($chgcount).' releases but no updates were done.'.PHP_EOL);
     }
 }

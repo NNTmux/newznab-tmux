@@ -66,38 +66,13 @@ class ReleaseImage
 
     /**
      * @param        $imgLoc
-     * @param string $token
      *
      * @return bool|\Intervention\Image\Image
      */
-    protected function fetchImage($imgLoc, $token = '')
+    protected function fetchImage($imgLoc)
     {
         try {
-            if ($token !== '') {
-                $file_data = file_get_contents(
-                    $imgLoc,
-                    false,
-                    stream_context_create(
-                        [
-                            'ssl' => [
-                                'verify_peer'      => false,
-                                'verify_peer_name' => false,
-                            ],
-                            'http' => [
-                                'method' => 'GET',
-                                'header' => [
-                                    'Accept-language: en',
-                                    'User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2',
-                                    'Authorization: Bearer '.$token,
-                                ],
-                            ],
-                        ]
-                    )
-                );
-            } else {
-                $file_data = $imgLoc;
-            }
-            $img = Image::make($file_data);
+            $img = Image::make($imgLoc);
         } catch (NotFoundException $e) {
             if ($e->getCode() === 404) {
                 ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
@@ -131,13 +106,12 @@ class ReleaseImage
      * @param string $imgMaxHeight Max height to resize image to.  (OPTIONAL)
      * @param bool   $saveThumb    Save a thumbnail of this image? (OPTIONAL)
      *
-     * @param string $token
      *
      * @return int 1 on success, 0 on failure Used on site to check if there is an image.
      */
-    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false, $token = ''): int
+    public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false): int
     {
-        $cover = $this->fetchImage($imgLoc, $token);
+        $cover = $this->fetchImage($imgLoc);
 
         if ($cover === false) {
             return 0;

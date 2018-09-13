@@ -75,10 +75,9 @@ class ReleaseCleaning
     /**
      * ReleaseCleaning constructor.
      *
-     * @param null $settings
      * @throws \Exception
      */
-    public function __construct($settings = null)
+    public function __construct()
     {
         // Extensions.
         $this->e0 = CollectionsCleaning::REGEX_FILE_EXTENSIONS;
@@ -185,7 +184,7 @@ class ReleaseCleaning
         }
 
         //if www.town.ag releases check against generic_town regexes
-        if (preg_match('/www\.town\.ag/i', $subject)) {
+        if (preg_match('/www\.town\.ag$/i', $subject)) {
             return $this->generic_town();
         }
         if ($groupName === 'alt.binaries.teevee') {

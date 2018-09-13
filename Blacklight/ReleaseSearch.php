@@ -4,10 +4,6 @@ namespace Blacklight;
 
 class ReleaseSearch
 {
-    public const FULLTEXT = 0;
-    public const LIKE = 1;
-    public const SPHINX = 2;
-
     /**
      * Array where keys are the column name, and value is the search string.
      * @var array
@@ -63,7 +59,7 @@ class ReleaseSearch
     /**
      * @return string
      */
-    private function sphinxSQL()
+    private function sphinxSQL(): string
     {
         $searchQuery = $fullReturn = '';
 

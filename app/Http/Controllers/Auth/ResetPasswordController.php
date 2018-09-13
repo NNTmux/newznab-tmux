@@ -42,6 +42,11 @@ class ResetPasswordController extends Controller
         $this->middleware('guest');
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
     public function reset(Request $request)
     {
         if (! $request->has('guid')) {
@@ -49,7 +54,7 @@ class ResetPasswordController extends Controller
         }
 
         $ret = User::getByPassResetGuid($request->input('guid'));
-        if (! $ret) {
+        if ($ret === null) {
             app('smarty.view')->assign('error', 'Bad reset code provided.');
         }
 
