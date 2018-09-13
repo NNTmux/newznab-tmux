@@ -13,7 +13,6 @@ use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
  */
 class TVDB extends TV
 {
-    private const TVDB_URL = 'https://api.thetvdb.com';
     private const TVDB_IMAGES_URL = 'https://www.thetvdb.com/banners/';
     private const TVDB_API_KEY = '31740C28BAC74DEF';
     private const MATCH_PROBABILITY = 75;
@@ -391,8 +390,18 @@ class TVDB extends TV
      */
     protected function formatShowInfo($show): array
     {
-        $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
-        $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
+        try {
+            $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
+        } catch (ResourceNotFoundException $e) {
+            ColorCLI::doEcho(ColorCLI::notice('Poster image not found on TVDB'), true);
+        }
+
+        try {
+            $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
+        } catch (ResourceNotFoundException $e) {
+            ColorCLI::doEcho(ColorCLI::notice('Fanart image not found on TVDB'), true);
+        }
+
         $imdbid = $this->client->series()->getById($show->id);
         preg_match('/tt(?P<imdbid>\d{6,7})$/i', $imdbid->imdbId, $imdb);
 

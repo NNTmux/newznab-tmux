@@ -1,4 +1,5 @@
 2018-09-13 DariusIII
+	* Chg: Prevent errors on missing images on TVDB
 	* Chg: Update scripts to use now() helper
 	* Chg: Use now() helper and related functions for time calculations in ProcessReleases class
 	* Chg: Update laravel/framework to version 5.7
