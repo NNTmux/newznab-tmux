@@ -1,3 +1,5 @@
+2018-09-13 DariusIII
+	* Chg: Update smarty/smarty to version 3.1.33
 2018-09-12 DariusIII
 	* Fix: Fix fetching of images from TheTVDB
 	* Chg: Update TVDB results handling
