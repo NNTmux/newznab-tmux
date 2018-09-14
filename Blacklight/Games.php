@@ -587,6 +587,7 @@ class Games
                             'url',
                             'screenshots',
                             'publishers',
+                            'themes',
                         ]);
 
                         $publishers = [];
@@ -594,6 +595,14 @@ class Games
 
                             $publishers[] = IGDB::getCompany($publisher)->name;
                         }
+
+                        $genres = [];
+
+                        foreach ($this->_gameResults->themes as $theme) {
+                            $genres[] = IGDB::getTheme($theme)->name;
+                        }
+
+                        $genreName = $this->_matchGenre(implode(',', $genres));
 
                         $game = [
                             'title' => $this->_gameResults->name,
@@ -607,7 +616,7 @@ class Games
                             'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                         ];
                     } else {
-                        ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+                        ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
 
                         return false;
                     }
