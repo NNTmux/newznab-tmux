@@ -124,7 +124,7 @@ class Console
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function getConsoleInfoByName($title, $platform)
+    public function getConsoleInfoByName($title, $platform): \Illuminate\Database\Eloquent\Model
     {
         //only used to get a count of words
         $searchWords = '';
@@ -420,13 +420,13 @@ class Console
         $titlepercent = $platformpercent = '';
 
         //Remove import tags from console title for match
-        $con['title'] = trim(preg_replace('/(\[|\().{2,} import(\]|\))$/i', '', $con['title']));
+        $con['title'] = trim(preg_replace('/([\[|\(]).{2,} import([\]|\)])$/i', '', $con['title']));
 
         similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
         similar_text(strtolower($gameInfo['platform']), strtolower($con['platform']), $platformpercent);
 
         // Since Wii Ware games and XBLA have inconsistent original platforms, as long as title is 50% its ok.
-        if (preg_match('/wiiware|xbla/i', trim($gameInfo['platform'])) && $titlepercent >= 50) {
+        if ($titlepercent >= 50 && preg_match('/wiiware|xbla/i', trim($gameInfo['platform']))) {
             $titlepercent = 100;
             $platformpercent = 100;
         }
