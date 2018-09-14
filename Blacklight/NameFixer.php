@@ -1210,10 +1210,10 @@ class NameFixer
         foreach (explode('||', $release->filename) as $key => $fileName) {
             $this->_fileName = $fileName;
             $this->_cleanMatchFiles();
-            $preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $this->_fileName, $match);
+            $preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $this->_fileName, $match);
             if ($preMatch) {
                 $result = Predb::search($match[0])->first();
-                $preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $result['filename'], $match1);
+                $preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
                 if ($preFTmatch && $match[0] === $match1[0]) {
                     $this->_fileName = $result['filename'];
                 }
