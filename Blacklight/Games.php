@@ -10,9 +10,9 @@ use App\Models\GamesInfo;
 use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
+use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Messerli90\IGDB\Facades\IGDB;
 
 class Games
 {
@@ -591,7 +591,6 @@ class Games
 
                         $publishers = [];
                         foreach ($this->_gameResults->publishers as $publisher) {
-
                             $publishers[] = IGDB::getCompany($publisher)->name;
                         }
 
@@ -617,7 +616,6 @@ class Games
                     return false;
                 }
             }
-
         }
 
         // Load genres.
