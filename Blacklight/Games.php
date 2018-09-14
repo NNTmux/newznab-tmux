@@ -12,6 +12,7 @@ use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Messerli90\IGDB\Facades\IGDB;
 
 class Games
 {
@@ -544,9 +545,7 @@ class Games
                         if ($this->_gameResults->original_release_date !== '') {
                             $dateReleased = $this->_gameResults->original_release_date;
                             $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
-                            if ($date instanceof \DateTime) {
-                                $game['releasedate'] = (string) $date->format('Y-m-d');
-                            }
+                            $game['releasedate'] = (string) $date->format('Y-m-d');
                         }
 
                         if ($this->_gameResults->deck !== '') {
@@ -563,6 +562,62 @@ class Games
                     return false;
                 }
             }
+        }
+
+        if (env('IGDB_KEY') !== '') {
+            if ($steamGameID === false || $this->_gameResults === false) {
+                $bestMatch = false;
+                $this->_classUsed = 'IGDB';
+                $result = IGDB::searchGames($gameInfo['title']);
+                if (! empty($result)) {
+                    foreach ($result as $res) {
+                        similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent);
+                        if ($percent >= self::GAME_MATCH_PERCENTAGE) {
+                            $bestMatch = $res->id;
+                        }
+                    }
+                    if ($bestMatch !== false) {
+                        $this->_gameResults = IGDB::getGame($bestMatch, [
+                            'id',
+                            'name',
+                            'first_release_date',
+                            'aggregated_rating',
+                            'summary',
+                            'cover',
+                            'url',
+                            'screenshots',
+                            'publishers',
+                        ]);
+
+                        $publishers = [];
+                        foreach ($this->_gameResults->publishers as $publisher) {
+
+                            $publishers[] = IGDB::getCompany($publisher)->name;
+                        }
+
+                        $game = [
+                            'title' => $this->_gameResults->name,
+                            'asin' => $this->_gameResults->id,
+                            'review' => $this->_gameResults->summary ?? '',
+                            'coverurl' => 'https:'.$this->_gameResults->cover->url ?? '',
+                            'releasedate' => Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
+                            'esrb' => round($this->_gameResults->aggregated_rating).'%' ?? 'Not Rated',
+                            'url' => $this->_gameResults->url ?? '',
+                            'backdropurl' => 'https:'.$this->_gameResults->screenshots[0]->url ?? '',
+                            'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
+                        ];
+                    } else {
+                        ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+
+                        return false;
+                    }
+                } else {
+                    ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+
+                    return false;
+                }
+            }
+
         }
 
         // Load genres.

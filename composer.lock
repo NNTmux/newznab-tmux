@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b5fcf01653d5163e9d17ea57e79cc2c",
+    "content-hash": "d7e790cca583e2d57488c9bf24bb12ee",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -257,7 +257,8 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            }
+            },
+            "time": "2016-06-06T17:37:52+00:00"
         },
         {
             "name": "bower-asset/autosize",
@@ -286,7 +287,8 @@
                 "form",
                 "textarea",
                 "ui"
-            ]
+            ],
+            "time": "2017-05-19T15:36:30+00:00"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -335,7 +337,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-3.x",
@@ -384,7 +387,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -413,7 +417,8 @@
             },
             "license": [
                 "Apache-2.0"
-            ]
+            ],
+            "time": "2016-08-05T09:50:13+00:00"
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -443,7 +448,8 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ]
+            ],
+            "time": "2015-12-01T23:35:57+00:00"
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -477,7 +483,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2015-05-15T18:56:17+00:00"
         },
         {
             "name": "bower-asset/bootswatch",
@@ -608,7 +615,8 @@
                 "modal",
                 "popup",
                 "ui"
-            ]
+            ],
+            "time": "2016-05-10T22:21:33+00:00"
         },
         {
             "name": "bower-asset/datatables",
@@ -723,7 +731,8 @@
                     "tests",
                     "examples"
                 ]
-            }
+            },
+            "time": "2015-01-26T21:19:01+00:00"
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -759,7 +768,8 @@
                 "css",
                 "flexbox",
                 "grid"
-            ]
+            ],
+            "time": "2016-08-14T16:43:18+00:00"
         },
         {
             "name": "bower-asset/font-awesome",
@@ -804,7 +814,8 @@
                     "src",
                     "build.xml"
                 ]
-            }
+            },
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "bower-asset/icheck",
@@ -854,7 +865,8 @@
                 "replacement",
                 "skins",
                 "ui"
-            ]
+            ],
+            "time": "2014-03-03T17:36:28+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -917,7 +929,8 @@
                 "javascript",
                 "jquery",
                 "library"
-            ]
+            ],
+            "time": "2016-05-20T17:24:43+00:00"
         },
         {
             "name": "bower-asset/jquery-3.2.x",
@@ -984,7 +997,8 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ]
+            ],
+            "time": "2017-08-31T15:51:29+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
@@ -1003,7 +1017,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-04-15T06:38:34+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-3.0.x",
@@ -1022,7 +1037,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-06-10T14:28:59+00:00"
         },
         {
             "name": "bower-asset/jquery.nicescroll",
@@ -1052,7 +1068,8 @@
                     "demo",
                     "package.json"
                 ]
-            }
+            },
+            "time": "2016-03-01T20:38:24+00:00"
         },
         {
             "name": "bower-asset/material-design-iconic-font",
@@ -1091,7 +1108,8 @@
                 "font",
                 "icons",
                 "material"
-            ]
+            ],
+            "time": "2015-11-08T04:50:28+00:00"
         },
         {
             "name": "bower-asset/materialize",
@@ -1150,7 +1168,8 @@
                 "responsive",
                 "sass",
                 "ux"
-            ]
+            ],
+            "time": "2017-04-15T01:39:28+00:00"
         },
         {
             "name": "bower-asset/pace",
@@ -1196,7 +1215,8 @@
                 "progress",
                 "progress",
                 "spinner"
-            ]
+            ],
+            "time": "2014-11-06T16:31:34+00:00"
         },
         {
             "name": "bower-asset/pnotify",
@@ -1248,7 +1268,8 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin."
+            "description": "JavaScript notification plugin.",
+            "time": "2017-07-31T21:50:29+00:00"
         },
         {
             "name": "bower-asset/respond",
@@ -1272,7 +1293,8 @@
                     "test"
                 ]
             },
-            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
+            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
+            "time": "2013-12-19T04:44:31+00:00"
         },
         {
             "name": "bower-asset/responsive-tables-js",
@@ -1302,7 +1324,8 @@
                 "jquery",
                 "responsive",
                 "table"
-            ]
+            ],
+            "time": "2015-10-08T14:18:04+00:00"
         },
         {
             "name": "bower-asset/select2",
@@ -1370,7 +1393,8 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ]
+            ],
+            "time": "2016-06-11T09:19:14+00:00"
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -4310,6 +4334,54 @@
                 "yaml"
             ],
             "time": "2018-01-18T09:07:50+00:00"
+        },
+        {
+            "name": "messerli90/igdb",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/messerli90/igdb.git",
+                "reference": "e93008753261e0c824589243916415eb5947baec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/messerli90/igdb/zipball/e93008753261e0c824589243916415eb5947baec",
+                "reference": "e93008753261e0c824589243916415eb5947baec",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "illuminate/support": ">= 5.0",
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Messerli90\\IGDB\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Messerli",
+                    "email": "michaelamesserli@gmail.com"
+                }
+            ],
+            "description": "Laravel PHP Facade/Wrapper for the IGDB API",
+            "keywords": [
+                "api",
+                "gaming",
+                "igdb",
+                "laravel",
+                "messerli90"
+            ],
+            "time": "2017-08-06T17:14:20+00:00"
         },
         {
             "name": "monolog/monolog",

@@ -164,6 +164,7 @@ return [
         Way\Generators\GeneratorsServiceProvider::class,
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         Orangehill\Iseed\IseedServiceProvider::class,
+        Messerli90\IGDB\IGDBServiceProvider::class,
 
     ],
 
@@ -214,6 +215,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'UserVerification' => Jrean\UserVerification\Facades\UserVerification::class,
+        'IGDB' => \Messerli90\IGDB\Facades\IGDB::class,
     ],
 
 ];
