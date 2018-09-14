@@ -1,4 +1,5 @@
 2018-09-14 DariusIII
+	* Chg: Update league/flysystem and spatie/laravel-permission to latest versions
 	* Chg: Update some of the regexes in Categorize and NameFixer classes
 	* Chg: Add IGDB for PC games lookup
 2018-09-13 DariusIII
