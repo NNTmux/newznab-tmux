@@ -183,19 +183,20 @@
         },
         {
             "name": "bhuvidya/laravel-countries",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bhuvidya/laravel-countries.git",
-                "reference": "6eda702c6d8710cc96a52397b89eb42ca4d20730"
+                "reference": "8e45bac5a255119878568afd302886c9b3eff8cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/6eda702c6d8710cc96a52397b89eb42ca4d20730",
-                "reference": "6eda702c6d8710cc96a52397b89eb42ca4d20730",
+                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/8e45bac5a255119878568afd302886c9b3eff8cb",
+                "reference": "8e45bac5a255119878568afd302886c9b3eff8cb",
                 "shasum": ""
             },
             "require": {
+                "illuminate/database": "^5.5.0",
                 "illuminate/support": "^5.5.0",
                 "php": ">=7.0.0"
             },
@@ -231,7 +232,7 @@
                 "iso_3166_3",
                 "laravel"
             ],
-            "time": "2018-02-10T23:09:24+00:00"
+            "time": "2018-09-15T03:26:27+00:00"
         },
         {
             "name": "bower-asset/animate.css",
