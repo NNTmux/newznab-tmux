@@ -852,12 +852,14 @@ class Console
 
                     $platform = '';
 
-                    foreach ($game->platforms as $platforms) {
-                        $platforms = IGDB::getPlatform($platforms);
-                        similar_text($platforms->name, $gamePlatform, $percent);
-                        if ($percent >= 85) {
-                            $platform = $platforms->name;
-                            break;
+                    if (! empty($game->platforms)) {
+                        foreach ($game->platforms as $platforms) {
+                            $platforms = IGDB::getPlatform($platforms);
+                            similar_text($platforms->name, $gamePlatform, $percent);
+                            if ($percent >= 85) {
+                                $platform = $platforms->name;
+                                break;
+                            }
                         }
                     }
 
