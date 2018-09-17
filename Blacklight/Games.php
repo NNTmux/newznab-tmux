@@ -7,13 +7,13 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\GamesInfo;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Exception\ClientException;
 
 class Games
 {
