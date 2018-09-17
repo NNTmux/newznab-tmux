@@ -122,9 +122,9 @@ class Console
      * @param $title
      * @param $platform
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return false|\Illuminate\Database\Eloquent\Model
      */
-    public function getConsoleInfoByName($title, $platform): \Illuminate\Database\Eloquent\Model
+    public function getConsoleInfoByName($title, $platform)
     {
         //only used to get a count of words
         $searchWords = '';
@@ -141,7 +141,7 @@ class Console
         }
         $searchWords = trim($searchWords);
 
-        return ConsoleInfo::search($searchWords, $platform)->first();
+        return ConsoleInfo::search($searchWords, $platform)->first() ?? false;
     }
 
     /**
@@ -819,7 +819,7 @@ class Console
                     // Check for existing console entry.
                     $gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-                    if ($gameCheck === null && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
+                    if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
