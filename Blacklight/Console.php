@@ -825,7 +825,7 @@ class Console
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $gameId = -2;
-                    } elseif ($gameCheck === null) {
+                    } elseif ($gameCheck === false) {
                         $gameId = $this->updateConsoleInfo($gameInfo);
                         $usedAmazon = true;
                         if ($gameId === null) {
