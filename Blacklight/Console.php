@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
@@ -28,6 +29,11 @@ class Console
     public const CONS_NTFND = -2;
 
     protected const MATCH_PERCENT = 60;
+
+    /**
+     * @var
+     */
+    protected $igdbSleep;
 
     /**
      * @var bool
@@ -809,86 +815,95 @@ class Console
         $bestMatch = false;
 
         $gamePlatform = $this->_replacePlatform($gamePlatform);
-        if (env('IGDB_KEY') !== '') {
-            $result = IGDB::searchGames($gameInfo);
-            if (! empty($result)) {
-                foreach ($result as $res) {
-                    similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
-                    if ($percent >= 90) {
-                        $bestMatch = $res->id;
-                    }
-                }
-                if ($bestMatch !== false) {
-                    $game = IGDB::getGame($bestMatch, [
-                        'id',
-                        'name',
-                        'first_release_date',
-                        'aggregated_rating',
-                        'summary',
-                        'cover',
-                        'url',
-                        'screenshots',
-                        'publishers',
-                        'themes',
-                        'platforms',
-                    ]);
-
-                    $publishers = [];
-                    if (! empty($game->publishers)) {
-                        foreach ($game->publishers as $publisher) {
-                            $publishers[] = IGDB::getCompany($publisher)->name;
+        if (now() > $this->igdbSleep) {
+            $this->igdbSleep = null;
+        }
+        if ($this->igdbSleep === null && env('IGDB_KEY') !== '') {
+            try {
+                $result = IGDB::searchGames($gameInfo);
+                if (! empty($result)) {
+                    foreach ($result as $res) {
+                        similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
+                        if ($percent >= 90) {
+                            $bestMatch = $res->id;
                         }
                     }
+                    if ($bestMatch !== false) {
+                        $game = IGDB::getGame($bestMatch, [
+                            'id',
+                            'name',
+                            'first_release_date',
+                            'aggregated_rating',
+                            'summary',
+                            'cover',
+                            'url',
+                            'screenshots',
+                            'publishers.name',
+                            'themes.name',
+                            'platforms.name',
+                        ]);
 
-                    $genres = [];
-
-                    if (! empty($game->themes)) {
-                        foreach ($game->themes as $theme) {
-                            $genres[] = IGDB::getTheme($theme)->name;
-                        }
-                    }
-
-                    $genreKey = $this->_getGenreKey(implode(',', $genres));
-
-                    $platform = '';
-
-                    if (! empty($game->platforms)) {
-                        foreach ($game->platforms as $platforms) {
-                            $platforms = IGDB::getPlatform($platforms);
-                            similar_text($platforms->name, $gamePlatform, $percent);
-                            if ($percent >= 85) {
-                                $platform = $platforms->name;
-                                break;
+                        $publishers = [];
+                        if (! empty($game->publishers)) {
+                            foreach ($game->publishers as $publisher) {
+                                $publishers[] = IGDB::getCompany($publisher)->name;
                             }
                         }
+
+                        $genres = [];
+
+                        if (! empty($game->themes)) {
+                            foreach ($game->themes as $theme) {
+                                $genres[] = IGDB::getTheme($theme)->name;
+                            }
+                        }
+
+                        $genreKey = $this->_getGenreKey(implode(',', $genres));
+
+                        $platform = '';
+
+                        if (! empty($game->platforms)) {
+                            foreach ($game->platforms as $platforms) {
+                                $platforms = IGDB::getPlatform($platforms);
+                                similar_text($platforms->name, $gamePlatform, $percent);
+                                if ($percent >= 85) {
+                                    $platform = $platforms->name;
+                                    break;
+                                }
+                            }
+                        }
+
+                        $game = [
+                            'title' => $game->name,
+                            'asin' => $game->id,
+                            'review' => $game->summary ?? '',
+                            'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
+                            'releasedate' => ! empty($game->first_release_date) ? Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
+                            'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
+                            'url' => $game->url ?? '',
+                            'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
+                            'platform' => $platform ?? '',
+                            'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
+                            'consolegenreid' => $genreKey ?? '',
+                            'salesrank' => '',
+                        ];
+
+                        return $game;
                     }
 
-                    $game = [
-                        'title' => $game->name,
-                        'asin' => $game->id,
-                        'review' => $game->summary ?? '',
-                        'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
-                        'releasedate' => ! empty($game->first_release_date) ? Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
-                        'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
-                        'url' => $game->url ?? '',
-                        'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
-                        'platform' => $platform ?? '',
-                        'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
-                        'consolegenreid' => $genreKey ?? '',
-                        'salesrank' => '',
-                    ];
+                    ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
 
-                    return $game;
+                    return false;
                 }
 
-                ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+                ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
 
                 return false;
+            } catch (ClientException $e) {
+                if ($e->getCode() === 429) {
+                    $this->igdbSleep = now()->endOfMonth();
+                }
             }
-
-            ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
-
-            return false;
         }
 
         return false;
