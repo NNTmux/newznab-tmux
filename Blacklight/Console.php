@@ -871,7 +871,7 @@ class Console
                         'url' => $game->url ?? '',
                         'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                         'platform' => $platform,
-                        'genres' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
+                        'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
                         'consolegenreid' => $genreKey ?? '',
                         'salesrank' => '',
                     ];
