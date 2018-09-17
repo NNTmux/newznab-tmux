@@ -10,14 +10,14 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
+use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
-use Illuminate\Support\Carbon;
+use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
-use Messerli90\IGDB\Facades\IGDB;
 
 /**
  * Class Console.
