@@ -868,7 +868,7 @@ class Console
                         'asin' => $game->id,
                         'review' => $game->summary ?? '',
                         'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
-                        'releasedate' => Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
+                        'releasedate' => ! empty($game->first_release_date) ? Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
                         'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
                         'url' => $game->url ?? '',
                         'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
