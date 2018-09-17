@@ -1,4 +1,5 @@
 2018-09-17 DariusIII
+	* Chg: Use igdb lookups for console games
 	* Chg: Update getConsoleInfoByName function return value
 2018-09-15 DariusIII
 	* Chg: Update bhuvidya/laravel-countries to version 1.0.4

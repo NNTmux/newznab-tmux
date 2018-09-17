@@ -12,10 +12,12 @@ use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use Messerli90\IGDB\Facades\IGDB;
 
 /**
  * Class Console.
@@ -402,6 +404,21 @@ class Console
                     );
                 }
             }
+        } else {
+            $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
+            if ($igdb !== false) {
+                if ($igdb['coverurl'] !== '') {
+                    $igdb['cover'] = 1;
+                } else {
+                    $igdb['cover'] = 0;
+                }
+
+                $consoleId = $this->_updateConsoleTable($igdb);
+
+                if ($this->echooutput && $consoleId !== -2) {
+                    ColorCLI::doEcho(ColorCLI::header('Added/updated game: ').ColorCLI::alternateOver('   Title:    ').ColorCLI::primary($igdb['title']).ColorCLI::alternateOver('   Platform: ').ColorCLI::primary($igdb['platform']).ColorCLI::alternateOver('   Genre: ').ColorCLI::primary($igdb['consolegenre']), true);
+                }
+            }
         }
 
         return $consoleId;
@@ -776,6 +793,97 @@ class Console
         }
 
         ColorCLI::doEcho(ColorCLI::info('Could not find match on Amazon'), true);
+
+        return false;
+    }
+
+    /**
+     * @param $gameInfo
+     * @param $gamePlatform
+     *
+     * @return array|bool|\StdClass
+     * @throws \Exception
+     */
+    public function fetchIGDBProperties($gameInfo, $gamePlatform)
+    {
+        $bestMatch = false;
+
+        $gamePlatform = $this->_replacePlatform($gamePlatform);
+        if (env('IGDB_KEY') !== '') {
+            $result = IGDB::searchGames($gameInfo);
+            if (! empty($result)) {
+                foreach ($result as $res) {
+                    similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
+                    if ($percent >= 90) {
+                        $bestMatch = $res->id;
+                    }
+                }
+                if ($bestMatch !== false) {
+                    $game = IGDB::getGame($bestMatch, [
+                        'id',
+                        'name',
+                        'first_release_date',
+                        'aggregated_rating',
+                        'summary',
+                        'cover',
+                        'url',
+                        'screenshots',
+                        'publishers',
+                        'themes',
+                        'platforms',
+                    ]);
+
+                    $publishers = [];
+                    foreach ($game->publishers as $publisher) {
+                        $publishers[] = IGDB::getCompany($publisher)->name;
+                    }
+
+                    $genres = [];
+
+                    foreach ($game->themes as $theme) {
+                        $genres[] = IGDB::getTheme($theme)->name;
+                    }
+
+                    $genreKey = $this->_getGenreKey(implode(',', $genres));
+
+                    $platform = '';
+
+                    foreach ($game->platforms as $platforms) {
+                        $platforms = IGDB::getPlatform($platforms);
+                        similar_text($platforms->name, $gamePlatform, $percent);
+                        if ($percent >= 85) {
+                            $platform = $platforms->name;
+                            break;
+                        }
+                    }
+
+                    $game = [
+                        'title' => $game->name,
+                        'asin' => $game->id,
+                        'review' => $game->summary ?? '',
+                        'coverurl' => 'https:'.$game->cover->url ?? '',
+                        'releasedate' => Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
+                        'esrb' => round($game->aggregated_rating).'%' ?? 'Not Rated',
+                        'url' => $game->url ?? '',
+                        'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
+                        'platform' => $platform,
+                        'genres' => implode(',', $genres),
+                        'genres_id' => $genreKey,
+                        'salesrank' => '',
+                    ];
+
+                    return $game;
+                }
+
+                ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+
+                return false;
+            }
+
+            ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+
+            return false;
+        }
 
         return false;
     }
