@@ -834,14 +834,18 @@ class Console
                     ]);
 
                     $publishers = [];
-                    foreach ($game->publishers as $publisher) {
-                        $publishers[] = IGDB::getCompany($publisher)->name;
+                    if (! empty($game->publishers)) {
+                        foreach ($game->publishers as $publisher) {
+                            $publishers[] = IGDB::getCompany($publisher)->name;
+                        }
                     }
 
                     $genres = [];
 
-                    foreach ($game->themes as $theme) {
-                        $genres[] = IGDB::getTheme($theme)->name;
+                    if (! empty($game->themes)) {
+                        foreach ($game->themes as $theme) {
+                            $genres[] = IGDB::getTheme($theme)->name;
+                        }
                     }
 
                     $genreKey = $this->_getGenreKey(implode(',', $genres));
