@@ -867,12 +867,12 @@ class Console
                         'review' => $game->summary ?? '',
                         'coverurl' => 'https:'.$game->cover->url ?? '',
                         'releasedate' => Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
-                        'esrb' => round($game->aggregated_rating).'%' ?? 'Not Rated',
+                        'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
                         'url' => $game->url ?? '',
                         'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                         'platform' => $platform,
-                        'genres' => implode(',', $genres),
-                        'genres_id' => $genreKey,
+                        'genres' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
+                        'genres_id' => $genreKey ?? '',
                         'salesrank' => '',
                     ];
 
