@@ -872,7 +872,7 @@ class Console
                         'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                         'platform' => $platform,
                         'genres' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
-                        'genres_id' => $genreKey ?? '',
+                        'consolegenreid' => $genreKey ?? '',
                         'salesrank' => '',
                     ];
 
