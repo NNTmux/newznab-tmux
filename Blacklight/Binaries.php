@@ -886,7 +886,6 @@ class Binaries
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
-                        ColorCLI::doEcho(ColorCLI::notice('Error occurred'));
                     } catch (\PDOException $e) {
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
@@ -922,13 +921,17 @@ class Binaries
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
-                    ColorCLI::doEcho(ColorCLI::notice('Error occurred'));
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
                         DB::commit();
                     }
                     if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
+                        ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                        DB::rollBack();
+                    }
+
+                    if ($e->getMessage() === 'SQLSTATE[23000]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                         ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
                         DB::rollBack();
                     }
@@ -969,7 +972,7 @@ class Binaries
 
         // End of processing headers.
         $this->timeCleaning = number_format($this->startUpdate - $this->startCleaning, 2);
-        $binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
+        $binariesQuery = $binariesCheck = sprintf('INSERT IGNORE INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
         foreach ($binariesUpdate as $binaryID => $binary) {
             $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
         }
