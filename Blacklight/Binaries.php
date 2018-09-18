@@ -886,7 +886,7 @@ class Binaries
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
-                        Log::error($e->getMessage());
+                        ColorCLI::doEcho(ColorCLI::notice('Error occurred'));
                     } catch (\PDOException $e) {
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
@@ -922,7 +922,7 @@ class Binaries
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
-                    Log::error($e->getMessage());
+                    ColorCLI::doEcho(ColorCLI::notice('Error occurred'));
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");

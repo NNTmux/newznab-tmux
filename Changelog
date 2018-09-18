@@ -1,4 +1,5 @@
 2018-09-18 DariusIII
+	* Chg: Do not log insert errors in Binaries class to reduce log size
 	* Chg: Update nikic/php-parser to version 4.0.4
 2018-09-17 DariusIII
 	* Chg: Catch 429 errors and disable IGDB lookups
