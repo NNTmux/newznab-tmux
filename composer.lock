@@ -4277,12 +4277,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mayconbordin/l5-fixtures.git",
-                "reference": "2ec4080260cbab53966ba8216ce08abb0c043f28"
+                "reference": "767b37f20be0ebdab41b3e7def56fdd65bf2b863"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mayconbordin/l5-fixtures/zipball/2ec4080260cbab53966ba8216ce08abb0c043f28",
-                "reference": "2ec4080260cbab53966ba8216ce08abb0c043f28",
+                "url": "https://api.github.com/repos/mayconbordin/l5-fixtures/zipball/767b37f20be0ebdab41b3e7def56fdd65bf2b863",
+                "reference": "767b37f20be0ebdab41b3e7def56fdd65bf2b863",
                 "shasum": ""
             },
             "require": {
@@ -4334,7 +4334,7 @@
                 "laravel 5",
                 "yaml"
             ],
-            "time": "2018-01-18T09:07:50+00:00"
+            "time": "2018-09-18T11:11:44+00:00"
         },
         {
             "name": "messerli90/igdb",

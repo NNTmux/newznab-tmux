@@ -1,4 +1,5 @@
 2018-09-18 DariusIII
+	* Chg: Update mayconbordin/l5-fixtures to latest commit
 	* Chg: Remove debug messages from Binaries class
 	* Chg: Try to ignore errors on binaries data insertion
 	* Chg: Do not log insert errors in Binaries class to reduce log size
