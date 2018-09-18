@@ -8,7 +8,6 @@ use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
 use Blacklight\processing\ProcessReleasesMultiGroup;
@@ -111,11 +110,6 @@ class Binaries
      * @var bool
      */
     protected $_echoCLI;
-
-    /**
-     * @var bool
-     */
-    protected $_debug = false;
 
     /**
      * Max tries to download headers.
@@ -981,14 +975,6 @@ class Binaries
 
         // Check if we got any binaries. If we did, try to insert them.
         if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) {
-            if ($this->_debug) {
-                ColorCLI::doEcho(
-                    ColorCLI::debug(
-                        'Sending '.round(\strlen($partsQuery) / 1024, 2).
-                        ' KB of'.($this->multiGroup ? ' MGR' : '').' parts to MySQL'
-                    ), true
-                );
-            }
             if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
                 $this->_pdo->commit();
             } else {
@@ -1321,10 +1307,6 @@ class Binaries
                 break;
             }
             $currentPost = $tempPost;
-
-            if ($this->_debug) {
-                ColorCLI::doEcho(ColorCLI::debug('Postdate retried '.$attempts.' time(s).'), true);
-            }
         } while ($attempts++ <= 20);
 
         // If we didn't get a date, set it to now.
