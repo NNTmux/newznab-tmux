@@ -95,7 +95,7 @@ class SABnzbd
     {
         $this->uid = $page->userdata['id'];
         $this->api_token = $page->userdata['api_token'];
-        $this->serverurl = $page->serverurl;
+        $this->serverurl = url('/');
         $this->client = new Client(['verify' => false]);
 
         // Set up properties.

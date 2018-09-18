@@ -121,9 +121,9 @@ class GetNzbController extends BasePageController
         $headers = [
             'Content-Type' => 'application/x-nzb',
             'Expires' => date('r', now()->addDays(365)->timestamp),
-            'X-DNZB-Failure' => $this->serverurl.'failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
+            'X-DNZB-Failure' => url('/').'/failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
             'X-DNZB-Category' => $relData['category_name'],
-            'X-DNZB-Details' => $this->serverurl.'details/'.$request->input('id'),
+            'X-DNZB-Details' => url('/').'/details/'.$request->input('id'),
         ];
 
         if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
@@ -133,7 +133,7 @@ class GetNzbController extends BasePageController
         }
 
         if ((int) $relData['nfostatus'] === 1) {
-            $headers += ['X-DNZB-NFO ' => $this->serverurl.'nfo/'.$request->input('id')];
+            $headers += ['X-DNZB-NFO ' => url('/').'/nfo/'.$request->input('id')];
         }
 
         $headers += ['X-DNZB-RCode' => '200',

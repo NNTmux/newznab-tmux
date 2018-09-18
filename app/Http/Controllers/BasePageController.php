@@ -88,8 +88,6 @@ class BasePageController extends Controller
         }
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
 
-        $this->serverurl = url('/');
-
         $this->smarty->assign('serverroot', url('/'));
     }
 
@@ -277,7 +275,7 @@ class BasePageController extends Controller
         }
 
         $content = new Contents();
-        $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
+        $this->smarty->assign('menulist', Menu::getMenu($role, url('/')));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
         if ($this->userdata !== null) {
