@@ -1,3 +1,5 @@
+2018-09-18 DariusIII
+	* Chg: Update nikic/php-parser to version 4.0.4
 2018-09-17 DariusIII
 	* Chg: Catch 429 errors and disable IGDB lookups
 	* Chg: Use igdb lookups for console games
