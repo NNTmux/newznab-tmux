@@ -1,4 +1,5 @@
 2018-09-18 DariusIII
+	* Fix: Add missing $this->serverurl declaration in BasePageController
 	* Chg: Update mayconbordin/l5-fixtures to latest commit
 	* Chg: Remove debug messages from Binaries class
 	* Chg: Try to ignore errors on binaries data insertion

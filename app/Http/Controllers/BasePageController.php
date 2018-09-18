@@ -88,6 +88,8 @@ class BasePageController extends Controller
         }
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
 
+        $this->serverurl = url('/');
+
         $this->smarty->assign('serverroot', url('/'));
     }
 
