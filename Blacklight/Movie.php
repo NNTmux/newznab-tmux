@@ -4,9 +4,9 @@ namespace Blacklight;
 
 use Imdb\Title;
 use Imdb\Config;
-use Imdb\TitleSearch;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
+use Imdb\TitleSearch;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
