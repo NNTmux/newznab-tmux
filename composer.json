@@ -130,6 +130,7 @@
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "dev-master",
+    "dirape/token": "^2.1",
     "doctrine/dbal": "^2.7",
     "exeu/apai-io": "~2.0",
     "fideloper/proxy": "~4.0",

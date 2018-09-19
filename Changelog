@@ -1,3 +1,5 @@
+2018-09-19 DariusIII
+	* Chg: Use dirape/token to generate tokens and passwords for users
 2018-09-18 DariusIII
 	* Chg: Update laravel/framework to version 5.7.4
 	* Fix: Use url helper in place of $this->serverurl variable

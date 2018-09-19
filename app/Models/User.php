@@ -215,29 +215,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @return array
-     */
-    public static function getAllUsers(): array
-    {
-        return self::all()->toArray();
-    }
-
-    /**
-     * Get the users selected theme.
-     *
-     *
-     * @param int $userID
-     *
-     * @return mixed|string
-     */
-    public static function getStyle($userID)
-    {
-        $row = self::query()->where('id', $userID)->value('style');
-
-        return $row ?? 'None';
-    }
-
-    /**
      * @param $id
      * @throws \Exception
      */
@@ -459,9 +436,9 @@ class User extends Authenticatable
      * @param bool   $apiRequests
      *
      * @return array
-     * @throws \Exception
+     * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
+    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false): array
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
@@ -505,7 +482,7 @@ class User extends Authenticatable
      *
      * @return string[]
      */
-    public static function getBrowseOrder($orderBy)
+    public static function getBrowseOrder($orderBy): array
     {
         $order = (empty($orderBy) ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
@@ -626,16 +603,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param string $string
-     *
-     * @return string
-     */
-    public static function hashSHA1(string $string): string
-    {
-        return sha1($string);
-    }
-
-    /**
      * @param $guid
      *
      * @return \Illuminate\Database\Eloquent\Model|static
@@ -705,51 +672,14 @@ class User extends Authenticatable
     }
 
     /**
-     * @param int    $length
-     * @param bool   $add_dashes
-     * @param string $available_sets
+     * @param int $length
      *
-     * @return bool|string
+     * @return string
      * @throws \Exception
      */
-    public static function generatePassword($length = 15, $add_dashes = false, $available_sets = 'luds')
+    public static function generatePassword($length = 15): string
     {
-        $sets = [];
-        if (strpos($available_sets, 'l') !== false) {
-            $sets[] = 'abcdefghjkmnpqrstuvwxyz';
-        }
-        if (strpos($available_sets, 'u') !== false) {
-            $sets[] = 'ABCDEFGHJKMNPQRSTUVWXYZ';
-        }
-        if (strpos($available_sets, 'd') !== false) {
-            $sets[] = '23456789';
-        }
-        if (strpos($available_sets, 's') !== false) {
-            $sets[] = '!@#$%&*?';
-        }
-        $all = '';
-        $password = '';
-        foreach ($sets as $set) {
-            $password .= $set[random_int(0, \count(str_split($set)) - 1)];
-            $all .= $set;
-        }
-        $all = str_split($all);
-        for ($i = 0; $i < $length - \count($sets); $i++) {
-            $password .= $all[random_int(0, \count($all) - 1)];
-        }
-        $password = str_shuffle($password);
-        if (! $add_dashes) {
-            return $password;
-        }
-        $dash_len = floor(sqrt($length));
-        $dash_str = '';
-        while (\strlen($password) > $dash_len) {
-            $dash_str .= substr($password, 0, $dash_len).'-';
-            $password = substr($password, $dash_len);
-        }
-        $dash_str .= $password;
-
-        return $dash_str;
+        return \Token::random($length, true);
     }
 
     /**
@@ -769,7 +699,7 @@ class User extends Authenticatable
      * @throws \Exception
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public static function signup($userName, $password, $email, $host, $role = self::ROLE_USER, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false)
+    public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER)
     {
         $userName = trim($userName);
         $password = trim($password);
@@ -817,7 +747,7 @@ class User extends Authenticatable
      * @param string $password
      * @return bool
      */
-    public static function isValidPassword(string $password)
+    public static function isValidPassword(string $password): bool
     {
         return \strlen($password) > 8 && preg_match('#[0-9]+#', $password) && preg_match('#[A-Z]+#', $password) && preg_match('#[a-z]+#', $password);
     }
@@ -994,11 +924,13 @@ class User extends Authenticatable
      * @param $serverUrl
      * @param $uid
      * @param $emailTo
+     *
      * @return string
+     * @throws \Exception
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $token = static::hashSHA1(uniqid('', true));
+        $token = \Token::randomString(40);
         $url = $serverUrl.'register?invitecode='.$token;
 
         Mail::to($emailTo)->send(new SendInvite($uid, $url));

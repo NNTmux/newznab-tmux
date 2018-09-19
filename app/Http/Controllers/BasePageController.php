@@ -21,14 +21,29 @@ class BasePageController extends Controller
      */
     public $settings;
 
+    /**
+     * @var string
+     */
     public $title = '';
 
+    /**
+     * @var string
+     */
     public $content = '';
 
+    /**
+     * @var string
+     */
     public $meta_keywords = '';
 
+    /**
+     * @var string
+     */
     public $meta_title = '';
 
+    /**
+     * @var string
+     */
     public $meta_description = '';
 
     /**
@@ -38,6 +53,9 @@ class BasePageController extends Controller
      */
     public $page = '';
 
+    /**
+     * @var string
+     */
     public $page_template = '';
 
     /**
@@ -48,23 +66,11 @@ class BasePageController extends Controller
     public $userdata = [];
 
     /**
-     * URL of the server. ie http://localhost/.
-     *
-     * @var string
-     */
-    public $serverurl = '';
-
-    /**
      * User's theme.
      *
      * @var string
      */
     protected $theme = 'Gentele';
-
-    /**
-     * @var string
-     */
-    public $token;
 
     /**
      * @var \Illuminate\Foundation\Application|mixed

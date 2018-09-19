@@ -15,9 +15,9 @@ class UserController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
-    public function index(Request $request)
+    public function index(Request $request): void
     {
         $this->setAdminPrefs();
 
@@ -138,7 +138,7 @@ class UserController extends BasePageController
                             $invites = $role['defaultinvites'];
                         }
                     }
-                    $ret = User::signup($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('role'), $request->input('notes'), $invites, '', true);
+                    $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'));
                     $this->smarty->assign('role', $request->input('role'));
                 } else {
                     $ret = User::updateUser($request->input('id'), $request->input('username'), $request->input('email'), $request->input('grabs'), $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
