@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use Imdb\Title;
 use Imdb\Config;
+use Imdb\TitleSearch;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use GuzzleHttp\Client;
@@ -910,13 +911,13 @@ class Movie
     public function fetchIMDBProperties($imdbId)
     {
         $result = new Title($imdbId, $this->config);
-        if (! empty($result->title())) {
-            similar_text($this->currentTitle, $result->title(), $percent);
+        if (! empty($result->orig_title())) {
+            similar_text($this->currentTitle, $result->orig_title(), $percent);
             if ($percent > self::MATCH_PERCENT) {
                 similar_text($this->currentYear, $result->year(), $percent);
                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                     $ret = [
-                        'title' => $result->title(),
+                        'title' => $result->orig_title(),
                         'tagline' => $result->tagline(),
                         'plot' => array_get($result->plot_split(), '0.plot'),
                         'rating' => ! empty($result->rating()) ? $result->rating() : '',
@@ -928,7 +929,7 @@ class Movie
                     ];
 
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->title()), true);
+                        ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->orig_title()), true);
                     }
 
                     return $ret;
@@ -1160,6 +1161,23 @@ class Movie
                     }
                 }
 
+                // Check on IMDb first
+                if ($movieUpdated === false) {
+                    $imdbSearch = new TitleSearch($this->config);
+                    foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
+                        if (! empty($imdbTitle->orig_title())) {
+                            similar_text($imdbTitle->orig_title(), $this->currentTitle, $percent);
+                            if ($percent >= self::MATCH_PERCENT) {
+                                $getIMDBid = $imdbTitle->imdbid();
+                                $imdbID = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $arr['id']);
+                                if ($imdbID !== false) {
+                                    $movieUpdated = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Check on OMDbAPI
                 if ($movieUpdated === false) {
                     $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
@@ -1196,26 +1214,22 @@ class Movie
                 // Check on The Movie Database.
                 if ($movieUpdated === false) {
                     $data = $this->tmdbclient->getSearchApi()->searchMovies($this->currentTitle);
-                    if ($data['total_results'] > 0) {
-                        if (! empty($data['results'])) {
-                            foreach ($data['results'] as $result) {
-                                if (! empty($result['id'])) {
-                                    similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
-                                    if ($percent > 80) {
-                                        $ret = $this->fetchTMDBProperties($result['id'], true);
-                                        if ($ret !== false && ! empty($ret['imdbid'])) {
-                                            $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
-                                            if ($imdbID !== false) {
-                                                $movieUpdated = true;
-                                            }
+                    if (($data['total_results'] > 0) && ! empty($data['results'])) {
+                        foreach ($data['results'] as $result) {
+                            if (! empty($result['id'])) {
+                                similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
+                                if ($percent > 80) {
+                                    $ret = $this->fetchTMDBProperties($result['id'], true);
+                                    if ($ret !== false && ! empty($ret['imdbid'])) {
+                                        $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
+                                        if ($imdbID !== false) {
+                                            $movieUpdated = true;
                                         }
                                     }
-                                } else {
-                                    $movieUpdated = false;
                                 }
+                            } else {
+                                $movieUpdated = false;
                             }
-                        } else {
-                            $movieUpdated = false;
                         }
                     } else {
                         $movieUpdated = false;
