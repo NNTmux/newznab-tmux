@@ -1,4 +1,5 @@
 2018-09-19 DariusIII
+	* Chg: Try to prevent foreign key erros in ReleaseFile model
 	* Chg: Use dirape/token to generate tokens and passwords for users
 2018-09-18 DariusIII
 	* Chg: Update laravel/framework to version 5.7.4
