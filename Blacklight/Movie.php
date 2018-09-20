@@ -759,7 +759,7 @@ class Movie
         if ($this->fanartapikey !== null) {
             $art = $this->fanart->getMovieFanart('tt'.$imdbId);
 
-            if ($art !== null && $art !== false) {
+            if (! empty($art)) {
                 if (isset($art['status']) && $art['status'] === 'error') {
                     return false;
                 }
