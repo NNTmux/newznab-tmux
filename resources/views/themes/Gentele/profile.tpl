@@ -114,13 +114,7 @@
 														<tr>
 															<th>Downloads last 24 hours</th>
 															<td><span id="ugrtd">{$grabstoday}</span> /</span>
-																{if $user.grabs >= $user->role->downloadrequests}&nbsp;&nbsp;
-																	<small>(Next DL
-																		in {($grabstoday.nextdl/3600)|intval}
-																		h {($grabstoday.nextdl/60) % 60}
-																		m)
-																	</small>
-																{else} {$user->role->downloadrequests} {/if}
+																{$user->role->downloadrequests}
 																{if isset($isadmin) && $grabstoday > 0}
 																	<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
 																	   href="#" class="label label-danger">
