@@ -873,11 +873,13 @@ class Binaries
                     $collectionID = false;
 
                     try {
-                        DB::transaction(function() use($unixtime, $fileCount, $collMatch, $xref, $random) {DB::insert(sprintf("
+                        DB::transaction(function () use ($unixtime, $fileCount, $collMatch, $xref, $random) {
+                            DB::insert(sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));}, 10);
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+                        }, 10);
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
@@ -906,10 +908,12 @@ class Binaries
 
                 $binaryID = false;
                 try {
-                    DB::transaction(function () use($hash, $collectionID, $fileCount){DB::insert(sprintf("
+                    DB::transaction(function () use ($hash, $collectionID, $fileCount) {
+                        DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));}, 10);
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+                    }, 10);
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
                 } catch (\PDOException $e) {
@@ -1707,11 +1711,13 @@ class Binaries
     protected function runQuery($query): string
     {
         try {
-            DB::transaction(function () use($query) {
-                DB::insert($query);}, 10);
+            DB::transaction(function () use ($query) {
+                DB::insert($query);
+            }, 10);
         } catch (QueryException $e) {
         } catch (\PDOException $e) {
         }
+
         return $this->_pdo->lastInsertId();
     }
 }
