@@ -1,3 +1,5 @@
+2018-09-20 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.20.0
 2018-09-19 DariusIII
 	* Chg: Update Movie class, fetch movie info from IMDb first before trying other sources
 	* Chg: Try to prevent foreign key erros in ReleaseFile model
