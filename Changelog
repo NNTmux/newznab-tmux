@@ -1,4 +1,5 @@
 2018-09-20 DariusIII
+	* Chg: Update releases with proper movieinfo_id when updating movies on movies list
 	* Chg: Update API v2 movie lookup description by adding traktid lookup example
 	* Chg: Update profile template
 	* Chg: Check for false response from getRawHtml function in FanartTV class

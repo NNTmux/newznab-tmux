@@ -53,7 +53,17 @@ class MovieController extends BasePageController
 
         if ($request->has('id') && \strlen($id) === 7) {
             $movCheck = $movie->getMovieInfo($id);
-            if ($movie->updateMovieInfo($id) === true && ($movCheck === null || ($request->has('update') && $request->input('update') === 1))) {
+            $movieInfo = $movie->updateMovieInfo($id);
+            if ($movieInfo === true && ($movCheck === null || ($request->has('update') === true && (int) $request->input('update') === 1))) {
+                $forUpdate = Release::query()->where('imdbid', $id)->get(['id']);
+                if ($forUpdate !== null) {
+                    $movieInfoId = MovieInfo::query()->where('imdbid', $id)->first(['id']);
+                    if ($movieInfoId !== null) {
+                        foreach ($forUpdate as $movie) {
+                            Release::query()->where('id', $movie->id)->update(['movieinfo_id' => $movieInfoId->id]);
+                        }
+                    }
+                }
                 return redirect('admin/movie-list');
             }
 
