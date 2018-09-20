@@ -966,7 +966,7 @@ class Binaries
 
         // End of processing headers.
         $this->timeCleaning = number_format($this->startUpdate - $this->startCleaning, 2);
-        $binariesQuery = $binariesCheck = sprintf('INSERT IGNORE INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
+        $binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
         foreach ($binariesUpdate as $binaryID => $binary) {
             $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
         }
@@ -974,15 +974,8 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) {
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
-                $this->_pdo->commit();
-            } else {
-                if ($this->addToPartRepair) {
-                    $this->headersNotInserted += $this->headersReceived;
-                }
-                DB::rollBack();
-            }
+        if ((\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) && \strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
+            $this->_pdo->commit();
         } else {
             if ($this->addToPartRepair) {
                 $this->headersNotInserted += $this->headersReceived;
