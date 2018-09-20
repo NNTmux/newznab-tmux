@@ -90,6 +90,6 @@ class FanartTV
 
         $response = getRawHtml($url);
 
-        return $response !== false ? json_decode(getRawHtml($url), true) : false;
+        return $response !== false ? json_decode($response, true) : false;
     }
 }
