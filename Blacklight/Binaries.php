@@ -804,9 +804,10 @@ class Binaries
      *
      *
      * @param array $headers
-     * @param bool  $multiGroup
+     * @param bool $multiGroup
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     protected function storeHeaders(array $headers = [], $multiGroup = false): void
     {
@@ -872,11 +873,11 @@ class Binaries
                     $collectionID = false;
 
                     try {
-                        DB::insert(sprintf("
+                        DB::transaction(function() use($unixtime, $fileCount, $collMatch, $xref, $random) {DB::insert(sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));}, 10);
 
                         $collectionID = $this->_pdo->lastInsertId();
                     } catch (QueryException $e) {
@@ -884,10 +885,6 @@ class Binaries
                         if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                             DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
                             DB::commit();
-                        }
-                        if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                            ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                            DB::rollBack();
                         }
                     }
 
@@ -909,25 +906,16 @@ class Binaries
 
                 $binaryID = false;
                 try {
-                    DB::insert(sprintf("
+                    DB::transaction(function () use($hash, $collectionID, $fileCount){DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));}, 10);
                     $binaryID = $this->_pdo->lastInsertId();
                 } catch (QueryException $e) {
                 } catch (\PDOException $e) {
                     if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
                         DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
                         DB::commit();
-                    }
-                    if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                        ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                        DB::rollBack();
-                    }
-
-                    if ($e->getMessage() === 'SQLSTATE[23000]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                        ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                        DB::rollBack();
                     }
                 }
 
@@ -957,6 +945,7 @@ class Binaries
             $partsQuery .=
                 '('.$binaryID.','.$this->header['Number'].','.rtrim($this->header['Message-ID'], '>')."',".
                 $this->header['matches'][2].','.$this->header['Bytes'].'),';
+            $partsQuery = rtrim($partsQuery, ',');
         }
 
         //unset($headers); // Reclaim memory.
@@ -974,7 +963,7 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if ((\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) && \strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
+        if ((\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) && \strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery($partsQuery)) {
             $this->_pdo->commit();
         } else {
             if ($this->addToPartRepair) {
@@ -1228,7 +1217,7 @@ class Binaries
                     $groupArr['id']
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1452,7 +1441,7 @@ class Binaries
         }
         DB::transaction(function () use ($groupID, $sql) {
             DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1648,7 +1637,7 @@ class Binaries
     {
         DB::transaction(function () use ($collectionID) {
             DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1708,5 +1697,21 @@ class Binaries
         Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;
+    }
+
+    /**
+     * @param $query
+     * @return string
+     * @throws \Throwable
+     */
+    protected function runQuery($query): string
+    {
+        try {
+            DB::transaction(function () use($query) {
+                DB::insert($query);}, 10);
+        } catch (QueryException $e) {
+        } catch (\PDOException $e) {
+        }
+        return $this->_pdo->lastInsertId();
     }
 }

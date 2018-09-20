@@ -1,4 +1,5 @@
 2018-09-20 DariusIII
+	* Chg: Update Binaries class, wrap insert queries inside transaction
 	* Chg: Update laravel/framework to version 5.7.5
 	* Chg: Revert change to Binaries class, it makes incomplete releases
 	* Chg: Update releases with proper movieinfo_id when updating movies on movies list
