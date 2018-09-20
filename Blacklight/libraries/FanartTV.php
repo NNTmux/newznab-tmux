@@ -14,10 +14,6 @@
 
 namespace Blacklight\libraries;
 
-use Blacklight\ColorCLI;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-
 class FanartTV
 {
     /**
@@ -91,6 +87,7 @@ class FanartTV
     private function _getUrl($path)
     {
         $url = $this->server.'/'.$path.'?api_key='.$this->apiKey;
+
         return json_decode(getRawHtml($url), true);
     }
 }
