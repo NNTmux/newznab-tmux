@@ -1,4 +1,5 @@
 2018-09-20 DariusIII
+	* Chg: Check for false response from getRawHtml function in FanartTV class
 	* Chg: Update FanartTV class and classes that use it
 	* Chg: Update spatie/laravel-permission to version 2.20.0
 2018-09-19 DariusIII
