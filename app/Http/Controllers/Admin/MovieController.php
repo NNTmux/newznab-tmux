@@ -64,6 +64,7 @@ class MovieController extends BasePageController
                         }
                     }
                 }
+
                 return redirect('admin/movie-list');
             }
 
