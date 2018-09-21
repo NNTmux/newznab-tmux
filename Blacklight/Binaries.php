@@ -4,12 +4,12 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Settings;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\QueryException;
 use Blacklight\processing\ProcessReleasesMultiGroup;
 
 /**
@@ -871,7 +871,6 @@ class Binaries
                     $random = random_bytes(16);
 
                     $collectionID = false;
-
 
                     try {
                         DB::insert(sprintf("
