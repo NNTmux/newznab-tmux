@@ -1,5 +1,6 @@
 2018-09-21 DariusIII
-	* CHg: Update binaries class
+	* Chg: Use strpos to check line in articles in NNTP class
+	* Chg: Update binaries class
 	* Chg: Set firewall as disabled in .env.example
 	* Chg: Update Binaries class, use transactions properly
 2018-09-20 DariusIII

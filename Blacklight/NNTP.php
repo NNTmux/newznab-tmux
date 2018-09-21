@@ -1128,7 +1128,7 @@ class NNTP extends \Net_NNTP_Client
                 }
 
                 // Check for line that starts with double period, remove one.
-                if ($line[0] === '.' && $line[1] === '.') {
+                if (strpos($line, '.') === 0 && $line[1] === '.') {
                     $line = substr($line, 1);
                 }
 
