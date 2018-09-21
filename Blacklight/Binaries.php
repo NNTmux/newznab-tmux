@@ -1238,7 +1238,7 @@ class Binaries
         $groupID = Group::getIDByName($groupData['group']);
         $group = [];
         if ($groupID !== '') {
-            $group = Group::getCBPTableNames($groupID);
+            $group = (new Group())->getCBPTableNames($groupID);
         }
 
         $currentPost = $post;
