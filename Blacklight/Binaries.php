@@ -4,12 +4,12 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Settings;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\QueryException;
 use Blacklight\processing\ProcessReleasesMultiGroup;
 
 /**
@@ -872,22 +872,17 @@ class Binaries
 
                     $collectionID = false;
 
+
                     try {
-                        DB::transaction(function () use ($unixtime, $fileCount, $collMatch, $xref, $random) {
-                            DB::insert(sprintf("
+                        DB::insert(sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
-                        }, 10);
-
                         $collectionID = $this->_pdo->lastInsertId();
-                    } catch (QueryException $e) {
-                    } catch (\PDOException $e) {
-                        if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                            DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
-                            DB::commit();
-                        }
+                        DB::commit();
+                    } catch (\Throwable $e) {
+                        DB::rollBack();
                     }
 
                     if ($collectionID === false) {
@@ -907,20 +902,16 @@ class Binaries
                 $hash = md5($this->header['matches'][1].$this->header['From'].$this->groupMySQL['id']);
 
                 $binaryID = false;
+
                 try {
-                    DB::transaction(function () use ($hash, $collectionID, $fileCount) {
-                        DB::insert(sprintf("
+                    DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
-                    }, 10);
                     $binaryID = $this->_pdo->lastInsertId();
-                } catch (QueryException $e) {
-                } catch (\PDOException $e) {
-                    if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                        DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
-                        DB::commit();
-                    }
+                    DB::commit();
+                } catch (\Throwable $e) {
+                    DB::rollBack();
                 }
 
                 if ($binaryID === false) {
@@ -949,7 +940,6 @@ class Binaries
             $partsQuery .=
                 '('.$binaryID.','.$this->header['Number'].','.rtrim($this->header['Message-ID'], '>')."',".
                 $this->header['matches'][2].','.$this->header['Bytes'].'),';
-            $partsQuery = rtrim($partsQuery, ',');
         }
 
         //unset($headers); // Reclaim memory.
@@ -967,8 +957,15 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if ((\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) && \strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery($partsQuery)) {
-            $this->_pdo->commit();
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) {
+            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery(rtrim($partsQuery, ','))) {
+                DB::commit();
+            } else {
+                if ($this->addToPartRepair) {
+                    $this->headersNotInserted += $this->headersReceived;
+                }
+                DB::rollBack();
+            }
         } else {
             if ($this->addToPartRepair) {
                 $this->headersNotInserted += $this->headersReceived;
@@ -1031,7 +1028,8 @@ class Binaries
                 'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
-            ), true
+            ),
+            true
         );
     }
 
@@ -1052,7 +1050,9 @@ class Binaries
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
                 ColorCLI::primaryOver(' for part repair, ').
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
-                ColorCLI::primary(' total.'), true);
+                ColorCLI::primary(' total.'),
+                true
+            );
         }
     }
 
@@ -1338,7 +1338,8 @@ class Binaries
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
-                ), true
+                ),
+                true
             );
         }
 
@@ -1399,7 +1400,8 @@ class Binaries
                 ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
-                ), true
+                ),
+                true
             );
         }
 
@@ -1705,19 +1707,21 @@ class Binaries
 
     /**
      * @param $query
-     * @return string
-     * @throws \Throwable
+     *
+     * @return bool
      */
-    protected function runQuery($query): string
+    protected function runQuery($query)
     {
         try {
-            DB::transaction(function () use ($query) {
-                DB::insert($query);
-            }, 10);
+            return DB::insert($query);
         } catch (QueryException $e) {
+            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
         } catch (\PDOException $e) {
+            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+        } catch (\Throwable $e) {
+            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
         }
 
-        return $this->_pdo->lastInsertId();
+        return false;
     }
 }
