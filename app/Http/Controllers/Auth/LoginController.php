@@ -53,7 +53,15 @@ class LoginController extends Controller
         ]);
 
         $error = '';
+        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $request->merge([
+            $login_type => $request->input('username'),
+        ]);
         $user = User::getByUsername($request->input('username'));
+        if ($user === null) {
+            $user = User::getByEmail($request->input('username'));
+        }
 
         if ($user !== null && \Firewall::isBlacklisted($user->host) === false) {
             if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
@@ -63,12 +71,6 @@ class LoginController extends Controller
             }
 
             $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
-
-            $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-            $request->merge([
-                $login_type => $request->input('username'),
-            ]);
 
             if ($user->isVerified() === false || $user->isPendingVerification()) {
                 return $this->showLoginForm('You have not verified your email address!');

@@ -1,3 +1,5 @@
+2018-09-22 DariusIIi
+	* Fix: Fix user login by email
 2018-09-21 DariusIII
 	* Chg: Update install script to set admin as verified
 	* Chg: Update nesbot/carbon to version 1.34.0 and fancybox to latest
