@@ -301,7 +301,7 @@ class BasePageController extends Controller
     }
 
     /**
-     *  Set admin preferences
+     *  Set admin preferences.
      */
     public function setAdminPrefs()
     {
