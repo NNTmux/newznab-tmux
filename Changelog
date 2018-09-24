@@ -1,3 +1,5 @@
+2018-09-24 DariusIII
+	* Chg: Use $this->userdata->id variable in place of Auth::(id) in controllers
 2018-09-22 DariusIIi
 	* Fix: Fix user login by email
 2018-09-21 DariusIII

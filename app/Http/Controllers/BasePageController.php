@@ -59,11 +59,9 @@ class BasePageController extends Controller
     public $page_template = '';
 
     /**
-     * User settings from the MySQL DB.
-     *
-     * @var array|bool
+     * @var User
      */
-    public $userdata = [];
+    public $userdata;
 
     /**
      * User's theme.
@@ -243,7 +241,7 @@ class BasePageController extends Controller
 
         // Update last login every 15 mins.
         if ((strtotime($this->userdata['now']) - 900) > strtotime($this->userdata['lastlogin'])) {
-            User::updateSiteAccessed($this->userdata['id']);
+            User::updateSiteAccessed($this->userdata->id);
         }
 
         $this->smarty->assign('userdata', $this->userdata);
@@ -302,6 +300,9 @@ class BasePageController extends Controller
         $this->smarty->assign('header_menu', $header_menu);
     }
 
+    /**
+     *  Set admin preferences
+     */
     public function setAdminPrefs()
     {
         // Tell Smarty which directories to use for templates

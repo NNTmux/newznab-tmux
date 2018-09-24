@@ -128,7 +128,7 @@ class ProfileController extends BasePageController
 
         $action = $request->input('action') ?? 'view';
 
-        $userid = Auth::id();
+        $userid = $this->userdata->id;
         $data = User::find($userid);
         if (! $data) {
             $this->show404('No such user!');

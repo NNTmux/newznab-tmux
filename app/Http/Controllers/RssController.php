@@ -68,7 +68,7 @@ class RssController extends BasePageController
             $uid = -1;
             // User requested a feed, ensure either logged in or passing a valid token.
             if (Auth::check()) {
-                $uid = Auth::id();
+                $uid = $this->userdata->id;
                 $rssToken = $this->userdata['api_token'];
                 $maxRequests = $this->userdata->role->apirequests;
             } else {

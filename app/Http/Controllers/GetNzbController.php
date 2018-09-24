@@ -28,7 +28,7 @@ class GetNzbController extends BasePageController
 
         // Page is accessible only by the rss token, or logged in users.
         if (Auth::check()) {
-            $uid = Auth::id();
+            $uid = $this->userdata->id;
             $maxDownloads = $this->userdata->role->downloadrequests;
             $rssToken = $this->userdata['api_token'];
             if ($this->userdata->hasRole('Disabled') === true) {

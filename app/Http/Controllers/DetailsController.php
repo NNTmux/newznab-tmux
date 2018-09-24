@@ -49,7 +49,7 @@ class DetailsController extends BasePageController
             }
 
             if ($this->isPostBack()) {
-                ReleaseComment::addComment($data['id'], $data['gid'], \request()->input('txtAddComment'), Auth::id(), \request()->ip());
+                ReleaseComment::addComment($data['id'], $data['gid'], \request()->input('txtAddComment'), $this->userdata->id, \request()->ip());
             }
 
             $nfo = ReleaseNfo::getReleaseNfo($data['id']);

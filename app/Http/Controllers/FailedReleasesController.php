@@ -20,7 +20,7 @@ class FailedReleasesController extends BasePageController
         $this->setPrefs();
         // Page is accessible only by the rss token, or logged in users.
         if (Auth::check()) {
-            $uid = Auth::id();
+            $uid = $this->userdata->id;
             $rssToken = $this->userdata['api_token'];
         } else {
             if (! $request->has('userid') || ! $request->has('api_token')) {
