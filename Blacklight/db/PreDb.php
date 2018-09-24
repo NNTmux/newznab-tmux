@@ -114,7 +114,7 @@ class PreDb
 
         $limit = $options['limit'] > 0 ? "LIMIT {$options['limit']}" : '';
 
-        $enclosedby = empty($options['enclosedby']) ? '' : "ENCLOSED BY {$this->quote($options['enclosedby'])}";
+        $enclosedby = empty($options['enclosedby']) ? '' : "ENCLOSED BY {$this->pdo->quote($options['enclosedby'])}";
 
         $sql = <<<SQL_EXPORT
 SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name
