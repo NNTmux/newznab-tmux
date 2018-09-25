@@ -775,12 +775,12 @@ class User extends Authenticatable
     /**
      * Add a new user.
      *
-     * @param     $userName
-     * @param     $password
-     * @param     $email
-     * @param $role
-     * @param     $notes
-     * @param     $host
+     * @param string    $userName
+     * @param  string   $password
+     * @param  string   $email
+     * @param int    $role
+     * @param string    $notes
+     * @param string    $host
      * @param int $invites
      * @param int $invitedBy
      *
@@ -794,7 +794,10 @@ class User extends Authenticatable
             return false;
         }
 
-        $rateLimit = Role::query()->where('id', $role)->value('rate_limit');
+        $roleData = Role::query()->where('id', $role);
+        $rateLimit = $roleData->value('rate_limit');
+        $roleName = $roleData->value('name');
+
 
         if (\defined('NN_INSTALLER')) {
             $storeips = '';
@@ -808,6 +811,7 @@ class User extends Authenticatable
                 'password' => $password,
                 'email' => $email,
                 'host' => $storeips,
+                'roles_id' => $role,
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
                 'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
@@ -817,7 +821,7 @@ class User extends Authenticatable
             ]
         );
 
-        $user->assignRole($role);
+        $user->assignRole($roleName);
 
         return $user->id;
     }
