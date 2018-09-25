@@ -152,7 +152,7 @@ class UserController extends BasePageController
                         $roleName = Role::query()->where('id', $request->input('role'))->value('name');
                         if ($roleName === 'Disabled') {
                             $blockedUser = User::find($request->input('id'));
-                            if (\Firewall::isBlacklisted($blockedUser->host) === false) {
+                            if (env('FIREWALL_ENABLED') === true && \Firewall::isBlacklisted($blockedUser->host) === false) {
                                 \Firewall::blacklist($blockedUser->host);
                             }
                         }
