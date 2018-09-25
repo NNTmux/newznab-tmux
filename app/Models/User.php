@@ -798,7 +798,6 @@ class User extends Authenticatable
         $rateLimit = $roleData->value('rate_limit');
         $roleName = $roleData->value('name');
 
-
         if (\defined('NN_INSTALLER')) {
             $storeips = '';
         } else {
