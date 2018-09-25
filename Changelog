@@ -1,3 +1,5 @@
+2018-09-25 DariusIII
+	* Chg: Publish the user verification migration to prevent database user table error
 2018-09-24 DariusIII
 	* Fix: Fix pdo quote in Blacklight/db/PreDB class
 	* Chg: Use $this->userdata->id variable in place of Auth::(id) in controllers
