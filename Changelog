@@ -1,4 +1,5 @@
 2018-09-26 DariusIII
+	* Chg: Fix checking for argv in reset_postprocessing.php
 	* Chg: Update egulias/email-validator to version 2.1.6 and laravel/framework to 5.7.6
 2018-09-25 DariusIII
 	* Fix: Fix login and user controllers behaviour if firewall is disabled
