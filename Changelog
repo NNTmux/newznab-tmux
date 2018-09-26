@@ -1,4 +1,5 @@
 2018-09-26 DariusIII
+	* Fix: Fix undefined offset 0 in Binaries class postdate function
 	* Chg: Update tmux install script to use tmux 2.8-rc to compile tmux
 	* Fix: Fix blacklist-list.tpl error
 	* Chg: Fix checking for argv in reset_postprocessing.php

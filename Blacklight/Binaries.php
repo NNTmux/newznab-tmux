@@ -1262,7 +1262,7 @@ class Binaries
                         $currentPost
                     )
                 );
-                if ($local > 0) {
+                if (! empty($local) && \count($local) > 0) {
                     $date = $local[0]->date;
                     break;
                 }
