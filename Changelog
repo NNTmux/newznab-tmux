@@ -1,4 +1,62 @@
+2018-09-26 DariusIII
+	* Fix: Fix undefined offset 0 in Binaries class postdate function
+	* Chg: Update tmux install script to use tmux 2.8-rc to compile tmux
+	* Fix: Fix blacklist-list.tpl error
+	* Chg: Fix checking for argv in reset_postprocessing.php
+	* Chg: Update egulias/email-validator to version 2.1.6 and laravel/framework to 5.7.6
+2018-09-25 DariusIII
+	* Fix: Fix login and user controllers behaviour if firewall is disabled
+	* Fix: Fix wrong assingment of role in users table on user creation
+	* Chg: Remove verified and verification_token from users table, it will be added by verification migration
+	* Chg: Publish the user verification migration to prevent database user table error
+2018-09-24 DariusIII
+	* Fix: Fix pdo quote in Blacklight/db/PreDB class
+	* Chg: Use $this->userdata->id variable in place of Auth::(id) in controllers
+2018-09-22 DariusIIi
+	* Fix: Fix user login by email
+2018-09-21 DariusIII
+	* Chg: Update install script to set admin as verified
+	* Chg: Update nesbot/carbon to version 1.34.0 and fancybox to latest
+	* Chg: Use strpos to check line in articles in NNTP class
+	* Chg: Update binaries class
+	* Chg: Set firewall as disabled in .env.example
+	* Chg: Update Binaries class, use transactions properly
+2018-09-20 DariusIII
+	* Chg: Update Binaries class, wrap insert queries inside transaction
+	* Chg: Update laravel/framework to version 5.7.5
+	* Chg: Revert change to Binaries class, it makes incomplete releases
+	* Chg: Update releases with proper movieinfo_id when updating movies on movies list
+	* Chg: Update API v2 movie lookup description by adding traktid lookup example
+	* Chg: Update profile template
+	* Chg: Check for false response from getRawHtml function in FanartTV class
+	* Chg: Update FanartTV class and classes that use it
+	* Chg: Update spatie/laravel-permission to version 2.20.0
+2018-09-19 DariusIII
+	* Chg: Update Movie class, fetch movie info from IMDb first before trying other sources
+	* Chg: Try to prevent foreign key erros in ReleaseFile model
+	* Chg: Use dirape/token to generate tokens and passwords for users
+2018-09-18 DariusIII
+	* Chg: Update laravel/framework to version 5.7.4
+	* Fix: Use url helper in place of $this->serverurl variable
+	* Fix: Add missing $this->serverurl declaration in BasePageController
+	* Chg: Update mayconbordin/l5-fixtures to latest commit
+	* Chg: Remove debug messages from Binaries class
+	* Chg: Try to ignore errors on binaries data insertion
+	* Chg: Do not log insert errors in Binaries class to reduce log size
+	* Chg: Update nikic/php-parser to version 4.0.4
+2018-09-17 DariusIII
+	* Chg: Catch 429 errors and disable IGDB lookups
+	* Chg: Use igdb lookups for console games
+	* Chg: Update getConsoleInfoByName function return value
+2018-09-15 DariusIII
+	* Chg: Update bhuvidya/laravel-countries to version 1.0.4
+2018-09-14 DariusIII
+	* Chg: Update Console class
+	* Chg: Update league/flysystem and spatie/laravel-permission to latest versions
+	* Chg: Update some of the regexes in Categorize and NameFixer classes
+	* Chg: Add IGDB for PC games lookup
 2018-09-13 DariusIII
+	* Chg: Update tiny-mce to latest version
 	* Chg: Update jrean/laravel-user-verification to version 7.0.0
 	* Chg: Update README
 	* Chg: Fix misplaced seconds word in ProcessReleases class

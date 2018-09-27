@@ -33,7 +33,7 @@ class MyMoviesController extends BasePageController
 
         switch ($action) {
             case 'delete':
-                $movie = UserMovie::getMovie(Auth::id(), $imdbid);
+                $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
                 if ($request->has('from')) {
                     header('Location:'.WWW_TOP.$request->input('from'));
                 } else {
@@ -42,13 +42,13 @@ class MyMoviesController extends BasePageController
                 if (! $movie) {
                     $this->show404();
                 } else {
-                    UserMovie::delMovie(Auth::id(), $imdbid);
+                    UserMovie::delMovie($this->userdata->id, $imdbid);
                 }
 
                 break;
             case 'add':
             case 'doadd':
-                $movie = UserMovie::getMovie(Auth::id(), $imdbid);
+                $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
                 if ($movie) {
                     $this->show404();
                 } else {
@@ -60,7 +60,7 @@ class MyMoviesController extends BasePageController
 
                 if ($action === 'doadd') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
-                    UserMovie::addMovie(Auth::id(), $imdbid, $category);
+                    UserMovie::addMovie($this->userdata->id, $imdbid, $category);
                     if ($request->has('from')) {
                         header('Location:'.WWW_TOP.$request->input('from'));
                     } else {
@@ -89,7 +89,7 @@ class MyMoviesController extends BasePageController
                 break;
             case 'edit':
             case 'doedit':
-                $movie = UserMovie::getMovie(Auth::id(), $imdbid);
+                $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
 
                 if (! $movie) {
                     $this->show404();
@@ -97,7 +97,7 @@ class MyMoviesController extends BasePageController
 
                 if ($action === 'doedit') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
-                    UserMovie::updateMovie(Auth::id(), $imdbid, $category);
+                    UserMovie::updateMovie($this->userdata->id, $imdbid, $category);
                     if ($request->has('from')) {
                         redirect($request->input('from'));
                     } else {

@@ -95,6 +95,13 @@
 														name="steam{$result->gamesinfo_id}"
 														title="View Steam page">
 															Steam</a>{/if}
+                                                    {if $result->classused == "IGDB"}<a
+                                                        class="label label-default"
+                                                        target="_blank"
+                                                        href="{$site->dereferrer_link}{$result->url}"
+                                                        name="igdb{$result->gamesinfo_id}"
+                                                        title="View IGDB page">
+                                                            IGDB</a>{/if}
 													{if $result->nfoid > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 														title="View NFO" class="modal_nfo label label-default"

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b5fcf01653d5163e9d17ea57e79cc2c",
+    "content-hash": "73d050456acb6fc2c38248a4f2c705ae",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -183,19 +183,20 @@
         },
         {
             "name": "bhuvidya/laravel-countries",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bhuvidya/laravel-countries.git",
-                "reference": "6eda702c6d8710cc96a52397b89eb42ca4d20730"
+                "reference": "8e45bac5a255119878568afd302886c9b3eff8cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/6eda702c6d8710cc96a52397b89eb42ca4d20730",
-                "reference": "6eda702c6d8710cc96a52397b89eb42ca4d20730",
+                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/8e45bac5a255119878568afd302886c9b3eff8cb",
+                "reference": "8e45bac5a255119878568afd302886c9b3eff8cb",
                 "shasum": ""
             },
             "require": {
+                "illuminate/database": "^5.5.0",
                 "illuminate/support": "^5.5.0",
                 "php": ">=7.0.0"
             },
@@ -231,7 +232,7 @@
                 "iso_3166_3",
                 "laravel"
             ],
-            "time": "2018-02-10T23:09:24+00:00"
+            "time": "2018-09-15T03:26:27+00:00"
         },
         {
             "name": "bower-asset/animate.css",
@@ -669,16 +670,16 @@
         },
         {
             "name": "bower-asset/fancybox",
-            "version": "v3.4.1",
+            "version": "v3.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fancyapps/fancybox.git",
-                "reference": "a829fabd0edf06ed711f3b5b201332b8164cc4ff"
+                "reference": "48c7be612e29083d9face31fa2c16a976eef4ab6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/a829fabd0edf06ed711f3b5b201332b8164cc4ff",
-                "reference": "a829fabd0edf06ed711f3b5b201332b8164cc4ff",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/48c7be612e29083d9face31fa2c16a976eef4ab6",
+                "reference": "48c7be612e29083d9face31fa2c16a976eef4ab6",
                 "shasum": ""
             },
             "require": {
@@ -704,7 +705,7 @@
                 "responsive",
                 "touch"
             ],
-            "time": "2018-08-31T12:53:24+00:00"
+            "time": "2018-09-21T11:43:08+00:00"
         },
         {
             "name": "bower-asset/fastclick",
@@ -1398,16 +1399,16 @@
         },
         {
             "name": "bower-asset/tinymce-dist",
-            "version": "4.8.2",
+            "version": "4.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "ec411e5fbf021ee7586d43cce285cded8c979409"
+                "reference": "e6ad606b0da07cc7d1847f01d5d89b42920d5bc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/ec411e5fbf021ee7586d43cce285cded8c979409",
-                "reference": "ec411e5fbf021ee7586d43cce285cded8c979409",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/e6ad606b0da07cc7d1847f01d5d89b42920d5bc2",
+                "reference": "e6ad606b0da07cc7d1847f01d5d89b42920d5bc2",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1432,7 +1433,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2018-08-09T09:17:07+00:00"
+            "time": "2018-09-13T14:31:22+00:00"
         },
         {
             "name": "cache/adapter-common",
@@ -1924,6 +1925,62 @@
             "time": "2018-08-20T21:53:06+00:00"
         },
         {
+            "name": "dirape/token",
+            "version": "v2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/F54it/laravel-token.git",
+                "reference": "a1c636399d1e45fa2ccc523f7494e54b33c05421"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/F54it/laravel-token/zipball/a1c636399d1e45fa2ccc523f7494e54b33c05421",
+                "reference": "a1c636399d1e45fa2ccc523f7494e54b33c05421",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.0 || ~4.0",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Dirape\\Token\\TokenServiceProvider"
+                    ],
+                    "aliases": {
+                        "Token": "Dirape\\Token\\Facades\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dirape\\Token\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "MustafaKhaled",
+                    "email": "MustafaKhaled.dev@gmail.com"
+                }
+            ],
+            "description": "Unique Token Generator For Laravel",
+            "keywords": [
+                "PHP token",
+                "generate",
+                "laravel",
+                "laravel token",
+                "token",
+                "token generator",
+                "unique token"
+            ],
+            "time": "2018-06-24T20:30:21+00:00"
+        },
+        {
             "name": "dnoegel/php-xdg-base-dir",
             "version": "0.1",
             "source": {
@@ -2356,16 +2413,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "2.1.5",
+            "version": "2.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "54859fabea8b3beecbb1a282888d5c990036b9e3"
+                "reference": "0578b32b30b22de3e8664f797cf846fc9246f786"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/54859fabea8b3beecbb1a282888d5c990036b9e3",
-                "reference": "54859fabea8b3beecbb1a282888d5c990036b9e3",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/0578b32b30b22de3e8664f797cf846fc9246f786",
+                "reference": "0578b32b30b22de3e8664f797cf846fc9246f786",
                 "shasum": ""
             },
             "require": {
@@ -2409,7 +2466,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2018-08-16T20:49:45+00:00"
+            "time": "2018-09-25T20:47:26+00:00"
         },
         {
             "name": "erusev/parsedown",
@@ -3628,16 +3685,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.7.3",
+            "version": "v5.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "536a024e3ef6b93f55f4039a7f4568efa7e60aea"
+                "reference": "93e761bb5367166ce98ba908d5eb0edd6be76792"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/536a024e3ef6b93f55f4039a7f4568efa7e60aea",
-                "reference": "536a024e3ef6b93f55f4039a7f4568efa7e60aea",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/93e761bb5367166ce98ba908d5eb0edd6be76792",
+                "reference": "93e761bb5367166ce98ba908d5eb0edd6be76792",
                 "shasum": ""
             },
             "require": {
@@ -3765,7 +3822,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2018-09-11T13:42:55+00:00"
+            "time": "2018-09-25T14:29:00+00:00"
         },
         {
             "name": "laravel/scout",
@@ -4022,26 +4079,26 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.46",
+            "version": "1.0.47",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "f3e0d925c18b92cf3ce84ea5cc58d62a1762a2b2"
+                "reference": "a11e4a75f256bdacf99d20780ce42d3b8272975c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/f3e0d925c18b92cf3ce84ea5cc58d62a1762a2b2",
-                "reference": "f3e0d925c18b92cf3ce84ea5cc58d62a1762a2b2",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/a11e4a75f256bdacf99d20780ce42d3b8272975c",
+                "reference": "a11e4a75f256bdacf99d20780ce42d3b8272975c",
                 "shasum": ""
             },
             "require": {
+                "ext-fileinfo": "*",
                 "php": ">=5.5.9"
             },
             "conflict": {
                 "league/flysystem-sftp": "<1.0.6"
             },
             "require-dev": {
-                "ext-fileinfo": "*",
                 "phpspec/phpspec": "^3.4",
                 "phpunit/phpunit": "^5.7.10"
             },
@@ -4102,7 +4159,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2018-08-22T07:45:22+00:00"
+            "time": "2018-09-14T15:30:29+00:00"
         },
         {
             "name": "league/fractal",
@@ -4276,12 +4333,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mayconbordin/l5-fixtures.git",
-                "reference": "2ec4080260cbab53966ba8216ce08abb0c043f28"
+                "reference": "767b37f20be0ebdab41b3e7def56fdd65bf2b863"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mayconbordin/l5-fixtures/zipball/2ec4080260cbab53966ba8216ce08abb0c043f28",
-                "reference": "2ec4080260cbab53966ba8216ce08abb0c043f28",
+                "url": "https://api.github.com/repos/mayconbordin/l5-fixtures/zipball/767b37f20be0ebdab41b3e7def56fdd65bf2b863",
+                "reference": "767b37f20be0ebdab41b3e7def56fdd65bf2b863",
                 "shasum": ""
             },
             "require": {
@@ -4333,7 +4390,55 @@
                 "laravel 5",
                 "yaml"
             ],
-            "time": "2018-01-18T09:07:50+00:00"
+            "time": "2018-09-18T11:11:44+00:00"
+        },
+        {
+            "name": "messerli90/igdb",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/messerli90/igdb.git",
+                "reference": "e93008753261e0c824589243916415eb5947baec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/messerli90/igdb/zipball/e93008753261e0c824589243916415eb5947baec",
+                "reference": "e93008753261e0c824589243916415eb5947baec",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "illuminate/support": ">= 5.0",
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Messerli90\\IGDB\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Messerli",
+                    "email": "michaelamesserli@gmail.com"
+                }
+            ],
+            "description": "Laravel PHP Facade/Wrapper for the IGDB API",
+            "keywords": [
+                "api",
+                "gaming",
+                "igdb",
+                "laravel",
+                "messerli90"
+            ],
+            "time": "2017-08-06T17:14:20+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -4415,16 +4520,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "1.33.0",
+            "version": "1.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "55667c1007a99e82030874b1bb14d24d07108413"
+                "reference": "1dbd3cb01c5645f3e7deda7aa46ef780d95fcc33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/55667c1007a99e82030874b1bb14d24d07108413",
-                "reference": "55667c1007a99e82030874b1bb14d24d07108413",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/1dbd3cb01c5645f3e7deda7aa46ef780d95fcc33",
+                "reference": "1dbd3cb01c5645f3e7deda7aa46ef780d95fcc33",
                 "shasum": ""
             },
             "require": {
@@ -4466,20 +4571,20 @@
                 "datetime",
                 "time"
             ],
-            "time": "2018-08-07T08:39:47+00:00"
+            "time": "2018-09-20T19:36:25+00:00"
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "bd088dc940a418f09cda079a9b5c7c478890fb8d"
+                "reference": "fa6ee28600d21d49b2b4e1006b48426cec8e579c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/bd088dc940a418f09cda079a9b5c7c478890fb8d",
-                "reference": "bd088dc940a418f09cda079a9b5c7c478890fb8d",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/fa6ee28600d21d49b2b4e1006b48426cec8e579c",
+                "reference": "fa6ee28600d21d49b2b4e1006b48426cec8e579c",
                 "shasum": ""
             },
             "require": {
@@ -4517,7 +4622,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-07-15T17:25:16+00:00"
+            "time": "2018-09-18T07:03:24+00:00"
         },
         {
             "name": "nzedb/Git.php",
@@ -5740,16 +5845,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.19.0",
+            "version": "2.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "cf4f3afb093a524bbdfb32f02a644a37694ff4c6"
+                "reference": "e2200bb92b67632abc92aa438de9cb0958da20d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/cf4f3afb093a524bbdfb32f02a644a37694ff4c6",
-                "reference": "cf4f3afb093a524bbdfb32f02a644a37694ff4c6",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/e2200bb92b67632abc92aa438de9cb0958da20d9",
+                "reference": "e2200bb92b67632abc92aa438de9cb0958da20d9",
                 "shasum": ""
             },
             "require": {
@@ -5797,7 +5902,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-09-10T19:52:52+00:00"
+            "time": "2018-09-20T01:30:08+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -9317,20 +9422,23 @@
         },
         {
             "name": "phpunit/php-file-iterator",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
-                "reference": "cecbc684605bb0cc288828eb5d65d93d5c676d3c"
+                "reference": "050bedf145a257b1ff02746c31894800e5122946"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/cecbc684605bb0cc288828eb5d65d93d5c676d3c",
-                "reference": "cecbc684605bb0cc288828eb5d65d93d5c676d3c",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/050bedf145a257b1ff02746c31894800e5122946",
+                "reference": "050bedf145a257b1ff02746c31894800e5122946",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.1"
             },
             "type": "library",
             "extra": {
@@ -9360,7 +9468,7 @@
                 "filesystem",
                 "iterator"
             ],
-            "time": "2018-06-11T11:44:00+00:00"
+            "time": "2018-09-13T20:33:42+00:00"
         },
         {
             "name": "phpunit/php-text-template",

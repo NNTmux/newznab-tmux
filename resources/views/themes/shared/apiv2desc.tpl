@@ -46,6 +46,9 @@
         <dt>Movies by TMDb <span style="font-family:courier;"><a
                     href="{$smarty.const.WWW_TOP}/api/v2/movies?tmdbid=43418&amp;api_token={$userdata.api_token}">movies?tmdbid=43418</a></span>
         </dt>
+        <dt>Movies by TraktTV <span style="font-family:courier;"><a
+                    href="{$smarty.const.WWW_TOP}/api/v2/movies?traktid=29200&amp;api_token={$userdata.api_token}">movies?traktid=29200</a></span>
+        </dt>
         <dd>Returns a list of nzbs matching a query, an imdbid, tmdbid or traktid and optionally a category. Filter by
             site category by including a comma separated list of categories as follows <span
                 style="font-family:courier;"><a

@@ -8,7 +8,6 @@ use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
 use Blacklight\processing\ProcessReleasesMultiGroup;
@@ -111,11 +110,6 @@ class Binaries
      * @var bool
      */
     protected $_echoCLI;
-
-    /**
-     * @var bool
-     */
-    protected $_debug = false;
 
     /**
      * Max tries to download headers.
@@ -810,9 +804,10 @@ class Binaries
      *
      *
      * @param array $headers
-     * @param bool  $multiGroup
+     * @param bool $multiGroup
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     protected function storeHeaders(array $headers = [], $multiGroup = false): void
     {
@@ -883,19 +878,10 @@ class Binaries
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
-
                         $collectionID = $this->_pdo->lastInsertId();
-                    } catch (QueryException $e) {
-                        Log::error($e->getMessage());
-                    } catch (\PDOException $e) {
-                        if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                            DB::unprepared("CREATE TABLE {$this->tableNames['cname']} LIKE collections");
-                            DB::commit();
-                        }
-                        if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                            ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                            DB::rollBack();
-                        }
+                        DB::commit();
+                    } catch (\Throwable $e) {
+                        DB::rollBack();
                     }
 
                     if ($collectionID === false) {
@@ -915,23 +901,16 @@ class Binaries
                 $hash = md5($this->header['matches'][1].$this->header['From'].$this->groupMySQL['id']);
 
                 $binaryID = false;
+
                 try {
                     DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
-                } catch (QueryException $e) {
-                    Log::error($e->getMessage());
-                } catch (\PDOException $e) {
-                    if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                        DB::unprepared("CREATE TABLE {$this->tableNames['bname']} LIKE binaries");
-                        DB::commit();
-                    }
-                    if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                        ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
-                        DB::rollBack();
-                    }
+                    DB::commit();
+                } catch (\Throwable $e) {
+                    DB::rollBack();
                 }
 
                 if ($binaryID === false) {
@@ -977,17 +956,9 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : DB::insert($binariesQuery)) {
-            if ($this->_debug) {
-                ColorCLI::doEcho(
-                    ColorCLI::debug(
-                        'Sending '.round(\strlen($partsQuery) / 1024, 2).
-                        ' KB of'.($this->multiGroup ? ' MGR' : '').' parts to MySQL'
-                    ), true
-                );
-            }
-            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : DB::insert(rtrim($partsQuery, ','))) {
-                $this->_pdo->commit();
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) {
+            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery(rtrim($partsQuery, ','))) {
+                DB::commit();
             } else {
                 if ($this->addToPartRepair) {
                     $this->headersNotInserted += $this->headersReceived;
@@ -1056,7 +1027,8 @@ class Binaries
                 'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
-            ), true
+            ),
+            true
         );
     }
 
@@ -1077,7 +1049,9 @@ class Binaries
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
                 ColorCLI::primaryOver(' for part repair, ').
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
-                ColorCLI::primary(' total.'), true);
+                ColorCLI::primary(' total.'),
+                true
+            );
         }
     }
 
@@ -1246,7 +1220,7 @@ class Binaries
                     $groupArr['id']
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1288,7 +1262,7 @@ class Binaries
                         $currentPost
                     )
                 );
-                if ($local > 0) {
+                if (! empty($local) && \count($local) > 0) {
                     $date = $local[0]->date;
                     break;
                 }
@@ -1318,10 +1292,6 @@ class Binaries
                 break;
             }
             $currentPost = $tempPost;
-
-            if ($this->_debug) {
-                ColorCLI::doEcho(ColorCLI::debug('Postdate retried '.$attempts.' time(s).'), true);
-            }
         } while ($attempts++ <= 20);
 
         // If we didn't get a date, set it to now.
@@ -1367,7 +1337,8 @@ class Binaries
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
-                ), true
+                ),
+                true
             );
         }
 
@@ -1428,7 +1399,8 @@ class Binaries
                 ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
-                ), true
+                ),
+                true
             );
         }
 
@@ -1474,7 +1446,7 @@ class Binaries
         }
         DB::transaction(function () use ($groupID, $sql) {
             DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupID);
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1670,7 +1642,7 @@ class Binaries
     {
         DB::transaction(function () use ($collectionID) {
             DB::delete(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1730,5 +1702,25 @@ class Binaries
         Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;
+    }
+
+    /**
+     * @param $query
+     *
+     * @return bool
+     */
+    protected function runQuery($query)
+    {
+        try {
+            return DB::insert($query);
+        } catch (QueryException $e) {
+            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+        } catch (\PDOException $e) {
+            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+        } catch (\Throwable $e) {
+            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+        }
+
+        return false;
     }
 }

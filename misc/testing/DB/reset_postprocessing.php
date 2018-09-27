@@ -11,7 +11,7 @@ $pdo = DB::connection()->getPdo();
 $consoletools = new ConsoleTools();
 $ran = false;
 
-if ($argv[1] !== null && $argv[1] === 'all' && $argv[2] !== null && $argv[2] === 'true') {
+if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'true') {
     $ran = true;
     $where = '';
     if (isset($argv[3]) && $argv[3] === 'truncate') {

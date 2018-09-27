@@ -107,9 +107,13 @@ class ReleaseFile extends Model
      */
     public static function addReleaseFiles($id, $name, $hash = '', $size, $createdTime, $hasPassword): int
     {
+        // Check if we already have this data in table
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
 
-        if ($duplicateCheck === null) {
+        // Check if the release exists in releases table to prevent foreign key error
+        $releaseCheck = Release::query()->where('id', $id)->first();
+
+        if ($duplicateCheck === null && $releaseCheck !== null) {
             try {
                 $insert = self::create([
                         'releases_id' => $id,

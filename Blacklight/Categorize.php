@@ -1135,7 +1135,7 @@ class Categorize extends Category
      */
     public function isXxxUHD(): bool
     {
-        if (preg_match('/^[\w-.]+(\d{2}\.\d{2}\.\d{2}).+(2160p)+[\w-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
+        if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(2160p)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
             $this->tmpCat = self::XXX_UHD;
 
             return true;
@@ -1149,7 +1149,7 @@ class Categorize extends Category
      */
     public function isXxxClipHD(): bool
     {
-        if (preg_match('/^[\w-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
+        if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
             $this->tmpCat = self::XXX_CLIPHD;
 
             return true;

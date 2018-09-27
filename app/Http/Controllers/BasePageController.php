@@ -21,14 +21,29 @@ class BasePageController extends Controller
      */
     public $settings;
 
+    /**
+     * @var string
+     */
     public $title = '';
 
+    /**
+     * @var string
+     */
     public $content = '';
 
+    /**
+     * @var string
+     */
     public $meta_keywords = '';
 
+    /**
+     * @var string
+     */
     public $meta_title = '';
 
+    /**
+     * @var string
+     */
     public $meta_description = '';
 
     /**
@@ -38,21 +53,15 @@ class BasePageController extends Controller
      */
     public $page = '';
 
+    /**
+     * @var string
+     */
     public $page_template = '';
 
     /**
-     * User settings from the MySQL DB.
-     *
-     * @var array|bool
+     * @var User
      */
-    public $userdata = [];
-
-    /**
-     * URL of the server. ie http://localhost/.
-     *
-     * @var string
-     */
-    public $serverurl = '';
+    public $userdata;
 
     /**
      * User's theme.
@@ -60,11 +69,6 @@ class BasePageController extends Controller
      * @var string
      */
     protected $theme = 'Gentele';
-
-    /**
-     * @var string
-     */
-    public $token;
 
     /**
      * @var \Illuminate\Foundation\Application|mixed
@@ -237,7 +241,7 @@ class BasePageController extends Controller
 
         // Update last login every 15 mins.
         if ((strtotime($this->userdata['now']) - 900) > strtotime($this->userdata['lastlogin'])) {
-            User::updateSiteAccessed($this->userdata['id']);
+            User::updateSiteAccessed($this->userdata->id);
         }
 
         $this->smarty->assign('userdata', $this->userdata);
@@ -275,7 +279,7 @@ class BasePageController extends Controller
         }
 
         $content = new Contents();
-        $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
+        $this->smarty->assign('menulist', Menu::getMenu($role, url('/')));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
         if ($this->userdata !== null) {
@@ -296,6 +300,9 @@ class BasePageController extends Controller
         $this->smarty->assign('header_menu', $header_menu);
     }
 
+    /**
+     *  Set admin preferences.
+     */
     public function setAdminPrefs()
     {
         // Tell Smarty which directories to use for templates

@@ -220,7 +220,8 @@ class InstallNntmux extends Command
         $this->info('Adding admin user to database');
         try {
             User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
-        } catch (\Exception $e) {
+            User::where('username', env('ADMIN_USER'))->update(['verified' => 1]);
+        } catch (\Throwable $e) {
             echo $e->getMessage();
             $this->error('Unable to add admin user!');
 

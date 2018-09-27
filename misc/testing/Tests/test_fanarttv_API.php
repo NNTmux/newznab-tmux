@@ -15,7 +15,7 @@ if (! empty($argv[1])) {
     // Search for a movie/tv
     $moviefanart = $fanart->getMovieFanart((string) $argv[1]);
     if ($moviefanart) {
-        print_r($moviefanart);
+        dump($moviefanart);
     } else {
         exit(ColorCLI::error('Error retrieving Fanart.TV data.'));
     }

@@ -52,7 +52,7 @@ class CartController extends BasePageController
         }
 
         foreach ($data as $d) {
-            UsersRelease::addCart(Auth::id(), $d['id']);
+            UsersRelease::addCart($this->userdata->id, $d['id']);
         }
     }
 

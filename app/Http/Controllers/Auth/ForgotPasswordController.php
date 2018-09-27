@@ -35,6 +35,11 @@ class ForgotPasswordController extends Controller
         $this->middleware('guest');
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @throws \Exception
+     */
     public function showLinkRequestForm(Request $request)
     {
         $sent = '';
@@ -59,7 +64,7 @@ class ForgotPasswordController extends Controller
             //
             // Generate a forgottenpassword guid, store it in the user table
             //
-            $guid = md5(uniqid('', false));
+            $guid = \Token::random(32);
             User::updatePassResetGuid($ret['id'], $guid);
             //
             // Send the email

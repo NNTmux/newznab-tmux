@@ -10,10 +10,13 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
+use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Exception\ClientException;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
@@ -26,6 +29,11 @@ class Console
     public const CONS_NTFND = -2;
 
     protected const MATCH_PERCENT = 60;
+
+    /**
+     * @var
+     */
+    protected $igdbSleep;
 
     /**
      * @var bool
@@ -122,7 +130,7 @@ class Console
      * @param $title
      * @param $platform
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return false|\Illuminate\Database\Eloquent\Model
      */
     public function getConsoleInfoByName($title, $platform)
     {
@@ -141,7 +149,7 @@ class Console
         }
         $searchWords = trim($searchWords);
 
-        return ConsoleInfo::search($searchWords, $platform)->first();
+        return ConsoleInfo::search($searchWords, $platform)->first() ?? false;
     }
 
     /**
@@ -402,6 +410,21 @@ class Console
                     );
                 }
             }
+        } else {
+            $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
+            if ($igdb !== false) {
+                if ($igdb['coverurl'] !== '') {
+                    $igdb['cover'] = 1;
+                } else {
+                    $igdb['cover'] = 0;
+                }
+
+                $consoleId = $this->_updateConsoleTable($igdb);
+
+                if ($this->echooutput && $consoleId !== -2) {
+                    ColorCLI::doEcho(ColorCLI::header('Added/updated game: ').ColorCLI::alternateOver('   Title:    ').ColorCLI::primary($igdb['title']).ColorCLI::alternateOver('   Platform: ').ColorCLI::primary($igdb['platform']).ColorCLI::alternateOver('   Genre: ').ColorCLI::primary($igdb['consolegenre']), true);
+                }
+            }
         }
 
         return $consoleId;
@@ -420,13 +443,13 @@ class Console
         $titlepercent = $platformpercent = '';
 
         //Remove import tags from console title for match
-        $con['title'] = trim(preg_replace('/(\[|\().{2,} import(\]|\))$/i', '', $con['title']));
+        $con['title'] = trim(preg_replace('/([\[|\(]).{2,} import([\]|\)])$/i', '', $con['title']));
 
         similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
         similar_text(strtolower($gameInfo['platform']), strtolower($con['platform']), $platformpercent);
 
         // Since Wii Ware games and XBLA have inconsistent original platforms, as long as title is 50% its ok.
-        if (preg_match('/wiiware|xbla/i', trim($gameInfo['platform'])) && $titlepercent >= 50) {
+        if ($titlepercent >= 50 && preg_match('/wiiware|xbla/i', trim($gameInfo['platform']))) {
             $titlepercent = 100;
             $platformpercent = 100;
         }
@@ -781,6 +804,112 @@ class Console
     }
 
     /**
+     * @param $gameInfo
+     * @param $gamePlatform
+     *
+     * @return array|bool|\StdClass
+     * @throws \Exception
+     */
+    public function fetchIGDBProperties($gameInfo, $gamePlatform)
+    {
+        $bestMatch = false;
+
+        $gamePlatform = $this->_replacePlatform($gamePlatform);
+        if (now() > $this->igdbSleep) {
+            $this->igdbSleep = null;
+        }
+        if ($this->igdbSleep === null && env('IGDB_KEY') !== '') {
+            try {
+                $result = IGDB::searchGames($gameInfo);
+                if (! empty($result)) {
+                    foreach ($result as $res) {
+                        similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
+                        if ($percent >= 90) {
+                            $bestMatch = $res->id;
+                        }
+                    }
+                    if ($bestMatch !== false) {
+                        $game = IGDB::getGame($bestMatch, [
+                            'id',
+                            'name',
+                            'first_release_date',
+                            'aggregated_rating',
+                            'summary',
+                            'cover',
+                            'url',
+                            'screenshots',
+                            'publishers.name',
+                            'themes.name',
+                            'platforms.name',
+                        ]);
+
+                        $publishers = [];
+                        if (! empty($game->publishers)) {
+                            foreach ($game->publishers as $publisher) {
+                                $publishers[] = IGDB::getCompany($publisher)->name;
+                            }
+                        }
+
+                        $genres = [];
+
+                        if (! empty($game->themes)) {
+                            foreach ($game->themes as $theme) {
+                                $genres[] = IGDB::getTheme($theme)->name;
+                            }
+                        }
+
+                        $genreKey = $this->_getGenreKey(implode(',', $genres));
+
+                        $platform = '';
+
+                        if (! empty($game->platforms)) {
+                            foreach ($game->platforms as $platforms) {
+                                $platforms = IGDB::getPlatform($platforms);
+                                similar_text($platforms->name, $gamePlatform, $percent);
+                                if ($percent >= 85) {
+                                    $platform = $platforms->name;
+                                    break;
+                                }
+                            }
+                        }
+
+                        $game = [
+                            'title' => $game->name,
+                            'asin' => $game->id,
+                            'review' => $game->summary ?? '',
+                            'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
+                            'releasedate' => ! empty($game->first_release_date) ? Carbon::createFromTimestamp(substr($game->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
+                            'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
+                            'url' => $game->url ?? '',
+                            'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
+                            'platform' => $platform ?? '',
+                            'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
+                            'consolegenreid' => $genreKey ?? '',
+                            'salesrank' => '',
+                        ];
+
+                        return $game;
+                    }
+
+                    ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+
+                    return false;
+                }
+
+                ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+
+                return false;
+            } catch (ClientException $e) {
+                if ($e->getCode() === 429) {
+                    $this->igdbSleep = now()->endOfMonth();
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @throws \Exception
      */
     public function processConsoleReleases(): void
@@ -819,13 +948,13 @@ class Console
                     // Check for existing console entry.
                     $gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-                    if ($gameCheck === null && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
+                    if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $gameId = -2;
-                    } elseif ($gameCheck === null) {
+                    } elseif ($gameCheck === false) {
                         $gameId = $this->updateConsoleInfo($gameInfo);
                         $usedAmazon = true;
                         if ($gameId === null) {

@@ -22,7 +22,7 @@ class ProfileController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function show(Request $request)
     {
@@ -128,7 +128,7 @@ class ProfileController extends BasePageController
 
         $action = $request->input('action') ?? 'view';
 
-        $userid = Auth::id();
+        $userid = $this->userdata->id;
         $data = User::find($userid);
         if (! $data) {
             $this->show404('No such user!');
@@ -172,8 +172,6 @@ class ProfileController extends BasePageController
                             $sab->setCookie($request->input('saburl'), $request->input('sabapikey'), $request->input('sabpriority'), $request->input('sabapikeytype'));
                         }
 
-                        $user = User::find($userid);
-
                         User::updateUser(
                             $userid,
                             $data['username'],
@@ -203,68 +201,68 @@ class ProfileController extends BasePageController
                             (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
                         );
 
-                        if ((int) $request->input('viewconsole') === 1 && $user->role->hasPermissionTo('view console') === true && $user->hasDirectPermission('view console') === false) {
-                            $user->givePermissionTo('view console');
-                        } elseif ((int) $request->input('viewconsole') === 0 && $user->role->hasPermissionTo('view console') === true && $user->hasPermissionTo('view console') === true) {
-                            $user->revokePermissionTo('view console');
-                        } elseif ($user->role->hasPermissionTo('view console') === false && $user->hasDirectPermission('view console') === true && ((int) $request->input('viewconsole') === 0 || (int) $request->input('viewconsole') === 1)) {
-                            $user->revokePermissionTo('view console');
+                        if ((int) $request->input('viewconsole') === 1 && $data->role->hasPermissionTo('view console') === true && $data->hasDirectPermission('view console') === false) {
+                            $data->givePermissionTo('view console');
+                        } elseif ((int) $request->input('viewconsole') === 0 && $data->role->hasPermissionTo('view console') === true && $data->hasPermissionTo('view console') === true) {
+                            $data->revokePermissionTo('view console');
+                        } elseif ($data->role->hasPermissionTo('view console') === false && $data->hasDirectPermission('view console') === true && ((int) $request->input('viewconsole') === 0 || (int) $request->input('viewconsole') === 1)) {
+                            $data->revokePermissionTo('view console');
                         }
 
-                        if ((int) $request->input('viewmovies') === 1 && $user->role->hasPermissionTo('view movies') === true && $user->hasDirectPermission('view movies') === false) {
-                            $user->givePermissionTo('view movies');
-                        } elseif ((int) $request->input('viewmovies') === 0 && $user->role->hasPermissionTo('view movies') === true && $user->hasDirectPermission('view movies') === true) {
-                            $user->revokePermissionTo('view movies');
-                        } elseif ($user->role->hasPermissionTo('view movies') === false && $user->hasDirectPermission('view movies') === true && ((int) $request->input('viewmovies') === 0 || (int) $request->input('viewmovies') === 1)) {
-                            $user->revokePermissionTo('view movies');
+                        if ((int) $request->input('viewmovies') === 1 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies') === false) {
+                            $data->givePermissionTo('view movies');
+                        } elseif ((int) $request->input('viewmovies') === 0 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies') === true) {
+                            $data->revokePermissionTo('view movies');
+                        } elseif ($data->role->hasPermissionTo('view movies') === false && $data->hasDirectPermission('view movies') === true && ((int) $request->input('viewmovies') === 0 || (int) $request->input('viewmovies') === 1)) {
+                            $data->revokePermissionTo('view movies');
                         }
 
-                        if ((int) $request->input('viewaudio') === 1 && $user->role->hasPermissionTo('view audio') === true && $user->hasDirectPermission('view audio') === false) {
-                            $user->givePermissionTo('view audio');
-                        } elseif ((int) $request->input('viewaudio') === 0 && $user->role->hasPermissionTo('view audio') === true && $user->hasDirectPermission('view audio') === true) {
-                            $user->revokePermissionTo('view audio');
-                        } elseif ($user->role->hasPermissionTo('view audio') === false && $user->hasDirectPermission('view audio') === true && ((int) $request->input('viewaudio') === 0 || (int) $request->input('viewaudio') === 1)) {
-                            $user->revokePermissionTo('view audio');
+                        if ((int) $request->input('viewaudio') === 1 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio') === false) {
+                            $data->givePermissionTo('view audio');
+                        } elseif ((int) $request->input('viewaudio') === 0 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio') === true) {
+                            $data->revokePermissionTo('view audio');
+                        } elseif ($data->role->hasPermissionTo('view audio') === false && $data->hasDirectPermission('view audio') === true && ((int) $request->input('viewaudio') === 0 || (int) $request->input('viewaudio') === 1)) {
+                            $data->revokePermissionTo('view audio');
                         }
 
-                        if ((int) $request->input('viewpc') === 1 && $user->role->hasPermissionTo('view pc') === true && $user->hasDirectPermission('view pc') === false) {
-                            $user->givePermissionTo('view pc');
-                        } elseif ((int) $request->input('viewpc') === 0 && $user->role->hasPermissionTo('view pc') === true && $user->hasDirectPermission('view pc') === true) {
-                            $user->revokePermissionTo('view pc');
-                        } elseif ($user->role->hasPermissionTo('view pc') === false && $user->hasDirectPermission('view pc') === true && ((int) $request->input('viewpc') === 0 || (int) $request->input('viewpc') === 1)) {
-                            $user->revokePermissionTo('view pc');
+                        if ((int) $request->input('viewpc') === 1 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc') === false) {
+                            $data->givePermissionTo('view pc');
+                        } elseif ((int) $request->input('viewpc') === 0 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc') === true) {
+                            $data->revokePermissionTo('view pc');
+                        } elseif ($data->role->hasPermissionTo('view pc') === false && $data->hasDirectPermission('view pc') === true && ((int) $request->input('viewpc') === 0 || (int) $request->input('viewpc') === 1)) {
+                            $data->revokePermissionTo('view pc');
                         }
 
-                        if ((int) $request->input('viewtv') === 1 && $user->role->hasPermissionTo('view tv') === true && $user->hasDirectPermission('view tv') === false) {
-                            $user->givePermissionTo('view tv');
-                        } elseif ((int) $request->input('viewtv') === 0 && $user->role->hasPermissionTo('view tv') === true && $user->hasDirectPermission('view tv') === true) {
-                            $user->revokePermissionTo('view tv');
-                        } elseif ($user->role->hasPermissionTo('view tv') === false && $user->hasDirectPermission('view tv') === true && ((int) $request->input('viewtv') === 0 || (int) $request->input('viewtv') === 1)) {
-                            $user->revokePermissionTo('view tv');
+                        if ((int) $request->input('viewtv') === 1 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv') === false) {
+                            $data->givePermissionTo('view tv');
+                        } elseif ((int) $request->input('viewtv') === 0 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv') === true) {
+                            $data->revokePermissionTo('view tv');
+                        } elseif ($data->role->hasPermissionTo('view tv') === false && $data->hasDirectPermission('view tv') === true && ((int) $request->input('viewtv') === 0 || (int) $request->input('viewtv') === 1)) {
+                            $data->revokePermissionTo('view tv');
                         }
 
-                        if ((int) $request->input('viewadult') === 1 && $user->role->hasPermissionTo('view adult') === true && $user->hasDirectPermission('view adult') === false) {
-                            $user->givePermissionTo('view adult');
-                        } elseif ((int) $request->input('viewadult') === 0 && $user->role->hasPermissionTo('view adult') === true && $user->hasDirectPermission('view adult') === true) {
-                            $user->revokePermissionTo('view adult');
-                        } elseif ($user->role->hasPermissionTo('view adult') === false && $user->hasDirectPermission('view adult') === true && ((int) $request->input('viewadult') === 0 || (int) $request->input('viewadult') === 1)) {
-                            $user->revokePermissionTo('view adult');
+                        if ((int) $request->input('viewadult') === 1 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult') === false) {
+                            $data->givePermissionTo('view adult');
+                        } elseif ((int) $request->input('viewadult') === 0 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult') === true) {
+                            $data->revokePermissionTo('view adult');
+                        } elseif ($data->role->hasPermissionTo('view adult') === false && $data->hasDirectPermission('view adult') === true && ((int) $request->input('viewadult') === 0 || (int) $request->input('viewadult') === 1)) {
+                            $data->revokePermissionTo('view adult');
                         }
 
-                        if ((int) $request->input('viewbooks') === 1 && $user->role->hasPermissionTo('view books') === true && $user->hasDirectPermission('view books') === false) {
-                            $user->givePermissionTo('view books');
-                        } elseif ((int) $request->input('viewbooks') === 0 && $user->role->hasPermissionTo('view books') === true && $user->hasDirectPermission('view books') === true) {
-                            $user->revokePermissionTo('view books');
-                        } elseif ($user->role->hasPermissionTo('view books') === false && $user->hasDirectPermission('view books') === true && ((int) $request->input('viewbooks') === 0 || (int) $request->input('viewbooks') === 1)) {
-                            $user->revokePermissionTo('view books');
+                        if ((int) $request->input('viewbooks') === 1 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books') === false) {
+                            $data->givePermissionTo('view books');
+                        } elseif ((int) $request->input('viewbooks') === 0 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books') === true) {
+                            $data->revokePermissionTo('view books');
+                        } elseif ($data->role->hasPermissionTo('view books') === false && $data->hasDirectPermission('view books') === true && ((int) $request->input('viewbooks') === 0 || (int) $request->input('viewbooks') === 1)) {
+                            $data->revokePermissionTo('view books');
                         }
 
-                        if ((int) $request->input('viewother') === 1 && $user->role->hasPermissionTo('view other') === true && $user->hasDirectPermission('view other') === false) {
-                            $user->givePermissionTo('view other');
-                        } elseif ((int) $request->input('viewother') === 0 && $user->role->hasPermissionTo('view other') === true && $user->hasDirectPermission('view other') === true) {
-                            $user->revokePermissionTo('view other');
-                        } elseif ($user->role->hasPermissionTo('view other') === false && $user->hasDirectPermission('view other') === true && ((int) $request->input('viewother') === 0 || (int) $request->input('viewother') === 1)) {
-                            $user->revokePermissionTo('view other');
+                        if ((int) $request->input('viewother') === 1 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other') === false) {
+                            $data->givePermissionTo('view other');
+                        } elseif ((int) $request->input('viewother') === 0 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other') === true) {
+                            $data->revokePermissionTo('view other');
+                        } elseif ($data->role->hasPermissionTo('view other') === false && $data->hasDirectPermission('view other') === true && ((int) $request->input('viewother') === 0 || (int) $request->input('viewother') === 1)) {
+                            $data->revokePermissionTo('view other');
                         }
 
                         if ($request->has('password') && ! empty($request->input('password'))) {

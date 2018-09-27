@@ -83,8 +83,8 @@
 													{if $result->url != ""}<a class="label label-default"
 																			 target="_blank"
 																			 href="{$site->dereferrer_link}{$result->url}"
-																			 name="amazon{$result->consoleinfo_id}"
-																			 title="View Amazon page">
+																			 name="game{$result->consoleinfo_id}"
+																			 title="View Game page">
 															Amazon</a>{/if}
 													{if $result->nfoid > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"

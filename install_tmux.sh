@@ -21,6 +21,10 @@ git clone https://github.com/tmux/tmux.git /tmp/tmux
 
 cd /tmp/tmux
 
+git fetch --all --tags --prune
+
+git checkout 2.8-rc
+
 sh autogen.sh
 
 ./configure && make

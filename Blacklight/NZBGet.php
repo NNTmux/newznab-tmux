@@ -80,7 +80,7 @@ class NZBGet
      */
     public function __construct(&$page)
     {
-        $this->serverurl = $page->serverurl;
+        $this->serverurl = url('/');
         $this->uid = $page->userdata['id'];
         $this->api_token = $page->userdata['api_token'];
 

@@ -3,7 +3,6 @@
 use Colors\Color;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
-use Blacklight\ColorCLI;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use Symfony\Component\Process\Process;
@@ -19,7 +18,6 @@ if (! function_exists('getRawHtml')) {
      */
     function getRawHtml($url, $cookie = false)
     {
-        $response = false;
         $cookiejar = new CookieJar();
         $client = new Client();
         if ($cookie !== false) {
@@ -29,17 +27,9 @@ if (! function_exists('getRawHtml')) {
         try {
             $response = $client->get($url)->getBody()->getContents();
         } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
-                } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
-                } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from server, http error reported: '.$e->getCode()), true);
-                }
-            }
+            $response = false;
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
+            $response = false;
         }
 
         return $response;

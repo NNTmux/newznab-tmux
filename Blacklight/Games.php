@@ -10,8 +10,10 @@ use App\Models\GamesInfo;
 use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
+use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Exception\ClientException;
 
 class Games
 {
@@ -101,6 +103,11 @@ class Games
      * @var \PDO
      */
     protected $pdo;
+
+    /**
+     * @var
+     */
+    protected $igdbSleep;
 
     /**
      * Games constructor.
@@ -544,9 +551,7 @@ class Games
                         if ($this->_gameResults->original_release_date !== '') {
                             $dateReleased = $this->_gameResults->original_release_date;
                             $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
-                            if ($date instanceof \DateTime) {
-                                $game['releasedate'] = (string) $date->format('Y-m-d');
-                            }
+                            $game['releasedate'] = (string) $date->format('Y-m-d');
                         }
 
                         if ($this->_gameResults->deck !== '') {
@@ -561,6 +566,78 @@ class Games
                     ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'), true);
 
                     return false;
+                }
+            }
+        }
+
+        if (now() > $this->igdbSleep) {
+            $this->igdbSleep = null;
+        }
+        if ($this->igdbSleep === null && env('IGDB_KEY') !== '') {
+            try {
+                if ($steamGameID === false || $this->_gameResults === false) {
+                    $bestMatch = false;
+                    $this->_classUsed = 'IGDB';
+                    $result = IGDB::searchGames($gameInfo['title']);
+                    if (! empty($result)) {
+                        foreach ($result as $res) {
+                            similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent);
+                            if ($percent >= self::GAME_MATCH_PERCENTAGE) {
+                                $bestMatch = $res->id;
+                            }
+                        }
+                        if ($bestMatch !== false) {
+                            $this->_gameResults = IGDB::getGame($bestMatch, [
+                                'id',
+                                'name',
+                                'first_release_date',
+                                'aggregated_rating',
+                                'summary',
+                                'cover',
+                                'url',
+                                'screenshots',
+                                'publishers',
+                                'themes',
+                            ]);
+
+                            $publishers = [];
+                            foreach ($this->_gameResults->publishers as $publisher) {
+                                $publishers[] = IGDB::getCompany($publisher)->name;
+                            }
+
+                            $genres = [];
+
+                            foreach ($this->_gameResults->themes as $theme) {
+                                $genres[] = IGDB::getTheme($theme)->name;
+                            }
+
+                            $genreName = $this->_matchGenre(implode(',', $genres));
+
+                            $game = [
+                                'title' => $this->_gameResults->name,
+                                'asin' => $this->_gameResults->id,
+                                'review' => $this->_gameResults->summary ?? '',
+                                'coverurl' => 'https:'.$this->_gameResults->cover->url ?? '',
+                                'releasedate' => Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
+                                'esrb' => round($this->_gameResults->aggregated_rating).'%' ?? 'Not Rated',
+                                'url' => $this->_gameResults->url ?? '',
+                                'backdropurl' => 'https:'.$this->_gameResults->screenshots[0]->url ?? '',
+                                'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
+                            ];
+                        } else {
+                            ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+
+                            return false;
+                        }
+                    } else {
+                        ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+
+                        return false;
+                    }
+                }
+            } catch (ClientException $e) {
+                if ($e->getCode() === 429) {
+                    $this->igdbSleep = now()->endOfMonth();
                 }
             }
         }
@@ -672,14 +749,12 @@ class Games
             if ($game['backdrop'] === 1) {
                 $game['backdrop'] = $ri->saveImage($gamesId.'-backdrop', $game['backdropurl'], $this->imgSavePath, 1920, 1024);
             }
-        } else {
-            if ($this->echoOutput) {
-                ColorCLI::doEcho(
-                    ColorCLI::headerOver('Nothing to update: ').
-                    ColorCLI::primary($game['title'].' (PC)'),
-                    true
-                );
-            }
+        } elseif ($this->echoOutput) {
+            ColorCLI::doEcho(
+                ColorCLI::headerOver('Nothing to update: ').
+                ColorCLI::primary($game['title'].' (PC)'),
+                true
+            );
         }
 
         return ! empty($gamesId) ? $gamesId : false;

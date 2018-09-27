@@ -20,7 +20,7 @@ class FailedReleasesController extends BasePageController
         $this->setPrefs();
         // Page is accessible only by the rss token, or logged in users.
         if (Auth::check()) {
-            $uid = Auth::id();
+            $uid = $this->userdata->id;
             $rssToken = $this->userdata['api_token'];
         } else {
             if (! $request->has('userid') || ! $request->has('api_token')) {
@@ -43,7 +43,7 @@ class FailedReleasesController extends BasePageController
                 return response('No NZB found for alternate match!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
             }
 
-            return response('Success', 200)->withHeaders(['Location' => $this->serverurl.'getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
+            return response('Success', 200)->withHeaders(['Location' => url('/').'/getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
         }
 
         return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);

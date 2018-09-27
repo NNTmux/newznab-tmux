@@ -17,13 +17,23 @@ namespace Blacklight\libraries;
 class FanartTV
 {
     /**
+     * @var string
+     */
+    private $apiKey;
+
+    /**
+     * @var string
+     */
+    private $server;
+
+    /**
      * The constructor setting the config variables.
      *
      * @param $apiKey
      */
     public function __construct($apiKey)
     {
-        $this->apikey = $apiKey;
+        $this->apiKey = $apiKey;
         $this->server = 'https://webservice.fanart.tv/v3';
     }
 
@@ -36,8 +46,8 @@ class FanartTV
      */
     public function getMovieFanart($id)
     {
-        if ($this->apikey !== '') {
-            $fanart = $this->_call('movies/'.$id);
+        if ($this->apiKey !== '') {
+            $fanart = $this->_getUrl('movies/'.$id);
             if (! empty($fanart)) {
                 return $fanart;
             }
@@ -56,8 +66,8 @@ class FanartTV
      */
     public function getTVFanart($id)
     {
-        if ($this->apikey !== '') {
-            $fanart = $this->_call('tv/'.$id);
+        if ($this->apiKey !== '') {
+            $fanart = $this->_getUrl('tv/'.$id);
             if (! empty($fanart)) {
                 return $fanart;
             }
@@ -72,17 +82,14 @@ class FanartTV
      * The function making all the work using curl to call.
      *
      * @param string $path
-     * @return array
+     * @return false|array
      */
-    private function _call($path)
+    private function _getUrl($path)
     {
-        $url = $this->server.'/'.$path.'?api_key='.$this->apikey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $url = $this->server.'/'.$path.'?api_key='.$this->apiKey;
 
-        return json_decode($response, true);
+        $response = getRawHtml($url);
+
+        return $response !== false ? json_decode($response, true) : false;
     }
 }

@@ -53,9 +53,17 @@ class LoginController extends Controller
         ]);
 
         $error = '';
-        $user = User::getByUsername($request->input('username'));
+        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if ($user !== null && \Firewall::isBlacklisted($user->host) === false) {
+        $request->merge([
+            $login_type => $request->input('username'),
+        ]);
+        $user = User::getByUsername($request->input('username'));
+        if ($user === null) {
+            $user = User::getByEmail($request->input('username'));
+        }
+
+        if ($user !== null && ((env('FIREWALL_ENABLED') === true && \Firewall::isBlacklisted($user->host) === false) || env('FIREWALL_ENABLED') === false)) {
             if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
                 $this->validate($request, [
                     'g-recaptcha-response' => 'required|captcha',
@@ -63,12 +71,6 @@ class LoginController extends Controller
             }
 
             $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
-
-            $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-            $request->merge([
-                $login_type => $request->input('username'),
-            ]);
 
             if ($user->isVerified() === false || $user->isPendingVerification()) {
                 return $this->showLoginForm('You have not verified your email address!');
