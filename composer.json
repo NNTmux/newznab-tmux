@@ -155,6 +155,7 @@
     "messerli90/igdb": "^1.0",
     "monolog/monolog": "^1.22",
     "nzedb/Git.php": "dev-master",
+    "php-ffmpeg/php-ffmpeg": "^0.13.0",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
     "php-tmdb/api": "~2.1",

@@ -20,6 +20,13 @@ use Blacklight\SphinxSearch;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\ArchiveInfo;
+use FFMpeg\Coordinate\Dimension;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\FFMpeg;
+use FFMpeg\FFProbe;
+use FFMpeg\Filters\Video\ResizeFilter;
+use FFMpeg\Format\Audio\Vorbis;
+use FFMpeg\Format\Video\Ogg;
 use Illuminate\Support\Facades\DB;
 
 class ProcessAdditional
@@ -372,6 +379,16 @@ class ProcessAdditional
     protected $sphinx;
 
     /**
+     * @var \FFMpeg\FFMpeg
+     */
+    private $ffmpeg;
+
+    /**
+     * @var \FFMpeg\FFProbe
+     */
+    private $ffprobe;
+
+    /**
      * ProcessAdditional constructor.
      *
      * @param array $options
@@ -408,6 +425,8 @@ class ProcessAdditional
         $this->_par2Info = new Par2Info();
         $this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
         $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
+        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
+        $this->ffprobe = FFProbe::create();
 
         $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
         $this->_maxNestedLevels = (int) Settings::settingValue('..maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('..maxnestedlevels');
@@ -1782,15 +1801,12 @@ class ProcessAdditional
                 $audioFileName = ($this->_release->guid.'.ogg');
 
                 // Create an audio sample.
-                runCmd(
-                    $this->_killString.
-                    Settings::settingValue('apps..ffmpegpath').
-                    '" -t 30 -i "'.
-                    $fileLocation.
-                    '" -acodec libvorbis -loglevel quiet -y "'.
-                    $this->tmpPath.$audioFileName.
-                    '"'
-                );
+                if ($this->ffprobe->isValid($fileLocation)) {
+                    $audioSample = $this->ffmpeg->open($fileLocation);
+                    $format = new Vorbis();
+                    $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
+                    $audioSample->save($format, $this->tmpPath.$audioFileName);
+                }
 
                 // Check if the new file was created.
                 if (is_file($this->tmpPath.$audioFileName)) {
@@ -1854,7 +1870,7 @@ class ProcessAdditional
     }
 
     /**
-     * @param $videoLocation
+     * @param string $videoLocation
      * @return string
      * @throws \Exception
      */
@@ -1869,14 +1885,9 @@ class ProcessAdditional
 
         $tmpVideo = ($this->tmpPath.uniqid('', true).$extension);
         // Get the real duration of the file.
-        $time = runCmd(
-            $this->_killString.
-            Settings::settingValue('apps..ffmpegpath').
-            '" -i "'.$videoLocation.
-            '" -vcodec copy -y 2>&1 "'.
-            $tmpVideo.'"',
-            false
-        );
+        if ($this->ffprobe->isValid($videoLocation)) {
+            $time = $this->ffprobe->format($videoLocation)->get('duration');
+        }
         @unlink($tmpVideo);
 
         if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
@@ -1914,16 +1925,11 @@ class ProcessAdditional
             $time = $this->getVideoTime($fileLocation);
 
             // Create the image.
-            runCmd(
-                $this->_killString.
-                Settings::settingValue('apps..ffmpegpath').
-                '" -i "'.
-                $fileLocation.
-                '" -ss '.($time === '' ? '00:00:03.00' : $time).
-                ' -vframes 1 -loglevel quiet -y "'.
-                $fileName.
-                '"'
-            );
+            if ($this->ffprobe->isValid($fileLocation)) {
+                $video = $this->ffmpeg->open($fileLocation);
+                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? 3 : $time));
+                $sample->save($fileName);
+            }
 
             // Check if the file exists.
             if (is_file($fileName)) {
@@ -2007,34 +2013,25 @@ class ProcessAdditional
                     }
 
                     // Try to get the sample (from the end instead of the start).
-                    runCmd(
-                        $this->_killString.
-                        Settings::settingValue('apps..ffmpegpath').
-                        '" -i "'.
-                        $fileLocation.
-                        '" -ss '.$lowestLength.
-                        ' -t '.$this->_ffMPEGDuration.
-                        ' -vcodec libtheora -filter:v scale=320:-1 '.
-                        ' -acodec libvorbis -loglevel quiet -y "'.
-                        $fileName.
-                        '"'
-                    );
+                    if ($this->ffprobe->isValid($fileLocation)) {
+                        $video = $this->ffmpeg->open($fileLocation);
+                        $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
+                        $format = new Ogg();
+                        $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
+                        $videoSample->save($format, $fileName);
+                    }
                 }
             }
 
             if ($newMethod === false) {
                 // If longer than 60 or we could not get the video length, run the old way.
-                runCmd(
-                    $this->_killString.
-                    Settings::settingValue('apps..ffmpegpath').
-                    '" -i "'.
-                    $fileLocation.
-                    '" -vcodec libtheora -filter:v scale=320:-1 -t '.
-                    $this->_ffMPEGDuration.
-                    ' -acodec libvorbis -loglevel quiet -y "'.
-                    $fileName.
-                    '"'
-                );
+                if ($this->ffprobe->isValid($fileLocation)) {
+                    $video = $this->ffmpeg->open($fileLocation);
+                    $videoSample = $video->clip(TimeCode::fromSeconds(1), TimeCode::fromSeconds($this->_ffMPEGDuration));
+                    $format = new Ogg();
+                    $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
+                    $videoSample->save($format, $fileName);
+                }
             }
 
             // Until we find the video file.
