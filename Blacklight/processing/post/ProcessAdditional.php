@@ -2,8 +2,10 @@
 
 namespace Blacklight\processing\post;
 
+use FFMpeg\FFMpeg;
 use Blacklight\Nfo;
 use Blacklight\NZB;
+use FFMpeg\FFProbe;
 use Blacklight\NNTP;
 use App\Models\Group;
 use App\Models\Release;
@@ -17,17 +19,15 @@ use App\Models\ReleaseFile;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
+use FFMpeg\Format\Video\Ogg;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
-use dariusiii\rarinfo\ArchiveInfo;
-use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\FFMpeg;
-use FFMpeg\FFProbe;
-use FFMpeg\Filters\Video\ResizeFilter;
 use FFMpeg\Format\Audio\Vorbis;
-use FFMpeg\Format\Video\Ogg;
+use FFMpeg\Coordinate\Dimension;
+use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
+use FFMpeg\Filters\Video\ResizeFilter;
 
 class ProcessAdditional
 {
