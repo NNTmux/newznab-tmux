@@ -1,3 +1,5 @@
+2018-09-28 DariusIII
+	* Chg: Use proper time string for _getSample function
 2018-09-27 DariusIII
 	* Chg: Use php-ffmpeg/php-ffmpeg for ffmpeg files manipulation
 2018-09-26 DariusIII

@@ -1876,19 +1876,10 @@ class ProcessAdditional
      */
     private function getVideoTime($videoLocation): ?string
     {
-        // Attempt to get the file extension as ffmpeg fails on some videos with the wrong extension, avconv however is fine.
-        if (preg_match('/(\.[a-zA-Z0-9]+)\s*$/', $videoLocation, $extension)) {
-            $extension = $extension[1];
-        } else {
-            $extension = '.avi';
-        }
-
-        $tmpVideo = ($this->tmpPath.uniqid('', true).$extension);
         // Get the real duration of the file.
         if ($this->ffprobe->isValid($videoLocation)) {
             $time = $this->ffprobe->format($videoLocation)->get('duration');
         }
-        @unlink($tmpVideo);
 
         if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
             return '';
@@ -1927,7 +1918,7 @@ class ProcessAdditional
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
                 $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? 3 : $time));
+                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? '00:00:03.00' : $time));
                 $sample->save($fileName);
             }
 
