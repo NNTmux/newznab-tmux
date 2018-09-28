@@ -1872,16 +1872,29 @@ class ProcessAdditional
     /**
      * @param string $videoLocation
      *
-     * @return mixed|string
+     * @return string
      */
-    private function getVideoTime(string $videoLocation)
+    private function getVideoTime($videoLocation): string
     {
         // Get the real duration of the file.
         if ($this->ffprobe->isValid($videoLocation)) {
             $time = $this->ffprobe->format($videoLocation)->get('duration');
         }
 
-        return $time ?? '';
+        if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
+            return '';
+        }
+
+        // Reduce the last number by 1, this is to make sure we don't ask avconv/ffmpeg for non existing data.
+        if ($numbers[3] > 0) {
+            $numbers[3] -= 1;
+        } elseif ($numbers[1] > 0) {
+            $numbers[2] -= 1;
+            $numbers[3] = '99';
+        }
+
+        // Manually pad the numbers in case they are 1 number. to get 02 for example instead of 2.
+        return '00:00:'.str_pad($numbers[2], 2, '0', STR_PAD_LEFT).'.'.str_pad($numbers[3], 2, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -1905,7 +1918,7 @@ class ProcessAdditional
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
                 $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? 3 : $time));
+                $sample = $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time));
                 $sample->save($fileName);
             }
 
@@ -1961,24 +1974,25 @@ class ProcessAdditional
                 // Get the real duration of the file.
                 $time = $this->getVideoTime($fileLocation);
 
-                if ($time !== '') {
+                if ($time !== '' && preg_match('/(\d{2}).(\d{2})/', $time, $numbers)) {
                     $newMethod = true;
-
                     // Get the lowest time we can start making the video at based on how many seconds the admin wants the video to be.
-                    if ($time <= $this->_ffMPEGDuration) {
+                    if ($numbers[1] <= $this->_ffMPEGDuration) {
+                        // If the clip is shorter than the length we want.
                         // The lowest we want is 0.
-                        $lowestLength = '00:00:00:00';
+                        $lowestLength = '00:00:00.00';
                     } else {
-
+                        // If the clip is longer than the length we want.
                         // The lowest we want is the the difference between the max video length and our wanted total time.
-                        $lowestLength = ($time - $this->_ffMPEGDuration);
-
+                        $lowestLength = ($numbers[1] - $this->_ffMPEGDuration);
+                        // Form the time string.
+                        $end = '.'.$numbers[2];
                         switch (\strlen($lowestLength)) {
                             case 1:
-                                $lowestLength = ('00:00:0'.$lowestLength);
+                                $lowestLength = ('00:00:0'.$lowestLength.$end);
                                 break;
                             case 2:
-                                $lowestLength = ('00:00:'.$lowestLength);
+                                $lowestLength = ('00:00:'.$lowestLength.$end);
                                 break;
                             default:
                                 $lowestLength = '00:00:60.00';
@@ -2001,7 +2015,7 @@ class ProcessAdditional
                 // If longer than 60 or we could not get the video length, run the old way.
                 if ($this->ffprobe->isValid($fileLocation)) {
                     $video = $this->ffmpeg->open($fileLocation);
-                    $videoSample = $video->clip(TimeCode::fromSeconds(1), TimeCode::fromSeconds($this->_ffMPEGDuration));
+                    $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
                     $format = new Ogg();
                     $format->setAudioCodec(new Vorbis());
                     $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);

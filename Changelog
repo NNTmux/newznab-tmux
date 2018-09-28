@@ -1,4 +1,5 @@
 2018-09-28 DariusIII
+	* Chg: Revert some of the changes and adjust wanted $time variable
 	* Chg: Update getVideoTime function, add codec setting to ffmpeg video sample creation
 	* Chg: Use proper time string for _getSample function
 2018-09-27 DariusIII
