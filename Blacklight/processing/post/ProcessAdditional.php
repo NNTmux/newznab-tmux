@@ -1871,18 +1871,17 @@ class ProcessAdditional
 
     /**
      * @param string $videoLocation
-     * @return string
-     * @throws \Exception
+     *
+     * @return float|string
      */
-    private function getVideoTime($videoLocation): ?string
+    private function getVideoTime($videoLocation)
     {
-        $time = 3;
         // Get the real duration of the file.
         if ($this->ffprobe->isValid($videoLocation)) {
             $time = $this->ffprobe->format($videoLocation)->get('duration');
         }
 
-        return $time;
+        return isset($time) ? round($time) : '';
     }
 
     /**
@@ -1906,7 +1905,7 @@ class ProcessAdditional
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
                 $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromSeconds($time));
+                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? round(3) : $time));
                 $sample->save($fileName);
             }
 
@@ -1940,7 +1939,7 @@ class ProcessAdditional
     }
 
     /**
-     * @param $fileLocation
+     * @param string $fileLocation
      * @return bool
      * @throws \Exception
      */
@@ -1962,29 +1961,24 @@ class ProcessAdditional
                 // Get the real duration of the file.
                 $time = $this->getVideoTime($fileLocation);
 
-                if ($time !== '' && preg_match('/(\d{2}).(\d{2})/', $time, $numbers)) {
+                if ($time !== '') {
                     $newMethod = true;
 
                     // Get the lowest time we can start making the video at based on how many seconds the admin wants the video to be.
-                    if ($numbers[1] <= $this->_ffMPEGDuration) {
-                        // If the clip is shorter than the length we want.
-
+                    if ($time <= $this->_ffMPEGDuration) {
                         // The lowest we want is 0.
-                        $lowestLength = '00:00:00.00';
+                        $lowestLength = '00:00:00:00';
                     } else {
-                        // If the clip is longer than the length we want.
 
                         // The lowest we want is the the difference between the max video length and our wanted total time.
-                        $lowestLength = ($numbers[1] - $this->_ffMPEGDuration);
+                        $lowestLength = ($time - $this->_ffMPEGDuration);
 
-                        // Form the time string.
-                        $end = '.'.$numbers[2];
                         switch (\strlen($lowestLength)) {
                             case 1:
-                                $lowestLength = ('00:00:0'.$lowestLength.$end);
+                                $lowestLength = ('00:00:0'.$lowestLength);
                                 break;
                             case 2:
-                                $lowestLength = ('00:00:'.$lowestLength.$end);
+                                $lowestLength = ('00:00:'.$lowestLength);
                                 break;
                             default:
                                 $lowestLength = '00:00:60.00';
