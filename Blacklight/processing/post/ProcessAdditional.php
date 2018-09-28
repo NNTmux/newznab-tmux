@@ -425,7 +425,7 @@ class ProcessAdditional
         $this->_par2Info = new Par2Info();
         $this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
         $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
-        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
+        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds'), 'ffmpeg.threads' => 0]);
         $this->ffprobe = FFProbe::create();
 
         $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
