@@ -425,7 +425,7 @@ class ProcessAdditional
         $this->_par2Info = new Par2Info();
         $this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
         $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
-        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds'), 'ffmpeg.threads' => 0]);
+        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds'), 'ffmpeg.threads' => 2]);
         $this->ffprobe = FFProbe::create();
 
         $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
@@ -1872,24 +1872,24 @@ class ProcessAdditional
     /**
      * @param string $videoLocation
      *
-     * @return float|string
+     * @return mixed|string
      */
-    private function getVideoTime($videoLocation)
+    private function getVideoTime(string $videoLocation)
     {
         // Get the real duration of the file.
         if ($this->ffprobe->isValid($videoLocation)) {
             $time = $this->ffprobe->format($videoLocation)->get('duration');
         }
 
-        return isset($time) ? round($time) : '';
+        return $time ?? '';
     }
 
     /**
-     * @param $fileLocation
+     * @param string $fileLocation
      * @return bool
      * @throws \Exception
      */
-    protected function _getSample($fileLocation): bool
+    protected function _getSample(string $fileLocation): bool
     {
         if (! $this->_processThumbnails) {
             return false;
@@ -1905,7 +1905,7 @@ class ProcessAdditional
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
                 $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? round(3) : $time));
+                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? 3 : $time));
                 $sample->save($fileName);
             }
 
@@ -1943,7 +1943,7 @@ class ProcessAdditional
      * @return bool
      * @throws \Exception
      */
-    protected function _getVideo($fileLocation)
+    protected function _getVideo(string $fileLocation): bool
     {
         if (! $this->_processVideo) {
             return false;
