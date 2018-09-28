@@ -1876,25 +1876,13 @@ class ProcessAdditional
      */
     private function getVideoTime($videoLocation): ?string
     {
+        $time = 3;
         // Get the real duration of the file.
         if ($this->ffprobe->isValid($videoLocation)) {
             $time = $this->ffprobe->format($videoLocation)->get('duration');
         }
 
-        if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
-            return '';
-        }
-
-        // Reduce the last number by 1, this is to make sure we don't ask avconv/ffmpeg for non existing data.
-        if ($numbers[3] > 0) {
-            $numbers[3] -= 1;
-        } elseif ($numbers[1] > 0) {
-            $numbers[2] -= 1;
-            $numbers[3] = '99';
-        }
-
-        // Manually pad the numbers in case they are 1 number. to get 02 for example instead of 2.
-        return '00:00:'.str_pad($numbers[2], 2, '0', STR_PAD_LEFT).'.'.str_pad($numbers[3], 2, '0', STR_PAD_LEFT);
+        return $time;
     }
 
     /**
@@ -1918,7 +1906,7 @@ class ProcessAdditional
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
                 $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? 3 : $time));
+                $sample = $video->frame(TimeCode::fromSeconds($time));
                 $sample->save($fileName);
             }
 
@@ -1993,10 +1981,10 @@ class ProcessAdditional
                         $end = '.'.$numbers[2];
                         switch (\strlen($lowestLength)) {
                             case 1:
-                                $lowestLength = ('00:00:0'.(string) $lowestLength.$end);
+                                $lowestLength = ('00:00:0'.$lowestLength.$end);
                                 break;
                             case 2:
-                                $lowestLength = ('00:00:'.(string) $lowestLength.$end);
+                                $lowestLength = ('00:00:'.$lowestLength.$end);
                                 break;
                             default:
                                 $lowestLength = '00:00:60.00';
@@ -2008,6 +1996,7 @@ class ProcessAdditional
                         $video = $this->ffmpeg->open($fileLocation);
                         $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
                         $format = new Ogg();
+                        $format->setAudioCodec(new Vorbis());
                         $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                         $videoSample->save($format, $fileName);
                     }
@@ -2020,6 +2009,7 @@ class ProcessAdditional
                     $video = $this->ffmpeg->open($fileLocation);
                     $videoSample = $video->clip(TimeCode::fromSeconds(1), TimeCode::fromSeconds($this->_ffMPEGDuration));
                     $format = new Ogg();
+                    $format->setAudioCodec(new Vorbis());
                     $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                     $videoSample->save($format, $fileName);
                 }
