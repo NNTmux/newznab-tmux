@@ -1918,7 +1918,7 @@ class ProcessAdditional
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
                 $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? '00:00:03.00' : $time));
+                $sample = $video->frame(TimeCode::fromSeconds($time === '' ? 3 : $time));
                 $sample->save($fileName);
             }
 
