@@ -7,6 +7,7 @@ use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
@@ -432,9 +433,9 @@ class Forking extends \fork_daemon
         $backfilldays = '';
         if ((int) $backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = now()->subDays((int) $days);
+            $backfilldays = now()->subDays((int) $days)->format('Y-m-d');
         } elseif ((int) $backfill_days === 2) {
-            $backfilldays = Settings::settingValue('..safebackfilldate');
+            $backfilldays = now()->subDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate'))->diffInDays())->format('Y-m-d');
         }
 
         $data = DB::select(

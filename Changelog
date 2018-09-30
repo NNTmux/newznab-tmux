@@ -1,3 +1,5 @@
+2018-10-01 DariusIII
+	* Fix: Fix wrong dates in Forking backfill functionality
 2018-09-30 DariusIII
 	* Chg: Update symfony components
 	* Chg: Update used libraries to latest versions
