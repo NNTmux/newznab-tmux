@@ -321,8 +321,7 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            },
-            "time": "2016-06-06T17:37:52+00:00"
+            }
         },
         {
             "name": "bower-asset/autosize",
@@ -351,8 +350,7 @@
                 "form",
                 "textarea",
                 "ui"
-            ],
-            "time": "2017-05-19T15:36:30+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap",
@@ -401,8 +399,7 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ],
-            "time": "2016-07-25T15:51:55+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-3.x",
@@ -451,8 +448,7 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ],
-            "time": "2016-07-25T15:51:55+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -481,8 +477,7 @@
             },
             "license": [
                 "Apache-2.0"
-            ],
-            "time": "2016-08-05T09:50:13+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -512,8 +507,7 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ],
-            "time": "2015-12-01T23:35:57+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -547,8 +541,7 @@
             },
             "license": [
                 "MIT"
-            ],
-            "time": "2015-05-15T18:56:17+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootswatch",
@@ -679,8 +672,7 @@
                 "modal",
                 "popup",
                 "ui"
-            ],
-            "time": "2016-05-10T22:21:33+00:00"
+            ]
         },
         {
             "name": "bower-asset/datatables",
@@ -733,16 +725,16 @@
         },
         {
             "name": "bower-asset/fancybox",
-            "version": "v3.4.2",
+            "version": "v3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fancyapps/fancybox.git",
-                "reference": "48c7be612e29083d9face31fa2c16a976eef4ab6"
+                "reference": "42d6aabb1fabde66c97711cf0a15409751da5a0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/48c7be612e29083d9face31fa2c16a976eef4ab6",
-                "reference": "48c7be612e29083d9face31fa2c16a976eef4ab6",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/42d6aabb1fabde66c97711cf0a15409751da5a0e",
+                "reference": "42d6aabb1fabde66c97711cf0a15409751da5a0e",
                 "shasum": ""
             },
             "require": {
@@ -768,7 +760,7 @@
                 "responsive",
                 "touch"
             ],
-            "time": "2018-09-21T11:43:08+00:00"
+            "time": "2018-09-29T12:53:35+00:00"
         },
         {
             "name": "bower-asset/fastclick",
@@ -795,8 +787,7 @@
                     "tests",
                     "examples"
                 ]
-            },
-            "time": "2015-01-26T21:19:01+00:00"
+            }
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -832,8 +823,7 @@
                 "css",
                 "flexbox",
                 "grid"
-            ],
-            "time": "2016-08-14T16:43:18+00:00"
+            ]
         },
         {
             "name": "bower-asset/font-awesome",
@@ -878,8 +868,7 @@
                     "src",
                     "build.xml"
                 ]
-            },
-            "time": "2015-07-20T20:04:00+00:00"
+            }
         },
         {
             "name": "bower-asset/icheck",
@@ -929,8 +918,7 @@
                 "replacement",
                 "skins",
                 "ui"
-            ],
-            "time": "2014-03-03T17:36:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery",
@@ -993,8 +981,7 @@
                 "javascript",
                 "jquery",
                 "library"
-            ],
-            "time": "2016-05-20T17:24:43+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery-3.2.x",
@@ -1061,8 +1048,7 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ],
-            "time": "2017-08-31T15:51:29+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
@@ -1081,8 +1067,7 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            },
-            "time": "2016-04-15T06:38:34+00:00"
+            }
         },
         {
             "name": "bower-asset/jquery-migrate-3.0.x",
@@ -1101,8 +1086,7 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            },
-            "time": "2016-06-10T14:28:59+00:00"
+            }
         },
         {
             "name": "bower-asset/jquery.nicescroll",
@@ -1132,8 +1116,7 @@
                     "demo",
                     "package.json"
                 ]
-            },
-            "time": "2016-03-01T20:38:24+00:00"
+            }
         },
         {
             "name": "bower-asset/material-design-iconic-font",
@@ -1172,8 +1155,7 @@
                 "font",
                 "icons",
                 "material"
-            ],
-            "time": "2015-11-08T04:50:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/materialize",
@@ -1232,8 +1214,7 @@
                 "responsive",
                 "sass",
                 "ux"
-            ],
-            "time": "2017-04-15T01:39:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/pace",
@@ -1279,8 +1260,7 @@
                 "progress",
                 "progress",
                 "spinner"
-            ],
-            "time": "2014-11-06T16:31:34+00:00"
+            ]
         },
         {
             "name": "bower-asset/pnotify",
@@ -1332,8 +1312,7 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin.",
-            "time": "2017-07-31T21:50:29+00:00"
+            "description": "JavaScript notification plugin."
         },
         {
             "name": "bower-asset/respond",
@@ -1357,8 +1336,7 @@
                     "test"
                 ]
             },
-            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
-            "time": "2013-12-19T04:44:31+00:00"
+            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
         },
         {
             "name": "bower-asset/responsive-tables-js",
@@ -1388,8 +1366,7 @@
                 "jquery",
                 "responsive",
                 "table"
-            ],
-            "time": "2015-10-08T14:18:04+00:00"
+            ]
         },
         {
             "name": "bower-asset/select2",
@@ -1457,8 +1434,7 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ],
-            "time": "2016-06-11T09:19:14+00:00"
+            ]
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -3345,32 +3321,32 @@
         },
         {
             "name": "jakub-onderka/php-console-color",
-            "version": "0.1",
+            "version": "v0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JakubOnderka/PHP-Console-Color.git",
-                "reference": "e0b393dacf7703fc36a4efc3df1435485197e6c1"
+                "reference": "d5deaecff52a0d61ccb613bb3804088da0307191"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JakubOnderka/PHP-Console-Color/zipball/e0b393dacf7703fc36a4efc3df1435485197e6c1",
-                "reference": "e0b393dacf7703fc36a4efc3df1435485197e6c1",
+                "url": "https://api.github.com/repos/JakubOnderka/PHP-Console-Color/zipball/d5deaecff52a0d61ccb613bb3804088da0307191",
+                "reference": "d5deaecff52a0d61ccb613bb3804088da0307191",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2"
+                "php": ">=5.4.0"
             },
             "require-dev": {
                 "jakub-onderka/php-code-style": "1.0",
-                "jakub-onderka/php-parallel-lint": "0.*",
+                "jakub-onderka/php-parallel-lint": "1.0",
                 "jakub-onderka/php-var-dump-check": "0.*",
-                "phpunit/phpunit": "3.7.*",
+                "phpunit/phpunit": "~4.3",
                 "squizlabs/php_codesniffer": "1.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "JakubOnderka\\PhpConsoleColor": "src/"
+                "psr-4": {
+                    "JakubOnderka\\PhpConsoleColor\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3380,11 +3356,10 @@
             "authors": [
                 {
                     "name": "Jakub Onderka",
-                    "email": "jakub.onderka@gmail.com",
-                    "homepage": "http://www.acci.cz"
+                    "email": "jakub.onderka@gmail.com"
                 }
             ],
-            "time": "2014-04-08T15:00:19+00:00"
+            "time": "2018-09-29T17:23:10+00:00"
         },
         {
             "name": "jakub-onderka/php-console-highlighter",
@@ -6013,20 +5988,21 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "5.4.1",
+            "version": "5.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "0f18df001833fc82e6502229565347290cecda85"
+                "reference": "2931881cac3155ceb798f2fd1e55bd152576682b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/0f18df001833fc82e6502229565347290cecda85",
-                "reference": "0f18df001833fc82e6502229565347290cecda85",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/2931881cac3155ceb798f2fd1e55bd152576682b",
+                "reference": "2931881cac3155ceb798f2fd1e55bd152576682b",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "~5.5.0|~5.6.0|~5.7.0",
+                "illuminate/contracts": "~5.5.0|~5.6.0|~5.7.0",
+                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0",
                 "php": "^7.0",
                 "spatie/fractalistic": "^2.5"
             },
@@ -6076,24 +6052,27 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2018-08-24T09:21:38+00:00"
+            "time": "2018-09-28T16:17:34+00:00"
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.20.0",
+            "version": "2.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "e2200bb92b67632abc92aa438de9cb0958da20d9"
+                "reference": "5415d29d54d15985b8cf56fef30d7514c8608309"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/e2200bb92b67632abc92aa438de9cb0958da20d9",
-                "reference": "e2200bb92b67632abc92aa438de9cb0958da20d9",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/5415d29d54d15985b8cf56fef30d7514c8608309",
+                "reference": "5415d29d54d15985b8cf56fef30d7514c8608309",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+                "illuminate/auth": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+                "illuminate/container": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+                "illuminate/contracts": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
+                "illuminate/database": "~5.4.0|~5.5.0|~5.6.0|~5.7.0",
                 "php": ">=7.0"
             },
             "require-dev": {
@@ -6137,7 +6116,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-09-20T01:30:08+00:00"
+            "time": "2018-09-29T04:20:17+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
