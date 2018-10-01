@@ -395,7 +395,7 @@ class NZB
                     // Change .rar and .par2 to be sorted before .part0x.rar and .volxxx+xxx.par2
                     if (strpos($i, '.par2') !== false && ! preg_match('#\.vol\d+\+\d+\.par2#i', $i)) {
                         $i = str_replace('.par2', '.vol0.par2', $i);
-                    } elseif (preg_match('#\.rar[^a-z0-9]#i', $i) && ! preg_match('#\.part\d+\.rar#i', $i)) {
+                    } elseif (preg_match('#\.rar[^a-z0-9]#i', $i) && ! preg_match('#\.part\d+\.rar$#i', $i)) {
                         $i = preg_replace('#\.rar(?:[^a-z0-9])#i', '.part0.rar', $i);
                     }
                 }
@@ -412,7 +412,7 @@ class NZB
                 .'ods|odt|ogg|par2|parity|pdf|pgp|php|pl|png|ppt|ps|py|r\d{2,3}|'
                 .'ram|rar|rb|rm|rpm|rtf|sfv|sig|sql|srs|swf|sxc|sxd|sxi|sxw|tar|'
                 .'tex|tgz|txt|vcf|video|vsd|wav|wma|wmv|xls|xml|xpi|xvid|zip7|zip)'
-                .'[" ](?!(\)|\-))/i',
+                .'[" ](?!([\)|\-]))/i',
                 $title,
                 $ext
             )
