@@ -12,7 +12,7 @@ return [
     | Supported: "bcrypt", "argon", "argon2id"
     |
     */
-    'driver' => 'argon2id',
+    'driver' => 'argon',
     /*
     |--------------------------------------------------------------------------
     | Bcrypt Options

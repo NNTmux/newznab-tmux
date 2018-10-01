@@ -17,23 +17,22 @@ return [
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
+        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
     ],
-
     'ses' => [
         'key' => env('SES_KEY'),
         'secret' => env('SES_SECRET'),
-        'region' => 'us-east-1',
+        'region' => env('SES_REGION', 'us-east-1'),
     ],
-
     'sparkpost' => [
         'secret' => env('SPARKPOST_SECRET'),
     ],
-
     'stripe' => [
-        'model' => App\Models\User::class,
+        'model' => App\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+
     'igdb' => [
         'key' => env('IGDB_KEY', ''),
         'url' => 'https://api-endpoint.igdb.com',

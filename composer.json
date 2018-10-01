@@ -193,7 +193,7 @@
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "post-create-project-cmd": [
-      "@php artisan key:generate"
+      "@php artisan key:generate --ansi"
     ],
     "post-install-cmd": [
       "Blacklight\\build\\ComposerScripts::postInstall",
@@ -201,12 +201,12 @@
     ],
     "post-update-cmd": [
       "Blacklight\\build\\ComposerScripts::postUpdate",
-      "php artisan ide-helper:generate",
-      "php artisan ide-helper:meta"
+      "@php artisan ide-helper:generate --ansi",
+      "@php artisan ide-helper:meta --ansi"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-      "@php artisan package:discover"
+      "@php artisan package:discover --ansi"
     ]
   },
   "suggest": {
