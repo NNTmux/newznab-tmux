@@ -9188,16 +9188,16 @@
         },
         {
             "name": "orangehill/iseed",
-            "version": "v2.5.1",
+            "version": "v2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orangehill/iseed.git",
-                "reference": "c99a9f7bcc37dd853891acdc2e4d43bcf55a0404"
+                "reference": "b166c1c12118b7e553222e374715f60d0f87f604"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orangehill/iseed/zipball/c99a9f7bcc37dd853891acdc2e4d43bcf55a0404",
-                "reference": "c99a9f7bcc37dd853891acdc2e4d43bcf55a0404",
+                "url": "https://api.github.com/repos/orangehill/iseed/zipball/b166c1c12118b7e553222e374715f60d0f87f604",
+                "reference": "b166c1c12118b7e553222e374715f60d0f87f604",
                 "shasum": ""
             },
             "require": {
@@ -9243,7 +9243,7 @@
                 "laravel",
                 "seed"
             ],
-            "time": "2017-10-05T07:30:15+00:00"
+            "time": "2018-10-01T07:59:18+00:00"
         },
         {
             "name": "phar-io/manifest",
