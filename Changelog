@@ -1,4 +1,5 @@
 2018-10-01 DariusIII
+	* Chg: Update hashing.php, add argon2id support
 	* Chg: Update orangehill/iseed to version 2.6
 	* Chg: Update extension regexes in NZB class
 	* Fix: Fix wrong dates in Forking backfill functionality
