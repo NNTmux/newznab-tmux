@@ -3,13 +3,13 @@
  * Created by PhpStorm.
  * User: darius
  * Date: 2.10.18.
- * Time: 10.50
+ * Time: 10.50.
  */
 
 namespace App\Forum\Policies;
 
-use Illuminate\Support\Facades\Gate;
 use Riari\Forum\Models\Thread;
+use Illuminate\Support\Facades\Gate;
 use Riari\Forum\Policies\ThreadPolicy;
 
 class CustomThreadPolicy extends ThreadPolicy
@@ -47,7 +47,7 @@ class CustomThreadPolicy extends ThreadPolicy
      */
     public function reply($user, Thread $thread)
     {
-        return !$thread->locked;
+        return ! $thread->locked;
     }
 
     /**

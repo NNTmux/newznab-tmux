@@ -18,7 +18,7 @@ return [
             Riari\Forum\Models\Category::class  => \App\Forum\Policies\CustomCategoryPolicy::class,
             Riari\Forum\Models\Thread::class    => \App\Forum\Policies\CustomThreadPolicy::class,
             Riari\Forum\Models\Post::class      => Riari\Forum\Policies\PostPolicy::class,
-        ]
+        ],
     ],
 
     /*

@@ -41,7 +41,7 @@ return [
         'namespace' => 'Riari\Forum\Frontend\Http\Controllers',
         'category'  => 'CategoryController',
         'thread'    => 'ThreadController',
-        'post'      => 'PostController'
+        'post'      => 'PostController',
     ],
 
     /*

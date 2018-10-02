@@ -27,7 +27,7 @@ return [
     'pagination' => [
         'categories'    => 20, // Categories per page (API only)
         'threads'       => 20, // Threads per page
-        'posts'         => 15  // Posts per page
+        'posts'         => 15,  // Posts per page
     ],
 
     /*
@@ -45,8 +45,8 @@ return [
         'default' => 5,
         'Category' => [
             'deepestChild'  => 720,
-            'depth'         => 720
-        ]
+            'depth'         => 720,
+        ],
     ],
 
     /*
@@ -75,6 +75,6 @@ return [
     |
     */
 
-    'display_trashed_posts' => true
+    'display_trashed_posts' => true,
 
 ];

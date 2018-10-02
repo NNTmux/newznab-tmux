@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: darius
  * Date: 2.10.18.
- * Time: 10.45
+ * Time: 10.45.
  */
 
 namespace App\Forum\Policies;

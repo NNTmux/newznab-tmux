@@ -24,6 +24,6 @@ return [
         'thread_id'         => ['integer', 'exists:forum_threads,id'],
         'title'             => ['string', 'min:5'],
         'weight'            => ['integer'],
-    ]
+    ],
 
 ];
