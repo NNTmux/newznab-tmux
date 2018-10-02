@@ -1,4 +1,5 @@
 2018-10-02 DariusIII
+	* Chg: Update laravel/framework to version 5.7.7 and imdbphp/imdbphp to version 6.0.4
 	* Chg: Update branches and their handling, remove restriction for updating non dev branches
 2018-10-01 DariusIII
 	* Chg: Make cache persistent
