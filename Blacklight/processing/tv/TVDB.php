@@ -13,7 +13,7 @@ use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
  */
 class TVDB extends TV
 {
-    private const TVDB_IMAGES_URL = 'https://www.thetvdb.com/banners/';
+    private const TVDB_IMAGES_URL = 'https://www.thetvdb.com/banners';
     private const TVDB_API_KEY = '31740C28BAC74DEF';
     private const MATCH_PROBABILITY = 75;
 
