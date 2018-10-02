@@ -41,11 +41,6 @@ class UpdateNNTmuxGit extends Command
     public function handle()
     {
         $this->initialiseGit();
-        if (! \in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
-            $this->error('Not on the stable or dev branch! Refusing to update repository');
-
-            return;
-        }
 
         $wasRunning = false;
 
@@ -61,6 +56,9 @@ class UpdateNNTmuxGit extends Command
         }
     }
 
+    /**
+     *
+     */
     protected function initialiseGit()
     {
         if (! ($this->git instanceof Git)) {
