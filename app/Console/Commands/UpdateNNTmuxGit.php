@@ -56,9 +56,6 @@ class UpdateNNTmuxGit extends Command
         }
     }
 
-    /**
-     *
-     */
     protected function initialiseGit()
     {
         if (! ($this->git instanceof Git)) {

@@ -53,14 +53,12 @@ class Git
     {
         $defaults = [
 			'branches' => [
-				'stable' =>
-                    [
+				'stable' => [
                         'master',
-                        '\d+\.\d+\.\d+(\.\d+)?'
+                        '\d+\.\d+\.\d+(\.\d+)?',
                     ],
-				'development' =>
-                    [
-                        'dev'
+				'development' => [
+                        'dev',
                     ],
 			],
 			'create' => false,
