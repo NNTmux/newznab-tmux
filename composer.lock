@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "941be88eda29a68d6dcba35f3edac2b8",
+    "content-hash": "89e8978836af572fa7ddbac61558e4d4",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -321,7 +321,8 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            }
+            },
+            "time": "2016-06-06T17:37:52+00:00"
         },
         {
             "name": "bower-asset/autosize",
@@ -350,7 +351,8 @@
                 "form",
                 "textarea",
                 "ui"
-            ]
+            ],
+            "time": "2017-05-19T15:36:30+00:00"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -399,7 +401,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-3.x",
@@ -448,7 +451,8 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ]
+            ],
+            "time": "2016-07-25T15:51:55+00:00"
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -477,7 +481,8 @@
             },
             "license": [
                 "Apache-2.0"
-            ]
+            ],
+            "time": "2016-08-05T09:50:13+00:00"
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -507,7 +512,8 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ]
+            ],
+            "time": "2015-12-01T23:35:57+00:00"
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -541,7 +547,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2015-05-15T18:56:17+00:00"
         },
         {
             "name": "bower-asset/bootswatch",
@@ -672,7 +679,8 @@
                 "modal",
                 "popup",
                 "ui"
-            ]
+            ],
+            "time": "2016-05-10T22:21:33+00:00"
         },
         {
             "name": "bower-asset/datatables",
@@ -787,7 +795,8 @@
                     "tests",
                     "examples"
                 ]
-            }
+            },
+            "time": "2015-01-26T21:19:01+00:00"
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -823,7 +832,8 @@
                 "css",
                 "flexbox",
                 "grid"
-            ]
+            ],
+            "time": "2016-08-14T16:43:18+00:00"
         },
         {
             "name": "bower-asset/font-awesome",
@@ -868,7 +878,8 @@
                     "src",
                     "build.xml"
                 ]
-            }
+            },
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "bower-asset/icheck",
@@ -918,7 +929,8 @@
                 "replacement",
                 "skins",
                 "ui"
-            ]
+            ],
+            "time": "2014-03-03T17:36:28+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -981,7 +993,8 @@
                 "javascript",
                 "jquery",
                 "library"
-            ]
+            ],
+            "time": "2016-05-20T17:24:43+00:00"
         },
         {
             "name": "bower-asset/jquery-3.2.x",
@@ -1048,7 +1061,8 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ]
+            ],
+            "time": "2017-08-31T15:51:29+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
@@ -1067,7 +1081,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-04-15T06:38:34+00:00"
         },
         {
             "name": "bower-asset/jquery-migrate-3.0.x",
@@ -1086,7 +1101,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "jquery-migrate.js"
-            }
+            },
+            "time": "2016-06-10T14:28:59+00:00"
         },
         {
             "name": "bower-asset/jquery.nicescroll",
@@ -1116,7 +1132,8 @@
                     "demo",
                     "package.json"
                 ]
-            }
+            },
+            "time": "2016-03-01T20:38:24+00:00"
         },
         {
             "name": "bower-asset/material-design-iconic-font",
@@ -1155,7 +1172,8 @@
                 "font",
                 "icons",
                 "material"
-            ]
+            ],
+            "time": "2015-11-08T04:50:28+00:00"
         },
         {
             "name": "bower-asset/materialize",
@@ -1214,7 +1232,8 @@
                 "responsive",
                 "sass",
                 "ux"
-            ]
+            ],
+            "time": "2017-04-15T01:39:28+00:00"
         },
         {
             "name": "bower-asset/pace",
@@ -1260,7 +1279,8 @@
                 "progress",
                 "progress",
                 "spinner"
-            ]
+            ],
+            "time": "2014-11-06T16:31:34+00:00"
         },
         {
             "name": "bower-asset/pnotify",
@@ -1312,7 +1332,8 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin."
+            "description": "JavaScript notification plugin.",
+            "time": "2017-07-31T21:50:29+00:00"
         },
         {
             "name": "bower-asset/respond",
@@ -1336,7 +1357,8 @@
                     "test"
                 ]
             },
-            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
+            "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
+            "time": "2013-12-19T04:44:31+00:00"
         },
         {
             "name": "bower-asset/responsive-tables-js",
@@ -1366,7 +1388,8 @@
                 "jquery",
                 "responsive",
                 "table"
-            ]
+            ],
+            "time": "2015-10-08T14:18:04+00:00"
         },
         {
             "name": "bower-asset/select2",
@@ -1434,7 +1457,8 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ]
+            ],
+            "time": "2016-06-11T09:19:14+00:00"
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -5829,6 +5853,99 @@
                 "uuid"
             ],
             "time": "2018-07-19T23:38:55+00:00"
+        },
+        {
+            "name": "riari/laravel-forum",
+            "version": "4.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Riari/laravel-forum.git",
+                "reference": "60a771f0d333788719693a261d7c1e1e161bcd9e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Riari/laravel-forum/zipball/60a771f0d333788719693a261d7c1e1e161bcd9e",
+                "reference": "60a771f0d333788719693a261d7c1e1e161bcd9e",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.5",
+                "laravel/framework": "~5.4",
+                "php": ">=5.4.0"
+            },
+            "suggest": {
+                "riari/laravel-forum-frontend": "The standard forum frontend that provides views written with Bootstrap 3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Riari\\Forum\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Riari",
+                    "email": "hello@ricko.me"
+                }
+            ],
+            "description": "A Laravel 4/5 package providing a solid foundation for building discussion forums",
+            "keywords": [
+                "discuss",
+                "forum",
+                "laravel",
+                "laravel-4",
+                "laravel-5"
+            ],
+            "time": "2018-06-05T13:34:04+00:00"
+        },
+        {
+            "name": "riari/laravel-forum-frontend",
+            "version": "1.1.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Riari/laravel-forum-frontend.git",
+                "reference": "0abc48380ca8c49268b4fa5cf9aea780092c0215"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Riari/laravel-forum-frontend/zipball/0abc48380ca8c49268b4fa5cf9aea780092c0215",
+                "reference": "0abc48380ca8c49268b4fa5cf9aea780092c0215",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "riari/laravel-forum": "3.0 - 4.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Riari\\Forum\\Frontend\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Riari",
+                    "email": "hello@ricko.me"
+                }
+            ],
+            "description": "A frontend for riari/laravel-forum providing views written with Bootstrap 3",
+            "keywords": [
+                "discuss",
+                "forum",
+                "frontend",
+                "laravel",
+                "laravel-4",
+                "laravel-5"
+            ],
+            "time": "2018-06-05T13:34:26+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
