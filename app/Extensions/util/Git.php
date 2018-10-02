@@ -60,7 +60,6 @@ class Git
                     ],
 				'development' =>
                     [
-                        'master',
                         'dev'
                     ],
 			],
