@@ -43,7 +43,7 @@
   "description": "A Usenet Indexer",
   "extra": {
     "branch-alias": {
-      "dev-dev": "0.x-dev"
+      "dev-dev": "master-dev"
     }
 
   },

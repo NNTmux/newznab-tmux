@@ -34,20 +34,36 @@ class Git
      */
     public $_config;
 
-    protected $gitTagLatest = null;
+    /**
+     * @var
+     */
+    protected $gitTagLatest;
 
+    /**
+     * @var string
+     */
     private $branch;
 
+    /**
+     * Git constructor.
+     *
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $defaults = [
-			'branches'		=> [
-				'stable' => ['0.x', 'Latest-testing', '\d+\.\d+\.\d+(\.\d+)?'],
-				'development' => ['dev', 'dev-test'],
+			'branches' => [
+				'stable' => [
+                        'master',
+                        '\d+\.\d+\.\d+(\.\d+)?',
+                    ],
+				'development' => [
+                        'dev',
+                    ],
 			],
-			'create'		=> false,
-			'initialise'	=> false,
-			'filepath'		=> NN_ROOT,
+			'create' => false,
+			'initialise' => false,
+			'filepath' => NN_ROOT,
 		];
 
         $config += $defaults;
@@ -88,6 +104,9 @@ class Git
         return $this->branch;
     }
 
+    /**
+     * @return mixed
+     */
     public function getBranchesDevelop()
     {
         return $this->_config['branches']['development'];
@@ -103,11 +122,17 @@ class Git
         return array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
     }
 
+    /**
+     * @return mixed
+     */
     public function getBranchesStable()
     {
         return $this->_config['branches']['stable'];
     }
 
+    /**
+     * @return string
+     */
     public function getHeadHash()
     {
         $command = new Process('git rev-parse HEAD');
@@ -145,6 +170,11 @@ class Git
         return $result === '';
     }
 
+    /**
+     * @param $branch
+     *
+     * @return bool
+     */
     public function isStable($branch)
     {
         foreach ($this->getBranchesStable() as $pattern) {
@@ -175,6 +205,11 @@ class Git
         return $command->getOutput();
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function gitPull(array $options = [])
     {
         $default = [

@@ -48,14 +48,14 @@ class Versions extends Collection
     protected $_config;
 
     /**
-     * @var \simpleXMLElement object.
+     * @var
      */
-    protected $versions = null;
+    protected $versions;
 
     /**
-     * @var \simpleXMLElement object
+     * @var
      */
-    protected $xml = null;
+    protected $xml;
 
     public function __construct(array $config = [])
     {
