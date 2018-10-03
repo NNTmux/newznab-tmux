@@ -196,7 +196,7 @@
 							</div>
 							{if    count($results) > 0}
 								<div class="col-md-4">
-									{$results->links()}
+									{$results->onEachSide(5)->links()}
 								</div>
 							{/if}
 						</div>
@@ -430,7 +430,7 @@
 							</div>
 							{if    count($results) > 0}
 								<div class="col-md-4">
-									{$results->links()}
+									{$results->onEachSide(5)->links()}
 								</div>
 							{/if}
 						</div>

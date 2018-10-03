@@ -4,7 +4,7 @@
 	{if $booklist}
 		{if $booklist->count() > 0}
 			<div class="col-md-4">
-				{$booklist->links()}
+				{$booklist->onEachSide(5)->links()}
 			</div>
 		{/if}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
@@ -30,7 +30,7 @@
 		<br/>
 		{if $booklist->count() > 0}
 			<div class="col-md-4">
-				{$booklist->links()}
+				{$booklist->onEachSide(5)->links()}
 			</div>
 		{/if}
 	{else}

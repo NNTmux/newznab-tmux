@@ -49,7 +49,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								{$results->links()}
+								{$results->onEachSide(5)->links()}
 							</div>
 						</div>
 					</div>
@@ -233,7 +233,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								{$results->links()}
+								{$results->onEachSide(5)->links()}
 							</div>
 						</div>
 					</div>

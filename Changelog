@@ -1,4 +1,5 @@
 2018-10-03 DariusIII
+	* Chg: Increase number of pages listed on each side of pagers current page
 	* Chg: Update mockery/mockery to version 1.2.0
 2018-10-02 DariusIII
 	* Fix: Fix wrong link to tvdb banners
