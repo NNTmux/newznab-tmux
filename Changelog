@@ -1,3 +1,9 @@
+2018-10-03 DariusIII
+	* Chg: Update symfony components to their latest versions
+	* Fix: Remove stray whitespace in X-DNZB-NFO header sent on nzb download. Fixes issue #735
+	* Chg: Update exception handling in ProcessAdditional class and related scripts
+	* Chg: Increase number of pages listed on each side of pagers current page
+	* Chg: Update mockery/mockery to version 1.2.0
 2018-10-02 DariusIII
 	* Fix: Fix wrong link to tvdb banners
 	* Chg: Update laravel/framework to version 5.7.7 and imdbphp/imdbphp to version 6.0.4

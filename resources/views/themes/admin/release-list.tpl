@@ -2,7 +2,7 @@
 	<h1>{$title}</h1>
 
 	{if $releaselist}
-		{$releaselist->links()}
+		{$releaselist->onEachSide(5)->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -33,7 +33,7 @@
 
 		</table>
 		<br/>
-		{$releaselist->links()}
+		{$releaselist->onEachSide(5)->links()}
 	{else}
 		<p>No releases available.</p>
 	{/if}
