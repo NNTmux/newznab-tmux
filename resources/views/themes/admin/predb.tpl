@@ -13,7 +13,7 @@
 		</span>
 		</div>
 	</form>
-	{$results->links()}
+	{$results->onEachSide(5)->links()}
 	<table class="data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<th> Date</th>
@@ -101,6 +101,6 @@
 	</table>
 	<hr>
 	<div style="padding-bottom:10px;">
-		{$results->links()}
+		{$results->onEachSide(5)->links()}
 	</div>
 </div>

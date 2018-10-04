@@ -315,9 +315,7 @@ switch ($options[1]) {
             // Post process the releases.
             try {
                 (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start($options[2]);
-            } catch (\Blacklight\processing\post\ProcessAdditionalException $e) {
-                echo $e->getMessage();
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 echo $e->getMessage();
             }
             try {
@@ -350,9 +348,7 @@ switch ($options[1]) {
             } else {
                 try {
                     (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start('', $options[2]);
-                } catch (\Blacklight\processing\post\ProcessAdditionalException $e) {
-                    echo $e->getMessage();
-                } catch (Exception $e) {
+                } catch (\Throwable $e) {
                     echo $e->getMessage();
                 }
             }

@@ -2,7 +2,7 @@
 	<h1>{$title}</h1>
 
 	{if $musiclist}
-		{$musiclist->links()}
+		{$musiclist->onEachSide(5)->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -24,7 +24,7 @@
 
 		</table>
 		<br/>
-		{$musiclist->links()}
+		{$musiclist->onEachSide(5)->links()}
 	{else}
 		<p>No Music available.</p>
 	{/if}

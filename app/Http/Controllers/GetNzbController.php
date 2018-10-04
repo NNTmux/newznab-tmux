@@ -133,7 +133,7 @@ class GetNzbController extends BasePageController
         }
 
         if ((int) $relData['nfostatus'] === 1) {
-            $headers += ['X-DNZB-NFO ' => url('/').'/nfo/'.$request->input('id')];
+            $headers += ['X-DNZB-NFO' => url('/').'/nfo/'.$request->input('id')];
         }
 
         $headers += ['X-DNZB-RCode' => '200',

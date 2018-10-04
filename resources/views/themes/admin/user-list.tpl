@@ -24,7 +24,7 @@
 		</form>
 	</div>
 
-	{$userlist->links()}
+	{$userlist->onEachSide(5)->links()}
 
 	<br/><br/>
 

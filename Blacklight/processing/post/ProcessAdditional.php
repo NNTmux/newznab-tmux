@@ -529,7 +529,6 @@ class ProcessAdditional
      * @param string $groupID
      * @param string $guidChar
      *
-     * @throws \Blacklight\processing\post\ProcessAdditionalException
      * @throws \Exception
      */
     public function start($groupID = '', $guidChar = ''): void
@@ -563,7 +562,6 @@ class ProcessAdditional
      * @param string $groupID
      * @throws \RuntimeException
      * @throws \Exception
-     * @throws \Blacklight\processing\post\ProcessAdditionalException
      */
     protected function _setMainTempPath(&$guidChar, &$groupID = ''): void
     {
@@ -592,7 +590,7 @@ class ProcessAdditional
         }
 
         if (! is_dir($this->_mainTmpPath)) {
-            throw new ProcessAdditionalException('Could not create the tmpunrar folder ('.$this->_mainTmpPath.')');
+            throw new \RuntimeException('Could not create the tmpunrar folder ('.$this->_mainTmpPath.')');
         }
 
         $this->_clearMainTmpPath();

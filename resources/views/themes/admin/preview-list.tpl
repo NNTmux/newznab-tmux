@@ -18,7 +18,7 @@
 	<br/><br/>
 
 	{if $releaselist}
-		{$releaselist->links()}
+		{$releaselist->onEachSide(5)->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 
 			<tr>
@@ -38,7 +38,7 @@
 
 		</table>
 		<br/>
-		{$releaselist->links()}
+		{$releaselist->onEachSide(5)->links()}
 	{else}
 		<p>No results.</p>
 	{/if}

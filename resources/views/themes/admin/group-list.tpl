@@ -15,7 +15,7 @@
 			{{Form::close()}}
             </div>
 			<div class="col-md-4">
-				{$grouplist->links()}
+				{$grouplist->onEachSide(5)->links()}
 			</div>
 			<div class="col-md-4" style="text-align:center;">
 				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"
@@ -92,7 +92,7 @@
                 {{Form::close()}}
             </div>
             <div class="col-md-4">
-                {$grouplist->links()}
+                {$grouplist->onEachSide(5)->links()}
             </div>
             <div class="col-md-4" style="text-align:center;">
                 <a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset"

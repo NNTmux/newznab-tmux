@@ -14,7 +14,7 @@
 		</form>
 	</div>
 
-		{$anidblist->links()}
+		{$anidblist->onEachSide(5)->links()}
 
 	<br/><br/>
 
@@ -45,7 +45,7 @@
 
 	<br/>
 
-		{$anidblist->links()}
+		{$anidblist->onEachSide(5)->links()}
 	{else}
 	<p>No AniDB episodes available.</p>
 	{/if}
