@@ -827,16 +827,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "5.3.1",
+            "version": "5.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "ff2853acce00085b5830a050a2afa328fd212562"
+                "reference": "5362994408184a0f86b2b63b5971eac15eca1664"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/ff2853acce00085b5830a050a2afa328fd212562",
-                "reference": "ff2853acce00085b5830a050a2afa328fd212562",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/5362994408184a0f86b2b63b5971eac15eca1664",
+                "reference": "5362994408184a0f86b2b63b5971eac15eca1664",
                 "shasum": ""
             },
             "type": "bower-asset-library"
@@ -5999,16 +5999,16 @@
         },
         {
             "name": "spatie/fractalistic",
-            "version": "2.7.1",
+            "version": "2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/fractalistic.git",
-                "reference": "83e208ce1e6061aa75d22c4efdab05ccfb99a849"
+                "reference": "5b5710b748beb2c1d5c272f4d3598d44b5b59fc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/83e208ce1e6061aa75d22c4efdab05ccfb99a849",
-                "reference": "83e208ce1e6061aa75d22c4efdab05ccfb99a849",
+                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/5b5710b748beb2c1d5c272f4d3598d44b5b59fc9",
+                "reference": "5b5710b748beb2c1d5c272f4d3598d44b5b59fc9",
                 "shasum": ""
             },
             "require": {
@@ -6046,7 +6046,7 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2018-01-15T09:17:52+00:00"
+            "time": "2018-10-08T09:18:33+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
