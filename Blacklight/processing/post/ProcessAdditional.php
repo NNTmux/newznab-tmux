@@ -414,18 +414,18 @@ class ProcessAdditional
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli') && (strtolower(PHP_SAPI) === 'cli'));
 
         $this->pdo = DB::connection()->getPdo();
-        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI]));
+        $this->_nntp = $options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI]);
 
-        $this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+        $this->_nzb = $options['NZB'] instanceof NZB ? $options['NZB'] : new NZB();
         $this->_archiveInfo = new ArchiveInfo();
-        $this->_categorize = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize());
-        $this->_nameFixer = ($options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
-        $this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra());
-        $this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->_categorize = $options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize();
+        $this->_nameFixer = $options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]);
+        $this->_releaseExtra = $options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra();
+        $this->_releaseImage = $options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage();
         $this->_par2Info = new Par2Info();
-        $this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
-        $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
-        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds'), 'ffmpeg.threads' => 2]);
+        $this->_nfo = $options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo();
+        $this->sphinx = $options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch();
+        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
 
         $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
