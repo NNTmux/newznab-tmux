@@ -141,8 +141,6 @@ class TraktAPI
             $extendedString = '?extended='.$extended;
         }
 
-        $json = '';
-
         if (! empty($this->requestHeaders)) {
             try {
                 $json = $this->client->get(
@@ -152,26 +150,12 @@ class TraktAPI
                     ]
                 )->getBody()->getContents();
             } catch (RequestException $e) {
-                if ($e->hasResponse()) {
-                    if ($e->getCode() === 404) {
-                        ColorCLI::doEcho(ColorCLI::notice('Data not available on TraktTV server'), true);
-                    } elseif ($e->getCode() === 503) {
-                        ColorCLI::doEcho(ColorCLI::notice('TraktTV service unavailable'), true);
-                    } elseif ($e->getCode() === 401) {
-                        ColorCLI::doEcho(ColorCLI::notice('Unauthorized - OAuth must be provided for TraktTV'), true);
-                    } else {
-                        ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: '.$e->getCode()), true);
-                    }
-
-                    return false;
-                }
+                return false;
             } catch (\RuntimeException $e) {
-                ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'), true);
-
                 return false;
             }
 
-            if ($json !== null && $json !== false) {
+            if (! empty($json)) {
                 $json = json_decode($json, true);
                 if (! \is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
                     return false;
