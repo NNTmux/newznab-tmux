@@ -138,7 +138,7 @@ class NZB
     }
 
     /**
-     *  Generate queries for collections, binaries and parts
+     *  Generate queries for collections, binaries and parts.
      */
     protected function setQueries(): void
     {
