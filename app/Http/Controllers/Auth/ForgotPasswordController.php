@@ -69,7 +69,7 @@ class ForgotPasswordController extends Controller
             //
             // Send the email
             //
-            $resetLink = $request->server('SERVER_NAME').'/resetpassword?guid='.$guid;
+            $resetLink = url('/').'/resetpassword?guid='.$guid;
             Mail::to($ret['email'])->send(new ForgottenPassword($resetLink));
             $sent = true;
         }
