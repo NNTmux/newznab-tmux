@@ -33,8 +33,8 @@ class ProcessAdditional
 {
     /**
      * How many compressed (rar/zip) files to check.
-     * @int
-     * @default 20
+     *
+     * @var int
      */
     public const maxCompressedFilesToCheck = 20;
 
@@ -894,7 +894,7 @@ class ProcessAdditional
             }
 
             // Look for a video sample, make sure it's not an image.
-            if ($this->_processThumbnails === true && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processThumbnails === true && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g$/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
             ) {
                 // Get the amount of segments for this file.
                 $segCount = (\count($this->_currentNZBFile['segments']) - 1);
@@ -1215,7 +1215,7 @@ class ProcessAdditional
 
                     // Check for "codec spam"
                     if (preg_match('/alt\.binaries\.movies($|\.divx$)/', $this->_releaseGroupName) &&
-                        preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe/i', $file['name'])
+                        preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])
                     ) {
                         $this->_debug('Codec spam found, setting release to potentially passworded.'.PHP_EOL);
                         $this->_releaseHasPassword = true;
@@ -1417,12 +1417,6 @@ class ProcessAdditional
                         if ($this->_foundVideo === false) {
                             $this->_foundVideo = $this->_getVideo($fileLocation);
                         }
-
-                        // Try to get media info. Don't get it here if $mediaMsgID is not empty.
-                        // 2014-06-28 -> Commented out, since the media info of a sample video is not indicative of the actual release.si
-                        /*if ($this->_foundMediaInfo === false && empty($mediaMsgID)) {
-                            $this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
-                        }*/
                     }
                 } elseif ($this->_echoCLI) {
                     $this->_echo('f', 'warningOver', false);
@@ -2284,7 +2278,6 @@ class ProcessAdditional
         $this->_foundAudioSample = $this->_processAudioSample ? false : true;
         $this->_foundJPGSample = $this->_processJPGSample ? false : true;
         $this->_foundSample = $this->_processThumbnails ? false : true;
-        $this->_foundSample = (int) $this->_release->disablepreview === 1;
         $this->_foundPAR2Info = false;
 
         $this->_passwordStatus = [Releases::PASSWD_NONE];

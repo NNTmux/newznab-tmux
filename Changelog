@@ -1,4 +1,5 @@
 2018-10-09 DariusIII
+	* Chg: Update some of the regexes and cleanup the code in ProcessAdditional class
 	* Chg: Update laravel/framework to version 5.7.9
 	* Chg: Update TraktAPI class, remove error messages
 	* Chg: Change writeNzbForReleaseId function name
