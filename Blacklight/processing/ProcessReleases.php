@@ -766,7 +766,7 @@ class ProcessReleases
             // Init vars for writing the NZB's.
             $this->nzb->initiateForWrite($groupID);
             foreach ($releases as $release) {
-                if ($this->nzb->writeNZBforReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
+                if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
                     if ($this->echoCLI) {
                         echo ColorCLI::primaryOver("Creating NZBs and deleting Collections:\t".$nzbCount.'/'.$total."\r");
