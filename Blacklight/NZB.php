@@ -117,18 +117,18 @@ class NZB
     }
 
     /**
-     * Initiate class vars when writing NZB's.
+     * Initiate class vars when writing NZBs.
      *
      * @param int $groupID
      */
     public function initiateForWrite($groupID)
     {
         $this->groupID = $groupID;
-        // Set table names
 
         if ($this->groupID === '') {
             exit("{$this->groupID} is missing\n");
         }
+        // Set table names
         $this->_tableNames = [
             'cName' => 'collections_'.$this->groupID,
             'bName' => 'binaries_'.$this->groupID,
@@ -137,6 +137,9 @@ class NZB
         $this->setQueries();
     }
 
+    /**
+     *  Generate queries for collections, binaries and parts
+     */
     protected function setQueries(): void
     {
         $this->_collectionsQuery = "
@@ -166,8 +169,9 @@ class NZB
      * @param string $cTitle  The name of the category this release is in.
      *
      * @return bool Have we successfully written the NZB to the hard drive?
+     * @throws \Throwable
      */
-    public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle): bool
+    public function writeNzbForReleaseId($relID, $relGuid, $name, $cTitle): bool
     {
         $collections = $this->pdo->query($this->_collectionsQuery.$relID);
 
@@ -261,18 +265,21 @@ class NZB
             return false;
         }
         // Mark release as having NZB.
-        $this->pdo->exec(
+        DB::transaction(function () use ($relID, $nzb_guid) {
+            DB::update(
             sprintf(
                 '
 				UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
                 self::NZB_ADDED,
-                ($nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.$this->pdo->quote(md5($nzb_guid)).' )'),
+                $nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.$this->pdo->quote(md5($nzb_guid)).' )',
                 $relID
             )
         );
+        }, 3);
 
         // Delete CBP for release that has its NZB created.
-        $this->pdo->exec(
+        DB::transaction(function () use ($relID) {
+            DB::delete(
             sprintf(
                 '
 				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collections_id) STRAIGHT_JOIN %s p ON(b.id=p.binaries_id) WHERE c.releases_id = %d',
@@ -282,6 +289,7 @@ class NZB
                 $relID
             )
         );
+        }, 3);
         // Chmod to fix issues some users have with file permissions.
         chmod($path, 0777);
 
@@ -297,7 +305,7 @@ class NZB
      *
      * @return string $nzbpath The path to store the NZB file.
      */
-    public function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist)
+    public function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist): string
     {
         $nzbPath = '';
 
@@ -337,8 +345,8 @@ class NZB
      *
      * @param  string $releaseGuid The guid of the release.
      *
-     * @return bool|string On success: (string) Path+file name of the nzb.
-     *                     On failure: (bool)   False.
+     * @return false|string On success: (string) Path+file name of the nzb.
+     *                     On failure: false .
      */
     public function NZBPath($releaseGuid)
     {
@@ -366,7 +374,7 @@ class NZB
         ];
         $options += $defaults;
 
-        $num_pars = $i = 0;
+        $i = 0;
         $result = [];
 
         if (! $nzb) {
@@ -381,11 +389,6 @@ class NZB
         foreach ($xml->file as $file) {
             // Subject.
             $title = (string) $file->attributes()->subject;
-
-            // Amount of pars.
-            if (stripos($title, '.par2') !== false) {
-                $num_pars++;
-            }
 
             if ($options['no-file-key'] === false) {
                 $i = $title;

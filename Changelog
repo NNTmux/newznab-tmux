@@ -1,3 +1,5 @@
+2018-10-09 DariusIII
+	* Chg: Use transactions in NZB class
 2018-10-08 DariusIIi
 	* Chg: Update ProcessAdditional class
 	* Chg: Update font-awesome and spatie/fractalistic to their latest versions
