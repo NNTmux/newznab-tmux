@@ -1,3 +1,5 @@
+2018-10-10 DariusIII
+	* Chg: Simplyfy return value for mgr check in ProcessMultiGroupReleases class
 2018-10-09 DariusIII
 	* Chg: Use url helper to generate password reset link
 	* Chg: Update some of the regexes and cleanup the code in ProcessAdditional class

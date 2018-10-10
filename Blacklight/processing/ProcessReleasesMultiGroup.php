@@ -44,7 +44,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
     {
         $poster = MultigroupPoster::query()->where('poster', '=', $fromName)->first();
 
-        return empty($poster) ? false : true;
+        return ! empty($poster);
     }
 
     /**
