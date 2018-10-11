@@ -157,14 +157,14 @@ class ProcessReleases
     /**
      * Main method for creating releases/NZB files from collections.
      *
-     * @param int          $categorize
-     * @param int          $postProcess
-     * @param string       $groupName (optional)
+     * @param int              $categorize
+     * @param int              $postProcess
+     * @param string           $groupName (optional)
      * @param \Blacklight\NNTP $nntp
-     * @param bool         $echooutput
+     * @param bool             $echooutput
      *
      * @return int
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput): int
     {
@@ -531,7 +531,7 @@ class ProcessReleases
      * @param int|string $groupID (optional)
      *
      * @return array
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function createReleases($groupID): array
     {
@@ -733,7 +733,7 @@ class ProcessReleases
      * @param int|string $groupID (optional)
      *
      * @return int
-     * @throws \RuntimeException
+     * @throws \Throwable
      */
     public function createNZBs($groupID): int
     {
@@ -1687,9 +1687,9 @@ class ProcessReleases
             );
         }, 3);
 
-        if ($this->echoCLI && $obj > 0) {
+        if ($this->echoCLI && \count($obj) > 0) {
             ColorCLI::doEcho(
-                ColorCLI::primary('Deleted '.$obj.' broken/stuck collections.'),
+                ColorCLI::primary('Deleted '.\count($obj).' broken/stuck collections.'),
                 true
             );
         }
