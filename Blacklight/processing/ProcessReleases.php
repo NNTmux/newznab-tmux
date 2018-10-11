@@ -1687,9 +1687,9 @@ class ProcessReleases
             );
         }, 3);
 
-        if ($this->echoCLI && \count($obj) > 0) {
+        if ($this->echoCLI && $obj > 0) {
             ColorCLI::doEcho(
-                ColorCLI::primary('Deleted '.\count($obj).' broken/stuck collections.'),
+                ColorCLI::primary('Deleted '.$obj.' broken/stuck collections.'),
                 true
             );
         }
