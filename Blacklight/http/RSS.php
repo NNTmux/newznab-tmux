@@ -102,7 +102,7 @@ class RSS extends Capabilities
                 ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
-                $limit === -1 ? '' : ' LIMIT '.$limit. ' OFFSET '.$offset
+                $limit === -1 ? '' : ' LIMIT '.$limit.' OFFSET '.$offset
             );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
