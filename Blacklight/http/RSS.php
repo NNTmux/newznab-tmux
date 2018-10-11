@@ -40,16 +40,17 @@ class RSS extends Capabilities
      *
      *
      * @param     $cat
-     * @param     $offset
+     * @param int $offset
      * @param     $videosId
      * @param     $aniDbID
      * @param int $userID
      * @param int $airDate
      *
+     * @param int $limit
+     *
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
-     * @throws \Exception
      */
-    public function getRss($cat, $offset, $videosId, $aniDbID, $userID = 0, $airDate = -1)
+    public function getRss($cat, $videosId, $aniDbID, $userID = 0, $airDate = -1, int $limit = 100, int $offset = 0)
     {
         $catSearch = $cartSearch = '';
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
@@ -101,7 +102,7 @@ class RSS extends Capabilities
                 ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
-                ' LIMIT 0,'.($offset > 100 ? 100 : $offset)
+                $limit === -1 ? '' : ' LIMIT '.$limit. ' OFFSET '.$offset
             );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
