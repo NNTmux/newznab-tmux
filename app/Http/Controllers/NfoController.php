@@ -15,7 +15,7 @@ class NfoController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showNfo($id = '', Request $request)
+    public function showNfo(Request $request, $id = '')
     {
         $this->setPrefs();
 
@@ -23,41 +23,44 @@ class NfoController extends BasePageController
             $rel = Release::getByGuid($id);
 
             if (! $rel) {
-                $this->show404();
+                abort(404, 'Release does not exist');
             }
 
             $nfo = ReleaseNfo::getReleaseNfo($rel['id']);
-            $nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
 
-            $this->smarty->assign('rel', $rel);
-            $this->smarty->assign('nfo', $nfo);
+            if ($nfo !== null) {
+                $nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
 
-            $title = 'NFO File';
-            $meta_title = 'View Nfo';
-            $meta_keywords = 'view,nzb,nfo,description,details';
-            $meta_description = 'View Nfo File';
+                $this->smarty->assign('rel', $rel);
+                $this->smarty->assign('nfo', $nfo);
 
-            $modal = false;
-            if ($request->has('modal')) {
-                $modal = true;
-                $this->smarty->assign('modal', true);
-            }
+                $title = 'NFO File';
+                $meta_title = 'View Nfo';
+                $meta_keywords = 'view,nzb,nfo,description,details';
+                $meta_description = 'View Nfo File';
 
-            $content = $this->smarty->fetch('viewnfo.tpl');
+                $modal = false;
+                if ($request->has('modal')) {
+                    $modal = true;
+                    $this->smarty->assign('modal', true);
+                }
 
-            if ($modal) {
-                echo $content;
+                $content = $this->smarty->fetch('viewnfo.tpl');
+
+                if ($modal) {
+                    echo $content;
+                } else {
+                    $this->smarty->assign([
+                            'title' => $title,
+                            'content' => $content,
+                            'meta_title' => $meta_title,
+                            'meta_keywords' => $meta_keywords,
+                            'meta_description' => $meta_description,
+                        ]);
+                    $this->pagerender();
+                }
             } else {
-                $this->smarty->assign(
-                    [
-                        'title' => $title,
-                        'content' => $content,
-                        'meta_title' => $meta_title,
-                        'meta_keywords' => $meta_keywords,
-                        'meta_description' => $meta_description,
-                    ]
-                );
-                $this->pagerender();
+                abort(404, 'NFO does not exist');
             }
         }
     }

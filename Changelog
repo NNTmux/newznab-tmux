@@ -1,4 +1,5 @@
 2018-10-11 DariusIII
+	* Chg: Update NfoController, check for missing nfo
 	* Chg: Update PHPDOC blocks in ProcessReleases class
 	* Chg: Update full site rss feed with ability to define limit and num(offset) for getting more releases from rss
 2018-10-10 DariusIII
