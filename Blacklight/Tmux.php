@@ -555,14 +555,12 @@ class Tmux
      */
     public function cbpmTableQuery()
     {
-        $regstr = '^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$';
-
         return DB::select(
             "
 			SELECT TABLE_NAME AS name
       		FROM information_schema.TABLES
       		WHERE TABLE_SCHEMA = (SELECT DATABASE())
-			AND TABLE_NAME REGEXP {escapeString($regstr)}
+			AND TABLE_NAME REGEXP {escapeString('^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$')}
 			ORDER BY TABLE_NAME ASC"
         );
     }
