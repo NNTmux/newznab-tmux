@@ -1674,13 +1674,14 @@ class ProcessReleases
         $obj = DB::transaction(function () use ($where, $lastRun) {
             DB::delete(
                 sprintf(
-                    "
+                    '
                 DELETE c FROM %s c
                 WHERE
                     c.added <
-                    DATE_SUB({escapeString($lastRun)}, INTERVAL %d HOUR)
-                %s",
+                    DATE_SUB(%s, INTERVAL %d HOUR)
+                %s',
                     $this->tables['cname'],
+                    escapeString($lastRun),
                     $this->collectionTimeout,
                     $where
                 )
