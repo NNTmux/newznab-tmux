@@ -1,4 +1,5 @@
 2018-10-12 DariusIII
+	* Chg: Update routes/web.php, use new role_or_permission middleware and group routes that use fw-block-blacklisted middleware
 	* Chg: Update spatie/laravel-permission to version 2.22.0
 2018-10-11 DariusIII
 	* Chg: Update font-awesome to version 5.4.1

@@ -11,15 +11,17 @@
 |
 */
 
-Route::get('/', 'ContentController@show')->middleware('fw-block-blacklisted');
-
 Auth::routes();
 
-Route::get('register', 'Auth\RegisterController@showRegistrationForm')->middleware('fw-block-blacklisted');
-Route::post('register', 'Auth\RegisterController@register')->middleware('fw-block-blacklisted');
+Route::group(['middleware' => ['fw-block-blacklisted']], function () {
+    Route::get('/', 'ContentController@show');
 
-Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->middleware('fw-block-blacklisted');
-Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->middleware('fw-block-blacklisted');
+    Route::get('register', 'Auth\RegisterController@showRegistrationForm');
+    Route::post('register', 'Auth\RegisterController@register');
+
+    Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+    Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+});
 
 Route::get('terms-and-conditions', 'TermsController@terms');
 
@@ -341,7 +343,7 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('group-list-inactive', 'GroupController@inactive');
 });
 
-Route::group(['middleware' => ['role:Admin|Moderator|permission:edit release'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
+Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
     Route::get('release-edit', 'ReleasesController@edit');
     Route::post('release-edit', 'ReleasesController@edit');
 });
