@@ -2066,16 +2066,19 @@ class NameFixer
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(
-                "
+            $result = DB::select(sprintf(
+                '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
 				WHERE ru.releases_id IS NOT NULL
-				AND ru.uniqueid = {escapeString($release->uid)}
-				AND ru.releases_id != {$release->releases_id}
-				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = {escapeString('nonscene@Ef.net (EF)')}) "
-            );
+				AND ru.uniqueid = %s
+				AND ru.releases_id != %d
+				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = %s',
+                escapeString($release->uid),
+                $release->releases_id,
+                escapeString('nonscene@Ef.net (EF)')
+            ));
 
             foreach ($result as $res) {
                 $floor = round(($res['relsize'] - $release->relsize) / $res['relsize'] * 100, 1);
@@ -2211,7 +2214,7 @@ class NameFixer
             $result = DB::select(
                 sprintf(
                     "
-				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+				    SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = {$release->releases_id})
