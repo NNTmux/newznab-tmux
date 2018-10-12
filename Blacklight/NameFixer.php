@@ -2261,15 +2261,14 @@ class NameFixer
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(
-                "
+            $result = DB::select(sprintf('
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = r.id
-				WHERE ph.hash = {escapeString($release->hash)}
-				AND ph.releases_id != {$release->releases_id}
-				AND (r.predb_id > 0 OR r.anidbid > 0)"
-            );
+				WHERE ph.hash = %s
+				AND ph.releases_id != %d
+				AND (r.predb_id > 0 OR r.anidbid > 0)', escapeString($release->hash), $release->releases_id
+            ));
 
             foreach ($result as $res) {
                 $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
