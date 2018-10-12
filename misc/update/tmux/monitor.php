@@ -67,7 +67,7 @@ $runVar['counts']['iterations'] = 1;
 $runVar['modsettings']['fc']['firstrun'] = true;
 $runVar['modsettings']['fc']['num'] = 0;
 
-$tblCount = 'SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = '.$pdo->quote($db_name);
+$tblCount = 'SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = '.escapeString($db_name);
 $psTableRowCount = $pdo->prepare($tblCount);
 
 while ($runVar['counts']['iterations'] > 0) {

@@ -37,7 +37,7 @@ if ($argv[3] === 'true') {
 
 $pdo = DB::connection()->getPdo();
 
-$group = DB::selectOne(sprintf('SELECT id FROM groups WHERE name = %s', $pdo->quote($argv[1])));
+$group = DB::selectOne(sprintf('SELECT id FROM groups WHERE name = %s', escapeString($argv[1])));
 
 if ($group === false) {
     exit('No group with name '.$argv[1].' found in the database.');
@@ -62,7 +62,7 @@ foreach ($releases as $release) {
         echo 'New name: '.$newName.PHP_EOL.PHP_EOL;
 
         if ($rename === true) {
-            $newName = $pdo->quote($newName);
+            $newName = escapeString($newName);
             DB::update(sprintf('UPDATE releases SET searchname = %s WHERE id = %d', $newName, $release->id));
             $sphinx->updateRelease($release->id);
         }
