@@ -61,6 +61,7 @@ class Kernel extends HttpKernel
         'isVerified' => \Jrean\UserVerification\Middleware\IsVerified::class,
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'clearance' => \App\Http\Middleware\ClearanceMiddleware::class,
         'fw-only-whitelisted' => \PragmaRX\Firewall\Middleware\FirewallWhitelist::class,
         'fw-block-blacklisted' => \PragmaRX\Firewall\Middleware\FirewallBlacklist::class,
