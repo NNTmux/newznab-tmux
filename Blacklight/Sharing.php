@@ -156,8 +156,8 @@ class Sharing
 				INSERT INTO sharing
 				(site_name, site_guid, max_push, max_pull, hide_users, start_position, auto_enable, fetching, max_download)
 				VALUES (%s, %s, 40 , 20000, 1, 1, 1, 1, 150)',
-                $this->pdo->quote($siteName),
-                $this->pdo->quote(($siteGuid === '' ? sha1($siteName) : $siteGuid))
+                escapeString($siteName),
+                escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
             )
         );
 
@@ -237,7 +237,7 @@ class Sharing
         $sid = sha1($row->unix_time.$row->text.$row->nzb_guid);
 
         // Check if the comment is already shared.
-        $check = DB::selectOne(sprintf('SELECT id FROM release_comments WHERE shareid = %s', $this->pdo->quote($sid)));
+        $check = DB::selectOne(sprintf('SELECT id FROM release_comments WHERE shareid = %s', escapeString($sid)));
         if ($check === null) {
 
             // Example of a subject.
@@ -268,7 +268,7 @@ class Sharing
 						UPDATE release_comments
 						SET shared = 1, shareid = %s
 						WHERE id = %d',
-                        $this->pdo->quote($sid),
+                        escapeString($sid),
                         $row->id
                     )
                 );
@@ -417,7 +417,7 @@ class Sharing
                 $check = DB::selectOne(
                     sprintf(
                         'SELECT id FROM release_comments WHERE shareid = %s',
-                        $this->pdo->quote($matches['sid'])
+                        escapeString($matches['sid'])
                     )
                 );
 
@@ -428,7 +428,7 @@ class Sharing
                     $check = DB::selectOne(
                         sprintf(
                             'SELECT enabled FROM sharing_sites WHERE site_guid = %s',
-                            $this->pdo->quote($matches['guid'])
+                            escapeString($matches['guid'])
                         )
                     );
 
@@ -442,8 +442,8 @@ class Sharing
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
 									VALUES (%s, %s, NOW(), NOW(), 0, 0)',
-                                    $this->pdo->quote($matches['site']),
-                                    $this->pdo->quote($matches['guid'])
+                                    escapeString($matches['site']),
+                                    escapeString($matches['guid'])
                                 )
                             );
                             continue;
@@ -456,8 +456,8 @@ class Sharing
                                 INSERT INTO sharing_sites
                                 (site_name, site_guid, last_time, first_time, enabled, comments)
                                 VALUES (%s, %s, NOW(), NOW(), 1, 0)',
-                                $this->pdo->quote($matches['site']),
-                                $this->pdo->quote($matches['guid'])
+                                escapeString($matches['site']),
+                                escapeString($matches['guid'])
                             )
                         );
                     } elseif ((int) $check->enabled === 0) {
@@ -470,8 +470,8 @@ class Sharing
                             sprintf(
                                 '
 								UPDATE sharing_sites SET comments = comments + 1, last_time = NOW(), site_name = %s WHERE site_guid = %s',
-                                $this->pdo->quote($matches['site']),
-                                $this->pdo->quote($matches['guid'])
+                                escapeString($matches['site']),
+                                escapeString($matches['guid'])
                             )
                         );
                         $found++;
@@ -551,14 +551,14 @@ class Sharing
 				INSERT IGNORE INTO release_comments
 				(text, created_at, issynced, shareid, cid, gid, nzb_guid, siteid, username, users_id, releases_id, shared, host, sourceID)
 				VALUES (%s, FROM_UNIXTIME(%s), 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
-                $this->pdo->quote($body['BODY']),
+                escapeString($body['BODY']),
                 $unixTime,
-                $this->pdo->quote($body['SID']),
-                $this->pdo->quote($cid),
-                $this->pdo->quote($body['RID']),
-                $this->pdo->quote($body['RID']),
-                $this->pdo->quote($siteID),
-                $this->pdo->quote((strpos($body['USER'] === 0, 'sn-') !== false ? 'SH_ANON' : 'SH_'.$body['USER']))
+                escapeString($body['SID']),
+                escapeString($cid),
+                escapeString($body['RID']),
+                escapeString($body['RID']),
+                escapeString($siteID),
+                escapeString((strpos($body['USER'] === 0, 'sn-') !== false ? 'SH_ANON' : 'SH_'.$body['USER']))
             )
         )
         ) {

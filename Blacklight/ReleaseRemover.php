@@ -427,7 +427,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
-            $this->pdo->quote('%.exe'),
+            escapeString('%.exe'),
             Category::PC_0DAY,
             Category::PC_GAMES,
             Category::OTHER_MISC,
@@ -456,7 +456,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
-            $this->pdo->quote('%install.bin%'),
+            escapeString('%install.bin%'),
             $this->crapTime
         );
 
@@ -481,7 +481,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
-            $this->pdo->quote('%password.url%'),
+            escapeString('%password.url%'),
             $this->crapTime
         );
 
@@ -514,13 +514,13 @@ class ReleaseRemover
 			AND r.nzbstatus = 1
 			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
             // Matches passwort / passworded / etc also.
-            $this->pdo->quote('%passwor%'),
-            $this->pdo->quote('%advanced%'),
-            $this->pdo->quote('%no password%'),
-            $this->pdo->quote('%not password%'),
-            $this->pdo->quote('%recovery%'),
-            $this->pdo->quote('%reset%'),
-            $this->pdo->quote('%unlocker%'),
+            escapeString('%passwor%'),
+            escapeString('%advanced%'),
+            escapeString('%no password%'),
+            escapeString('%not password%'),
+            escapeString('%recovery%'),
+            escapeString('%reset%'),
+            escapeString('%unlocker%'),
             Category::PC_GAMES,
             Category::PC_0DAY,
             Category::PC_ISO,
@@ -612,7 +612,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
 			AND rf.name LIKE %s %s',
-            $this->pdo->quote('%.nzb%'),
+            escapeString('%.nzb%'),
             $this->crapTime
         );
 
@@ -639,7 +639,7 @@ class ReleaseRemover
 			AND r.size < 40000000
 			AND r.name LIKE %s
 			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
-            $this->pdo->quote('%sample%'),
+            escapeString('%sample%'),
             Category::TV_ANIME,
             Category::TV_DOCU,
             Category::TV_FOREIGN,
@@ -721,7 +721,7 @@ class ReleaseRemover
         if (\count($regexList) > 0) {
             foreach ($regexList as $regex) {
                 $regexSQL = $ftMatch = $regexMatch = $opTypeName = '';
-                $dbRegex = $this->pdo->quote($regex->regex);
+                $dbRegex = escapeString($regex->regex);
 
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
@@ -750,7 +750,7 @@ class ReleaseRemover
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->quote($regex->groupname)
+                        escapeString($regex->groupname)
                     );
 
                     $groupIDCount = \count($groupIDs);
@@ -846,7 +846,7 @@ class ReleaseRemover
             foreach ($allRegex as $regex) {
                 $regexSQL = sprintf(
                     'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
-                    $this->pdo->quote($regex->regex)
+                    escapeString($regex->regex)
                 );
 
                 if ($regexSQL === '') {
@@ -858,7 +858,7 @@ class ReleaseRemover
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->quote($regex->groupname)
+                        escapeString($regex->groupname)
                     );
                     $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
@@ -1108,7 +1108,7 @@ class ReleaseRemover
                 case 'fromname':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND fromname = '.$this->pdo->quote($args[2]);
+                            return ' AND fromname = '.escapeString($args[2]);
                         case 'like':
                             return ' AND fromname '.$this->formatLike($args[2], 'fromname');
                     }
@@ -1116,7 +1116,7 @@ class ReleaseRemover
                 case 'groupname':
                     switch ($args[1]) {
                         case 'equals':
-                            $group = DB::select('SELECT id FROM groups WHERE name = '.$this->pdo->quote($args[2]));
+                            $group = DB::select('SELECT id FROM groups WHERE name = '.escapeString($args[2]));
                             if (empty($group)) {
                                 $this->error = 'This group was not found in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1142,13 +1142,13 @@ class ReleaseRemover
                     break;
                 case 'guid':
                     if ($args[1] === 'equals') {
-                        return ' AND guid = '.$this->pdo->quote($args[2]);
+                        return ' AND guid = '.escapeString($args[2]);
                     }
                     break;
                 case 'name':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND name = '.$this->pdo->quote($args[2]);
+                            return ' AND name = '.escapeString($args[2]);
                         case 'like':
                             return ' AND name '.$this->formatLike($args[2], 'name');
                         default:
@@ -1158,7 +1158,7 @@ class ReleaseRemover
                 case 'searchname':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND searchname = '.$this->pdo->quote($args[2]);
+                            return ' AND searchname = '.escapeString($args[2]);
                         case 'like':
                             return ' AND searchname '.$this->formatLike($args[2], 'searchname');
                         default:

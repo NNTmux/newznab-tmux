@@ -405,7 +405,7 @@ class Movie
                 if ($bb === 'imdb') {
                     $browseBy .= sprintf('AND m.imdbid = %d', $bbv);
                 } else {
-                    $browseBy .= 'AND m.'.$bb.' '.'LIKE '.$this->pdo->quote('%'.$bbv.'%');
+                    $browseBy .= 'AND m.'.$bb.' '.'LIKE '.escapeString('%'.$bbv.'%');
                 }
             }
         }
@@ -553,7 +553,7 @@ class Movie
                 if (\in_array($key, ['genre', 'language'], false)) {
                     $value = substr($value, 0, 64);
                 }
-                $value = $this->pdo->quote($value);
+                $value = escapeString($value);
                 $query[1] .= "$value, ";
                 $query[2] .= "$key = $value, ";
             }

@@ -643,7 +643,7 @@ class ProcessAdditional
                 $this->_maxSize,
                 $this->_minSize,
                 ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID),
-                ($guidChar === '' ? '' : 'AND r.leftguid = '.$this->pdo->quote($guidChar)),
+                ($guidChar === '' ? '' : 'AND r.leftguid = '.escapeString($guidChar)),
                 $this->_queryLimit
             )
         );
@@ -1741,7 +1741,7 @@ class ProcessAdditional
                                     $newCat = $this->_categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname);
                                 }
 
-                                $newTitle = $this->pdo->quote(substr($newName, 0, 255));
+                                $newTitle = escapeString(substr($newName, 0, 255));
                                 // Update the search name.
                                 DB::update(
                                         sprintf(

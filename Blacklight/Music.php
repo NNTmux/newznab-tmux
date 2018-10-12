@@ -299,7 +299,7 @@ class Music
                 if (stripos($bbv, 'id') !== false) {
                     $browseby .= 'AND m.'.$bbv.' = '.$bbs;
                 } else {
-                    $browseby .= 'AND m.'.$bbv.' '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
+                    $browseby .= 'AND m.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
                 }
             }
         }
@@ -407,7 +407,7 @@ class Music
 
         $mus['publisher'] = (string) $amaz->ItemAttributes->Publisher;
 
-        $mus['releasedate'] = $this->pdo->quote((string) $amaz->ItemAttributes->ReleaseDate);
+        $mus['releasedate'] = escapeString((string) $amaz->ItemAttributes->ReleaseDate);
         if ($mus['releasedate'] === "''") {
             $mus['releasedate'] = 'null';
         }

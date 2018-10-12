@@ -271,7 +271,7 @@ class NZB
                 '
 				UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
                 self::NZB_ADDED,
-                $nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.$this->pdo->quote(md5($nzb_guid)).' )',
+                $nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.escapeString(md5($nzb_guid)).' )',
                 $relID
             )
         );

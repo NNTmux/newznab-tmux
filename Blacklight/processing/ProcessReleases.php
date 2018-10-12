@@ -701,7 +701,7 @@ class ProcessReleases
 							FROM %s c
 							WHERE c.collectionhash = %s',
                             $this->tables['cname'],
-                            $this->pdo->quote($collection->collectionhash)
+                            escapeString($collection->collectionhash)
                         )
                     );
                 }, 3);
@@ -1678,7 +1678,7 @@ class ProcessReleases
                 DELETE c FROM %s c
                 WHERE
                     c.added <
-                    DATE_SUB({$this->pdo->quote($lastRun)}, INTERVAL %d HOUR)
+                    DATE_SUB({escapeString($lastRun)}, INTERVAL %d HOUR)
                 %s",
                     $this->tables['cname'],
                     $this->collectionTimeout,

@@ -96,7 +96,7 @@ class ReleaseExtra
                         LEFT OUTER JOIN audio_data ON video_data.releases_id = audio_data.releases_id
                         INNER JOIN releases r ON r.id = video_data.releases_id
                         WHERE r.guid = %s
-                        GROUP BY r.id LIMIT 1", $this->pdo->quote($guid)));
+                        GROUP BY r.id LIMIT 1", escapeString($guid)));
     }
 
     /**

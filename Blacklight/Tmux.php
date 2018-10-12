@@ -494,7 +494,7 @@ class Tmux
 					) AS backfill_groups_days,
 					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
 					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
-                    $this->pdo->quote($db_name)
+                    escapeString($db_name)
                 );
             case 6:
                 return 'SELECT
@@ -562,7 +562,7 @@ class Tmux
 			SELECT TABLE_NAME AS name
       		FROM information_schema.TABLES
       		WHERE TABLE_SCHEMA = (SELECT DATABASE())
-			AND TABLE_NAME REGEXP {$this->pdo->quote($regstr)}
+			AND TABLE_NAME REGEXP {escapeString($regstr)}
 			ORDER BY TABLE_NAME ASC"
         );
     }

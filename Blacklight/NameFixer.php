@@ -365,7 +365,7 @@ class NameFixer
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,
-                $this->pdo->quote('%SDPORN%')
+                escapeString('%SDPORN%')
             );
         }
 
@@ -429,7 +429,7 @@ class NameFixer
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,
-                $this->pdo->quote('%.srr'),
+                escapeString('%.srr'),
                 self::PROC_SRR_NONE
             );
         }
@@ -1079,7 +1079,7 @@ class NameFixer
 				AND r.predb_id = 0
 				LIMIT 21',
                 $join,
-                $this->pdo->quote($pre['%title%'])
+                escapeString($pre['%title%'])
             )
         );
 
@@ -1321,7 +1321,7 @@ class NameFixer
 						FROM predb p INNER JOIN predb_hashes h ON h.predb_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1',
-                $this->pdo->quote($hash)
+                escapeString($hash)
             )
         );
 
@@ -2072,7 +2072,7 @@ class NameFixer
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
 				WHERE ru.releases_id IS NOT NULL
-				AND ru.uniqueid = {$this->pdo->quote($release->uid)}
+				AND ru.uniqueid = {escapeString($release->uid)}
 				AND ru.releases_id != {$release->releases_id}
 				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')"
             );
@@ -2167,7 +2167,7 @@ class NameFixer
                     self::IS_RENAMED_NONE,
                     Category::OTHER_MISC,
                     Category::OTHER_HASHED,
-                    $this->pdo->quote('%SDPORN%')
+                    escapeString('%SDPORN%')
                 )
             );
 
@@ -2220,7 +2220,7 @@ class NameFixer
                     self::IS_RENAMED_NONE,
                     Category::OTHER_MISC,
                     Category::OTHER_HASHED,
-                    $this->pdo->quote('%.srr')
+                    escapeString('%.srr')
                 )
             );
 
@@ -2266,7 +2266,7 @@ class NameFixer
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = r.id
-				WHERE ph.hash = {$this->pdo->quote($release->hash)}
+				WHERE ph.hash = {escapeString($release->hash)}
 				AND ph.releases_id != {$release->releases_id}
 				AND (r.predb_id > 0 OR r.anidbid > 0)"
             );

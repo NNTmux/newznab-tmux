@@ -200,7 +200,7 @@ class AniDB
 				SELECT at.anidbid, at.title
 				FROM anidb_titles AS at
 				WHERE at.title LIKE %s',
-                $this->pdo->quote('%'.$searchName.'%')
+                escapeString('%'.$searchName.'%')
             )
         );
     }

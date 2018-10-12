@@ -1,4 +1,5 @@
 2018-10-12 DariusIII
+	* Chg: Add escapeString helper function
 	* Fix: Add missed role_or_permission middleware to Kernel.php
 	* Chg: Update routes/web.php, use new role_or_permission middleware and group routes that use fw-block-blacklisted middleware
 	* Chg: Update spatie/laravel-permission to version 2.22.0

@@ -315,16 +315,16 @@ abstract class TV extends Videos
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-                        sprintf($ifStringInfo, 'v.countries_id', $this->pdo->quote($show['country']), 'v.countries_id'),
+                        sprintf($ifStringInfo, 'v.countries_id', escapeString($show['country']), 'v.countries_id'),
                         sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
                         sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
                         sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
                         sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
                         sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
                         sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-                        sprintf($ifStringInfo, 'tvi.summary', $this->pdo->quote($show['summary']), 'tvi.summary'),
-                        sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->quote($show['publisher']), 'tvi.publisher'),
-                        sprintf($ifStringInfo, 'tvi.localzone', $this->pdo->quote($show['localzone']), 'tvi.localzone'),
+                        sprintf($ifStringInfo, 'tvi.summary', escapeString($show['summary']), 'tvi.summary'),
+                        sprintf($ifStringInfo, 'tvi.publisher', escapeString($show['publisher']), 'tvi.publisher'),
+                        sprintf($ifStringInfo, 'tvi.localzone', escapeString($show['localzone']), 'tvi.localzone'),
                         $videoId
                 )
         );
@@ -410,7 +410,7 @@ abstract class TV extends Videos
         if ($series > 0 && $episode > 0) {
             $queryString = sprintf('tve.series = %d AND tve.episode = %d', $series, $episode);
         } elseif (! empty($airdate)) {
-            $queryString = sprintf('DATE(tve.firstaired) = %s', $this->pdo->quote(date('Y-m-d', strtotime($airdate))));
+            $queryString = sprintf('DATE(tve.firstaired) = %s', escapeString(date('Y-m-d', strtotime($airdate))));
         } else {
             return false;
         }

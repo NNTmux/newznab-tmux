@@ -307,7 +307,7 @@ class Backfill
 					SET first_record_postdate = FROM_UNIXTIME(%s), first_record = %s, last_updated = NOW()
 					WHERE id = %d',
                     $newdate,
-                    $this->pdo->quote($first),
+                    escapeString($first),
                     $groupArr['id']
                 )
             );

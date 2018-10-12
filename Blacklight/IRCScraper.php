@@ -305,15 +305,15 @@ class IRCScraper extends IRCClient
 
         $query .= 'predate, title) VALUES (';
 
-        $query .= (! empty($this->_curPre['size']) ? $this->_pdo->quote($this->_curPre['size']).', ' : '');
-        $query .= (! empty($this->_curPre['category']) ? $this->_pdo->quote($this->_curPre['category']).', ' : '');
-        $query .= (! empty($this->_curPre['source']) ? $this->_pdo->quote($this->_curPre['source']).', ' : '');
-        $query .= (! empty($this->_curPre['reason']) ? $this->_pdo->quote($this->_curPre['reason']).', ' : '');
-        $query .= (! empty($this->_curPre['files']) ? $this->_pdo->quote($this->_curPre['files']).', ' : '');
+        $query .= (! empty($this->_curPre['size']) ? escapeString($this->_curPre['size']).', ' : '');
+        $query .= (! empty($this->_curPre['category']) ? escapeString($this->_curPre['category']).', ' : '');
+        $query .= (! empty($this->_curPre['source']) ? escapeString($this->_curPre['source']).', ' : '');
+        $query .= (! empty($this->_curPre['reason']) ? escapeString($this->_curPre['reason']).', ' : '');
+        $query .= (! empty($this->_curPre['files']) ? escapeString($this->_curPre['files']).', ' : '');
         $query .= (! empty($this->_curPre['reqid']) ? $this->_curPre['reqid'].', ' : '');
         $query .= (! empty($this->_curPre['group_id']) ? $this->_curPre['group_id'].', ' : '');
         $query .= (! empty($this->_curPre['nuked']) ? $this->_curPre['nuked'].', ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? $this->_pdo->quote($this->_curPre['filename']).', ' : '');
+        $query .= (! empty($this->_curPre['filename']) ? escapeString($this->_curPre['filename']).', ' : '');
         $query .= (! empty($this->_curPre['predate']) ? $this->_curPre['predate'].', ' : 'NOW(), ');
 
         $query .= '%s)';
@@ -321,7 +321,7 @@ class IRCScraper extends IRCClient
         DB::insert(
             sprintf(
                 $query,
-                $this->_pdo->quote($this->_curPre['title'])
+                escapeString($this->_curPre['title'])
             )
         );
 
@@ -341,18 +341,18 @@ class IRCScraper extends IRCClient
 
         $query = 'UPDATE predb SET ';
 
-        $query .= (! empty($this->_curPre['size']) ? 'size = '.$this->_pdo->quote($this->_curPre['size']).', ' : '');
-        $query .= (! empty($this->_curPre['source']) ? 'source = '.$this->_pdo->quote($this->_curPre['source']).', ' : '');
-        $query .= (! empty($this->_curPre['files']) ? 'files = '.$this->_pdo->quote($this->_curPre['files']).', ' : '');
-        $query .= (! empty($this->_curPre['reason']) ? 'nukereason = '.$this->_pdo->quote($this->_curPre['reason']).', ' : '');
+        $query .= (! empty($this->_curPre['size']) ? 'size = '.escapeString($this->_curPre['size']).', ' : '');
+        $query .= (! empty($this->_curPre['source']) ? 'source = '.escapeString($this->_curPre['source']).', ' : '');
+        $query .= (! empty($this->_curPre['files']) ? 'files = '.escapeString($this->_curPre['files']).', ' : '');
+        $query .= (! empty($this->_curPre['reason']) ? 'nukereason = '.escapeString($this->_curPre['reason']).', ' : '');
         $query .= (! empty($this->_curPre['reqid']) ? 'requestid = '.$this->_curPre['reqid'].', ' : '');
         $query .= (! empty($this->_curPre['group_id']) ? 'groups_id = '.$this->_curPre['group_id'].', ' : '');
         $query .= (! empty($this->_curPre['predate']) ? 'predate = '.$this->_curPre['predate'].', ' : '');
         $query .= (! empty($this->_curPre['nuked']) ? 'nuked = '.$this->_curPre['nuked'].', ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? 'filename = '.$this->_pdo->quote($this->_curPre['filename']).', ' : '');
+        $query .= (! empty($this->_curPre['filename']) ? 'filename = '.escapeString($this->_curPre['filename']).', ' : '');
         $query .= (
         (empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
-            ? 'category = '.$this->_pdo->quote($this->_curPre['category']).', '
+            ? 'category = '.escapeString($this->_curPre['category']).', '
             : ''
         );
 
@@ -360,8 +360,8 @@ class IRCScraper extends IRCClient
             return;
         }
 
-        $query .= 'title = '.$this->_pdo->quote($this->_curPre['title']);
-        $query .= ' WHERE title = '.$this->_pdo->quote($this->_curPre['title']);
+        $query .= 'title = '.escapeString($this->_curPre['title']);
+        $query .= ' WHERE title = '.escapeString($this->_curPre['title']);
 
         DB::update($query);
 
