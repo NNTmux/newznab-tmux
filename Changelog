@@ -1,3 +1,5 @@
+2018-10-13 DariusIII
+	* Chg: Update psy/psysh to version 0.9.9 and laravel/tinker to version 1.0.8
 2018-10-12 DariusIII
 	* Chg: Add escapeString helper function
 	* Fix: Add missed role_or_permission middleware to Kernel.php
