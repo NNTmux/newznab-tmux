@@ -1216,7 +1216,7 @@ class NameFixer
                 $result = Predb::search($match[0])->first();
                 $preFtMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
                 if ($preFtMatch) {
-                    similar_text($match[0],$match1[0],$percent);
+                    similar_text($match[0], $match1[0], $percent);
                     if ($percent >= 85) {
                         $this->_fileName = $result['filename'];
                         $release->filename = $this->_fileName;
