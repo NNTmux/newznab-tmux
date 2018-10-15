@@ -1,4 +1,5 @@
 2018-10-15 DariusIII
+	* Chg: Simplify matchPredbFiles function query
 	* Fix: Fix badly formatted query in uidCheck function
 	* Chg: Display complete time string for getPreFileNames function
 	* Fix: Fix use of empty release uniqueid in matching that causes errors

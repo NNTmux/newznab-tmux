@@ -1219,13 +1219,12 @@ class NameFixer
                 }
             }
 
-            if ($this->_fileName !== '') {
+            if (! empty($this->_fileName)) {
                 $pre = Predb::query()
+                    ->where('filename', $this->_fileName)
+                    ->orWhere('title', $this->_fileName)
                     ->select(['id as predb_id', 'title', 'source'])
-                    ->where(function ($query) {
-                        $query->where('filename', $this->_fileName)
-                    ->orWhere('title', $this->_fileName);
-                    })->first();
+                    ->first();
             }
 
             if ($pre !== null) {
