@@ -2074,7 +2074,7 @@ class NameFixer
 				WHERE ru.releases_id IS NOT NULL
 				AND ru.uniqueid = %s
 				AND ru.releases_id != %d
-				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = %s',
+				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = %s)',
                 escapeString($release->uid),
                 $release->releases_id,
                 escapeString('nonscene@Ef.net (EF)')
