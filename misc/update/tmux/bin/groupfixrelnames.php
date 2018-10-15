@@ -234,7 +234,7 @@ switch (true) {
             foreach ($pres as $pre) {
                 $nameFixer->done = $nameFixer->matched = false;
                 $searched = 0;
-                $ftmatched = $nameFixer->matchPredbFT($pre, true, 1, true, 1);
+                $ftmatched = $nameFixer->matchPredbFT($pre, true, 1, true);
                 if ($ftmatched > 0) {
                     $searched = 1;
                 } elseif ($ftmatched < 0) {

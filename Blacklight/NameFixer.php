@@ -838,12 +838,12 @@ class NameFixer
      * @param     $echo
      * @param     $type
      * @param int $nameStatus
-     * @param int $show
+     * @param bool $show
      * @param int $preId
      *
      * @throws \Exception
      */
-    public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, int $show, int $preId = 0): void
+    public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, bool $show, int $preId = 0): void
     {
         if (\is_array($release)) {
             $release = (object) $release;
@@ -872,7 +872,7 @@ class NameFixer
                 $newName = explode('\\', $newName);
                 $newName = preg_replace(['/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'], '', $newName[0]);
 
-                if ($this->echooutput === true && $show === 1) {
+                if ($this->echooutput === true && $show === true) {
                     $groupName = Group::getNameByID($release->groups_id);
                     $oldCatName = Category::getNameByID($release->categories_id);
                     $newCatName = Category::getNameByID($determinedCategory);
@@ -1079,7 +1079,7 @@ class NameFixer
 				AND r.predb_id = 0
 				LIMIT 21',
                 $join,
-                escapeString($pre['%title%'])
+                escapeString('%'.$pre['title'].'%')
             )
         );
 
