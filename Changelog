@@ -1,4 +1,5 @@
 2018-10-15 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.23.0
 	* Chg: Tremenduosly improve speed of matchPreDbFiles function by using laravel/scout full text matching
 	* Chg: Update league/flysystem to version 1.0.48
 	* Chg: Make $show variable in matchPreDbFiles function a boolean
