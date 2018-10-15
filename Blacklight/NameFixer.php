@@ -1175,13 +1175,15 @@ class NameFixer
             if ($total > 0) {
                 echo ColorCLI::header($n.number_format($total).' releases to process.');
 
-                foreach ($query as $row) {
-                    $success = $this->matchPredbFiles($row, true, 1, $show);
-                    if ($success === 1) {
-                        $counted++;
-                    }
-                    if ($show === 0) {
-                        $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
+                foreach (collect($query)->chunk(100) as $chunked) {
+                    foreach ($chunked as $row) {
+                        $success = $this->matchPreDbFiles($row, true, 1, $show);
+                        if ($success === 1) {
+                            $counted++;
+                        }
+                        if ($show === 0) {
+                            $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
+                        }
                     }
                 }
                 echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
@@ -1202,7 +1204,7 @@ class NameFixer
      * @return int
      * @throws \Exception
      */
-    public function matchPredbFiles($release, $echo, $nameStatus, $show): int
+    public function matchPreDbFiles($release, $echo, $nameStatus, $show): int
     {
         $matching = 0;
         $pre = false;
@@ -1213,8 +1215,8 @@ class NameFixer
             $preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $this->_fileName, $match);
             if ($preMatch) {
                 $result = Predb::search($match[0])->first();
-                $preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
-                if ($preFTmatch && $match[0] === $match1[0]) {
+                $preFtMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
+                if ($preFtMatch && $match[0] === $match1[0]) {
                     $this->_fileName = $result['filename'];
                 }
             }
@@ -1231,12 +1233,12 @@ class NameFixer
                 );
             }
 
-            if (! empty($pre)) {
+            if (! empty($pre[0])) {
                 $release->filename = $this->_fileName;
-                if ($pre['title'] !== $release->searchname) {
-                    $this->updateRelease($release, $pre['title'], $method = 'file matched source: '.$pre['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $pre['predb_id']);
+                if ($pre[0]->title !== $release->searchname) {
+                    $this->updateRelease($release, $pre[0]->title, $method = 'file matched source: '.$pre[0]->source, $echo, 'PreDB file match, ', $nameStatus, $show, $pre[0]->predb_id);
                 } else {
-                    $this->_updateSingleColumn('predb_id', $pre['predb_id'], $release->releases_id);
+                    $this->_updateSingleColumn('predb_id', $pre[0]->predb_id, $release->releases_id);
                 }
                 $matching++;
                 break;
