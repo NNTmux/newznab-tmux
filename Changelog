@@ -1,4 +1,5 @@
 2018-10-15 DariusIII
+	* Chg: Use raw query in matchPredbFiles query
 	* Chg: Simplify matchPredbFiles function query
 	* Fix: Fix badly formatted query in uidCheck function
 	* Chg: Display complete time string for getPreFileNames function

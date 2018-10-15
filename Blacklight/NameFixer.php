@@ -1220,14 +1220,18 @@ class NameFixer
             }
 
             if (! empty($this->_fileName)) {
-                $pre = Predb::query()
-                    ->where('filename', $this->_fileName)
-                    ->orWhere('title', $this->_fileName)
-                    ->select(['id as predb_id', 'title', 'source'])
-                    ->first();
+                $pre = DB::select(
+                    sprintf('
+                    SELECT id AS predb_id, title, source
+                    FROM predb
+                    WHERE filename = %s
+                    OR title = %1$s LIMIT 1',
+                        escapeString($this->_fileName)
+                    )
+                );
             }
 
-            if ($pre !== null) {
+            if (! empty($pre)) {
                 $release->filename = $this->_fileName;
                 if ($pre['title'] !== $release->searchname) {
                     $this->updateRelease($release, $pre['title'], $method = 'file matched source: '.$pre['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $pre['predb_id']);
