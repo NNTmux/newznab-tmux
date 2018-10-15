@@ -1207,7 +1207,6 @@ class NameFixer
     public function matchPreDbFiles($release, $echo, $nameStatus, $show): int
     {
         $matching = 0;
-        $pre = false;
 
         foreach (explode('||', $release->filename) as $key => $fileName) {
             $this->_fileName = $fileName;
@@ -1216,32 +1215,20 @@ class NameFixer
             if ($preMatch) {
                 $result = Predb::search($match[0])->first();
                 $preFtMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
-                if ($preFtMatch && $match[0] === $match1[0]) {
-                    $this->_fileName = $result['filename'];
+                if ($preFtMatch) {
+                    similar_text($match[0],$match1[0],$percent);
+                    if ($percent >= 85) {
+                        $this->_fileName = $result['filename'];
+                        $release->filename = $this->_fileName;
+                        if ($result['title'] !== $release->searchname) {
+                            $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                        } else {
+                            $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
+                        }
+                        $matching++;
+                        break;
+                    }
                 }
-            }
-
-            if (! empty($this->_fileName)) {
-                $pre = DB::select(
-                    sprintf('
-                    SELECT id AS predb_id, title, source
-                    FROM predb
-                    WHERE filename = %s
-                    OR title = %1$s LIMIT 1',
-                        escapeString($this->_fileName)
-                    )
-                );
-            }
-
-            if (! empty($pre[0])) {
-                $release->filename = $this->_fileName;
-                if ($pre[0]->title !== $release->searchname) {
-                    $this->updateRelease($release, $pre[0]->title, $method = 'file matched source: '.$pre[0]->source, $echo, 'PreDB file match, ', $nameStatus, $show, $pre[0]->predb_id);
-                } else {
-                    $this->_updateSingleColumn('predb_id', $pre[0]->predb_id, $release->releases_id);
-                }
-                $matching++;
-                break;
             }
         }
 
