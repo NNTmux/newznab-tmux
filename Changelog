@@ -1,4 +1,5 @@
 2018-10-15 DariusIII
+	* Chg: Make $show variable in matchPreDbFiles function a boolean
 	* Chg: Slightly improve matchPredbFiles speed
 	* Chg: Use raw query in matchPredbFiles query
 	* Chg: Simplify matchPredbFiles function query

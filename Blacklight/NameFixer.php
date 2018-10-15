@@ -1136,7 +1136,7 @@ class NameFixer
     {
         $n = PHP_EOL;
 
-        $show = (isset($args[2]) && $args[2] === 'show') ? 1 : 0;
+        $show = isset($args[2]) && $args[2] === 'show';
 
         if (isset($args[1]) && is_numeric($args[1])) {
             $limit = 'LIMIT '.$args[1];
@@ -1199,7 +1199,7 @@ class NameFixer
      * @param         $release
      * @param bool $echo
      * @param int $nameStatus
-     * @param int $show
+     * @param bool $show
      *
      * @return int
      * @throws \Exception
