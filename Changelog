@@ -1,3 +1,5 @@
+2018-10-15 DariusIII
+	* Fix: Fix use of empty release uniqueid in matching that causes errors
 2018-10-13 DariusIII
 	* Chg: Add nunomaduro/larastan to dev dependencies to test the code
 	* Chg: Update psy/psysh to version 0.9.9 and laravel/tinker to version 1.0.8

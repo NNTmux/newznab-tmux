@@ -2065,7 +2065,7 @@ class NameFixer
      */
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
     {
-        if ($this->done === false && $this->relid !== (int) $release->releases_id) {
+        if (! empty($release->uid) && $this->done === false && $this->relid !== (int) $release->releases_id) {
             $result = DB::select(sprintf(
                 '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
