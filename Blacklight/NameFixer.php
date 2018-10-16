@@ -866,9 +866,6 @@ class NameFixer
 
                 $this->fixed++;
 
-                if (! empty($release->fromname) && (preg_match('/oz@lot[.]com/i', $release->fromname) || preg_match('/anon@y[.]com/i', $release->fromname))) {
-                    $newName = preg_replace('/(KTR|GUSH|BIUK|WEIRD)$/', 'SDCLiP', $newName);
-                }
                 $newName = explode('\\', $newName);
                 $newName = preg_replace(['/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'], '', $newName[0]);
 
@@ -1134,7 +1131,6 @@ class NameFixer
      */
     public function getPreFileNames(array $args = []): void
     {
-        $n = PHP_EOL;
 
         $show = isset($args[2]) && $args[2] === 'show';
 
@@ -1173,7 +1169,7 @@ class NameFixer
             $total = \count($query);
 
             if ($total > 0) {
-                echo ColorCLI::header($n.number_format($total).' releases to process.');
+                ColorCLI::doEcho(ColorCLI::header(PHP_EOL.number_format($total).' releases to process.'), true);
 
                 foreach (collect($query)->chunk(100) as $chunked) {
                     foreach ($chunked as $row) {
@@ -1186,9 +1182,9 @@ class NameFixer
                         }
                     }
                 }
-                echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
+                ColorCLI::doEcho(ColorCLI::header(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.'), true);
             } else {
-                ColorCLI::doEcho(ColorCLI::info($n.'Nothing to do.'), true);
+                ColorCLI::doEcho(ColorCLI::info('Nothing to do.'), true);
             }
         }
     }
@@ -1211,12 +1207,12 @@ class NameFixer
         foreach (explode('||', $release->filename) as $key => $fileName) {
             $this->_fileName = $fileName;
             $this->_cleanMatchFiles();
-            $preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $this->_fileName, $match);
-            if ($preMatch) {
-                $result = Predb::search($match[0])->first();
-                $preFtMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
-                if ($preFtMatch) {
-                    similar_text($match[0], $match1[0], $percent);
+            $preMatch = $this->preMatch($this->_fileName);
+            if ($preMatch[0] === true) {
+                $result = Predb::search($preMatch[1])->first();
+                $preFtMatch = $this->preMatch($result['filename']);
+                if ($preFtMatch[0] === true) {
+                    similar_text($preMatch[1], $preFtMatch[1], $percent);
                     if ($percent >= 85) {
                         $this->_fileName = $result['filename'];
                         $release->filename = $this->_fileName;
@@ -2294,5 +2290,17 @@ class NameFixer
     public function reset(): void
     {
         $this->done = $this->matched = false;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return array
+     */
+    private function preMatch(string $fileName): array
+    {
+        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $fileName, $match);
+
+        return [$result === 1, $match[0]];
     }
 }

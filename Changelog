@@ -1,4 +1,5 @@
 2018-10-16 DariusIII
+	* Chg: Update NameFixer and Utility classes
 	* Chg: Update phpunit/php-code-coverage to version 6.1.0
 2018-10-15 DariusIII
 	* Fix: Fix query in matchpredbFT function
