@@ -1225,6 +1225,8 @@ class NameFixer
                     }
                 }
             }
+
+            echo '.';
         }
 
         return $matching;
