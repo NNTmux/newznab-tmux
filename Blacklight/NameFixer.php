@@ -2296,7 +2296,7 @@ class NameFixer
      *
      * @return array
      */
-    private function preMatch(string $fileName): array
+    private function preMatch($fileName): array
     {
         $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $fileName, $match);
 
