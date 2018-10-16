@@ -1131,7 +1131,6 @@ class NameFixer
      */
     public function getPreFileNames(array $args = []): void
     {
-
         $show = isset($args[2]) && $args[2] === 'show';
 
         if (isset($args[1]) && is_numeric($args[1])) {
