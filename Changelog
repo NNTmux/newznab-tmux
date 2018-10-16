@@ -1,4 +1,5 @@
 2018-10-16 DariusIII
+	* Chg: Update yab/laravel-scout-mysql-driver to version 2.0.6 and laravel/scout to version 5.0.3
 	* Fix: Fix wrong anidb_info table name (anidb_infos)
 	* Fix: Fix preMatch function return values
 	* Chg: Update NameFixer and Utility classes

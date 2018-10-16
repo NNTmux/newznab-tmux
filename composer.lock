@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf6647c0e2036caa8b3be45ee6035c6c",
+    "content-hash": "57080088606a96b9762d3a7a7498116c",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3913,16 +3913,16 @@
         },
         {
             "name": "laravel/scout",
-            "version": "v4.0.4",
+            "version": "v5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "f1b5d65a7d4a70bafaba7ec996176e95341c44ec"
+                "reference": "ac7e8d2de8fba37473e3a802347d8f24141993cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/f1b5d65a7d4a70bafaba7ec996176e95341c44ec",
-                "reference": "f1b5d65a7d4a70bafaba7ec996176e95341c44ec",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/ac7e8d2de8fba37473e3a802347d8f24141993cd",
+                "reference": "ac7e8d2de8fba37473e3a802347d8f24141993cd",
                 "shasum": ""
             },
             "require": {
@@ -3945,7 +3945,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.0-dev"
+                    "dev-master": "5.0-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -3974,7 +3974,7 @@
                 "laravel",
                 "search"
             ],
-            "time": "2018-05-24T13:35:34+00:00"
+            "time": "2018-08-05T18:16:13+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -7986,21 +7986,21 @@
         },
         {
             "name": "yab/laravel-scout-mysql-driver",
-            "version": "v2.0.5",
+            "version": "v2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/YABhq/laravel-scout-mysql-driver.git",
-                "reference": "b6a2ff42337fd97557b9633867f9bd88a86019d1"
+                "reference": "6af05ef12e4c618d41b27253401a5de6f76a4eca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/YABhq/laravel-scout-mysql-driver/zipball/b6a2ff42337fd97557b9633867f9bd88a86019d1",
-                "reference": "b6a2ff42337fd97557b9633867f9bd88a86019d1",
+                "url": "https://api.github.com/repos/YABhq/laravel-scout-mysql-driver/zipball/6af05ef12e4c618d41b27253401a5de6f76a4eca",
+                "reference": "6af05ef12e4c618d41b27253401a5de6f76a4eca",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "5.3.*|5.4.*|5.5.*|5.6.*|5.7.*",
-                "laravel/scout": "^2.0|^3.0|^4.0",
+                "laravel/framework": "5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*",
+                "laravel/scout": "^5.0",
                 "php": ">=5.6.4"
             },
             "type": "library",
@@ -8034,7 +8034,7 @@
                 }
             ],
             "description": "MySQL driver for Laravel Scout.",
-            "time": "2018-08-27T07:27:01+00:00"
+            "time": "2018-10-16T10:38:04+00:00"
         },
         {
             "name": "yadakhov/insert-on-duplicate-key",
