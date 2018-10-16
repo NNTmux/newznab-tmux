@@ -2300,6 +2300,6 @@ class NameFixer
     {
         $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $fileName, $match);
 
-        return [$result === 1, $match[0]];
+        return [$result === 1, $match[0] ?? ''];
     }
 }
