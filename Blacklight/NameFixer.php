@@ -1157,11 +1157,10 @@ class NameFixer
 					INNER JOIN release_files rf ON r.id = rf.releases_id
 					WHERE rf.name IS NOT NULL
 					AND r.predb_id = 0
-					AND r.categories_id IN (%s, %s)
+					AND r.categories_id IN (%s)
 					GROUP BY r.id
 					%s %s",
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
+                implode(',',Category::OTHERS_GROUP),
                 $orderby,
                 $limit
             )
