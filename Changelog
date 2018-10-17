@@ -1,4 +1,5 @@
 2018-10-17 DariusIII
+	* Chg: Update james-heinrich/getid3 to version 1.9.16
 	* Chg: Add resend_email_verification.php script to resend user email verification if server failed to send it for some reason
 	* Chg: Update getPreFiles function to search inside other misc and hashed categories
 	* Chg: Update yab/laravel-scout-mysql-driver to version 2.0.7
