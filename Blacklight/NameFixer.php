@@ -1160,7 +1160,7 @@ class NameFixer
 					AND r.categories_id IN (%s)
 					GROUP BY r.id
 					%s %s",
-                implode(',',Category::OTHERS_GROUP),
+                implode(',', Category::OTHERS_GROUP),
                 $orderby,
                 $limit
             )
