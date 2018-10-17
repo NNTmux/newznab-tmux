@@ -1155,10 +1155,13 @@ class NameFixer
 						GROUP_CONCAT(rf.name ORDER BY LENGTH(rf.name) DESC SEPARATOR '||') AS filename
 					FROM releases r
 					INNER JOIN release_files rf ON r.id = rf.releases_id
-					AND rf.name IS NOT NULL
-					WHERE r.predb_id = 0
+					WHERE rf.name IS NOT NULL
+					AND r.predb_id = 0
+					AND r.categories_id IN (%s, %s)
 					GROUP BY r.id
 					%s %s",
+                Category::OTHER_MISC,
+                Category::OTHER_HASHED,
                 $orderby,
                 $limit
             )
