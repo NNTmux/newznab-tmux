@@ -1211,20 +1211,21 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
-                $result = Predb::search($preMatch[1])->first();
-                $preFtMatch = $this->preMatch($result['filename']);
-                if ($preFtMatch[0] === true) {
-                    similar_text($preMatch[1], $preFtMatch[1], $percent);
-                    if ($percent >= 85) {
-                        $this->_fileName = $result['filename'];
-                        $release->filename = $this->_fileName;
-                        if ($result['title'] !== $release->searchname) {
-                            $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
-                        } else {
-                            $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
+                foreach (Predb::search($preMatch[1])->get()->chunk(1000)->first() as $result) {
+                    $preFtMatch = $this->preMatch($result['filename']);
+                    if ($preFtMatch[0] === true) {
+                        similar_text($preMatch[1], $preFtMatch[1], $percent);
+                        if ($percent >= 85) {
+                            $this->_fileName = $result['filename'];
+                            $release->filename = $this->_fileName;
+                            if ($result['title'] !== $release->searchname) {
+                                $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                            } else {
+                                $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
+                            }
+                            $matching++;
+                            break;
                         }
-                        $matching++;
-                        break;
                     }
                 }
             }
