@@ -1158,6 +1158,7 @@ class NameFixer
 					WHERE rf.name IS NOT NULL
 					AND r.predb_id = 0
 					AND r.categories_id IN (%s)
+					AND r.isrenamed = 0
 					GROUP BY r.id
 					%s %s",
                 implode(',', Category::OTHERS_GROUP),
