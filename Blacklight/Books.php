@@ -18,7 +18,6 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 class Books
 {
-
     /**
      * @var bool
      */

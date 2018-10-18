@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class Regexes
 {
-
     /**
      * @var mixed The ID of the Regex input string matched or the generic name
      */
