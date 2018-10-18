@@ -1,4 +1,5 @@
 2018-10-18 DariusIII
+	* Chg: Update PHPDOC block in Categorize class
 	* Chg: Further refine predb file matching by selecting only releases that have been not renamed
 	* Chg: Update used libraries to latest versions
 2018-10-17 DariusIII
