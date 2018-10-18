@@ -21,9 +21,6 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
  */
 class Music
 {
-    /**
-     *
-     */
     protected const MATCH_PERCENT = 60;
 
     /**
