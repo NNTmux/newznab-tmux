@@ -127,8 +127,8 @@ class Console
     }
 
     /**
-     * @param $title
-     * @param $platform
+     * @param string $title
+     * @param string $platform
      *
      * @return false|\Illuminate\Database\Eloquent\Model
      */
@@ -147,9 +147,9 @@ class Console
                 $searchWords .= sprintf('%s ', $word);
             }
         }
-        $searchWords = trim($searchWords);
+        $searchWords = trim($searchWords.'+'.$platform);
 
-        return ConsoleInfo::search($searchWords, $platform)->first() ?? false;
+        return ConsoleInfo::search($searchWords)->first() ?? false;
     }
 
     /**
@@ -158,12 +158,12 @@ class Console
      * @param       $start
      * @param       $num
      * @param       $orderBy
-     * @param array $excludedcats
+     * @param array $excludedCats
      *
      * @return array
      * @throws \Exception
      */
-    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedcats = []): array
+    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
     {
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
@@ -171,8 +171,8 @@ class Console
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
-        if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+        if (\count($excludedCats) > 0) {
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
         $order = $this->getConsoleOrder($orderBy);
         $calcSql = sprintf(
