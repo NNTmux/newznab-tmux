@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class Regexes
 {
-    public $pdo;
 
     /**
      * @var mixed The ID of the Regex input string matched or the generic name
@@ -46,7 +45,6 @@ class Regexes
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->tableName = $options['Table_Name'];
     }
 

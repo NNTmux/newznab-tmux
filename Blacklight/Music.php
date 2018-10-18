@@ -21,12 +21,10 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
  */
 class Music
 {
-    protected const MATCH_PERCENT = 60;
-
     /**
-     * @var \PDO
+     *
      */
-    protected $pdo;
+    protected const MATCH_PERCENT = 60;
 
     /**
      * @var bool
@@ -88,7 +86,6 @@ class Music
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = DB::connection()->getPdo();
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');

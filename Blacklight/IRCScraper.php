@@ -48,11 +48,6 @@ class IRCScraper extends IRCClient
     protected $_oldPre;
 
     /**
-     * @var \PDO
-     */
-    protected $_pdo;
-
-    /**
      * Run this in silent mode (no text output).
      * @var bool
      */
@@ -134,7 +129,6 @@ class IRCScraper extends IRCClient
             $this->_titleIgnoreRegex = config('irc_settings.scrape_irc_title_ignore');
         }
 
-        $this->_pdo = DB::connection()->getPdo();
         $this->_groupList = [];
         $this->_silent = $silent;
         $this->_debug = $debug;

@@ -100,11 +100,6 @@ class Games
     protected $giantBomb;
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * @var
      */
     protected $igdbSleep;
@@ -124,7 +119,6 @@ class Games
         ];
         $options += $defaults;
         $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = DB::connection()->getPdo();
 
         $this->publicKey = Settings::settingValue('APIs..giantbombkey');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;

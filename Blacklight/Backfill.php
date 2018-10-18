@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\DB;
 class Backfill
 {
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * @var \Blacklight\Binaries
      */
     protected $_binaries;
@@ -80,7 +75,6 @@ class Backfill
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = DB::connection()->getPdo();
         $this->_nntp = (
             $options['NNTP'] instanceof NNTP
             ? $options['NNTP'] : new NNTP()

@@ -87,11 +87,6 @@ class Console
     public $failCache;
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * @param array $options Class instances / Echo to cli.
      * @throws \Exception
      */
@@ -103,7 +98,6 @@ class Console
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');

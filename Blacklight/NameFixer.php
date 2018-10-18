@@ -117,11 +117,6 @@ class NameFixer
     protected $fullall;
 
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * @var \Blacklight\ConsoleTools
      */
     public $consoletools;
@@ -160,7 +155,6 @@ class NameFixer
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->relid = $this->fixed = $this->checked = 0;
-        $this->pdo = DB::connection()->getPdo();
         $this->othercats = implode(',', Category::OTHERS_GROUP);
         $this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categories_id IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
         $this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';

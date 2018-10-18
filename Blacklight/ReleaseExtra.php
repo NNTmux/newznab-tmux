@@ -13,16 +13,10 @@ use Illuminate\Support\Facades\DB;
 class ReleaseExtra
 {
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * ReleaseExtra constructor.
      */
     public function __construct()
     {
-        $this->pdo = DB::connection()->getPdo();
     }
 
     /**

@@ -9,16 +9,10 @@ use Illuminate\Support\Facades\DB;
 class AniDB
 {
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * AniDB constructor.
      */
     public function __construct()
     {
-        $this->pdo = DB::connection()->getPdo();
     }
 
     /**

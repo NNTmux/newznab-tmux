@@ -44,11 +44,6 @@ class Sharing
      */
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * @var \Blacklight\NNTP
      */
     protected $nntp;
@@ -81,8 +76,7 @@ class Sharing
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
-        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo]));
+        $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP());
 
         // Get all sharing info from DB.
         $check = DB::selectOne('SELECT * FROM sharing');

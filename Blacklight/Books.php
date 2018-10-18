@@ -18,10 +18,6 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 class Books
 {
-    /**
-     * @var \PDO
-     */
-    public $pdo;
 
     /**
      * @var bool
@@ -87,7 +83,6 @@ class Books
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = DB::connection()->getPdo();
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');

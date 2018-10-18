@@ -22,11 +22,6 @@ class Releases
     public const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * @var \Blacklight\ReleaseSearch
      */
     public $releaseSearch;
@@ -52,7 +47,6 @@ class Releases
             'Groups'   => null,
         ];
         $options += $defaults;
-        $this->pdo = DB::connection()->getPdo();
 
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch();

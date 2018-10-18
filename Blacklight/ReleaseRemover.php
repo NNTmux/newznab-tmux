@@ -69,11 +69,6 @@ class ReleaseRemover
     protected $method = '';
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * The query we will use to select unwanted releases.
      *
      * @var string
@@ -121,7 +116,6 @@ class ReleaseRemover
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => null]));
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());

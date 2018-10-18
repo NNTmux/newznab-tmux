@@ -65,11 +65,6 @@ class XXX
     protected $cookie;
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * @param array $options Echo to cli / Class instances.
      *
      * @throws \Exception
@@ -83,7 +78,6 @@ class XXX
         ];
         $options += $defaults;
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
-        $this->pdo = DB::connection()->getPdo();
 
         $this->movieQty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = (new Releases())->showPasswords();

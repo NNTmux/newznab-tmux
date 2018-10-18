@@ -1,4 +1,5 @@
 2018-10-18 DariusIII
+	* Chg: Remove unused $this->pdo instances
 	* Chg: Try to further improve speed and RAM consumption of matchPreDbFiles function
 	* Chg: Update Console class fulltext search
 	* Chg: Update PHPDOC block in Categorize class
