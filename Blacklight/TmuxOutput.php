@@ -555,11 +555,11 @@ class TmuxOutput extends Tmux
 
     protected function _setColourMasks(): void
     {
-        $this->_colourMasks[1] = color('%-18s')->yellow.' '.color('%-48.48s')->yellow->dark;
+        $this->_colourMasks[1] = color('%-18s')->yellow.' '.color('%-48.48s')->yellow->dark.PHP_EOL;
         $this->_colourMasks['2.0'] = color('%-20s')->magenta->dark.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
         $this->_colourMasks['2.1'] = color('%-20s')->yellow.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
         $this->_colourMasks[3] = color('%-16.16s %25.25s %25.25s')->yellow.PHP_EOL;
-        $this->_colourMasks[4] = color('%-16.16s')->green.' '.color('%25.25s %25.25s')->yellow->dark;
-        $this->_colourMasks[5] = color('%-16.16s %25.25s %25.25s')->yellow->dark;
+        $this->_colourMasks[4] = color('%-16.16s')->green.' '.color('%25.25s %25.25s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks[5] = color('%-16.16s %25.25s %25.25s')->yellow->dark.PHP_EOL;
     }
 }
