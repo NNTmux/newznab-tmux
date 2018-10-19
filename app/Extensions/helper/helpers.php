@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\XXX;
 use Colors\Color;
+use Blacklight\XXX;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
