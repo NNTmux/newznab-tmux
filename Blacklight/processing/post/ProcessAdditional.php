@@ -582,7 +582,7 @@ class ProcessAdditional
 
         if (! is_dir($this->_mainTmpPath)) {
             $old = umask(0777);
-            if (! mkdir($this->_mainTmpPath) && ! is_dir($this->_mainTmpPath)) {
+            if (! Storage::makeDirectory($this->_mainTmpPath) && ! is_dir($this->_mainTmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->_mainTmpPath));
             }
             @chmod($this->_mainTmpPath, 0777);
@@ -788,7 +788,7 @@ class ProcessAdditional
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
         if (! is_dir($this->tmpPath)) {
             $old = umask(0777);
-            if (! mkdir($this->tmpPath) && ! is_dir($this->tmpPath)) {
+            if (! Storage::makeDirectory($this->tmpPath) && ! is_dir($this->tmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->tmpPath));
             }
             @chmod($this->tmpPath, 0777);
