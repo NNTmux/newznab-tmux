@@ -27,8 +27,8 @@ use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
-use FFMpeg\Filters\Video\ResizeFilter;
 use Illuminate\Support\Facades\File;
+use FFMpeg\Filters\Video\ResizeFilter;
 
 class ProcessAdditional
 {
