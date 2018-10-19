@@ -12,9 +12,10 @@ use Blacklight\utility\Utility;
 $dir = NN_RES.'movednzbs/';
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {
-    exit(ColorCLI::error("\nThis script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
+    ColorCLI::error("This script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
         ."php $argv[0] true     ...: For a dry run, to see how many would be moved.\n"
-        ."php $argv[0] move     ...: Move NZBs that are possibly bad or have no release. They are moved into this folder: $dir\n"));
+        ."php $argv[0] move     ...: Move NZBs that are possibly bad or have no release. They are moved into this folder: $dir");
+    exit();
 }
 
 if (! is_dir($dir) && ! mkdir($dir) && ! is_dir($dir)) {
@@ -29,8 +30,8 @@ $timestart = date('r');
 $checked = $moved = 0;
 $couldbe = ($argv[1] === 'true') ? 'could be ' : '';
 
-echo ColorCLI::header('Getting List of nzbs to check against db.');
-echo ColorCLI::header("Checked / {$couldbe}moved\n");
+ColorCLI::header('Getting List of nzbs to check against db.');
+ColorCLI::header("Checked / {$couldbe}moved\n");
 
 $dirItr = new \RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
 $itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
@@ -52,9 +53,9 @@ foreach ($itr as $filePath) {
     }
 }
 
-echo ColorCLI::header("\n".number_format($checked).' nzbs checked, '.number_format($moved).' nzbs '.$couldbe.'moved.');
-echo ColorCLI::header('Getting List of releases to check against nzbs.');
-echo ColorCLI::header("Checked / releases deleted\n");
+ColorCLI::header("\n".number_format($checked).' nzbs checked, '.number_format($moved).' nzbs '.$couldbe.'moved.');
+ColorCLI::header('Getting List of releases to check against nzbs.');
+ColorCLI::header("Checked / releases deleted\n");
 
 $checked = $deleted = 0;
 
@@ -70,5 +71,5 @@ $res = DB::select('SELECT id, guid, nzbstatus FROM releases');
         $checked++;
         echo "$checked / $deleted\r";
     }
-echo ColorCLI::header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
-echo ColorCLI::header("Script started at [$timestart], finished at [".date('r').']');
+ColorCLI::header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
+ColorCLI::header("Script started at [$timestart], finished at [".date('r').']');

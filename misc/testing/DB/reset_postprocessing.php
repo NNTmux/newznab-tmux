@@ -32,7 +32,7 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
         $pdo->exec('TRUNCATE TABLE anidb_info');
         $pdo->exec('TRUNCATE TABLE anidb_episodes');
     }
-    echo ColorCLI::header('Resetting all postprocessing');
+    ColorCLI::header('Resetting all postprocessing');
     $qry = $pdo->query('SELECT id FROM releases');
     $affected = 0;
     if ($qry instanceof \Traversable) {
@@ -59,10 +59,10 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE consoleinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Console postprocessing');
+        ColorCLI::header('Resetting all Console postprocessing');
         $where = ' WHERE consoleinfo_id IS NOT NULL';
     } else {
-        echo ColorCLI::header('Resetting all failed Console postprocessing');
+        ColorCLI::header('Resetting all failed Console postprocessing');
         $where = ' WHERE consoleinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::GAME_ROOT.' AND '.Category::GAME_OTHER;
     }
 
@@ -79,7 +79,7 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting Console Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' consoleinfoIDs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' consoleinfoIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
     $ran = true;
@@ -87,10 +87,10 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE gamesinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Games postprocessing');
+        ColorCLI::header('Resetting all Games postprocessing');
         $where = ' WHERE gamesinfo_id != 0';
     } else {
-        echo ColorCLI::header('Resetting all failed Games postprocessing');
+        ColorCLI::header('Resetting all failed Games postprocessing');
         $where = ' WHERE gamesinfo_id IN (-2, 0) AND categories_id = 4050';
     }
 
@@ -107,7 +107,7 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
             $pdo->exec('UPDATE releases SET gamesinfo_id = 0 WHERE id = '.$releases['id']);
             $consoletools->overWritePrimary('Resetting Games Releases:  '.$consoletools->percentString(++$concount, $total));
         }
-        echo ColorCLI::header(PHP_EOL.number_format($concount).' gameinfo_IDs reset.');
+        ColorCLI::header(PHP_EOL.number_format($concount).' gameinfo_IDs reset.');
     }
 }
 if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
@@ -116,10 +116,10 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE movieinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Movie postprocessing');
+        ColorCLI::header('Resetting all Movie postprocessing');
         $where = ' WHERE imdbid IS NOT NULL';
     } else {
-        echo ColorCLI::header('Resetting all failed Movie postprocessing');
+        ColorCLI::header('Resetting all failed Movie postprocessing');
         $where = ' WHERE imdbid IN (-2, 0) AND categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER;
     }
 
@@ -136,7 +136,7 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting Movie Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' imdbIDs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' imdbIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
     $ran = true;
@@ -144,10 +144,10 @@ if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE musicinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Music postprocessing');
+        ColorCLI::header('Resetting all Music postprocessing');
         $where = ' WHERE musicinfo_id IS NOT NULL';
     } else {
-        echo ColorCLI::header('Resetting all failed Music postprocessing');
+        ColorCLI::header('Resetting all failed Music postprocessing');
         $where = ' WHERE musicinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::MUSIC_ROOT.' AND '.Category::MUSIC_OTHER;
     }
 
@@ -160,19 +160,19 @@ if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting Music Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' musicinfo_ids reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' musicinfo_ids reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Additional postprocessing');
+        ColorCLI::header('Resetting all Additional postprocessing');
         $where = ' WHERE (haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0 OR videostatus != 0 OR audiostatus != 0';
     } else {
-        echo ColorCLI::header('Resetting all failed Additional postprocessing');
+        ColorCLI::header('Resetting all failed Additional postprocessing');
         $where = ' WHERE haspreview < -1 OR haspreview = 0 OR passwordstatus < -1 OR passwordstatus = 0 OR jpgstatus < 0 OR videostatus < 0 OR audiostatus < 0';
     }
 
-    echo ColorCLI::primary('SELECT id FROM releases'.$where);
+    ColorCLI::primary('SELECT id FROM releases'.$where);
     $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
         $total = $qry->rowCount();
@@ -186,7 +186,7 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' Releases reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' Releases reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
     $ran = true;
@@ -196,10 +196,10 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE tv_episodes');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all TV postprocessing');
+        ColorCLI::header('Resetting all TV postprocessing');
         $where = ' WHERE videos_id != 0 AND tv_episodes_id != 0 AND categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     } else {
-        echo ColorCLI::header('Resetting all failed TV postprocessing');
+        ColorCLI::header('Resetting all failed TV postprocessing');
         $where = ' WHERE tv_episodes_id < 0 AND categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
@@ -216,7 +216,7 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting TV Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' Video IDs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' Video IDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
     $ran = true;
@@ -225,10 +225,10 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE anidb_episodes');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Anime postprocessing');
+        ColorCLI::header('Resetting all Anime postprocessing');
         $where = ' WHERE categories_id = 5070';
     } else {
-        echo ColorCLI::header('Resetting all failed Anime postprocessing');
+        ColorCLI::header('Resetting all failed Anime postprocessing');
         $where = ' WHERE anidbid BETWEEN -2 AND -1 AND categories_id = '.Category::TV_ANIME;
     }
 
@@ -245,7 +245,7 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting Anime Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' anidbIDs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' anidbIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
     $ran = true;
@@ -253,10 +253,10 @@ if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE bookinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all Book postprocessing');
+        ColorCLI::header('Resetting all Book postprocessing');
         $where = ' WHERE bookinfo_id IS NOT NULL';
     } else {
-        echo ColorCLI::header('Resetting all failed Book postprocessing');
+        ColorCLI::header('Resetting all failed Book postprocessing');
         $where = ' WHERE bookinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::BOOKS_ROOT.' AND '.Category::BOOKS_UNKNOWN;
     }
 
@@ -269,7 +269,7 @@ if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting Book Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' bookinfoIDs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' bookinfoIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
     $ran = true;
@@ -277,10 +277,10 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE xxxinfo');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all XXX postprocessing');
+        ColorCLI::header('Resetting all XXX postprocessing');
         $where = ' WHERE xxxinfo_id != 0';
     } else {
-        echo ColorCLI::header('Resetting all failed XXX postprocessing');
+        ColorCLI::header('Resetting all failed XXX postprocessing');
         $where = ' WHERE xxxinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::XXX_ROOT.' AND '.Category::XXX_X264;
     }
 
@@ -296,7 +296,7 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
             ));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' xxxinfo_IDs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' xxxinfo_IDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
     $ran = true;
@@ -304,10 +304,10 @@ if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
         $pdo->exec('TRUNCATE TABLE release_nfos');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
-        echo ColorCLI::header('Resetting all NFO postprocessing');
+        ColorCLI::header('Resetting all NFO postprocessing');
         $where = ' WHERE nfostatus != -1';
     } else {
-        echo ColorCLI::header('Resetting all failed NFO postprocessing');
+        ColorCLI::header('Resetting all failed NFO postprocessing');
         $where = ' WHERE nfostatus < -1';
     }
 
@@ -320,7 +320,7 @@ if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
             $consoletools->overWritePrimary('Resetting NFO Releases:  '.$consoletools->percentString(++$concount, $total));
         }
     }
-    echo ColorCLI::header(PHP_EOL.number_format($concount).' NFOs reset.');
+    ColorCLI::header(PHP_EOL.number_format($concount).' NFOs reset.');
 }
 
 if ($ran === false) {

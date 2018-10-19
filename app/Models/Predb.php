@@ -98,7 +98,7 @@ class Predb extends Model
         $updated = 0;
 
         if (config('nntmux.echocli')) {
-            echo ColorCLI::header('Querying DB for release search names not matched with PreDB titles.');
+            ColorCLI::header('Querying DB for release search names not matched with PreDB titles.');
         }
 
         $query = self::query()
@@ -113,7 +113,7 @@ class Predb extends Model
 
         if ($res !== null) {
             $total = \count($res);
-            echo ColorCLI::primary(number_format($total).' releases to match.');
+            ColorCLI::primary(number_format($total).' releases to match.');
 
             foreach ($res as $row) {
                 Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
@@ -129,7 +129,7 @@ class Predb extends Model
             }
 
             if (config('nntmux.echocli')) {
-                echo ColorCLI::header(
+                ColorCLI::header(
                     'Matched '.number_format(($updated > 0) ? $updated : 0).' PreDB titles to release search names.'
                 );
             }

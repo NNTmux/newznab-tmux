@@ -14,7 +14,7 @@ $movies = $pdo->query('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id
 if ($movies instanceof \Traversable) {
     $count = $movies->rowCount();
     if ($count > 0) {
-        echo ColorCLI::header('Updating movie info for '.number_format($count).' movies.');
+        ColorCLI::header('Updating movie info for '.number_format($count).' movies.');
 
         foreach ($movies as $mov) {
             $startTime = microtime(true);
@@ -28,6 +28,6 @@ if ($movies instanceof \Traversable) {
             }
         }
     } else {
-        echo ColorCLI::header('No movies to update');
+        ColorCLI::header('No movies to update');
     }
 }

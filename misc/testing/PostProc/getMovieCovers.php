@@ -12,11 +12,11 @@ $movie = new Movie(['Echo' => true]);
 $movies = MovieInfo::query()->where('cover', '=', 0)->orderBy('year')->orderByDesc('id')->get(['imdbid']);
 $count = $movies->count();
 if ($count > 0) {
-    echo ColorCLI::primary('Updating '.number_format($count).' movie covers.');
+    ColorCLI::primary('Updating '.number_format($count).' movie covers.');
     foreach ($movies as $mov) {
         $startTime = microtime(true);
         $mov = $movie->updateMovieInfo($mov['imdbid']);
     }
 } else {
-    echo ColorCLI::header('No movie covers to update');
+    ColorCLI::header('No movie covers to update');
 }

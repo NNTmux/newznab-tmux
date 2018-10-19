@@ -813,7 +813,7 @@ class NNTP extends \Net_NNTP_Client
             $message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
 
             if ($this->_echo) {
-                ColorCLI::doEcho(ColorCLI::error($message), true);
+                ColorCLI::error($message);
             }
             $nntp->doQuit();
         }
@@ -985,13 +985,10 @@ class NNTP extends \Net_NNTP_Client
                     if (! empty($deComp)) {
                         $bytesReceived = \strlen($data);
                         if ($this->_echo && $bytesReceived > 10240) {
-                            ColorCLI::doEcho(
-                                ColorCLI::primaryOver(
+                            ColorCLI::primaryOver(
                                     'Received '.round($bytesReceived / 1024).
                                     'KB from group ('.$this->group().').'
-                                ),
-                                true
-                            );
+                                );
                         }
 
                         // Split the string of headers into an array of individual headers, then return it.

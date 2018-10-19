@@ -215,7 +215,7 @@ class Utility
             $message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php ".
                 NN_ROOT."./tmux nntmux:db\n";
             if (self::isCLI()) {
-                echo ColorCLI::error($message);
+                ColorCLI::error($message);
             }
             throw new \RuntimeException($message);
         }

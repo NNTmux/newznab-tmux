@@ -609,7 +609,7 @@ class Movie
     public function updateMovieInfo($imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId), true);
+            ColorCLI::primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId);
         }
 
         // Check TMDB for IMDB info.
@@ -731,17 +731,14 @@ class Movie
         ]);
 
         if ($this->echooutput && $this->service !== '') {
-            ColorCLI::doEcho(
-                ColorCLI::headerOver('Added/updated movie: ').
+            ColorCLI::headerOver('Added/updated movie: ').
                 ColorCLI::primary(
                     $mov['title'].
                     ' ('.
                     $mov['year'].
                     ') - '.
                     $mov['imdbid']
-                ),
-                true
-            );
+                );
         }
 
         return (int) $movieID > 0;
@@ -782,7 +779,7 @@ class Movie
                         $ret['title'] = $art['name'];
                     }
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::alternateOver('Fanart Found ').ColorCLI::headerOver($ret['title']), true);
+                        ColorCLI::alternateOver('Fanart Found ').ColorCLI::headerOver($ret['title']);
                     }
 
                     return $ret;
@@ -809,7 +806,7 @@ class Movie
         try {
             $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
         } catch (TmdbApiException $error) {
-            ColorCLI::doEcho(ColorCLI::error($error->getMessage()), true);
+            ColorCLI::error($error->getMessage());
 
             return false;
         }
@@ -894,7 +891,7 @@ class Movie
                 $ret['backdrop'] = '';
             }
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::primaryOver('TMDb Found ').ColorCLI::headerOver($ret['title']), true);
+                ColorCLI::primaryOver('TMDb Found ').ColorCLI::headerOver($ret['title']);
             }
 
             return $ret;
@@ -929,7 +926,7 @@ class Movie
                     ];
 
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->orig_title()), true);
+                        ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->orig_title());
                     }
 
                     return $ret;
@@ -972,7 +969,7 @@ class Movie
                             return false;
                         }
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
+                            ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']);
                         }
 
                         return $ret;
@@ -1023,7 +1020,7 @@ class Movie
                         ];
 
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ').ColorCLI::headerOver($ret['title']), true);
+                            ColorCLI::alternateOver('OMDbAPI Found ').ColorCLI::headerOver($ret['title']);
                         }
 
                         return $ret;
@@ -1062,7 +1059,7 @@ class Movie
         if ($imdbID !== false) {
             $this->service = $service;
             if ($this->echooutput && $this->service !== '') {
-                ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID), true);
+                ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID);
             }
 
             $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
@@ -1127,7 +1124,7 @@ class Movie
 
         if ($movieCount > 0) {
             if ($this->echooutput && $movieCount > 1) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' movie releases.'), true);
+                ColorCLI::header('Processing '.$movieCount.' movie releases.');
             }
 
             // Loop over releases.
@@ -1146,7 +1143,7 @@ class Movie
                 }
 
                 if ($this->echooutput) {
-                    ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($movieName), true);
+                    ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($movieName);
                 }
 
                 $movieUpdated = false;

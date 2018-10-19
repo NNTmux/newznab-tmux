@@ -106,7 +106,7 @@ class AniDB
                 }
             }
         } else {
-            ColorCLI::doEcho(ColorCLI::info('No anidb releases to  process.'), true);
+            ColorCLI::info('No anidb releases to  process.');
         }
     }
 
@@ -224,7 +224,7 @@ class AniDB
         $cleanArr = $this->extractTitleEpisode($release->searchname);
 
         if (\is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
-            echo ColorCLI::header(PHP_EOL.'Looking Up: ').
+            ColorCLI::header(PHP_EOL.'Looking Up: ').
                 ColorCLI::primary('   Title: '.$cleanArr['title'].PHP_EOL.
                     '   Episode: '.$cleanArr['epno']);
 
@@ -254,16 +254,15 @@ class AniDB
 
                 $this->updateRelease($anidbId->anidbid, $release->id);
 
-                ColorCLI::doEcho(
-                    ColorCLI::headerOver('Matched '.$type.' AniDB ID: ').
+
+                ColorCLI::headerOver('Matched '.$type.' AniDB ID: ').
                     ColorCLI::primary($anidbId->anidbid).
                     ColorCLI::alternateOver('   Title: ').
                     ColorCLI::primary($anidbId->title).
                     ColorCLI::alternateOver('   Episode #: ').
                     ColorCLI::primary($cleanArr['epno']).
                     ColorCLI::alternateOver('   Episode Title: ').
-                    ColorCLI::primary($updatedAni['episode_title']), true
-                );
+                    ColorCLI::primary($updatedAni['episode_title']);
 
                 $matched = true;
             } else {

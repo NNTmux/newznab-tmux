@@ -18,7 +18,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
         $limit = $argv[2];
     }
 
-    echo ColorCLI::header('Scanning for XXX UHD/HD/SD releases missing sample images');
+    ColorCLI::header('Scanning for XXX UHD/HD/SD releases missing sample images');
     $res = $pdo->query(sprintf('SELECT r.id, r.guid AS guid, r.searchname AS searchname
 								FROM releases r
 								WHERE r.nzbstatus = 1 AND r.jpgstatus = 0 AND r.categories_id IN (%s, %s, %s) ORDER BY r.adddate DESC', Category::XXX_CLIPHD, Category::XXX_CLIPSD, Category::XXX_UHD));
@@ -35,10 +35,10 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
                 }
                 $sample = $releaseImage->saveImage($row['guid'].'_thumb', $imgpath, $releaseImage->jpgSavePath, 650, 650);
                 if ($sample !== 0) {
-                    echo ColorCLI::info('Downloaded sample for '.$row['searchname']);
+                    ColorCLI::info('Downloaded sample for '.$row['searchname']);
                     $pdo->exec(sprintf('UPDATE releases SET jpgstatus = 1 WHERE id = %d', $row['id']));
                 } else {
-                    echo ColorCLI::notice('Sample download failed!');
+                    ColorCLI::notice('Sample download failed!');
                     $pdo->exec(sprintf('UPDATE releases SET jpgstatus = -2 WHERE id = %d', $row['id']));
                 }
             }
@@ -48,9 +48,10 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
             break;
         }
     }
-    echo ColorCLI::header('Total releases missing samples that '.$couldbe.'their samples updated = '.number_format($counterfixed));
+    ColorCLI::header('Total releases missing samples that '.$couldbe.'their samples updated = '.number_format($counterfixed));
 } else {
-    exit(ColorCLI::header("\nThis script checks if XXX release samples actually exist on disk.\n\n"
+   ColorCLI::header("\nThis script checks if XXX release samples actually exist on disk.\n\n"
         ."php $argv[0] check   ...: Dry run, displays missing samples.\n"
-        ."php $argv[0] true    ...: Update XXX releases missing samples.\n"));
+        ."php $argv[0] true    ...: Update XXX releases missing samples.\n");
+   exit();
 }

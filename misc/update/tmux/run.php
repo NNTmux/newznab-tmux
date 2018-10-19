@@ -31,11 +31,12 @@ $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
 if ($session !== null) {
-    exit(ColorCLI::error("tmux session: '".$tmux_session."' is already running, aborting.\n"));
+    ColorCLI::error("tmux session: '".$tmux_session."' is already running, aborting.");
+    exit();
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-ColorCLI::doEcho(ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.'), true);
+ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
 
 $sql = 'SHOW table status';
 $tables = DB::select($sql);
@@ -55,7 +56,7 @@ foreach ($tables as $row) {
         }
     }
 }
-ColorCLI::doEcho(ColorCLI::primary(number_format($ran).' collections reset.'), true);
+ColorCLI::primary(number_format($ran).' collections reset.');
 sleep(2);
 
 function writelog($pane)
@@ -74,14 +75,15 @@ function command_exist($cmd)
 {
     $returnVal = exec("which $cmd 2>/dev/null");
 
-    return empty($returnVal) ? false : true;
+    return ! empty($returnVal);
 }
 
 //check for apps
 $apps = ['time', 'tmux', 'nice', 'tee'];
 foreach ($apps as &$value) {
     if (! command_exist($value)) {
-        exit(ColorCLI::error('Tmux scripts require '.$value.' but its not installed. Aborting.'.PHP_EOL));
+        ColorCLI::error('Tmux scripts require '.$value.' but its not installed. Aborting.');
+        exit();
     }
 }
 

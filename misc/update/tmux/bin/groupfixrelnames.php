@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
 if (! isset($argv[1])) {
-    exit(ColorCLI::error('This script is not intended to be run manually, it is called from Multiprocessing.'));
+    ColorCLI::error('This script is not intended to be run manually, it is called from Multiprocessing.');
+    exit();
 }
 $nameFixer = new NameFixer();
 [$type, $guidChar, $maxPerRun, $thread] = explode(' ', $argv[1]);
@@ -101,12 +102,12 @@ switch (true) {
                 echo PHP_EOL.ColorCLI::primaryOver("[{$release['releases_id']}]");
 
                 if ((int) $release['ishashed'] === 1 && (int) $release['dehashstatus'] >= -6 && (int) $release['dehashstatus'] <= 0) {
-                    echo ColorCLI::primaryOver('m');
+                    ColorCLI::primaryOver('m');
                     if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
                         $nameFixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
                     }
                     if ($nameFixer->matched === false && ! empty($release['filehash']) && preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
-                        echo ColorCLI::primaryOver('h');
+                        ColorCLI::primaryOver('h');
                         $nameFixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
                     }
                 }
@@ -117,7 +118,7 @@ switch (true) {
                 $nameFixer->reset();
 
                 if ((int) $release['proc_uid'] === NameFixer::PROC_UID_NONE && (! empty($release['uid']) || ! empty($release['mediainfo']))) {
-                    echo ColorCLI::primaryOver('U');
+                    ColorCLI::primaryOver('U');
                     $nameFixer->mediaMovieNameCheck($release, true, 'Mediainfo, ', 1, 1);
                     $nameFixer->uidCheck($release, true, 'UID, ', 1, 1);
                 }
@@ -130,7 +131,7 @@ switch (true) {
                 $nameFixer->reset();
 
                 if ((int) $release['proc_srr'] === NameFixer::PROC_SRR_NONE) {
-                    echo ColorCLI::primaryOver('sr');
+                    ColorCLI::primaryOver('sr');
                     $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
@@ -142,7 +143,7 @@ switch (true) {
                 $nameFixer->reset();
 
                 if ((int) $release['proc_hash16k'] === NameFixer::PROC_HASH16K_NONE && ! empty($release['hash'])) {
-                    echo ColorCLI::primaryOver('H');
+                    ColorCLI::primaryOver('H');
                     $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
@@ -155,7 +156,7 @@ switch (true) {
 
                 if ((int) $release['nfostatus'] === Nfo::NFO_FOUND && (int) $release['proc_nfo'] === NameFixer::PROC_NFO_NONE) {
                     if (! empty($release['textstring']) && ! preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
-                        echo ColorCLI::primaryOver('n');
+                        ColorCLI::primaryOver('n');
                         $nameFixer->done = $nameFixer->matched = false;
                         $nameFixer->checkName($release, true, 'NFO, ', 1, 1);
                     }
@@ -168,14 +169,14 @@ switch (true) {
                 $nameFixer->reset();
 
                 if ((int) $release['fileid'] > 0 && (int) $release['proc_files'] === NameFixer::PROC_FILES_NONE) {
-                    echo ColorCLI::primaryOver('F');
+                    ColorCLI::primaryOver('F');
                     $nameFixer->done = $nameFixer->matched = false;
                     $fileNames = explode('|', $release['filestring']);
                     if (is_array($fileNames)) {
                         $releaseFile = $release;
                         foreach ($fileNames as $fileName) {
                             if ($nameFixer->matched === false) {
-                                echo ColorCLI::primaryOver('f');
+                                ColorCLI::primaryOver('f');
                                 $releaseFile['textstring'] = $fileName;
                                 $nameFixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
                             }
@@ -191,7 +192,7 @@ switch (true) {
                 $nameFixer->reset();
 
                 if ((int) $release['proc_par2'] === NameFixer::PROC_PAR2_NONE) {
-                    echo ColorCLI::primaryOver('p');
+                    ColorCLI::primaryOver('p');
                     if (! isset($nzbcontents)) {
                         $nntp = new NNTP();
                         if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {

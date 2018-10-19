@@ -120,7 +120,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['counts']['now']['total_work'] = 0;
         $runVar['modsettings']['fix_crap'] = explode(', ', $runVar['settings']['fix_crap']);
 
-        echo ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
+        ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
         try {
@@ -417,7 +417,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 function errorOnSQL()
 {
-    echo ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
+    ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
 }
 
 /**

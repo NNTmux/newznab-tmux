@@ -182,18 +182,6 @@ if (! function_exists('makeFieldLinks')) {
         }
     }
 
-    if (! function_exists('color')) {
-        /**
-         * @param string $string
-         *
-         * @return \Colors\Color
-         */
-        function color($string = ''): Color
-        {
-            return new Color($string);
-        }
-    }
-
     if (! function_exists('human_filesize')) {
 
         /**

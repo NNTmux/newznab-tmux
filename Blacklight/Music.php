@@ -499,16 +499,14 @@ class Music
 
         if ($musicId) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(
+
                     ColorCLI::header(PHP_EOL.'Added/updated album: ').
                     ColorCLI::alternateOver('   Artist: ').
                     ColorCLI::primary($mus['artist']).
                     ColorCLI::alternateOver('   Title:  ').
                     ColorCLI::primary($mus['title']).
                     ColorCLI::alternateOver('   Year:   ').
-                    ColorCLI::primary($mus['year']),
-                    true
-                );
+                    ColorCLI::primary($mus['year']);
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
         } else {
@@ -518,7 +516,7 @@ class Music
                 } else {
                     $artist = 'Artist: '.$mus['artist'].', Album: ';
                 }
-                ColorCLI::doEcho(
+
                     ColorCLI::headerOver('Nothing to update: ').
                     ColorCLI::primaryOver(
                         $artist.
@@ -526,9 +524,7 @@ class Music
                         ' ('.
                         $mus['year'].
                         ')'
-                    ),
-                    true
-                );
+                    );
             }
         }
 
@@ -636,12 +632,10 @@ class Music
         })->whereIn('categories_id', [Category::MUSIC_MP3, Category::MUSIC_LOSSLESS, Category::MUSIC_OTHER])->orderBy('postdate', 'DESC')->limit($this->musicqty)->get(['searchname', 'id']);
         if ($res instanceof \Traversable && ! empty($res)) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(
+
                     ColorCLI::header(
                         'Processing '.$res->count().' music release(s).'
-                    ),
-                    true
-                );
+                    );
             }
 
             foreach ($res as $arr) {
@@ -652,7 +646,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ').ColorCLI::primary($newname), true);
+                        ColorCLI::headerOver('Looking up: ').ColorCLI::primary($newname);
                     }
 
                     // Do a local lookup first
@@ -661,7 +655,7 @@ class Music
                     if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
+                            ColorCLI::headerOver('Cached previous failure. Skipping.');
                         }
                         $albumId = -2;
                     } elseif ($musicCheck === null && $local === false) {
@@ -691,10 +685,8 @@ class Music
             if ($this->echooutput) {
                 echo "\n";
             }
-        } else {
-            if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('No music releases to process.'), true);
-            }
+        } elseif ($this->echooutput) {
+            ColorCLI::header('No music releases to process.');
         }
     }
 

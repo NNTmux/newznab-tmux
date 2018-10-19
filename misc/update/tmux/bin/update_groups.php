@@ -15,16 +15,18 @@ $consoleTools = new ConsoleTools();
 // Create the connection here and pass
 $nntp = new NNTP();
 if ($nntp->doConnect() !== true) {
-    exit(ColorCLI::error('Unable to connect to usenet.'));
+    ColorCLI::error('Unable to connect to usenet.');
+    exit();
 }
 
-ColorCLI::doEcho(ColorCLI::header('Getting first/last for all your active groups.'));
+ColorCLI::header('Getting first/last for all your active groups.');
 $data = $nntp->getGroups();
 if ($nntp->isError($data)) {
-    exit(ColorCLI::error('Failed to getGroups() from nntp server.'));
+    ColorCLI::error('Failed to getGroups() from nntp server.');
+    exit();
 }
 
-ColorCLI::doEcho(ColorCLI::header('Inserting new values into short_groups table.'));
+ColorCLI::header('Inserting new values into short_groups table.');
 
 DB::unprepared('TRUNCATE TABLE short_groups');
 DB::commit();
@@ -40,8 +42,8 @@ foreach ($data as $newgroup) {
                     'last_record' => $newgroup['last'],
                     'updated' => now(),
                 ]);
-        ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']));
+        ColorCLI::primary('Updated '.$newgroup['group']);
     }
 }
 
-ColorCLI::doEcho(ColorCLI::header('Running time: '.now()->diffInSeconds($start).' seconds'), true);
+ColorCLI::header('Running time: '.now()->diffInSeconds($start).' seconds');

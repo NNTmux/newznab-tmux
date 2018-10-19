@@ -126,7 +126,7 @@ class Versions
                     $count++;
                 }
                 if ($count !== $this->_vers->git->commit) {
-                    echo ColorCLI::primary("Updating commit number to {$count}");
+                    ColorCLI::primary("Updating commit number to {$count}");
                     $this->_vers->git->commit = $count;
                     $this->_changes |= self::UPDATED_GIT_COMMIT;
                 }
@@ -165,17 +165,17 @@ class Versions
         // Check if version file's entry is the same as current branch's tag
         if (version_compare($this->_vers->git->tag, $latest, '!=')) {
             if ($update) {
-                echo ColorCLI::primaryOver('Updating tag version to ').ColorCLI::headerOver($latest);
+                ColorCLI::primaryOver('Updating tag version to ').ColorCLI::headerOver($latest);
                 $this->_vers->git->tag = $ver;
                 $this->_changes |= self::UPDATED_GIT_TAG;
             } else {
-                echo ColorCLI::primaryOver('Leaving tag version at ').
+                ColorCLI::primaryOver('Leaving tag version at ').
                     ColorCLI::headerOver($this->_vers->git->tag);
             }
 
             return $this->_vers->git->tag;
         } else {
-            echo ColorCLI::primaryOver('Tag version is ').ColorCLI::header($latest);
+            ColorCLI::primaryOver('Tag version is ').ColorCLI::header($latest);
         }
 
         return false;
@@ -194,7 +194,7 @@ class Versions
 
         if ($this->_vers->sql->db->__toString() !== $this->_vers->sql->file->__toString()) {
             if ($update) {
-                echo ColorCLI::primaryOver('Updating Db revision to '.$this->_vers->sql->file);
+                ColorCLI::primaryOver('Updating Db revision to '.$this->_vers->sql->file);
                 $this->_vers->sql->db = $this->_vers->sql->file->__toString();
                 $this->_changes |= self::UPDATED_SQL_DB_PATCH;
             }
@@ -228,7 +228,7 @@ class Versions
 
         if ($update) {
             if ($last !== false && $this->_vers->sql->file->__toString() !== $last) {
-                echo ColorCLI::primary('Updating latest patch file to '.$last);
+                ColorCLI::primary('Updating latest patch file to '.$last);
                 $this->_vers->sql->file = $last;
                 $this->_changes |= self::UPDATED_SQL_FILE_LAST;
             }

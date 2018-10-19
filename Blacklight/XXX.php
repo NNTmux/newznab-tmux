@@ -466,14 +466,14 @@ class XXX
         $this->whichClass = 'aebn';
         $mov = new AEBN();
         $mov->cookie = $this->cookie;
-        ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'), true);
+        ColorCLI::info('Checking AEBN for movie info');
         $res = $mov->processSite($movie);
 
         if ($res === false) {
             $this->whichClass = 'pop';
             $mov = new Popporn();
             $mov->cookie = $this->cookie;
-            ColorCLI::doEcho(ColorCLI::info('Checking PopPorn for movie info'), true);
+            ColorCLI::info('Checking PopPorn for movie info');
             $res = $mov->processSite($movie);
         }
 
@@ -481,14 +481,14 @@ class XXX
             $this->whichClass = 'adm';
             $mov = new ADM();
             $mov->cookie = $this->cookie;
-            ColorCLI::doEcho(ColorCLI::info('Checking ADM for movie info'), true);
+            ColorCLI::info('Checking ADM for movie info');
             $res = $mov->processSite($movie);
         }
 
         if ($res === false) {
             $this->whichClass = 'ade';
             $mov = new ADE();
-            ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'), true);
+            ColorCLI::info('Checking ADE for movie info');
             $res = $mov->processSite($movie);
         }
 
@@ -496,7 +496,7 @@ class XXX
             $this->whichClass = 'hotm';
             $mov = new Hotmovies();
             $mov->cookie = $this->cookie;
-            ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'), true);
+            ColorCLI::info('Checking HotMovies for movie info');
             $res = $mov->processSite($movie);
         }
 
@@ -522,7 +522,7 @@ class XXX
                     default:
                         $fromstr = '';
                 }
-                ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from: '.$fromstr), true);
+                ColorCLI::primary('Fetching XXX info from: '.$fromstr);
             }
             $res = $mov->getAll();
         } else {
@@ -601,10 +601,8 @@ class XXX
         }
 
         if ($this->echoOutput) {
-            ColorCLI::doEcho(
-                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))),
-                true
-            );
+
+                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title'])));
         }
 
         return $xxxID;
@@ -639,7 +637,7 @@ class XXX
 
         if ($movieCount > 0) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' XXX releases.'), true);
+                ColorCLI::header('Processing '.$movieCount.' XXX releases.');
             }
 
             // Loop over releases.
@@ -651,17 +649,17 @@ class XXX
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
                         if ($this->echoOutput) {
-                            ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($this->currentTitle), true);
+                            ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($this->currentTitle);
                         }
 
-                        ColorCLI::doEcho(ColorCLI::info('Local match not found, checking web!'), true);
+                        ColorCLI::info('Local match not found, checking web!');
                         $idcheck = $this->updateXXXInfo($this->currentTitle);
                     } else {
-                        ColorCLI::doEcho(ColorCLI::info('Local match found for XXX Movie: '.ColorCLI::headerOver($this->currentTitle)), true);
+                        ColorCLI::info('Local match found for XXX Movie: '.ColorCLI::headerOver($this->currentTitle));
                         $idcheck = (int) $check['id'];
                     }
                 } else {
-                    ColorCLI::doEcho('.', true);
+                    ColorCLI::primary('.');
                 }
                 Release::query()
                     ->where('id', $arr['id'])
@@ -669,7 +667,7 @@ class XXX
                     ->update(['xxxinfo_id' => $idcheck]);
             }
         } elseif ($this->echoOutput) {
-            ColorCLI::doEcho(ColorCLI::header('No xxx releases to process.'), true);
+            ColorCLI::header('No xxx releases to process.');
         }
     }
 

@@ -530,12 +530,12 @@ class Tmux
         if ($this->isRunning() === true) {
             Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
             $sleep = Settings::settingValue('site.tmux.monitor_delay');
-            ColorCLI::doEcho(ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown'), true);
+            ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
             sleep($sleep);
 
             return true;
         }
-        ColorCLI::doEcho(ColorCLI::info('Tmux scripts are not running!'), true);
+        ColorCLI::info('Tmux scripts are not running!');
 
         return false;
     }

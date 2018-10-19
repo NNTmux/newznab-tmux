@@ -552,12 +552,12 @@ class Games
                             $game['review'] = (string) $this->_gameResults->deck;
                         }
                     } else {
-                        ColorCLI::doEcho(ColorCLI::notice('GiantBomb returned no valid results'), true);
+                        ColorCLI::notice('GiantBomb returned no valid results');
 
                         return false;
                     }
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'), true);
+                    ColorCLI::notice('GiantBomb found no valid results');
 
                     return false;
                 }
@@ -619,12 +619,12 @@ class Games
                                 'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             ];
                         } else {
-                            ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+                            ColorCLI::notice('IGDB returned no valid results');
 
                             return false;
                         }
                     } else {
-                        ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+                        ColorCLI::notice('IGDB found no valid results');
 
                         return false;
                     }
@@ -728,14 +728,11 @@ class Games
 
         if (! empty($gamesId)) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(
-                    ColorCLI::header('Added/updated game: ').
+                ColorCLI::header('Added/updated game: ').
                     ColorCLI::alternateOver('   Title:    ').
                     ColorCLI::primary($game['title']).
                     ColorCLI::alternateOver('   Source:   ').
-                    ColorCLI::primary($this->_classUsed),
-                    true
-                );
+                    ColorCLI::primary($this->_classUsed);
             }
             if ($game['cover'] === 1) {
                 $game['cover'] = $ri->saveImage($gamesId, $game['coverurl'], $this->imgSavePath, 250, 250);
@@ -744,11 +741,8 @@ class Games
                 $game['backdrop'] = $ri->saveImage($gamesId.'-backdrop', $game['backdropurl'], $this->imgSavePath, 1920, 1024);
             }
         } elseif ($this->echoOutput) {
-            ColorCLI::doEcho(
-                ColorCLI::headerOver('Nothing to update: ').
-                ColorCLI::primary($game['title'].' (PC)'),
-                true
-            );
+            ColorCLI::headerOver('Nothing to update: ').
+                ColorCLI::primary($game['title'].' (PC)');
         }
 
         return ! empty($gamesId) ? $gamesId : false;
@@ -776,7 +770,7 @@ class Games
 
         if ($res->count() > 0) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->count().' games release(s).'), true);
+                ColorCLI::header('Processing '.$res->count().' games release(s).');
             }
 
             foreach ($res as $arr) {
@@ -787,11 +781,8 @@ class Games
                 $gameInfo = $this->parseTitle($arr['searchname']);
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        ColorCLI::doEcho(
-                            ColorCLI::headerOver('Looking up: ').
-                            ColorCLI::primary($gameInfo['title'].' (PC)'),
-                            true
-                        );
+                        ColorCLI::headerOver('Looking up: ').
+                            ColorCLI::primary($gameInfo['title'].' (PC)');
                     }
 
                     // Check for existing games entry.
@@ -822,7 +813,7 @@ class Games
                 }
             }
         } elseif ($this->echoOutput) {
-            ColorCLI::doEcho(ColorCLI::header('No games releases to process.'), true);
+            ColorCLI::header('No games releases to process.');
         }
     }
 

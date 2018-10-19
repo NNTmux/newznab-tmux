@@ -63,15 +63,15 @@ class ForkingImportNZB extends Forking
         $this->_workCount = \count($directories);
 
         if ((int) $this->_workCount === 0) {
-            echo ColorCLI::error('No sub-folders were found in your specified folder ('.$folder.').');
+            ColorCLI::error('No sub-folders were found in your specified folder ('.$folder.').');
             exit();
         }
 
         if (config('nntmux.echocli')) {
-            ColorCLI::doEcho(ColorCLI::header(
+            ColorCLI::header(
                 'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
                 ' job(s) to do using a max of '.$maxProcesses.' child process(es).'
-            ), true);
+            );
         }
 
         $this->deleteComplete = $deleteComplete;
@@ -86,13 +86,11 @@ class ForkingImportNZB extends Forking
         $this->process_work(true);
 
         if (config('nntmux.echocli')) {
-            ColorCLI::doEcho(
+
                 ColorCLI::header(
                     'Multi-processing for import finished in '.(microtime(true) - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
-                ),
-                true
-            );
+                );
         }
     }
 

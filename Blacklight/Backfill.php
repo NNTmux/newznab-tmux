@@ -123,7 +123,7 @@ class Backfill
             );
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::header($dMessage), true);
+                ColorCLI::header($dMessage);
             }
 
             if ($articles !== '' && ! is_numeric($articles)) {
@@ -136,7 +136,7 @@ class Backfill
                     $dMessage = 'Starting group '.$counter.' of '.$groupCount;
 
                     if ($this->_echoCLI) {
-                        ColorCLI::doEcho(ColorCLI::header($dMessage), true);
+                        ColorCLI::header($dMessage);
                     }
                 }
                 $this->backfillGroup($groupArr, $groupCount - $counter, $articles);
@@ -146,13 +146,13 @@ class Backfill
             $dMessage = 'Backfilling completed in '.number_format(microtime(true) - $allTime, 2).' seconds.';
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::primary($dMessage), true);
+                ColorCLI::primary($dMessage);
             }
         } else {
             $dMessage = 'No groups specified. Ensure groups are added to database for updating.';
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::warning($dMessage), true);
+                ColorCLI::warning($dMessage);
             }
         }
     }
@@ -165,7 +165,7 @@ class Backfill
      * @param int|string $articles
      *
      * @return void
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function backfillGroup($groupArr, $left, $articles = ''): void
     {
@@ -184,7 +184,7 @@ class Backfill
                 '. Otherwise the group is dead, you must disable it.';
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::error($dMessage), true);
+                ColorCLI::error($dMessage);
             }
 
             return;
@@ -200,7 +200,7 @@ class Backfill
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(ColorCLI::primary('Processing '.$groupName), true);
+            ColorCLI::primary('Processing '.$groupName);
         }
 
         // Check if this is days or post backfill.
@@ -233,28 +233,26 @@ class Backfill
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::notice($dMessage), true);
+                ColorCLI::notice($dMessage);
             }
 
             return;
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
+            ColorCLI::primary(
                     'Group '.
                     $groupName.
                     "'s oldest article is ".
                     number_format($data['first']).
                     ', newest is '.
                     number_format($data['last']).
-                    ".\nOur target article is ".
+                    '.Our target article is '.
                     number_format($targetpost).
                     '. Our oldest article is article '.
                     number_format($groupArr['first_record']).
                     '.'
-                ), true
-            );
+                );
         }
 
         // Set first and last, moving the window by max messages.
@@ -270,8 +268,7 @@ class Backfill
         $done = false;
         while ($done === false) {
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(
-                    color('Getting '.
+                ColorCLI::header('Getting '.
                     number_format($last - $first + 1).
                     ' articles from '.
                     $groupName.
@@ -279,7 +276,7 @@ class Backfill
                     $left.
                     ' group(s) left. ('.
                     number_format($first - $targetpost).
-                    ' articles in queue')->fg('yellow'), true);
+                    ' articles in queue');
             }
 
             flush();
@@ -318,17 +315,14 @@ class Backfill
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
+            ColorCLI::primary(
                     PHP_EOL.
                     'Group '.
                     $groupName.
                     ' processed in '.
                     number_format(microtime(true) - $startGroup, 2).
                     ' seconds.'
-                ),
-                true
-            );
+                );
         }
     }
 

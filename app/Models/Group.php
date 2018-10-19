@@ -589,10 +589,6 @@ class Group extends Model
     public static function disableIfNotExist($id): void
     {
         self::updateGroupStatus($id, 'active');
-        ColorCLI::doEcho(
-            ColorCLI::error(
-                'Group does not exist on server, disabling'
-            ), true
-        );
+        ColorCLI::error('Group does not exist on server, disabling');
     }
 }

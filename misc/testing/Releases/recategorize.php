@@ -9,7 +9,7 @@ use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
-    exit(ColorCLI::error(
+    ColorCLI::error(
         "\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
         ."No updates will be done unless the category changes\n"
         ."An optional last argument, test, will display the number of category changes that would be made\n"
@@ -18,7 +18,8 @@ if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_mat
         ."php $argv[0] misc                    ...: To process all releases in misc categories.\n"
         ."php $argv[0] 155                     ...: To process all releases in groupid 155.\n"
         ."php $argv[0] '(155, 140)'            ...: To process all releases in groupids 155 and 140.\n"
-    ));
+    );
+    exit();
 }
 
 reCategorize($argv);
@@ -40,11 +41,11 @@ function reCategorize($argv)
     }
 
     if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]))) {
-        echo ColorCLI::header('Categorizing all releases in '.$argv[1].' using searchname. This can take a while, be patient.');
+        ColorCLI::header('Categorizing all releases in '.$argv[1].' using searchname. This can take a while, be patient.');
     } elseif (isset($argv[1]) && $argv[1] === 'misc') {
-        echo ColorCLI::header('Categorizing all releases in misc categories using searchname. This can take a while, be patient.');
+        ColorCLI::header('Categorizing all releases in misc categories using searchname. This can take a while, be patient.');
     } else {
-        echo ColorCLI::header('Categorizing all releases using searchname. This can take a while, be patient.');
+        ColorCLI::header('Categorizing all releases using searchname. This can take a while, be patient.');
     }
     $timestart = now();
     if (isset($argv[1]) && (is_numeric($argv[1]) || $argv[1] === 'misc')) {
@@ -54,9 +55,9 @@ function reCategorize($argv)
     }
     $time = now()->diffInSeconds($timestart);
     if ($update === true) {
-        echo ColorCLI::header('Finished re-categorizing '.number_format($chgcount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
+        ColorCLI::header('Finished re-categorizing '.number_format($chgcount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
     } else {
-        echo ColorCLI::header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
+        ColorCLI::header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
             .'This would have changed '.number_format($chgcount).' releases but no updates were done.'.PHP_EOL);
     }
 }
@@ -68,7 +69,7 @@ function categorizeRelease($where, $update = true, $echooutput = false)
     $cat = new Categorize();
     $consoletools = new ConsoleTools();
     $relcount = $chgcount = 0;
-    echo ColorCLI::primary('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
+    ColorCLI::primary('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
     $resrel = DB::select('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
     $total = \count($resrel);
     if ($total > 0) {
