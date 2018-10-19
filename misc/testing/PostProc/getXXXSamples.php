@@ -50,8 +50,8 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     }
     ColorCLI::header('Total releases missing samples that '.$couldbe.'their samples updated = '.number_format($counterfixed));
 } else {
-   ColorCLI::header("\nThis script checks if XXX release samples actually exist on disk.\n\n"
+    ColorCLI::header("\nThis script checks if XXX release samples actually exist on disk.\n\n"
         ."php $argv[0] check   ...: Dry run, displays missing samples.\n"
         ."php $argv[0] true    ...: Update XXX releases missing samples.\n");
-   exit();
+    exit();
 }

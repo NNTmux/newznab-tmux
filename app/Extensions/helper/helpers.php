@@ -1,6 +1,5 @@
 <?php
 
-use Colors\Color;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;

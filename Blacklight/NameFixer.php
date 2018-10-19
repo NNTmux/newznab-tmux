@@ -874,7 +874,6 @@ class NameFixer
 
                     echo PHP_EOL;
 
-
                     ColorCLI::headerOver('New name:  ').
                         ColorCLI::primary(substr($newName, 0, 299)).
                         ColorCLI::headerOver('Old name:  ').

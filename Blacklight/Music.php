@@ -499,8 +499,7 @@ class Music
 
         if ($musicId) {
             if ($this->echooutput) {
-
-                    ColorCLI::header(PHP_EOL.'Added/updated album: ').
+                ColorCLI::header(PHP_EOL.'Added/updated album: ').
                     ColorCLI::alternateOver('   Artist: ').
                     ColorCLI::primary($mus['artist']).
                     ColorCLI::alternateOver('   Title:  ').
@@ -517,7 +516,7 @@ class Music
                     $artist = 'Artist: '.$mus['artist'].', Album: ';
                 }
 
-                    ColorCLI::headerOver('Nothing to update: ').
+                ColorCLI::headerOver('Nothing to update: ').
                     ColorCLI::primaryOver(
                         $artist.
                         $mus['title'].
@@ -632,8 +631,7 @@ class Music
         })->whereIn('categories_id', [Category::MUSIC_MP3, Category::MUSIC_LOSSLESS, Category::MUSIC_OTHER])->orderBy('postdate', 'DESC')->limit($this->musicqty)->get(['searchname', 'id']);
         if ($res instanceof \Traversable && ! empty($res)) {
             if ($this->echooutput) {
-
-                    ColorCLI::header(
+                ColorCLI::header(
                         'Processing '.$res->count().' music release(s).'
                     );
             }

@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 $covers = $updated = $deleted = 0;
 
 if ($argc === 1 || $argv[1] !== 'true') {
-   ColorCLI::error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n");
-   exit();
+    ColorCLI::error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n");
+    exit();
 }
 
 $pdo = DB::connection()->getPdo();
