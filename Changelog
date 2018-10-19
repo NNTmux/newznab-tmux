@@ -1,4 +1,5 @@
 2018-10-19 DariusIII
+	* Chg: Use Storage facade to manage temp files
 	* Fix: Fix invalid argument supplied for foreach error in matchPreDbFiles function
 	* Chg: Use kevinlebron/colors.php in monitor pane
 	* Chg: Use league/climate in ColorCLI class

@@ -28,6 +28,7 @@ use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
 use FFMpeg\Filters\Video\ResizeFilter;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessAdditional
 {
@@ -413,13 +414,12 @@ class ProcessAdditional
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli') && (strtolower(PHP_SAPI) === 'cli'));
 
-        $this->pdo = DB::connection()->getPdo();
         $this->_nntp = $options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI]);
 
         $this->_nzb = $options['NZB'] instanceof NZB ? $options['NZB'] : new NZB();
         $this->_archiveInfo = new ArchiveInfo();
         $this->_categorize = $options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize();
-        $this->_nameFixer = $options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]);
+        $this->_nameFixer = $options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Categorize' => $this->_categorize]);
         $this->_releaseExtra = $options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra();
         $this->_releaseImage = $options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage();
         $this->_par2Info = new Par2Info();
@@ -762,9 +762,7 @@ class ProcessAdditional
     protected function _recursivePathDelete($path, $ignoredFolders = []): void
     {
         if (is_dir($path)) {
-            $files = glob(rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'*');
-
-            foreach ($files as $file) {
+            foreach (Storage::files($path) as $file) {
                 $this->_recursivePathDelete($file, $ignoredFolders);
             }
 
@@ -772,9 +770,9 @@ class ProcessAdditional
                 return;
             }
 
-            @rmdir($path);
+            Storage::deleteDirectory($path);
         } elseif (is_file($path)) {
-            @unlink($path);
+            Storage::delete($path);
         }
     }
 
