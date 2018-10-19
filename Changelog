@@ -1,3 +1,5 @@
+2018-10-19 DariusIII
+	* Chg: Increase matching percentage for matchPreDbFiles function
 2018-10-18 DariusIII
 	* Chg: Remove unused $this->pdo instances
 	* Chg: Try to further improve speed and RAM consumption of matchPreDbFiles function

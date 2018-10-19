@@ -1209,7 +1209,7 @@ class NameFixer
                     $preFtMatch = $this->preMatch($result['filename']);
                     if ($preFtMatch[0] === true) {
                         similar_text($preMatch[1], $preFtMatch[1], $percent);
-                        if ($percent >= 85) {
+                        if ($percent >= 93) {
                             $this->_fileName = $result['filename'];
                             $release->filename = $this->_fileName;
                             if ($result['title'] !== $release->searchname) {
