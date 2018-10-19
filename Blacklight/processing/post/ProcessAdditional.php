@@ -28,7 +28,7 @@ use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
 use FFMpeg\Filters\Video\ResizeFilter;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ProcessAdditional
 {
@@ -582,7 +582,7 @@ class ProcessAdditional
 
         if (! is_dir($this->_mainTmpPath)) {
             $old = umask(0777);
-            if (! Storage::makeDirectory($this->_mainTmpPath) && ! is_dir($this->_mainTmpPath)) {
+            if (! File::makeDirectory($this->_mainTmpPath, 0777, true, true) && ! is_dir($this->_mainTmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->_mainTmpPath));
             }
             @chmod($this->_mainTmpPath, 0777);
@@ -762,17 +762,16 @@ class ProcessAdditional
     protected function _recursivePathDelete($path, $ignoredFolders = []): void
     {
         if (is_dir($path)) {
-            foreach (Storage::files($path) as $file) {
-                $this->_recursivePathDelete($file, $ignoredFolders);
-            }
-
             if (\in_array($path, $ignoredFolders, false)) {
                 return;
             }
+            foreach (File::files($path) as $file) {
+                $this->_recursivePathDelete($file, $ignoredFolders);
+            }
 
-            Storage::deleteDirectory($path);
+            File::deleteDirectory($path);
         } elseif (is_file($path)) {
-            Storage::delete($path);
+            File::delete($path);
         }
     }
 
@@ -788,7 +787,7 @@ class ProcessAdditional
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
         if (! is_dir($this->tmpPath)) {
             $old = umask(0777);
-            if (! Storage::makeDirectory($this->tmpPath) && ! is_dir($this->tmpPath)) {
+            if (! mkdir($this->tmpPath) && ! is_dir($this->tmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->tmpPath));
             }
             @chmod($this->tmpPath, 0777);

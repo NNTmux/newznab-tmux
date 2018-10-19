@@ -1,4 +1,5 @@
 2018-10-19 DariusIII
+	* Chg: Replace Storage with File facade in ProcessAdditional class
 	* Chg: Use Storage facade to create temporary directory
 	* Chg: Use Storage facade to manage temp files
 	* Fix: Fix invalid argument supplied for foreach error in matchPreDbFiles function
