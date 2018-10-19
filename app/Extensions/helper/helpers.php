@@ -1,6 +1,7 @@
 <?php
 
 use Blacklight\XXX;
+use Colors\Color;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -178,6 +179,18 @@ if (! function_exists('makeFieldLinks')) {
         function getSimilarName($name): string
         {
             return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+        }
+    }
+
+    if (! function_exists('color')) {
+        /**
+         * @param string $string
+         *
+         * @return \Colors\Color
+         */
+        function color($string = ''): Color
+        {
+            return new Color($string);
         }
     }
 
