@@ -86,8 +86,7 @@ class ForkingImportNZB extends Forking
         $this->process_work(true);
 
         if (config('nntmux.echocli')) {
-
-                ColorCLI::header(
+            ColorCLI::header(
                     'Multi-processing for import finished in '.(microtime(true) - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
                 );

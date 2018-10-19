@@ -399,16 +399,14 @@ class AniDB
                 $AniDBAPIArray = $this->getAniDbAPI($anidb['anidbid']);
 
                 if ($this->banned === true) {
-
-                        ColorCLI::error(
+                    ColorCLI::error(
                             'AniDB Banned, import will fail, please wait 24 hours before retrying.'
                         );
                     exit;
                 }
 
                 if ($AniDBAPIArray === false && $this->echooutput) {
-
-                        ColorCLI::info(
+                    ColorCLI::info(
                             'Anime ID: '.$anidb['anidbid'].' not available for update yet.'
                         );
                 } else {
@@ -420,16 +418,14 @@ class AniDB
             $AniDBAPIArray = $this->getAniDbAPI($anidbId);
 
             if ($this->banned === true) {
-
-                    ColorCLI::error(
+                ColorCLI::error(
                         'AniDB Banned, import will fail, please wait 24 hours before retrying.'
                     );
                 exit;
             }
 
             if ($AniDBAPIArray === false && $this->echooutput) {
-
-                    ColorCLI::info(
+                ColorCLI::info(
                         'Anime ID: '.$anidbId.' not available for update yet.'
                     );
             } else {

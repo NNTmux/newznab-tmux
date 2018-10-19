@@ -254,7 +254,6 @@ class AniDB
 
                 $this->updateRelease($anidbId->anidbid, $release->id);
 
-
                 ColorCLI::headerOver('Matched '.$type.' AniDB ID: ').
                     ColorCLI::primary($anidbId->anidbid).
                     ColorCLI::alternateOver('   Title: ').
