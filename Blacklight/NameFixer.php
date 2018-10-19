@@ -1192,35 +1192,35 @@ class NameFixer
     {
         $matching = 0;
 
-            foreach (explode('||', $release->filename) as $key => $fileName) {
-                $this->_fileName = $fileName;
-                $this->_cleanMatchFiles();
-                $preMatch = $this->preMatch($this->_fileName);
-                if ($preMatch[0] === true) {
-                    $results = Predb::search($preMatch[1])->get()->chunk(1000)->first();
-                    if (! empty($results)) {
-                        foreach ($results as $result) {
-                            if (! empty($result)) {
-                                $preFtMatch = $this->preMatch($result['filename']);
-                                if ($preFtMatch[0] === true) {
-                                    similar_text($preMatch[1], $preFtMatch[1], $percent);
-                                    if ($percent >= 93) {
-                                        $this->_fileName = $result['filename'];
-                                        $release->filename = $this->_fileName;
-                                        if ($result['title'] !== $release->searchname) {
-                                            $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
-                                        } else {
-                                            $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
-                                        }
-                                        $matching++;
-                                        break;
+        foreach (explode('||', $release->filename) as $key => $fileName) {
+            $this->_fileName = $fileName;
+            $this->_cleanMatchFiles();
+            $preMatch = $this->preMatch($this->_fileName);
+            if ($preMatch[0] === true) {
+                $results = Predb::search($preMatch[1])->get()->chunk(1000)->first();
+                if (! empty($results)) {
+                    foreach ($results as $result) {
+                        if (! empty($result)) {
+                            $preFtMatch = $this->preMatch($result['filename']);
+                            if ($preFtMatch[0] === true) {
+                                similar_text($preMatch[1], $preFtMatch[1], $percent);
+                                if ($percent >= 93) {
+                                    $this->_fileName = $result['filename'];
+                                    $release->filename = $this->_fileName;
+                                    if ($result['title'] !== $release->searchname) {
+                                        $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                                    } else {
+                                        $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
                                     }
+                                    $matching++;
+                                    break;
                                 }
                             }
                         }
                     }
                 }
             }
+        }
 
         return $matching;
     }
