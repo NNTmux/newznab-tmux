@@ -1,4 +1,5 @@
 2018-10-20 DariusIII
+	* Chg: Use object casting instead of row2Object function, remove now unused Sites class
 	* Chg: Update phpstan/phpstan to version 0.10.4
 2018-10-19 DariusIII
 	* Chg: Replace Storage with File facade in ProcessAdditional class

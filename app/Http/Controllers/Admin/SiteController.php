@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use Blacklight\Sites;
 use App\Models\Release;
 use Blacklight\SABnzbd;
 use App\Models\Category;
@@ -23,8 +22,6 @@ class SiteController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-
-        $sites = new Sites();
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -63,7 +60,7 @@ class SiteController extends BasePageController
                 }
 
                 $this->smarty->assign('error', $error);
-                $site = $sites->row2Object($request->all());
+                $site = (object) $request->all();
                 $this->smarty->assign('site', $site);
 
                 break;
