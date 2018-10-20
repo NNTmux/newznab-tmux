@@ -1,3 +1,5 @@
+2018-10-20 DariusIII
+	* Chg: Update phpstan/phpstan to version 0.10.4
 2018-10-19 DariusIII
 	* Chg: Replace Storage with File facade in ProcessAdditional class
 	* Chg: Use Storage facade to create temporary directory
