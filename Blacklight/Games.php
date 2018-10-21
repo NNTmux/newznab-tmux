@@ -595,8 +595,10 @@ class Games
                             ]);
 
                             $publishers = [];
-                            foreach ($this->_gameResults->publishers as $publisher) {
-                                $publishers[] = IGDB::getCompany($publisher)->name;
+                            if (! empty($this->_gameResults->publishers)) {
+                                foreach ($this->_gameResults->publishers as $publisher) {
+                                    $publishers[] = IGDB::getCompany($publisher)->name;
+                                }
                             }
 
                             $genres = [];
