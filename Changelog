@@ -1,3 +1,5 @@
+2018-10-21 DariusIII
+	* Chg: Update filp/whoops to version 2.3.0 and phpstan/phpstan to version 0.10.5
 2018-10-20 DariusIII
 	* Chg: Update ProfileController
 	* Chg: Use object casting instead of row2Object function, remove now unused Sites class
