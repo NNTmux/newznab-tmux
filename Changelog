@@ -1,3 +1,5 @@
+2018-10-22 DariusIII
+	* Chg: Add check if the functions are ran from CLI so ColorCLI does not throw an error if its ran from web(Movie class)
 2018-10-21 DariusIII
 	* Chg: Try to prevent error on missing publishers from IGDB results
 	* Chg: Update filp/whoops to version 2.3.0 and phpstan/phpstan to version 0.10.5
