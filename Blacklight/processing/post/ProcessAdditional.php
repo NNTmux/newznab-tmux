@@ -20,6 +20,7 @@ use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
 use FFMpeg\Format\Video\Ogg;
+use Mhor\MediaInfo\MediaInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use FFMpeg\Coordinate\TimeCode;
@@ -29,7 +30,6 @@ use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use FFMpeg\Filters\Video\ResizeFilter;
-use Mhor\MediaInfo\MediaInfo;
 
 class ProcessAdditional
 {
@@ -2071,7 +2071,6 @@ class ProcessAdditional
 
         // Look for the video file.
         if (is_file($fileLocation)) {
-
             $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
             // Check if we got it.
