@@ -353,7 +353,7 @@ class ReleaseExtra
             ReleaseSubtitle::query()->insert([
                 'releases_id' => $releaseID,
                 'subsid' => $subsID,
-                'subslanguage' => $subsLanguage,
+                'subslanguage' => $subsLanguage[1],
             ]);
         }
     }
