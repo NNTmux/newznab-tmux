@@ -603,8 +603,10 @@ class Games
 
                             $genres = [];
 
-                            foreach ($this->_gameResults->themes as $theme) {
-                                $genres[] = IGDB::getTheme($theme)->name;
+                            if (! empty($this->_gameResults->themes)) {
+                                foreach ($this->_gameResults->themes as $theme) {
+                                    $genres[] = IGDB::getTheme($theme)->name;
+                                }
                             }
 
                             $genreName = $this->_matchGenre(implode(',', $genres));

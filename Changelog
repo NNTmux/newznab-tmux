@@ -1,4 +1,5 @@
 2018-10-22 DariusIII
+	* Chg: Add check for existing theme data from IGDB
 	* Chg: Update Versions class
 	* CHg: Check for TBA date in steam games information check
 	* Chg: Add check if the functions are ran from CLI so ColorCLI does not throw an error if its ran from web(Movie class)
