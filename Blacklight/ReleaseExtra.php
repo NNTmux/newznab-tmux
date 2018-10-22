@@ -126,13 +126,13 @@ class ReleaseExtra
         $videos = $arrXml->getVideos();
         $subtitles = $arrXml->getSubtitles();
 
-        if (! empty($general->get('unique_id')->getShortName()) && (int) $general->get('unique_id')->getShortName() !== 1) {
+        if (! empty($general->get('unique_id')) && (int) $general->get('unique_id')->getShortName() !== 1) {
             $uniqueId = $general->get('unique_id')->getShortName();
             $this->addUID($releaseID, $uniqueId);
         }
 
         if ($general->get('format') !== null) {
-            $containerFormat = $general->get('format')->getFullName;
+            $containerFormat = $general->get('format')->getFullName();
         }
 
         if ($general->get('overall_bit_rate') !== null) {
@@ -147,7 +147,7 @@ class ReleaseExtra
 
         foreach ($videos as $video) {
             if ($video->get('duration') !== null) {
-                $videoDuration = $general->get('duration')->getMiliseconds();
+                $videoDuration = $general->get('duration')->getMilliseconds();
             }
 
             if ($video->get('format') !== null) {
