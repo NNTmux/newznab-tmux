@@ -481,8 +481,8 @@ class Games
                 }
 
                 if (! empty($this->_gameResults['releasedate'])) {
-                    $dateReleased = $this->_gameResults['releasedate'];
-                    $game['releasedate'] = Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
+                    $dateReleased = $this->_gameResults['releasedate'] === 'TBA' ? '' : $this->_gameResults['releasedate'];
+                    $game['releasedate'] = $this->_gameResults['releasedate'] === '' ? null : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
                 }
 
                 if (! empty($this->_gameResults['description'])) {
