@@ -615,7 +615,7 @@ class Games
                                 'title' => $this->_gameResults->name,
                                 'asin' => $this->_gameResults->id,
                                 'review' => $this->_gameResults->summary ?? '',
-                                'coverurl' => 'https:'.$this->_gameResults->cover->url ?? '',
+                                'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover->url : '',
                                 'releasedate' => Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
                                 'esrb' => round($this->_gameResults->aggregated_rating).'%' ?? 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',

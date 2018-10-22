@@ -1,4 +1,5 @@
 2018-10-22 DariusIII
+	* Chg: Add check to see if the cover is set in IGDB
 	* Chg: Add check for existing theme data from IGDB
 	* Chg: Update Versions class
 	* CHg: Check for TBA date in steam games information check
