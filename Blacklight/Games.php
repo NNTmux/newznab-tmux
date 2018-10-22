@@ -616,10 +616,10 @@ class Games
                                 'asin' => $this->_gameResults->id,
                                 'review' => $this->_gameResults->summary ?? '',
                                 'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover->url : '',
-                                'releasedate' => Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
+                                'releasedate' => isset($this->_gameResults->first_release_date) ? Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
                                 'esrb' => round($this->_gameResults->aggregated_rating).'%' ?? 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
-                                'backdropurl' => 'https:'.$this->_gameResults->screenshots[0]->url ?? '',
+                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.$this->_gameResults->screenshots[0]->url : '',
                                 'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             ];
                         } else {
