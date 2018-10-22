@@ -29,6 +29,7 @@ use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use FFMpeg\Filters\Video\ResizeFilter;
+use Mhor\MediaInfo\MediaInfo;
 
 class ProcessAdditional
 {
@@ -390,6 +391,11 @@ class ProcessAdditional
     private $ffprobe;
 
     /**
+     * @var \Mhor\MediaInfo\MediaInfo
+     */
+    private $mediaInfo;
+
+    /**
      * ProcessAdditional constructor.
      *
      * @param array $options
@@ -427,6 +433,9 @@ class ProcessAdditional
         $this->sphinx = $options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch();
         $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
+        $this->mediaInfo = new MediaInfo();
+        $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
+        $this->mediaInfo->setConfig('command', Settings::settingValue('apps..mediainfopath'));
 
         $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
         $this->_maxNestedLevels = (int) Settings::settingValue('..maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('..maxnestedlevels');
@@ -1905,9 +1914,9 @@ class ProcessAdditional
 
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
-                $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time));
-                $sample->save($fileName);
+                $this->ffmpeg->open($fileLocation)
+                    ->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
+                    ->save($fileName);
             }
 
             // Check if the file exists.
@@ -2063,14 +2072,11 @@ class ProcessAdditional
         // Look for the video file.
         if (is_file($fileLocation)) {
 
-            // Run media info on it.
-            $xmlArray = runCmd(
-                $this->_killString.Settings::settingValue('apps..mediainfopath').'" --Output=XML "'.$fileLocation.'"'
-            );
+            $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
             // Check if we got it.
 
-            if (! preg_match('/<track type="(Audio|Video)">/i', $xmlArray)) {
+            if ($xmlArray === null) {
                 return false;
             }
 

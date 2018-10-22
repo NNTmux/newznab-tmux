@@ -154,6 +154,7 @@
     "league/climate": "^3.4",
     "mayconbordin/l5-fixtures": "dev-master",
     "messerli90/igdb": "^1.0",
+    "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
     "nzedb/Git.php": "dev-master",
     "php-ffmpeg/php-ffmpeg": "^0.13.0",
