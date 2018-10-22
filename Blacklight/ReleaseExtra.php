@@ -125,142 +125,149 @@ class ReleaseExtra
         $audios = $arrXml->getAudios();
         $videos = $arrXml->getVideos();
         $subtitles = $arrXml->getSubtitles();
-
-        if (! empty($general->get('unique_id')) && (int) $general->get('unique_id')->getShortName() !== 1) {
-            $uniqueId = $general->get('unique_id')->getShortName();
-            $this->addUID($releaseID, $uniqueId);
-        }
-
-        if ($general->get('format') !== null) {
-            $containerFormat = $general->get('format')->getFullName();
-        }
-
-        if ($general->get('overall_bit_rate') !== null) {
-            $overallBitRate = $general->get('overall_bit_rate')->getFullName();
-        }
-
-        if ($general->get('overall_bit_rate') !== null) {
-            $overallBitRate = $general->get('overall_bit_rate')->getFullName();
-        }
-
-        $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = $videoBitRate = '';
-
-        foreach ($videos as $video) {
-            if ($video->get('duration') !== null) {
-                $videoDuration = $general->get('duration')->getMilliseconds();
+        if (! empty($general)) {
+            if (! empty($general->get('unique_id')) && (int) $general->get('unique_id')->getShortName() !== 1) {
+                $uniqueId = $general->get('unique_id')->getShortName();
+                $this->addUID($releaseID, $uniqueId);
             }
 
-            if ($video->get('format') !== null) {
-                $videoFormat = $video->get('format')->getFullName();
+            if ($general->get('format') !== null) {
+                $containerFormat = $general->get('format')->getFullName();
             }
 
-            if ($video->get('codec_id') !== null) {
-                $videoCodec = $video->get('codec_id');
+            if ($general->get('overall_bit_rate') !== null) {
+                $overallBitRate = $general->get('overall_bit_rate')->getFullName();
             }
 
-            if ($video->get('width') !== null) {
-                $videoWidth = $video->get('width')->getAbsoluteValue();
+            if ($general->get('overall_bit_rate') !== null) {
+                $overallBitRate = $general->get('overall_bit_rate')->getFullName();
             }
 
-            if ($video->get('height') !== null) {
-                $videoHeight = $video->get('height')->getAbsoluteValue();
+            $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = $videoBitRate = '';
+
+            if (! empty($videos)) {
+                foreach ($videos as $video) {
+                    if ($video->get('duration') !== null) {
+                        $videoDuration = $general->get('duration')->getMilliseconds();
+                    }
+
+                    if ($video->get('format') !== null) {
+                        $videoFormat = $video->get('format')->getFullName();
+                    }
+
+                    if ($video->get('codec_id') !== null) {
+                        $videoCodec = $video->get('codec_id');
+                    }
+
+                    if ($video->get('width') !== null) {
+                        $videoWidth = $video->get('width')->getAbsoluteValue();
+                    }
+
+                    if ($video->get('height') !== null) {
+                        $videoHeight = $video->get('height')->getAbsoluteValue();
+                    }
+
+                    if ($video->get('display_aspect_ratio') !== null) {
+                        $videoAspect = $video->get('display_aspect_ratio')->getTextValue();
+                    }
+
+                    if ($video->get('frame_rate') !== null) {
+                        $videoFrameRate = $video->get('frame_rate')->getTextValue();
+                    }
+
+                    if ($video->get('encoded_library') !== null) {
+                        $videoLibrary = $video->get('encoded_library');
+                    }
+
+                    if ($video->get('encoded_library_version') !== null) {
+                        $videoLibrary .= $video->get('encoded_library_version');
+                    }
+
+                    if ($video->get('writing_library') !== null) {
+                        $videoLibrary = $video->get('writing_library')->getFullName();
+                    }
+
+                    if ($video->get('nominal_bit_rate') !== null) {
+                        $videoBitRate = $video->get('nominal_bit_rate')->getTextValue();
+                    }
+
+                    if (! empty($videoBitRate)) {
+                        $overallBitRate = $videoBitRate;
+                    }
+
+                    $this->addVideo($releaseID, $containerFormat, $overallBitRate, $videoDuration, $videoFormat, $videoCodec, $videoWidth, $videoHeight, $videoAspect, $videoFrameRate, $videoLibrary);
+                }
             }
 
-            if ($video->get('display_aspect_ratio') !== null) {
-                $videoAspect = $video->get('display_aspect_ratio')->getTextValue();
+            $audioID = 1;
+            $audioFormat = $audioMode = $audioBitRateMode = $audioBitRate = $audioChannels = $audioSampleRate = $audioLibrary = $audioLanguage = $audioTitle = '';
+
+            if (! empty($audios)) {
+                foreach ($audios as $audio) {
+                    if ($audio->get('id') !== null) {
+                        $audioID = $audio->get('id')->getFullName();
+                    }
+
+                    if ($audio->get('format') !== null) {
+                        $audioFormat = $audio->get('format')->getFullName();
+                    }
+
+                    if ($audio->get('mode') !== null) {
+                        $audioMode = $audio->get('mode')->getFullName();
+                    }
+
+                    if ($audio->get('format_settings_sbr') !== null) {
+                        $audioMode = $audio->get('format_settings_sbr')->getFullName();
+                    }
+
+                    if ($audio->get('bit_rate_mode') !== null) {
+                        $audioBitRateMode = $audio->get('bit_rate_mode')->getFullName();
+                    }
+
+                    if ($audio->get('bit_rate') !== null) {
+                        $audioBitRate = $audio->get('bit_rate')->getTextValue();
+                    }
+
+                    if ($audio->get('channel_s') !== null) {
+                        $audioChannels = $audio->get('channel_s')->getAbsoluteValue();
+                    }
+
+                    if ($audio->get('sampling_rate') !== null) {
+                        $audioSampleRate = $audio->get('sampling_rate')->getTextValue();
+                    }
+
+                    if ($audio->get('encoded_library') !== null) {
+                        $audioLibrary = $audio->get('encoded_library');
+                    }
+
+                    if ($audio->get('language') !== null) {
+                        $audioLanguage = $audio->get('language');
+                    }
+
+                    if ($audio->get('title') !== null) {
+                        $audioTitle = $audio->get('title');
+                    }
+
+                    $this->addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle);
+                }
             }
 
-            if ($video->get('frame_rate') !== null) {
-                $videoFrameRate = $video->get('frame_rate')->getTextValue();
+            if (! empty($subtitles)) {
+                foreach ($subtitles as $subtitle) {
+                    $subsID = 1;
+                    $subsLanguage = 'Unknown';
+
+                    if ($subtitle->get('id') !== null) {
+                        $subsID = $subtitle->get('id')->getFullName();
+                    }
+
+                    if ($subtitle->get('language') !== null) {
+                        $subsLanguage = $subtitle->get('language');
+                    }
+
+                    $this->addSubs($releaseID, $subsID, $subsLanguage);
+                }
             }
-
-            if ($video->get('encoded_library') !== null) {
-                $videoLibrary = $video->get('encoded_library');
-            }
-
-            if ($video->get('encoded_library_version') !== null) {
-                $videoLibrary .= $video->get('encoded_library_version');
-            }
-
-            if ($video->get('writing_library') !== null) {
-                $videoLibrary = $video->get('writing_library')->getFullName();
-            }
-
-            if ($video->get('nominal_bit_rate') !== null) {
-                $videoBitRate = $video->get('nominal_bit_rate')->getTextValue();
-            }
-
-            if (! empty($videoBitRate)) {
-                $overallBitRate = $videoBitRate;
-            }
-
-            $this->addVideo($releaseID, $containerFormat, $overallBitRate, $videoDuration, $videoFormat, $videoCodec, $videoWidth, $videoHeight, $videoAspect, $videoFrameRate, $videoLibrary);
-        }
-
-        $audioID = 1;
-        $audioFormat = $audioMode = $audioBitRateMode = $audioBitRate = $audioChannels = $audioSampleRate = $audioLibrary = $audioLanguage = $audioTitle = '';
-
-        foreach ($audios as $audio) {
-            if ($audio->get('id') !== null) {
-                $audioID = $audio->get('id')->getFullName();
-            }
-
-            if ($audio->get('format') !== null) {
-                $audioFormat = $audio->get('format')->getFullName();
-            }
-
-            if ($audio->get('mode') !== null) {
-                $audioMode = $audio->get('mode')->getFullName();
-            }
-
-            if ($audio->get('format_settings_sbr') !== null) {
-                $audioMode = $audio->get('format_settings_sbr')->getFullName();
-            }
-
-            if ($audio->get('bit_rate_mode') !== null) {
-                $audioBitRateMode = $audio->get('bit_rate_mode')->getFullName();
-            }
-
-            if ($audio->get('bit_rate') !== null) {
-                $audioBitRate = $audio->get('bit_rate')->getTextValue();
-            }
-
-            if ($audio->get('channel_s') !== null) {
-                $audioChannels = $audio->get('channel_s')->getAbsoluteValue();
-            }
-
-            if ($audio->get('sampling_rate') !== null) {
-                $audioSampleRate = $audio->get('sampling_rate')->getTextValue();
-            }
-
-            if ($audio->get('encoded_library') !== null) {
-                $audioLibrary = $audio->get('encoded_library');
-            }
-
-            if ($audio->get('language') !== null) {
-                $audioLanguage = $audio->get('language');
-            }
-
-            if ($audio->get('title') !== null) {
-                $audioTitle = $audio->get('title');
-            }
-
-            $this->addAudio($releaseID, $audioID, $audioFormat, $audioMode, $audioBitRateMode, $audioBitRate, $audioChannels, $audioSampleRate, $audioLibrary, $audioLanguage, $audioTitle);
-        }
-
-        foreach ($subtitles as $subtitle) {
-            $subsID = 1;
-            $subsLanguage = 'Unknown';
-
-            if ($subtitle->get('id') !== null) {
-                $subsID = $subtitle->get('id')->getFullName();
-            }
-
-            if ($subtitle->get('language') !== null) {
-                $subsLanguage = $subtitle->get('language');
-            }
-
-            $this->addSubs($releaseID, $subsID, $subsLanguage);
         }
     }
 
