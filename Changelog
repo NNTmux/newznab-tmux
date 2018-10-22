@@ -1,4 +1,5 @@
 2018-10-22 DariusIII
+	* Chg: Fetch only one audio language from array from mediainfo
 	* Chg: Use new mediainfo managing library
 	* Chg: Define STDOUT to prevent errors in web movie info update
 	* Chg: Add check to see if the cover is set in IGDB

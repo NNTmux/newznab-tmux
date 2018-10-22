@@ -139,10 +139,6 @@ class ReleaseExtra
                 $overallBitRate = $general->get('overall_bit_rate')->getFullName();
             }
 
-            if ($general->get('overall_bit_rate') !== null) {
-                $overallBitRate = $general->get('overall_bit_rate')->getFullName();
-            }
-
             $videoDuration = $videoFormat = $videoCodec = $videoWidth = $videoHeight = $videoAspect = $videoFrameRate = $videoLibrary = $videoBitRate = '';
 
             if (! empty($videos)) {
@@ -210,10 +206,6 @@ class ReleaseExtra
 
                     if ($audio->get('format') !== null) {
                         $audioFormat = $audio->get('format')->getFullName();
-                    }
-
-                    if ($audio->get('mode') !== null) {
-                        $audioMode = $audio->get('mode')->getFullName();
                     }
 
                     if ($audio->get('format_settings_sbr') !== null) {
@@ -342,7 +334,7 @@ class ReleaseExtra
                     'audiochannels' => \is_array($audioChannels) ? implode($audioChannels) : $audioChannels,
                     'audiosamplerate' => \is_array($audioSampleRate) ? implode($audioSampleRate) : $audioSampleRate,
                     'audiolibrary' => \is_array($audioLibrary) ? implode($audioLibrary) : $audioLibrary,
-                    'audiolanguage' => \is_array($audioLanguage) ? implode($audioLanguage) : $audioLanguage,
+                    'audiolanguage' => $audioLanguage[1],
                     'audiotitle' => \is_array($audioTitle) ? implode($audioTitle) : $audioTitle,
                 ]);
         }
