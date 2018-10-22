@@ -285,7 +285,7 @@ class Versions
 
         if ($this->_xml === false) {
             if (Utility::isCLI()) {
-                ColorCLI::error('Your versions XML file ('.$filepath. ') is broken, try updating from git.');
+                ColorCLI::error('Your versions XML file ('.$filepath.') is broken, try updating from git.');
             }
             throw new \RuntimeException('Failed to open versions XML file '.$filepath);
         }
