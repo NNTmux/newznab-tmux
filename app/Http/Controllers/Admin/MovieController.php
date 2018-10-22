@@ -44,7 +44,7 @@ class MovieController extends BasePageController
      */
     public function create(Request $request)
     {
-        if(! \defined('STDOUT')) {
+        if (! \defined('STDOUT')) {
             \define('STDOUT', fopen('php://stdout', 'wb'));
         }
         $this->setAdminPrefs();
