@@ -334,7 +334,7 @@ class ReleaseExtra
                     'audiochannels' => \is_array($audioChannels) ? implode($audioChannels) : $audioChannels,
                     'audiosamplerate' => \is_array($audioSampleRate) ? implode($audioSampleRate) : $audioSampleRate,
                     'audiolibrary' => \is_array($audioLibrary) ? implode($audioLibrary) : $audioLibrary,
-                    'audiolanguage' => $audioLanguage[1] ?? '',
+                    'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage[0] : '',
                     'audiotitle' => \is_array($audioTitle) ? implode($audioTitle) : $audioTitle,
                 ]);
         }
@@ -352,7 +352,7 @@ class ReleaseExtra
             ReleaseSubtitle::query()->insert([
                 'releases_id' => $releaseID,
                 'subsid' => $subsID,
-                'subslanguage' => $subsLanguage[1] ?? '',
+                'subslanguage' => ! empty($subsLanguage) ? $subsLanguage[0] : '',
             ]);
         }
     }
