@@ -1462,16 +1462,16 @@
         },
         {
             "name": "bower-asset/tinymce-dist",
-            "version": "4.8.3",
+            "version": "4.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "e6ad606b0da07cc7d1847f01d5d89b42920d5bc2"
+                "reference": "bf8376eb0006effc20c10202bbb8abbfe4cfd310"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/e6ad606b0da07cc7d1847f01d5d89b42920d5bc2",
-                "reference": "e6ad606b0da07cc7d1847f01d5d89b42920d5bc2",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/bf8376eb0006effc20c10202bbb8abbfe4cfd310",
+                "reference": "bf8376eb0006effc20c10202bbb8abbfe4cfd310",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1496,7 +1496,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2018-09-13T14:31:22+00:00"
+            "time": "2018-10-23T12:33:19+00:00"
         },
         {
             "name": "cache/adapter-common",
@@ -8920,16 +8920,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "a9f129b99df316f847584d482c89c14a9f796e2b"
+                "reference": "bc0fd11bc455cc20ee4b5edabc63ebbf859324c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/a9f129b99df316f847584d482c89c14a9f796e2b",
-                "reference": "a9f129b99df316f847584d482c89c14a9f796e2b",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/bc0fd11bc455cc20ee4b5edabc63ebbf859324c7",
+                "reference": "bc0fd11bc455cc20ee4b5edabc63ebbf859324c7",
                 "shasum": ""
             },
             "require": {
@@ -8977,7 +8977,7 @@
                 "throwable",
                 "whoops"
             ],
-            "time": "2018-10-20T09:00:00+00:00"
+            "time": "2018-10-23T09:00:00+00:00"
         },
         {
             "name": "fzaninotto/faker",
