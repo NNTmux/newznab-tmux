@@ -295,7 +295,7 @@ class ReleaseExtra
                     'releases_id' => $releaseID,
                     'containerformat' => $containerFormat,
                     'overallbitrate' => $overallBitRate,
-                    'videoduration' => $videoDuration,
+                    'videoduration' => is_numeric($videoDuration) ? realDuration($videoDuration) : $videoDuration,
                     'videoformat' => $videoFormat,
                     'videocodec' => $videoCodec,
                     'videowidth' => $videoWidth,

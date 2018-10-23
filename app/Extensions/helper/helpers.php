@@ -271,4 +271,17 @@ if (! function_exists('makeFieldLinks')) {
             return DB::connection()->getPdo()->quote($string);
         }
     }
+
+    if (! function_exists('realDuration')) {
+
+        /**
+         * @param $milliseconds
+         *
+         * @return string
+         */
+        function realDuration($milliseconds) {
+            $time = round($milliseconds/1000);
+            return sprintf('%02dh:%02dm:%02ds', $time/3600,$time/60%60, $time%60);
+        }
+    }
 }
