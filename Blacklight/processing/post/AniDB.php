@@ -173,6 +173,8 @@ class AniDB
         )
         ) {
             $matches['epno'] = 1;
+        } elseif (preg_match('#^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(?P<title>[\w -]+)?\s+-\s+(?P<epno>\d+)\s*(\[\d+p\])?$#', $cleanName, $matches)) {
+            $matches['epno'] = (int) $matches['epno'];
         } else {
             $this->status = self::PROC_EXTFAIL;
         }
