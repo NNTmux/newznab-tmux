@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7c0f640d2c9872c181f6dd1581652905",
+    "content-hash": "fe891424162955e68bf5bcdd3773941a",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -544,96 +544,6 @@
             ]
         },
         {
-            "name": "bower-asset/bootswatch",
-            "version": "v3.3.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thomaspark/bootswatch.git",
-                "reference": "4b0d3762f309326a6d66fa4ea18945a7fc11f8ef"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thomaspark/bootswatch/zipball/4b0d3762f309326a6d66fa4ea18945a7fc11f8ef",
-                "reference": "4b0d3762f309326a6d66fa4ea18945a7fc11f8ef",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/bootstrap": "~3.3.7"
-            },
-            "require-dev": {
-                "bower-asset/bootstrap-sass-official": "~3.3.7",
-                "bower-asset/font-awesome": "~4.0.0",
-                "bower-asset/html5shiv": "~3.7.0",
-                "bower-asset/respond": "~1.4.2"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-ignore": [
-                    "2",
-                    "api",
-                    "assets",
-                    "bower_components",
-                    "custom",
-                    "default",
-                    "global",
-                    "help",
-                    "tests",
-                    "_config.yml",
-                    ".gitignore",
-                    ".travis.yml",
-                    "CNAME",
-                    "composer.json",
-                    "favicon.ico",
-                    "Gemfile",
-                    "Gruntfile.js",
-                    "index.html",
-                    "package.json",
-                    "*/index.html"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Bootswatch is a collection of themes for Bootstrap.",
-            "time": "2016-07-30T21:56:26+00:00"
-        },
-        {
-            "name": "bower-asset/chosen",
-            "version": "v1.8.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/harvesthq/chosen-package.git",
-                "reference": "ad86732b668627c131e61ee8f0e6e9ed52e4db8d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/ad86732b668627c131e61ee8f0e6e9ed52e4db8d",
-                "reference": "ad86732b668627c131e61ee8f0e6e9ed52e4db8d",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "chosen.jquery.js",
-                    "chosen.css"
-                ],
-                "bower-asset-ignore": []
-            },
-            "license": [
-                "https://github.com/harvesthq/chosen/blob/master/LICENSE.md"
-            ],
-            "description": "Chosen is a JavaScript plugin that makes select boxes user-friendly. It is currently available in both jQuery and Prototype flavors.",
-            "keywords": [
-                "dropdown",
-                "form",
-                "input",
-                "multiselect",
-                "select",
-                "ui"
-            ],
-            "time": "2018-06-28T20:32:51+00:00"
-        },
-        {
             "name": "bower-asset/colorbox",
             "version": "1.6.4",
             "source": {
@@ -953,37 +863,6 @@
             "time": "2018-01-20T17:26:57+00:00"
         },
         {
-            "name": "bower-asset/jquery-2.2.x",
-            "version": "2.2.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
-                "reference": "c0185ab7c75aab88762c5aae780b9d83b80eda72"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/c0185ab7c75aab88762c5aae780b9d83b80eda72",
-                "reference": "c0185ab7c75aab88762c5aae780b9d83b80eda72",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "dist/jquery.js",
-                "bower-asset-ignore": [
-                    "package.json"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "keywords": [
-                "browser",
-                "javascript",
-                "jquery",
-                "library"
-            ]
-        },
-        {
             "name": "bower-asset/jquery-3.2.x",
             "version": "3.3.1",
             "source": {
@@ -1051,25 +930,6 @@
             ]
         },
         {
-            "name": "bower-asset/jquery-migrate-1.4.x",
-            "version": "1.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/appleboy/jquery-migrate.git",
-                "reference": "29077d39689bddad05036a537d49c4cf96488569"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/appleboy/jquery-migrate/zipball/29077d39689bddad05036a537d49c4cf96488569",
-                "reference": "29077d39689bddad05036a537d49c4cf96488569",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "jquery-migrate.js"
-            }
-        },
-        {
             "name": "bower-asset/jquery-migrate-3.0.x",
             "version": "3.0.0",
             "source": {
@@ -1117,104 +977,6 @@
                     "package.json"
                 ]
             }
-        },
-        {
-            "name": "bower-asset/material-design-iconic-font",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zavoloklom/material-design-iconic-font.git",
-                "reference": "a1cdb51dc417163d0f262806ffe290751b0e63d3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zavoloklom/material-design-iconic-font/zipball/a1cdb51dc417163d0f262806ffe290751b0e63d3",
-                "reference": "a1cdb51dc417163d0f262806ffe290751b0e63d3",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "./dist/css/material-design-iconic-font.min.css",
-                    "./dist/fonts/*"
-                ],
-                "bower-asset-ignore": [
-                    "*/.*",
-                    "node_modules/*",
-                    "*.json",
-                    "*.md"
-                ]
-            },
-            "license": [
-                "OFL-1.1",
-                "MIT"
-            ],
-            "description": "Material Design Iconic Font",
-            "keywords": [
-                "design",
-                "font",
-                "icons",
-                "material"
-            ]
-        },
-        {
-            "name": "bower-asset/materialize",
-            "version": "v0.98.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Dogfalo/materialize.git",
-                "reference": "138be0b945cc8e1ee24d76ab6c1240c3f3628565"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Dogfalo/materialize/zipball/138be0b945cc8e1ee24d76ab6c1240c3f3628565",
-                "reference": "138be0b945cc8e1ee24d76ab6c1240c3f3628565",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=2.1.1"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "bin/materialize.css",
-                    "bin/materialize.js"
-                ],
-                "bower-asset-ignore": [
-                    "jade/",
-                    ".gitignore",
-                    "CNAME",
-                    "css/",
-                    "bower.json",
-                    "README.md",
-                    "images/",
-                    "js/jquery.timeago.js",
-                    "js/init.js",
-                    "js/prism.js",
-                    "res/",
-                    "sass/style.scss",
-                    "sass/ghpages-materialize.scss",
-                    "**/*.html",
-                    "**/*.zip",
-                    "**/*.txt",
-                    "sitemap.xml",
-                    "package.json",
-                    "Gruntfile.js"
-                ]
-            },
-            "description": "A modern responsive front-end framework based on Material Design",
-            "keywords": [
-                "css",
-                "design",
-                "framework",
-                "front-end",
-                "js",
-                "material",
-                "mobile-first",
-                "responsive",
-                "sass",
-                "ux"
-            ]
         },
         {
             "name": "bower-asset/pace",
@@ -1337,63 +1099,6 @@
                 ]
             },
             "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
-        },
-        {
-            "name": "bower-asset/responsive-tables-js",
-            "version": "v1.0.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/smasala/responsive-tables-js.git",
-                "reference": "10c8ea1f59acb8a00dc4af898d0cd54a527eef5d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/smasala/responsive-tables-js/zipball/10c8ea1f59acb8a00dc4af898d0cd54a527eef5d",
-                "reference": "10c8ea1f59acb8a00dc4af898d0cd54a527eef5d",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": "dev-default|*"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "responsivetables.js",
-                "bower-asset-ignore": ""
-            },
-            "description": "JavaScript solution for supporting responsive tables",
-            "keywords": [
-                "javascript",
-                "jquery",
-                "responsive",
-                "table"
-            ]
-        },
-        {
-            "name": "bower-asset/select2",
-            "version": "4.0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/select2/select2.git",
-                "reference": "ebf10c93db7d6d7a0d1330119d4c6f32cbd231d7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/select2/select2/zipball/ebf10c93db7d6d7a0d1330119d4c6f32cbd231d7",
-                "reference": "ebf10c93db7d6d7a0d1330119d4c6f32cbd231d7",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "dist/js/select2.js",
-                    "src/scss/core.scss"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Select2 is a jQuery based replacement for select boxes. It supports searching, remote data sets, and infinite scrolling of results.",
-            "time": "2017-10-25T22:08:18+00:00"
         },
         {
             "name": "bower-asset/slimscroll",
