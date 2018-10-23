@@ -1,4 +1,5 @@
 2018-10-23 DariusIII
+	* Chg: Remove Charisma/Omicron related js and css files
 	* Chg: Update regex in AniDB postprocessing
 	* Chg: Update used libraries to their latest versions
 	* Chg: Convert miliseconds to proper time in ReleaseExtra for video duration from mediainfo
