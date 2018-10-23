@@ -1,4 +1,5 @@
 2018-10-23 DariusIII
+	* Fix: Downgrade laravel/framework to 5.7.9 due to breaking changes
 	* Chg: Remove unused assets from composer.json
 	* Chg: Update laravel/framework to version 5.7.10
 	* Chg: Update ReleaseExtra class, use first available audio/subtitle language

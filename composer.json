@@ -139,7 +139,7 @@
     "joshpinkney/tv-maze-php-api": "dev-master",
     "jrean/laravel-user-verification": "^7.0",
     "kevinlebrun/colors.php": "^1.0",
-    "laravel/framework": "5.7.*",
+    "laravel/framework": "5.7.9",
     "laravel/scout": "^5.0",
     "laravel/tinker": "~1.0",
     "laravelcollective/html": "^5.6",
