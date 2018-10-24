@@ -3333,16 +3333,16 @@
         },
         {
             "name": "jrean/laravel-user-verification",
-            "version": "v7.0.0",
+            "version": "v7.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jrean/laravel-user-verification.git",
-                "reference": "492b55be1593de844295094b16666d583c144020"
+                "reference": "50e91093c4815b738502aa7be901133c5f3d104c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/492b55be1593de844295094b16666d583c144020",
-                "reference": "492b55be1593de844295094b16666d583c144020",
+                "url": "https://api.github.com/repos/jrean/laravel-user-verification/zipball/50e91093c4815b738502aa7be901133c5f3d104c",
+                "reference": "50e91093c4815b738502aa7be901133c5f3d104c",
                 "shasum": ""
             },
             "require": {
@@ -3392,7 +3392,7 @@
                 "user activation",
                 "user verification"
             ],
-            "time": "2018-09-13T10:21:07+00:00"
+            "time": "2018-10-24T07:52:18+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",

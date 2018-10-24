@@ -1,4 +1,5 @@
 2018-10-24 DariusIII
+	* Chg: Update jrean/laravel-user-verification to version 7.0.1
 	* Chg: Update laravel/framework to 5.7.10 again
 2018-10-23 DariusIII
 	* Fix: Downgrade laravel/framework to 5.7.9 due to breaking changes
