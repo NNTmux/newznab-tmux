@@ -1,4 +1,5 @@
 2018-10-24 DariusIII
+	* Chg: Update laravel/framework to version 5.7.11
 	* Chg: Update user migration and add patch to add email_verified_at column to users table
 	* Chg: Update jrean/laravel-user-verification to version 7.0.1
 	* Chg: Update laravel/framework to 5.7.10 again
