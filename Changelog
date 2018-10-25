@@ -1,4 +1,5 @@
 2018-10-25 DariusIII
+	* Chg: Update Categorize class, update regexes to better match tv UHD releases
 	* Fix: Fix empty my shows RSS feed
 	* Chg: Add try catch block to ffmpeg frame generation so we catch the error and silently pass by
 	* Chg: Update ReleaseExtra class mediainfo languages retrieval
