@@ -41,7 +41,7 @@ switch (true) {
 						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
 						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
-						IFNULL(HEX(ru.uniqueid), '') AS uid,
+						IFNULL(ru.uniqueid, '') AS uid,
 						IFNULL(ph.hash, 0) AS hash
 					FROM releases r
 					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
