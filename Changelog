@@ -1,4 +1,5 @@
 2018-10-25 DariusIII
+	* Fix: Fix deletion of sjows from my shows page
 	* Chg: Update groupfixrelnames queries
 	* Chg: Update Categorize class, update regexes to better match tv UHD releases
 	* Fix: Fix empty my shows RSS feed
