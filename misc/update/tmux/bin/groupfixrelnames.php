@@ -95,7 +95,7 @@ switch (true) {
             $nameFixer->checked++;
             $nameFixer->reset();
 
-            ColorCLI::primaryOver("[{$release->releases_id}]");
+            PHP_EOL.ColorCLI::primaryOver("[{$release->releases_id}]");
 
             if ((int) $release->ishashed === 1 && (int) $release->dehashstatus >= -6 && (int) $release->dehashstatus <= 0) {
                 ColorCLI::primaryOver('m');
