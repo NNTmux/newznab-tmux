@@ -1,4 +1,5 @@
 2018-10-25 DariusIII
+	* Chg: Update groupfixrelnames.php, remove traversable check for query results
 	* Fix: Fix deletion of sjows from my shows page
 	* Chg: Update groupfixrelnames queries
 	* Chg: Update Categorize class, update regexes to better match tv UHD releases
