@@ -118,7 +118,7 @@ class RSS extends Capabilities
     }
 
     /**
-     * @param       $limit
+     * @param int   $limit
      * @param int   $userID
      * @param array $excludedCats
      * @param int   $airDate
@@ -164,7 +164,7 @@ class RSS extends Capabilities
             Category::TV_ROOT,
             Category::TV_OTHER,
             $this->releases->showPasswords(),
-            ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
+            ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
