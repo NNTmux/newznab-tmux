@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\Exception\NotReadableException;
@@ -159,6 +158,6 @@ class ReleaseImage
     {
         $thumb = $guid.'_thumb.jpg';
 
-        Storage::delete([$this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv']);
+        File::delete([$this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv']);
     }
 }
