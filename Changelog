@@ -1,4 +1,5 @@
 2018-10-25 DariusIII
+	* Chg: Update ReleaseExtra class mediainfo languages retrieval
 	* CHg: Use File in place of Storage in ReleaseIMage delete function
 2018-10-24 DariusIII
 	* Fix: Add missing bootstrap-datepicker from admin area

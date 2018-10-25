@@ -334,7 +334,7 @@ class ReleaseExtra
                     'audiochannels' => \is_array($audioChannels) ? implode($audioChannels) : $audioChannels,
                     'audiosamplerate' => \is_array($audioSampleRate) ? implode($audioSampleRate) : $audioSampleRate,
                     'audiolibrary' => \is_array($audioLibrary) ? implode($audioLibrary) : $audioLibrary,
-                    'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage[0] : '',
+                    'audiolanguage' => ! empty($audioLanguage) ? $audioLanguage[1] : '',
                     'audiotitle' => \is_array($audioTitle) ? implode($audioTitle) : $audioTitle,
                 ]);
         }
@@ -348,11 +348,19 @@ class ReleaseExtra
     private function addSubs($releaseID, $subsID, $subsLanguage): void
     {
         $ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->first(['releases_id']);
+        $subs = '';
+        if (! empty($subsLanguage)) {
+            if (! empty($subsLanguage[1])) {
+               $subs = $subsLanguage[1];
+            } elseif (! empty($subsLanguage[0])) {
+                $subs = $subsLanguage[0];
+            }
+        }
         if ($ckid === null) {
             ReleaseSubtitle::query()->insert([
                 'releases_id' => $releaseID,
                 'subsid' => $subsID,
-                'subslanguage' => ! empty($subsLanguage) ? $subsLanguage[0] : '',
+                'subslanguage' => $subs,
             ]);
         }
     }
