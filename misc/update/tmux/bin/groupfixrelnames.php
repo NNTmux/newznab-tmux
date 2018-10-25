@@ -95,11 +95,11 @@ switch (true) {
             $nameFixer->checked++;
             $nameFixer->reset();
 
-            PHP_EOL.ColorCLI::primaryOver("[{$release->releases_id}]");
+            ColorCLI::primaryOver("[{$release->releases_id}]");
 
             if ((int) $release->ishashed === 1 && (int) $release->dehashstatus >= -6 && (int) $release->dehashstatus <= 0) {
                 ColorCLI::primaryOver('m');
-                if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
+                if (preg_match('/[a-fA-F0-9]{32,40}/i', $release->name, $matches)) {
                     $nameFixer->matchPredbHash($matches[0], $release, true, 1, true);
                 }
                 if ($nameFixer->matched === false && ! empty($release->filehash) && preg_match('/[a-fA-F0-9]{32,40}/i', $release->filehash, $matches)) {
@@ -202,7 +202,7 @@ switch (true) {
                     ]);
                 }
 
-                $nzbcontents->checkPAR2($release['guid'], $release->releases_id, $release->groups_id, 1, 1);
+                $nzbcontents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, 1, 1);
             }
 
             // Not all gate requirements in query always set column status as PP Add check is in query
