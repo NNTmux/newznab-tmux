@@ -6,7 +6,6 @@ use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
-use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
