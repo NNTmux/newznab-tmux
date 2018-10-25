@@ -1914,9 +1914,11 @@ class ProcessAdditional
 
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
-                $this->ffmpeg->open($fileLocation)
-                    ->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
-                    ->save($fileName);
+                try {
+                    $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
+                } catch (\RuntimeException $runtimeException) {
+                    //We show no error at all, we failed to save the frame and move on
+                }
             }
 
             // Check if the file exists.
