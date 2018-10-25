@@ -22,11 +22,6 @@ class Releases
     public const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * @var \Blacklight\ReleaseSearch
      */
     public $releaseSearch;
@@ -52,7 +47,6 @@ class Releases
             'Groups'   => null,
         ];
         $options += $defaults;
-        $this->pdo = DB::connection()->getPdo();
 
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch();
@@ -109,7 +103,7 @@ class Releases
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->quote($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
@@ -152,7 +146,7 @@ class Releases
             ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->quote($groupName)) : ''),
+            ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
@@ -819,7 +813,7 @@ class Releases
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->quote($airdate)) : '')
+                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
             $show = DB::select($showQry);
 
@@ -957,7 +951,7 @@ class Releases
                 implode(' OR ', $siteSQL),
                 ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->quote($airdate)) : '')
+                ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
             $show = DB::select($showQry);
 

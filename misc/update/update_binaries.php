@@ -13,13 +13,14 @@ $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000
 // Create the connection here and pass
 $nntp = new NNTP();
 if ($nntp->doConnect() !== true) {
-    exit(ColorCLI::error('Unable to connect to usenet.'));
+    ColorCLI::error('Unable to connect to usenet.');
+    exit();
 }
 $binaries = new Binaries(['NNTP' => $nntp]);
 
 if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $groupName = $argv[1];
-    echo ColorCLI::header("Updating group: $groupName");
+    ColorCLI::header("Updating group: $groupName");
 
     $group = Group::getByName($groupName);
     if (is_array($group)) {

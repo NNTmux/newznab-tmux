@@ -13,20 +13,20 @@ $movie = new Movie(['Echo' => true]);
 $movies = MovieInfo::query()->where('imdbid', '<>', 0)->where('traktid', '=', 0)->get(['imdbid']);
 $count = $movies->count();
 if ($count > 0) {
-    echo ColorCLI::primary('Updating '.number_format($count).' movies for TraktTV id.');
+    ColorCLI::primary('Updating '.number_format($count).' movies for TraktTV id.');
     foreach ($movies as $mov) {
         $traktTv = new TraktTv(['Settings' => null]);
         $traktmovie = $traktTv->client->movieSummary('tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT), 'full');
         if ($traktmovie !== false) {
-            ColorCLI::doEcho(ColorCLI::info('Updating IMDb id: tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT)), true);
+            ColorCLI::info('Updating IMDb id: tt'.str_pad($mov['imdbid'], 7, '0', STR_PAD_LEFT));
             $trakt = $movie->parseTraktTv($traktmovie);
             if ($trakt === true) {
-                ColorCLI::doEcho(ColorCLI::info('Added traktid: '.$traktmovie['ids']['trakt']), true);
+                ColorCLI::info('Added traktid: '.$traktmovie['ids']['trakt']);
             } else {
-                ColorCLI::doEcho(ColorCLI::info('No traktid found.'), true);
+                ColorCLI::info('No traktid found.');
             }
         }
     }
 } else {
-    echo ColorCLI::header('No movies to update');
+    ColorCLI::header('No movies to update');
 }

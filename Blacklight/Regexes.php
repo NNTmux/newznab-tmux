@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class Regexes
 {
-    public $pdo;
-
     /**
      * @var mixed The ID of the Regex input string matched or the generic name
      */
@@ -46,7 +44,6 @@ class Regexes
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->tableName = $options['Table_Name'];
     }
 
@@ -64,10 +61,10 @@ class Regexes
                 'INSERT INTO %s (group_regex, regex, status, description, ordinal%s) VALUES (%s, %s, %d, %s, %d%s)',
                 $this->tableName,
                 ($this->tableName === 'category_regexes' ? ', categories_id' : ''),
-                trim($this->pdo->quote($data['group_regex'])),
-                trim($this->pdo->quote($data['regex'])),
+                trim(escapeString($data['group_regex'])),
+                trim(escapeString($data['regex'])),
                 $data['status'],
-                trim($this->pdo->quote($data['description'])),
+                trim(escapeString($data['description'])),
                 $data['ordinal'],
                 ($this->tableName === 'category_regexes' ? (', '.$data['categories_id']) : '')
             )
@@ -89,10 +86,10 @@ class Regexes
 				SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
 				WHERE id = %d',
                 $this->tableName,
-                trim($this->pdo->quote($data['group_regex'])),
-                trim($this->pdo->quote($data['regex'])),
+                trim(escapeString($data['group_regex'])),
+                trim(escapeString($data['regex'])),
                 $data['status'],
-                trim($this->pdo->quote($data['description'])),
+                trim(escapeString($data['description'])),
                 $data['ordinal'],
                 ($this->tableName === 'category_regexes' ? (', categories_id = '.$data['categories_id']) : ''),
                 $data['id']
@@ -343,7 +340,7 @@ class Regexes
                 'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
                 ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
                 $this->tableName,
-                $this->pdo->quote($groupName)
+                escapeString($groupName)
             )
         );
         // Set the TTL.
@@ -396,6 +393,6 @@ class Regexes
      */
     protected function _groupQueryString($group_regex): string
     {
-        return $group_regex ? ('WHERE group_regex LIKE '.$this->pdo->quote('%'.$group_regex.'%')) : '';
+        return $group_regex ? ('WHERE group_regex LIKE '.escapeString('%'.$group_regex.'%')) : '';
     }
 }

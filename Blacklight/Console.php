@@ -87,11 +87,6 @@ class Console
     public $failCache;
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * @param array $options Class instances / Echo to cli.
      * @throws \Exception
      */
@@ -103,7 +98,6 @@ class Console
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
@@ -127,8 +121,8 @@ class Console
     }
 
     /**
-     * @param $title
-     * @param $platform
+     * @param string $title
+     * @param string $platform
      *
      * @return false|\Illuminate\Database\Eloquent\Model
      */
@@ -147,9 +141,9 @@ class Console
                 $searchWords .= sprintf('%s ', $word);
             }
         }
-        $searchWords = trim($searchWords);
+        $searchWords = trim($searchWords.'+'.$platform);
 
-        return ConsoleInfo::search($searchWords, $platform)->first() ?? false;
+        return ConsoleInfo::search($searchWords)->first() ?? false;
     }
 
     /**
@@ -158,12 +152,12 @@ class Console
      * @param       $start
      * @param       $num
      * @param       $orderBy
-     * @param array $excludedcats
+     * @param array $excludedCats
      *
      * @return array
      * @throws \Exception
      */
-    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedcats = []): array
+    public function getConsoleRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
     {
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
@@ -171,8 +165,8 @@ class Console
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
-        if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+        if (\count($excludedCats) > 0) {
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
         $order = $this->getConsoleOrder($orderBy);
         $calcSql = sprintf(
@@ -318,7 +312,7 @@ class Console
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= 'AND con.'.$bbv.' LIKE '.$this->pdo->quote('%'.$bbs.'%');
+                $browseBy .= 'AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
             }
         }
 
@@ -398,16 +392,13 @@ class Console
                 $consoleId = $this->_updateConsoleTable($con);
 
                 if ($this->echooutput && $consoleId !== -2) {
-                    ColorCLI::doEcho(
-                        ColorCLI::header('Added/updated game: ').
+                    ColorCLI::header('Added/updated game: ').
                         ColorCLI::alternateOver('   Title:    ').
                         ColorCLI::primary($con['title']).
                         ColorCLI::alternateOver('   Platform: ').
                         ColorCLI::primary($con['platform']).
                         ColorCLI::alternateOver('   Genre: ').
-                        ColorCLI::primary($con['consolegenre']),
-                        true
-                    );
+                        ColorCLI::primary($con['consolegenre']);
                 }
             }
         } else {
@@ -422,7 +413,7 @@ class Console
                 $consoleId = $this->_updateConsoleTable($igdb);
 
                 if ($this->echooutput && $consoleId !== -2) {
-                    ColorCLI::doEcho(ColorCLI::header('Added/updated game: ').ColorCLI::alternateOver('   Title:    ').ColorCLI::primary($igdb['title']).ColorCLI::alternateOver('   Platform: ').ColorCLI::primary($igdb['platform']).ColorCLI::alternateOver('   Genre: ').ColorCLI::primary($igdb['consolegenre']), true);
+                    ColorCLI::header('Added/updated game: ').ColorCLI::alternateOver('   Title:    ').ColorCLI::primary($igdb['title']).ColorCLI::alternateOver('   Platform: ').ColorCLI::primary($igdb['platform']).ColorCLI::alternateOver('   Genre: ').ColorCLI::primary($igdb['consolegenre']);
                 }
             }
         }
@@ -782,7 +773,7 @@ class Console
 
         $apaiIo = new ApaiIO($conf);
 
-        ColorCLI::doEcho(ColorCLI::info('Trying to find info on Amazon'), true);
+        ColorCLI::info('Trying to find info on Amazon');
         $responses = $apaiIo->runOperation($search);
 
         if ($responses === false) {
@@ -792,13 +783,13 @@ class Console
         foreach ($responses->Items->Item as $response) {
             similar_text($title, $response->ItemAttributes->Title, $percent);
             if ($percent > self::MATCH_PERCENT && isset($response->ItemAttributes->Title)) {
-                ColorCLI::doEcho(ColorCLI::info('Found matching info on Amazon: '.$response->ItemAttributes->Title), true);
+                ColorCLI::info('Found matching info on Amazon: '.$response->ItemAttributes->Title);
 
                 return $response;
             }
         }
 
-        ColorCLI::doEcho(ColorCLI::info('Could not find match on Amazon'), true);
+        ColorCLI::info('Could not find match on Amazon');
 
         return false;
     }
@@ -891,12 +882,12 @@ class Console
                         return $game;
                     }
 
-                    ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+                    ColorCLI::notice('IGDB returned no valid results');
 
                     return false;
                 }
 
-                ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+                ColorCLI::notice('IGDB found no valid results');
 
                 return false;
             } catch (ClientException $e) {
@@ -923,7 +914,7 @@ class Console
         $releaseCount = $res->count();
         if ($res instanceof \Traversable && $releaseCount > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$releaseCount.' console release(s).'), true);
+                ColorCLI::header('Processing '.$releaseCount.' console release(s).');
             }
 
             foreach ($res as $arr) {
@@ -934,15 +925,12 @@ class Console
 
                 if ($gameInfo !== false) {
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(
-                            ColorCLI::headerOver('Looking up: ').
+                        ColorCLI::headerOver('Looking up: ').
                             ColorCLI::primary(
                                 $gameInfo['title'].
                                 ' ('.
                                 $gameInfo['platform'].')'
-                            ),
-                            true
-                        );
+                            );
                     }
 
                     // Check for existing console entry.
@@ -951,7 +939,7 @@ class Console
                     if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
+                            ColorCLI::headerOver('Cached previous failure. Skipping.');
                         }
                         $gameId = -2;
                     } elseif ($gameCheck === false) {
@@ -963,11 +951,8 @@ class Console
                         }
                     } else {
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(
-                                ColorCLI::headerOver('Found Local: ').
-                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}"),
-                                true
-                            );
+                            ColorCLI::headerOver('Found Local: ').
+                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}");
                         }
                         $gameId = $gameCheck['id'];
                     }
@@ -985,22 +970,22 @@ class Console
                 }
             }
         } elseif ($this->echooutput) {
-            ColorCLI::doEcho(ColorCLI::header('No console releases to process.'), true);
+            ColorCLI::header('No console releases to process.');
         }
     }
 
     /**
-     * @param $releasename
+     * @param $releaseName
      *
      * @return array|false
      */
-    public function parseTitle($releasename)
+    public function parseTitle($releaseName)
     {
-        $releasename = preg_replace('/\sMulti\d?\s/i', '', $releasename);
+        $releaseName = preg_replace('/\sMulti\d?\s/i', '', $releaseName);
         $result = [];
 
         // Get name of the game from name of release.
-        if (preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg|Place2(hom|us)e.net|united-forums? co uk|\(\d+\)))?(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI(\.?\d{1,2})?|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|[\. ]RF[\. ]?|READ\.?NFO|NFOFIX|PSX(2PSP)?|PS[2-4]|PSP|PSVITA|WIIU|WII|X\-?BOX|XBLA|X360|3DS|NDS|N64|NGC)/i', $releasename, $matches)) {
+        if (preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg|Place2(hom|us)e.net|united-forums? co uk|\(\d+\)))?(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI(\.?\d{1,2})?|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|[\. ]RF[\. ]?|READ\.?NFO|NFOFIX|PSX(2PSP)?|PS[2-4]|PSP|PSVITA|WIIU|WII|X\-?BOX|XBLA|X360|3DS|NDS|N64|NGC)/i', $releaseName, $matches)) {
             $title = $matches['title'];
 
             // Replace dots, underscores, or brackets with spaces.
@@ -1028,7 +1013,7 @@ class Console
         }
 
         // Get the platform of the release.
-        if (preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS[2-4]|PS 3|PSX(2PSP)?|PSP|WIIU|WII|XBOX360|XBOXONE|X\-?BOX|X360|3DS|NDS|N?GC)/i', $releasename, $matches)) {
+        if (preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS[2-4]|PS 3|PSX(2PSP)?|PSP|WIIU|WII|XBOX360|XBOXONE|X\-?BOX|X360|3DS|NDS|N?GC)/i', $releaseName, $matches)) {
             $platform = $matches['platform'];
 
             if (preg_match('/^N?GC$/i', $platform)) {
@@ -1047,7 +1032,7 @@ class Console
             $result['platform'] = $platform;
             $result['node'] = $browseNode;
         }
-        $result['release'] = $releasename;
+        $result['release'] = $releaseName;
         array_map('trim', $result);
 
         /* Make sure we got a title and platform otherwise the resulting lookup will probably be shit.

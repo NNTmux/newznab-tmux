@@ -494,7 +494,7 @@ class Tmux
 					) AS backfill_groups_days,
 					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
 					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
-                    $this->pdo->quote($db_name)
+                    escapeString($db_name)
                 );
             case 6:
                 return 'SELECT
@@ -530,12 +530,12 @@ class Tmux
         if ($this->isRunning() === true) {
             Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
             $sleep = Settings::settingValue('site.tmux.monitor_delay');
-            ColorCLI::doEcho(ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown'), true);
+            ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
             sleep($sleep);
 
             return true;
         }
-        ColorCLI::doEcho(ColorCLI::info('Tmux scripts are not running!'), true);
+        ColorCLI::info('Tmux scripts are not running!');
 
         return false;
     }
@@ -555,14 +555,12 @@ class Tmux
      */
     public function cbpmTableQuery()
     {
-        $regstr = '^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$';
-
         return DB::select(
             "
 			SELECT TABLE_NAME AS name
       		FROM information_schema.TABLES
       		WHERE TABLE_SCHEMA = (SELECT DATABASE())
-			AND TABLE_NAME REGEXP {$this->pdo->quote($regstr)}
+			AND TABLE_NAME REGEXP {escapeString('^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$')}
 			ORDER BY TABLE_NAME ASC"
         );
     }

@@ -41,6 +41,7 @@
 			Full site feed<br/>
 			<a href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">{$smarty.const.WWW_TOP}
 				/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}</a>
+            <br>You can define limit and num parameters, which will decide how much items to show and what offset to use (default values: limit 100 and offset 0).
 		</li>
 		<li>
 			<a href="{$smarty.const.WWW_TOP}/cart/index">My cart</a> feed<br/>

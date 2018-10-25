@@ -36,7 +36,7 @@ class ProfileController extends BasePageController
 
         if ($privileged || ! $privateProfiles) {
             $altID = ($request->has('id') && (int) $request->input('id') >= 0) ? (int) $request->input('id') : false;
-            $altUsername = ($request->has('name') && \strlen($request->input('name')) > 0) ? $request->input('name') : false;
+            $altUsername = ($request->has('name') && $request->input('name') !== '') ? $request->input('name') : false;
 
             // If both 'id' and 'name' are specified, 'id' should take precedence.
             if ($altID === false && $altUsername !== false) {
@@ -149,7 +149,7 @@ class ProfileController extends BasePageController
                 break;
             case 'submit':
 
-                if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && \strlen(trim($request->input('saburl'))) > 0) {
+                if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && trim($request->input('saburl')) !== '') {
                     $request->merge(['saburl' => $request->input('saburl').'/']);
                 }
 

@@ -143,7 +143,7 @@ class Categorize extends Category
                 case $group === 'alt.binaries.audio.warez':
                     $this->tmpCat = self::PC_0DAY;
                     break;
-                case preg_match('/alt\.binaries\.(multimedia\.erotica\.|cartoons\.french\.|dvd\.|multimedia\.)?anime(\.highspeed|\.repost|s-fansub|\.german)?/', $group):
+                case preg_match('/alt\.binaries\.(multimedia\.erotica\.|cartoons\.french\.|dvd\.|multimedia\.)?anime(\.highspeed|\.repost|s-fansub|\.german)?$/', $group):
                     $this->tmpCat = self::TV_ANIME;
                     break;
                 case $group === 'alt.binaries.b4e.erotica':
@@ -209,7 +209,7 @@ class Categorize extends Category
                 case $group === 'alt.binaries.classic.tv.shows':
                     $this->tmpCat = self::TV_SD;
                     break;
-                case preg_match('/alt\.binaries\.(comics\.dcp|pictures\.comics\.(complete|dcp|reposts?))/', $group):
+                case preg_match('/alt\.binaries\.(comics\.dcp|pictures\.comics\.(complete|dcp|reposts?))$/', $group):
                     if ($this->categorizeForeign && $this->isBookForeign()) {
                         break;
                     }
@@ -254,7 +254,7 @@ class Categorize extends Category
                     }
                     $this->tmpCat = self::OTHER_MISC;
                     break;
-                case preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))|dk\.(binaer|binaries)\.film(\.divx)?/', $group):
+                case preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))|dk\.(binaer|binaries)\.film(\.divx)?$/', $group):
                     if ($this->categorizeForeign && $this->isMovieForeign()) {
                         break;
                     }
@@ -427,7 +427,7 @@ class Categorize extends Category
                             return false;
                     }
                     break;
-                case preg_match('/alt\.binaries\.ipod\.videos\.tvshows/', $group):
+                case preg_match('/alt\.binaries\.ipod\.videos\.tvshows$/', $group):
                     $this->tmpCat = self::TV_OTHER;
                     break;
                 case $group === 'alt.binaries.mac':
@@ -477,7 +477,7 @@ class Categorize extends Category
                 case $group === 'alt.binaries.multimedia.documentaries':
                     $this->tmpCat = self::TV_DOCU;
                     break;
-                case preg_match('/alt\.binaries\.multimedia\.sports(\.boxing)?/', $group):
+                case preg_match('/alt\.binaries\.multimedia\.sports(\.boxing)?$/', $group):
                     $this->tmpCat = self::TV_SPORT;
                     break;
                 case $group === 'alt.binaries.music.opera':
@@ -492,7 +492,7 @@ class Categorize extends Category
                             break;
                     }
                     break;
-                case preg_match('/alt\.binaries\.music/', $group):
+                case preg_match('/alt\.binaries\.music$/', $group):
                     switch (true) {
                         case $this->categorizeForeign && $this->isMusicForeign():
                         case $this->isMusic():
@@ -511,7 +511,7 @@ class Categorize extends Category
                 case $group === 'alt.binaries.pro-wrestling':
                     $this->tmpCat = self::TV_SPORT;
                     break;
-                case preg_match('/alt\.binaries\.sounds\.(flac(\.jazz)?|jpop|lossless(\.[a-z0-9]+)?)|alt\.binaries\.(cd\.lossless|music\.flac)/i', $group):
+                case preg_match('/alt\.binaries\.sounds\.(flac(\.jazz)?|jpop|lossless(\.[a-z0-9]+)?)|alt\.binaries\.(cd\.lossless|music\.flac)$/i', $group):
                     switch (true) {
                         case $this->categorizeForeign && $this->isMusicForeign():
                         case $this->isMusic():
@@ -605,10 +605,6 @@ class Categorize extends Category
      */
     public function isTV(): bool
     {
-        //		if (/*!preg_match('/s\d{1,3}[-._ ]?[ed]\d{1,3}|season|episode/i', $this->releaseName) &&*/ preg_match('/part[-._ ]?\d/i', $this->releaseName)) {
-        //			return false;
-        //		}
-
         if (preg_match('/Daily[-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[-_].*\d{1,3}[-_. ](([\[\(])(h264-)?\d{3,4}([pi])([\]\)])\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|\d+x\d+|\.e\d{1,3}\.|s\d{1,3}[-._ ]?[ed]\d{1,3}([ex]\d{1,3}|[-.\w ])|[-._ ](\dx\d\d|C4TV|Complete[-._ ]Season|DSR|([DHPS])DTV|EP[-._ ]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[-._ ]\d{1,2})([-._ ]|$)|TVRIP|TV[-._ ](19|20)\d\d|Troll(HD|UHD)/i', $this->releaseName)
             && ! preg_match('/[-._ ](flac|imageset|mp3|xxx)[-._ ]|[ .]exe$/i', $this->releaseName)) {
             switch (true) {
@@ -660,9 +656,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isForeignTV(): ?bool
+    public function isForeignTV(): bool
     {
         switch (true) {
             case preg_match('/[-._ ](NHL|stanley.+cup)[-._ ]/', $this->releaseName):
@@ -681,9 +677,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isSportTV(): ?bool
+    public function isSportTV(): bool
     {
         switch (true) {
             case preg_match('/s\d{1,3}[-._ ]?[ed]\d{1,3}([ex]\d{1,3}|[-.\w ])/i', $this->releaseName):
@@ -772,7 +768,7 @@ class Categorize extends Category
      */
     public function isUHDTV(): bool
     {
-        if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName)) {
+        if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon|NF|AMZN).*(TrollUHD|NTb|VLAD|DEFLATE|POFUDUK)/i', $this->releaseName)) {
             $this->tmpCat = self::TV_UHD;
 
             return true;
@@ -782,9 +778,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isSDTV(): ?bool
+    public function isSDTV(): bool
     {
         switch (true) {
             case preg_match('/(360|480|576)p|Complete[-._ ]Season|dvdr(ip)?|dvd5|dvd9|\.pdtv|SD[-._ ]TV|TVRip|NTSC|BDRip|hdtv|xvid/i', $this->releaseName):
@@ -840,9 +836,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isMovieForeign(): ?bool
+    public function isMovieForeign(): bool
     {
         switch (true) {
             case $this->isConsole():
@@ -979,9 +975,9 @@ class Categorize extends Category
     //  PC.
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isPC(): ?bool
+    public function isPC(): bool
     {
         switch (true) {
             case preg_match('/s\d{1,3}[-._ ]?[ed]\d{1,3}([ex]\d{1,3}|[-.\w ])|[^a-z0-9](FLAC|Imageset|PICTURESET|MP3|Nintendo|PDTV|PS[23P]|SWE6RUS|UMD(RIP)?|WII|x264|XBOX(360|DVD|ONE)?|XXX)[^a-z0-9]/i', $this->releaseName):
@@ -1020,9 +1016,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isISO(): ?bool
+    public function isISO(): bool
     {
         switch (true) {
             case preg_match('/[-._ ]([a-zA-Z]{2,10})?iso[ _.-]|[-. ]([a-z]{2,10})?iso$/i', $this->releaseName):
@@ -1036,9 +1032,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function is0day(): ?bool
+    public function is0day(): bool
     {
         switch (true) {
             case preg_match('/[-._ ]exe$|[-._ ](utorrent|Virtualbox)[-._ ]|\b0DAY\b|incl.+crack| DRM$|>DRM</i', $this->releaseName):
@@ -1083,9 +1079,9 @@ class Categorize extends Category
     //	XXX.
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isXxx(): ?bool
+    public function isXxx(): bool
     {
         switch (true) {
             case ! preg_match('/\bXXX\b|(a\.b\.erotica|ClubSeventeen|Cum(ming|shot)|Err?oticax?|Porn(o|lation)?|Imageset|PICTURESET|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|My_Stepfather_Made_Me|nympho?|OLDER ANGELS|pictures\.erotica\.anime|sexontv|slut|Squirt|SWE6RUS|Transsexual|whore)/i', $this->releaseName):
@@ -1244,9 +1240,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isXxxClipSD(): ?bool
+    public function isXxxClipSD(): bool
     {
         switch (true) {
             case $this->checkPoster('/oz@lot[.]com/i', $this->poster, self::XXX_CLIPSD):
@@ -1295,9 +1291,9 @@ class Categorize extends Category
     //	Console.
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isConsole(): ?bool
+    public function isConsole(): bool
     {
         switch (true) {
             case $this->isGameNDS():
@@ -1469,9 +1465,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isGameWiiU(): ?bool
+    public function isGameWiiU(): bool
     {
         switch (true) {
             case ! preg_match('/WII-?U/i', $this->releaseName):
@@ -1488,9 +1484,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isGameWii(): ?bool
+    public function isGameWii(): bool
     {
         switch (true) {
             case stripos($this->releaseName, 'WII') === false:
@@ -1591,9 +1587,9 @@ class Categorize extends Category
     //	Music.
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isMusic(): ?bool
+    public function isMusic(): bool
     {
         switch (true) {
             //They Knew What They Wanted (1940).480p.DVDRIP.MP3-NoGroup -- prevents movies matches with MP3 audio codec in the title
@@ -1729,9 +1725,9 @@ class Categorize extends Category
     //	Books.
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isBook(): ?bool
+    public function isBook(): bool
     {
         switch (true) {
             case preg_match('/AVI[-._ ]PDF|\.exe|Full[-._ ]Video/i', $this->releaseName):
@@ -1748,9 +1744,9 @@ class Categorize extends Category
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isBookForeign(): ?bool
+    public function isBookForeign(): bool
     {
         switch (true) {
             case $this->categorizeForeign === false:

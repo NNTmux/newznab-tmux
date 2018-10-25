@@ -32,7 +32,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     if ($argv[1] === 7 || $argv[1] === 8) {
         $nntp = new NNTP();
         if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-            echo ColorCLI::error('Unable to connect to usenet.'.PHP_EOL);
+            ColorCLI::error('Unable to connect to usenet.'.PHP_EOL);
 
             return;
         }
@@ -94,11 +94,12 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             $namefixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
             break;
         default:
-            exit(ColorCLI::error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.'.PHP_EOL));
+            ColorCLI::error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.');
+            exit();
             break;
     }
 } else {
-    exit(ColorCLI::error(PHP_EOL.'You must supply 4 arguments.'.PHP_EOL
+    ColorCLI::error(PHP_EOL.'You must supply 4 arguments.'.PHP_EOL
             .'The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.'.PHP_EOL
             .'The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.'.PHP_EOL
             .'The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.'.PHP_EOL
@@ -120,5 +121,6 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             .'php '.$argv[0].' 15 false other no ...: Fix release names in misc categories using PAR2 hash_16K block in the past 6 hours.'.PHP_EOL
             .'php '.$argv[0].' 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.'.PHP_EOL
             .'php '.$argv[0].' 17 false other no ...: Fix release names in misc categories using Mediainfo in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL));
+            .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL);
+    exit();
 }

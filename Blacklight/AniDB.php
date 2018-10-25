@@ -9,16 +9,10 @@ use Illuminate\Support\Facades\DB;
 class AniDB
 {
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * AniDB constructor.
      */
     public function __construct()
     {
-        $this->pdo = DB::connection()->getPdo();
     }
 
     /**
@@ -52,20 +46,20 @@ class AniDB
 					related = %s, similar = %s, creators = %s, description = %s, rating = %s,
 					categories = %s, characters = %s, epnos = %s, airdates = %s,
 					episodetitles = %s WHERE anidbid = %d',
-                $this->pdo->quote($title),
-                $this->pdo->quote($type),
-                $this->pdo->quote($startdate),
-                $this->pdo->quote($enddate),
-                $this->pdo->quote($related),
-                $this->pdo->quote($similar),
-                $this->pdo->quote($creators),
-                $this->pdo->quote($description),
-                $this->pdo->quote($rating),
-                $this->pdo->quote($categories),
-                $this->pdo->quote($characters),
-                $this->pdo->quote($epnos),
-                $this->pdo->quote($airdates),
-                $this->pdo->quote($episodetitles),
+                escapeString($title),
+                escapeString($type),
+                escapeString($startdate),
+                escapeString($enddate),
+                escapeString($related),
+                escapeString($similar),
+                escapeString($creators),
+                escapeString($description),
+                escapeString($rating),
+                escapeString($categories),
+                escapeString($characters),
+                escapeString($epnos),
+                escapeString($airdates),
+                escapeString($episodetitles),
                 $anidbID
             )
         );
@@ -110,11 +104,11 @@ class AniDB
             if ($letter === '0-9') {
                 $letter = '[0-9]';
             }
-            $rsql .= sprintf('AND at.title REGEXP %s', $this->pdo->quote('^'.$letter));
+            $rsql .= sprintf('AND at.title REGEXP %s', escapeString('^'.$letter));
         }
 
         if ($animetitle !== '') {
-            $tsql .= sprintf('AND at.title LIKE %s', $this->pdo->quote('%'.$animetitle.'%'));
+            $tsql .= sprintf('AND at.title LIKE %s', escapeString('%'.$animetitle.'%'));
         }
 
         return DB::select(

@@ -117,11 +117,6 @@ class NameFixer
     protected $fullall;
 
     /**
-     * @var \PDO
-     */
-    public $pdo;
-
-    /**
      * @var \Blacklight\ConsoleTools
      */
     public $consoletools;
@@ -160,7 +155,6 @@ class NameFixer
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->relid = $this->fixed = $this->checked = 0;
-        $this->pdo = DB::connection()->getPdo();
         $this->othercats = implode(',', Category::OTHERS_GROUP);
         $this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categories_id IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
         $this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
@@ -225,7 +219,7 @@ class NameFixer
 
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' releases to process.');
+            ColorCLI::primary(number_format($total).' releases to process.');
 
             foreach ($releases as $rel) {
                 $releaseRow = DB::select(
@@ -254,7 +248,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' NFO\'s');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -309,7 +303,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' file names to process.');
+            ColorCLI::primary(number_format($total).' file names to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -320,7 +314,7 @@ class NameFixer
 
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -365,7 +359,7 @@ class NameFixer
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,
-                $this->pdo->quote('%SDPORN%')
+                escapeString('%SDPORN%')
             );
         }
 
@@ -373,7 +367,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' xxx file names to process.');
+            ColorCLI::primary(number_format($total).' xxx file names to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -383,7 +377,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -429,7 +423,7 @@ class NameFixer
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,
-                $this->pdo->quote('%.srr'),
+                escapeString('%.srr'),
                 self::PROC_SRR_NONE
             );
         }
@@ -438,7 +432,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' srr file extensions to process.');
+            ColorCLI::primary(number_format($total).' srr file extensions to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -448,7 +442,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -496,7 +490,7 @@ class NameFixer
         if ($total > 0) {
             $this->_totalReleases = $total;
 
-            echo ColorCLI::primary(number_format($total).' releases to process.');
+            ColorCLI::primary(number_format($total).' releases to process.');
             $Nfo = new Nfo();
             $nzbContents = new NZBContents(
                     [
@@ -518,7 +512,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -583,7 +577,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' unique ids to process.');
+            ColorCLI::primary(number_format($total).' unique ids to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -592,7 +586,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' UID\'s');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -648,7 +642,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' mediainfo movie names to process.');
+            ColorCLI::primary(number_format($total).' mediainfo movie names to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -657,7 +651,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' MediaInfo\'s');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -721,7 +715,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            echo ColorCLI::primary(number_format($total).' hash_16K to process.');
+            ColorCLI::primary(number_format($total).' hash_16K to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -730,7 +724,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' hashes');
         } else {
-            ColorCLI::doEcho(ColorCLI::info('Nothing to fix.'), true);
+            ColorCLI::info('Nothing to fix.');
         }
     }
 
@@ -748,19 +742,19 @@ class NameFixer
         $queryLimit = ($limit === '') ? '' : ' LIMIT '.$limit;
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
-            echo ColorCLI::header($query.$this->timeother.$queryLimit.";\n");
+            ColorCLI::header($query.$this->timeother.$queryLimit.";\n");
             $releases = DB::select($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
-            echo ColorCLI::header($query.$this->timeall.$queryLimit.";\n");
+            ColorCLI::header($query.$this->timeall.$queryLimit.";\n");
             $releases = DB::select($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
-            echo ColorCLI::header($query.$this->fullother.$queryLimit.";\n");
+            ColorCLI::header($query.$this->fullother.$queryLimit.";\n");
             $releases = DB::select($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
-            echo ColorCLI::header($query.$this->fullall.$queryLimit.";\n");
+            ColorCLI::header($query.$this->fullall.$queryLimit.";\n");
             $releases = DB::select($query.$this->fullall.$queryLimit);
         }
 
@@ -776,7 +770,7 @@ class NameFixer
     protected function _echoFoundCount($echo, $type): void
     {
         if ($echo === true) {
-            echo ColorCLI::header(
+            ColorCLI::header(
                 PHP_EOL.
                 number_format($this->fixed).
                 ' releases have had their names changed out of: '.
@@ -784,7 +778,7 @@ class NameFixer
                 $type.'.'
             );
         } else {
-            echo ColorCLI::header(
+            ColorCLI::header(
                 PHP_EOL.
                 number_format($this->fixed).
                 ' releases could have their names changed. '.
@@ -800,7 +794,7 @@ class NameFixer
      */
     protected function _echoStartMessage($time, $type): void
     {
-        echo ColorCLI::header(
+        ColorCLI::header(
             sprintf(
                 'Fixing search names %s using %s.',
                 ($time === 1 ? 'in the past 6 hours' : 'since the beginning'),
@@ -815,7 +809,7 @@ class NameFixer
     protected function _echoRenamed($show): void
     {
         if ($this->checked % 500 === 0 && $show === 1) {
-            echo ColorCLI::alternate(PHP_EOL.number_format($this->checked).' files processed.'.PHP_EOL);
+            ColorCLI::alternate(PHP_EOL.number_format($this->checked).' files processed.'.PHP_EOL);
         }
 
         if ($show === 2) {
@@ -838,12 +832,12 @@ class NameFixer
      * @param     $echo
      * @param     $type
      * @param int $nameStatus
-     * @param int $show
+     * @param bool $show
      * @param int $preId
      *
      * @throws \Exception
      */
-    public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, int $show, int $preId = 0): void
+    public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, bool $show, int $preId = 0): void
     {
         if (\is_array($release)) {
             $release = (object) $release;
@@ -866,13 +860,10 @@ class NameFixer
 
                 $this->fixed++;
 
-                if (! empty($release->fromname) && (preg_match('/oz@lot[.]com/i', $release->fromname) || preg_match('/anon@y[.]com/i', $release->fromname))) {
-                    $newName = preg_replace('/(KTR|GUSH|BIUK|WEIRD)$/', 'SDCLiP', $newName);
-                }
                 $newName = explode('\\', $newName);
                 $newName = preg_replace(['/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'], '', $newName[0]);
 
-                if ($this->echooutput === true && $show === 1) {
+                if ($this->echooutput === true && $show === true) {
                     $groupName = Group::getNameByID($release->groups_id);
                     $oldCatName = Category::getNameByID($release->categories_id);
                     $newCatName = Category::getNameByID($determinedCategory);
@@ -883,8 +874,7 @@ class NameFixer
 
                     echo PHP_EOL;
 
-                    ColorCLI::doEcho(
-                        ColorCLI::headerOver('New name:  ').
+                    ColorCLI::headerOver('New name:  ').
                         ColorCLI::primary(substr($newName, 0, 299)).
                         ColorCLI::headerOver('Old name:  ').
                         ColorCLI::primary($release->searchname).
@@ -899,15 +889,10 @@ class NameFixer
                         ColorCLI::headerOver('Method:    ').
                         ColorCLI::primary($type.$method).
                         ColorCLI::headerOver('Releases ID: ').
-                        ColorCLI::primary($release->releases_id),
-                        true
-                    );
+                        ColorCLI::primary($release->releases_id);
                     if (! empty($release->filename)) {
-                        ColorCLI::doEcho(
-                            ColorCLI::headerOver('Filename:  ').
-                            ColorCLI::primary($release->filename),
-                            true
-                        );
+                        ColorCLI::headerOver('Filename:  ').
+                            ColorCLI::primary($release->filename);
                     }
 
                     if ($type !== 'PAR2, ') {
@@ -1034,16 +1019,14 @@ class NameFixer
         ]
     ): void {
         echo PHP_EOL;
-        ColorCLI::doEcho(
-            ColorCLI::headerOver('New name:     ').ColorCLI::primaryOver($data['new_name']).
+
+        ColorCLI::headerOver('New name:     ').ColorCLI::primaryOver($data['new_name']).
             ColorCLI::headerOver('Old name:     ').ColorCLI::primaryOver($data['old_name']).
             ColorCLI::headerOver('New category: ').ColorCLI::primaryOver($data['new_category']).
             ColorCLI::headerOver('Old category: ').ColorCLI::primaryOver($data['old_category']).
             ColorCLI::headerOver('Group:        ').ColorCLI::primaryOver($data['group']).
             ColorCLI::headerOver('Releases ID:   ').ColorCLI::primaryOver($data['releases_id']).
-            ColorCLI::headerOver('Method:       ').ColorCLI::primaryOver($data['method']),
-            true
-        );
+            ColorCLI::headerOver('Method:       ').ColorCLI::primaryOver($data['method']);
     }
 
     /**
@@ -1079,7 +1062,7 @@ class NameFixer
 				AND r.predb_id = 0
 				LIMIT 21',
                 $join,
-                $this->pdo->quote($pre['%title%'])
+                escapeString('%'.$pre['title'].'%')
             )
         );
 
@@ -1134,9 +1117,7 @@ class NameFixer
      */
     public function getPreFileNames(array $args = []): void
     {
-        $n = PHP_EOL;
-
-        $show = (isset($args[2]) && $args[2] === 'show') ? 1 : 0;
+        $show = isset($args[2]) && $args[2] === 'show';
 
         if (isset($args[1]) && is_numeric($args[1])) {
             $limit = 'LIMIT '.$args[1];
@@ -1146,8 +1127,8 @@ class NameFixer
             $limit = 'LIMIT 1000000';
         }
 
-        ColorCLI::doEcho(ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now()->format('Y-m-d')), true);
-        ColorCLI::doEcho(ColorCLI::primary('Matching predb filename to cleaned release_files.name.'), true);
+        ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now());
+        ColorCLI::primary('Matching predb filename to cleaned release_files.name.');
 
         $counter = $counted = 0;
         $timestart = now();
@@ -1160,10 +1141,13 @@ class NameFixer
 						GROUP_CONCAT(rf.name ORDER BY LENGTH(rf.name) DESC SEPARATOR '||') AS filename
 					FROM releases r
 					INNER JOIN release_files rf ON r.id = rf.releases_id
-					AND rf.name IS NOT NULL
-					WHERE r.predb_id = 0
+					WHERE rf.name IS NOT NULL
+					AND r.predb_id = 0
+					AND r.categories_id IN (%s)
+					AND r.isrenamed = 0
 					GROUP BY r.id
 					%s %s",
+                implode(',', Category::OTHERS_GROUP),
                 $orderby,
                 $limit
             )
@@ -1173,20 +1157,22 @@ class NameFixer
             $total = \count($query);
 
             if ($total > 0) {
-                echo ColorCLI::header($n.number_format($total).' releases to process.');
+                ColorCLI::header(PHP_EOL.number_format($total).' releases to process.');
 
-                foreach ($query as $row) {
-                    $success = $this->matchPredbFiles($row, true, 1, $show);
-                    if ($success === 1) {
-                        $counted++;
-                    }
-                    if ($show === 0) {
-                        $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
+                foreach (collect($query)->chunk(100) as $chunked) {
+                    foreach ($chunked as $row) {
+                        $success = $this->matchPreDbFiles($row, true, 1, $show);
+                        if ($success === 1) {
+                            $counted++;
+                        }
+                        if ($show === 0) {
+                            $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
+                        }
                     }
                 }
-                echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
+                ColorCLI::header(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
             } else {
-                ColorCLI::doEcho(ColorCLI::info($n.'Nothing to do.'), true);
+                ColorCLI::info('Nothing to do.');
             }
         }
     }
@@ -1197,46 +1183,42 @@ class NameFixer
      * @param         $release
      * @param bool $echo
      * @param int $nameStatus
-     * @param int $show
+     * @param bool $show
      *
      * @return int
      * @throws \Exception
      */
-    public function matchPredbFiles($release, $echo, $nameStatus, $show): int
+    public function matchPreDbFiles($release, $echo, $nameStatus, $show): int
     {
         $matching = 0;
-        $pre = false;
 
         foreach (explode('||', $release->filename) as $key => $fileName) {
             $this->_fileName = $fileName;
             $this->_cleanMatchFiles();
-            $preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $this->_fileName, $match);
-            if ($preMatch) {
-                $result = Predb::search($match[0])->first();
-                $preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $result['filename'], $match1);
-                if ($preFTmatch && $match[0] === $match1[0]) {
-                    $this->_fileName = $result['filename'];
+            $preMatch = $this->preMatch($this->_fileName);
+            if ($preMatch[0] === true) {
+                $results = Predb::search($preMatch[1])->get()->chunk(1000)->first();
+                if (! empty($results)) {
+                    foreach ($results as $result) {
+                        if (! empty($result)) {
+                            $preFtMatch = $this->preMatch($result['filename']);
+                            if ($preFtMatch[0] === true) {
+                                similar_text($preMatch[1], $preFtMatch[1], $percent);
+                                if ($percent >= 93) {
+                                    $this->_fileName = $result['filename'];
+                                    $release->filename = $this->_fileName;
+                                    if ($result['title'] !== $release->searchname) {
+                                        $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                                    } else {
+                                        $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
+                                    }
+                                    $matching++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-            }
-
-            if ($this->_fileName !== '') {
-                $pre = Predb::query()
-                    ->select(['id as predb_id', 'title', 'source'])
-                    ->where(function ($query) {
-                        $query->where('filename', $this->_fileName)
-                    ->orWhere('title', $this->_fileName);
-                    })->first();
-            }
-
-            if ($pre !== null) {
-                $release->filename = $this->_fileName;
-                if ($pre['title'] !== $release->searchname) {
-                    $this->updateRelease($release, $pre['title'], $method = 'file matched source: '.$pre['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $pre['predb_id']);
-                } else {
-                    $this->_updateSingleColumn('predb_id', $pre['predb_id'], $release->releases_id);
-                }
-                $matching++;
-                break;
             }
         }
 
@@ -1321,7 +1303,7 @@ class NameFixer
 						FROM predb p INNER JOIN predb_hashes h ON h.predb_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1',
-                $this->pdo->quote($hash)
+                escapeString($hash)
             )
         );
 
@@ -1367,7 +1349,7 @@ class NameFixer
             if ($time === 1) {
                 $te = ' in the past 3 hours';
             }
-            echo ColorCLI::header('Fixing search names'.$te.' using the predb hash.');
+            ColorCLI::header('Fixing search names'.$te.' using the predb hash.');
         }
         $regex = 'AND (r.ishashed = 1 OR rf.ishashed = 1)';
 
@@ -1385,7 +1367,7 @@ class NameFixer
 
         $res = DB::select($query);
         $total = \count($res);
-        echo ColorCLI::primary(number_format($total).' releases to process.');
+        ColorCLI::primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
             if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $matches)) {
                 $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
@@ -1397,9 +1379,9 @@ class NameFixer
             }
         }
         if ($echo === 1) {
-            echo ColorCLI::header(PHP_EOL.$updated.' releases have had their names changed out of: '.number_format($checked).' files.');
+            ColorCLI::header(PHP_EOL.$updated.' releases have had their names changed out of: '.number_format($checked).' files.');
         } else {
-            echo ColorCLI::header(PHP_EOL.$updated.' releases could have their names changed. '.number_format($checked).' files were checked.');
+            ColorCLI::header(PHP_EOL.$updated.' releases could have their names changed. '.number_format($checked).' files were checked.');
         }
 
         return $updated;
@@ -2065,17 +2047,20 @@ class NameFixer
      */
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
     {
-        if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(
-                "
+        if (! empty($release->uid) && $this->done === false && $this->relid !== (int) $release->releases_id) {
+            $result = DB::select(sprintf(
+                '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
 				WHERE ru.releases_id IS NOT NULL
-				AND ru.uniqueid = {$this->pdo->quote($release->uid)}
-				AND ru.releases_id != {$release->releases_id}
-				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')"
-            );
+				AND ru.uniqueid = %s
+				AND ru.releases_id != %d
+				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = %s)',
+                escapeString($release->uid),
+                $release->releases_id,
+                escapeString('nonscene@Ef.net (EF)')
+            ));
 
             foreach ($result as $res) {
                 $floor = round(($res['relsize'] - $release->relsize) / $res['relsize'] * 100, 1);
@@ -2167,7 +2152,7 @@ class NameFixer
                     self::IS_RENAMED_NONE,
                     Category::OTHER_MISC,
                     Category::OTHER_HASHED,
-                    $this->pdo->quote('%SDPORN%')
+                    escapeString('%SDPORN%')
                 )
             );
 
@@ -2211,7 +2196,7 @@ class NameFixer
             $result = DB::select(
                 sprintf(
                     "
-				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+				    SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = {$release->releases_id})
@@ -2220,7 +2205,7 @@ class NameFixer
                     self::IS_RENAMED_NONE,
                     Category::OTHER_MISC,
                     Category::OTHER_HASHED,
-                    $this->pdo->quote('%.srr')
+                    escapeString('%.srr')
                 )
             );
 
@@ -2261,15 +2246,17 @@ class NameFixer
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(
-                "
+            $result = DB::select(sprintf(
+                '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = r.id
-				WHERE ph.hash = {$this->pdo->quote($release->hash)}
-				AND ph.releases_id != {$release->releases_id}
-				AND (r.predb_id > 0 OR r.anidbid > 0)"
-            );
+				WHERE ph.hash = %s
+				AND ph.releases_id != %d
+				AND (r.predb_id > 0 OR r.anidbid > 0)',
+                escapeString($release->hash),
+                $release->releases_id
+            ));
 
             foreach ($result as $res) {
                 $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
@@ -2300,5 +2287,17 @@ class NameFixer
     public function reset(): void
     {
         $this->done = $this->matched = false;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return array
+     */
+    private function preMatch($fileName): array
+    {
+        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $fileName, $match);
+
+        return [$result === 1, $match[0] ?? ''];
     }
 }

@@ -17,8 +17,10 @@ if (! empty($argv[1])) {
     if ($moviefanart) {
         dump($moviefanart);
     } else {
-        exit(ColorCLI::error('Error retrieving Fanart.TV data.'));
+        ColorCLI::error('Error retrieving Fanart.TV data.');
+        exit();
     }
 } else {
-    exit(ColorCLI::error('Invalid arguments. This script requires a number or string (TMDB or IMDb ID.'));
+    ColorCLI::error('Invalid arguments. This script requires a number or string (TMDB or IMDb ID.');
+    exit();
 }

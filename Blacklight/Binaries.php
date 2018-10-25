@@ -346,14 +346,14 @@ class Binaries
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(ColorCLI::primary('Processing '.$groupMySQL['name']), true);
+            ColorCLI::primary('Processing '.$groupMySQL['name']);
         }
 
         // Attempt to repair any missing parts before grabbing new ones.
         if ((int) $groupMySQL['last_record'] !== 0) {
             if ($this->_partRepair) {
                 if ($this->_echoCLI) {
-                    ColorCLI::doEcho(ColorCLI::primary('Part repair enabled. Checking for missing parts.'), true);
+                    ColorCLI::primary('Part repair enabled. Checking for missing parts.');
                 }
                 $this->partRepair($groupMySQL);
 
@@ -363,7 +363,7 @@ class Binaries
                     $this->partRepair($groupMySQL, $tableNames);
                 }
             } elseif ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::primary('Part repair disabled by user.'), true);
+                ColorCLI::primary('Part repair disabled by user.');
             }
         }
 
@@ -431,8 +431,7 @@ class Binaries
         // If total is bigger than 0 it means we have new parts in the newsgroup.
         if ($total > 0) {
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(
-                    ColorCLI::primary(
+                ColorCLI::primary(
                         (
                         (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
@@ -447,9 +446,7 @@ class Binaries
                         " for next pass.\nServer oldest: ".number_format($groupNNTP['first']).
                         ' Server newest: '.number_format($groupNNTP['last']).
                         ' Local newest: '.number_format($groupMySQL['last_record'])
-                    ),
-                    true
-                );
+                    );
             }
 
             $done = false;
@@ -468,13 +465,11 @@ class Binaries
                 $first++;
 
                 if ($this->_echoCLI) {
-                    ColorCLI::doEcho(
-                        ColorCLI::header(
+                    ColorCLI::header(
                             PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
                             ' to '.number_format($last).') from '.$groupMySQL['name'].' - ('.
                             number_format($groupLast - $last).' articles in queue).'
-                        )
-                    );
+                        );
                 }
 
                 // Get article headers from newsgroup.
@@ -539,24 +534,18 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(
-                    ColorCLI::primary(
+                ColorCLI::primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
                         number_format(microtime(true) - $startGroup, 2).' seconds.'
-                    ),
-                    true
-                );
+                    );
             }
         } elseif ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
+            ColorCLI::primary(
                     'No new articles for '.$groupMySQL['name'].' (first '.number_format($first).
                     ', last '.number_format($last).', grouplast '.number_format($groupMySQL['last_record']).
                     ', total '.number_format($total).")\n".'Server oldest: '.number_format($groupNNTP['first']).
                     ' Server newest: '.number_format($groupNNTP['last']).' Local newest: '.number_format($groupMySQL['last_record'])
-                ),
-                true
-            );
+                );
         }
     }
 
@@ -782,13 +771,10 @@ class Binaries
                 $this->addMissingParts($rangeNotReceived, $this->tableNames['prname'], $this->groupMySQL['id']);
 
                 if ($this->_echoCLI) {
-                    ColorCLI::doEcho(
-                        ColorCLI::alternate(
+                    ColorCLI::alternate(
                             'Server did not return '.$notReceivedCount.
                             ' articles from '.$this->groupMySQL['name'].'.'
-                        ),
-                        true
-                    );
+                        );
                 }
             }
             unset($rangeNotReceived);
@@ -864,7 +850,7 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
-                    $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->quote(substr($this->header['Xref'], 2, 255))) : '');
+                    $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
@@ -877,7 +863,7 @@ class Binaries
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], $this->_pdo->quote(substr(utf8_encode($this->header['matches'][1]), 0, 255)), $this->_pdo->quote(utf8_encode($this->header['From'])), $unixtime, $this->_pdo->quote(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
@@ -906,7 +892,7 @@ class Binaries
                     DB::insert(sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, $this->_pdo->quote(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, escapeString(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
@@ -1022,14 +1008,11 @@ class Binaries
      */
     protected function outputHeaderInitial(): void
     {
-        ColorCLI::doEcho(
-            ColorCLI::primary(
+        ColorCLI::primary(
                 'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
-            ),
-            true
-        );
+            );
     }
 
     /**
@@ -1039,8 +1022,7 @@ class Binaries
     {
         $currentMicroTime = microtime(true);
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::alternateOver($this->timeHeaders.'s').
+            ColorCLI::alternateOver($this->timeHeaders.'s').
                 ColorCLI::primaryOver(' to download articles, ').
                 ColorCLI::alternateOver($this->timeCleaning.'s').
                 ColorCLI::primaryOver(' to process collections, ').
@@ -1049,9 +1031,7 @@ class Binaries
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
                 ColorCLI::primaryOver(' for part repair, ').
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
-                ColorCLI::primary(' total.'),
-                true
-            );
+                ColorCLI::primary(' total.');
         }
     }
 
@@ -1106,7 +1086,7 @@ class Binaries
                 DB::commit();
             }
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                ColorCLI::doEcho(ColorCLI::notice('Deadlock occurred'));
+                ColorCLI::notice('Deadlock occurred');
                 DB::rollBack();
             }
         }
@@ -1114,14 +1094,11 @@ class Binaries
         $missingCount = \count($missingParts);
         if ($missingCount > 0) {
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(
-                    ColorCLI::primary(
+                ColorCLI::primary(
                         'Attempting to repair '.
                         number_format($missingCount).
                         ' parts.'
-                    ),
-                    true
-                );
+                    );
             }
 
             // Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
@@ -1199,14 +1176,11 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(
-                    ColorCLI::primary(
+                ColorCLI::primary(
                         PHP_EOL.
                         number_format($partsRepaired).
                         ' parts repaired.'
-                    ),
-                    true
-                );
+                    );
             }
         }
 
@@ -1334,12 +1308,9 @@ class Binaries
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
+            ColorCLI::primary(
                     'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
-                ),
-                true
-            );
+                );
         }
 
         // Pick the middle to start with
@@ -1395,13 +1366,10 @@ class Binaries
 
         $wantedArticle = (int) $wantedArticle;
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
+            ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
-                ),
-                true
-            );
+                );
         }
 
         return $wantedArticle;
@@ -1565,7 +1533,7 @@ class Binaries
                 ($groupRegex ? 'REGEXP' : '='),
                 ($activeOnly ? 'AND bb.status = 1' : ''),
                 $opType,
-                ($groupName ? ('AND g.name REGEXP '.$this->_pdo->quote($groupName)) : '')
+                ($groupName ? ('AND g.name REGEXP '.escapeString($groupName)) : '')
             )
         );
     }
@@ -1655,10 +1623,7 @@ class Binaries
     private function log($message, $method, $color): void
     {
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::$color($message.' ['.__CLASS__."::$method]"),
-                true
-            );
+            ColorCLI::$color($message.' ['.__CLASS__."::$method]");
         }
     }
 
@@ -1714,11 +1679,11 @@ class Binaries
         try {
             return DB::insert($query);
         } catch (QueryException $e) {
-            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+            ColorCLI::debug('Query error occurred.');
         } catch (\PDOException $e) {
-            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+            ColorCLI::debug('Query error occurred.');
         } catch (\Throwable $e) {
-            ColorCLI::doEcho(ColorCLI::debug('Query error occurred.'), true);
+            ColorCLI::debug('Query error occurred.');
         }
 
         return false;

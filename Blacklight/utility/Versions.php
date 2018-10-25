@@ -68,10 +68,8 @@ class Versions
      */
     public function __construct($filepath = null)
     {
-        if (empty($filepath)) {
-            if (defined('NN_VERSIONS')) {
-                $filepath = NN_VERSIONS;
-            }
+        if ($filepath === null && \defined('NN_VERSIONS')) {
+            $filepath = NN_VERSIONS;
         }
 
         if (! file_exists($filepath)) {
@@ -126,7 +124,7 @@ class Versions
                     $count++;
                 }
                 if ($count !== $this->_vers->git->commit) {
-                    echo ColorCLI::primary("Updating commit number to {$count}");
+                    ColorCLI::primary("Updating commit number to {$count}");
                     $this->_vers->git->commit = $count;
                     $this->_changes |= self::UPDATED_GIT_COMMIT;
                 }
@@ -154,7 +152,7 @@ class Versions
         $this->_gitHighestTag = $latest = trim($this->git->tagLatest());
         $ver = preg_match('#v(\d+\.\d+\.\d+).*#', $latest, $matches) ? $matches[1] : $latest;
 
-        if (! in_array($branch, $this->_stable, false)) {
+        if (! \in_array($branch, $this->_stable, false)) {
             if (version_compare($this->_vers->git->tag, '0.0.0', '!=')) {
                 $this->_vers->git->tag = '0.0.0';
                 $this->_changes |= self::UPDATED_GIT_TAG;
@@ -165,18 +163,18 @@ class Versions
         // Check if version file's entry is the same as current branch's tag
         if (version_compare($this->_vers->git->tag, $latest, '!=')) {
             if ($update) {
-                echo ColorCLI::primaryOver('Updating tag version to ').ColorCLI::headerOver($latest);
+                ColorCLI::primaryOver('Updating tag version to ').ColorCLI::headerOver($latest);
                 $this->_vers->git->tag = $ver;
                 $this->_changes |= self::UPDATED_GIT_TAG;
             } else {
-                echo ColorCLI::primaryOver('Leaving tag version at ').
+                ColorCLI::primaryOver('Leaving tag version at ').
                     ColorCLI::headerOver($this->_vers->git->tag);
             }
 
             return $this->_vers->git->tag;
-        } else {
-            echo ColorCLI::primaryOver('Tag version is ').ColorCLI::header($latest);
         }
+
+        ColorCLI::primaryOver('Tag version is ').ColorCLI::header($latest);
 
         return false;
     }
@@ -194,7 +192,7 @@ class Versions
 
         if ($this->_vers->sql->db->__toString() !== $this->_vers->sql->file->__toString()) {
             if ($update) {
-                echo ColorCLI::primaryOver('Updating Db revision to '.$this->_vers->sql->file);
+                ColorCLI::primaryOver('Updating Db revision to '.$this->_vers->sql->file);
                 $this->_vers->sql->db = $this->_vers->sql->file->__toString();
                 $this->_changes |= self::UPDATED_SQL_DB_PATCH;
             }
@@ -228,7 +226,7 @@ class Versions
 
         if ($update) {
             if ($last !== false && $this->_vers->sql->file->__toString() !== $last) {
-                echo ColorCLI::primary('Updating latest patch file to '.$last);
+                ColorCLI::primary('Updating latest patch file to '.$last);
                 $this->_vers->sql->file = $last;
                 $this->_changes |= self::UPDATED_SQL_FILE_LAST;
             }
@@ -287,19 +285,19 @@ class Versions
 
         if ($this->_xml === false) {
             if (Utility::isCLI()) {
-                ColorCLI::error("Your versions XML file ($filepath) is broken, try updating from git.");
+                ColorCLI::error('Your versions XML file ('.$filepath.') is broken, try updating from git.');
             }
-            throw new \RuntimeException("Failed to open versions XML file '$filepath'");
+            throw new \RuntimeException('Failed to open versions XML file '.$filepath);
         }
 
         if ($this->_xml->count() > 0) {
             $vers = $this->_xml->xpath('/nntmux/versions');
 
             if ($vers[0]->count() === 0) {
-                ColorCLI::error('Your versions XML file ({NN_VERSIONS}) does not contain version info, try updating from git.');
-                throw new \RuntimeException("Failed to find versions node in XML file '$filepath'");
+                ColorCLI::error('Your versions XML file ('.NN_VERSIONS.') does not contain version info, try updating from git.');
+                throw new \RuntimeException('Failed to find versions node in XML file '.$filepath);
             }
-            ColorCLI::primary('Your versions XML file ({NN_VERSIONS}) looks okay, continuing.');
+            ColorCLI::primary('Your versions XML file ('.NN_VERSIONS.') looks okay, continuing.');
             $this->_vers = &$this->_xml->versions;
         } else {
             throw new \RuntimeException("No elements in file!\n");

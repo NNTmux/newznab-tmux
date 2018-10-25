@@ -257,7 +257,7 @@ class AniDB
         if ($check === false) {
             AnidbTitle::insertIgnore(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title]);
         } else {
-            echo ColorCLI::warning("Duplicate: $id");
+            ColorCLI::warning("Duplicate: $id");
         }
     }
 
@@ -327,7 +327,7 @@ class AniDB
 
         if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {
             if ($this->echooutput) {
-                echo ColorCLI::header('Updating anime titles by grabbing full data AniDB dump.');
+                ColorCLI::header('Updating anime titles by grabbing full data AniDB dump.');
             }
 
             $animetitles = new \SimpleXMLElement('compress.zlib://http://anidb.net/api/anime-titles.xml.gz', null, true);
@@ -339,7 +339,7 @@ class AniDB
             if ($animetitles instanceof \Traversable) {
                 $count = $animetitles->count();
                 if ($this->echooutput) {
-                    echo ColorCLI::header(
+                    ColorCLI::header(
                         'Total of '.number_format($count).' titles to add.'.PHP_EOL
                     );
                 }
@@ -399,22 +399,16 @@ class AniDB
                 $AniDBAPIArray = $this->getAniDbAPI($anidb['anidbid']);
 
                 if ($this->banned === true) {
-                    ColorCLI::doEcho(
-                        ColorCLI::error(
+                    ColorCLI::error(
                             'AniDB Banned, import will fail, please wait 24 hours before retrying.'
-                        ),
-                        true
-                    );
+                        );
                     exit;
                 }
 
                 if ($AniDBAPIArray === false && $this->echooutput) {
-                    ColorCLI::doEcho(
-                        ColorCLI::info(
+                    ColorCLI::info(
                             'Anime ID: '.$anidb['anidbid'].' not available for update yet.'
-                        ),
-                        true
-                    );
+                        );
                 } else {
                     $this->updateAniChildTables($AniDBAPIArray, $anidb['anidbid']);
                 }
@@ -424,22 +418,16 @@ class AniDB
             $AniDBAPIArray = $this->getAniDbAPI($anidbId);
 
             if ($this->banned === true) {
-                ColorCLI::doEcho(
-                    ColorCLI::error(
+                ColorCLI::error(
                         'AniDB Banned, import will fail, please wait 24 hours before retrying.'
-                    ),
-                    true
-                );
+                    );
                 exit;
             }
 
             if ($AniDBAPIArray === false && $this->echooutput) {
-                ColorCLI::doEcho(
-                    ColorCLI::info(
+                ColorCLI::info(
                         'Anime ID: '.$anidbId.' not available for update yet.'
-                    ),
-                    true
-                );
+                    );
             } else {
                 $this->updateAniChildTables($AniDBAPIArray, $anidbId);
             }

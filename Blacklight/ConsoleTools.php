@@ -40,7 +40,7 @@ class ConsoleTools
         echo str_repeat(\chr(8), $this->lastMessageLength);
 
         $this->lastMessageLength = \strlen($message);
-        echo ColorCLI::headerOver($message);
+        ColorCLI::headerOver($message);
     }
 
     /**
@@ -58,7 +58,7 @@ class ConsoleTools
         echo str_repeat(\chr(8), $this->lastMessageLength);
 
         $this->lastMessageLength = \strlen($message);
-        echo ColorCLI::primaryOver($message);
+        ColorCLI::primaryOver($message);
     }
 
     /**

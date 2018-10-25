@@ -2,135 +2,119 @@
 
 namespace Blacklight;
 
+use League\CLImate\CLImate;
+
 class ColorCLI
 {
     /**
-     * @param $str
-     *
-     * @return string
+     * @return \League\CLImate\CLImate
      */
-    public static function debug($str)
+    protected static function climate()
     {
-        return color('Debug: '.$str)->light_gray().PHP_EOL;
+        return new CLImate();
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function info($str): string
+    public static function debug($str): void
     {
-        return color('Info: '.$str)->fg('magenta');
+        self::climate()->lightGray()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function notice($str): string
+    public static function info($str): void
     {
-        return color('Notice: '.$str)->blue();
+        self::climate()->magenta()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function warning($str): string
+    public static function notice($str): void
     {
-        return color('Warning: '.$str)->fg('yellow');
+        self::climate()->blue()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function error($str): string
+    public static function warning($str): void
     {
-        return color('Error: '.$str)->fg('red');
+        self::climate()->yellow()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function primary($str): string
+    public static function error($str): void
     {
-        return color($str)->green().PHP_EOL;
+        self::climate()->red()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function header($str): string
+    public static function primary($str): void
     {
-        return color($str)->yellow().PHP_EOL;
+        self::climate()->green()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function alternate($str): string
+    public static function header($str): void
     {
-        return color($str)->magenta()->dark()->bold().PHP_EOL;
+        self::climate()->yellow()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function tmuxOrange($str): string
+    public static function alternate($str): void
     {
-        return color($str)->yellow()->dark().PHP_EOL;
+        self::climate()->magenta()->bold()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function primaryOver($str): string
+    public static function tmuxOrange($str): void
     {
-        return color($str)->green();
+        self::climate()->yellow()->bold()->out($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function headerOver($str): string
+    public static function primaryOver($str): void
     {
-        return color($str)->yellow();
+        self::climate()->green()->inline($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function alternateOver($str): string
+    public static function headerOver($str): void
     {
-        return color($str)->magenta()->dark();
+        self::climate()->yellow()->inline($str);
     }
 
     /**
      * @param $str
-     * @return string
      */
-    public static function warningOver($str): string
+    public static function alternateOver($str): void
     {
-        return color($str)->red();
+        self::climate()->magenta()->bold()->inline($str);
     }
 
     /**
-     * Echo message to CLI.
-     *
-     * @param string $message The message.
-     * @param bool $nl Add a new line?
-     * @void
+     * @param $str
      */
-    public static function doEcho($message, $nl = false): void
+    public static function warningOver($str): void
     {
-        echo $message.($nl ? PHP_EOL : '');
+        self::climate()->red()->inline($str);
     }
 }

@@ -509,16 +509,16 @@ class TmuxOutput extends Tmux
         );
 
         $pieces = explode(' ', $this->pdo->getAttribute(\PDO::ATTR_SERVER_INFO));
-        $buffer .= ColorCLI::primaryOver("\nThreads = ").
-            ColorCLI::headerOver($pieces[4]).
-            ColorCLI::primaryOver(', Opens = ').
-            ColorCLI::headerOver($pieces[14]).
-            ColorCLI::primaryOver(', Tables = ').
-            ColorCLI::headerOver($pieces[22]).
-            ColorCLI::primaryOver(', Slow = ').
-            ColorCLI::headerOver($pieces[11]).
-            ColorCLI::primaryOver(', QPS = ').
-            ColorCLI::header($pieces[28]);
+        $buffer .= color("\nThreads = ")->green.
+            color($pieces[4])->yellow.
+            color(', Opens = ')->green.
+            color($pieces[14])->yellow.
+            color(', Tables = ')->green.
+            color($pieces[22])->yellow.
+            color(', Slow = ')->green.
+            color($pieces[11])->yellow.
+            color(', QPS = ')->green.
+            color($pieces[28])->yellow.PHP_EOL;
 
         return $buffer;
     }
@@ -555,11 +555,11 @@ class TmuxOutput extends Tmux
 
     protected function _setColourMasks(): void
     {
-        $this->_colourMasks[1] = ColorCLI::headerOver('%-18s').' '.ColorCLI::tmuxOrange('%-48.48s');
-        $this->_colourMasks['2.0'] = ColorCLI::alternateOver('%-20s').' '.ColorCLI::tmuxOrange('%-33.33s');
-        $this->_colourMasks['2.1'] = ColorCLI::headerOver('%-20s').' '.ColorCLI::tmuxOrange('%-33.33s');
-        $this->_colourMasks[3] = ColorCLI::header('%-16.16s %25.25s %25.25s');
-        $this->_colourMasks[4] = ColorCLI::primaryOver('%-16.16s').' '.ColorCLI::tmuxOrange('%25.25s %25.25s');
-        $this->_colourMasks[5] = ColorCLI::tmuxOrange('%-16.16s %25.25s %25.25s');
+        $this->_colourMasks[1] = color('%-18s')->yellow.' '.color('%-48.48s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks['2.0'] = color('%-20s')->magenta->dark.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks['2.1'] = color('%-20s')->yellow.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks[3] = color('%-16.16s %25.25s %25.25s')->yellow.PHP_EOL;
+        $this->_colourMasks[4] = color('%-16.16s')->green.' '.color('%25.25s %25.25s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks[5] = color('%-16.16s %25.25s %25.25s')->yellow->dark.PHP_EOL;
     }
 }

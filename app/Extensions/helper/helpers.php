@@ -5,6 +5,7 @@ use Blacklight\XXX;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 use GuzzleHttp\Exception\RequestException;
 
@@ -255,6 +256,34 @@ if (! function_exists('makeFieldLinks')) {
             }
 
             return $output;
+        }
+    }
+
+    if (! function_exists('escapeString')) {
+
+        /**
+         * @param $string
+         *
+         * @return string
+         */
+        function escapeString($string)
+        {
+            return DB::connection()->getPdo()->quote($string);
+        }
+    }
+
+    if (! function_exists('realDuration')) {
+
+        /**
+         * @param $milliseconds
+         *
+         * @return string
+         */
+        function realDuration($milliseconds)
+        {
+            $time = round($milliseconds / 1000);
+
+            return sprintf('%02dh:%02dm:%02ds', $time / 3600, $time / 60 % 60, $time % 60);
         }
     }
 }

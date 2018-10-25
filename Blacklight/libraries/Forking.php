@@ -211,12 +211,10 @@ class Forking extends \fork_daemon
         $this->processEndWork();
 
         if (config('nntmux.echocli')) {
-            ColorCLI::doEcho(
-                ColorCLI::header(
+            ColorCLI::header(
                     'Multi-processing for '.$this->workType.' finished in '.(microtime(true) - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
-                ), true
-            );
+                );
         }
     }
 
@@ -305,22 +303,16 @@ class Forking extends \fork_daemon
         $this->_workCount = \count($this->work);
         if ($this->_workCount > 0) {
             if (config('nntmux.echocli')) {
-                ColorCLI::doEcho(
-                    ColorCLI::header(
+                ColorCLI::header(
                         'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
                         ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
-                    ), true
-                );
+                    );
             }
 
             $this->addwork($this->work);
             $this->process_work(true);
-        } else {
-            if (config('nntmux.echocli')) {
-                ColorCLI::doEcho(
-                    ColorCLI::header('No work to do!'), true
-                );
-            }
+        } elseif (config('nntmux.echocli')) {
+            ColorCLI::header('No work to do!');
         }
     }
 
@@ -1107,13 +1099,11 @@ class Forking extends \fork_daemon
     public function childExit($pid, $identifier = '')
     {
         if (config('nntmux.echocli')) {
-            ColorCLI::doEcho(
-                ColorCLI::header(
+            ColorCLI::header(
                     'Process ID #'.$pid.' has completed.'.PHP_EOL.
                     'There are '.($this->forked_children_count - 1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.'.PHP_EOL
-                ), true
-            );
+                );
         }
     }
 }

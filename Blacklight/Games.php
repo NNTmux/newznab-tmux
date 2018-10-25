@@ -100,11 +100,6 @@ class Games
     protected $giantBomb;
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * @var
      */
     protected $igdbSleep;
@@ -124,7 +119,6 @@ class Games
         ];
         $options += $defaults;
         $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = DB::connection()->getPdo();
 
         $this->publicKey = Settings::settingValue('APIs..giantbombkey');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
@@ -385,9 +379,9 @@ class Games
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if ($bbk === 'year') {
-                    $browseBy .= 'AND YEAR (gi.releasedate) '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
+                    $browseBy .= 'AND YEAR (gi.releasedate) '.'LIKE '.escapeString('%'.$bbs.'%');
                 } else {
-                    $browseBy .= 'AND gi.'.$bbv.' '.'LIKE '.$this->pdo->quote('%'.$bbs.'%');
+                    $browseBy .= 'AND gi.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
                 }
             }
         }
@@ -487,8 +481,8 @@ class Games
                 }
 
                 if (! empty($this->_gameResults['releasedate'])) {
-                    $dateReleased = $this->_gameResults['releasedate'];
-                    $game['releasedate'] = Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
+                    $dateReleased = $this->_gameResults['releasedate'] === 'TBA' ? '' : $this->_gameResults['releasedate'];
+                    $game['releasedate'] = $this->_gameResults['releasedate'] === '' ? null : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
                 }
 
                 if (! empty($this->_gameResults['description'])) {
@@ -558,12 +552,12 @@ class Games
                             $game['review'] = (string) $this->_gameResults->deck;
                         }
                     } else {
-                        ColorCLI::doEcho(ColorCLI::notice('GiantBomb returned no valid results'), true);
+                        ColorCLI::notice('GiantBomb returned no valid results');
 
                         return false;
                     }
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'), true);
+                    ColorCLI::notice('GiantBomb found no valid results');
 
                     return false;
                 }
@@ -601,14 +595,18 @@ class Games
                             ]);
 
                             $publishers = [];
-                            foreach ($this->_gameResults->publishers as $publisher) {
-                                $publishers[] = IGDB::getCompany($publisher)->name;
+                            if (! empty($this->_gameResults->publishers)) {
+                                foreach ($this->_gameResults->publishers as $publisher) {
+                                    $publishers[] = IGDB::getCompany($publisher)->name;
+                                }
                             }
 
                             $genres = [];
 
-                            foreach ($this->_gameResults->themes as $theme) {
-                                $genres[] = IGDB::getTheme($theme)->name;
+                            if (! empty($this->_gameResults->themes)) {
+                                foreach ($this->_gameResults->themes as $theme) {
+                                    $genres[] = IGDB::getTheme($theme)->name;
+                                }
                             }
 
                             $genreName = $this->_matchGenre(implode(',', $genres));
@@ -617,20 +615,20 @@ class Games
                                 'title' => $this->_gameResults->name,
                                 'asin' => $this->_gameResults->id,
                                 'review' => $this->_gameResults->summary ?? '',
-                                'coverurl' => 'https:'.$this->_gameResults->cover->url ?? '',
-                                'releasedate' => Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') ?? now()->format('Y-m-d'),
-                                'esrb' => round($this->_gameResults->aggregated_rating).'%' ?? 'Not Rated',
+                                'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover->url : '',
+                                'releasedate' => isset($this->_gameResults->first_release_date) ? Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
+                                'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
-                                'backdropurl' => 'https:'.$this->_gameResults->screenshots[0]->url ?? '',
+                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.$this->_gameResults->screenshots[0]->url : '',
                                 'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             ];
                         } else {
-                            ColorCLI::doEcho(ColorCLI::notice('IGDB returned no valid results'), true);
+                            ColorCLI::notice('IGDB returned no valid results');
 
                             return false;
                         }
                     } else {
-                        ColorCLI::doEcho(ColorCLI::notice('IGDB found no valid results'), true);
+                        ColorCLI::notice('IGDB found no valid results');
 
                         return false;
                     }
@@ -734,14 +732,11 @@ class Games
 
         if (! empty($gamesId)) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(
-                    ColorCLI::header('Added/updated game: ').
+                ColorCLI::header('Added/updated game: ').
                     ColorCLI::alternateOver('   Title:    ').
                     ColorCLI::primary($game['title']).
                     ColorCLI::alternateOver('   Source:   ').
-                    ColorCLI::primary($this->_classUsed),
-                    true
-                );
+                    ColorCLI::primary($this->_classUsed);
             }
             if ($game['cover'] === 1) {
                 $game['cover'] = $ri->saveImage($gamesId, $game['coverurl'], $this->imgSavePath, 250, 250);
@@ -750,11 +745,8 @@ class Games
                 $game['backdrop'] = $ri->saveImage($gamesId.'-backdrop', $game['backdropurl'], $this->imgSavePath, 1920, 1024);
             }
         } elseif ($this->echoOutput) {
-            ColorCLI::doEcho(
-                ColorCLI::headerOver('Nothing to update: ').
-                ColorCLI::primary($game['title'].' (PC)'),
-                true
-            );
+            ColorCLI::headerOver('Nothing to update: ').
+                ColorCLI::primary($game['title'].' (PC)');
         }
 
         return ! empty($gamesId) ? $gamesId : false;
@@ -782,7 +774,7 @@ class Games
 
         if ($res->count() > 0) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->count().' games release(s).'), true);
+                ColorCLI::header('Processing '.$res->count().' games release(s).');
             }
 
             foreach ($res as $arr) {
@@ -793,11 +785,8 @@ class Games
                 $gameInfo = $this->parseTitle($arr['searchname']);
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        ColorCLI::doEcho(
-                            ColorCLI::headerOver('Looking up: ').
-                            ColorCLI::primary($gameInfo['title'].' (PC)'),
-                            true
-                        );
+                        ColorCLI::headerOver('Looking up: ').
+                            ColorCLI::primary($gameInfo['title'].' (PC)');
                     }
 
                     // Check for existing games entry.
@@ -828,7 +817,7 @@ class Games
                 }
             }
         } elseif ($this->echoOutput) {
-            ColorCLI::doEcho(ColorCLI::header('No games releases to process.'), true);
+            ColorCLI::header('No games releases to process.');
         }
     }
 

@@ -1,3 +1,114 @@
+2018-10-25 DariusIII
+	* Chg: Update groupfixrelnames.php, remove traversable check for query results
+	* Fix: Fix deletion of sjows from my shows page
+	* Chg: Update groupfixrelnames queries
+	* Chg: Update Categorize class, update regexes to better match tv UHD releases
+	* Fix: Fix empty my shows RSS feed
+	* Chg: Add try catch block to ffmpeg frame generation so we catch the error and silently pass by
+	* Chg: Update ReleaseExtra class mediainfo languages retrieval
+	* CHg: Use File in place of Storage in ReleaseIMage delete function
+2018-10-24 DariusIII
+	* Fix: Add missing bootstrap-datepicker from admin area
+	* Chg: Update laravel/framework to version 5.7.11
+	* Chg: Update user migration and add patch to add email_verified_at column to users table
+	* Chg: Update jrean/laravel-user-verification to version 7.0.1
+	* Chg: Update laravel/framework to 5.7.10 again
+2018-10-23 DariusIII
+	* Fix: Downgrade laravel/framework to 5.7.9 due to breaking changes
+	* Chg: Remove unused assets from composer.json
+	* Chg: Update laravel/framework to version 5.7.10
+	* Chg: Update ReleaseExtra class, use first available audio/subtitle language
+	* Chg: Update tinymce to version 4.8.4 and filp/whoops to version 2.3.1
+	* Chg: Update ReleaseExtra class, check that data is there before using it
+	* Chg: Remove Charisma/Omicron related js and css files
+	* Chg: Update regex in AniDB postprocessing
+	* Chg: Update used libraries to their latest versions
+	* Chg: Convert miliseconds to proper time in ReleaseExtra for video duration from mediainfo
+2018-10-22 DariusIII
+	* Chg: Fetch only one audio language from array from mediainfo
+	* Chg: Use new mediainfo managing library
+	* Chg: Define STDOUT to prevent errors in web movie info update
+	* Chg: Add check to see if the cover is set in IGDB
+	* Chg: Add check for existing theme data from IGDB
+	* Chg: Update Versions class
+	* CHg: Check for TBA date in steam games information check
+	* Chg: Add check if the functions are ran from CLI so ColorCLI does not throw an error if its ran from web(Movie class)
+2018-10-21 DariusIII
+	* Chg: Try to prevent error on missing publishers from IGDB results
+	* Chg: Update filp/whoops to version 2.3.0 and phpstan/phpstan to version 0.10.5
+2018-10-20 DariusIII
+	* Chg: Update ProfileController
+	* Chg: Use object casting instead of row2Object function, remove now unused Sites class
+	* Chg: Update phpstan/phpstan to version 0.10.4
+2018-10-19 DariusIII
+	* Chg: Replace Storage with File facade in ProcessAdditional class
+	* Chg: Use Storage facade to create temporary directory
+	* Chg: Use Storage facade to manage temp files
+	* Fix: Fix invalid argument supplied for foreach error in matchPreDbFiles function
+	* Chg: Use kevinlebron/colors.php in monitor pane
+	* Chg: Use league/climate in ColorCLI class
+	* Chg: Check for empty filename before processing filename matching
+	* Chg: Increase matching percentage for matchPreDbFiles function
+2018-10-18 DariusIII
+	* Chg: Remove unused $this->pdo instances
+	* Chg: Try to further improve speed and RAM consumption of matchPreDbFiles function
+	* Chg: Update Console class fulltext search
+	* Chg: Update PHPDOC block in Categorize class
+	* Chg: Further refine predb file matching by selecting only releases that have been not renamed
+	* Chg: Update used libraries to latest versions
+2018-10-17 DariusIII
+	* Chg: Update james-heinrich/getid3 to version 1.9.16
+	* Chg: Add resend_email_verification.php script to resend user email verification if server failed to send it for some reason
+	* Chg: Update getPreFiles function to search inside other misc and hashed categories
+	* Chg: Update yab/laravel-scout-mysql-driver to version 2.0.7
+2018-10-16 DariusIII
+	* Chg: Update yab/laravel-scout-mysql-driver to version 2.0.6 and laravel/scout to version 5.0.3
+	* Fix: Fix wrong anidb_info table name (anidb_infos)
+	* Fix: Fix preMatch function return values
+	* Chg: Update NameFixer and Utility classes
+	* Chg: Update phpunit/php-code-coverage to version 6.1.0
+2018-10-15 DariusIII
+	* Fix: Fix query in matchpredbFT function
+	* Chg: Update spatie/laravel-permission to version 2.23.0
+	* Chg: Tremenduosly improve speed of matchPreDbFiles function by using laravel/scout full text matching
+	* Chg: Update league/flysystem to version 1.0.48
+	* Chg: Make $show variable in matchPreDbFiles function a boolean
+	* Chg: Slightly improve matchPredbFiles speed
+	* Chg: Use raw query in matchPredbFiles query
+	* Chg: Simplify matchPredbFiles function query
+	* Fix: Fix badly formatted query in uidCheck function
+	* Chg: Display complete time string for getPreFileNames function
+	* Fix: Fix use of empty release uniqueid in matching that causes errors
+2018-10-13 DariusIII
+	* Chg: Add nunomaduro/larastan to dev dependencies to test the code
+	* Chg: Update psy/psysh to version 0.9.9 and laravel/tinker to version 1.0.8
+2018-10-12 DariusIII
+	* Chg: Add escapeString helper function
+	* Fix: Add missed role_or_permission middleware to Kernel.php
+	* Chg: Update routes/web.php, use new role_or_permission middleware and group routes that use fw-block-blacklisted middleware
+	* Chg: Update spatie/laravel-permission to version 2.22.0
+2018-10-11 DariusIII
+	* Chg: Update font-awesome to version 5.4.1
+	* Chg: Update NfoController, check for missing nfo
+	* Chg: Update PHPDOC blocks in ProcessReleases class
+	* Chg: Update full site rss feed with ability to define limit and num(offset) for getting more releases from rss
+2018-10-10 DariusIII
+	* Chg: Update nikic/php-parser to version 4.1.0
+	* Chg: Simplyfy return value for mgr check in ProcessMultiGroupReleases class
+2018-10-09 DariusIII
+	* Chg: Use url helper to generate password reset link
+	* Chg: Update some of the regexes and cleanup the code in ProcessAdditional class
+	* Chg: Update laravel/framework to version 5.7.9
+	* Chg: Update TraktAPI class, remove error messages
+	* Chg: Change writeNzbForReleaseId function name
+	* Chg: Use transactions in NZB class
+2018-10-08 DariusIIi
+	* Chg: Update ProcessAdditional class
+	* Chg: Update font-awesome and spatie/fractalistic to their latest versions
+2018-10-05 DariusIII
+	* Chg: Update used libraries to their latest versions
+2018-10-04 DariusIII
+	* Chg: Update laravel/framework to version 5.7.8 and used libraries to their latest versions
 2018-10-03 DariusIII
 	* Chg: Update symfony components to their latest versions
 	* Fix: Remove stray whitespace in X-DNZB-NFO header sent on nzb download. Fixes issue #735

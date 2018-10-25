@@ -268,16 +268,14 @@ class Nfo
         $nfoCount = $res->count();
 
         if ($nfoCount > 0) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
+            ColorCLI::primary(
                     PHP_EOL.
                     ($guidChar === '' ? '' : '['.$guidChar.'] ').
                     ($groupID === '' ? '' : '['.$groupID.'] ').
                     'Processing '.$nfoCount.
                     ' NFO(s), starting at '.$this->nzbs.
                     ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-                ), true
-            );
+                );
 
             if ($this->echo) {
                 // Get count of releases per nfo status
@@ -310,7 +308,7 @@ class Nfo
                     foreach ($nfoStats as $row) {
                         $outString .= ', '.$row['status'].' = '.number_format($row['count']);
                     }
-                    ColorCLI::doEcho(ColorCLI::header($outString.'.'), true);
+                    ColorCLI::header($outString.'.');
                 }
             }
 
@@ -372,7 +370,7 @@ class Nfo
                 echo PHP_EOL;
             }
             if ($ret > 0) {
-                ColorCLI::doEcho($ret.' NFO file(s) found/processed.', true);
+                ColorCLI::primary($ret.' NFO file(s) found/processed.');
             }
         }
 

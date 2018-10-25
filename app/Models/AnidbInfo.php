@@ -38,11 +38,22 @@ class AnidbInfo extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @var string
+     */
+    protected $table = 'anidb_info';
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function title()
     {
         return $this->belongsTo(AnidbTitle::class, 'anidbid');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function episode()
     {
         return $this->belongsTo(AnidbEpisode::class, 'anidbid');

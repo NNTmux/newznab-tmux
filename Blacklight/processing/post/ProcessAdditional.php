@@ -20,6 +20,7 @@ use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
 use FFMpeg\Format\Video\Ogg;
+use Mhor\MediaInfo\MediaInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use FFMpeg\Coordinate\TimeCode;
@@ -27,14 +28,15 @@ use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use FFMpeg\Filters\Video\ResizeFilter;
 
 class ProcessAdditional
 {
     /**
      * How many compressed (rar/zip) files to check.
-     * @int
-     * @default 20
+     *
+     * @var int
      */
     public const maxCompressedFilesToCheck = 20;
 
@@ -389,6 +391,11 @@ class ProcessAdditional
     private $ffprobe;
 
     /**
+     * @var \Mhor\MediaInfo\MediaInfo
+     */
+    private $mediaInfo;
+
+    /**
      * ProcessAdditional constructor.
      *
      * @param array $options
@@ -413,20 +420,22 @@ class ProcessAdditional
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli') && (strtolower(PHP_SAPI) === 'cli'));
 
-        $this->pdo = DB::connection()->getPdo();
-        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI]));
+        $this->_nntp = $options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI]);
 
-        $this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+        $this->_nzb = $options['NZB'] instanceof NZB ? $options['NZB'] : new NZB();
         $this->_archiveInfo = new ArchiveInfo();
-        $this->_categorize = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize());
-        $this->_nameFixer = ($options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
-        $this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra());
-        $this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->_categorize = $options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize();
+        $this->_nameFixer = $options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Categorize' => $this->_categorize]);
+        $this->_releaseExtra = $options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra();
+        $this->_releaseImage = $options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage();
         $this->_par2Info = new Par2Info();
-        $this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
-        $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
-        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds'), 'ffmpeg.threads' => 2]);
+        $this->_nfo = $options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo();
+        $this->sphinx = $options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch();
+        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
+        $this->mediaInfo = new MediaInfo();
+        $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
+        $this->mediaInfo->setConfig('command', Settings::settingValue('apps..mediainfopath'));
 
         $this->_innerFileBlacklist = Settings::settingValue('indexer.ppa.innerfileblacklist') === '' ? false : Settings::settingValue('indexer.ppa.innerfileblacklist');
         $this->_maxNestedLevels = (int) Settings::settingValue('..maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('..maxnestedlevels');
@@ -582,7 +591,7 @@ class ProcessAdditional
 
         if (! is_dir($this->_mainTmpPath)) {
             $old = umask(0777);
-            if (! mkdir($this->_mainTmpPath) && ! is_dir($this->_mainTmpPath)) {
+            if (! File::makeDirectory($this->_mainTmpPath, 0777, true, true) && ! is_dir($this->_mainTmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->_mainTmpPath));
             }
             @chmod($this->_mainTmpPath, 0777);
@@ -643,7 +652,7 @@ class ProcessAdditional
                 $this->_maxSize,
                 $this->_minSize,
                 ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID),
-                ($guidChar === '' ? '' : 'AND r.leftguid = '.$this->pdo->quote($guidChar)),
+                ($guidChar === '' ? '' : 'AND r.leftguid = '.escapeString($guidChar)),
                 $this->_queryLimit
             )
         );
@@ -686,8 +695,7 @@ class ProcessAdditional
             $this->_echo(
                 PHP_EOL.'['.$this->_release->id.']['.
                 human_filesize($this->_release->size, 1).']',
-                'primaryOver',
-                false
+                'primaryOver'
             );
 
             cli_set_process_title($this->_showCLIReleaseID.$this->_release->id);
@@ -763,19 +771,16 @@ class ProcessAdditional
     protected function _recursivePathDelete($path, $ignoredFolders = []): void
     {
         if (is_dir($path)) {
-            $files = glob(rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'*');
-
-            foreach ($files as $file) {
-                $this->_recursivePathDelete($file, $ignoredFolders);
-            }
-
             if (\in_array($path, $ignoredFolders, false)) {
                 return;
             }
+            foreach (File::files($path) as $file) {
+                $this->_recursivePathDelete($file, $ignoredFolders);
+            }
 
-            @rmdir($path);
+            File::deleteDirectory($path);
         } elseif (is_file($path)) {
-            @unlink($path);
+            File::delete($path);
         }
     }
 
@@ -894,7 +899,7 @@ class ProcessAdditional
             }
 
             // Look for a video sample, make sure it's not an image.
-            if ($this->_processThumbnails === true && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processThumbnails === true && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g$/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
             ) {
                 // Get the amount of segments for this file.
                 $segCount = (\count($this->_currentNZBFile['segments']) - 1);
@@ -979,7 +984,7 @@ class ProcessAdditional
             }
 
             if ($this->_releaseHasPassword === true) {
-                $this->_echo('Skipping processing of rar '.$nzbFile['title'].' it has a password.', 'primaryOver', false);
+                $this->_echo('Skipping processing of rar '.$nzbFile['title'].' it has a password.', 'primaryOver');
                 break;
             }
 
@@ -1023,7 +1028,7 @@ class ProcessAdditional
 
                 // Echo we downloaded compressed file.
                 if ($this->_echoCLI) {
-                    $this->_echo('(cB)', 'primaryOver', false);
+                    $this->_echo('(cB)', 'primaryOver');
                 }
 
                 $downloaded++;
@@ -1037,7 +1042,7 @@ class ProcessAdditional
             } else {
                 $failed++;
                 if ($this->_echoCLI) {
-                    $this->_echo('f('.$failed.')', 'warningOver', false);
+                    $this->_echo('f('.$failed.')', 'warningOver');
                 }
             }
         }
@@ -1056,7 +1061,7 @@ class ProcessAdditional
         $this->_compressedFilesChecked++;
         // Give the data to archive info so it can check if it's a rar.
         if ($this->_archiveInfo->setData($compressedData, true) === false) {
-            $this->_debug('Data is probably not RAR or ZIP.'.PHP_EOL);
+            $this->_debug('Data is probably not RAR or ZIP.');
 
             return false;
         }
@@ -1083,7 +1088,7 @@ class ProcessAdditional
         switch ($dataSummary['main_type']) {
             case ArchiveInfo::TYPE_RAR:
                 if ($this->_echoCLI) {
-                    $this->_echo('r', 'primaryOver', false);
+                    $this->_echo('r', 'primaryOver');
                 }
 
                 if ($this->_extractUsingRarInfo === false && $this->_unrarPath !== false) {
@@ -1099,7 +1104,7 @@ class ProcessAdditional
                 break;
             case ArchiveInfo::TYPE_ZIP:
                 if ($this->_echoCLI) {
-                    $this->_echo('z', 'primaryOver', false);
+                    $this->_echo('z', 'primaryOver');
                 }
 
                 if ($this->_extractUsingRarInfo === false && $this->_7zipPath !== false) {
@@ -1210,21 +1215,21 @@ class ProcessAdditional
                     $this->_addedFileInfo++;
 
                     if ($this->_echoCLI) {
-                        $this->_echo('^', 'primaryOver', false);
+                        $this->_echo('^', 'primaryOver');
                     }
 
                     // Check for "codec spam"
                     if (preg_match('/alt\.binaries\.movies($|\.divx$)/', $this->_releaseGroupName) &&
-                        preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe/i', $file['name'])
+                        preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])
                     ) {
-                        $this->_debug('Codec spam found, setting release to potentially passworded.'.PHP_EOL);
+                        $this->_debug('Codec spam found, setting release to potentially passworded.');
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     } //Run a PreDB filename check on insert to try and match the release
                     elseif (strpos($file['name'], '.') !== 0 && \strlen($file['name']) > 0) {
                         $this->_release['filename'] = $file['name'];
                         $this->_release['releases_id'] = $this->_release->id;
-                        $this->_nameFixer->matchPredbFiles($this->_release, 1, 1, true);
+                        $this->_nameFixer->matchPreDbFiles($this->_release, 1, 1, true);
                     }
                 }
             }
@@ -1399,7 +1404,7 @@ class ProcessAdditional
 
                 if ($sampleBinary !== false) {
                     if ($this->_echoCLI) {
-                        $this->_echo('(sB)', 'primaryOver', false);
+                        $this->_echo('(sB)', 'primaryOver');
                     }
 
                     // Check if it's more than 40 bytes.
@@ -1417,15 +1422,9 @@ class ProcessAdditional
                         if ($this->_foundVideo === false) {
                             $this->_foundVideo = $this->_getVideo($fileLocation);
                         }
-
-                        // Try to get media info. Don't get it here if $mediaMsgID is not empty.
-                        // 2014-06-28 -> Commented out, since the media info of a sample video is not indicative of the actual release.si
-                        /*if ($this->_foundMediaInfo === false && empty($mediaMsgID)) {
-                            $this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
-                        }*/
                     }
                 } elseif ($this->_echoCLI) {
-                    $this->_echo('f', 'warningOver', false);
+                    $this->_echo('f', 'warningOver');
                 }
             }
         }
@@ -1452,7 +1451,7 @@ class ProcessAdditional
 
                 if ($mediaBinary !== false) {
                     if ($this->_echoCLI) {
-                        $this->_echo('(mB)', 'primaryOver', false);
+                        $this->_echo('(mB)', 'primaryOver');
                     }
 
                     // If it's more than 40 bytes...
@@ -1477,7 +1476,7 @@ class ProcessAdditional
                         }
                     }
                 } elseif ($this->_echoCLI) {
-                    $this->_echo('f', 'warningOver', false);
+                    $this->_echo('f', 'warningOver');
                 }
             }
         }
@@ -1502,7 +1501,7 @@ class ProcessAdditional
 
                 if ($audioBinary !== false) {
                     if ($this->_echoCLI) {
-                        $this->_echo('(aB)', 'primaryOver', false);
+                        $this->_echo('(aB)', 'primaryOver');
                     }
 
                     $fileLocation = $this->tmpPath.'audio.'.$this->_AudioInfoExtension;
@@ -1512,7 +1511,7 @@ class ProcessAdditional
                     // Try to get media info / sample of the audio file.
                     $this->_getAudioInfo($fileLocation, $this->_AudioInfoExtension);
                 } elseif ($this->_echoCLI) {
-                    $this->_echo('f', 'warningOver', false);
+                    $this->_echo('f', 'warningOver');
                 }
             }
         }
@@ -1537,7 +1536,7 @@ class ProcessAdditional
 
             if ($jpgBinary !== false) {
                 if ($this->_echoCLI) {
-                    $this->_echo('(jB)', 'primaryOver', false);
+                    $this->_echo('(jB)', 'primaryOver');
                 }
 
                 // Try to create a file with it.
@@ -1559,13 +1558,13 @@ class ProcessAdditional
                     Release::query()->where('id', $this->_release->id)->update(['jpgstatus' => 1]);
 
                     if ($this->_echoCLI) {
-                        $this->_echo('j', 'primaryOver', false);
+                        $this->_echo('j', 'primaryOver');
                     }
                 }
 
                 @unlink($this->tmpPath.'samplepicture.jpg');
             } elseif ($this->_echoCLI) {
-                $this->_echo('f', 'warningOver', false);
+                $this->_echo('f', 'warningOver');
             }
         }
     }
@@ -1661,7 +1660,7 @@ class ProcessAdditional
                 new \RecursiveDirectoryIterator($path)
             );
         } catch (\Throwable $e) {
-            $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage().PHP_EOL);
+            $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
 
             return false;
         }
@@ -1747,7 +1746,7 @@ class ProcessAdditional
                                     $newCat = $this->_categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname);
                                 }
 
-                                $newTitle = $this->pdo->quote(substr($newName, 0, 255));
+                                $newTitle = escapeString(substr($newName, 0, 255));
                                 // Update the search name.
                                 DB::update(
                                         sprintf(
@@ -1784,7 +1783,7 @@ class ProcessAdditional
                             $retVal = true;
                             $this->_foundAudioInfo = true;
                             if ($this->_echoCLI) {
-                                $this->_echo('a', 'primaryOver', false);
+                                $this->_echo('a', 'primaryOver');
                             }
                             break;
                         }
@@ -1834,7 +1833,7 @@ class ProcessAdditional
                     $audVal = $this->_foundAudioSample = true;
 
                     if ($this->_echoCLI) {
-                        $this->_echo('A', 'primaryOver', false);
+                        $this->_echo('A', 'primaryOver');
                     }
                 }
             }
@@ -1915,9 +1914,11 @@ class ProcessAdditional
 
             // Create the image.
             if ($this->ffprobe->isValid($fileLocation)) {
-                $video = $this->ffmpeg->open($fileLocation);
-                $sample = $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time));
-                $sample->save($fileName);
+                try {
+                    $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
+                } catch (\RuntimeException $runtimeException) {
+                    //We show no error at all, we failed to save the frame and move on
+                }
             }
 
             // Check if the file exists.
@@ -1938,7 +1939,7 @@ class ProcessAdditional
                 // Check if it saved.
                 if ($saved === 1) {
                     if ($this->_echoCLI) {
-                        $this->_echo('s', 'primaryOver', false);
+                        $this->_echo('s', 'primaryOver');
                     }
 
                     return true;
@@ -2049,7 +2050,7 @@ class ProcessAdditional
                 // Update query to say we got the video.
                 Release::query()->where('guid', $this->_release->guid)->update(['videostatus' => 1]);
                 if ($this->_echoCLI) {
-                    $this->_echo('v', 'primaryOver', false);
+                    $this->_echo('v', 'primaryOver');
                 }
 
                 return true;
@@ -2072,15 +2073,11 @@ class ProcessAdditional
 
         // Look for the video file.
         if (is_file($fileLocation)) {
-
-            // Run media info on it.
-            $xmlArray = runCmd(
-                $this->_killString.Settings::settingValue('apps..mediainfopath').'" --Output=XML "'.$fileLocation.'"'
-            );
+            $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
             // Check if we got it.
 
-            if (! preg_match('/<track type="(Audio|Video)">/i', $xmlArray)) {
+            if ($xmlArray === null) {
                 return false;
             }
 
@@ -2089,7 +2086,7 @@ class ProcessAdditional
             $this->_releaseExtra->addFromXml($this->_release->id, $xmlArray);
 
             if ($this->_echoCLI) {
-                $this->_echo('m', 'primaryOver', false);
+                $this->_echo('m', 'primaryOver');
             }
 
             return true;
@@ -2284,7 +2281,6 @@ class ProcessAdditional
         $this->_foundAudioSample = $this->_processAudioSample ? false : true;
         $this->_foundJPGSample = $this->_processJPGSample ? false : true;
         $this->_foundSample = $this->_processThumbnails ? false : true;
-        $this->_foundSample = (int) $this->_release->disablepreview === 1;
         $this->_foundPAR2Info = false;
 
         $this->_passwordStatus = [Releases::PASSWD_NONE];
@@ -2314,14 +2310,13 @@ class ProcessAdditional
      *
      * @param string $string  String to echo.
      * @param string $type    Method type.
-     * @param bool   $newLine Print a new line at the end of the string.
      *
      * @void
      */
-    protected function _echo($string, $type, $newLine = true): void
+    protected function _echo($string, $type): void
     {
         if ($this->_echoCLI) {
-            ColorCLI::doEcho(ColorCLI::$type($string), $newLine);
+            ColorCLI::$type($string);
         }
     }
 
@@ -2329,12 +2324,11 @@ class ProcessAdditional
      * Echo a string to CLI. For debugging.
      *
      * @param string $string
-     * @param bool   $newline
      *
      * @void
      */
-    protected function _debug($string, $newline = true): void
+    protected function _debug($string): void
     {
-        $this->_echo('DEBUG: '.$string, 'debug', $newline);
+        $this->_echo('DEBUG: '.$string, 'debug');
     }
 }

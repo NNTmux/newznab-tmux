@@ -69,11 +69,6 @@ class ReleaseRemover
     protected $method = '';
 
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
      * The query we will use to select unwanted releases.
      *
      * @var string
@@ -121,7 +116,6 @@ class ReleaseRemover
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => null]));
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
@@ -183,8 +177,8 @@ class ReleaseRemover
         $this->deleteReleases();
 
         if ($this->echoCLI) {
-            echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            echo ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
+            ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
         }
 
         return $this->browser
@@ -225,7 +219,7 @@ class ReleaseRemover
 
         if ($time === 'full') {
             if ($this->echoCLI) {
-                echo ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.\n');
+                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.\n');
             }
         } else {
             if (! is_numeric($time)) {
@@ -234,7 +228,7 @@ class ReleaseRemover
                 return $this->returnError();
             }
             if ($this->echoCLI) {
-                echo ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).\n');
+                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).\n');
             }
             $this->crapTime = ' AND r.adddate > (NOW() - INTERVAL '.$time.' HOUR)';
         }
@@ -312,8 +306,8 @@ class ReleaseRemover
         }
 
         if ($this->echoCLI) {
-            echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            echo ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
+            ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
         }
 
         return $this->browser
@@ -427,7 +421,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
-            $this->pdo->quote('%.exe'),
+            escapeString('%.exe'),
             Category::PC_0DAY,
             Category::PC_GAMES,
             Category::OTHER_MISC,
@@ -456,7 +450,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
-            $this->pdo->quote('%install.bin%'),
+            escapeString('%install.bin%'),
             $this->crapTime
         );
 
@@ -481,7 +475,7 @@ class ReleaseRemover
 			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
-            $this->pdo->quote('%password.url%'),
+            escapeString('%password.url%'),
             $this->crapTime
         );
 
@@ -514,13 +508,13 @@ class ReleaseRemover
 			AND r.nzbstatus = 1
 			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
             // Matches passwort / passworded / etc also.
-            $this->pdo->quote('%passwor%'),
-            $this->pdo->quote('%advanced%'),
-            $this->pdo->quote('%no password%'),
-            $this->pdo->quote('%not password%'),
-            $this->pdo->quote('%recovery%'),
-            $this->pdo->quote('%reset%'),
-            $this->pdo->quote('%unlocker%'),
+            escapeString('%passwor%'),
+            escapeString('%advanced%'),
+            escapeString('%no password%'),
+            escapeString('%not password%'),
+            escapeString('%recovery%'),
+            escapeString('%reset%'),
+            escapeString('%unlocker%'),
             Category::PC_GAMES,
             Category::PC_0DAY,
             Category::PC_ISO,
@@ -612,7 +606,7 @@ class ReleaseRemover
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
 			AND rf.name LIKE %s %s',
-            $this->pdo->quote('%.nzb%'),
+            escapeString('%.nzb%'),
             $this->crapTime
         );
 
@@ -639,7 +633,7 @@ class ReleaseRemover
 			AND r.size < 40000000
 			AND r.name LIKE %s
 			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
-            $this->pdo->quote('%sample%'),
+            escapeString('%sample%'),
             Category::TV_ANIME,
             Category::TV_DOCU,
             Category::TV_FOREIGN,
@@ -721,7 +715,7 @@ class ReleaseRemover
         if (\count($regexList) > 0) {
             foreach ($regexList as $regex) {
                 $regexSQL = $ftMatch = $regexMatch = $opTypeName = '';
-                $dbRegex = $this->pdo->quote($regex->regex);
+                $dbRegex = escapeString($regex->regex);
 
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
@@ -750,7 +744,7 @@ class ReleaseRemover
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->quote($regex->groupname)
+                        escapeString($regex->groupname)
                     );
 
                     $groupIDCount = \count($groupIDs);
@@ -782,7 +776,7 @@ class ReleaseRemover
                 }
 
                 // Provide useful output of operations
-                echo ColorCLI::header(
+                ColorCLI::header(
                     sprintf(
                     "Finding crap releases for %s: Using %s method against release %s.\n".
                         '%s',
@@ -815,7 +809,7 @@ class ReleaseRemover
                 $this->deleteReleases();
             }
         } else {
-            echo ColorCLI::error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
+            ColorCLI::error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
         }
 
         return true;
@@ -846,7 +840,7 @@ class ReleaseRemover
             foreach ($allRegex as $regex) {
                 $regexSQL = sprintf(
                     'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
-                    $this->pdo->quote($regex->regex)
+                    escapeString($regex->regex)
                 );
 
                 if ($regexSQL === '') {
@@ -858,7 +852,7 @@ class ReleaseRemover
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = DB::select(
                         'SELECT id FROM groups WHERE name REGEXP '.
-                        $this->pdo->quote($regex->groupname)
+                        escapeString($regex->groupname)
                     );
                     $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
@@ -884,7 +878,7 @@ class ReleaseRemover
                 $ftUsing = PHP_EOL;
 
                 // Provide useful output of operations
-                echo ColorCLI::header(
+                ColorCLI::header(
                     sprintf(
                     'Finding crap releases for %s: Using %s method against release filenames.'.PHP_EOL.
                         '%s',
@@ -1011,10 +1005,10 @@ class ReleaseRemover
             if ($this->delete) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
-                    echo ColorCLI::primary('Deleting: '.$this->method.': '.$release->searchname);
+                    ColorCLI::primary('Deleting: '.$this->method.': '.$release->searchname);
                 }
             } elseif ($this->echoCLI) {
-                echo ColorCLI::primary('Would be deleting: '.$this->method.': '.$release->searchname);
+                ColorCLI::primary('Would be deleting: '.$this->method.': '.$release->searchname);
             }
             $deletedCount++;
         }
@@ -1108,7 +1102,7 @@ class ReleaseRemover
                 case 'fromname':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND fromname = '.$this->pdo->quote($args[2]);
+                            return ' AND fromname = '.escapeString($args[2]);
                         case 'like':
                             return ' AND fromname '.$this->formatLike($args[2], 'fromname');
                     }
@@ -1116,7 +1110,7 @@ class ReleaseRemover
                 case 'groupname':
                     switch ($args[1]) {
                         case 'equals':
-                            $group = DB::select('SELECT id FROM groups WHERE name = '.$this->pdo->quote($args[2]));
+                            $group = DB::select('SELECT id FROM groups WHERE name = '.escapeString($args[2]));
                             if (empty($group)) {
                                 $this->error = 'This group was not found in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1142,13 +1136,13 @@ class ReleaseRemover
                     break;
                 case 'guid':
                     if ($args[1] === 'equals') {
-                        return ' AND guid = '.$this->pdo->quote($args[2]);
+                        return ' AND guid = '.escapeString($args[2]);
                     }
                     break;
                 case 'name':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND name = '.$this->pdo->quote($args[2]);
+                            return ' AND name = '.escapeString($args[2]);
                         case 'like':
                             return ' AND name '.$this->formatLike($args[2], 'name');
                         default:
@@ -1158,7 +1152,7 @@ class ReleaseRemover
                 case 'searchname':
                     switch ($args[1]) {
                         case 'equals':
-                            return ' AND searchname = '.$this->pdo->quote($args[2]);
+                            return ' AND searchname = '.escapeString($args[2]);
                         case 'like':
                             return ' AND searchname '.$this->formatLike($args[2], 'searchname');
                         default:
@@ -1231,7 +1225,7 @@ class ReleaseRemover
         }
 
         // Print the query to the user, ask them if they want to continue using it.
-        echo ColorCLI::primary(
+        ColorCLI::primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
             'If you are satisfied, type yes and press enter. Anything else will exit.'
@@ -1240,7 +1234,7 @@ class ReleaseRemover
         // Check the users response.
         $userInput = trim(fgets(fopen('php://stdin', 'rtb')));
         if ($userInput !== 'yes') {
-            echo ColorCLI::primary('You typed: "'.$userInput.'", the program will exit.');
+            ColorCLI::primary('You typed: "'.$userInput.'", the program will exit.');
 
             return false;
         }
@@ -1291,7 +1285,7 @@ class ReleaseRemover
         }
 
         if ($this->echoCLI && $this->error !== '') {
-            echo ColorCLI::error($this->error);
+            ColorCLI::error($this->error);
         }
 
         return false;

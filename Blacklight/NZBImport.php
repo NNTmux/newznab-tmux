@@ -458,7 +458,7 @@ class NZBImport
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
         } elseif ($this->echoCLI) {
-            ColorCLI::doEcho(ColorCLI::notice($message), true);
+            ColorCLI::notice($message);
         }
     }
 
