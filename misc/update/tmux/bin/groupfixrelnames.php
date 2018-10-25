@@ -32,83 +32,80 @@ switch (true) {
 
         // Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
         // in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
-        $releases = Release::query()
-            ->select(
-                [
-                    'releases.id as releases_id',
-                    'releases.guid',
-                    'releases.groups_id',
-                    'releases.categories_id',
-                    'releases.name',
-                    'releases.searchname',
-                    'releases.proc_nfo',
-                    'releases.proc_uid',
-                    'releases.proc_files',
-                    'releases.proc_par2',
-                    'releases.proc_srr',
-                    'releases.proc_hash16k',
-                    'releases.ishashed',
-                    'releases.dehashstatus',
-                    'releases.nfostatus',
-                    'releases.size as relsize',
-                    'releases.predb_id',
-                    DB::raw('IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash'),
-                    DB::raw("IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring"),
-                    DB::raw("IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring"),
-                    DB::raw("IFNULL(HEX(ru.uniqueid), '') AS uid"),
-                    DB::raw('IFNULL(ph.hash, 0) AS hash'),
-                    DB::raw("IFNULL(re.mediainfo, '') AS mediainfo"),
-                ]
+        $releases = DB::select(
+            sprintf("
+					SELECT
+						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
+						r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
+						r.size AS relsize, r.predb_id, r.proc_hash16k, r.proc_srr,
+						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
+						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
+						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
+						IFNULL(HEX(ru.uniqueid), '') AS uid,
+						IFNULL(ph.hash, 0) AS hash
+					FROM releases r
+					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
+					LEFT JOIN release_files rf ON r.id = rf.releases_id
+					LEFT JOIN release_unique ru ON ru.releases_id = r.id
+					LEFT JOIN par_hashes ph ON r.id = ph.releases_id
+					WHERE r.leftguid = %s
+					AND r.nzbstatus = %d
+					AND r.isrenamed = %d
+					AND r.predb_id = 0
+					AND r.passwordstatus >= 0
+					AND r.nfostatus > %d
+					AND
+					(
+						(
+							r.nfostatus = %d
+							AND r.proc_nfo = %d
+						)
+						OR r.proc_files = %d
+						OR r.proc_uid = %d
+						OR r.proc_par2 = %d
+						OR r.proc_srr = %d
+						OR r.proc_hash16k = %d
+						OR
+						(
+							r.ishashed = 1
+							AND r.dehashstatus BETWEEN -6 AND 0
+						)
+					)
+					AND r.categories_id IN (%s)
+					GROUP BY r.id
+					ORDER BY r.id DESC
+					LIMIT %s",
+                escapeString($guidChar),
+                NZB::NZB_ADDED,
+                NameFixer::IS_RENAMED_NONE,
+                Nfo::NFO_UNPROC,
+                Nfo::NFO_FOUND,
+                NameFixer::PROC_NFO_NONE,
+                NameFixer::PROC_FILES_NONE,
+                NameFixer::PROC_UID_NONE,
+                NameFixer::PROC_PAR2_NONE,
+                NameFixer::PROC_SRR_NONE,
+                NameFixer::PROC_HASH16K_NONE,
+                Category::getCategoryOthersGroup(),
+                $maxPerRun
             )
-            ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'releases.id')
-            ->leftJoin('release_files as rf', 'rf.releases_id', '=', 'releases.id')
-            ->leftJoin('release_unique as ru', 'ru.releases_id', '=', 'releases.id')
-            ->leftJoin('par_hashes as ph', 'ph.releases_id', '=', 'releases.id')
-            ->leftJoin('releaseextrafull as re', 're.releases_id', '=', 'releases.id')
-            ->where('releases.leftguid', $guidChar)
-            ->where('releases.nzbstatus', NZB::NZB_ADDED)
-            ->where('releases.isrenamed', NameFixer::IS_RENAMED_NONE)
-            ->where('releases.predb_id', '=', 0)
-            ->where('releases.passwordstatus', '>=', 0)
-            ->where('releases.nfostatus', '>', Nfo::NFO_UNPROC)
-            ->whereNested(function ($query) {
-                $query->orWhere(function ($query) {
-                    $query->where('releases.nfostatus', Nfo::NFO_FOUND)
-                        ->where('releases.proc_nfo', NameFixer::PROC_NFO_NONE);
-                })
-                    ->orWhere('releases.proc_files', NameFixer::PROC_FILES_NONE)
-                    ->orWhere('releases.proc_uid', NameFixer::PROC_UID_NONE)
-                    ->orWhere('releases.proc_par2', NameFixer::PROC_PAR2_NONE)
-                    ->orwhere('releases.proc_srr', NameFixer::PROC_SRR_NONE)
-                    ->orWhere('releases.proc_hash16k', NameFixer::PROC_HASH16K_NONE)
-                    ->orwhere('releases.isrenamed', '=', 1)
-                    ->orWhere(function ($query) {
-                        $query->where('releases.ishashed', '=', 1)
-                        ->whereBetween('releases.dehashstatus', [-6, 0]);
-                    })
-                    ->orWhereRaw("releases.name REGEXP '[a-z0-9]{32,64}' AND re.mediainfo REGEXP '\<Movie_name\>'");
-            })
-            ->whereIn('releases.categories_id', Category::OTHERS_GROUP)
-            ->groupBy('releases.id')
-            ->orderByDesc('releases.id')
-            ->limit($maxPerRun)
-            ->get();
+        );
 
         if ($releases instanceof \Traversable) {
             foreach ($releases as $release) {
                 $nameFixer->checked++;
                 $nameFixer->reset();
 
-                echo PHP_EOL.ColorCLI::primaryOver("[{$release['releases_id']}]");
+                echo PHP_EOL.ColorCLI::primaryOver("[{$release->releases_id}]");
 
-                if ((int) $release['ishashed'] === 1 && (int) $release['dehashstatus'] >= -6 && (int) $release['dehashstatus'] <= 0) {
+                if ((int) $release->ishashed === 1 && (int) $release->dehashstatus >= -6 && (int) $release->dehashstatus <= 0) {
                     ColorCLI::primaryOver('m');
                     if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
-                        $nameFixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
+                        $nameFixer->matchPredbHash($matches[0], $release, true, 1, true);
                     }
-                    if ($nameFixer->matched === false && ! empty($release['filehash']) && preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
+                    if ($nameFixer->matched === false && ! empty($release->filehash) && preg_match('/[a-fA-F0-9]{32,40}/i', $release->filehash, $matches)) {
                         ColorCLI::primaryOver('h');
-                        $nameFixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
+                        $nameFixer->matchPredbHash($matches[0], $release, true, 1, true);
                     }
                 }
 
@@ -117,50 +114,49 @@ switch (true) {
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['proc_uid'] === NameFixer::PROC_UID_NONE && (! empty($release['uid']) || ! empty($release['mediainfo']))) {
+                if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && ! empty($release->uid)) {
                     ColorCLI::primaryOver('U');
-                    $nameFixer->mediaMovieNameCheck($release, true, 'Mediainfo, ', 1, 1);
                     $nameFixer->uidCheck($release, true, 'UID, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
-                $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release['releases_id']);
+                $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
 
                 if ($nameFixer->matched) {
                     continue;
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['proc_srr'] === NameFixer::PROC_SRR_NONE) {
+                if ((int) $release->proc_srr === NameFixer::PROC_SRR_NONE) {
                     ColorCLI::primaryOver('sr');
                     $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
-                $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release['releases_id']);
+                $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
 
                 if ($nameFixer->matched) {
                     continue;
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['proc_hash16k'] === NameFixer::PROC_HASH16K_NONE && ! empty($release['hash'])) {
+                if ((int) $release->proc_hash16k === NameFixer::PROC_HASH16K_NONE && ! empty($release->hash)) {
                     ColorCLI::primaryOver('H');
                     $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
-                $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release['releases_id']);
+                $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
 
                 if ($nameFixer->matched) {
                     continue;
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['nfostatus'] === Nfo::NFO_FOUND && (int) $release['proc_nfo'] === NameFixer::PROC_NFO_NONE) {
-                    if (! empty($release['textstring']) && ! preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
+                if ((int) $release->nfostatus === Nfo::NFO_FOUND && (int) $release->proc_nfo === NameFixer::PROC_NFO_NONE) {
+                    if (! empty($release->textstring) && ! preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
                         ColorCLI::primaryOver('n');
                         $nameFixer->done = $nameFixer->matched = false;
                         $nameFixer->checkName($release, true, 'NFO, ', 1, 1);
                     }
-                    $nameFixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release['releases_id']);
+                    $nameFixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release->releases_id);
                 }
 
                 if ($nameFixer->matched) {
@@ -168,30 +164,30 @@ switch (true) {
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['fileid'] > 0 && (int) $release['proc_files'] === NameFixer::PROC_FILES_NONE) {
+                if ((int) $release->fileid > 0 && (int) $release->proc_files === NameFixer::PROC_FILES_NONE) {
                     ColorCLI::primaryOver('F');
                     $nameFixer->done = $nameFixer->matched = false;
-                    $fileNames = explode('|', $release['filestring']);
+                    $fileNames = explode('|', $release->filestring);
                     if (is_array($fileNames)) {
                         $releaseFile = $release;
                         foreach ($fileNames as $fileName) {
                             if ($nameFixer->matched === false) {
                                 ColorCLI::primaryOver('f');
-                                $releaseFile['textstring'] = $fileName;
+                                $releaseFile->textstring = $fileName;
                                 $nameFixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
                             }
                         }
                     }
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
-                $nameFixer->_updateSingleColumn('proc_files', NameFixer::PROC_FILES_DONE, $release['releases_id']);
+                $nameFixer->_updateSingleColumn('proc_files', NameFixer::PROC_FILES_DONE, $release->releases_id);
 
                 if ($nameFixer->matched) {
                     continue;
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['proc_par2'] === NameFixer::PROC_PAR2_NONE) {
+                if ((int) $release->proc_par2 === NameFixer::PROC_PAR2_NONE) {
                     ColorCLI::primaryOver('p');
                     if (! isset($nzbcontents)) {
                         $nntp = new NNTP();
@@ -207,23 +203,20 @@ switch (true) {
                         );
                     }
 
-                    $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
+                    $nzbcontents->checkPAR2($release['guid'], $release->releases_id, $release->groups_id, 1, 1);
                 }
 
                 // Not all gate requirements in query always set column status as PP Add check is in query
-                $nameFixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release['releases_id']);
-
-                if ($nameFixer->matched) {
-                    continue;
-                }
+                $nameFixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release->releases_id);
             }
         }
         break;
 
     case $type === 'predbft' && isset($maxPerRun) && is_numeric($maxPerRun) && isset($thread) && is_numeric($thread):
         $pres = Predb::query()
-            ->whereRaw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"')
             ->where('searched', '=', 0)
+            ->where('predate', '<', now()->subDay())
+            ->where(DB::raw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"'))
             ->where('predate', '<', now()->subDay())
             ->select(['id as predb_id', 'title', 'source', 'searched'])
             ->orderBy('predate')
