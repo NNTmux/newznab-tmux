@@ -351,7 +351,7 @@ class ReleaseExtra
         $subs = '';
         if (! empty($subsLanguage)) {
             if (! empty($subsLanguage[1])) {
-               $subs = $subsLanguage[1];
+                $subs = $subsLanguage[1];
             } elseif (! empty($subsLanguage[0])) {
                 $subs = $subsLanguage[0];
             }
