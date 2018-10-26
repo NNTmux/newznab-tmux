@@ -1,4 +1,5 @@
 2018-10-26 DariusIII
+	* Chg: Update font-awesome to version 5.4.2
 	* Chg: Catch InvalidArgumentException when opening corrupt video/audio file for processing
 2018-10-25 DariusIII
 	* Chg: Update groupfixrelnames.php, remove traversable check for query results
