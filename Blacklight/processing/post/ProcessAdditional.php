@@ -1922,6 +1922,8 @@ class ProcessAdditional
                     $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
                 } catch (\RuntimeException $runtimeException) {
                     //We show no error at all, we failed to save the frame and move on
+                } catch (\InvalidArgumentException $e) {
+                    //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 }
             }
 
