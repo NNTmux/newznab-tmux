@@ -1799,10 +1799,14 @@ class ProcessAdditional
 
                 // Create an audio sample.
                 if ($this->ffprobe->isValid($fileLocation)) {
-                    $audioSample = $this->ffmpeg->open($fileLocation);
-                    $format = new Vorbis();
-                    $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
-                    $audioSample->save($format, $this->tmpPath.$audioFileName);
+                    try {
+                        $audioSample = $this->ffmpeg->open($fileLocation);
+                        $format = new Vorbis();
+                        $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
+                        $audioSample->save($format, $this->tmpPath.$audioFileName);
+                    } catch (\InvalidArgumentException $e) {
+                        //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                    }
                 }
 
                 // Check if the new file was created.
@@ -1918,6 +1922,8 @@ class ProcessAdditional
                     $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
                 } catch (\RuntimeException $runtimeException) {
                     //We show no error at all, we failed to save the frame and move on
+                } catch (\InvalidArgumentException $e) {
+                    //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 }
             }
 
@@ -2000,12 +2006,16 @@ class ProcessAdditional
 
                     // Try to get the sample (from the end instead of the start).
                     if ($this->ffprobe->isValid($fileLocation)) {
-                        $video = $this->ffmpeg->open($fileLocation);
-                        $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
-                        $format = new Ogg();
-                        $format->setAudioCodec(new Vorbis());
-                        $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
-                        $videoSample->save($format, $fileName);
+                        try {
+                            $video = $this->ffmpeg->open($fileLocation);
+                            $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
+                            $format = new Ogg();
+                            $format->setAudioCodec(new Vorbis());
+                            $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
+                            $videoSample->save($format, $fileName);
+                        } catch (\InvalidArgumentException $e) {
+                            //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                        }
                     }
                 }
             }
@@ -2013,12 +2023,16 @@ class ProcessAdditional
             if ($newMethod === false) {
                 // If longer than 60 or we could not get the video length, run the old way.
                 if ($this->ffprobe->isValid($fileLocation)) {
-                    $video = $this->ffmpeg->open($fileLocation);
-                    $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
-                    $format = new Ogg();
-                    $format->setAudioCodec(new Vorbis());
-                    $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
-                    $videoSample->save($format, $fileName);
+                    try {
+                        $video = $this->ffmpeg->open($fileLocation);
+                        $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
+                        $format = new Ogg();
+                        $format->setAudioCodec(new Vorbis());
+                        $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
+                        $videoSample->save($format, $fileName);
+                    } catch (\InvalidArgumentException $e) {
+                        //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                    }
                 }
             }
 
