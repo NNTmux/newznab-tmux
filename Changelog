@@ -1,6 +1,8 @@
 2018-10-26 DariusIII
 	* Chg: Catch InvalidArgumentException when opening corrupt video/audio file for processing
 2018-10-25 DariusIII
+	* Chg: Update groupfixrelnames.php, remove traversable check for query results
+	* Fix: Fix deletion of sjows from my shows page
 	* Chg: Update groupfixrelnames queries
 	* Chg: Update Categorize class, update regexes to better match tv UHD releases
 	* Fix: Fix empty my shows RSS feed

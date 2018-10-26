@@ -13,7 +13,7 @@ class MyShowsController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     *
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function show(Request $request)
@@ -31,15 +31,15 @@ class MyShowsController extends BasePageController
         switch ($action) {
             case 'delete':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
+                if (! $show) {
+                    return redirect()->back();
+                }
+
+                UserSerie::delShow($this->userdata->id, $videoId);
                 if ($request->has('from')) {
                     header('Location:'.WWW_TOP.$request->input('from'));
                 } else {
                     return redirect('myshows');
-                }
-                if (! $show) {
-                    $this->show404();
-                } else {
-                    UserSerie::delShow($this->userdata->id, $videoId);
                 }
 
                 break;
@@ -59,33 +59,33 @@ class MyShowsController extends BasePageController
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
                     UserSerie::addShow($this->userdata->id, $videoId, $category);
                     if ($request->has('from')) {
-                        header('Location:'.WWW_TOP.$request->input('from'));
-                    } else {
-                        return redirect('myshows');
+                        return redirect($request->input('from'));
                     }
-                } else {
-                    $tmpcats = Category::getChildren(Category::TV_ROOT);
-                    $categories = [];
-                    foreach ($tmpcats as $c) {
-                        // If TV WEB-DL categorization is disabled, don't include it as an option
-                        if ((int) $c['id'] === Category::TV_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
-                            continue;
-                        }
-                        $categories[$c['id']] = $c['title'];
-                    }
-                    $this->smarty->assign('type', 'add');
-                    $this->smarty->assign('cat_ids', array_keys($categories));
-                    $this->smarty->assign('cat_names', $categories);
-                    $this->smarty->assign('cat_selected', []);
-                    $this->smarty->assign('video', $videoId);
-                    $this->smarty->assign('show', $show);
-                    $content = $this->smarty->fetch('myshows-add.tpl');
-                    $this->smarty->assign([
-                        'content' => $content,
-                    ]);
-                    $this->pagerender();
+
+                    return redirect('myshows');
                 }
-                break;
+
+            $tmpcats = Category::getChildren(Category::TV_ROOT);
+            $categories = [];
+            foreach ($tmpcats as $c) {
+                // If TV WEB-DL categorization is disabled, don't include it as an option
+                if ((int) $c['id'] === Category::TV_WEBDL && (int) Settings::settingValue('indexer.categorise.catwebdl') === 0) {
+                    continue;
+                }
+                $categories[$c['id']] = $c['title'];
+            }
+            $this->smarty->assign('type', 'add');
+            $this->smarty->assign('cat_ids', array_keys($categories));
+            $this->smarty->assign('cat_names', $categories);
+            $this->smarty->assign('cat_selected', []);
+            $this->smarty->assign('video', $videoId);
+            $this->smarty->assign('show', $show);
+            $content = $this->smarty->fetch('myshows-add.tpl');
+            $this->smarty->assign([
+                'content' => $content,
+            ]);
+            $this->pagerender();
+            break;
             case 'edit':
             case 'doedit':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
