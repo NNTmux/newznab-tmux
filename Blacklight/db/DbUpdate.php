@@ -98,7 +98,7 @@ class DbUpdate
     {
         $defaults = [
             'ext'    => 'sql',
-            'path'    => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'path'    => NN_RES.'db'.DS.'patches',
             'regex'    => '#^'.Utility::PATH_REGEX.'\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
             'safe'    => true,
         ];
@@ -150,7 +150,7 @@ class DbUpdate
         $patched = 0;
         $defaults = [
             'ext'    => 'sql',
-            'path'    => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'path'    => NN_RES.'db'.DS.'patches',
             'regex'    => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
             'safe'    => true,
         ];

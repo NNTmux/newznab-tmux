@@ -215,7 +215,7 @@ class Versions
         $options = [
             'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
             'ext'   => 'sql',
-            'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'path'  => NN_RES.'db'.DS.'patches',
             'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
             'safe'  => true,
         ];
