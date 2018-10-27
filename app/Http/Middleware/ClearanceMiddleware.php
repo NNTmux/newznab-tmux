@@ -18,11 +18,11 @@ class ClearanceMiddleware
     {
         $user = Auth::user();
 
-        if ($user->hasRole(['Admin']) || ($user->hasRole(['Moderator']) && (! $request->is('Admin') || ! $request->is('Admin/*')))) {
+        if ($user->hasAnyRole(['Admin', 'Moderator']) && ! $request->is(['Admin', 'Admin/*'])) {
             return $next($request);
         }
 
-        if ($request->is('Movies') || $request->is('browse/Movies') || $request->is('browse/Movies/*')) {
+        if ($request->is(['Movies', 'browse/Movies', 'browse/Movies/*'])) {
             if (! $user->hasDirectPermission('view movies') || ! $user->hasPermissionTo('view movies')) {
                 abort(401);
             } else {
@@ -30,7 +30,7 @@ class ClearanceMiddleware
             }
         }
 
-        if ($request->is('Console') || $request->is('browse/Console') || $request->is('browse/Console/*')) {
+        if ($request->is(['Console', 'browse/Console', 'browse/Console/*'])) {
             if (! $user->hasDirectPermission('view console') || ! $user->hasPermissionTo('view console')) {
                 abort(401);
             } else {
@@ -38,7 +38,7 @@ class ClearanceMiddleware
             }
         }
 
-        if ($request->is('Books') || $request->is('browse/Books') || $request->is('browse/Books/*')) {
+        if ($request->is(['Books', 'browse/Books', 'browse/Books/*'])) {
             if (! $user->hasDirectPermission('view books') || ! $user->hasPermissionTo('view books')) {
                 abort(401);
             } else {
@@ -46,7 +46,7 @@ class ClearanceMiddleware
             }
         }
 
-        if ($request->is('Audio') || $request->is('browse/Audio') || $request->is('browse/Audio/*')) {
+        if ($request->is(['Audio', 'browse/Audio', 'browse/Audio/*'])) {
             if (! $user->hasDirectPermission('view audio') || ! $user->hasPermissionTo('view audio')) {
                 abort(401);
             } else {
@@ -54,7 +54,7 @@ class ClearanceMiddleware
             }
         }
 
-        if ($request->is('XXX') || $request->is('browse/XXX') || $request->is('browse/XXX/*')) {
+        if ($request->is(['XXX', 'browse/XXX', 'browse/XXX/*'])) {
             if (! $user->hasDirectPermission('view adult') || ! $user->hasPermissionTo('view adult')) {
                 abort(401);
             } else {
@@ -62,7 +62,7 @@ class ClearanceMiddleware
             }
         }
 
-        if ($request->is('Games') || $request->is('browse/PC') || $request->is('browse/PC/*')) {
+        if ($request->is(['Games', 'browse/PC', 'browse/PC/*'])) {
             if (! $user->hasDirectPermission('view pc') || ! $user->hasPermissionTo('view pc')) {
                 abort(401);
             } else {

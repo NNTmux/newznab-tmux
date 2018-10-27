@@ -1,3 +1,5 @@
+2018-10-27 DariusIII
+	* Chg: Simplify ClearanceMiddleware checks
 2018-10-26 DariusIII
 	* Chg: Move patches from mysql to patches folder as we only support mysql so no need for one more folder
 	* Chg: Remove mysql-schema.sql as it is not used anymore
