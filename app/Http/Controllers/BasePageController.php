@@ -135,17 +135,6 @@ class BasePageController extends Controller
     }
 
     /**
-     * Done in html here to reduce any smarty processing burden if a large flood is underway.
-     *
-     * @param int $seconds
-     */
-    public function showFloodWarning($seconds = 5): void
-    {
-        header('Retry-After: '.$seconds);
-        $this->show503();
-    }
-
-    /**
      * @return bool
      */
     public function isPostBack(): bool
