@@ -1,3 +1,5 @@
+2018-10-28 DariusIII
+	* Chg: Update PPA class
 2018-10-27 DariusIII
 	* Chg: Remove unused showFloodWarning function
 	* Chg: Simplify ClearanceMiddleware checks

@@ -1924,6 +1924,8 @@ class ProcessAdditional
                     //We show no error at all, we failed to save the frame and move on
                 } catch (\InvalidArgumentException $e) {
                     //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                } catch (\Throwable $e) {
+                    //Again we do nothing, we just want to catch the error
                 }
             }
 
