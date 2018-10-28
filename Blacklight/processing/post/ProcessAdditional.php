@@ -1716,25 +1716,20 @@ class ProcessAdditional
             if ($retVal === false) {
 
                 // Get the media info for the file.
-                $xmlArray = runCmd(
-                    $this->_killString.Settings::settingValue('apps..mediainfopath').'" --Output=XML "'.$fileLocation.'"'
-                );
+                $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
-                // Convert to array.
-                $arrXml = Utility::objectsIntoArray(@simplexml_load_string($xmlArray));
-
-                if (isset($arrXml['File']['track'])) {
-                    foreach ($arrXml['File']['track'] as $track) {
-                        if (isset($track['Album'], $track['Performer'])) {
+                if ($xmlArray !== null) {
+                    foreach ($xmlArray->getAudios() as $track) {
+                        if (isset($track['album'], $track['performer'])) {
                             if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
                                 // Make the extension upper case.
                                 $ext = strtoupper($fileExtension);
 
                                 // Form a new search name.
-                                if (! empty($track['Recorded_date']) && preg_match('/(?:19|20)\d\d/', $track['Recorded_date'], $Year)) {
-                                    $newName = $track['Performer'].' - '.$track['Album'].' ('.$Year[0].') '.$ext;
+                                if (! empty($track['recorded_date']) && preg_match('/(?:19|20)\d\d/', $track['recorded_date'], $Year)) {
+                                    $newName = $track['performer'].' - '.$track['album'].' ('.$Year[0].') '.$ext;
                                 } else {
-                                    $newName = $track['Performer'].' - '.$track['Album'].' '.$ext;
+                                    $newName = $track['performer'].' - '.$track['album'].' '.$ext;
                                 }
 
                                 // Get the category or try to determine it.
