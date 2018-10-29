@@ -1,3 +1,5 @@
+2018-10-29 DariusIII
+	* Fix: Fix mediainfo data check
 2018-10-28 DariusIII
 	* Chg: Update _getAudioInfo function to use mhor/php-mediainfo
 	* Chg: Update PPA class
