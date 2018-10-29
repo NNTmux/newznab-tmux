@@ -112,8 +112,6 @@
 <!-- newznab default scripts, needed for stuff to work -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/sorttable.js")}}
 <!-- Custom functions -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/custom.js")}}
