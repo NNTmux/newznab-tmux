@@ -1,4 +1,5 @@
 2018-10-29 DariusIII
+	* Chg: Update scripts used, remove unused ones, remove support for IE8 and IE9
 	* Chg: Remove unused scripts from basepage and baseadminpage and from related assets folder
 	* Chg: Use mediainfo data properly
 	* Fix: Replace isset with null check in _getAudioInfo mediainfo lookup

@@ -21,7 +21,7 @@
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
 	<!-- Bootstrap core CSS -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/css/bootstrap.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap/dist/css/bootstrap.min.css")}}
 	<!-- flexboxgrid -->
 	{{Html::style("{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css")}}
 	{{Html::style("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css")}}
@@ -34,11 +34,8 @@
 	{{Html::style("{$smarty.const.WWW_ASSETS}/icheck/skins/flat/green.css")}}
 	<!-- fancybox css -->
 	{{Html::style("{$smarty.const.WWW_ASSETS}/fancybox/dist/jquery.fancybox.css")}}
-	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-	<!--[if lt IE 9]>
-	{{Html::script("{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js")}}
-	{{Html::script("{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js")}}
-	<![endif]-->
+    <!--multiselect css-->
+    {{Html::style("{$smarty.const.WWW_ASSETS}multiselect/css/multi-select.css")}}
 
 </head>
 <body class="nav-md">
@@ -97,8 +94,8 @@
 
 </div>
 <!-- jQuery 3.2.0 -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-3.2.x/dist/jquery.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/jquery/dist/jquery.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap/dist/js/bootstrap.min.js")}}
 <!-- bootstrap progress js -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-progressbar/bootstrap-progressbar.min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js")}}
@@ -108,7 +105,7 @@
 <!-- tinymce editor -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-dist/tinymce.min.js")}}
 <!-- jQuery migrate script -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-migrate-3.0.x/jquery-migrate.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-migrate/jquery-migrate.min.js")}}
 <!-- newznab default scripts, needed for stuff to work -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
@@ -116,8 +113,8 @@
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/custom.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/utils-admin.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.multiselect.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.multifile.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/multiselect/js/jquery.multi-select.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/multifile/jquery.MultiFile.min.js")}}
 <!-- pace -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/pace/pace.min.js")}}
 <!-- fancybox js -->
