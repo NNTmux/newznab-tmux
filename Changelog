@@ -1,4 +1,5 @@
 2018-10-29 DariusIII
+	* Chg: Use mediainfo data properly
 	* Fix: Replace isset with null check in _getAudioInfo mediainfo lookup
 	* Fix: Fix mediainfo data check
 2018-10-28 DariusIII

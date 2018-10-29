@@ -1726,10 +1726,10 @@ class ProcessAdditional
                                 $ext = strtoupper($fileExtension);
 
                                 // Form a new search name.
-                                if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date'), $Year)) {
-                                    $newName = $track->get('performer').' - '.$track->get('album').' ('.$Year[0].') '.$ext;
+                                if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
+                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
                                 } else {
-                                    $newName = $track->get('performer').' - '.$track->get('album').' '.$ext;
+                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
                                 }
 
                                 // Get the category or try to determine it.
