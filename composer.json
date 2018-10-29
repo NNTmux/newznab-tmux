@@ -155,6 +155,7 @@
     "php-tmdb/api": "~2.1",
     "pragmarx/firewall": "^2.2",
     "predis/predis": "^1.1",
+    "propaganistas/laravel-disposable-email": "^2.0",
     "ramsey/uuid": "^3.7",
     "smarty/smarty": "^3.1",
     "spatie/laravel-fractal": "^5.3",

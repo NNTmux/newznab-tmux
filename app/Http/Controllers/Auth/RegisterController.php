@@ -80,6 +80,7 @@ class RegisterController extends Controller
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @throws \Illuminate\Validation\ValidationException
      * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
     public function register(Request $request)
@@ -89,7 +90,7 @@ class RegisterController extends Controller
 
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|min:5|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users|indisposable',
             'password' => 'required|string|min:8|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
         ]);
 

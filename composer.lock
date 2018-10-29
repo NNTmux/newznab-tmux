@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "502c724b2c43d50aeec0ba2990ba22bb",
+    "content-hash": "b3a47d0324cda1a0b9b10734d9f34c27",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -5038,6 +5038,70 @@
                 "redis"
             ],
             "time": "2016-06-16T16:22:20+00:00"
+        },
+        {
+            "name": "propaganistas/laravel-disposable-email",
+            "version": "2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
+                "reference": "762a5372afb16b9ebcfa5bda0e5a70a2453229eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/762a5372afb16b9ebcfa5bda0e5a70a2453229eb",
+                "reference": "762a5372afb16b9ebcfa5bda0e5a70a2453229eb",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/cache": ">=5.0,<5.8",
+                "illuminate/config": ">=5.0,<5.8",
+                "illuminate/console": ">=5.0,<5.8",
+                "illuminate/contracts": ">=5.0,<5.8",
+                "illuminate/support": ">=5.0,<5.8",
+                "illuminate/validation": ">=5.0,<5.8",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "*",
+                "orchestra/testbench": "*",
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Propaganistas\\LaravelDisposableEmail\\DisposableEmailServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Propaganistas\\LaravelDisposableEmail\\": "src/",
+                    "Propaganistas\\LaravelDisposableEmail\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Propaganistas",
+                    "email": "Propaganistas@users.noreply.github.com"
+                }
+            ],
+            "description": "Disposable email validator",
+            "keywords": [
+                "disposable",
+                "email",
+                "laravel",
+                "mail",
+                "temporary",
+                "throwaway",
+                "validator"
+            ],
+            "time": "2018-10-14T08:25:07+00:00"
         },
         {
             "name": "psr/container",
