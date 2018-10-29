@@ -90,31 +90,23 @@ class Backfill
     }
 
     /**
-     * Backfill all the groups up to user specified time/date.
-     *
-     * @param string     $groupName
+     * @param string $groupName
      * @param string|int $articles
-     * @param string     $type
-     *
-     * @return void
-     * @throws \Exception
+     * @param string $type
+     * @throws \Throwable
      */
     public function backfillAllGroups($groupName = '', $articles = '', $type = ''): void
     {
-        $res = [];
         if ($groupName !== '') {
-            $grp = Group::getByName($groupName);
-            if ($grp) {
-                $res = [$grp];
-            }
+            $grp[] = Group::getByName($groupName);
         } else {
-            $res = Group::getActiveBackfill($type);
+            $grp = Group::getActiveBackfill($type);
         }
 
-        $groupCount = \count($res);
+        $groupCount = \count($grp);
         if ($groupCount > 0) {
             $counter = 1;
-            $allTime = microtime(true);
+            $allTime = now();
             $dMessage = (
                 'Backfilling: '.
                 $groupCount.
@@ -131,7 +123,7 @@ class Backfill
             }
 
             // Loop through groups.
-            foreach ($res as $groupArr) {
+            foreach ($grp as $groupArr) {
                 if ($groupName === '') {
                     $dMessage = 'Starting group '.$counter.' of '.$groupCount;
 
@@ -143,7 +135,7 @@ class Backfill
                 $counter++;
             }
 
-            $dMessage = 'Backfilling completed in '.number_format(microtime(true) - $allTime, 2).' seconds.';
+            $dMessage = 'Backfilling completed in '.now()->diffInSeconds($allTime).' seconds.';
 
             if ($this->_echoCLI) {
                 ColorCLI::primary($dMessage);
@@ -327,18 +319,13 @@ class Backfill
     }
 
     /**
-     * Safe backfill using posts. Going back to a date specified by the user on the site settings.
-     * This does 1 group for x amount of parts until it reaches the date.
-     *
      * @param string $articles
-     *
-     * @return void
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function safeBackfill($articles = ''): void
     {
         $groupname = Group::query()
-            ->whereBetween('first_record_postdate', [$this->_safeBackFillDate, Carbon::now()])
+            ->whereBetween('first_record_postdate', [$this->_safeBackFillDate, now()])
             ->where('backfill', '=', 1)
             ->select('name')
             ->orderBy('name')

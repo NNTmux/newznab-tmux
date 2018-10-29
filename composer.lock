@@ -321,8 +321,7 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            },
-            "time": "2016-06-06T17:37:52+00:00"
+            }
         },
         {
             "name": "bower-asset/autosize",
@@ -351,8 +350,7 @@
                 "form",
                 "textarea",
                 "ui"
-            ],
-            "time": "2017-05-19T15:36:30+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap",
@@ -401,8 +399,7 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ],
-            "time": "2016-07-25T15:51:55+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -431,8 +428,7 @@
             },
             "license": [
                 "Apache-2.0"
-            ],
-            "time": "2016-08-05T09:50:13+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -462,8 +458,7 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ],
-            "time": "2015-12-01T23:35:57+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -497,8 +492,7 @@
             },
             "license": [
                 "MIT"
-            ],
-            "time": "2015-05-15T18:56:17+00:00"
+            ]
         },
         {
             "name": "bower-asset/colorbox",
@@ -539,8 +533,7 @@
                 "modal",
                 "popup",
                 "ui"
-            ],
-            "time": "2016-05-10T22:21:33+00:00"
+            ]
         },
         {
             "name": "bower-asset/datatables",
@@ -655,8 +648,7 @@
                     "tests",
                     "examples"
                 ]
-            },
-            "time": "2015-01-26T21:19:01+00:00"
+            }
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -692,8 +684,7 @@
                 "css",
                 "flexbox",
                 "grid"
-            ],
-            "time": "2016-08-14T16:43:18+00:00"
+            ]
         },
         {
             "name": "bower-asset/font-awesome",
@@ -759,8 +750,7 @@
                 "replacement",
                 "skins",
                 "ui"
-            ],
-            "time": "2014-03-03T17:36:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery",
@@ -827,8 +817,7 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ],
-            "time": "2017-08-31T15:51:29+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery-migrate",
@@ -878,8 +867,7 @@
                     "demo",
                     "package.json"
                 ]
-            },
-            "time": "2016-03-01T20:38:24+00:00"
+            }
         },
         {
             "name": "bower-asset/multifile",
@@ -995,8 +983,7 @@
                 "progress",
                 "progress",
                 "spinner"
-            ],
-            "time": "2014-11-06T16:31:34+00:00"
+            ]
         },
         {
             "name": "bower-asset/pnotify",
@@ -1048,8 +1035,7 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin.",
-            "time": "2017-07-31T21:50:29+00:00"
+            "description": "JavaScript notification plugin."
         },
         {
             "name": "bower-asset/slimscroll",
@@ -1090,8 +1076,7 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ],
-            "time": "2016-06-11T09:19:14+00:00"
+            ]
         },
         {
             "name": "bower-asset/tinymce-dist",
