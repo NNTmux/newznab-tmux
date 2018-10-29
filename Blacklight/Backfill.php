@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class Backfill
