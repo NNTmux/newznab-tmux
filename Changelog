@@ -1,4 +1,5 @@
 2018-10-29 DariusIII
+	* Fix: Replace isset with null check in _getAudioInfo mediainfo lookup
 	* Fix: Fix mediainfo data check
 2018-10-28 DariusIII
 	* Chg: Update _getAudioInfo function to use mhor/php-mediainfo

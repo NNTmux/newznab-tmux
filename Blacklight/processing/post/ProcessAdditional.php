@@ -1720,7 +1720,7 @@ class ProcessAdditional
 
                 if ($xmlArray !== null) {
                     foreach ($xmlArray->getAudios() as $track) {
-                        if (isset($track->get('album'), $track->get('performer'))) {
+                        if ($track->get('album') !== null && $track->get('performer') !== null) {
                             if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
                                 // Make the extension upper case.
                                 $ext = strtoupper($fileExtension);
