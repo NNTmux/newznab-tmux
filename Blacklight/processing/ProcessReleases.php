@@ -1346,7 +1346,7 @@ class ProcessReleases
                     number_format($disabledGenreDeleted).
                     ' from disabled music genres, '.
                     number_format($miscRetentionDeleted).
-                    ' from misc->other'.
+                    ' from misc->other '.
                     number_format($miscHashedDeleted).
                     ' from misc->hashed'.
                     (
