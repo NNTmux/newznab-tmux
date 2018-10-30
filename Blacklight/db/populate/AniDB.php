@@ -372,7 +372,7 @@ class AniDB
                     PHP_EOL;
             }
         } else {
-            echo PHP_EOL.ColorCLI::info(
+            ColorCLI::info(
                     'AniDB has been updated within the past '.$this->updateInterval.' days. '.
                     'Either set this value lower in Site Edit (at your own risk of being banned) or try again later.'
             );

@@ -148,7 +148,7 @@ class Steam
             $this->setLastUpdated();
             $fullAppArray = $this->steamFront->getFullAppList();
             $inserted = $dupe = 0;
-            ColorCLI::info('Populating steam apps table').PHP_EOL;
+            ColorCLI::info('Populating steam apps table');
             foreach ($fullAppArray as $appsArray) {
                 foreach ($appsArray as $appArray) {
                     foreach ($appArray as $app) {

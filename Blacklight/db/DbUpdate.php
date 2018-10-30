@@ -118,7 +118,7 @@ class DbUpdate
 
             foreach ($files as $file) {
                 if (! preg_match($options['regex'], $file, $matches)) {
-                    ColorCLI::error("$file does not match the pattern {$options['regex']}\nPlease fix this before continuing");
+                    ColorCLI::error("$file does not match the pattern {$options['regex']}. Please fix this before continuing");
                 } else {
                     ColorCLI::header('Processing patch file: '.$file);
                     $this->splitSQL($file, ['local' => $local]);
@@ -305,11 +305,11 @@ class DbUpdate
                                     $this->pdo->exec($query);
                                     ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query);
                                 } catch (\PDOException $e) {
-                                    ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]);
+                                    ColorCLI::error("$query Failed {".$e->errorInfo[1]."}".$e->errorInfo[2]);
                                     exit();
                                 }
                             } else {
-                                ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]);
+                                ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}".$e->errorInfo[2]);
                                 exit();
                             }
                         }

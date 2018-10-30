@@ -399,7 +399,7 @@ class Books
     {
         if ($res->count() > 0) {
             if ($this->echooutput) {
-                ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID);
+                ColorCLI::header("Processing ".$res->count().' book release(s) for categories id '.$categoryID);
             }
 
             $bookId = -2;

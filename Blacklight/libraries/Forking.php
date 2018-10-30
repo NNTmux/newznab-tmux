@@ -302,7 +302,7 @@ class Forking extends \fork_daemon
     {
         $this->_workCount = \count($this->work);
         if ($this->_workCount > 0) {
-            if (config('nntmux.echocli')) {
+            if (config('nntmux.echocli') === true) {
                 ColorCLI::header(
                         'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
                         ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
@@ -311,8 +311,10 @@ class Forking extends \fork_daemon
 
             $this->addwork($this->work);
             $this->process_work(true);
-        } elseif (config('nntmux.echocli')) {
-            ColorCLI::header('No work to do!');
+        } else {
+            if (config('nntmux.echocli') === true) {
+                ColorCLI::header('No work to do!');
+            }
         }
     }
 

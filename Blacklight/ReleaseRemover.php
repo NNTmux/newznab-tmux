@@ -219,7 +219,7 @@ class ReleaseRemover
 
         if ($time === 'full') {
             if ($this->echoCLI) {
-                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.\n');
+                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.');
             }
         } else {
             if (! is_numeric($time)) {
@@ -228,7 +228,7 @@ class ReleaseRemover
                 return $this->returnError();
             }
             if ($this->echoCLI) {
-                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).\n');
+                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).');
             }
             $this->crapTime = ' AND r.adddate > (NOW() - INTERVAL '.$time.' HOUR)';
         }
@@ -778,7 +778,7 @@ class ReleaseRemover
                 // Provide useful output of operations
                 ColorCLI::header(
                     sprintf(
-                    "Finding crap releases for %s: Using %s method against release %s.\n".
+                    "Finding crap releases for %s: Using %s method against release %s.".
                         '%s',
                     $this->method,
                     $blType,
@@ -809,7 +809,7 @@ class ReleaseRemover
                 $this->deleteReleases();
             }
         } else {
-            ColorCLI::error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
+            ColorCLI::error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.");
         }
 
         return true;
