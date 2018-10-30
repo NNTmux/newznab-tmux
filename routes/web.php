@@ -347,3 +347,7 @@ Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'
     Route::get('release-edit', 'ReleasesController@edit');
     Route::post('release-edit', 'ReleasesController@edit');
 });
+
+Route::fallback(function(){
+    return response()->view('notFound', [], 404);
+});
