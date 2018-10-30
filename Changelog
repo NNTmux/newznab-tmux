@@ -1,3 +1,5 @@
+2018-10-30 DariusIII
+	* Chg: Update phpunit/php-token-stream to version 3.0.1
 2018-10-29 DariusIII
 	* Chg: Update Backfill class
 	* Chg: Dissallow disposable emails for new users
