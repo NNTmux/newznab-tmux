@@ -778,7 +778,7 @@ class ReleaseRemover
                 // Provide useful output of operations
                 ColorCLI::header(
                     sprintf(
-                    "Finding crap releases for %s: Using %s method against release %s.".
+                    'Finding crap releases for %s: Using %s method against release %s.'.
                         '%s',
                     $this->method,
                     $blType,

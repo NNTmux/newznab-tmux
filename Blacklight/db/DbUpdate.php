@@ -305,11 +305,11 @@ class DbUpdate
                                     $this->pdo->exec($query);
                                     ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query);
                                 } catch (\PDOException $e) {
-                                    ColorCLI::error("$query Failed {".$e->errorInfo[1]."}".$e->errorInfo[2]);
+                                    ColorCLI::error("$query Failed {".$e->errorInfo[1].'}'.$e->errorInfo[2]);
                                     exit();
                                 }
                             } else {
-                                ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}".$e->errorInfo[2]);
+                                ColorCLI::error("$query Failed \{".$e->errorInfo[1].'}'.$e->errorInfo[2]);
                                 exit();
                             }
                         }

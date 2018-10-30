@@ -742,19 +742,19 @@ class NameFixer
         $queryLimit = ($limit === '') ? '' : ' LIMIT '.$limit;
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
-            ColorCLI::header($query.$this->timeother.$queryLimit.";");
+            ColorCLI::header($query.$this->timeother.$queryLimit.';');
             $releases = DB::select($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
-            ColorCLI::header($query.$this->timeall.$queryLimit.";");
+            ColorCLI::header($query.$this->timeall.$queryLimit.';');
             $releases = DB::select($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
-            ColorCLI::header($query.$this->fullother.$queryLimit.";");
+            ColorCLI::header($query.$this->fullother.$queryLimit.';');
             $releases = DB::select($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
-            ColorCLI::header($query.$this->fullall.$queryLimit.";");
+            ColorCLI::header($query.$this->fullall.$queryLimit.';');
             $releases = DB::select($query.$this->fullall.$queryLimit);
         }
 
