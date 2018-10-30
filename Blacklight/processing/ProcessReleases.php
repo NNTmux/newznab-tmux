@@ -752,7 +752,7 @@ class ProcessReleases
                 if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
                     if ($this->echoCLI) {
-                        ColorCLI::primaryOver("Creating NZBs and deleting Collections:\t".$nzbCount.'/'.$total."\r");
+                        ColorCLI::primaryOver('Creating NZBs and deleting Collections: '.$nzbCount.'/'.$total);
                     }
                 }
             }
@@ -764,7 +764,7 @@ class ProcessReleases
             ColorCLI::primary(
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
-                    'Total time: '.ColorCLI::primary($totalTime.' seconds')
+                    'Total time: '. $totalTime.' seconds'
                 );
         }
 
@@ -823,7 +823,7 @@ class ProcessReleases
             (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
         } elseif ($this->echoCLI) {
             ColorCLI::info(
-                    "\nPost-processing is not running inside the Process Releases class.\n".
+                    'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
                     'If you are using tmux or screen they might have their own scripts running Post-processing.'
                 );
         }
