@@ -764,7 +764,7 @@ class ProcessReleases
             ColorCLI::primary(
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
-                    'Total time: '. $totalTime.' seconds'
+                    'Total time: '.$totalTime.' seconds'
                 );
         }
 
