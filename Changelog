@@ -1,4 +1,5 @@
 2018-10-30 DariusIII
+	* Chg: Update laravel/framework to version 5.7.12
 	* Chg: Update Music class
 	* Chg: Add fallback routes to web and api
 	* Chg: Update messages output in ProcessReleases
