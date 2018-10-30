@@ -89,7 +89,7 @@ class Music
         $this->musicqty = Settings::settingValue('..maxmusicprocessed') !== '' ? (int) Settings::settingValue('..maxmusicprocessed') : 150;
         $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'music'.DS;
-        $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2 ? 'AND isrenamed = 1': '';
+        $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
     }
@@ -651,7 +651,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        ColorCLI::headerOver('Looking up: '. $newname);
+                        ColorCLI::headerOver('Looking up: '.$newname);
                     }
 
                     // Do a local lookup first
