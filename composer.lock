@@ -1095,16 +1095,16 @@
         },
         {
             "name": "bower-asset/tinymce-dist",
-            "version": "4.8.4",
+            "version": "4.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "bf8376eb0006effc20c10202bbb8abbfe4cfd310"
+                "reference": "68af6df530cf2a72b461bf8778a8ba7c6a0da19f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/bf8376eb0006effc20c10202bbb8abbfe4cfd310",
-                "reference": "bf8376eb0006effc20c10202bbb8abbfe4cfd310",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/68af6df530cf2a72b461bf8778a8ba7c6a0da19f",
+                "reference": "68af6df530cf2a72b461bf8778a8ba7c6a0da19f",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1129,7 +1129,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2018-10-23T12:33:19+00:00"
+            "time": "2018-10-31T07:57:27+00:00"
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
