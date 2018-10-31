@@ -62,6 +62,7 @@ class Category extends Model
     public const MOVIE_BLURAY = 2060;
     public const MOVIE_DVD = 2070;
     public const MOVIE_WEBDL = 2080;
+    public const MOVIE_X265 = 2090;
     public const MUSIC_MP3 = 3010;
     public const MUSIC_VIDEO = 3020;
     public const MUSIC_AUDIOBOOK = 3030;
@@ -84,6 +85,7 @@ class Category extends Model
     public const TV_SPORT = 5060;
     public const TV_ANIME = 5070;
     public const TV_DOCU = 5080;
+    public const TV_X265 = 5090;
     public const XXX_DVD = 6010;
     public const XXX_WMV = 6020;
     public const XXX_XVID = 6030;
@@ -139,6 +141,7 @@ class Category extends Model
             self::MOVIE_BLURAY,
             self::MOVIE_DVD,
             self::MOVIE_WEBDL,
+            self::MOVIE_X265,
         ];
 
     public const TV_GROUP =
@@ -153,6 +156,7 @@ class Category extends Model
             self::TV_DOCU,
             self::TV_SPORT,
             self::TV_WEBDL,
+            self::TV_X265,
         ];
 
     /**

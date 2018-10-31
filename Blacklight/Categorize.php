@@ -618,6 +618,7 @@ class Categorize extends Category
                 case $this->isHDTV():
                 case $this->isSDTV():
                 case $this->isOtherTV2():
+                case $this->isTVx265():
                     return true;
                 default:
                     $this->tmpCat = self::TV_OTHER;
@@ -808,6 +809,20 @@ class Categorize extends Category
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function isTVx265(): bool
+    {
+        if (! preg_match('/(S\d+).*(x265).*(rmteam|MeGusta|HETeam|PSA|ONLY|H4S5S|TrollHD|ImE)/i', $this->releaseName)) {
+            $this->tmpCat = self::TV_x265;
+
+            return true;
+        }
+
+        return false;
+    }
+
     //  Movies.
 
     /**
@@ -965,6 +980,20 @@ class Categorize extends Category
     {
         if (preg_match('/web[-._ ]dl|web-?rip/i', $this->releaseName)) {
             $this->tmpCat = self::MOVIE_WEBDL;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMovieX265(): bool
+    {
+        if (! preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE)/i', $this->releaseName)) {
+            $this->tmpCat = self::MOVIE_X265;
 
             return true;
         }
