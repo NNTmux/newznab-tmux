@@ -2,7 +2,6 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
 use JPinkney\TVMaze\TVMaze as Client;
 
