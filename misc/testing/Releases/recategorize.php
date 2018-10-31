@@ -8,7 +8,6 @@ use Blacklight\Categorize;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
-$colorCli = new ColorCLI();
 
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
     $colorCli->error(
@@ -28,6 +27,7 @@ reCategorize($argv);
 
 function reCategorize($argv)
 {
+    $colorCli = new ColorCLI();
     $where = '';
     $othercats = implode(',', Category::OTHERS_GROUP);
     $update = true;
@@ -68,6 +68,7 @@ function reCategorize($argv)
 // Returns the quantity of categorized releases.
 function categorizeRelease($where, $update = true, $echooutput = false)
 {
+    $colorCli = new ColorCLI();
     $cat = new Categorize();
     $consoletools = new ConsoleTools();
     $relcount = $chgcount = 0;
