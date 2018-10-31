@@ -11,7 +11,6 @@ use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
-use Blacklight\ColorCLI;
 
 /**
  * Class Nfo
