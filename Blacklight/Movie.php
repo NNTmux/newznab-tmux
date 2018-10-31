@@ -1067,7 +1067,7 @@ class Movie
         if ($imdbID !== false) {
             $this->service = $service;
             if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
-                $this->colorCli->headerOver($service.' found IMDBid: ').$this->colorCli->primary('tt'.$imdbID);
+                $this->colorCli->primary($service.' found IMDBid: tt'.$imdbID, true);
             }
 
             $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
