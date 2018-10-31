@@ -1104,7 +1104,7 @@ class Forking extends \fork_daemon
             $this->colorCli->header(
                     'Process ID #'.$pid.' has completed.'.PHP_EOL.
                     'There are '.($this->forked_children_count - 1).' process(es) still active with '.
-                    (--$this->_workCount).' job(s) left in the queue.'.PHP_EOL
+                    (--$this->_workCount).' job(s) left in the queue.', true
                 );
         }
     }

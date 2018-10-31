@@ -11,6 +11,7 @@ use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
+use Blacklight\ColorCLI;
 
 /**
  * Class Nfo
@@ -54,6 +55,11 @@ class Nfo
     public const NFO_FOUND = 1; // Release has an NFO.
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Default constructor.
      *
      * @throws \Exception
@@ -66,6 +72,7 @@ class Nfo
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+        $this->colorCli = new ColorCLI();
 
         $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {

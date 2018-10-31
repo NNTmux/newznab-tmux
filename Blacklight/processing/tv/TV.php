@@ -11,6 +11,7 @@ use App\Models\TvEpisode;
 use Blacklight\utility\Country;
 use Blacklight\processing\Videos;
 use Illuminate\Support\Facades\DB;
+use Blacklight\ColorCLI;
 
 /**
  * Class TV -- abstract extension of Videos
@@ -59,7 +60,7 @@ abstract class TV extends Videos
     public $catWhere;
 
     /**
-     * @var \Blacklight\processing\tv\ColorCLI
+     * @var \Blacklight\ColorCLI
      */
     protected $colorCli;
 
