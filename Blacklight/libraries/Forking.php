@@ -85,11 +85,6 @@ class Forking extends \fork_daemon
     private $safeBackfillGroup = '';
 
     /**
-     * @var
-     */
-    public $pdo;
-
-    /**
      * @var int
      */
     protected $maxSize;
@@ -192,17 +187,11 @@ class Forking extends \fork_daemon
         $this->processAdditional = $this->processNFO = $this->processTV = $this->processMovies = $this->ppRenamedOnly = false;
         $this->work = [];
 
-        // Init Settings here, as forking causes errors when it's destroyed.
-        $this->pdo = DB::connection()->getPdo();
-
         // Process extra work that should not be forked and done before forking.
         $this->processStartWork();
 
         // Get work to fork.
         $this->getWork();
-
-        // Now we destroy settings, to prevent errors from forking.
-        unset($this->pdo);
 
         // Process the work we got.
         $this->processWork();
@@ -960,9 +949,9 @@ class Forking extends \fork_daemon
     {
         $sharing = DB::select('SELECT enabled FROM sharing');
         if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
-            $nntp = new NNTP(['Settings' => $this->pdo]);
+            $nntp = new NNTP();
             if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
-                (new PostProcess(['ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
+                (new PostProcess(['ColorCLI' => $this->colorCli]))->processSharing($nntp);
             }
 
             return true;
