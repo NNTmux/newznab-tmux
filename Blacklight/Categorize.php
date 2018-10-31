@@ -814,7 +814,7 @@ class Categorize extends Category
      */
     public function isTVx265(): bool
     {
-        if (! preg_match('/(S\d+).*(x265).*(rmteam|MeGusta|HETeam|PSA|ONLY|H4S5S|TrollHD|ImE)/i', $this->releaseName)) {
+        if (preg_match('/(S\d+).*(x265).*(rmteam|MeGusta|HETeam|PSA|ONLY|H4S5S|TrollHD|ImE)/i', $this->releaseName)) {
             $this->tmpCat = self::TV_X265;
 
             return true;
@@ -992,7 +992,7 @@ class Categorize extends Category
      */
     public function isMovieX265(): bool
     {
-        if (! preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE)/i', $this->releaseName)) {
+        if (preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE)/i', $this->releaseName)) {
             $this->tmpCat = self::MOVIE_X265;
 
             return true;
