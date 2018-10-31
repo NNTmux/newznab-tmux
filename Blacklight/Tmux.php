@@ -23,11 +23,17 @@ class Tmux
     public $tmux_session;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Tmux constructor.
      */
     public function __construct()
     {
         $this->pdo = DB::connection()->getPdo();
+        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -530,12 +536,12 @@ class Tmux
         if ($this->isRunning() === true) {
             Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
             $sleep = Settings::settingValue('site.tmux.monitor_delay');
-            ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
+            $this->colorCli->header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
             sleep($sleep);
 
             return true;
         }
-        ColorCLI::info('Tmux scripts are not running!');
+        $this->colorCli->info('Tmux scripts are not running!');
 
         return false;
     }

@@ -14,6 +14,7 @@ $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;
 $delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
+$colorCli = new ColorCLI();
 
 try {
     Utility::isPatched();
@@ -31,12 +32,12 @@ $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
 if ($session !== null) {
-    ColorCLI::error("tmux session: '".$tmux_session."' is already running, aborting.");
+    $colorCli->error("tmux session: '".$tmux_session."' is already running, aborting.");
     exit();
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
+$colorCli->header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
 
 $sql = 'SHOW table status';
 $tables = DB::select($sql);
@@ -56,7 +57,7 @@ foreach ($tables as $row) {
         }
     }
 }
-ColorCLI::primary(number_format($ran).' collections reset.');
+$colorCli->primary(number_format($ran).' collections reset.');
 sleep(2);
 
 function writelog($pane)
@@ -82,7 +83,7 @@ function command_exist($cmd)
 $apps = ['time', 'tmux', 'nice', 'tee'];
 foreach ($apps as &$value) {
     if (! command_exist($value)) {
-        ColorCLI::error('Tmux scripts require '.$value.' but its not installed. Aborting.');
+        $colorCli->error('Tmux scripts require '.$value.' but its not installed. Aborting.');
         exit();
     }
 }

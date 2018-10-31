@@ -6,6 +6,7 @@ use aharen\OMDbAPI;
 use Blacklight\ColorCLI;
 
 $omdb = new OMDbAPI();
+$colorCli = new ColorCLI();
 
 if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2] !== 'movie')) {
 
@@ -24,10 +25,10 @@ if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2]
 
         dump($search);
     } else {
-        ColorCLI::error('Error retrieving OMDb API data.');
+        $colorCli->error('Error retrieving OMDb API data.');
         exit();
     }
 } else {
-    ColorCLI::error('Invalid arguments. This script requires a text string (show name), and a second argument, movie or series.');
+    $colorCli->error('Invalid arguments. This script requires a text string (show name), and a second argument, movie or series.');
     exit();
 }

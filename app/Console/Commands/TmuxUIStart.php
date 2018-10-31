@@ -42,7 +42,7 @@ class TmuxUIStart extends Command
         // Kill the placeholder
         exec('tmux kill-session -t placeholder');
         if ($session === null) {
-            ColorCLI::info('Starting the tmux server and monitor script.');
+            (new ColorCLI())->info('Starting the tmux server and monitor script.');
             passthru('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/update/tmux/run.php');
         }
     }

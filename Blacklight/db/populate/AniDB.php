@@ -51,6 +51,11 @@ class AniDB
     private $updateInterval;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances / Echo to cli.
      *
      * @throws \Exception
@@ -64,6 +69,7 @@ class AniDB
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+        $this->colorCli = new ColorCLI();
 
         $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
         $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');
@@ -257,7 +263,7 @@ class AniDB
         if ($check === false) {
             AnidbTitle::insertIgnore(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title]);
         } else {
-            ColorCLI::warning("Duplicate: $id");
+            $this->colorCli->warning("Duplicate: $id");
         }
     }
 
@@ -327,7 +333,7 @@ class AniDB
 
         if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {
             if ($this->echooutput) {
-                ColorCLI::header('Updating anime titles by grabbing full data AniDB dump.');
+                $this->colorCli->header('Updating anime titles by grabbing full data AniDB dump.');
             }
 
             $animetitles = new \SimpleXMLElement('compress.zlib://http://anidb.net/api/anime-titles.xml.gz', null, true);
@@ -339,7 +345,7 @@ class AniDB
             if ($animetitles instanceof \Traversable) {
                 $count = $animetitles->count();
                 if ($this->echooutput) {
-                    ColorCLI::header(
+                    $this->colorCli->header(
                         'Total of '.number_format($count).' titles to add.'.PHP_EOL
                     );
                 }
@@ -354,7 +360,7 @@ class AniDB
                             (string) $xmlAttribs->lang,
                             (string) $title[0]
                         );
-                        ColorCLI::primary(
+                        $this->colorCli->primary(
                             sprintf(
                                 'Inserting: %d, %s, %s, %s',
                                 $anime['aid'],
@@ -368,11 +374,11 @@ class AniDB
                 }
             } else {
                 echo PHP_EOL.
-                    ColorCLI::error('Error retrieving XML data from AniDB. Please try again later.').
+                    $this->colorCli->error('Error retrieving XML data from AniDB. Please try again later.').
                     PHP_EOL;
             }
         } else {
-            ColorCLI::info(
+            $this->colorCli->info(
                     'AniDB has been updated within the past '.$this->updateInterval.' days. '.
                     'Either set this value lower in Site Edit (at your own risk of being banned) or try again later.'
             );
@@ -399,14 +405,14 @@ class AniDB
                 $AniDBAPIArray = $this->getAniDbAPI($anidb['anidbid']);
 
                 if ($this->banned === true) {
-                    ColorCLI::error(
+                    $this->colorCli->error(
                             'AniDB Banned, import will fail, please wait 24 hours before retrying.'
                         );
                     exit;
                 }
 
                 if ($AniDBAPIArray === false && $this->echooutput) {
-                    ColorCLI::info(
+                    $this->colorCli->info(
                             'Anime ID: '.$anidb['anidbid'].' not available for update yet.'
                         );
                 } else {
@@ -418,14 +424,14 @@ class AniDB
             $AniDBAPIArray = $this->getAniDbAPI($anidbId);
 
             if ($this->banned === true) {
-                ColorCLI::error(
+                $this->colorCli->error(
                         'AniDB Banned, import will fail, please wait 24 hours before retrying.'
                     );
                 exit;
             }
 
             if ($AniDBAPIArray === false && $this->echooutput) {
-                ColorCLI::info(
+                $this->colorCli->info(
                         'Anime ID: '.$anidbId.' not available for update yet.'
                     );
             } else {

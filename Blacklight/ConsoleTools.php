@@ -10,7 +10,7 @@ class ConsoleTools
     /**
      * @var \Blacklight\ColorCLI
      */
-    public $cli;
+    public $colorCli;
 
     /**
      * @var int
@@ -23,6 +23,8 @@ class ConsoleTools
     public function __construct()
     {
         $this->lastMessageLength = 0;
+
+        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -40,7 +42,7 @@ class ConsoleTools
         echo str_repeat(\chr(8), $this->lastMessageLength);
 
         $this->lastMessageLength = \strlen($message);
-        ColorCLI::headerOver($message);
+        $this->colorCli->headerOver($message);
     }
 
     /**
@@ -58,7 +60,7 @@ class ConsoleTools
         echo str_repeat(\chr(8), $this->lastMessageLength);
 
         $this->lastMessageLength = \strlen($message);
-        ColorCLI::primaryOver($message);
+        $this->colorCli->primaryOver($message);
     }
 
     /**

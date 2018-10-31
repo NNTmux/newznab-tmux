@@ -55,6 +55,11 @@ class Backfill
     protected $_disableBackfillGroup;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Constructor.
      *
      * @param array $options Class instances / Echo to cli?
@@ -81,6 +86,8 @@ class Backfill
         $this->_binaries = new Binaries(
             ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI]
         );
+
+        $this->colorCli = new ColorCLI();
 
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2008-08-14';
@@ -114,7 +121,7 @@ class Backfill
             );
 
             if ($this->_echoCLI) {
-                ColorCLI::header($dMessage);
+                $this->colorCli->header($dMessage);
             }
 
             if ($articles !== '' && ! is_numeric($articles)) {
@@ -127,7 +134,7 @@ class Backfill
                     $dMessage = 'Starting group '.$counter.' of '.$groupCount;
 
                     if ($this->_echoCLI) {
-                        ColorCLI::header($dMessage);
+                        $this->colorCli->header($dMessage);
                     }
                 }
                 $this->backfillGroup($groupArr, $groupCount - $counter, $articles);
@@ -137,13 +144,13 @@ class Backfill
             $dMessage = 'Backfilling completed in '.now()->diffInSeconds($allTime).' seconds.';
 
             if ($this->_echoCLI) {
-                ColorCLI::primary($dMessage);
+                $this->colorCli->primary($dMessage);
             }
         } else {
             $dMessage = 'No groups specified. Ensure groups are added to database for updating.';
 
             if ($this->_echoCLI) {
-                ColorCLI::warning($dMessage);
+                $this->colorCli->warning($dMessage);
             }
         }
     }
@@ -175,7 +182,7 @@ class Backfill
                 '. Otherwise the group is dead, you must disable it.';
 
             if ($this->_echoCLI) {
-                ColorCLI::error($dMessage);
+                $this->colorCli->error($dMessage);
             }
 
             return;
@@ -191,7 +198,7 @@ class Backfill
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary('Processing '.$groupName);
+            $this->colorCli->primary('Processing '.$groupName);
         }
 
         // Check if this is days or post backfill.
@@ -224,14 +231,14 @@ class Backfill
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::notice($dMessage);
+                $this->colorCli->notice($dMessage);
             }
 
             return;
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     'Group '.
                     $groupName.
                     "'s oldest article is ".
@@ -259,7 +266,7 @@ class Backfill
         $done = false;
         while ($done === false) {
             if ($this->_echoCLI) {
-                ColorCLI::header('Getting '.
+                $this->colorCli->header('Getting '.
                     number_format($last - $first + 1).
                     ' articles from '.
                     $groupName.
@@ -306,7 +313,7 @@ class Backfill
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     PHP_EOL.
                     'Group '.
                     $groupName.

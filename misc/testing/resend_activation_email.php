@@ -12,7 +12,7 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
 
     UserVerification::send($user, 'User email verification required');
 
-    ColorCLI::notice('Email has been sent');
+   echo 'Email has been sent';
 } else {
-    ColorCLI::info('You need to provide user id as argument');
+    echo 'You need to provide user id as argument';
 }

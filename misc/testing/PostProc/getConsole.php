@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $console = new Console(['Echo' => true]);
+$colorCli = new ColorCLI();
 
 $res = $pdo->query(
     sprintf(
@@ -21,7 +22,7 @@ $res = $pdo->query(
     )
 );
 if ($res instanceof \Traversable) {
-    ColorCLI::header('Updating console info for '.number_format($res->rowCount()).' releases.');
+    $colorCli->header('Updating console info for '.number_format($res->rowCount()).' releases.');
 
     foreach ($res as $arr) {
         $starttime = microtime(true);
@@ -29,14 +30,14 @@ if ($res instanceof \Traversable) {
         if ($gameInfo !== false) {
             $game = $console->updateConsoleInfo($gameInfo);
             if ($game === false) {
-                ColorCLI::primary($gameInfo['release'].' not found');
+                $colorCli->primary($gameInfo['release'].' not found');
             }
         }
 
         // amazon limits are 1 per 1 sec
         $diff = floor((microtime(true) - $starttime) * 1000000);
         if (1000000 - $diff > 0) {
-            ColorCLI::alternate('Sleeping');
+            $colorCli->alternate('Sleeping');
             usleep(1000000 - $diff);
         }
     }

@@ -83,7 +83,7 @@ class TraktTv extends TV
         $tvcount = \count($res);
 
         if ($this->echooutput && $tvcount > 1) {
-            ColorCLI::header('Processing TRAKT lookup for '.number_format($tvcount).' release(s).');
+            $this->colorCli->header('Processing TRAKT lookup for '.number_format($tvcount).' release(s).');
         }
 
         if ($res instanceof \Traversable) {
@@ -96,9 +96,9 @@ class TraktTv extends TV
                 if (\is_array($release) && $release['name'] !== '') {
                     if (\in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
-                            ColorCLI::headerOver('Title: ').
-                                    ColorCLI::warningOver($release['cleanname']).
-                                    ColorCLI::header(' already failed lookup for this site.  Skipping.');
+                            $this->colorCli->headerOver('Title: ').
+                                    $this->colorCli->warningOver($release['cleanname']).
+                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.');
                         }
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                         continue;
@@ -118,9 +118,9 @@ class TraktTv extends TV
 
                         // If it doesn't exist locally and lookups are allowed lets try to get it.
                         if ($this->echooutput) {
-                            ColorCLI::primaryOver('Checking Trakt for previously failed title: ').
-                                    ColorCLI::headerOver($release['cleanname']).
-                                    ColorCLI::primary('.');
+                            $this->colorCli->primaryOver('Checking Trakt for previously failed title: ').
+                                    $this->colorCli->headerOver($release['cleanname']).
+                                    $this->colorCli->primary('.');
                         }
 
                         // Get the show from TRAKT
@@ -132,9 +132,9 @@ class TraktTv extends TV
                         }
                     } else {
                         if ($this->echooutput) {
-                            ColorCLI::primaryOver('Found local TMDB match for: ').
-                                    ColorCLI::headerOver($release['cleanname']).
-                                    ColorCLI::primary('.  Attempting episode lookup!');
+                            $this->colorCli->primaryOver('Found local TMDB match for: ').
+                                    $this->colorCli->headerOver($release['cleanname']).
+                                    $this->colorCli->primary('.  Attempting episode lookup!');
                         }
                         $traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
                         $this->localizedTZ = $this->getLocalZoneFromVideoID($videoId);
@@ -150,7 +150,7 @@ class TraktTv extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            ColorCLI::primary('Found TRAKT Match for Full Season!');
+                            $this->colorCli->primary('Found TRAKT Match for Full Season!');
                             continue;
                         }
 
@@ -174,7 +174,7 @@ class TraktTv extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                ColorCLI::primary('Found TRAKT Match!');
+                                $this->colorCli->primary('Found TRAKT Match!');
                             }
                             continue;
                         }

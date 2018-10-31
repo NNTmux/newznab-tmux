@@ -10,9 +10,10 @@ use Blacklight\ReleaseImage;
 use Blacklight\utility\Utility;
 
 $dir = NN_RES.'movednzbs/';
+$colorCli = new ColorCLI();
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {
-    ColorCLI::error("This script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
+    $colorCli->error("This script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
         ."php $argv[0] true     ...: For a dry run, to see how many would be moved.\n"
         ."php $argv[0] move     ...: Move NZBs that are possibly bad or have no release. They are moved into this folder: $dir");
     exit();
@@ -30,8 +31,8 @@ $timestart = date('r');
 $checked = $moved = 0;
 $couldbe = ($argv[1] === 'true') ? 'could be ' : '';
 
-ColorCLI::header('Getting List of nzbs to check against db.');
-ColorCLI::header("Checked / {$couldbe}moved\n");
+$colorCli->header('Getting List of nzbs to check against db.');
+$colorCli->header("Checked / {$couldbe}moved\n");
 
 $dirItr = new \RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'));
 $itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
@@ -53,9 +54,9 @@ foreach ($itr as $filePath) {
     }
 }
 
-ColorCLI::header("\n".number_format($checked).' nzbs checked, '.number_format($moved).' nzbs '.$couldbe.'moved.');
-ColorCLI::header('Getting List of releases to check against nzbs.');
-ColorCLI::header("Checked / releases deleted\n");
+$colorCli->header("\n".number_format($checked).' nzbs checked, '.number_format($moved).' nzbs '.$couldbe.'moved.');
+$colorCli->header('Getting List of releases to check against nzbs.');
+$colorCli->header("Checked / releases deleted\n");
 
 $checked = $deleted = 0;
 
@@ -71,5 +72,5 @@ $res = DB::select('SELECT id, guid, nzbstatus FROM releases');
         $checked++;
         echo "$checked / $deleted\r";
     }
-ColorCLI::header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
-ColorCLI::header("Script started at [$timestart], finished at [".date('r').']');
+$colorCli->header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
+$colorCli->header("Script started at [$timestart], finished at [".date('r').']');

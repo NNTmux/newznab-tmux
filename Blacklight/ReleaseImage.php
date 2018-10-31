@@ -52,10 +52,16 @@ class ReleaseImage
     public $vidSavePath;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * ReleaseImage constructor.
      */
     public function __construct()
     {
+        $this->colorCli = new ColorCLI();
         $this->audSavePath = NN_COVERS.'audiosample'.DS;
         $this->imgSavePath = NN_COVERS.'preview'.DS;
         $this->jpgSavePath = NN_COVERS.'sample'.DS;
@@ -74,20 +80,20 @@ class ReleaseImage
             $img = Image::make($imgLoc);
         } catch (NotFoundException $e) {
             if ($e->getCode() === 404) {
-                ColorCLI::notice('Data not available on server');
+                $this->colorCli->notice('Data not available on server');
             } elseif ($e->getCode() === 503) {
-                ColorCLI::notice('Service unavailable');
+                $this->colorCli->notice('Service unavailable');
             } else {
-                ColorCLI::notice('Unable to fetch image: '.$e->getMessage());
+                $this->colorCli->notice('Unable to fetch image: '.$e->getMessage());
             }
 
             $img = false;
         } catch (NotReadableException $e) {
-            ColorCLI::notice($e->getMessage());
+            $this->colorCli->notice($e->getMessage());
 
             $img = false;
         } catch (ImageException $e) {
-            ColorCLI::notice('Image error: '.$e->getMessage());
+            $this->colorCli->notice('Image error: '.$e->getMessage());
 
             $img = false;
         }

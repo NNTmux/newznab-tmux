@@ -60,7 +60,7 @@ class TVDB extends TV
         try {
             $this->token = $this->client->authentication()->login(self::TVDB_API_KEY);
         } catch (UnauthorizedException $error) {
-            ColorCLI::warning('Could not reach TVDB API. Running in local mode only!');
+            $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!');
             $this->local = true;
         }
 
@@ -85,7 +85,7 @@ class TVDB extends TV
         $tvCount = \count($res);
 
         if ($this->echooutput && $tvCount > 0) {
-            ColorCLI::header('Processing TVDB lookup for '.number_format($tvCount).' release(s).');
+            $this->colorCli->header('Processing TVDB lookup for '.number_format($tvCount).' release(s).');
         }
         $this->titleCache = [];
 
@@ -97,9 +97,9 @@ class TVDB extends TV
             if (\is_array($release) && $release['name'] !== '') {
                 if (\in_array($release['cleanname'], $this->titleCache, false)) {
                     if ($this->echooutput) {
-                        ColorCLI::headerOver('Title: ').
-                                    ColorCLI::warningOver($release['cleanname']).
-                                    ColorCLI::header(' already failed lookup for this site.  Skipping.');
+                        $this->colorCli->headerOver('Title: ').
+                                    $this->colorCli->warningOver($release['cleanname']).
+                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.');
                     }
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     continue;
@@ -122,9 +122,9 @@ class TVDB extends TV
 
                         // If it doesnt exist locally and lookups are allowed lets try to get it.
                     if ($this->echooutput) {
-                        ColorCLI::primaryOver('Video ID for ').
-                                ColorCLI::headerOver($release['cleanname']).
-                                ColorCLI::primary(' not found in local db, checking web.');
+                        $this->colorCli->primaryOver('Video ID for ').
+                                $this->colorCli->headerOver($release['cleanname']).
+                                $this->colorCli->primary(' not found in local db, checking web.');
                     }
 
                     // Check if we have a valid country and set it in the array
@@ -143,9 +143,9 @@ class TVDB extends TV
                         $tvDbId = (int) $tvdbShow['tvdb'];
                     }
                 } elseif ($this->echooutput && $tvDbId !== false) {
-                    ColorCLI::primaryOver('Video ID for ').
-                            ColorCLI::headerOver($release['cleanname']).
-                            ColorCLI::primary(' found in local db, attempting episode match.');
+                    $this->colorCli->primaryOver('Video ID for ').
+                            $this->colorCli->headerOver($release['cleanname']).
+                            $this->colorCli->primary(' found in local db, attempting episode match.');
                 }
 
                 if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvDbId) && $tvDbId > 0) {
@@ -168,7 +168,7 @@ class TVDB extends TV
                     if ($episodeNo === 'all') {
                         // Set the video ID and leave episode 0
                         $this->setVideoIdFound($videoId, $row['id'], 0);
-                        ColorCLI::primary('Found TVDB Match for Full Season!');
+                        $this->colorCli->primary('Found TVDB Match for Full Season!');
                         continue;
                     }
 
@@ -198,7 +198,7 @@ class TVDB extends TV
                         // Mark the releases video and episode IDs
                         $this->setVideoIdFound($videoId, $row['id'], $episode);
                         if ($this->echooutput) {
-                            ColorCLI::primary('Found TVDB Match!');
+                            $this->colorCli->primary('Found TVDB Match!');
                         }
                     } else {
                         //Processing failed, set the episode ID to the next processing group
@@ -248,7 +248,7 @@ class TVDB extends TV
             $response = $this->client->search()->searchByName($cleanName);
         } catch (ResourceNotFoundException $e) {
             $response = false;
-            ColorCLI::notice('Show not found on TVDB');
+            $this->colorCli->notice('Show not found on TVDB');
         }
 
         if ($response === false && $country !== '') {
@@ -256,7 +256,7 @@ class TVDB extends TV
                 $response = $this->client->search()->searchByName(rtrim(str_replace($country, '', $cleanName)));
             } catch (ResourceNotFoundException $e) {
                 $response = false;
-                ColorCLI::notice('Show not found on TVDB');
+                $this->colorCli->notice('Show not found on TVDB');
             }
         }
 
@@ -393,13 +393,13 @@ class TVDB extends TV
         try {
             $poster = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'poster']);
         } catch (ResourceNotFoundException $e) {
-            ColorCLI::notice('Poster image not found on TVDB');
+            $this->colorCli->notice('Poster image not found on TVDB');
         }
 
         try {
             $fanart = $this->client->series()->getImagesWithQuery($show->id, ['keyType' => 'fanart']);
         } catch (ResourceNotFoundException $e) {
-            ColorCLI::notice('Fanart image not found on TVDB');
+            $this->colorCli->notice('Fanart image not found on TVDB');
         }
 
         $imdbid = $this->client->series()->getById($show->id);

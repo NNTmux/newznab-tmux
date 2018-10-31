@@ -2327,7 +2327,7 @@ class ProcessAdditional
     protected function _echo($string, $type): void
     {
         if ($this->_echoCLI) {
-            ColorCLI::$type($string);
+            (new ColorCLI())->$type($string);
         }
     }
 

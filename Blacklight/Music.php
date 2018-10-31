@@ -70,6 +70,11 @@ class Music
     public $failCache;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances/ echo to CLI.
      * @throws \Exception
      */
@@ -82,6 +87,8 @@ class Music
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+
+        $this->colorCli = new ColorCLI();
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -498,7 +505,7 @@ class Music
 
         if ($musicId) {
             if ($this->echooutput) {
-                ColorCLI::header(PHP_EOL.'Added/updated album: '.
+                $this->colorCli->header(PHP_EOL.'Added/updated album: '.
                     '   Artist: '.
                     $mus['artist'].
                     '   Title:  '.
@@ -516,7 +523,7 @@ class Music
                     $artist = 'Artist: '.$mus['artist'].', Album: ';
                 }
 
-                ColorCLI::headerOver('Nothing to update: '.
+                $this->colorCli->headerOver('Nothing to update: '.
                         $artist.
                         $mus['title'].
                         ' ('.
@@ -651,7 +658,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        ColorCLI::headerOver('Looking up: '.$newname);
+                        $this->colorCli->headerOver('Looking up: '.$newname);
                     }
 
                     // Do a local lookup first
@@ -660,7 +667,7 @@ class Music
                     if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::headerOver('Cached previous failure. Skipping.');
+                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
                         }
                         $albumId = -2;
                     } elseif ($musicCheck === null && $local === false) {
@@ -692,7 +699,7 @@ class Music
                 echo PHP_EOL;
             }
         } elseif ($this->echooutput) {
-            ColorCLI::header('No music releases to process.');
+            $this->colorCli->header('No music releases to process.');
         }
     }
 

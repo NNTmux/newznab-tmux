@@ -7,6 +7,7 @@ use Blacklight\ColorCLI;
 use Blacklight\libraries\FanartTV;
 
 $fanart = new FanartTV(Settings::settingValue('APIs..fanarttvkey'));
+$colorCli = new ColorCLI();
 
 if (! empty($argv[1])) {
 
@@ -17,10 +18,10 @@ if (! empty($argv[1])) {
     if ($moviefanart) {
         dump($moviefanart);
     } else {
-        ColorCLI::error('Error retrieving Fanart.TV data.');
+        $colorCli->error('Error retrieving Fanart.TV data.');
         exit();
     }
 } else {
-    ColorCLI::error('Invalid arguments. This script requires a number or string (TMDB or IMDb ID.');
+    $colorCli->error('Invalid arguments. This script requires a number or string (TMDB or IMDb ID.');
     exit();
 }

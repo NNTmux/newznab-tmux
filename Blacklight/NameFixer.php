@@ -137,6 +137,11 @@ class NameFixer
     public $sphinx;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances / Echo to cli.
      * @throws \Exception
      */
@@ -166,6 +171,7 @@ class NameFixer
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => null]));
         $this->text = ($options['Misc'] instanceof Utility ? $options['Misc'] : new Utility());
         $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
+        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -219,7 +225,7 @@ class NameFixer
 
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' releases to process.');
+            $this->colorCli->primary(number_format($total).' releases to process.');
 
             foreach ($releases as $rel) {
                 $releaseRow = DB::select(
@@ -248,7 +254,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' NFO\'s');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -303,7 +309,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' file names to process.');
+            $this->colorCli->primary(number_format($total).' file names to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -314,7 +320,7 @@ class NameFixer
 
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -367,7 +373,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' xxx file names to process.');
+            $this->colorCli->primary(number_format($total).' xxx file names to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -377,7 +383,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -432,7 +438,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' srr file extensions to process.');
+            $this->colorCli->primary(number_format($total).' srr file extensions to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -442,7 +448,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -490,7 +496,7 @@ class NameFixer
         if ($total > 0) {
             $this->_totalReleases = $total;
 
-            ColorCLI::primary(number_format($total).' releases to process.');
+            $this->colorCli->primary(number_format($total).' releases to process.');
             $Nfo = new Nfo();
             $nzbContents = new NZBContents(
                     [
@@ -512,7 +518,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -577,7 +583,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' unique ids to process.');
+            $this->colorCli->primary(number_format($total).' unique ids to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -586,7 +592,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' UID\'s');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -642,7 +648,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' mediainfo movie names to process.');
+            $this->colorCli->primary(number_format($total).' mediainfo movie names to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -651,7 +657,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' MediaInfo\'s');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -715,7 +721,7 @@ class NameFixer
         $total = \count($releases);
         if ($total > 0) {
             $this->_totalReleases = $total;
-            ColorCLI::primary(number_format($total).' hash_16K to process.');
+            $this->colorCli->primary(number_format($total).' hash_16K to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -724,7 +730,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' hashes');
         } else {
-            ColorCLI::info('Nothing to fix.');
+            $this->colorCli->info('Nothing to fix.');
         }
     }
 
@@ -742,19 +748,19 @@ class NameFixer
         $queryLimit = ($limit === '') ? '' : ' LIMIT '.$limit;
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
-            ColorCLI::header($query.$this->timeother.$queryLimit.';');
+            $this->colorCli->header($query.$this->timeother.$queryLimit.';');
             $releases = DB::select($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
-            ColorCLI::header($query.$this->timeall.$queryLimit.';');
+            $this->colorCli->header($query.$this->timeall.$queryLimit.';');
             $releases = DB::select($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
-            ColorCLI::header($query.$this->fullother.$queryLimit.';');
+            $this->colorCli->header($query.$this->fullother.$queryLimit.';');
             $releases = DB::select($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
-            ColorCLI::header($query.$this->fullall.$queryLimit.';');
+            $this->colorCli->header($query.$this->fullall.$queryLimit.';');
             $releases = DB::select($query.$this->fullall.$queryLimit);
         }
 
@@ -770,7 +776,7 @@ class NameFixer
     protected function _echoFoundCount($echo, $type): void
     {
         if ($echo === true) {
-            ColorCLI::header(
+            $this->colorCli->header(
                 PHP_EOL.
                 number_format($this->fixed).
                 ' releases have had their names changed out of: '.
@@ -778,7 +784,7 @@ class NameFixer
                 $type.'.'
             );
         } else {
-            ColorCLI::header(
+            $this->colorCli->header(
                 PHP_EOL.
                 number_format($this->fixed).
                 ' releases could have their names changed. '.
@@ -794,7 +800,7 @@ class NameFixer
      */
     protected function _echoStartMessage($time, $type): void
     {
-        ColorCLI::header(
+        $this->colorCli->header(
             sprintf(
                 'Fixing search names %s using %s.',
                 ($time === 1 ? 'in the past 6 hours' : 'since the beginning'),
@@ -809,7 +815,7 @@ class NameFixer
     protected function _echoRenamed($show): void
     {
         if ($this->checked % 500 === 0 && $show === 1) {
-            ColorCLI::alternate(PHP_EOL.number_format($this->checked).' files processed.'.PHP_EOL);
+            $this->colorCli->alternate(PHP_EOL.number_format($this->checked).' files processed.'.PHP_EOL);
         }
 
         if ($show === 2) {
@@ -874,25 +880,25 @@ class NameFixer
 
                     echo PHP_EOL;
 
-                    ColorCLI::headerOver('New name:  ').
-                        ColorCLI::primary(substr($newName, 0, 299)).
-                        ColorCLI::headerOver('Old name:  ').
-                        ColorCLI::primary($release->searchname).
-                        ColorCLI::headerOver('Use name:  ').
-                        ColorCLI::primary($release->name).
-                        ColorCLI::headerOver('New cat:   ').
-                        ColorCLI::primary($newCatName).
-                        ColorCLI::headerOver('Old cat:   ').
-                        ColorCLI::primary($oldCatName).
-                        ColorCLI::headerOver('Group:     ').
-                        ColorCLI::primary($groupName).
-                        ColorCLI::headerOver('Method:    ').
-                        ColorCLI::primary($type.$method).
-                        ColorCLI::headerOver('Releases ID: ').
-                        ColorCLI::primary($release->releases_id);
+                    $this->colorCli->headerOver('New name:  ').
+                        $this->colorCli->primary(substr($newName, 0, 299)).
+                        $this->colorCli->headerOver('Old name:  ').
+                        $this->colorCli->primary($release->searchname).
+                        $this->colorCli->headerOver('Use name:  ').
+                        $this->colorCli->primary($release->name).
+                        $this->colorCli->headerOver('New cat:   ').
+                        $this->colorCli->primary($newCatName).
+                        $this->colorCli->headerOver('Old cat:   ').
+                        $this->colorCli->primary($oldCatName).
+                        $this->colorCli->headerOver('Group:     ').
+                        $this->colorCli->primary($groupName).
+                        $this->colorCli->headerOver('Method:    ').
+                        $this->colorCli->primary($type.$method).
+                        $this->colorCli->headerOver('Releases ID: ').
+                        $this->colorCli->primary($release->releases_id);
                     if (! empty($release->filename)) {
-                        ColorCLI::headerOver('Filename:  ').
-                            ColorCLI::primary($release->filename);
+                        $this->colorCli->headerOver('Filename:  ').
+                            $this->colorCli->primary($release->filename);
                     }
 
                     if ($type !== 'PAR2, ') {
@@ -1018,15 +1024,16 @@ class NameFixer
             'method'       => '',
         ]
     ): void {
+        $colorCLI = new ColorCLI();
         echo PHP_EOL;
 
-        ColorCLI::headerOver('New name:     ').ColorCLI::primaryOver($data['new_name']).
-            ColorCLI::headerOver('Old name:     ').ColorCLI::primaryOver($data['old_name']).
-            ColorCLI::headerOver('New category: ').ColorCLI::primaryOver($data['new_category']).
-            ColorCLI::headerOver('Old category: ').ColorCLI::primaryOver($data['old_category']).
-            ColorCLI::headerOver('Group:        ').ColorCLI::primaryOver($data['group']).
-            ColorCLI::headerOver('Releases ID:   ').ColorCLI::primaryOver($data['releases_id']).
-            ColorCLI::headerOver('Method:       ').ColorCLI::primaryOver($data['method']);
+        $colorCLI->headerOver('New name:     ').$colorCLI->primaryOver($data['new_name']).
+            $colorCLI->headerOver('Old name:     ').$colorCLI->primaryOver($data['old_name']).
+            $colorCLI->headerOver('New category: ').$colorCLI->primaryOver($data['new_category']).
+            $colorCLI->headerOver('Old category: ').$colorCLI->primaryOver($data['old_category']).
+            $colorCLI->headerOver('Group:        ').$colorCLI->primaryOver($data['group']).
+            $colorCLI->headerOver('Releases ID:   ').$colorCLI->primaryOver($data['releases_id']).
+            $colorCLI->headerOver('Method:       ').$colorCLI->primaryOver($data['method']);
     }
 
     /**
@@ -1127,8 +1134,8 @@ class NameFixer
             $limit = 'LIMIT 1000000';
         }
 
-        ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now());
-        ColorCLI::primary('Matching predb filename to cleaned release_files.name.');
+        $this->colorCli->header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now());
+        $this->colorCli->primary('Matching predb filename to cleaned release_files.name.');
 
         $counter = $counted = 0;
         $timestart = now();
@@ -1157,7 +1164,7 @@ class NameFixer
             $total = \count($query);
 
             if ($total > 0) {
-                ColorCLI::header(PHP_EOL.number_format($total).' releases to process.');
+                $this->colorCli->header(PHP_EOL.number_format($total).' releases to process.');
 
                 foreach (collect($query)->chunk(100) as $chunked) {
                     foreach ($chunked as $row) {
@@ -1170,9 +1177,9 @@ class NameFixer
                         }
                     }
                 }
-                ColorCLI::header(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
+                $this->colorCli->header(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
             } else {
-                ColorCLI::info('Nothing to do.');
+                $this->colorCli->info('Nothing to do.');
             }
         }
     }
@@ -1349,7 +1356,7 @@ class NameFixer
             if ($time === 1) {
                 $te = ' in the past 3 hours';
             }
-            ColorCLI::header('Fixing search names'.$te.' using the predb hash.');
+            $this->colorCli->header('Fixing search names'.$te.' using the predb hash.');
         }
         $regex = 'AND (r.ishashed = 1 OR rf.ishashed = 1)';
 
@@ -1367,7 +1374,7 @@ class NameFixer
 
         $res = DB::select($query);
         $total = \count($res);
-        ColorCLI::primary(number_format($total).' releases to process.');
+        $this->colorCli->primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
             if (preg_match('/[a-fA-F0-9]{32,40}/i', $row->name, $matches)) {
                 $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
@@ -1375,13 +1382,13 @@ class NameFixer
                 $updated += $this->matchPredbHash($matches[0], $row, $echo, $nameStatus, $show);
             }
             if ($show === 2) {
-                ColorCLI::overWritePrimary('Renamed Releases: ['.number_format($updated).'] '.$this->consoletools->percentString($checked++, $total));
+                $this->colorCli->overWritePrimary('Renamed Releases: ['.number_format($updated).'] '.$this->consoletools->percentString($checked++, $total));
             }
         }
         if ($echo === 1) {
-            ColorCLI::header(PHP_EOL.$updated.' releases have had their names changed out of: '.number_format($checked).' files.');
+            $this->colorCli->header(PHP_EOL.$updated.' releases have had their names changed out of: '.number_format($checked).' files.');
         } else {
-            ColorCLI::header(PHP_EOL.$updated.' releases could have their names changed. '.number_format($checked).' files were checked.');
+            $this->colorCli->header(PHP_EOL.$updated.' releases could have their names changed. '.number_format($checked).' files were checked.');
         }
 
         return $updated;

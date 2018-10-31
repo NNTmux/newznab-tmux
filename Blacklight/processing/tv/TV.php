@@ -59,6 +59,11 @@ abstract class TV extends Videos
     public $catWhere;
 
     /**
+     * @var \Blacklight\processing\tv\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * TV constructor.
      *
      * @param array $options
@@ -67,6 +72,7 @@ abstract class TV extends Videos
     public function __construct(array $options = [])
     {
         parent::__construct($options);
+        $this->colorCli = new ColorCLI();
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         $this->tvqty = Settings::settingValue('..maxrageprocessed') !== '' ? (int) Settings::settingValue('..maxrageprocessed') : 75;
         $this->imgSavePath = NN_COVERS.'tvshows'.DS;

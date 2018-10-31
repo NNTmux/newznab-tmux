@@ -11,22 +11,23 @@ use Illuminate\Support\Facades\DB;
 
 $start = now();
 $consoleTools = new ConsoleTools();
+$colorCli = new ColorCLI();
 
 // Create the connection here and pass
 $nntp = new NNTP();
 if ($nntp->doConnect() !== true) {
-    ColorCLI::error('Unable to connect to usenet.');
+    $colorCli->error('Unable to connect to usenet.');
     exit();
 }
 
-ColorCLI::header('Getting first/last for all your active groups.');
+$colorCli->header('Getting first/last for all your active groups.');
 $data = $nntp->getGroups();
 if ($nntp->isError($data)) {
-    ColorCLI::error('Failed to getGroups() from nntp server.');
+    $colorCli->error('Failed to getGroups() from nntp server.');
     exit();
 }
 
-ColorCLI::header('Inserting new values into short_groups table.');
+$colorCli->header('Inserting new values into short_groups table.');
 
 DB::unprepared('TRUNCATE TABLE short_groups');
 DB::commit();
@@ -42,8 +43,8 @@ foreach ($data as $newgroup) {
                     'last_record' => $newgroup['last'],
                     'updated' => now(),
                 ]);
-        ColorCLI::primary('Updated '.$newgroup['group']);
+        $colorCli->primary('Updated '.$newgroup['group']);
     }
 }
 
-ColorCLI::header('Running time: '.now()->diffInSeconds($start).' seconds');
+$colorCli->header('Running time: '.now()->diffInSeconds($start).' seconds');

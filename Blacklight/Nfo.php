@@ -268,7 +268,7 @@ class Nfo
         $nfoCount = $res->count();
 
         if ($nfoCount > 0) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     PHP_EOL.
                     ($guidChar === '' ? '' : '['.$guidChar.'] ').
                     ($groupID === '' ? '' : '['.$groupID.'] ').
@@ -308,7 +308,7 @@ class Nfo
                     foreach ($nfoStats as $row) {
                         $outString .= ', '.$row['status'].' = '.number_format($row['count']);
                     }
-                    ColorCLI::header($outString.'.');
+                    $this->colorCli->header($outString.'.');
                 }
             }
 
@@ -370,7 +370,7 @@ class Nfo
                 echo PHP_EOL;
             }
             if ($ret > 0) {
-                ColorCLI::primary($ret.' NFO file(s) found/processed.');
+                $this->colorCli->primary($ret.' NFO file(s) found/processed.');
             }
         }
 

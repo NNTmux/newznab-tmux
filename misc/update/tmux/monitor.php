@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $tMain = new Tmux();
+$colorCli = new ColorCLI();
 try {
     $tRun = new TmuxRun();
 } catch (Exception $e) {
@@ -120,7 +121,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['counts']['now']['total_work'] = 0;
         $runVar['modsettings']['fix_crap'] = explode(', ', $runVar['settings']['fix_crap']);
 
-        ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
+        $colorCli->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
         try {
@@ -417,7 +418,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 function errorOnSQL()
 {
-    ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
+    $colorCli->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
 }
 
 /**

@@ -6,9 +6,10 @@ use Blacklight\ColorCLI;
 use App\Models\ConsoleInfo;
 
 $covers = $updated = $deleted = 0;
+$colorCli = new ColorCLI();
 
 if ($argc === 1 || $argv[1] !== 'true') {
-    ColorCLI::error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n");
+    $colorCli->error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n");
     exit();
 }
 
@@ -31,7 +32,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = ConsoleInfo::query()->where('id', $match[1])->value('id');
                 if ($run === 0) {
-                    ColorCLI::info($filePath.' not found in db.');
+                    $colorCli->info($filePath.' not found in db.');
                 }
             }
         }
@@ -48,10 +49,10 @@ if ($qry instanceof \Traversable) {
                     ['id' => $rows['id']],
                 ]
             )->update(['cover' => 0]);
-            ColorCLI::info($path2covers.$rows['id'].'.jpg does not exist.');
+            $colorCli->info($path2covers.$rows['id'].'.jpg does not exist.');
             $deleted++;
         }
     }
 }
-ColorCLI::header($covers.' covers set.');
-ColorCLI::header($deleted.' consoles unset.');
+$colorCli->header($covers.' covers set.');
+$colorCli->header($deleted.' consoles unset.');
