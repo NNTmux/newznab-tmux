@@ -849,8 +849,7 @@ class NameFixer
             $release = (object) $release;
         }
         if ($this->relid !== $release->releases_id) {
-            $releaseCleaning = new ReleaseCleaning();
-            $newName = $releaseCleaning->fixerCleaner($name);
+            $newName = (new ReleaseCleaning())->fixerCleaner($name);
             if (strtolower($newName) !== strtolower($release->searchname)) {
                 $this->matched = true;
                 $this->relid = (int) $release->releases_id;
@@ -963,16 +962,12 @@ class NameFixer
                             }
                         }
 
-                        Release::query()
-                            ->where('id', $release->releases_id)
-                            ->update($updateColumns);
+                        $release->update($updateColumns);
                         $this->sphinx->updateRelease($release->releases_id);
                     } else {
                         $newTitle = substr($newName, 0, 299);
 
-                        Release::query()
-                            ->where('id', $release->releases_id)
-                            ->update(
+                        $release->update(
                                 [
                                     'videos_id' => 0,
                                     'tv_episodes_id' => 0,
