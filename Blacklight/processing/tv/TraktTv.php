@@ -3,7 +3,6 @@
 namespace Blacklight\processing\tv;
 
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
 use Blacklight\utility\Time;
 use Blacklight\libraries\TraktAPI;

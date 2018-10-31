@@ -2,7 +2,6 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
 use CanIHaveSomeCoffee\TheTVDbAPI\TheTVDbAPI;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;

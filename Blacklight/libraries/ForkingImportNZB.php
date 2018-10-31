@@ -2,8 +2,6 @@
 
 namespace Blacklight\libraries;
 
-use Blacklight\ColorCLI;
-
 /**
  * Class ForkingImportNZB.
  *
