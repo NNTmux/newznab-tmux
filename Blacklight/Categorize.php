@@ -992,7 +992,7 @@ class Categorize extends Category
      */
     public function isMovieX265(): bool
     {
-        if (preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE)/i', $this->releaseName)) {
+        if (preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE|NCmt)/i', $this->releaseName)) {
             $this->tmpCat = self::MOVIE_X265;
 
             return true;

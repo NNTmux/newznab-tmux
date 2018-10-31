@@ -1,4 +1,5 @@
 2018-10-31 DariusIII
+	* Chg: Update isMovieX265 function regex
 	* Chg: Update Category model getCategorySearch function
 	* Chg: Add x265 Movies and TV categories
 	* Fix: Fix query in reset_postprocessing script related to misc categories reset
