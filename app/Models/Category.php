@@ -224,12 +224,10 @@ class Category extends Model
 
     /**
      * @param array $cat
-     * @param null  $query
-     * @param bool  $builder
      *
-     * @return string|\Illuminate\Database\Query\Builder
+     * @return string
      */
-    public static function getCategorySearch(array $cat = [], $query = null, $builder = false)
+    public static function getCategorySearch(array $cat = [])
     {
         $categories = [];
         // If multiple categories were sent in a single array position, slice and add them
@@ -252,29 +250,19 @@ class Category extends Model
             }
         }
         $catCount = \count($categories);
-        $catsrch = '';
         switch ($catCount) {
             //No category constraint
             case 0:
-                if ($builder === false) {
                     $catsrch = 'AND 1=1';
-                }
                 break;
             // One category constraint
             case 1:
-                if ($builder === false) {
                     $catsrch = $categories[0] !== -1 ? '  AND r.categories_id = '.$categories[0] : '';
-                } else {
-                    return $query->where('r.categories_id', '=', $categories[0]);
-                }
                 break;
             // Multiple category constraints
             default:
-                if ($builder === false) {
+
                     $catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
-                } else {
-                    return $query->whereIn('r.categories_id', $categories);
-                }
                 break;
         }
 
