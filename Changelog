@@ -1,4 +1,5 @@
 2018-10-31 DariusIII
+	* Fix: Fix query in reset_postprocessing script related to misc categories reset
 	* Chg: Update Forking class - remove pdo
 	* Chg: Increase group_concat_max_len in groupfixrelnames script
 	* Chg: Refactor ColorCLI class

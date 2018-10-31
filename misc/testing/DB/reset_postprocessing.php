@@ -173,6 +173,8 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
         $where = ' WHERE haspreview < -1 OR haspreview = 0 OR passwordstatus < -1 OR passwordstatus = 0 OR jpgstatus < 0 OR videostatus < 0 OR audiostatus < 0';
     }
 
+    $where .= ' AND categories_id < 1000';
+
     $colorCli->primary('SELECT id FROM releases'.$where);
     $qry = $pdo->query('SELECT id FROM releases'.$where);
     if ($qry !== false) {
