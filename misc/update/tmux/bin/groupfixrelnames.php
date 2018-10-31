@@ -27,7 +27,7 @@ switch (true) {
     case $type === 'standard' && $guidChar !== null && $maxPerRun !== null && is_numeric($maxPerRun):
 
         // Allow for larger filename return sets
-        DB::unprepared('SET SESSION group_concat_max_len = 32768');
+        DB::unprepared('SET SESSION group_concat_max_len = 65536');
         DB::commit();
 
         // Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
