@@ -1,4 +1,5 @@
 2018-10-31 DariusIII
+	* Fix: Move x265 TV and Movie categorization up the ladder
 	* Chg: Update isMovieX265 function regex
 	* Chg: Update Category model getCategorySearch function
 	* Chg: Add x265 Movies and TV categories

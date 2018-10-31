@@ -445,6 +445,8 @@ class Categorize extends Category
                             break;
                         case $this->isMovieSD(): // Need to check this BEFORE the HD check
                             break;
+                        case $this->isMovieX265(): // Check before UHD check
+                            break;
                         case $this->isMovieUHD():  // Check the movie isn't an UHD release before blindly assigning SD
                             break;
                         case $this->isMovieHD():  // Check the movie isn't an HD release before blindly assigning SD
@@ -465,6 +467,8 @@ class Categorize extends Category
                         case $this->isTV():
                             break;
                         case $this->isMovieSD():
+                            break;
+                        case $this->isMovieX265():
                             break;
                         case $this->isMovieUHD():
                             break;
@@ -612,13 +616,13 @@ class Categorize extends Category
                 case $this->categorizeForeign && $this->isForeignTV():
                 case $this->isSportTV():
                 case $this->isDocumentaryTV():
+                case $this->isTVx265():
                 case $this->isUHDTV():
                 case $this->catWebDL && $this->isWEBDL():
                 case $this->isAnimeTV():
                 case $this->isHDTV():
                 case $this->isSDTV():
                 case $this->isOtherTV2():
-                case $this->isTVx265():
                     return true;
                 default:
                     $this->tmpCat = self::TV_OTHER;
@@ -834,6 +838,7 @@ class Categorize extends Category
             switch (true) {
                 case $this->categorizeForeign && $this->isMovieForeign():
                 case $this->isMovieDVD():
+                case $this->isMovieX265():
                 case $this->isMovieUHD():
                 case $this->catWebDL && $this->isMovieWEBDL():
                 case $this->isMovieSD():
