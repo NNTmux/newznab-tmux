@@ -7,11 +7,11 @@ use App\Models\TvInfo;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
 use App\Models\TvEpisode;
 use Blacklight\utility\Country;
 use Blacklight\processing\Videos;
 use Illuminate\Support\Facades\DB;
-use Blacklight\ColorCLI;
 
 /**
  * Class TV -- abstract extension of Videos
