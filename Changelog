@@ -1,4 +1,5 @@
 2018-11-01 DariusIII
+	* Chg: Update used libraries (mostly composer)
 	* Chg: Update NameFixer updateRelease function
 	* Chg: Add first wave of Release tagging capabilities
 2018-10-31 DariusIII

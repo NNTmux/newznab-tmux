@@ -321,8 +321,7 @@
                     "Gemfile.lock",
                     "*.md"
                 ]
-            },
-            "time": "2016-06-06T17:37:52+00:00"
+            }
         },
         {
             "name": "bower-asset/autosize",
@@ -351,8 +350,7 @@
                 "form",
                 "textarea",
                 "ui"
-            ],
-            "time": "2017-05-19T15:36:30+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap",
@@ -401,8 +399,7 @@
                 "mobile-first",
                 "responsive",
                 "web"
-            ],
-            "time": "2016-07-25T15:51:55+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-datepicker",
@@ -431,8 +428,7 @@
             },
             "license": [
                 "Apache-2.0"
-            ],
-            "time": "2016-08-05T09:50:13+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-hover-dropdown",
@@ -462,8 +458,7 @@
                 "dropdowns",
                 "hover",
                 "twitter"
-            ],
-            "time": "2015-12-01T23:35:57+00:00"
+            ]
         },
         {
             "name": "bower-asset/bootstrap-progressbar",
@@ -497,8 +492,7 @@
             },
             "license": [
                 "MIT"
-            ],
-            "time": "2015-05-15T18:56:17+00:00"
+            ]
         },
         {
             "name": "bower-asset/colorbox",
@@ -539,8 +533,7 @@
                 "modal",
                 "popup",
                 "ui"
-            ],
-            "time": "2016-05-10T22:21:33+00:00"
+            ]
         },
         {
             "name": "bower-asset/datatables",
@@ -655,8 +648,7 @@
                     "tests",
                     "examples"
                 ]
-            },
-            "time": "2015-01-26T21:19:01+00:00"
+            }
         },
         {
             "name": "bower-asset/flexboxgrid",
@@ -692,8 +684,7 @@
                 "css",
                 "flexbox",
                 "grid"
-            ],
-            "time": "2016-08-14T16:43:18+00:00"
+            ]
         },
         {
             "name": "bower-asset/font-awesome",
@@ -759,8 +750,7 @@
                 "replacement",
                 "skins",
                 "ui"
-            ],
-            "time": "2014-03-03T17:36:28+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery",
@@ -827,8 +817,7 @@
                 "scroll",
                 "scrolltop",
                 "scrolltotop"
-            ],
-            "time": "2017-08-31T15:51:29+00:00"
+            ]
         },
         {
             "name": "bower-asset/jquery-migrate",
@@ -878,8 +867,7 @@
                     "demo",
                     "package.json"
                 ]
-            },
-            "time": "2016-03-01T20:38:24+00:00"
+            }
         },
         {
             "name": "bower-asset/multifile",
@@ -995,8 +983,7 @@
                 "progress",
                 "progress",
                 "spinner"
-            ],
-            "time": "2014-11-06T16:31:34+00:00"
+            ]
         },
         {
             "name": "bower-asset/pnotify",
@@ -1048,8 +1035,7 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "JavaScript notification plugin.",
-            "time": "2017-07-31T21:50:29+00:00"
+            "description": "JavaScript notification plugin."
         },
         {
             "name": "bower-asset/slimscroll",
@@ -1090,8 +1076,7 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
-            ],
-            "time": "2016-06-11T09:19:14+00:00"
+            ]
         },
         {
             "name": "bower-asset/tinymce-dist",
@@ -4627,16 +4612,16 @@
         },
         {
             "name": "php-http/message",
-            "version": "v1.7.1",
+            "version": "1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/message.git",
-                "reference": "a296f8bca76071711fe10e5f2a3350bd2295dbba"
+                "reference": "b159ffe570dffd335e22ef0b91a946eacb182fa1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/message/zipball/a296f8bca76071711fe10e5f2a3350bd2295dbba",
-                "reference": "a296f8bca76071711fe10e5f2a3350bd2295dbba",
+                "url": "https://api.github.com/repos/php-http/message/zipball/b159ffe570dffd335e22ef0b91a946eacb182fa1",
+                "reference": "b159ffe570dffd335e22ef0b91a946eacb182fa1",
                 "shasum": ""
             },
             "require": {
@@ -4695,7 +4680,7 @@
                 "message",
                 "psr-7"
             ],
-            "time": "2018-10-29T11:56:34+00:00"
+            "time": "2018-11-01T09:32:41+00:00"
         },
         {
             "name": "php-http/message-factory",
@@ -8084,16 +8069,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "1.7.2",
+            "version": "1.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "576aab9b5abb2ed11a1c52353a759363216a4ad2"
+                "reference": "e965b9aaa8854c3067f1ed2ae45f436572d73eb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/576aab9b5abb2ed11a1c52353a759363216a4ad2",
-                "reference": "576aab9b5abb2ed11a1c52353a759363216a4ad2",
+                "url": "https://api.github.com/repos/composer/composer/zipball/e965b9aaa8854c3067f1ed2ae45f436572d73eb7",
+                "reference": "e965b9aaa8854c3067f1ed2ae45f436572d73eb7",
                 "shasum": ""
             },
             "require": {
@@ -8160,7 +8145,7 @@
                 "dependency",
                 "package"
             ],
-            "time": "2018-08-16T14:57:12+00:00"
+            "time": "2018-11-01T09:05:06+00:00"
         },
         {
             "name": "composer/semver",
@@ -8226,16 +8211,16 @@
         },
         {
             "name": "composer/spdx-licenses",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/spdx-licenses.git",
-                "reference": "cb17687e9f936acd7e7245ad3890f953770dec1b"
+                "reference": "7a9556b22bd9d4df7cad89876b00af58ef20d3a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/spdx-licenses/zipball/cb17687e9f936acd7e7245ad3890f953770dec1b",
-                "reference": "cb17687e9f936acd7e7245ad3890f953770dec1b",
+                "url": "https://api.github.com/repos/composer/spdx-licenses/zipball/7a9556b22bd9d4df7cad89876b00af58ef20d3a2",
+                "reference": "7a9556b22bd9d4df7cad89876b00af58ef20d3a2",
                 "shasum": ""
             },
             "require": {
@@ -8283,7 +8268,7 @@
                 "spdx",
                 "validator"
             ],
-            "time": "2018-04-30T10:33:04+00:00"
+            "time": "2018-11-01T09:45:54+00:00"
         },
         {
             "name": "composer/xdebug-handler",
