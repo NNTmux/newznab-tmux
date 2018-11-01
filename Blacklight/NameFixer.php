@@ -963,7 +963,7 @@ class NameFixer
                             }
                         }
 
-                        $release->update($updateColumns);
+                        $taggedRelease->update($updateColumns);
                         $taggedRelease->retag($determinedCategory['tags']);
                         $this->sphinx->updateRelease($release->releases_id);
                     } else {
