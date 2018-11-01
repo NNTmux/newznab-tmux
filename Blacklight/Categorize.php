@@ -810,7 +810,6 @@ class Categorize
             $this->tmpCat = Category::TV_ANIME;
             $this->tmpTag[] = Category::TV_ANIME;
 
-
             return true;
         }
         if (preg_match('/(ANiHLS|HaiKU|ANiURL)/i', $this->releaseName)) {
