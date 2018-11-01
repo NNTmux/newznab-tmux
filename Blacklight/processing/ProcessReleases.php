@@ -268,7 +268,7 @@ class ProcessReleases
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
                 Release::query()->where('id', $release->id)->update(['categories_id' => $catId['categories_id'], 'iscategorized' => 1]);
                 $taggedRelease = Release::find($release->id);
-                $taggedRelease->retag($catId['tags']);
+                $taggedRelease->tag($catId['tags']);
                 $categorized++;
                 if ($this->echoCLI) {
                     $this->consoleTools->overWritePrimary(
@@ -617,7 +617,7 @@ class ProcessReleases
                         ]
                     );
                 $release = Release::find($releaseID);
-                $release->retag($determinedCategory['tags']);
+                $release->tag($determinedCategory['tags']);
 
                 if ($releaseID !== null) {
                     // Update collections table to say we inserted the release.

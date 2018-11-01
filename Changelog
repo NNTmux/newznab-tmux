@@ -1,4 +1,5 @@
 2018-11-01 DariusIII
+	* Chg: Update tagging on new release addition
 	* Fix: Fix tag assignement in Categorize class
 	* Chg: Update used libraries (mostly composer)
 	* Chg: Update NameFixer updateRelease function
