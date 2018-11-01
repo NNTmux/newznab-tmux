@@ -1,3 +1,5 @@
+2018-11-01 DariusIII
+	* Chg: Add first wave of Release tagging capabilities
 2018-10-31 DariusIII
 	* Chg: Update NameFixer updateRelease function to use already provided release to update and skip doing unnecessary queries
 	* Chg: Update symfony components to their latest versions

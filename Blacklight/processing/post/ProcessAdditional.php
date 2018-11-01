@@ -1750,10 +1750,12 @@ class ProcessAdditional
 											SET searchname = %s, categories_id = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
 											WHERE id = %d',
                                             $newTitle,
-                                            $newCat,
+                                            $newCat['categories_id'],
                                             $this->_release->id
                                         )
                                     );
+                                $release = Release::find($this->_release->id);
+                                $release->retag($newCat['tags']);
                                 $this->sphinx->updateRelease($this->_release->id);
 
                                 // Echo the changed name.

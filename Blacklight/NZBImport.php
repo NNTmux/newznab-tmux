@@ -396,6 +396,7 @@ class NZBImport
 
         if ($dupeCheck === null) {
             $escapedSearchName = $cleanName;
+            $determinedCategory = $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName);
             // Insert the release into the DB.
             $relID = Release::insertRelease(
                 [
@@ -407,13 +408,16 @@ class NZBImport
                     'postdate'        => $nzbDetails['postDate'],
                     'fromname'        => $escapedFromName,
                     'size'            => $nzbDetails['totalSize'],
-                    'categories_id'    => $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName),
+                    'categories_id'    => $determinedCategory['categories_id'],
                     'isrenamed'        => $renamed,
                     'reqidstatus'    => 0,
                     'predb_id'        => 0,
                     'nzbstatus'        => NZB::NZB_ADDED,
                 ]
             );
+            $release = Release::find($relID);
+            $release->tag($determinedCategory['tags']);
+
         } else {
             $this->echoOut('This release is already in our DB so skipping: '.$subject);
 

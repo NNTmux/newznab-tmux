@@ -160,12 +160,10 @@ class Category extends Model
         ];
 
     /**
-     * Temporary category while we sort through the name.
-     * @var int
+     * @var string
      */
-    protected $tmpCat = self::OTHER_MISC;
-
     protected $table = 'categories';
+
     /**
      * @var bool
      */

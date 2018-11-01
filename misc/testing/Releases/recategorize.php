@@ -3,6 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Category;
+use App\Models\Release;
 use Blacklight\ColorCLI;
 use Blacklight\Categorize;
 use Blacklight\ConsoleTools;
@@ -97,10 +98,12 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 								xxxinfo_id = 0,
 								categories_id = %d
 							WHERE id = %d',
-                            $catId,
+                            $catId['categories_id'],
                             $rowrel->id
                         )
                     );
+                    $release = Release::find($rowrel->id);
+                    $release->retag($catId['tags']);
                 }
                 $chgcount++;
             }

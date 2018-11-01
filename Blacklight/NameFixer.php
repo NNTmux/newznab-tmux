@@ -871,7 +871,7 @@ class NameFixer
                 if ($this->echooutput === true && $show === true) {
                     $groupName = Group::getNameByID($release->groups_id);
                     $oldCatName = Category::getNameByID($release->categories_id);
-                    $newCatName = Category::getNameByID($determinedCategory);
+                    $newCatName = Category::getNameByID($determinedCategory['categories_id']);
 
                     if ($type === 'PAR2, ') {
                         echo PHP_EOL;
@@ -953,7 +953,7 @@ class NameFixer
                             'anidbid' => null,
                             'predb_id' => $preId,
                             'searchname' => $newTitle,
-                            'categories_id' => $determinedCategory,
+                            'categories_id' => $determinedCategory['categories_id'],
                         ];
 
                         if ($status !== '') {
@@ -963,6 +963,7 @@ class NameFixer
                         }
 
                         $release->update($updateColumns);
+                        $release->tag($determinedCategory['tags']);
                         $this->sphinx->updateRelease($release->releases_id);
                     } else {
                         $newTitle = substr($newName, 0, 299);
@@ -978,10 +979,11 @@ class NameFixer
                                     'anidbid' => null,
                                     'predb_id' => $preId,
                                     'searchname' => $newTitle,
-                                    'categories_id' => $determinedCategory,
+                                    'categories_id' => $determinedCategory['categories_id'],
                                     'iscategorized' => 1,
                                 ]
                             );
+                        $release->tag($determinedCategory['tags']);
                         $this->sphinx->updateRelease($release->releases_id);
                     }
                 }

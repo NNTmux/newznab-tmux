@@ -266,7 +266,8 @@ class ProcessReleases
             $total = \count($releases);
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
-                Release::query()->where('id', $release->id)->update(['categories_id' => $catId, 'iscategorized' => 1]);
+                Release::query()->where('id', $release->id)->update(['categories_id' => $catId['categories_id'], 'iscategorized' => 1]);
+                $release->retag($catId['tags']);
                 $categorized++;
                 if ($this->echoCLI) {
                     $this->consoleTools->overWritePrimary(
@@ -596,6 +597,8 @@ class ProcessReleases
                     }
                 }
 
+                $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
+
                 $releaseID = Release::insertRelease(
                         [
                             'name' => $cleanRelName,
@@ -606,12 +609,14 @@ class ProcessReleases
                             'postdate' => $collection->date,
                             'fromname' => $fromName,
                             'size' => $collection->filesize,
-                            'categories_id' => $categorize->determineCategory($collection->groups_id, $cleanedName),
+                            'categories_id' => $determinedCategory['categories_id'],
                             'isrenamed' => $properName === true ? 1 : 0,
                             'predb_id' => $preID === false ? 0 : $preID,
                             'nzbstatus' => NZB::NZB_NONE,
                         ]
                     );
+                $release = Release::find($releaseID);
+                $release->retag($determinedCategory['tags']);
 
                 if ($releaseID !== null) {
                     // Update collections table to say we inserted the release.

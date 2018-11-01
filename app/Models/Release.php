@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
+use Conner\Tagging\Taggable;
 use Illuminate\Support\Facades\DB;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
@@ -128,7 +129,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Release extends Model
 {
-    use Rememberable;
+    use Rememberable, Taggable;
 
     /**
      * @var bool
