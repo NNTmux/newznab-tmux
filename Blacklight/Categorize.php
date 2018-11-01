@@ -15,13 +15,15 @@ class Categorize
 {
     /**
      * Temporary category while we sort through the name.
+     *
      * @var int
      */
     protected $tmpCat = Category::OTHER_MISC;
 
     /**
      * Temporary tag while we sort through the name.
-     * @var int
+     *
+     * @var array
      */
     protected $tmpTag = [Category::OTHER_MISC];
     /**
