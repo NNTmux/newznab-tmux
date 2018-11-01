@@ -267,7 +267,8 @@ class ProcessReleases
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
                 Release::query()->where('id', $release->id)->update(['categories_id' => $catId['categories_id'], 'iscategorized' => 1]);
-                $release->retag($catId['tags']);
+                $taggedRelease = Release::find($release->id);
+                $taggedRelease->retag($catId['tags']);
                 $categorized++;
                 if ($this->echoCLI) {
                     $this->consoleTools->overWritePrimary(

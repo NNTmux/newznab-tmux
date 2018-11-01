@@ -416,7 +416,7 @@ class NZBImport
                 ]
             );
             $release = Release::find($relID);
-            $release->tag($determinedCategory['tags']);
+            $release->retag($determinedCategory['tags']);
         } else {
             $this->echoOut('This release is already in our DB so skipping: '.$subject);
 

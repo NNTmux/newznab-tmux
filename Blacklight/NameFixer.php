@@ -906,6 +906,7 @@ class NameFixer
                 }
 
                 $newTitle = substr($newName, 0, 299);
+                $taggedRelease = Release::find($release->releases_id);
 
                 if ($echo === true) {
                     if ($nameStatus === 1) {
@@ -963,7 +964,7 @@ class NameFixer
                         }
 
                         $release->update($updateColumns);
-                        $release->tag($determinedCategory['tags']);
+                        $taggedRelease->retag($determinedCategory['tags']);
                         $this->sphinx->updateRelease($release->releases_id);
                     } else {
                         $newTitle = substr($newName, 0, 299);
@@ -983,7 +984,7 @@ class NameFixer
                                     'iscategorized' => 1,
                                 ]
                             );
-                        $release->tag($determinedCategory['tags']);
+                        $taggedRelease->retag($determinedCategory['tags']);
                         $this->sphinx->updateRelease($release->releases_id);
                     }
                 }
