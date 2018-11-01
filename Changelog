@@ -1,4 +1,5 @@
 2018-11-01 DariusIII
+	* Fix: Fix tag assignement in Categorize class
 	* Chg: Update used libraries (mostly composer)
 	* Chg: Update NameFixer updateRelease function
 	* Chg: Add first wave of Release tagging capabilities

@@ -793,7 +793,7 @@ class Categorize
     {
         if (preg_match('/web[-._ ]dl|web-?rip/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_WEBDL;
-            $this->tmpTag[] = [Category::TV_WEBDL, Category::TV_HD];
+            $this->tmpTag = [Category::TV_WEBDL, Category::TV_HD];
 
             return true;
         }
@@ -850,7 +850,7 @@ class Categorize
     {
         if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon|NF|AMZN).*(TrollUHD|NTb|VLAD|DEFLATE|POFUDUK)/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_UHD;
-            $this->tmpTag[] = [Category::TV_UHD, Category::TV_HD];
+            $this->tmpTag = [Category::TV_UHD, Category::TV_HD];
 
             return true;
         }
@@ -898,7 +898,7 @@ class Categorize
     {
         if (preg_match('/(S\d+).*(x265).*(rmteam|MeGusta|HETeam|PSA|ONLY|H4S5S|TrollHD|ImE)/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_X265;
-            $this->tmpTag[] = [Category::TV_X265, Category::TV_HD];
+            $this->tmpTag = [Category::TV_X265, Category::TV_HD];
 
             return true;
         }
@@ -1043,7 +1043,7 @@ class Categorize
     {
         if (! preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName) && false !== stripos($this->releaseName, '2160p')) {
             $this->tmpCat = Category::MOVIE_UHD;
-            $this->tmpTag[] = [Category::MOVIE_UHD, Category::MOVIE_HD];
+            $this->tmpTag = [Category::MOVIE_UHD, Category::MOVIE_HD];
 
             return true;
         }
@@ -1073,7 +1073,7 @@ class Categorize
     {
         if (preg_match('/web[-._ ]dl|web-?rip/i', $this->releaseName)) {
             $this->tmpCat = Category::MOVIE_WEBDL;
-            $this->tmpTag[] = [Category::MOVIE_WEBDL, Category::MOVIE_HD];
+            $this->tmpTag = [Category::MOVIE_WEBDL, Category::MOVIE_HD];
 
             return true;
         }
@@ -1088,7 +1088,7 @@ class Categorize
     {
         if (preg_match('/(\w+[\.-_\s]+).*(x265).*(Tigole|SESKAPiLE|CHD|IAMABLE|THREESOME|OohLaLa|DEFLATE|NCmt)/i', $this->releaseName)) {
             $this->tmpCat = Category::MOVIE_X265;
-            $this->tmpTag[] = [Category::MOVIE_X265, Category::MOVIE_HD];
+            $this->tmpTag = [Category::MOVIE_X265, Category::MOVIE_HD];
 
             return true;
         }
@@ -2065,7 +2065,7 @@ class Categorize
     {
         if (preg_match($regex, $fromName)) {
             $this->tmpCat = $category;
-            $this->tmpTag[] = [$category];
+            $this->tmpTag[] = $category;
 
             return true;
         }
