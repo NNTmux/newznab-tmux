@@ -270,8 +270,9 @@ class ProcessReleases
                 try {
                     $taggedRelease = Release::find($release->id);
                     $taggedRelease->tag($catId['tags']);
-                } catch(\Throwable $e) {
+                } catch (\Throwable $e) {
                     //Just pass this part, tag is not created for some reason, exception is thrown and blocks release creation
+                    continue;
                 }
                 $categorized++;
                 if ($this->echoCLI) {
@@ -623,8 +624,9 @@ class ProcessReleases
                 try {
                     $release = Release::find($releaseID);
                     $release->tag($determinedCategory['tags']);
-                } catch(\Throwable $e) {
+                } catch (\Throwable $e) {
                     //Just pass this part, tag is not created for some reason, exception is thrown and blocks release creation
+                    continue;
                 }
 
                 if ($releaseID !== null) {
