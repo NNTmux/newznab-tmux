@@ -1,3 +1,5 @@
+2018-11-02 DariusIII
+	* Chg: Update nunomaduro/larastan to version 0.3.7
 2018-11-01 DariusIII
 	* Chg: Update tagging on new release addition
 	* Fix: Fix tag assignement in Categorize class
