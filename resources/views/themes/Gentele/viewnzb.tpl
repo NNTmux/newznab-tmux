@@ -526,8 +526,11 @@
                                                             <tr>
                                                                 <th width="140">Category tags</th>
                                                                 <td>
-                                                                    {$release.tags}
+                                                                    {foreach $release.tags as $tag}
+                                                                        {$tag->name}
+                                                                    {/foreach}
                                                                 </td>
+
                                                             </tr>
                                                         {/if}
 														<tr>
