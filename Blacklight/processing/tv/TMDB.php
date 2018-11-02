@@ -156,7 +156,7 @@ class TMDB extends TV
                         }
                     } else {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('Found local TMDB match for: ' . $release['cleanname']);
+                            $this->colorCli->primaryOver('Found local TMDB match for: '.$release['cleanname']);
                             $this->colorCli->primary('.  Attempting episode lookup!', true);
                         }
                         $tmdbid = $this->getSiteIDFromVideoID('tmdb', $videoId);
