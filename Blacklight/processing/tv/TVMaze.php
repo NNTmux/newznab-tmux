@@ -68,7 +68,7 @@ class TVMaze extends TV
         $tvCount = \count($res);
 
         if ($this->echooutput && $tvCount > 0) {
-            $this->colorCli->header('Processing TVMaze lookup for '.number_format($tvCount).' release(s).');
+            $this->colorCli->header('Processing TVMaze lookup for '.number_format($tvCount).' release(s).', true);
         }
 
         if ($res instanceof \Traversable) {
@@ -85,7 +85,7 @@ class TVMaze extends TV
                         if ($this->echooutput) {
                             $this->colorCli->headerOver('Title: ').
                                     $this->colorCli->warningOver($release['cleanname']).
-                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.');
+                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
                         }
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         continue;
@@ -103,7 +103,7 @@ class TVMaze extends TV
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('Checking TVMaze for previously failed title: ').
                                     $this->colorCli->headerOver($release['cleanname']).
-                                    $this->colorCli->primary('.');
+                                    $this->colorCli->primary('.', true);
                         }
 
                         // Get the show from TVMaze
@@ -129,7 +129,7 @@ class TVMaze extends TV
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('Found local TVMaze match for: ').
                                     $this->colorCli->headerOver($release['cleanname']).
-                                    $this->colorCli->primary('.  Attempting episode lookup!');
+                                    $this->colorCli->primary('.  Attempting episode lookup!', true);
                         }
                         $tvMazeId = $this->getSiteIDFromVideoID('tvmaze', $videoId);
                     }
@@ -144,7 +144,7 @@ class TVMaze extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            $this->colorCli->primary('Found TVMaze Match for Full Season!');
+                            $this->colorCli->primary('Found TVMaze Match for Full Season!', true);
                             continue;
                         }
 
@@ -174,7 +174,7 @@ class TVMaze extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->primary('Found TVMaze Match!');
+                                $this->colorCli->primary('Found TVMaze Match!', true);
                             }
                             continue;
                         }
