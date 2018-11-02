@@ -1,4 +1,5 @@
 2018-11-02 DariusIII
+	* Chg: Add category tag constants and use them in categorization
 	* Chg: Update ouput messages formatting for TV processing
 	* Chg: Update ReleaseRemover messages output
 	* Chg: Update output messages of ProcessReleases class
