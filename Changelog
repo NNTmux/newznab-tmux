@@ -1,4 +1,5 @@
 2018-11-02 DariusIII
+	* Chg: Update details page to show release category tags
 	* Chg: Update DetailsTransformer to include release tags
 	* Chg: Update Releases class queries to include tags, update ApiTransformer to use them
 	* Chg: Add category tag constants and use them in categorization

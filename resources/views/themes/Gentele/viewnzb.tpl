@@ -522,6 +522,14 @@
 																   href="{$smarty.const.WWW_TOP}/browse/{$release.parent_category}/{$release.sub_category}"> {$release.category_name}</a>
 															</td>
 														</tr>
+                                                        {if !empty($release.tags)}
+                                                            <tr>
+                                                                <th width="140">Category tags</th>
+                                                                <td>
+                                                                    {$release.tags}
+                                                                </td>
+                                                            </tr>
+                                                        {/if}
 														<tr>
 															<th width="140">Files</th>
 															<td>
