@@ -1,4 +1,5 @@
 2018-11-02 DariusIII
+	* Chg: Update removeCrapReleases message in TmuxRun class
 	* Chg: Update check for actual/artificial parts in NZB class
 	* Chg: Update NZB class to use DB facade
 	* Chg: Update font-awesome to version 5.5.0
