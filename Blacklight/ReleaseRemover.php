@@ -184,7 +184,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             $this->colorCli->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->colorCli->header(now()->diffInSeconds($timeStart).' seconds');
+            $this->colorCli->header(now()->diffInSeconds($timeStart).' seconds', true);
         }
 
         return $this->browser
@@ -225,7 +225,7 @@ class ReleaseRemover
 
         if ($time === 'full') {
             if ($this->echoCLI) {
-                $this->colorCli->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.');
+                $this->colorCli->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.', true);
             }
         } else {
             if (! is_numeric($time)) {
@@ -234,7 +234,7 @@ class ReleaseRemover
                 return $this->returnError();
             }
             if ($this->echoCLI) {
-                $this->colorCli->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).');
+                $this->colorCli->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).', true);
             }
             $this->crapTime = ' AND r.adddate > (NOW() - INTERVAL '.$time.' HOUR)';
         }
@@ -313,7 +313,7 @@ class ReleaseRemover
 
         if ($this->echoCLI) {
             $this->colorCli->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->colorCli->header(now()->diffInSeconds($timeStart).' seconds');
+            $this->colorCli->header(now()->diffInSeconds($timeStart).' seconds', true);
         }
 
         return $this->browser
@@ -790,7 +790,7 @@ class ReleaseRemover
                     $blType,
                     $opTypeName,
                     $ftUsing
-                    )
+                    ), true
                 );
 
                 if ($opTypeName === 'Subject') {
@@ -815,7 +815,7 @@ class ReleaseRemover
                 $this->deleteReleases();
             }
         } else {
-            $this->colorCli->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.");
+            $this->colorCli->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
         }
 
         return true;
@@ -891,7 +891,7 @@ class ReleaseRemover
                     $this->method,
                     $blType,
                     $ftUsing
-                    )
+                    ), true
                 );
 
                 $this->query = sprintf(
@@ -1011,10 +1011,10 @@ class ReleaseRemover
             if ($this->delete) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
-                    $this->colorCli->primary('Deleting: '.$this->method.': '.$release->searchname);
+                    $this->colorCli->primary('Deleting: '.$this->method.': '.$release->searchname, true);
                 }
             } elseif ($this->echoCLI) {
-                $this->colorCli->primary('Would be deleting: '.$this->method.': '.$release->searchname);
+                $this->colorCli->primary('Would be deleting: '.$this->method.': '.$release->searchname, true);
             }
             $deletedCount++;
         }
@@ -1234,13 +1234,13 @@ class ReleaseRemover
         $this->colorCli->primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
-            'If you are satisfied, type yes and press enter. Anything else will exit.'
+            'If you are satisfied, type yes and press enter. Anything else will exit.', true
         );
 
         // Check the users response.
         $userInput = trim(fgets(fopen('php://stdin', 'rtb')));
         if ($userInput !== 'yes') {
-            $this->colorCli->primary('You typed: "'.$userInput.'", the program will exit.');
+            $this->colorCli->primary('You typed: "'.$userInput.'", the program will exit.', true);
 
             return false;
         }
@@ -1291,7 +1291,7 @@ class ReleaseRemover
         }
 
         if ($this->echoCLI && $this->error !== '') {
-            $this->colorCli->error($this->error);
+            $this->colorCli->error($this->error, true);
         }
 
         return false;
