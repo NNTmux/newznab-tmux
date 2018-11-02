@@ -329,7 +329,7 @@ class ProcessReleases
 
             $this->colorCli->primary(
                     ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    now()->diffInSeconds($startTime).' seconds'
+                    now()->diffInSeconds($startTime).' seconds', true
                 );
         }
     }
@@ -370,9 +370,9 @@ class ProcessReleases
         );
         if ($checked > 0 && $this->echoCLI) {
             $this->colorCli->primary(
-                    $checked.' collections set to filecheck = 3(size calculated)'
+                    $checked.' collections set to filecheck = 3(size calculated)', true
                 );
-            $this->colorCli->primary(now()->diffInSeconds($startTime).' seconds');
+            $this->colorCli->primary(now()->diffInSeconds($startTime).' seconds', true);
         }
     }
 
@@ -501,7 +501,7 @@ class ProcessReleases
                     $minSizeDeleted.' smaller than, '.
                     $maxSizeDeleted.' bigger than, '.
                     $minFilesDeleted.' with less files than site/group settings in: '.
-                    now()->diffInSeconds($startTime).' seconds'
+                    now()->diffInSeconds($startTime).' seconds', true
                 );
         }
     }
@@ -561,7 +561,7 @@ class ProcessReleases
         );
 
         if ($this->echoCLI && \count($collections) > 0) {
-            $this->colorCli->primary(\count($collections).' Collections ready to be converted to releases.');
+            $this->colorCli->primary(\count($collections).' Collections ready to be converted to releases.', true);
         }
 
         foreach ($collections as $collection) {
@@ -725,7 +725,7 @@ class ProcessReleases
                     ' Releases added and '.
                     number_format($duplicate).
                     ' duplicate collections deleted in '.
-                    now()->diffInSeconds($startTime).' seconds'
+                    now()->diffInSeconds($startTime).' seconds', true
                 );
         }
 
@@ -787,7 +787,7 @@ class ProcessReleases
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
                     'Total time: '.$totalTime.' seconds'
-                );
+                , true);
         }
 
         return $nzbCount;
@@ -871,7 +871,7 @@ class ProcessReleases
                 $this->colorCli->primary(sprintf(
                     'Deleting collections/binaries/parts older than %d hours.',
                     Settings::settingValue('..partretentionhours')
-                ));
+                ), true);
         }
 
         $deleted = 0;
@@ -898,7 +898,7 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                $firstQuery->diffInSeconds($startTime).' seconds.'.PHP_EOL
+                $firstQuery->diffInSeconds($startTime).' seconds.', true
             );
         }
 
@@ -939,14 +939,14 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' orphaned collections in '.
-                    $secondQuery->diffInSeconds($firstQuery).' seconds.'.PHP_EOL
+                    $secondQuery->diffInSeconds($firstQuery).' seconds.', true
                 );
             }
 
             // orphaned binaries - binaries with no parts or binaries with no collection
             // Don't delete currently inserting binaries by checking the max id.
             if ($this->echoCLI) {
-                $this->colorCli->primary('Deleting orphaned binaries/parts with no collection.');
+                $this->colorCli->primary('Deleting orphaned binaries/parts with no collection.', true);
             }
 
             $deleted = 0;
@@ -976,14 +976,14 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' binaries with no collections or parts in '.
-                    $thirdQuery->diffInSeconds($secondQuery).' seconds.'
+                    $thirdQuery->diffInSeconds($secondQuery).' seconds.', true
                 );
             }
 
             // orphaned parts - parts with no binary
             // Don't delete currently inserting parts by checking the max id.
             if ($this->echoCLI) {
-                $this->colorCli->primary('Deleting orphaned parts with no binaries.');
+                $this->colorCli->primary('Deleting orphaned parts with no binaries.', true);
             }
             $deleted = 0;
             $deleteQuery = DB::transaction(function () {
@@ -1012,14 +1012,14 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' parts with no binaries in '.
-                    $fourthQuery->diffInSeconds($thirdQuery).' seconds.'.PHP_EOL
+                    $fourthQuery->diffInSeconds($thirdQuery).' seconds.', true
                 );
             }
         } // done cleaning up Binaries/Parts orphans
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                'Deleting collections that were missed after NZB creation.'
+                'Deleting collections that were missed after NZB creation.', true
             );
         }
 
@@ -1060,7 +1060,7 @@ class ProcessReleases
                     'Removed '.
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
-                    $fourthQuery->diffInSeconds($startTime).' seconds'
+                    $fourthQuery->diffInSeconds($startTime).' seconds', true
                 );
         }
     }
@@ -1154,7 +1154,7 @@ class ProcessReleases
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
-                    now()->diffInSeconds($startTime).' seconds'
+                    now()->diffInSeconds($startTime).' seconds', true
                 );
         }
     }
@@ -1375,7 +1375,7 @@ class ProcessReleases
                         $this->completion > 0
                         ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
                         : '.'
-                    )
+                    ), true
                 );
 
             $totalDeleted = (
@@ -1386,7 +1386,7 @@ class ProcessReleases
             if ($totalDeleted > 0) {
                 $this->colorCli->primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
-                        now()->diffInSeconds($startTime).' seconds'
+                        now()->diffInSeconds($startTime).' seconds', true
                     );
             }
         }
@@ -1676,7 +1676,7 @@ class ProcessReleases
         }, 3);
 
         if ($this->echoCLI && $obj > 0) {
-            $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.');
+            $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.', true);
         }
     }
 }
