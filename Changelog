@@ -1,3 +1,5 @@
+2018-11-03 DariusIII
+	* Chg: Update symfony components
 2018-11-02 DariusIII
 	* Chg: Update removeCrapReleases message in TmuxRun class
 	* Chg: Update check for actual/artificial parts in NZB class
