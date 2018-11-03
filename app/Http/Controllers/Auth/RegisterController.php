@@ -102,6 +102,7 @@ class RegisterController extends Controller
 
         if ($validator->fails()) {
             $error = implode('', array_collapse($validator->errors()->toArray()));
+
             return $this->showRegistrationForm($error);
         }
 
