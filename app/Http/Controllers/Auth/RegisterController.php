@@ -89,19 +89,20 @@ class RegisterController extends Controller
         $showRegister = 1;
 
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|min:5|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users|indisposable',
-            'password' => 'required|string|min:8|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
+            'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
         ]);
 
         if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
             $this->validate($request, [
-                'g-recaptcha-response' => 'required|captcha',
+                'g-recaptcha-response' => ['required', 'captcha'],
             ]);
         }
 
         if ($validator->fails()) {
-            return $this->showRegistrationForm($validator->errors()->first());
+            $error = implode('', array_collapse($validator->errors()->toArray()));
+            return $this->showRegistrationForm($error);
         }
 
         if (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! $request->has('invitecode') || empty($request->input('invitecode')))) {

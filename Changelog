@@ -1,4 +1,5 @@
 2018-11-03 DariusIII
+	* Chg: Update Registration and Login controllers
 	* Chg: Update symfony components
 2018-11-02 DariusIII
 	* Chg: Update removeCrapReleases message in TmuxRun class
