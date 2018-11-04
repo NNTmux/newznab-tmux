@@ -471,7 +471,7 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
-        $sql = self::query()
+        $sql = self::query()->with('tagged')
             ->select(
                 [
                     'releases.*',
