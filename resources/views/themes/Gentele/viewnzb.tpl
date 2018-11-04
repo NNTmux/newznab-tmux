@@ -522,11 +522,11 @@
 																   href="{$smarty.const.WWW_TOP}/browse/{$release.parent_category}/{$release.sub_category}"> {$release.category_name}</a>
 															</td>
 														</tr>
-                                                        {if !empty($release.tags)}
+                                                        {if !empty($release.tag_name)}
                                                             <tr>
-                                                                <th width="140">Category tags</th>
+                                                                <th width="140">Category Tags</th>
                                                                 <td>
-                                                                    {foreach $release.tags as $tag}
+                                                                    {foreach $release.tag_name as $tag}
                                                                         {$tag->slug}
                                                                     {/foreach}
                                                                 </td>
