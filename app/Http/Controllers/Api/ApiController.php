@@ -16,8 +16,7 @@ class ApiController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function api(Request $request)
     {
@@ -142,7 +141,7 @@ class ApiController extends BasePageController
                        'basic',
                        $categoryID,
                        $minSize
-                   );
+                   )->toArray();
                } else {
                    $relData = $releases->getBrowseRange(
                        1,
@@ -154,7 +153,7 @@ class ApiController extends BasePageController
                        $catExclusions,
                        $groupName,
                        $minSize
-                   );
+                   )->toArray();
                }
                $api->output($relData, $params, $outputXML, $offset, 'api');
                break;
@@ -204,7 +203,7 @@ class ApiController extends BasePageController
                    $maxAge,
                    $minSize,
                    $catExclusions
-               );
+               )->toArray();
 
                $api->addLanguage($relData);
                $api->output($relData, $params, $outputXML, $offset, 'api');
@@ -232,7 +231,7 @@ class ApiController extends BasePageController
                    $maxAge,
                    $minSize,
                    $catExclusions
-               );
+               )->toArray();
 
                $api->addCoverURL(
                    $relData,
@@ -264,14 +263,9 @@ class ApiController extends BasePageController
                }
 
                UserRequest::addApiRequest($uid, $request->getRequestUri());
-               $data = Release::getByGuid($request->input('id'));
+               $data = Release::getByGuid($request->input('id'))->toArray();
 
-               $relData = [];
-               if ($data) {
-                   $relData[] = $data;
-               }
-
-               $api->output($relData, $params, $outputXML, $offset, 'api');
+               $api->output($data, $params, $outputXML, $offset, 'api');
                break;
 
            // Get an NFO file for an individual release.
