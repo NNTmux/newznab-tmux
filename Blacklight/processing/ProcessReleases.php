@@ -269,10 +269,9 @@ class ProcessReleases
                 Release::query()->where('id', $release->id)->update(['categories_id' => $catId['categories_id'], 'iscategorized' => 1]);
                 try {
                     $taggedRelease = Release::find($release->id);
-                    $taggedRelease->tag($catId['tags']);
+                    $taggedRelease->retag($catId['tags']);
                 } catch (\Throwable $e) {
                     //Just pass this part, tag is not created for some reason, exception is thrown and blocks release creation
-                    continue;
                 }
                 $categorized++;
                 if ($this->echoCLI) {
@@ -623,10 +622,9 @@ class ProcessReleases
                     );
                 try {
                     $release = Release::find($releaseID);
-                    $release->tag($determinedCategory['tags']);
+                    $release->retag($determinedCategory['tags']);
                 } catch (\Throwable $e) {
                     //Just pass this part, tag is not created for some reason, exception is thrown and blocks release creation
-                    continue;
                 }
 
                 if ($releaseID !== null) {
