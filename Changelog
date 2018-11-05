@@ -1,4 +1,5 @@
 2018-11-05 DariusIII
+	* Fix: Enable code that was commented for testing
 	* Chg: Update Releases class, use Release Model to retrieve data and add tags to API v2 output
 	* Chg: Remove web.php fallback route and page
 	* Chg: Add config/captcha.php and use it in place of direct env file call
