@@ -53,7 +53,7 @@ class Releases
     }
 
     /**
-     * Used for Browse results
+     * Used for Browse results.
      *
      *
      * @param $page
@@ -366,7 +366,7 @@ class Releases
     }
 
     /**
-     * Get TV for My Shows page
+     * Get TV for My Shows page.
      *
      *
      * @param $userShows
@@ -693,7 +693,7 @@ class Releases
     }
 
     /**
-     * Search function for API
+     * Search function for API.
      *
      *
      * @param $searchName
@@ -771,7 +771,7 @@ class Releases
     }
 
     /**
-     * Search TV Shows via API
+     * Search TV Shows via API.
      *
      *
      * @param array $siteIdArr
@@ -911,7 +911,7 @@ class Releases
     }
 
     /**
-     * Search TV Shows vua API
+     * Search TV Shows vua API.
      *
      *
      * @param array $siteIdArr
@@ -1044,7 +1044,7 @@ class Releases
     }
 
     /**
-     * Search anime releases
+     * Search anime releases.
      *
      *
      * @param $aniDbID
@@ -1112,7 +1112,7 @@ class Releases
     }
 
     /**
-     * Movies search through API and site
+     * Movies search through API and site.
      *
      *
      * @param int $imDbId
@@ -1213,6 +1213,7 @@ class Releases
                 }
             }
         }
+
         return $ret;
     }
 
