@@ -29,7 +29,7 @@
 									   name="rememberme" type="checkbox"> Remember Me
 							</label>
 							<hr>
-							{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+                            {if {config('captcha.enabled')} == 1 && !empty({config('captcha.sitekey')}) && !empty({config('captcha.secret')})}
 								{NoCaptcha::display()}{NoCaptcha::renderJs()}
 							{/if}
 						</div>

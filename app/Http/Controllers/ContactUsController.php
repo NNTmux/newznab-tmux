@@ -22,7 +22,7 @@ class ContactUsController extends BasePageController
             'username' => 'required',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
+        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
             ]);
