@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Category;
 use App\Models\Release;
+use App\Models\Category;
 use Blacklight\ColorCLI;
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
@@ -12,8 +12,7 @@ $releases = Release::query()->select(['id', 'categories_id'])->get();
 $count = $releases->count();
 $relstring = $count === 1 ? ' release' : ' releases';
 
-$colorCli->info('Tagging '. $count. $relstring );
-
+$colorCli->info('Tagging '.$count.$relstring);
 
 foreach ($releases as $release) {
     switch ($release->categories_id) {
