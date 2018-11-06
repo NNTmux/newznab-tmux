@@ -263,7 +263,7 @@ class ApiController extends BasePageController
                }
 
                UserRequest::addApiRequest($uid, $request->getRequestUri());
-               $data = Release::getByGuid($request->input('id'))->toArray();
+               $data = Release::getByGuid($request->input('id'));
 
                $api->output($data, $params, $outputXML, $offset, 'api');
                break;

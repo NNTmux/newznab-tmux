@@ -51,7 +51,7 @@ class XML_Response
     /**
      * The release we are adding to the stream.
      *
-     * @var array
+     * @var mixed
      */
     protected $release;
 
