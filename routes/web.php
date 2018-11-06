@@ -35,6 +35,7 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
     Route::get('profile', 'ProfileController@show');
 
     Route::group(['prefix' => 'browse'], function () {
+        Route::get('tags', 'BrowseController@tags');
         Route::get('group', 'BrowseController@group');
         Route::get('all', 'BrowseController@index');
         Route::get('{parentCategory}/{id?}', 'BrowseController@show')->middleware('clearance');

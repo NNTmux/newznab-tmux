@@ -526,8 +526,9 @@
                                                             <tr>
                                                                 <th width="140">Category Tags</th>
                                                                 <td>
-                                                                    {foreach $release->tagSlugs() as $tag}
-                                                                        {$tag}
+                                                                    {foreach $release->tagNames() as $tag}
+                                                                        <a title="Browse {$tag}"
+                                                                           href="{$smarty.const.WWW_TOP}/browse/tags?tags={$tag}"> {$tag}</a>
                                                                     {/foreach}
                                                                 </td>
 

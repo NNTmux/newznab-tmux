@@ -1,4 +1,5 @@
 2018-11-06 DariusIII
+	* Chg: Add support for tags in browse, APIv2 and on site release searches
 	* Chg: Add script to misct/run_me_once to tag all the releases
 2018-11-05 DariusIII
 	* Chg: Update ApiController data to return arrays for output
