@@ -1,3 +1,5 @@
+2018-11-06 DariusIII
+	* Chg: Add script to misct/run_me_once to tag all the releases
 2018-11-05 DariusIII
 	* Chg: Update ApiController data to return arrays for output
 	* Fix: Enable code that was commented for testing
