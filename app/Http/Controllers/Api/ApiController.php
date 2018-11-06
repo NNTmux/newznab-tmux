@@ -141,7 +141,7 @@ class ApiController extends BasePageController
                        'basic',
                        $categoryID,
                        $minSize
-                   )->toArray();
+                   );
                } else {
                    $relData = $releases->getBrowseRange(
                        1,
@@ -153,7 +153,7 @@ class ApiController extends BasePageController
                        $catExclusions,
                        $groupName,
                        $minSize
-                   )->toArray();
+                   );
                }
                $api->output($relData, $params, $outputXML, $offset, 'api');
                break;
@@ -203,7 +203,7 @@ class ApiController extends BasePageController
                    $maxAge,
                    $minSize,
                    $catExclusions
-               )->toArray();
+               );
 
                $api->addLanguage($relData);
                $api->output($relData, $params, $outputXML, $offset, 'api');
@@ -231,7 +231,7 @@ class ApiController extends BasePageController
                    $maxAge,
                    $minSize,
                    $catExclusions
-               )->toArray();
+               );
 
                $api->addCoverURL(
                    $relData,
