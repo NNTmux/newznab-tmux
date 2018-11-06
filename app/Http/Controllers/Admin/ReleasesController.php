@@ -64,7 +64,8 @@ class ReleasesController extends BasePageController
                     $request->input('videos_id'),
                     $request->input('tv_episodes_id'),
                     $request->input('imdbid'),
-                    $request->input('anidbid')
+                    $request->input('anidbid'),
+                    $request->input('tagnames')
                 );
 
                 $release = Release::getByGuid($request->input('guid'));

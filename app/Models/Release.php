@@ -304,9 +304,10 @@ class Release extends Model
      * @param        $episodeId
      * @param int $imDbID
      * @param int $aniDbID
+     * @param string $tags
      * @throws \Exception
      */
-    public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID): void
+    public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID, string $tags = ''): void
     {
         $movieInfoId = null;
         if (! empty($imDbID)) {
@@ -331,6 +332,10 @@ class Release extends Model
             ]
         );
         (new SphinxSearch())->updateRelease($ID);
+        if (! empty($tags)) {
+            $newTags = explode(',', $tags);
+            self::find($ID)->retag($newTags);
+        }
     }
 
     /**
