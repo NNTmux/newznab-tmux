@@ -545,7 +545,7 @@ class Releases
     /**
      * Creates part of a query for some functions.
      *
-     * @param array  $userQuery
+     * @param array|\Illuminate\Database\Eloquent\Collection  $userQuery
      * @param string $type
      *
      * @return string
