@@ -2,12 +2,12 @@
 
 namespace Blacklight\http;
 
-use App\Models\Release;
-use App\Models\UserMovie;
-use App\Models\UserSerie;
 use Blacklight\NZB;
+use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
+use App\Models\UserMovie;
+use App\Models\UserSerie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
