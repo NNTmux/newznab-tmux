@@ -1,4 +1,5 @@
 2018-11-07 DariusIII
+	* Fix: Fix error with tv episode data retrieval on API and RSS
 	* Chg: Update Capabilities class output function PHPDOC block
 	* Chg: Update spatie/laravel-permission to version 2.24.0
 2018-11-06 DariusIII

@@ -459,7 +459,7 @@ class XML_Response
         if (isset($this->release->series) && $this->release->series > 0) {
             $this->writeZedAttr('season', $this->release->series);
         }
-        if (isset($this->release->episode) && $this->release->episode->episode > 0) {
+        if (isset($this->release->episode->episode) && $this->release->episode->episode > 0) {
             $this->writeZedAttr('episode', $this->release->episode->episode);
         }
         if (! empty($this->release->firstaired)) {
