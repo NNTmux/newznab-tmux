@@ -42,6 +42,7 @@ abstract class Capabilities
      */
     protected $type;
 
+
     /**
      * Construct.
      *
@@ -60,7 +61,7 @@ abstract class Capabilities
     /**
      * Print XML or JSON output.
      *
-     * @param array  $data   Data to print.
+     * @param array|\Illuminate\Database\Eloquent\Collection $data   Data to print.
      * @param array  $params Additional request parameters
      * @param bool   $xml    True: Print as XML False: Print as JSON.
      * @param int    $offset How much releases to skip
