@@ -42,7 +42,6 @@ abstract class Capabilities
      */
     protected $type;
 
-
     /**
      * Construct.
      *
