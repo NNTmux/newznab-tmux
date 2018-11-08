@@ -1,4 +1,5 @@
 2018-11-08 DariusIII
+	* Chg: Update API v2 capabilities ouput by adding category tags used on site
 	* Chg: Update barryvdh/reflection-docblock to version 2.0.5 and spatie/laravel-permission to version 2.25.0
 2018-11-07 DariusIII
 	* Chg: Update LoginController to use confgig and not env file settings

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Transformers\TagsTransformer;
 use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\UserRequest;
@@ -27,6 +28,7 @@ class ApiV2Controller extends Controller
     {
         $serverroot = url('/');
         $category = Category::getForApi();
+        $tags = Release::existingTags();
 
         $capabilities = [
             'server' => [
@@ -52,6 +54,7 @@ class ApiV2Controller extends Controller
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => fractal($category, new CategoryTransformer()),
+            'tags' => fractal($tags, new TagsTransformer()),
         ];
 
         return response()->json($capabilities);
