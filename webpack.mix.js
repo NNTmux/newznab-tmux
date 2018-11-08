@@ -12,6 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix.copy('node_modules/bootstrap/dist/css/bootstrap.min.css', 'public/assets/css/bootstrap.min.css')
+    .copy('node_modules/bootstrap/dist/css/bootstrap.min.css.map', 'public/assets/css/bootstrap.min.css.map')
     .copy('node_modules/bootstrap/dist/js/bootstrap.min.js', 'public/assets/js/bootstrap.min.js')
     .copy('node_modules/datatables/media/css/jquery.dataTables.min.css', 'public/assets/css/jquery.dataTables.min.css')
     .copy('node_modules/datatables/media/js/jquery.dataTables.min.js', 'public/assets/js/jquery.dataTables.min.js')
@@ -47,6 +48,7 @@ mix.copy('node_modules/bootstrap/dist/css/bootstrap.min.css', 'public/assets/css
     .copy('node_modules/pnotify/dist/pnotify.nonblock.js', 'public/assets/js/pnotify.nonblock.js')
     .copy('node_modules/pnotify/dist/pnotify.nonblock.js.map', 'public/assets/js/pnotify.nonblock.js.map')
     .copy('node_modules/pnotify/dist/pnotify.js', 'public/assets/js/pnotify.js')
+    .copy('node_modules/pnotify/dist/pnotify.js.map', 'public/assets/js/pnotify.js.map')
     .copy('node_modules/tinymce/tinymce.min.js', 'public/assets/js/tinymce.min.js')
     .copy('node_modules/jquery-colorbox/jquery.colorbox-min.js', 'public/assets/js/jquery.colorbox-min.js')
     .copy('node_modules/flexboxgrid2/flexboxgrid2.min.css', 'public/assets/css/flexboxgrid2.min.css')
