@@ -1,4 +1,5 @@
 2018-11-08 DariusIII
+	* Chg: Use combined css and js files
 	* Chg: Remove fxp/composer-asset
 	* Chg: Remove last of bower assets and add them to npm and laravel-mix asset management
 	* Chg: First batch of changes to use npm and laravel-mix for asset management

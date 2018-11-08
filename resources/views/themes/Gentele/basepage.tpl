@@ -21,20 +21,7 @@
 
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-	<!-- Bootstrap core CSS -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/bootstrap.min.css")}}
-	<!-- flexboxgrid -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/flexboxgrid.min.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/svg-with-js.min.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/pnotify.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/animate.min.css")}}
-	<!-- Normalize.css -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/normalize.css")}}
-	<!-- Custom styling plus plugins -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/custom.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/green.css")}}
-	<!-- fancybox css -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/jquery.fancybox.min.css")}}
+	{{Html::style("{$smarty.const.WWW_ASSETS}/css/all-css.css")}}
 
 </head>
 <body class="nav-md">
@@ -192,44 +179,7 @@
 
 </div>
 <!-- jQuery 3.3.0 -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery/jquery.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/bootstrap.min.js")}}
-<!-- bootstrap progress js -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/bootstrap-progressbar.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/bootstrap-hover-dropdown.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.nicescroll.min.js")}}
-<!-- icheck -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/icheck.min.js")}}
-<!-- tinymce editor -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/tinymce.min.js")}}
-<!-- jQuery migrate script -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery-migrate.min.js")}}
-<!-- newznab default scripts, needed for stuff to work -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.colorbox-min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/autosize.min.js")}}
-<!-- Custom functions -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/custom.js")}}
-
-<!-- PNotify -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.animate.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.desktop.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.callbacks.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.buttons.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.confirm.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pnotify.nonblock.js")}}
-
-<!-- pace -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/pace.min.js")}}
-<!-- scrollup -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.goup.min.js")}}
-
-<!-- fancybox js -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.fancybox.min.js")}}
-<!--font-awesome-->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/v4-shims.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/all.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/js/all-js.js")}}
 
 
 <script>

@@ -11,7 +11,8 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.copy('node_modules/bootstrap/dist/css/bootstrap.min.css', 'public/assets/css/bootstrap.min.css')
+mix
+    .copy('node_modules/bootstrap/dist/css/bootstrap.min.css', 'public/assets/css/bootstrap.min.css')
     .copy('node_modules/bootstrap/dist/css/bootstrap.min.css.map', 'public/assets/css/bootstrap.min.css.map')
     .copy('node_modules/bootstrap/dist/js/bootstrap.min.js', 'public/assets/js/bootstrap.min.js')
     .copy('node_modules/datatables/media/css/jquery.dataTables.min.css', 'public/assets/css/jquery.dataTables.min.css')
@@ -56,5 +57,55 @@ mix.copy('node_modules/bootstrap/dist/css/bootstrap.min.css', 'public/assets/css
     .copy('node_modules/multiselect/css/multi-select.css', 'public/assets/css/multi-select.css')
     .copy('node_modules/multiselect/js/jquery.multi-select.js', 'public/assets/js/jquery.multi-select.js')
     .copy('node_modules/pace-js/pace.min.js', 'public/assets/js/pace.min.js')
-    .copy('node_modules/jquery-slimscroll/jquery.slimscroll.min.js', 'public/assets/js/jquery.slimscroll.min.js');
+    .copy('node_modules/jquery-slimscroll/jquery.slimscroll.min.js', 'public/assets/js/jquery.slimscroll.min.js')
+    .styles(
+        [
+            'public/assets/css/bootstrap.min.css',
+            'public/assets/css/jquery.dataTables.min.css',
+            'public/assets/css/animate.min.css',
+            'public/assets/css/bootstrap-datepicker.standalone.min.css',
+            'public/assets/css/bootstrap-progressbar-3.3.4.min.css',
+            'public/assets/css/svg-with-js.min.css',
+            'public/assets/css/jquery.fancybox.min.css',
+            'public/assets/css/green.css',
+            'public/assets/css/pnotify.css',
+            'public/assets/css/flexboxgrid2.min.css',
+            'public/assets/css/multi-select.css',
+            'public/assets/css/normalize.css',
+            'public/assets/css/custom.css'
+    ], 'public/assets/css/all-css.css')
+    .scripts(
+        [
+            'public/assets/jquery/jquery.min.js',
+            'public/assets/js/bootstrap.min.js',
+            'public/assets/js/jquery-migrate.min.js',
+            'public/assets/js/all.min.js',
+            'public/assets/js/v4-shims.min.js',
+            'public/assets/js/jquery.dataTables.min.js',
+            'public/assets/js/bootstrap-datepicker.min.js',
+            'public/assets/js/autosize.min.js',
+            'public/assets/js/bootstrap-hover-dropdown.min.js',
+            'public/assets/js/bootstrap-progressbar.min.js',
+            'public/assets/js/jquery.nicescroll.min.js',
+            'public/assets/js/pnotify.js',
+            'public/assets/js/pnotify.animate.js',
+            'public/assets/js/pnotify.buttons.js',
+            'public/assets/js/pnotify.callbacks.js',
+            'public/assets/js/pnotify.confirm.js',
+            'public/assets/js/pnotify.desktop.js',
+            'public/assets/js/pnotify.nonblock.js',
+            'public/assets/js/tinymce.min.js',
+            'public/assets/js/icheck.min.js',
+            'public/assets/js/jquery.colorbox-min.js',
+            'public/assets/js/jquery.MultiFile.min.js',
+            'public/assets/js/jquery.multi-select.js',
+            'public/assets/js/pace.min.js',
+            'public/assets/js/jquery.slimscroll.min.js',
+            'public/assets/js/jquery.goup.min.js',
+            'public/assets/js/utils-admin.js',
+            'public/assets/js/custom.js',
+            'public/assets/js/functions.js'
+        ]
+    , 'public/assets/js/all-js.js')
+    .sourceMaps();
 
