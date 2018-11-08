@@ -110,9 +110,9 @@ class MovieController extends BasePageController
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         foreach ($results as $result) {
-            $result->genre = makeFieldLinks((array) $result, 'genre', 'movies');
-            $result->actors = makeFieldLinks((array) $result, 'actors', 'movies');
-            $result->director = makeFieldLinks((array) $result, 'director', 'movies');
+            $result->genre = makeFieldLinks($result, 'genre', 'movies');
+            $result->actors = makeFieldLinks($result, 'actors', 'movies');
+            $result->director = makeFieldLinks($result, 'director', 'movies');
             $result->languages = explode(', ', $result->language);
 
             $movies[] = $result;

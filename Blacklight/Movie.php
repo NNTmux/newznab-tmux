@@ -294,17 +294,18 @@ class Movie
         if ($movieCache !== null) {
             $movies = $movieCache;
         } else {
-            $data = DB::select($moviesSql);
+            $data = MovieInfo::fromQuery($moviesSql);
             $movies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($moviesSql.$page), $movies, $expiresAt);
         }
         $movieIDs = $releaseIDs = [];
-        if (\is_array($movies['result'])) {
+        if (! empty($movies['result'])) {
             foreach ($movies['result'] as $movie => $id) {
                 $movieIDs[] = $id->imdbid;
                 $releaseIDs[] = $id->grp_release_id;
             }
         }
+
         $sql = sprintf(
             "
 			SELECT
@@ -347,7 +348,7 @@ class Movie
         if ($return !== null) {
             return $return;
         }
-        $return = DB::select($sql);
+        $return = Release::fromQuery($sql);
         if (\count($return) > 0) {
             $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
         }
