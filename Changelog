@@ -1,4 +1,5 @@
 2018-11-08 DariusIII
+	* Chg: Remove last of bower assets and add them to npm and laravel-mix asset management
 	* Chg: First batch of changes to use npm and laravel-mix for asset management
 	* Chg: Update helpres makeFieldLinks function to properly create links, update Movie class and MovieController
 	* Chg: Update API v2 capabilities ouput by adding category tags used on site
