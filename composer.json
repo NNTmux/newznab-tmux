@@ -104,7 +104,6 @@
     "exeu/apai-io": "~2.0",
     "fideloper/proxy": "~4.0",
     "foolz/sphinxql-query-builder": "^1.2",
-    "fxp/composer-asset-plugin": "~1.1",
     "genealabs/laravel-caffeine": "^0.7.1",
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "~1.1",
