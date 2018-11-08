@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use App\Transformers\TagsTransformer;
 use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\UserRequest;
@@ -16,6 +15,7 @@ use App\Extensions\util\Versions;
 use App\Http\Controllers\Controller;
 use App\Transformers\ApiTransformer;
 use Illuminate\Support\Facades\Auth;
+use App\Transformers\TagsTransformer;
 use App\Transformers\DetailsTransformer;
 use App\Transformers\CategoryTransformer;
 
