@@ -191,13 +191,13 @@
 	</div>
 
 </div>
-<!-- jQuery 3.2.0 -->
+<!-- jQuery 3.3.0 -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/jquery/jquery.min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/bootstrap.min.js")}}
 <!-- bootstrap progress js -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/bootstrap-progressbar.min.js")}}
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/bootstrap-hover-dropdown.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery.nicescroll/jquery.nicescroll.min.js")}}
+{{Html::script("{$smarty.const.WWW_ASSETS}/js/jquery.nicescroll.min.js")}}
 <!-- icheck -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/icheck.min.js")}}
 <!-- tinymce editor -->

@@ -32,13 +32,7 @@
       "*": "source"
     },
     "sort-packages": true,
-    "optimize-autoloader": true,
-    "fxp-asset" : {
-      "installer-paths": {
-        "npm-asset-library": "public/assets",
-        "bower-asset-library": "public/assets"
-      }
-    }
+    "optimize-autoloader": true
   },
   "description": "A Usenet Indexer",
   "extra": {
