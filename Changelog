@@ -1,4 +1,12 @@
+2018-11-10 DariusIII
+	* Chg: Update webpack.mix.js and properly generate files
+2018-11-09 DariusIII
+	* Chg: Update js and css files and ther folders
 2018-11-08 DariusIII
+	* Chg: Use combined css and js files
+	* Chg: Remove fxp/composer-asset
+	* Chg: Remove last of bower assets and add them to npm and laravel-mix asset management
+	* Chg: First batch of changes to use npm and laravel-mix for asset management
 	* Chg: Update helpres makeFieldLinks function to properly create links, update Movie class and MovieController
 	* Chg: Update API v2 capabilities ouput by adding category tags used on site
 	* Chg: Update barryvdh/reflection-docblock to version 2.0.5 and spatie/laravel-permission to version 2.25.0

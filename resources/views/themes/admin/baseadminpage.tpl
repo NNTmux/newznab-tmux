@@ -20,22 +20,8 @@
 
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
-	<!-- Bootstrap core CSS -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/bootstrap/dist/css/bootstrap.min.css")}}
-	<!-- flexboxgrid -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css")}}
-	<!-- Normalize.css -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/normalize.css")}}
-	<!-- Custom styling plus plugins -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/custom.css")}}
-	{{Html::style("{$smarty.const.WWW_ASSETS}/icheck/skins/flat/green.css")}}
-	<!-- fancybox css -->
-	{{Html::style("{$smarty.const.WWW_ASSETS}/fancybox/dist/jquery.fancybox.css")}}
-    <!--multiselect css-->
-    {{Html::style("{$smarty.const.WWW_ASSETS}multiselect/css/multi-select.css")}}
+
+	{{Html::style("{$smarty.const.WWW_ASSETS}/css/all-css.css")}}
 
 </head>
 <body class="nav-md">
@@ -93,36 +79,8 @@
 	</div>
 
 </div>
-<!-- jQuery 3.2.0 -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery/dist/jquery.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap/dist/js/bootstrap.min.js")}}
-<!-- bootstrap progress js -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-progressbar/bootstrap-progressbar.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery.nicescroll/jquery.nicescroll.min.js")}}
-<!-- icheck -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js")}}
-<!-- tinymce editor -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/tinymce-dist/tinymce.min.js")}}
-<!-- jQuery migrate script -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/jquery-migrate/jquery-migrate.min.js")}}
-<!-- newznab default scripts, needed for stuff to work -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js")}}
-<!-- Custom functions -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/functions.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/custom.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/utils-admin.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/multiselect/js/jquery.multi-select.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/multifile/jquery.MultiFile.min.js")}}
-<!-- pace -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/pace/pace.min.js")}}
-<!-- fancybox js -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/fancybox/dist/jquery.fancybox.js")}}
-<!--font-awesome-->
-{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js")}}
-{{Html::script("{$smarty.const.WWW_ASSETS}/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js")}}
+
+{{Html::script("{$smarty.const.WWW_ASSETS}/js/all-js.js")}}
 
 </body>
 

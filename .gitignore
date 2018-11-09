@@ -18,10 +18,4 @@ test.php
 /resources/nzb/*
 /resources/tmp/*
 !/resources/tmp/unrar/
-/public/assets/*
-!/public/assets/js/
-!/public/assets/css/
-!/public/assets/images/
-!/public/assets/Charisma/
-!/public/assets/Gamma/
-!/public/assets/Omicron/
+!/public/assets/*

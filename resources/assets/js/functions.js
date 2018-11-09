@@ -967,98 +967,6 @@ jQuery(function($){
 
         return false;
     });
-
-    // file list tooltip
-    $(".rarfilelist").each(function() {
-        var guid = $(this).children('img').attr('alt');
-        $(this).qtip({
-            content: {
-                title: {
-                    text: 'rar archive contains...'
-                },
-                text: 'loading...',
-                ajax: {
-                    url: SERVERROOT + 'ajax_rarfilelist',
-                    type: 'GET',
-                    data: { id: guid },
-                    success: function(data, status) {
-                        this.set('content.text', data);
-                    }
-                }
-            },
-            position: {
-                my: 'top right',
-                at: 'bottom left'
-            },
-            style: {
-                classes: 'ui-tooltip-newznab',
-                width: { max: 500 },
-                tip: {
-                    corner: 'topRight',
-                    size: {
-                        x: 8,
-                        y : 8
-                    }
-                }
-            }
-        });
-    });
-
-    // seriesinfo tooltip
-    $(".seriesinfo").each(function() {
-        var guid = $(this).attr('title');
-        $(this).qtip({
-            content: {
-                title: {
-                    text: 'Episode Info'
-                },
-                text: 'loading...',
-                ajax: {
-                    url: SERVERROOT + 'ajax_tvinfo',
-                    type: 'GET',
-                    data: { id: guid },
-                    success: function(data, status) {
-                        this.set('content.text', data);
-                    }
-                }
-            },
-            style: {
-                classes: 'ui-tooltip-newznab'
-            }
-        });
-    });
-
-    // mediainfo tooltip
-    $(".mediainfo").each(function() {
-        var guid = $(this).attr('title');
-        $(this).qtip({
-            content: {
-                title: {
-                    text: 'Extended Media Info'
-                },
-                text: 'loading...',
-                ajax: {
-                    url: SERVERROOT + 'ajax_mediainfo',
-                    type: 'GET',
-                    data: { id: guid },
-                    success: function(data, status) {
-                        this.set('content.text', data);
-                    }
-                }
-            },
-            style: {
-                classes: 'ui-tooltip-newznab',
-                width: { max: 500 },
-                tip: {
-                    corner: 'topLeft',
-                    size: {
-                        x: 8,
-                        y : 8
-                    }
-                }
-            }
-        });
-    });
 });
 
 
@@ -1115,84 +1023,6 @@ function mymovie_add(imdbID, btn)
     return false;
 }
 
-
-// qtip growl
-$(document).ready(function()
-{
-    window.createGrowl = function(tipText ) {
-
-        var target = $('.qtip.jgrowl:visible:last');
-        var tipTitle = 'Attention!';
-        var persistent = false;
-
-        $(document.body).qtip({
-            content: {
-                text: tipText,
-                title: {
-                    text: tipTitle,
-                    button: true
-                }
-            },
-            position: {
-                my: 'top right',
-                at: (target.length ? 'bottom' : 'top') + ' right',
-                target: target.length ? target : $(document.body),
-                adjust: { y: 5 }
-            },
-            show: {
-                event: false,
-                ready: true,
-                effect: function() { $(this).stop(0,1).fadeIn(400); },
-
-                persistent: persistent
-            },
-            hide: {
-                event: false,
-                effect: function(api) {
-                    $(this).stop(0,1).fadeOut(400).queue(function() {
-                        api.destroy();
-                        updateGrowls();
-                    })
-                }
-            },
-            style: {
-                classes: 'jgrowl ui-tooltip-newznab ui-tooltip-rounded',
-                tip: false
-            },
-            events: {
-                render: function(event, api) {
-                    timer.call(api.elements.tooltip, event);
-                }
-            }
-        })
-            .removeData('qtip');
-    };
-
-    window.updateGrowls = function() {
-        var each = $('.qtip.jgrowl:not(:animated)');
-        each.each(function(i) {
-            var api = $(this).data('qtip');
-
-            api.options.position.target = !i ? $(document.body) : each.eq(i - 1);
-            api.set('position.at', (!i ? 'top' : 'bottom') + ' right');
-        });
-    };
-
-    function timer(event) {
-        var api = $(this).data('qtip'),
-            lifespan = 5000;
-
-        if(api.get('show.persistent') === true) { return; }
-
-        clearTimeout(api.timer);
-        if(event.type !== 'mouseover') {
-            api.timer = setTimeout(api.hide, lifespan);
-        }
-    }
-
-    $(document).delegate('.qtip.jgrowl', 'mouseover mouseout', timer);
-});
-
 //reset users api counts
 function resetapireq(uid, type)
 {
@@ -1238,16 +1068,16 @@ function getHistory()
 /** ******  iswitch  *********************** **/
 
 $(function () {
-    var checkAll = $('input.square-all');
-    var checkboxes = $('input.square');
+    var checkAll = $('input.flat-all');
+    var checkboxes = $('input.flat');
 
     $('input').iCheck({
-        checkboxClass: 'icheckbox_square-blue',
-        radioClass: 'iradio_square-blue'
+        checkboxClass: 'icheckbox_flat-green',
+        radioClass: 'iradio_flat-green'
     });
 
     checkAll.on('ifChecked ifUnchecked', function(event) {
-        if (event.type == 'ifChecked') {
+        if (event.type === 'ifChecked') {
             checkboxes.iCheck('check');
         } else {
             checkboxes.iCheck('uncheck');
@@ -1255,7 +1085,7 @@ $(function () {
     });
 
     checkboxes.on('ifChanged', function(event){
-        if(checkboxes.filter(':checked').length == checkboxes.length) {
+        if(checkboxes.filter(':checked').length === checkboxes.length) {
             checkAll.prop('checked', 'checked');
         } else {
             checkAll.prop('checked', false);
