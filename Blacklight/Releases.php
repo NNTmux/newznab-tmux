@@ -805,6 +805,7 @@ class Releases
      * @param int $maxAge
      * @param int $minSize
      * @param array $excludedCategories
+     * @param array $tags
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
@@ -837,8 +838,8 @@ class Releases
             );
             $show = Release::fromQuery($showQry);
 
-            if (! empty($show)) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen($show[0]->episodes) > 0) {
+            if (! empty($show[0])) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
