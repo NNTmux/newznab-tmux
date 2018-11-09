@@ -1,4 +1,5 @@
 2018-11-10 DariusIII
+	* Fix: Fix TV series page
 	* Chg: Update webpack.mix.js and properly generate files
 2018-11-09 DariusIII
 	* Chg: Update js and css files and ther folders
