@@ -1,4 +1,5 @@
 2018-11-10 DariusIII
+	* Fix: Fix links to anime and series pages
 	* Chg: Add missing green@2x.png
 	* Chg: Remove unused css and js from resources/assets folder
 	* Fix: Fix TV series page
