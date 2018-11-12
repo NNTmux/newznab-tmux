@@ -106,6 +106,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereUserseed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereXxxview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereVerified($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereApiToken($value)
  * @mixin \Eloquent
  */
 class User extends Authenticatable
@@ -143,6 +145,9 @@ class User extends Authenticatable
      */
     protected $dateFormat = false;
 
+    /**
+     * @var array
+     */
     protected $hidden = ['remember_token', 'password'];
 
     /**
@@ -220,7 +225,7 @@ class User extends Authenticatable
      */
     public static function deleteUser($id): void
     {
-        self::query()->where('id', $id)->delete();
+        self::whereId($id)->delete();
     }
 
     /**
@@ -338,7 +343,7 @@ class User extends Authenticatable
             'rate_limit' => $rateLimit[0]['rate_limit'],
         ];
 
-        self::query()->where('id', $id)->update($sql);
+        self::whereId($id)->update($sql);
 
         $user = self::find($id);
         $user->syncRoles([$rateLimit[0]['name']]);
@@ -374,7 +379,7 @@ class User extends Authenticatable
      */
     public static function getByUsername(string $userName)
     {
-        return self::query()->where('username', $userName)->first();
+        return self::whereUsername($userName)->first();
     }
 
     /**
@@ -385,7 +390,7 @@ class User extends Authenticatable
      */
     public static function getByEmail(string $email)
     {
-        return self::query()->where('email', $email)->first();
+        return self::whereEmail($email)->first();
     }
 
     /**
@@ -395,7 +400,7 @@ class User extends Authenticatable
      */
     public static function updateUserRole(int $uid, int $role): int
     {
-        return self::query()->where('id', $uid)->update(['roles_id' => $role]);
+        return self::whereId($uid)->update(['roles_id' => $role]);
     }
 
     /**
@@ -405,7 +410,7 @@ class User extends Authenticatable
      */
     public static function updateUserRoleChangeDate($uid, $date): int
     {
-        return self::query()->where('id', $uid)->update(['rolechangedate' => $date]);
+        return self::whereId($uid)->update(['rolechangedate' => $date]);
     }
 
     /**
@@ -464,9 +469,9 @@ class User extends Authenticatable
         return DB::select(
             sprintf(
                 $query,
-                ! empty($userName) ? 'AND users.username '.'LIKE '.DB::connection()->getPdo()->quote('%'.$userName.'%') : '',
-                ! empty($email) ? 'AND users.email '.'LIKE '.DB::connection()->getPdo()->quote('%'.$email.'%') : '',
-                ! empty($host) ? 'AND users.host '.'LIKE '.DB::connection()->getPdo()->quote('%'.$host.'%') : '',
+                ! empty($userName) ? 'AND users.username '.'LIKE '.escapeString('%'.$userName.'%') : '',
+                ! empty($email) ? 'AND users.email '.'LIKE '.escapeString('%'.$email.'%') : '',
+                ! empty($host) ? 'AND users.host '.'LIKE '.escapeString('%'.$host.'%') : '',
                 (! empty($role) ? ('AND users.roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
@@ -548,7 +553,7 @@ class User extends Authenticatable
             $hash = self::hashPassword($password);
 
             if ($hash !== false) {
-                self::query()->where('id', $userID)->update(['password' => $hash]);
+                self::whereId($userID)->update(['password' => $hash]);
             }
         }
 
@@ -562,7 +567,7 @@ class User extends Authenticatable
      */
     public static function updateRssKey($uid): int
     {
-        self::query()->where('id', $uid)->update(['api_token' => md5(Password::getRepository()->createNewToken())]);
+        self::whereId($uid)->update(['api_token' => md5(Password::getRepository()->createNewToken())]);
 
         return self::SUCCESS;
     }
@@ -575,7 +580,7 @@ class User extends Authenticatable
      */
     public static function updatePassResetGuid($id, $guid): int
     {
-        self::query()->where('id', $id)->update(['resetguid' => $guid]);
+        self::whereId($id)->update(['resetguid' => $guid]);
 
         return self::SUCCESS;
     }
@@ -588,7 +593,7 @@ class User extends Authenticatable
      */
     public static function updatePassword(int $id, string $password): int
     {
-        self::query()->where('id', $id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
+        self::whereId($id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
 
         return self::SUCCESS;
     }
@@ -610,7 +615,7 @@ class User extends Authenticatable
      */
     public static function getByPassResetGuid(string $guid)
     {
-        return self::query()->where('resetguid', $guid)->first();
+        return self::whereResetguid($guid)->first();
     }
 
     /**
@@ -619,7 +624,7 @@ class User extends Authenticatable
      */
     public static function incrementGrabs(int $id, $num = 1): void
     {
-        self::query()->where('id', $id)->increment('grabs', $num);
+        self::whereId($id)->increment('grabs', $num);
     }
 
     /**
@@ -647,7 +652,7 @@ class User extends Authenticatable
      */
     public static function getByRssToken(string $rssToken)
     {
-        return self::query()->where('api_token', $rssToken)->first();
+        return self::whereApiToken($rssToken)->first();
     }
 
     /**
@@ -833,7 +838,7 @@ class User extends Authenticatable
      */
     public static function updateSiteAccessed($userID, $host = ''): void
     {
-        self::query()->where('id', $userID)->update(
+        self::whereId($userID)->update(
             [
                 'lastlogin' => now(),
                 'host' => $host,
@@ -846,7 +851,7 @@ class User extends Authenticatable
      */
     public static function updateApiAccessed($uid): void
     {
-        self::query()->where('id', $uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
+        self::whereId($uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
     }
 
     /**
@@ -966,6 +971,6 @@ class User extends Authenticatable
      */
     public static function deleteUnVerified(): void
     {
-        static::query()->where('verified', '=', 0)->where('created_at', '<', now()->subDays(3))->delete();
+        static::whereVerified(0)->where('created_at', '<', now()->subDays(3))->delete();
     }
 }

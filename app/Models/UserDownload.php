@@ -38,11 +38,17 @@ class UserDownload extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function release()
     {
         return $this->belongsTo(Release::class, 'releases_id');
@@ -54,12 +60,13 @@ class UserDownload extends Model
      * @param int $userID
      *
      * @return int
+     * @throws \Exception
      */
     public static function getDownloadRequests($userID): int
     {
         // Clear old requests.
-        self::query()->where('users_id', $userID)->where('timestamp', '<', now()->subDay())->delete();
-        $value = self::query()->where('users_id', $userID)->where('timestamp', '>', now()->subDay())->count('id');
+        self::whereUsersId($userID)->where('timestamp', '<', now()->subDay())->delete();
+        $value = self::whereUsersId($userID)->where('timestamp', '>', now()->subDay())->count('id');
 
         return $value === false ? 0 : $value;
     }
@@ -70,7 +77,7 @@ class UserDownload extends Model
      */
     public static function getDownloadRequestsForUser($userID)
     {
-        return self::query()->where('users_id', $userID)->with('release')->orderBy('timestamp', 'DESC')->get();
+        return self::whereUsersId($userID)->with('release')->orderBy('timestamp', 'DESC')->get();
     }
 
     /**
@@ -97,17 +104,19 @@ class UserDownload extends Model
     /**
      * @param int $releaseID
      * @return mixed
+     * @throws \Exception
      */
     public static function delDownloadRequestsForRelease(int $releaseID)
     {
-        return self::query()->where('releases_id', $releaseID)->delete();
+        return self::whereReleasesId($releaseID)->delete();
     }
 
     /**
      * @param $userID
+     * @throws \Exception
      */
     public static function delDownloadRequests($userID): void
     {
-        self::query()->where('users_id', $userID)->delete();
+        self::whereUsersId($userID)->delete();
     }
 }
