@@ -1,23 +1,6 @@
 // event bindings
 jQuery(function($){
 
-    function notify(message, position, type) {
-        var n = noty({
-            layout: position, //or left, right, bottom-right...
-            type: type,
-            theme: 'bootstrapTheme',
-            text: message,
-            animation: {
-                open: 'animated flipInX', // Animate.css class names
-                close: 'animated flipOutX', // Animate.css class names
-                easing: 'swing', // unavailable - no need
-                speed: 500 // unavailable - no need
-            },
-            maxVisible: 10,
-            timeout: 3000
-        });
-    }
-
     $('.cartadd').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
         var guid = $(".guid").attr('id').substring(4);
@@ -30,7 +13,6 @@ jQuery(function($){
         $.post( SERVERROOT + "/cart/add?id=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your Download Basket!',
                 type: 'success',
@@ -41,7 +23,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                 desktop: {
-                    desktop: true
+                    desktop: false
                 }})
             );
         });
@@ -58,7 +40,6 @@ jQuery(function($){
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Added to Queue');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -69,7 +50,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                 desktop: {
-                    desktop: true
+                    desktop: false
                 }})
             );
         });
@@ -85,7 +66,6 @@ jQuery(function($){
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -96,7 +76,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                 desktop: {
-                    desktop: true
+                    desktop: t
                 }})
             );
         });
@@ -111,7 +91,6 @@ jQuery(function($){
         $.post(cpurl, function(resp){
             $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                     title: 'Movie added to CoucPotato wanted list!',
                     type: 'success',
@@ -122,7 +101,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                     desktop: {
-                        desktop: true
+                        desktop: false
                     }})
             );
         });
@@ -145,7 +124,6 @@ jQuery(function($){
                 var message = 'Added ' + guid + ' to queue.';
                 $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
                 PNotify.prototype.options.styling = "fontawesome";
-                PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your download queue!',
                     type: 'success',
@@ -156,7 +134,7 @@ jQuery(function($){
                             out_class: 'bounceOutRight'
                         },
                     desktop: {
-                        desktop: true
+                        desktop: false
                     }})
                 );
             }).fail(function(response)
@@ -242,7 +220,6 @@ jQuery(function($){
         $.post( SERVERROOT + "/cart/add?id=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download basket!',
                 type: 'success',
@@ -253,7 +230,7 @@ jQuery(function($){
                     out_class: 'bounceOutRight'
                 },
                 desktop: {
-                    desktop: true
+                    desktop: false
                 }})
             );
         });
@@ -276,7 +253,6 @@ jQuery(function($){
                 var message = 'Added ' + guid + ' to queue.';
                 $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
                 PNotify.prototype.options.styling = "fontawesome";
-                PNotify.desktop.permission();
                 (new PNotify({
                     title: 'ADDED TO NZBVORTEX!',
                     type: 'success',
@@ -287,7 +263,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                     desktop: {
-                        desktop: true
+                        desktop: false
                     }})
                 );
             }).fail(function(response)
@@ -403,7 +379,6 @@ jQuery(function($){
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Release added to Queue');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -414,7 +389,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                 desktop: {
-                    desktop: true
+                    desktop: false
                 }})
             );
         });
@@ -430,7 +405,6 @@ jQuery(function($){
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
             PNotify.prototype.options.styling = "fontawesome";
-            PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -441,7 +415,7 @@ jQuery(function($){
                         out_class: 'bounceOutRight'
                     },
                 desktop: {
-                    desktop: true
+                    desktop: false
                 }})
             );
         });
@@ -538,7 +512,6 @@ jQuery(function($){
                 $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');
                 guids.push(guid);
                 PNotify.prototype.options.styling = "fontawesome";
-                PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your Download Basket!',
                     type: 'success',
@@ -549,7 +522,7 @@ jQuery(function($){
                             out_class: 'bounceOutRight'
                         },
                     desktop: {
-                        desktop: true
+                        desktop: false
                     }})
                 );
             }
@@ -570,7 +543,6 @@ jQuery(function($){
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
                     PNotify.prototype.options.styling = "fontawesome";
-                    PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
                         type: 'success',
@@ -581,7 +553,7 @@ jQuery(function($){
                                 out_class: 'bounceOutRight'
                             },
                         desktop: {
-                            desktop: true
+                            desktop: false
                         }})
                     );
                 });
@@ -598,7 +570,6 @@ jQuery(function($){
                 $.post( nzburl, function(resp){
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title','Added to Queue');
                     PNotify.prototype.options.styling = "fontawesome";
-                    PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
                         type: 'success',
@@ -609,7 +580,7 @@ jQuery(function($){
                                 out_class: 'bounceOutRight'
                             },
                         desktop: {
-                            desktop: true
+                            desktop: false
                         }})
                     );
                 });
@@ -723,7 +694,6 @@ jQuery(function($){
             var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
             $.post( nzburl, function(){
                 PNotify.prototype.options.styling = "fontawesome";
-                PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Releases sent to queue!',
                     type: 'success',
@@ -734,7 +704,7 @@ jQuery(function($){
                             out_class: 'bounceOutRight'
                         },
                     desktop: {
-                        desktop: true
+                        desktop: false
                     }})
                 );
             });
