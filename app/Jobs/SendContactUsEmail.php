@@ -4,11 +4,11 @@ namespace App\Jobs;
 
 use App\Mail\ContactUs;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Mail;
 
 class SendContactUsEmail implements ShouldQueue
 {
@@ -34,9 +34,6 @@ class SendContactUsEmail implements ShouldQueue
         $this->mailBody = $mailBody;
     }
 
-    /**
-     *
-     */
     public function handle()
     {
         Mail::to($this->mailTo)->send(new ContactUs($this->email, $this->mailBody));

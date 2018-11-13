@@ -361,7 +361,6 @@ class ProfileController extends BasePageController
         $userId = $request->input('id');
 
         if ($userId !== null && $this->userdata->hasRole('Admin') === false && (int) $userId === Auth::id()) {
-
             User::deleteUser($userId);
 
             return redirect('login');
