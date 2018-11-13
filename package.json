@@ -11,10 +11,10 @@
     },
     "devDependencies": {
         "axios": "^0.18",
-        "cross-env": "^5.1",
+        "cross-env": "^5.2.0",
         "jquery": "^3.2",
         "laravel-mix": "^2.1.14",
-        "lodash": "^4.17.5",
+        "lodash": "^4.17.11",
         "popper.js": "^1.14.5",
         "vue": "^2.5.7"
     },
