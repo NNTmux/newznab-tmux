@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use App\Models\Settings;
 use App\Mail\AccountDeleted;
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;

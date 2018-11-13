@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Mail\AccountExpired;
 use App\Models\User;
+use App\Mail\AccountExpired;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;

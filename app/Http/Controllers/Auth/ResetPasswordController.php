@@ -73,16 +73,16 @@ class ResetPasswordController extends Controller
             $confirmed = true;
         }
 
-            $theme = Settings::settingValue('site.main.style');
+        $theme = Settings::settingValue('site.main.style');
 
-            $title = 'Forgotten Password';
-            $meta_title = 'Forgotten Password';
-            $meta_keywords = 'forgotten,password,signup,registration';
-            $meta_description = 'Forgotten Password';
+        $title = 'Forgotten Password';
+        $meta_title = 'Forgotten Password';
+        $meta_keywords = 'forgotten,password,signup,registration';
+        $meta_description = 'Forgotten Password';
 
-            $content = app('smarty.view')->fetch($theme.'/forgottenpassword.tpl');
+        $content = app('smarty.view')->fetch($theme.'/forgottenpassword.tpl');
 
-            app('smarty.view')->assign(
+        app('smarty.view')->assign(
                 [
                     'content' => $content,
                     'title' => $title,
@@ -95,6 +95,6 @@ class ResetPasswordController extends Controller
                     'notice' => $onscreen,
                 ]
             );
-            app('smarty.view')->display($theme.'/basepage.tpl');
+        app('smarty.view')->display($theme.'/basepage.tpl');
     }
 }

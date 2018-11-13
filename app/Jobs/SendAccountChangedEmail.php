@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Mail\AccountChange;
 use App\Models\User;
+use App\Mail\AccountChange;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
