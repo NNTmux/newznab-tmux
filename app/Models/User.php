@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Jobs\SendAccountExpiredEmail;
-use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Str;
+use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use App\Jobs\SendAccountExpiredEmail;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
@@ -940,9 +940,9 @@ class User extends Authenticatable
         $token = \Token::randomString(40);
         $url = $serverUrl.'register?invitecode='.$token;
 
-
         Invitation::addInvite($uid, $token);
         SendInviteEmail::dispatch($emailTo, $uid, $url);
+
         return $url;
     }
 

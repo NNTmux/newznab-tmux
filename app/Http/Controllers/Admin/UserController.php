@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Jobs\SendAccountChangedEmail;
 use App\Models\User;
 use App\Models\Invitation;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use App\Jobs\SendAccountChangedEmail;
 use App\Http\Controllers\BasePageController;
 
 class UserController extends BasePageController

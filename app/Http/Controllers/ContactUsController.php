@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendContactUsEmail;
 use App\Models\Settings;
 use Illuminate\Http\Request;
+use App\Jobs\SendContactUsEmail;
 
 class ContactUsController extends BasePageController
 {
@@ -41,7 +41,7 @@ class ContactUsController extends BasePageController
             }
 
             if (! preg_match("/\n/i", $request->input('useremail'))) {
-               SendContactUsEmail::dispatch($email, $mailTo, $mailBody);
+                SendContactUsEmail::dispatch($email, $mailTo, $mailBody);
             }
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }
