@@ -8,13 +8,11 @@ use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
-use App\Mail\AccountDeleted;
 use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController
@@ -363,7 +361,7 @@ class ProfileController extends BasePageController
         $userId = $request->input('id');
 
         if ($userId !== null && $this->userdata->hasRole('Admin') === false && (int) $userId === Auth::id()) {
-            Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
+
             User::deleteUser($userId);
 
             return redirect('login');

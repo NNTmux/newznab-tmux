@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use App\Mail\SendInvite;
+use App\Jobs\SendAccountExpiredEmail;
+use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Str;
-use App\Mail\AccountExpired;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
@@ -424,7 +423,7 @@ class User extends Authenticatable
             $user = self::find($u['id']);
             $user->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
             $user->syncRoles('User');
-            Mail::to($u['email'])->send(new AccountExpired($u['id']));
+            SendAccountExpiredEmail::dispatch($u['email'], $u['id']);
         }
 
         return self::SUCCESS;
@@ -941,9 +940,9 @@ class User extends Authenticatable
         $token = \Token::randomString(40);
         $url = $serverUrl.'register?invitecode='.$token;
 
-        Mail::to($emailTo)->send(new SendInvite($uid, $url));
-        Invitation::addInvite($uid, $token);
 
+        Invitation::addInvite($uid, $token);
+        SendInviteEmail::dispatch($emailTo, $uid, $url);
         return $url;
     }
 

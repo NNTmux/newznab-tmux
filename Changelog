@@ -1,4 +1,5 @@
 2018-11-13 DariusIII
+	* Chg: Use laravel queue for sending emails
 	* Chg: Update basepage template and remove duplicated meta tags
 	* Chg: Update nesbot/carbon to latest version
 	* Chg: Remove unnecesarry code from login template

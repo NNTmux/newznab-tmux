@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Jobs\SendPasswordResetEmail;
 use App\Models\User;
 use App\Models\Settings;
 use App\Mail\PasswordReset;
@@ -65,9 +66,8 @@ class ResetPasswordController extends Controller
         $newpass = User::generatePassword();
         User::updatePassword($ret['id'], $newpass);
 
-        $to = $ret['email'];
         $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
-        Mail::to($to)->send(new PasswordReset($ret['id'], $newpass));
+        SendPasswordResetEmail::dispatch($ret['email'], $ret['id'], $newpass);
         app('smarty.view')->assign('notice', $onscreen);
         $confirmed = true;
 

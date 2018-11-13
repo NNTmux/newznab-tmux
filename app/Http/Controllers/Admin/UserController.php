@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Jobs\SendAccountChangedEmail;
 use App\Models\User;
 use App\Models\Invitation;
-use App\Mail\AccountChange;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\BasePageController;
 
 class UserController extends BasePageController
@@ -157,7 +156,7 @@ class UserController extends BasePageController
                             }
                         }
                         $email = $request->input('email') ?? $request->input('email');
-                        Mail::to($email)->send(new AccountChange($request->input('id')));
+                        SendAccountChangedEmail::dispatch($email, $request->input('id'));
                     }
                 }
 

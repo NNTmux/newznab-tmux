@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Http\Request;
@@ -70,7 +71,7 @@ class ForgotPasswordController extends Controller
             // Send the email
             //
             $resetLink = url('/').'/resetpassword?guid='.$guid;
-            Mail::to($ret['email'])->send(new ForgottenPassword($resetLink));
+            SendPasswordForgottenEmail::dispatch($ret['email'], $resetLink);
             $sent = true;
         }
 
