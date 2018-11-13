@@ -49,47 +49,52 @@ class ResetPasswordController extends Controller
      */
     public function reset(Request $request)
     {
+        $error = '';
+        $confirmed = '';
+        $onscreen = '';
         if (! $request->has('guid')) {
-            app('smarty.view')->assign('error', 'No reset code provided.');
+            $error = 'No reset code provided.';
         }
 
         $ret = User::getByPassResetGuid($request->input('guid'));
         if ($ret === null) {
-            app('smarty.view')->assign('error', 'Bad reset code provided.');
+            $error = 'Bad reset code provided.';
+        } else {
+
+            //
+            // reset the password, inform the user, send out the email
+            //
+            User::updatePassResetGuid($ret['id'], '');
+            $newpass = User::generatePassword();
+            User::updatePassword($ret['id'], $newpass);
+
+            $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
+            SendPasswordResetEmail::dispatch($ret, $newpass);
+            $confirmed = true;
         }
 
-        //
-        // reset the password, inform the user, send out the email
-        //
-        User::updatePassResetGuid($ret['id'], '');
-        $newpass = User::generatePassword();
-        User::updatePassword($ret['id'], $newpass);
+            $theme = Settings::settingValue('site.main.style');
 
-        $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
-        SendPasswordResetEmail::dispatch($ret['email'], $ret['id'], $newpass);
-        app('smarty.view')->assign('notice', $onscreen);
-        $confirmed = true;
+            $title = 'Forgotten Password';
+            $meta_title = 'Forgotten Password';
+            $meta_keywords = 'forgotten,password,signup,registration';
+            $meta_description = 'Forgotten Password';
 
-        $theme = Settings::settingValue('site.main.style');
+            $content = app('smarty.view')->fetch($theme.'/forgottenpassword.tpl');
 
-        $title = 'Forgotten Password';
-        $meta_title = 'Forgotten Password';
-        $meta_keywords = 'forgotten,password,signup,registration';
-        $meta_description = 'Forgotten Password';
-
-        $content = app('smarty.view')->fetch($theme.'/forgottenpassword.tpl');
-
-        app('smarty.view')->assign(
-            [
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-                'email'     => $ret['email'],
-                'confirmed' => $confirmed,
-            ]
-        );
-        app('smarty.view')->display($theme.'/basepage.tpl');
+            app('smarty.view')->assign(
+                [
+                    'content' => $content,
+                    'title' => $title,
+                    'meta_title' => $meta_title,
+                    'meta_keywords' => $meta_keywords,
+                    'meta_description' => $meta_description,
+                    'email' => $ret['email'],
+                    'confirmed' => $confirmed,
+                    'error' => $error,
+                    'notice' => $onscreen,
+                ]
+            );
+            app('smarty.view')->display($theme.'/basepage.tpl');
     }
 }

@@ -60,18 +60,19 @@ class ForgotPasswordController extends Controller
             if ($ret === null) {
                 app('smarty.view')->assign('error', 'The email or apikey are not recognised.');
                 $sent = true;
+            } else {
+                //
+                // Generate a forgottenpassword guid, store it in the user table
+                //
+                $guid = \Token::random(32);
+                User::updatePassResetGuid($ret['id'], $guid);
+                //
+                // Send the email
+                //
+                $resetLink = url('/').'/resetpassword?guid='.$guid;
+                SendPasswordForgottenEmail::dispatch($ret, $resetLink);
+                $sent = true;
             }
-            //
-            // Generate a forgottenpassword guid, store it in the user table
-            //
-            $guid = \Token::random(32);
-            User::updatePassResetGuid($ret['id'], $guid);
-            //
-            // Send the email
-            //
-            $resetLink = url('/').'/resetpassword?guid='.$guid;
-            SendPasswordForgottenEmail::dispatch($ret['email'], $resetLink);
-            $sent = true;
         }
 
         $theme = Settings::settingValue('site.main.style');

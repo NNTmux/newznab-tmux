@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\AccountChange;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -21,13 +22,12 @@ class SendAccountChangedEmail implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $email
-     * @param $id
+     * @param \App\Models\User $user
      */
-    public function __construct($email, $id)
+    public function __construct(User $user)
     {
-        $this->email = $email;
-        $this->id = $id;
+        $this->email = $user->email;
+        $this->id = $user->id;
     }
 
     /**

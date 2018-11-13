@@ -423,7 +423,7 @@ class User extends Authenticatable
             $user = self::find($u['id']);
             $user->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
             $user->syncRoles('User');
-            SendAccountExpiredEmail::dispatch($u['email'], $u['id']);
+            SendAccountExpiredEmail::dispatch($user);
         }
 
         return self::SUCCESS;

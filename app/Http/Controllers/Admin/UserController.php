@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use App\Models\Invitation;
 use Illuminate\Http\Request;
@@ -140,23 +141,23 @@ class UserController extends BasePageController
                     $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'));
                     $this->smarty->assign('role', $request->input('role'));
                 } else {
-                    $ret = User::updateUser($request->input('id'), $request->input('username'), $request->input('email'), $request->input('grabs'), $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
+                    $editedUser = User::find($request->input('id'));
+                    $ret = User::updateUser($editedUser->id, $request->input('username'), $request->input('email'), $request->input('grabs'), $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
                     if ($request->input('password') !== null) {
-                        User::updatePassword($request->input('id'), $request->input('password'));
+                        User::updatePassword($editedUser->id, $request->input('password'));
                     }
                     if ($request->input('rolechangedate') !== null) {
-                        User::updateUserRoleChangeDate($request->input('id'), $request->input('rolechangedate'));
+                        User::updateUserRoleChangeDate($editedUser->id, $request->input('rolechangedate'));
                     }
                     if ($request->input('role') !== null) {
                         $roleName = Role::query()->where('id', $request->input('role'))->value('name');
                         if ($roleName === 'Disabled') {
-                            $blockedUser = User::find($request->input('id'));
-                            if (env('FIREWALL_ENABLED') === true && \Firewall::isBlacklisted($blockedUser->host) === false) {
-                                \Firewall::blacklist($blockedUser->host);
+                            if (env('FIREWALL_ENABLED') === true && \Firewall::isBlacklisted($editedUser->host) === false) {
+                                \Firewall::blacklist($editedUser->host);
                             }
                         }
-                        $email = $request->input('email') ?? $request->input('email');
-                        SendAccountChangedEmail::dispatch($email, $request->input('id'));
+                        $editedUser->refresh();
+                        SendAccountChangedEmail::dispatch($editedUser);
                     }
                 }
 

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\PasswordReset;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -14,23 +15,31 @@ class SendPasswordResetEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var string
+     */
     private $email;
 
+    /**
+     * @var int
+     */
     private $userId;
 
+    /**
+     * @var string
+     */
     private $newPass;
 
     /**
      * Create a new job instance.
      *
-     * @param $email
-     * @param $userId
-     * @param $newPass
+     * @param \App\Models\User $user
+     * @param string $newPass
      */
-    public function __construct($email, $userId, $newPass)
+    public function __construct(User $user, $newPass)
     {
-        $this->email = $email;
-        $this->userId = $userId;
+        $this->email = $user->email;
+        $this->userId = $user->id;
         $this->newPass = $newPass;
     }
 

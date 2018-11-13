@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\AccountExpired;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -21,13 +22,12 @@ class SendAccountExpiredEmail implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $email
-     * @param $userId
+     * @param \App\Models\User $user
      */
-    public function __construct($email, $userId)
+    public function __construct(User $user)
     {
-        $this->email = $email;
-        $this->userId = $userId;
+        $this->email = $user->email;
+        $this->userId = $user->id;
     }
 
     /**

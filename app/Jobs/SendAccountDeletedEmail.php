@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Settings;
 use App\Mail\AccountDeleted;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -20,11 +21,11 @@ class SendAccountDeletedEmail implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $userId
+     * @param \App\Models\User $user
      */
-    public function __construct($userId)
+    public function __construct(User $user)
     {
-        $this->userId = $userId;
+        $this->userId = $user->id;
     }
 
     /**
