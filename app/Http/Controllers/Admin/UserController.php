@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use App\Models\Invitation;
 use Illuminate\Http\Request;

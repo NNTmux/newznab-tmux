@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
@@ -13,7 +12,7 @@ use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\Auth;
+use App\Jobs\SendAccountDeletedEmail;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController
@@ -361,10 +360,11 @@ class ProfileController extends BasePageController
         $this->setPrefs();
         $userId = $request->input('id');
 
-        if ($userId !== null && (int) $userId === $this->userdata->id && $this->userdata->hasRole('Admin') === false ) {
+        if ($userId !== null && (int) $userId === $this->userdata->id && $this->userdata->hasRole('Admin') === false) {
             $user = User::find($userId);
             SendAccountDeletedEmail::dispatch($user);
             User::deleteUser($user->id);
+
             return redirect('login');
         }
 
