@@ -1,3 +1,5 @@
+2018-11-14 DariusIII
+	* Chg: Update PNotify and fix notifications
 2018-11-13 DariusIII
 	* Chg: Update assets
 	* Chg: Use User model for email queue where possible

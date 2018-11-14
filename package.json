@@ -39,7 +39,7 @@
         "multiselect": "^0.9.12",
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
-        "pnotify": "^3.2.1",
+        "pnotify": "^4.0.0-alpha.4",
         "tinymce": "^4.8.5"
     }
 }
