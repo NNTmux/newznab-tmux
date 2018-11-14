@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "903b59f6211793722af7962a0481e948",
+    "content-hash": "0eed6470579e605d5cdf09623326591d",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -447,6 +447,48 @@
                 "tls"
             ],
             "time": "2018-10-18T06:09:13+00:00"
+        },
+        {
+            "name": "czproject/git-php",
+            "version": "v3.14.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/czproject/git-php.git",
+                "reference": "6faf55527a17fb569456709c2769a6d8749ceb6d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/6faf55527a17fb569456709c2769a6d8749ceb6d",
+                "reference": "6faf55527a17fb569456709c2769a6d8749ceb6d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "nette/tester": "~1.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Pecha",
+                    "email": "janpecha@email.cz"
+                }
+            ],
+            "description": "Library for work with Git repository in PHP.",
+            "keywords": [
+                "git"
+            ],
+            "time": "2018-04-17T08:52:47+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
@@ -3446,31 +3488,6 @@
                 "php"
             ],
             "time": "2018-10-10T09:24:14+00:00"
-        },
-        {
-            "name": "nzedb/Git.php",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nZEDb/Git.php.git",
-                "reference": "327f844c964fc078075a0a77e789b8dfd8b5016f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nZEDb/Git.php/zipball/327f844c964fc078075a0a77e789b8dfd8b5016f",
-                "reference": "327f844c964fc078075a0a77e789b8dfd8b5016f",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "Git.php"
-                ]
-            },
-            "support": {
-                "source": "https://github.com/nZEDb/Git.php/tree/master"
-            },
-            "time": "2016-10-30T19:06:19+00:00"
         },
         {
             "name": "opis/closure",
@@ -10694,8 +10711,7 @@
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "mayconbordin/l5-fixtures": 20,
-        "nzedb/git.php": 20
+        "mayconbordin/l5-fixtures": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

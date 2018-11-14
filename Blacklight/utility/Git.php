@@ -21,14 +21,29 @@
 
 namespace Blacklight\utility;
 
+use Cz\Git\GitRepository;
+
 /**
  * Class Git - Wrapper for various git operations.
  */
-class Git extends \GitRepo
+class Git extends GitRepository
 {
+    /**
+     * @var string
+     */
     private $branch;
+
+    /**
+     * @var array
+     */
     private $mainBranches = ['dev', '0.5.x', '0.x'];
 
+    /**
+     * Git constructor.
+     *
+     * @param array $options
+     * @throws \Cz\Git\GitException
+     */
     public function __construct(array $options = [])
     {
         $defaults = [
@@ -38,19 +53,21 @@ class Git extends \GitRepo
         ];
         $options += $defaults;
 
-        parent::__construct($options['filepath'], $options['create'], $options['initialise']);
-        $this->branch = parent::active_branch();
+        parent::__construct($options['filepath']);
+        $this->branch = parent::getCurrentBranchName();
     }
 
     /**
      * Return the number of commits made to repo.
+     *
+     * @throws \Cz\Git\GitException
      */
-    public function commits()
+    public function commits(): int
     {
         $count = 0;
         $log = explode("\n", $this->log());
         foreach ($log as $line) {
-            if (preg_match('#^commit#', $line)) {
+            if (0 === strpos($line, 'commit')) {
                 $count++;
             }
         }
@@ -59,16 +76,19 @@ class Git extends \GitRepo
     }
 
     /**
-     * @param string $options
-     *
-     * @return string
+     * @param null $options
+     * @return \Cz\Git\GitRepository
+     * @throws \Cz\Git\GitException
      */
-    public function describe($options = null)
+    public function describe($options = null): GitRepository
     {
         return $this->run("describe $options");
     }
 
-    public function getBranch()
+    /**
+     * @return string
+     */
+    public function getBranch(): string
     {
         return $this->branch;
     }
@@ -78,7 +98,7 @@ class Git extends \GitRepo
      *
      * @return false|bool
      */
-    public function isCommited($gitObject)
+    public function isCommited($gitObject): bool
     {
         $cmd = "cat-file -e $gitObject";
 
@@ -96,27 +116,39 @@ class Git extends \GitRepo
         return $result === '';
     }
 
-    public function log($options = null)
+    /**
+     * @param null $options
+     * @return \Cz\Git\GitRepository
+     * @throws \Cz\Git\GitException
+     */
+    public function log($options = null): GitRepository
     {
         return $this->run("log $options");
     }
 
-    public function mainBranches()
+    /**
+     * @return array
+     */
+    public function mainBranches(): array
     {
         return $this->mainBranches;
     }
 
     /**
-     * @param string $options
-     *
-     * @return string
+     * @param null $options
+     * @return \Cz\Git\GitRepository
+     * @throws \Cz\Git\GitException
      */
-    public function tag($options = null)
+    public function tag($options = null): GitRepository
     {
         return $this->run("tag $options");
     }
 
-    public function tagLatest()
+    /**
+     * @return \Cz\Git\GitRepository
+     * @throws \Cz\Git\GitException
+     */
+    public function tagLatest(): GitRepository
     {
         return $this->describe('--tags --abbrev=0 HEAD');
     }

@@ -54,12 +54,6 @@
   "non-feature-branches": [
     "latest-.*"
   ],
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/nZEDb/Git.php"
-    }
-  ],
   "require": {
     "php": ">=7.2.0",
     "ext-bcmath": "*",
@@ -91,6 +85,7 @@
     "barracudanetworks/forkdaemon-php": "~1.0",
     "bhuvidya/laravel-countries": "^1.0",
     "canihavesomecoffee/thetvdbapi": "^1.0",
+    "czproject/git-php": "^3.14",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "^1.0",
     "dirape/token": "^2.1",
@@ -109,6 +104,7 @@
     "joshpinkney/tv-maze-php-api": "dev-master",
     "jrean/laravel-user-verification": "^7.0",
     "kevinlebrun/colors.php": "^1.0",
+    "kylekatarnls/laravel-carbon-2": "^1.0.0",
     "laravel/framework": "5.7.*",
     "laravel/scout": "^5.0",
     "laravel/tinker": "~1.0",
@@ -119,8 +115,6 @@
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
     "nesbot/carbon": "2.5.3 as 1.35.0",
-    "kylekatarnls/laravel-carbon-2": "^1.0.0",
-    "nzedb/Git.php": "dev-master",
     "php-ffmpeg/php-ffmpeg": "^0.13.0",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
