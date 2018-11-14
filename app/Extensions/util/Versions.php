@@ -37,7 +37,7 @@ class Versions
     protected $changes = 0;
 
     /**
-     * @var
+     * @var \App\Extensions\util\Git
      */
     protected $git;
 
@@ -75,9 +75,7 @@ class Versions
     }
 
     /**
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \RuntimeException
+     * @throws \Cz\Git\GitException
      */
     public function checkGitTag(): void
     {
@@ -91,9 +89,7 @@ class Versions
      * @param bool $update
      *
      * @return false|string version string if matched or false.
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \RuntimeException
+     * @throws \Cz\Git\GitException
      */
     public function checkGitTagInFile($update = false)
     {
@@ -206,6 +202,7 @@ class Versions
 
     /**
      * @return string
+     * @throws \Cz\Git\GitException
      */
     public function getGitBranch(): string
     {
@@ -216,6 +213,7 @@ class Versions
 
     /**
      * @return string
+     * @throws \Cz\Git\GitException
      */
     public function getGitHeadHash(): string
     {
@@ -237,8 +235,7 @@ class Versions
 
     /**
      * @return string
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Cz\Git\GitException
      */
     public function getGitTagInRepo(): string
     {
@@ -266,7 +263,7 @@ class Versions
      * @return null|string
      * @throws \RuntimeException
      */
-    public function getSQLPatchFromFile()
+    public function getSQLPatchFromFile(): ?string
     {
         $this->loadXMLFile();
 
@@ -293,8 +290,7 @@ class Versions
 
     /**
      * @return string
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Cz\Git\GitException
      */
     public function getTagVersion(): string
     {
@@ -407,6 +403,9 @@ class Versions
         }
     }
 
+    /**
+     *
+     */
     protected function _init(): void
     {
         if ($this->_config['git'] instanceof Git) {
