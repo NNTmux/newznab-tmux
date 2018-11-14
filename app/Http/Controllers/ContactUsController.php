@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ContactUs;
 use App\Models\Settings;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
+use App\Jobs\SendContactUsEmail;
 
 class ContactUsController extends BasePageController
 {
@@ -22,7 +21,7 @@ class ContactUsController extends BasePageController
             'username' => 'required',
         ]);
 
-        if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
+        if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
             $this->validate($request, [
                 'g-recaptcha-response' => 'required|captcha',
             ]);
@@ -42,7 +41,7 @@ class ContactUsController extends BasePageController
             }
 
             if (! preg_match("/\n/i", $request->input('useremail'))) {
-                Mail::to($mailTo)->send(new ContactUs($email, $mailBody));
+                SendContactUsEmail::dispatch($email, $mailTo, $mailBody);
             }
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }

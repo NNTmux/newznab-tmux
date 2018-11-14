@@ -34,3 +34,7 @@ Route::group(['prefix' => 'v2', 'namespace' => 'Api', 'middleware' => ['auth:api
     Route::get('details', 'ApiV2Controller@details');
     Route::post('details', 'ApiV2Controller@details');
 });
+
+Route::fallback(function () {
+    return response()->json(['message' => 'Not Found!'], 404);
+});

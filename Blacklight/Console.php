@@ -87,6 +87,11 @@ class Console
     public $failCache;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances / Echo to cli.
      * @throws \Exception
      */
@@ -99,6 +104,8 @@ class Console
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+
+        $this->colorCli = new ColorCLI();
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -392,13 +399,13 @@ class Console
                 $consoleId = $this->_updateConsoleTable($con);
 
                 if ($this->echooutput && $consoleId !== -2) {
-                    ColorCLI::header('Added/updated game: ').
-                        ColorCLI::alternateOver('   Title:    ').
-                        ColorCLI::primary($con['title']).
-                        ColorCLI::alternateOver('   Platform: ').
-                        ColorCLI::primary($con['platform']).
-                        ColorCLI::alternateOver('   Genre: ').
-                        ColorCLI::primary($con['consolegenre']);
+                    $this->colorCli->header('Added/updated game: ').
+                        $this->colorCli->alternateOver('   Title:    ').
+                        $this->colorCli->primary($con['title']).
+                        $this->colorCli->alternateOver('   Platform: ').
+                        $this->colorCli->primary($con['platform']).
+                        $this->colorCli->alternateOver('   Genre: ').
+                        $this->colorCli->primary($con['consolegenre']);
                 }
             }
         } else {
@@ -413,7 +420,7 @@ class Console
                 $consoleId = $this->_updateConsoleTable($igdb);
 
                 if ($this->echooutput && $consoleId !== -2) {
-                    ColorCLI::header('Added/updated game: ').ColorCLI::alternateOver('   Title:    ').ColorCLI::primary($igdb['title']).ColorCLI::alternateOver('   Platform: ').ColorCLI::primary($igdb['platform']).ColorCLI::alternateOver('   Genre: ').ColorCLI::primary($igdb['consolegenre']);
+                    $this->colorCli->header('Added/updated game: ').$this->colorCli->alternateOver('   Title:    ').$this->colorCli->primary($igdb['title']).$this->colorCli->alternateOver('   Platform: ').$this->colorCli->primary($igdb['platform']).$this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary($igdb['consolegenre']);
                 }
             }
         }
@@ -773,7 +780,7 @@ class Console
 
         $apaiIo = new ApaiIO($conf);
 
-        ColorCLI::info('Trying to find info on Amazon');
+        $this->colorCli->info('Trying to find info on Amazon');
         $responses = $apaiIo->runOperation($search);
 
         if ($responses === false) {
@@ -783,13 +790,13 @@ class Console
         foreach ($responses->Items->Item as $response) {
             similar_text($title, $response->ItemAttributes->Title, $percent);
             if ($percent > self::MATCH_PERCENT && isset($response->ItemAttributes->Title)) {
-                ColorCLI::info('Found matching info on Amazon: '.$response->ItemAttributes->Title);
+                $this->colorCli->info('Found matching info on Amazon: '.$response->ItemAttributes->Title);
 
                 return $response;
             }
         }
 
-        ColorCLI::info('Could not find match on Amazon');
+        $this->colorCli->info('Could not find match on Amazon');
 
         return false;
     }
@@ -882,12 +889,12 @@ class Console
                         return $game;
                     }
 
-                    ColorCLI::notice('IGDB returned no valid results');
+                    $this->colorCli->notice('IGDB returned no valid results');
 
                     return false;
                 }
 
-                ColorCLI::notice('IGDB found no valid results');
+                $this->colorCli->notice('IGDB found no valid results');
 
                 return false;
             } catch (ClientException $e) {
@@ -914,7 +921,7 @@ class Console
         $releaseCount = $res->count();
         if ($res instanceof \Traversable && $releaseCount > 0) {
             if ($this->echooutput) {
-                ColorCLI::header('Processing '.$releaseCount.' console release(s).');
+                $this->colorCli->header('Processing '.$releaseCount.' console release(s).');
             }
 
             foreach ($res as $arr) {
@@ -925,8 +932,8 @@ class Console
 
                 if ($gameInfo !== false) {
                     if ($this->echooutput) {
-                        ColorCLI::headerOver('Looking up: ').
-                            ColorCLI::primary(
+                        $this->colorCli->headerOver('Looking up: ').
+                            $this->colorCli->primary(
                                 $gameInfo['title'].
                                 ' ('.
                                 $gameInfo['platform'].')'
@@ -939,7 +946,7 @@ class Console
                     if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::headerOver('Cached previous failure. Skipping.');
+                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
                         }
                         $gameId = -2;
                     } elseif ($gameCheck === false) {
@@ -951,8 +958,8 @@ class Console
                         }
                     } else {
                         if ($this->echooutput) {
-                            ColorCLI::headerOver('Found Local: ').
-                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}");
+                            $this->colorCli->headerOver('Found Local: ').
+                                $this->colorCli->primary("{$gameCheck['title']} - {$gameCheck['platform']}");
                         }
                         $gameId = $gameCheck['id'];
                     }
@@ -970,7 +977,7 @@ class Console
                 }
             }
         } elseif ($this->echooutput) {
-            ColorCLI::header('No console releases to process.');
+            $this->colorCli->header('No console releases to process.');
         }
     }
 

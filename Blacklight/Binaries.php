@@ -45,7 +45,7 @@ class Binaries
     /**
      * @var \Blacklight\ColorCLI
      */
-    protected $_colorCLI;
+    protected $colorCli;
 
     /**
      * @var \Blacklight\CollectionsCleaning
@@ -241,8 +241,8 @@ class Binaries
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->_pdo = DB::connection()->getPdo();
-        $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
-        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'ColorCLI' => $this->_colorCLI]));
+        $this->colorCli = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
+        $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->colorCli, 'ColorCLI' => $this->colorCli]));
         $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning());
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
@@ -346,14 +346,14 @@ class Binaries
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary('Processing '.$groupMySQL['name']);
+            $this->colorCli->primary('Processing '.$groupMySQL['name']);
         }
 
         // Attempt to repair any missing parts before grabbing new ones.
         if ((int) $groupMySQL['last_record'] !== 0) {
             if ($this->_partRepair) {
                 if ($this->_echoCLI) {
-                    ColorCLI::primary('Part repair enabled. Checking for missing parts.');
+                    $this->colorCli->primary('Part repair enabled. Checking for missing parts.');
                 }
                 $this->partRepair($groupMySQL);
 
@@ -363,7 +363,7 @@ class Binaries
                     $this->partRepair($groupMySQL, $tableNames);
                 }
             } elseif ($this->_echoCLI) {
-                ColorCLI::primary('Part repair disabled by user.');
+                $this->colorCli->primary('Part repair disabled by user.');
             }
         }
 
@@ -431,7 +431,7 @@ class Binaries
         // If total is bigger than 0 it means we have new parts in the newsgroup.
         if ($total > 0) {
             if ($this->_echoCLI) {
-                ColorCLI::primary(
+                $this->colorCli->primary(
                         (
                         (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
@@ -465,7 +465,7 @@ class Binaries
                 $first++;
 
                 if ($this->_echoCLI) {
-                    ColorCLI::header(
+                    $this->colorCli->header(
                             PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
                             ' to '.number_format($last).') from '.$groupMySQL['name'].' - ('.
                             number_format($groupLast - $last).' articles in queue).'
@@ -534,13 +534,13 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::primary(
+                $this->colorCli->primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
                         number_format(microtime(true) - $startGroup, 2).' seconds.'
                     );
             }
         } elseif ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     'No new articles for '.$groupMySQL['name'].' (first '.number_format($first).
                     ', last '.number_format($last).', grouplast '.number_format($groupMySQL['last_record']).
                     ', total '.number_format($total).")\n".'Server oldest: '.number_format($groupNNTP['first']).
@@ -771,7 +771,7 @@ class Binaries
                 $this->addMissingParts($rangeNotReceived, $this->tableNames['prname'], $this->groupMySQL['id']);
 
                 if ($this->_echoCLI) {
-                    ColorCLI::alternate(
+                    $this->colorCli->alternate(
                             'Server did not return '.$notReceivedCount.
                             ' articles from '.$this->groupMySQL['name'].'.'
                         );
@@ -1008,7 +1008,7 @@ class Binaries
      */
     protected function outputHeaderInitial(): void
     {
-        ColorCLI::primary(
+        $this->colorCli->primary(
                 'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
@@ -1022,16 +1022,16 @@ class Binaries
     {
         $currentMicroTime = microtime(true);
         if ($this->_echoCLI) {
-            ColorCLI::alternateOver($this->timeHeaders.'s').
-                ColorCLI::primaryOver(' to download articles, ').
-                ColorCLI::alternateOver($this->timeCleaning.'s').
-                ColorCLI::primaryOver(' to process collections, ').
-                ColorCLI::alternateOver($this->timeInsert.'s').
-                ColorCLI::primaryOver(' to insert binaries/parts, ').
-                ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
-                ColorCLI::primaryOver(' for part repair, ').
-                ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
-                ColorCLI::primary(' total.');
+            $this->colorCli->alternateOver($this->timeHeaders.'s').
+                $this->colorCli->primaryOver(' to download articles, ').
+                $this->colorCli->alternateOver($this->timeCleaning.'s').
+                $this->colorCli->primaryOver(' to process collections, ').
+                $this->colorCli->alternateOver($this->timeInsert.'s').
+                $this->colorCli->primaryOver(' to insert binaries/parts, ').
+                $this->colorCli->alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
+                $this->colorCli->primaryOver(' for part repair, ').
+                $this->colorCli->alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
+                $this->colorCli->primary(' total.');
         }
     }
 
@@ -1086,7 +1086,7 @@ class Binaries
                 DB::commit();
             }
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
-                ColorCLI::notice('Deadlock occurred');
+                $this->colorCli->notice('Deadlock occurred');
                 DB::rollBack();
             }
         }
@@ -1094,7 +1094,7 @@ class Binaries
         $missingCount = \count($missingParts);
         if ($missingCount > 0) {
             if ($this->_echoCLI) {
-                ColorCLI::primary(
+                $this->colorCli->primary(
                         'Attempting to repair '.
                         number_format($missingCount).
                         ' parts.'
@@ -1176,7 +1176,7 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::primary(
+                $this->colorCli->primary(
                         PHP_EOL.
                         number_format($partsRepaired).
                         ' parts repaired.'
@@ -1308,7 +1308,7 @@ class Binaries
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
                 );
         }
@@ -1366,7 +1366,7 @@ class Binaries
 
         $wantedArticle = (int) $wantedArticle;
         if ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
                 );
@@ -1623,7 +1623,7 @@ class Binaries
     private function log($message, $method, $color): void
     {
         if ($this->_echoCLI) {
-            ColorCLI::$color($message.' ['.__CLASS__."::$method]");
+            $this->colorCli->$color($message.' ['.__CLASS__."::$method]");
         }
     }
 
@@ -1679,11 +1679,11 @@ class Binaries
         try {
             return DB::insert($query);
         } catch (QueryException $e) {
-            ColorCLI::debug('Query error occurred.');
+            $this->colorCli->debug('Query error occurred.');
         } catch (\PDOException $e) {
-            ColorCLI::debug('Query error occurred.');
+            $this->colorCli->debug('Query error occurred.');
         } catch (\Throwable $e) {
-            ColorCLI::debug('Query error occurred.');
+            $this->colorCli->debug('Query error occurred.');
         }
 
         return false;

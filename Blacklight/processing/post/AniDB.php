@@ -43,6 +43,11 @@ class AniDB
     private $status;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances / Echo to cli.
      * @throws \Exception
      */
@@ -57,6 +62,7 @@ class AniDB
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->pdo = DB::connection()->getPdo();
         $this->padb = new PaDb(['Echo' => $options['Echo']]);
+        $this->colorCli = new ColorCLI();
 
         $qty = (int) Settings::settingValue('..maxanidbprocessed');
         $this->aniqty = $qty ?? 100;
@@ -106,7 +112,7 @@ class AniDB
                 }
             }
         } else {
-            ColorCLI::info('No anidb releases to  process.');
+            $this->colorCli->info('No anidb releases to  process.');
         }
     }
 
@@ -226,8 +232,8 @@ class AniDB
         $cleanArr = $this->extractTitleEpisode($release->searchname);
 
         if (\is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
-            ColorCLI::header(PHP_EOL.'Looking Up: ').
-                ColorCLI::primary('   Title: '.$cleanArr['title'].PHP_EOL.
+            $this->colorCli->header(PHP_EOL.'Looking Up: ').
+                $this->colorCli->primary('   Title: '.$cleanArr['title'].PHP_EOL.
                     '   Episode: '.$cleanArr['epno']);
 
             // get anidb number for the title of the name
@@ -249,21 +255,21 @@ class AniDB
                         $type = 'Remote';
                     } else {
                         echo PHP_EOL.
-                            ColorCLI::info('This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.').
+                            $this->colorCli->info('This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.').
                             PHP_EOL;
                     }
                 }
 
                 $this->updateRelease($anidbId->anidbid, $release->id);
 
-                ColorCLI::headerOver('Matched '.$type.' AniDB ID: ').
-                    ColorCLI::primary($anidbId->anidbid).
-                    ColorCLI::alternateOver('   Title: ').
-                    ColorCLI::primary($anidbId->title).
-                    ColorCLI::alternateOver('   Episode #: ').
-                    ColorCLI::primary($cleanArr['epno']).
-                    ColorCLI::alternateOver('   Episode Title: ').
-                    ColorCLI::primary($updatedAni['episode_title']);
+                $this->colorCli->headerOver('Matched '.$type.' AniDB ID: ').
+                    $this->colorCli->primary($anidbId->anidbid).
+                    $this->colorCli->alternateOver('   Title: ').
+                    $this->colorCli->primary($anidbId->title).
+                    $this->colorCli->alternateOver('   Episode #: ').
+                    $this->colorCli->primary($cleanArr['epno']).
+                    $this->colorCli->alternateOver('   Episode Title: ').
+                    $this->colorCli->primary($updatedAni['episode_title']);
 
                 $matched = true;
             } else {

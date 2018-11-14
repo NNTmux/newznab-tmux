@@ -15,6 +15,7 @@ use App\Extensions\util\Versions;
 use App\Http\Controllers\Controller;
 use App\Transformers\ApiTransformer;
 use Illuminate\Support\Facades\Auth;
+use App\Transformers\TagsTransformer;
 use App\Transformers\DetailsTransformer;
 use App\Transformers\CategoryTransformer;
 
@@ -27,6 +28,7 @@ class ApiV2Controller extends Controller
     {
         $serverroot = url('/');
         $category = Category::getForApi();
+        $tags = Release::existingTags();
 
         $capabilities = [
             'server' => [
@@ -52,6 +54,7 @@ class ApiV2Controller extends Controller
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => fractal($category, new CategoryTransformer()),
+            'tags' => fractal($tags, new TagsTransformer()),
         ];
 
         return response()->json($capabilities);
@@ -75,6 +78,7 @@ class ApiV2Controller extends Controller
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
         $traktId = $request->has('traktid') && ! empty($request->input('traktid')) ? $request->input('traktid') : -1;
+        $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
 
         $relData = $releases->moviesSearch(
             $imdbId,
@@ -86,7 +90,8 @@ class ApiV2Controller extends Controller
             $api->categoryID(),
             $maxAge,
             $minSize,
-            $catExclusions
+            $catExclusions,
+            $tags
         );
 
         $response = [
@@ -111,6 +116,7 @@ class ApiV2Controller extends Controller
         $offset = $api->offset();
         $catExclusions = User::getCategoryExclusion($user->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
+        $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $maxAge = $api->maxAge();
         $groupName = $api->group();
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
@@ -126,7 +132,8 @@ class ApiV2Controller extends Controller
                 $maxAge,
                 $catExclusions,
                 $categoryID,
-                $minSize
+                $minSize,
+                $tags
             );
         } else {
             $relData = $releases->getBrowseRange(
@@ -138,7 +145,8 @@ class ApiV2Controller extends Controller
                 $maxAge,
                 $catExclusions,
                 $groupName,
-                $minSize
+                $minSize,
+                $tags
             );
         }
 
@@ -163,6 +171,7 @@ class ApiV2Controller extends Controller
         $releases = new Releases();
         $catExclusions = User::getCategoryExclusion($user->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
+        $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $api->verifyEmptyParameter('id');
         $api->verifyEmptyParameter('vid');
         $api->verifyEmptyParameter('tvdbid');
@@ -206,7 +215,8 @@ class ApiV2Controller extends Controller
             $api->categoryID(),
             $maxAge,
             $minSize,
-            $catExclusions
+            $catExclusions,
+            $tags
         );
 
         $response = [

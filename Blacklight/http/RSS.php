@@ -3,8 +3,11 @@
 namespace Blacklight\http;
 
 use Blacklight\NZB;
+use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
+use App\Models\UserMovie;
+use App\Models\UserSerie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -111,7 +114,7 @@ class RSS extends Capabilities
             return $result;
         }
 
-        $result = DB::select($sql);
+        $result = Release::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -147,7 +150,7 @@ class RSS extends Capabilities
 				ORDER BY postdate DESC %s",
             $this->releases->getConcatenatedCategoryIDs(),
             $this->releases->uSQL(
-                DB::select(
+                UserSerie::fromQuery(
                     sprintf(
                         '
 							SELECT videos_id, categories
@@ -173,7 +176,7 @@ class RSS extends Capabilities
             return $result;
         }
 
-        $result = DB::select($sql);
+        $result = Release::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -210,7 +213,7 @@ class RSS extends Capabilities
 				ORDER BY postdate DESC %s",
             $this->releases->getConcatenatedCategoryIDs(),
             $this->releases->uSQL(
-                DB::select(
+                UserMovie::fromQuery(
                     sprintf(
                         '
 							SELECT imdbid, categories
@@ -235,7 +238,7 @@ class RSS extends Capabilities
             return $result;
         }
 
-        $result = DB::select($sql);
+        $result = Release::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;

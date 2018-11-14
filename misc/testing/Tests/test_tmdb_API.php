@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use Blacklight\processing\tv\TMDB;
 
 $tmdb = new TMDB();
+$colorCli = new ColorCLI();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
@@ -47,11 +48,11 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
                 }
             }
         } else {
-            exit(\Blacklight\ColorCLI::error('Invalid episode data returned from TMDB API.'));
+            exit($colorCli->error('Invalid episode data returned from TMDB API.'));
         }
     } else {
-        exit(\Blacklight\ColorCLI::error('Invalid show data returned from TMDB API.'));
+        exit($colorCli->error('Invalid show data returned from TMDB API.'));
     }
 } else {
-    exit(\Blacklight\ColorCLI::error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
+    exit($colorCli->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
 }

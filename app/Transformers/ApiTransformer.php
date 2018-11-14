@@ -2,6 +2,7 @@
 
 namespace App\Transformers;
 
+use App\Models\Release;
 use App\Models\Category;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
@@ -21,11 +22,10 @@ class ApiTransformer extends TransformerAbstract
     }
 
     /**
-     * @param \stdClass $releases
-     *
+     * @param \App\Models\Release $releases
      * @return array
      */
-    public function transform(\stdClass $releases): array
+    public function transform(Release $releases): array
     {
         if (\in_array($releases->categories_id, Category::MOVIES_GROUP, false)) {
             return [
@@ -34,6 +34,7 @@ class ApiTransformer extends TransformerAbstract
                 'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category_name' => $releases->category_name,
+                'tags' => $releases->tagNames() ?? $this->null(),
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
@@ -56,6 +57,7 @@ class ApiTransformer extends TransformerAbstract
                 'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category_name' => $releases->category_name,
+                'tags' => $releases->tagNames() ?? $this->null(),
                 'added' => Carbon::parse($releases->adddate)->toRssString(),
                 'size' => $releases->size,
                 'files' => $releases->totalpart,
@@ -84,6 +86,7 @@ class ApiTransformer extends TransformerAbstract
             'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
             'category' => $releases->categories_id,
             'category_name' => $releases->category_name,
+            'tags' => $releases->tagNames() ?? $this->null(),
             'added' => Carbon::parse($releases->adddate)->toRssString(),
             'size' => $releases->size,
             'files' => $releases->totalpart,

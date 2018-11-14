@@ -87,6 +87,7 @@ foreach ($data as $dir => $files) {
 $total--;
 
 $predb = new PreDb();
+$colorCli = new ColorCLI();
 
 $progress = $predb->progress(settings_array());
 
@@ -145,7 +146,7 @@ foreach ($data as $dir => $files) {
                 $verbose = $argv[3] === true;
 
                 if ($verbose) {
-                    ColorCLI::info('Clearing import table');
+                    $colorCli->info('Clearing import table');
                 }
 
                 // Truncate to clear any old data
@@ -163,7 +164,7 @@ foreach ($data as $dir => $files) {
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
-                    ColorCLI::info('Deleting any records where title <=8 from Temporary Table');
+                    $colorCli->info('Deleting any records where title <=8 from Temporary Table');
                 }
                 $predb->executeDeleteShort();
 
@@ -173,7 +174,7 @@ foreach ($data as $dir => $files) {
                 // Fill the groups_id
                 $predb->executeUpdateGroupID();
 
-                ColorCLI::info('Inserting records from temporary table into predb table');
+                $colorCli->info('Inserting records from temporary table into predb table');
                 $predb->executeInsert();
 
                 // Delete the dump.

@@ -2,8 +2,6 @@
 
 namespace Blacklight\libraries;
 
-use Blacklight\ColorCLI;
-
 /**
  * Class ForkingImportNZB.
  *
@@ -63,12 +61,12 @@ class ForkingImportNZB extends Forking
         $this->_workCount = \count($directories);
 
         if ((int) $this->_workCount === 0) {
-            ColorCLI::error('No sub-folders were found in your specified folder ('.$folder.').');
+            $this->colorCli->error('No sub-folders were found in your specified folder ('.$folder.').');
             exit();
         }
 
         if (config('nntmux.echocli')) {
-            ColorCLI::header(
+            $this->colorCli->header(
                 'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
                 ' job(s) to do using a max of '.$maxProcesses.' child process(es).'
             );
@@ -86,7 +84,7 @@ class ForkingImportNZB extends Forking
         $this->process_work(true);
 
         if (config('nntmux.echocli')) {
-            ColorCLI::header(
+            $this->colorCli->header(
                     'Multi-processing for import finished in '.(microtime(true) - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
                 );

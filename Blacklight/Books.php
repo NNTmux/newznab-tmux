@@ -69,6 +69,11 @@ class Books
     public $failCache;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances / Echo to cli.
      *
      * @throws \Exception
@@ -82,6 +87,8 @@ class Books
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
+
+        $this->colorCli = new ColorCLI();
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
@@ -349,12 +356,12 @@ class Books
         }
 
         if (isset($response->Items->Item->ItemAttributes->Title)) {
-            ColorCLI::info('Found matching title: '.$response->Items->Item->ItemAttributes->Title);
+            $this->colorCli->info('Found matching title: '.$response->Items->Item->ItemAttributes->Title);
 
             return $response;
         }
 
-        ColorCLI::notice('Could not find a match on Amazon!');
+        $this->colorCli->notice('Could not find a match on Amazon!');
 
         return false;
     }
@@ -399,7 +406,7 @@ class Books
     {
         if ($res->count() > 0) {
             if ($this->echooutput) {
-                ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID);
+                $this->colorCli->header('Processing '.$res->count().' book release(s) for categories id '.$categoryID);
             }
 
             $bookId = -2;
@@ -417,7 +424,7 @@ class Books
 
                 if ($bookInfo !== false) {
                     if ($this->echooutput) {
-                        ColorCLI::headerOver('Looking up: ').ColorCLI::primary($bookInfo);
+                        $this->colorCli->headerOver('Looking up: ').$this->colorCli->primary($bookInfo);
                     }
 
                     // Do a local lookup first
@@ -426,7 +433,7 @@ class Books
                     if ($bookCheck === null && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::headerOver('Cached previous failure. Skipping.');
+                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
                         }
                         $bookId = -2;
                     } elseif ($bookCheck === null) {
@@ -454,7 +461,7 @@ class Books
                 }
             }
         } elseif ($this->echooutput) {
-            ColorCLI::header('No book releases to process for categories id '.$categoryID);
+            $this->colorCli->header('No book releases to process for categories id '.$categoryID);
         }
     }
 
@@ -481,7 +488,7 @@ class Books
         if ($releasetype === 'ebook') {
             if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O([ck])tober|November|De([cz])ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
                 if ($this->echooutput) {
-                    ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename);
+                    $this->colorCli->headerOver('Changing category to misc books: ').$this->colorCli->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
 
@@ -490,7 +497,7 @@ class Books
 
             if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}([abc])?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun([ e$])|Jul([ y$])|Aug( |ust|$)|Sep( |tember|$)|O([ck])t( |ober|$)|Nov( |ember|$)|De([cz])( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
                 if ($this->echooutput) {
-                    ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename);
+                    $this->colorCli->headerOver('Changing category to magazines: ').$this->colorCli->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
 
@@ -530,7 +537,7 @@ class Books
 
         $amaz = false;
         if ($bookInfo !== '') {
-            ColorCLI::info('Fetching data from Amazon for '.$bookInfo);
+            $this->colorCli->info('Fetching data from Amazon for '.$bookInfo);
 
             $amaz = $this->fetchAmazonProperties($bookInfo);
         } elseif ($amazdata !== null) {
@@ -648,20 +655,20 @@ class Books
 
         if ($bookId && $bookId !== -2) {
             if ($this->echooutput) {
-                ColorCLI::header('Added/updated book: ');
+                $this->colorCli->header('Added/updated book: ');
                 if ($book['author'] !== '') {
-                    ColorCLI::alternateOver('   Author: ').ColorCLI::primary($book['author']);
+                    $this->colorCli->alternateOver('   Author: ').$this->colorCli->primary($book['author']);
                 }
-                ColorCLI::alternateOver('   Title: ').ColorCLI::primary(' '.$book['title']);
+                $this->colorCli->alternateOver('   Title: ').$this->colorCli->primary(' '.$book['title']);
                 if ($book['genre'] !== 'null') {
-                    ColorCLI::alternateOver('   Genre: ').ColorCLI::primary(' '.$book['genre']);
+                    $this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary(' '.$book['genre']);
                 }
             }
 
             $book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
         } elseif ($this->echooutput) {
-            ColorCLI::header('Nothing to update: ').
-                ColorCLI::header($book['author'].
+            $this->colorCli->header('Nothing to update: ').
+                $this->colorCli->header($book['author'].
                     ' - '.
                     $book['title']);
         }

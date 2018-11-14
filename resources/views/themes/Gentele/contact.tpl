@@ -53,7 +53,7 @@
 													<label for="comment" class="h6">Message</label>
 													<textarea rows="7" name="comment" id="comment"
 															  class="form-control form-white"></textarea>
-													{if {env('NOCAPTCHA_ENABLED')} == 1 && !empty({env('NOCAPTCHA_SITEKEY')}) && !empty({env('NOCAPTCHA_SECRET')})}
+													{if {config('captcha.enabled')} == 1 && !empty({config('captcha.sitekey')}) && !empty({config('captcha.secret')})}
 														{NoCaptcha::display()}{NoCaptcha::renderJs()}
 													{/if}
 													<button type="submit" class="btn btn-primary m-t-20">

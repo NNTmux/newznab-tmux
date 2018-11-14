@@ -9,18 +9,19 @@ use Blacklight\Binaries;
 use Blacklight\ColorCLI;
 
 $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
+$colorCli = new ColorCLI();
 
 // Create the connection here and pass
 $nntp = new NNTP();
 if ($nntp->doConnect() !== true) {
-    ColorCLI::error('Unable to connect to usenet.');
+    $colorCli->error('Unable to connect to usenet.');
     exit();
 }
 $binaries = new Binaries(['NNTP' => $nntp]);
 
 if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $groupName = $argv[1];
-    ColorCLI::header("Updating group: $groupName");
+    $colorCli->header("Updating group: $groupName");
 
     $group = Group::getByName($groupName);
     if (is_array($group)) {

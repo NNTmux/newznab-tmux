@@ -7,114 +7,155 @@ use League\CLImate\CLImate;
 class ColorCLI
 {
     /**
-     * @return \League\CLImate\CLImate
+     * @var \League\CLImate\CLImate
      */
-    protected static function climate()
+    protected $climate;
+
+    /**
+     * ColorCLI constructor.
+     */
+    public function __construct()
     {
-        return new CLImate();
+        $this->climate = new CLImate();
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function debug($str): void
+    public function debug(string $str, bool $newline = false): void
     {
-        self::climate()->lightGray()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->lightGray()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function info($str): void
+    public function info(string $str, bool $newline = false): void
     {
-        self::climate()->magenta()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->magenta()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function notice($str): void
+    public function notice(string $str, bool $newline = false): void
     {
-        self::climate()->blue()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->blue()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function warning($str): void
+    public function warning(string $str, bool $newline = false): void
     {
-        self::climate()->yellow()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->yellow()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function error($str): void
+    public function error(string $str, bool $newline = false): void
     {
-        self::climate()->red()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->red()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function primary($str): void
+    public function primary(string $str, bool $newline = false): void
     {
-        self::climate()->green()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->green()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function header($str): void
+    public function header(string $str, bool $newline = false): void
     {
-        self::climate()->yellow()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->yellow()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function alternate($str): void
+    public function alternate(string $str, bool $newline = false): void
     {
-        self::climate()->magenta()->bold()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->magenta()->bold()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool   $newline
      */
-    public static function tmuxOrange($str): void
+    public function tmuxOrange(string $str, bool $newline = false): void
     {
-        self::climate()->yellow()->bold()->out($str);
+        if ($newline) {
+            $this->climate->br();
+        }
+        $this->climate->yellow()->bold()->out($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
      */
-    public static function primaryOver($str): void
+    public function primaryOver(string $str): void
     {
-        self::climate()->green()->inline($str);
+        $this->climate->green()->inline($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
      */
-    public static function headerOver($str): void
+    public function headerOver(string $str): void
     {
-        self::climate()->yellow()->inline($str);
+        $this->climate->yellow()->inline($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
      */
-    public static function alternateOver($str): void
+    public function alternateOver(string $str): void
     {
-        self::climate()->magenta()->bold()->inline($str);
+        $this->climate->magenta()->bold()->inline($str);
     }
 
     /**
-     * @param $str
+     * @param string $str
      */
-    public static function warningOver($str): void
+    public function warningOver(string $str): void
     {
-        self::climate()->red()->inline($str);
+        $this->climate->red()->inline($str);
     }
 }

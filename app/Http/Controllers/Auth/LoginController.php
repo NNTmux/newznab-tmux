@@ -7,6 +7,7 @@ use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -43,49 +44,55 @@ class LoginController extends Controller
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @return $this|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
-        $this->validate($request, [
-            'username'    => 'required',
-            'password' => 'required',
+        $validator = Validator::make($request->all(), [
+            'username' => ['required'],
+            'password' => ['required'],
         ]);
 
-        $error = '';
         $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $request->merge([
             $login_type => $request->input('username'),
         ]);
-        $user = User::getByUsername($request->input('username'));
-        if ($user === null) {
-            $user = User::getByEmail($request->input('username'));
+        if ($validator->passes()) {
+            $user = User::getByUsername($request->input('username'));
+            if ($user === null) {
+                $user = User::getByEmail($request->input('username'));
+            }
+
+            if ($user !== null && ((config('firewall.enabled') === true && \Firewall::isBlacklisted($user->host) === false) || config('firewall.enabled') === false)) {
+                if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
+                    $this->validate($request, [
+                        'g-recaptcha-response' => ['required', 'captcha'],
+                    ]);
+                }
+
+                $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
+
+                if ($user->isVerified() === false || $user->isPendingVerification()) {
+                    return $this->showLoginForm('You have not verified your email address!');
+                }
+
+                if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
+                    User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+
+                    return redirect()->intended($this->redirectPath());
+                }
+
+                $error = 'Username/email and password combination used does not match our records!';
+            } else {
+                $error = 'Username or email used do not match our records!';
+            }
+
+            return $this->showLoginForm($error);
         }
 
-        if ($user !== null && ((env('FIREWALL_ENABLED') === true && \Firewall::isBlacklisted($user->host) === false) || env('FIREWALL_ENABLED') === false)) {
-            if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
-                $this->validate($request, [
-                    'g-recaptcha-response' => 'required|captcha',
-                ]);
-            }
-
-            $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
-
-            if ($user->isVerified() === false || $user->isPendingVerification()) {
-                return $this->showLoginForm('You have not verified your email address!');
-            }
-
-            if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
-
-                return redirect()->intended($this->redirectPath());
-            }
-
-            $error = 'Username/email and password combination used does not match our records!';
-        } else {
-            $error = 'Username or email used do not match our records!';
-        }
+        $error = implode('', array_collapse($validator->errors()->toArray()));
 
         return $this->showLoginForm($error);
     }

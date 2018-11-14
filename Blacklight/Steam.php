@@ -31,6 +31,11 @@ class Steam
     protected $steamFront;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Steam constructor.
      *
      * @param array $options
@@ -47,6 +52,8 @@ class Steam
                 'local_lang'   => 'english',
             ]
         );
+
+        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -78,7 +85,7 @@ class Steam
         }
 
         if ($res === false) {
-            ColorCLI::notice('Steam did not return game data');
+            $this->colorCli->notice('Steam did not return game data');
         }
 
         return false;
@@ -97,7 +104,7 @@ class Steam
         $bestMatch = false;
 
         if (empty($searchTerm)) {
-            ColorCLI::notice('Search term cannot be empty');
+            $this->colorCli->notice('Search term cannot be empty');
 
             return $bestMatch;
         }
@@ -128,7 +135,7 @@ class Steam
             }
         }
         if ($bestMatch === false) {
-            ColorCLI::notice('Steam search returned no valid results');
+            $this->colorCli->notice('Steam search returned no valid results');
         }
 
         return $bestMatch;
@@ -148,7 +155,7 @@ class Steam
             $this->setLastUpdated();
             $fullAppArray = $this->steamFront->getFullAppList();
             $inserted = $dupe = 0;
-            ColorCLI::info('Populating steam apps table').PHP_EOL;
+            $this->colorCli->info('Populating steam apps table');
             foreach ($fullAppArray as $appsArray) {
                 foreach ($appsArray as $appArray) {
                     foreach ($appArray as $app) {

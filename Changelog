@@ -1,4 +1,120 @@
+2018-11-14 DariusIII
+	* Chg: Update PNotify and fix notifications
+2018-11-13 DariusIII
+	* Chg: Update assets
+	* Chg: Use User model for email queue where possible
+	* Chg: Update assets
+	* Chg: Update nesbot/carbon to version 1.34.4
+	* Chg: Use laravel queue for sending emails
+	* Chg: Update basepage template and remove duplicated meta tags
+	* Chg: Update nesbot/carbon to latest version
+	* Chg: Remove unnecesarry code from login template
+2018-11-12 DariusIII
+	* Chg: Update Release model
+	* Chg: Update ConsoleInfo, User and UserDownload models
+2018-11-10 DariusIII
+	* Fix: Fix links to anime and series pages
+	* Chg: Add missing green@2x.png
+	* Chg: Remove unused css and js from resources/assets folder
+	* Fix: Fix TV series page
+	* Chg: Update webpack.mix.js and properly generate files
+2018-11-09 DariusIII
+	* Chg: Update js and css files and ther folders
+2018-11-08 DariusIII
+	* Chg: Use combined css and js files
+	* Chg: Remove fxp/composer-asset
+	* Chg: Remove last of bower assets and add them to npm and laravel-mix asset management
+	* Chg: First batch of changes to use npm and laravel-mix for asset management
+	* Chg: Update helpres makeFieldLinks function to properly create links, update Movie class and MovieController
+	* Chg: Update API v2 capabilities ouput by adding category tags used on site
+	* Chg: Update barryvdh/reflection-docblock to version 2.0.5 and spatie/laravel-permission to version 2.25.0
+2018-11-07 DariusIII
+	* Chg: Update LoginController to use confgig and not env file settings
+	* Chg: Update barryvdh/laravel-ide-helper to latest version
+	* Chg: Update PHPDOC block for uSQL function
+	* Chg: Update laravel/framework to version 5.7.13
+	* Chg: Update RSS class queries, use Model to retrieve results
+	* Fix: Fix error with tv episode data retrieval on API and RSS
+	* Chg: Update Capabilities class output function PHPDOC block
+	* Chg: Update spatie/laravel-permission to version 2.24.0
+2018-11-06 DariusIII
+	* Fix: Fix errors related to model/collection change
+	* Chg: Add option for admins to edit release tags on edit release admin page
+	* Chg: Add support for tags in browse, APIv2 and on site release searches
+	* Chg: Add script to misct/run_me_once to tag all the releases
+2018-11-05 DariusIII
+	* Chg: Update ApiController data to return arrays for output
+	* Fix: Enable code that was commented for testing
+	* Chg: Update Releases class, use Release Model to retrieve data and add tags to API v2 output
+	* Chg: Remove web.php fallback route and page
+	* Chg: Add config/captcha.php and use it in place of direct env file call
+	* Chg: Update monolog/monolog to version 1.24.0
+	* Chg: Update ProcessReleases class release tagging
+2018-11-04 DariusIII
+	* Chg: Update nzb details page
+	* Chg: Update tags display in API v2 details display.
+	* Chg: Remove tags from queries for now
+2018-11-03 DariusIII
+	* Chg: Update Registration and Login controllers
+	* Chg: Update symfony components
+2018-11-02 DariusIII
+	* Chg: Update removeCrapReleases message in TmuxRun class
+	* Chg: Update check for actual/artificial parts in NZB class
+	* Chg: Update NZB class to use DB facade
+	* Chg: Update font-awesome to version 5.5.0
+	* Chg: Update details page to show release category tags
+	* Chg: Update DetailsTransformer to include release tags
+	* Chg: Update Releases class queries to include tags, update ApiTransformer to use them
+	* Chg: Add category tag constants and use them in categorization
+	* Chg: Update ouput messages formatting for TV processing
+	* Chg: Update ReleaseRemover messages output
+	* Chg: Update output messages of ProcessReleases class
+	* Chg: Catch exception on release tagging
+	* Chg: Update nunomaduro/larastan to version 0.3.7
+2018-11-01 DariusIII
+	* Chg: Update tagging on new release addition
+	* Fix: Fix tag assignement in Categorize class
+	* Chg: Update used libraries (mostly composer)
+	* Chg: Update NameFixer updateRelease function
+	* Chg: Add first wave of Release tagging capabilities
+2018-10-31 DariusIII
+	* Chg: Update NameFixer updateRelease function to use already provided release to update and skip doing unnecessary queries
+	* Chg: Update symfony components to their latest versions
+	* CHg: Update output message in Movie class doMovieUpdate function
+	* Chg: Update tinymce to version 4.8.5
+	* Fix: Move x265 TV and Movie categorization up the ladder
+	* Chg: Update isMovieX265 function regex
+	* Chg: Update Category model getCategorySearch function
+	* Chg: Add x265 Movies and TV categories
+	* Fix: Fix query in reset_postprocessing script related to misc categories reset
+	* Chg: Update Forking class - remove pdo
+	* Chg: Increase group_concat_max_len in groupfixrelnames script
+	* Chg: Refactor ColorCLI class
+	* Chg: Update nunomaduro/larastan to version 0.3.7
+2018-10-30 DariusIII
+	* Chg: Update laravel/framework to version 5.7.12
+	* Chg: Update Music class
+	* Chg: Add fallback routes to web and api
+	* Chg: Update messages output in ProcessReleases
+	* Chg: Update ColorCLI output, remove added newline string (\n)
+	* Chg: Update phpunit/php-token-stream to version 3.0.1
+2018-10-29 DariusIII
+	* Chg: Update Backfill class
+	* Chg: Dissallow disposable emails for new users
+	* Chg: Update scripts used, remove unused ones, remove support for IE8 and IE9
+	* Chg: Remove unused scripts from basepage and baseadminpage and from related assets folder
+	* Chg: Use mediainfo data properly
+	* Fix: Replace isset with null check in _getAudioInfo mediainfo lookup
+	* Fix: Fix mediainfo data check
+2018-10-28 DariusIII
+	* Chg: Update _getAudioInfo function to use mhor/php-mediainfo
+	* Chg: Update PPA class
+2018-10-27 DariusIII
+	* Chg: Remove unused showFloodWarning function
+	* Chg: Simplify ClearanceMiddleware checks
 2018-10-26 DariusIII
+	* Chg: Move patches from mysql to patches folder as we only support mysql so no need for one more folder
+	* Chg: Remove mysql-schema.sql as it is not used anymore
 	* Chg: Update font-awesome to version 5.4.2
 	* Chg: Catch InvalidArgumentException when opening corrupt video/audio file for processing
 2018-10-25 DariusIII

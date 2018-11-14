@@ -56,7 +56,10 @@ class ConsoleInfo extends Model
      */
     protected $guarded = [];
 
-    public function searchableAs()
+    /**
+     * @return string
+     */
+    public function searchableAs(): string
     {
         return 'ix_consoleinfo_title_platform_ft';
     }
@@ -64,7 +67,7 @@ class ConsoleInfo extends Model
     /**
      * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'title'=> $this->title,

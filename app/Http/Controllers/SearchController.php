@@ -65,6 +65,11 @@ class SearchController extends BasePageController
                 );
             }
 
+            $tags = [];
+            if ($request->has('tags')) {
+                $tags = explode(',', $request->input('tags'));
+            }
+
             $rslt = $releases->search(
                 $searchString,
                 -1,
@@ -83,7 +88,9 @@ class SearchController extends BasePageController
                 -1,
                 $this->userdata['categoryexclusions'],
                 'basic',
-                $categoryID
+                $categoryID,
+                0,
+                $tags
             );
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());

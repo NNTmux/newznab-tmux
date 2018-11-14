@@ -154,7 +154,7 @@ class DetailsController extends BasePageController
             $this->smarty->assign('predb', $pre);
             $this->smarty->assign('comments', $comments);
             $this->smarty->assign('searchname', getSimilarName($data['searchname']));
-            $this->smarty->assign('similars', $similars);
+            $this->smarty->assign('similars', $similars !== false ? $similars : '');
             $this->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
             $this->smarty->assign('failed', $failed);
             $this->smarty->assign('cpapi', $cpapi);

@@ -21,7 +21,7 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
  */
 class Music
 {
-    protected const MATCH_PERCENT = 60;
+    protected const MATCH_PERCENT = 85;
 
     /**
      * @var bool
@@ -70,6 +70,11 @@ class Music
     public $failCache;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Class instances/ echo to CLI.
      * @throws \Exception
      */
@@ -83,13 +88,15 @@ class Music
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
+        $this->colorCli = new ColorCLI();
+
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
         $this->musicqty = Settings::settingValue('..maxmusicprocessed') !== '' ? (int) Settings::settingValue('..maxmusicprocessed') : 150;
         $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'music'.DS;
-        $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2;
+        $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
     }
@@ -133,13 +140,13 @@ class Music
      * @param       $cat
      * @param       $start
      * @param       $num
-     * @param       $orderby
-     * @param array $excludedcats
+     * @param       $orderBy
+     * @param array $excludedCats
      *
      * @return array
      * @throws \Exception
      */
-    public function getMusicRange($page, $cat, $start, $num, $orderby, array $excludedcats = [])
+    public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = [])
     {
         $browseby = $this->getBrowseBy();
         $catsrch = '';
@@ -147,10 +154,10 @@ class Music
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
-        if (\count($excludedcats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+        if (\count($excludedCats) > 0) {
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
-        $order = $this->getMusicOrder($orderby);
+        $order = $this->getMusicOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $musicSql =
             sprintf(
@@ -228,13 +235,13 @@ class Music
     }
 
     /**
-     * @param $orderby
+     * @param $orderBy
      *
      * @return array
      */
-    public function getMusicOrder($orderby): array
+    public function getMusicOrder($orderBy): array
     {
-        $order = ($orderby === '') ? 'r.postdate' : $orderby;
+        $order = ($orderBy === '') ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'artist':
@@ -434,8 +441,7 @@ class Music
             // Had issues getting this out of the browsenodes obj.
             // Workaround is to get the xml and load that into its own obj.
             $amazGenresXml = $amaz->BrowseNodes->asXml();
-            $amazGenresObj = simplexml_load_string($amazGenresXml);
-            $amazGenres = $amazGenresObj->xpath('//BrowseNodeId');
+            $amazGenres = simplexml_load_string($amazGenresXml)->xpath('//BrowseNodeId');
 
             foreach ($amazGenres as $amazGenre) {
                 $currNode = trim($amazGenre[0]);
@@ -499,13 +505,14 @@ class Music
 
         if ($musicId) {
             if ($this->echooutput) {
-                ColorCLI::header(PHP_EOL.'Added/updated album: ').
-                    ColorCLI::alternateOver('   Artist: ').
-                    ColorCLI::primary($mus['artist']).
-                    ColorCLI::alternateOver('   Title:  ').
-                    ColorCLI::primary($mus['title']).
-                    ColorCLI::alternateOver('   Year:   ').
-                    ColorCLI::primary($mus['year']);
+                $this->colorCli->header(PHP_EOL.'Added/updated album: '.
+                    '   Artist: '.
+                    $mus['artist'].
+                    '   Title:  '.
+                    $mus['title'].
+                    '   Year:   '.
+                    $mus['year']
+                );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
         } else {
@@ -516,14 +523,13 @@ class Music
                     $artist = 'Artist: '.$mus['artist'].', Album: ';
                 }
 
-                ColorCLI::headerOver('Nothing to update: ').
-                    ColorCLI::primaryOver(
+                $this->colorCli->headerOver('Nothing to update: '.
                         $artist.
                         $mus['title'].
                         ' ('.
                         $mus['year'].
                         ')'
-                    );
+                );
             }
         }
 
@@ -626,25 +632,33 @@ class Music
      */
     public function processMusicReleases($local = false)
     {
-        $res = Release::query()->where(['musicinfo_id' => null, 'nzbstatus' => NZB::NZB_ADDED])->when($this->renamed === true, function ($query) {
-            return $query->where('isrenamed', '=', 1);
-        })->whereIn('categories_id', [Category::MUSIC_MP3, Category::MUSIC_LOSSLESS, Category::MUSIC_OTHER])->orderBy('postdate', 'DESC')->limit($this->musicqty)->get(['searchname', 'id']);
-        if ($res instanceof \Traversable && ! empty($res)) {
-            if ($this->echooutput) {
-                ColorCLI::header(
-                        'Processing '.$res->count().' music release(s).'
-                    );
-            }
+        $res = DB::select(sprintf('
+					SELECT searchname, id
+					FROM releases
+					WHERE musicinfo_id IS NULL
+					AND nzbstatus = %d %s
+					AND categories_id IN (%s, %s, %s)
+					ORDER BY postdate DESC
+					LIMIT %d',
+            NZB::NZB_ADDED,
+            $this->renamed,
+            Category::MUSIC_MP3,
+            Category::MUSIC_LOSSLESS,
+            Category::MUSIC_OTHER,
+            $this->musicqty
+        )
+        );
 
+        if (! empty($res)) {
             foreach ($res as $arr) {
-                $startTime = microtime(true);
+                $startTime = now();
                 $usedAmazon = false;
-                $album = $this->parseArtist($arr['searchname']);
+                $album = $this->parseArtist($arr->searchname);
                 if ($album !== false) {
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        ColorCLI::headerOver('Looking up: ').ColorCLI::primary($newname);
+                        $this->colorCli->headerOver('Looking up: '.$newname);
                     }
 
                     // Do a local lookup first
@@ -653,7 +667,7 @@ class Music
                     if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::headerOver('Cached previous failure. Skipping.');
+                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
                         }
                         $albumId = -2;
                     } elseif ($musicCheck === null && $local === false) {
@@ -666,25 +680,26 @@ class Music
                     } else {
                         $albumId = $musicCheck['id'];
                     }
-                    Release::query()->where('id', $arr['id'])->update(['musicinfo_id' => $albumId]);
+                    Release::query()->where('id', $arr->id)->update(['musicinfo_id' => $albumId]);
                 } // No album found.
                 else {
-                    Release::query()->where('id', $arr['id'])->update(['musicinfo_id' => -2]);
+                    Release::query()->where('id', $arr->id)->update(['musicinfo_id' => -2]);
                     echo '.';
                 }
 
                 // Sleep to not flood amazon.
-                $diff = floor((microtime(true) - $startTime) * 1000000);
-                if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
-                    usleep($this->sleeptime * 1000 - $diff);
+                $sleeptime = $this->sleeptime / 1000;
+                $diff = now()->diffInSeconds($startTime);
+                if ($sleeptime - $diff > 0 && $usedAmazon === true) {
+                    sleep($sleeptime - $diff);
                 }
             }
 
             if ($this->echooutput) {
-                echo "\n";
+                echo PHP_EOL;
             }
         } elseif ($this->echooutput) {
-            ColorCLI::header('No music releases to process.');
+            $this->colorCli->header('No music releases to process.');
         }
     }
 
@@ -699,12 +714,12 @@ class Music
             $result = [];
             $result['year'] = $name[3];
 
-            $a = preg_replace('/( |-)(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\dCD|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $name[1]);
-            $b = preg_replace('/( |-)([a-z]+[\d]+[a-z]+[\d]+.+|[a-z]{2,}[\d]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX)( |-)\d.+)/i', ' ', $a);
-            $c = preg_replace('/( |-)(\d{1,2} \d{1,2} )?([A-Z])( ?$)|\(?[\d]{8,}\)?|( |-)(CABLE|FREEWEB|LINE|MAG|MCD|YMRSMILES)|\(([a-z]{2,}[\d]{2,}|ost)\)|-web-/i', ' ', $b);
-            $d = preg_replace('/VA( |-)/', 'Various Artists ', $c);
-            $e = preg_replace('/( |-)(\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS)( |-)/i', ' ', $d);
-            $f = preg_replace('/( |-)(\d{1,2} \d{1,2} )?(CABLE|CD(A|EP|M|R|S)?|QEDCD|SAT|SBD)( |-)/i', ' ', $e);
+            $a = preg_replace('/([ |-])(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\dCD|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $name[1]);
+            $b = preg_replace('/([ |-])([a-z]+[\d]+[a-z]+[\d]+.+|[a-z]{2,}[\d]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX)([ |-])\d.+)/i', ' ', $a);
+            $c = preg_replace('/([ |-])(\d{1,2} \d{1,2} )?([A-Z])( ?$)|\(?[\d]{8,}\)?|([ |-])(CABLE|FREEWEB|LINE|MAG|MCD|YMRSMILES)|\(([a-z]{2,}[\d]{2,}|ost)\)|-web-/i', ' ', $b);
+            $d = preg_replace('/VA([ |-])/', 'Various Artists ', $c);
+            $e = preg_replace('/([ |-])(\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS)([ |-])/i', ' ', $d);
+            $f = preg_replace('/([ |-])(\d{1,2} \d{1,2} )?(CABLE|CD(A|EP|M|R|S)?|QEDCD|SAT|SBD)([ |-])/i', ' ', $e);
             $g = str_replace(['_', '-'], ' ', $f);
             $h = trim(preg_replace('/\s\s+/', ' ', $g));
             $newname = trim(preg_replace('/ [a-z]{2}$| [a-z]{3} \d{2,}$|\d{5,} \d{5,}$|-WEB$/i', '', $h));

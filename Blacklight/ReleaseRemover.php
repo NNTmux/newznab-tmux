@@ -98,6 +98,11 @@ class ReleaseRemover
     private $releaseImage;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Construct.
      *
      * @param array $options Class instances / various options.
@@ -120,6 +125,7 @@ class ReleaseRemover
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => null]));
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->colorCli = new ColorCLI();
 
         $this->query = '';
         $this->error = '';
@@ -177,8 +183,8 @@ class ReleaseRemover
         $this->deleteReleases();
 
         if ($this->echoCLI) {
-            ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
+            $this->colorCli->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            $this->colorCli->header(now()->diffInSeconds($timeStart).' seconds', true);
         }
 
         return $this->browser
@@ -219,7 +225,7 @@ class ReleaseRemover
 
         if ($time === 'full') {
             if ($this->echoCLI) {
-                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.\n');
+                $this->colorCli->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' - no time limit.', true);
             }
         } else {
             if (! is_numeric($time)) {
@@ -228,7 +234,7 @@ class ReleaseRemover
                 return $this->returnError();
             }
             if ($this->echoCLI) {
-                ColorCLI::header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).\n');
+                $this->colorCli->header('Removing '.($type === '' ? 'All crap releases ' : $type.' crap releases').' from the past '.$time.' hour(s).', true);
             }
             $this->crapTime = ' AND r.adddate > (NOW() - INTERVAL '.$time.' HOUR)';
         }
@@ -306,8 +312,8 @@ class ReleaseRemover
         }
 
         if ($this->echoCLI) {
-            ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            ColorCLI::header(now()->diffInSeconds($timeStart).' seconds');
+            $this->colorCli->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            $this->colorCli->header(now()->diffInSeconds($timeStart).' seconds', true);
         }
 
         return $this->browser
@@ -776,15 +782,15 @@ class ReleaseRemover
                 }
 
                 // Provide useful output of operations
-                ColorCLI::header(
+                $this->colorCli->header(
                     sprintf(
-                    "Finding crap releases for %s: Using %s method against release %s.\n".
+                    'Finding crap releases for %s: Using %s method against release %s.'.
                         '%s',
                     $this->method,
                     $blType,
                     $opTypeName,
                     $ftUsing
-                    )
+                    ), true
                 );
 
                 if ($opTypeName === 'Subject') {
@@ -809,7 +815,7 @@ class ReleaseRemover
                 $this->deleteReleases();
             }
         } else {
-            ColorCLI::error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
+            $this->colorCli->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
         }
 
         return true;
@@ -878,14 +884,14 @@ class ReleaseRemover
                 $ftUsing = PHP_EOL;
 
                 // Provide useful output of operations
-                ColorCLI::header(
+                $this->colorCli->header(
                     sprintf(
                     'Finding crap releases for %s: Using %s method against release filenames.'.PHP_EOL.
                         '%s',
                     $this->method,
                     $blType,
                     $ftUsing
-                    )
+                    ), true
                 );
 
                 $this->query = sprintf(
@@ -1005,10 +1011,10 @@ class ReleaseRemover
             if ($this->delete) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
-                    ColorCLI::primary('Deleting: '.$this->method.': '.$release->searchname);
+                    $this->colorCli->primary('Deleting: '.$this->method.': '.$release->searchname, true);
                 }
             } elseif ($this->echoCLI) {
-                ColorCLI::primary('Would be deleting: '.$this->method.': '.$release->searchname);
+                $this->colorCli->primary('Would be deleting: '.$this->method.': '.$release->searchname, true);
             }
             $deletedCount++;
         }
@@ -1225,16 +1231,16 @@ class ReleaseRemover
         }
 
         // Print the query to the user, ask them if they want to continue using it.
-        ColorCLI::primary(
+        $this->colorCli->primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
-            'If you are satisfied, type yes and press enter. Anything else will exit.'
+            'If you are satisfied, type yes and press enter. Anything else will exit.', true
         );
 
         // Check the users response.
         $userInput = trim(fgets(fopen('php://stdin', 'rtb')));
         if ($userInput !== 'yes') {
-            ColorCLI::primary('You typed: "'.$userInput.'", the program will exit.');
+            $this->colorCli->primary('You typed: "'.$userInput.'", the program will exit.', true);
 
             return false;
         }
@@ -1285,7 +1291,7 @@ class ReleaseRemover
         }
 
         if ($this->echoCLI && $this->error !== '') {
-            ColorCLI::error($this->error);
+            $this->colorCli->error($this->error, true);
         }
 
         return false;

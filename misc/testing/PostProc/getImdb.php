@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $movie = new Movie(['Echo' => true]);
+$colorCli = new ColorCLI();
 
 $movies = $pdo->query('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC');
 if ($movies instanceof \Traversable) {
     $count = $movies->rowCount();
     if ($count > 0) {
-        ColorCLI::header('Updating movie info for '.number_format($count).' movies.');
+        $colorCli->header('Updating movie info for '.number_format($count).' movies.');
 
         foreach ($movies as $mov) {
             $startTime = microtime(true);
@@ -28,6 +29,6 @@ if ($movies instanceof \Traversable) {
             }
         }
     } else {
-        ColorCLI::header('No movies to update');
+        $colorCli->header('No movies to update');
     }
 }

@@ -15,6 +15,7 @@ use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 
 $namefixer = new NameFixer();
+$colorCli = new ColorCLI();
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $update = $argv[2] === 'true';
@@ -32,7 +33,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     if ($argv[1] === 7 || $argv[1] === 8) {
         $nntp = new NNTP();
         if ((Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-            ColorCLI::error('Unable to connect to usenet.'.PHP_EOL);
+            $colorCli->error('Unable to connect to usenet.');
 
             return;
         }
@@ -94,12 +95,12 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             $namefixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
             break;
         default:
-            ColorCLI::error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.');
+            $colorCli->error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.');
             exit();
             break;
     }
 } else {
-    ColorCLI::error(PHP_EOL.'You must supply 4 arguments.'.PHP_EOL
+    $colorCli->error(PHP_EOL.'You must supply 4 arguments.'.PHP_EOL
             .'The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.'.PHP_EOL
             .'The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.'.PHP_EOL
             .'The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.'.PHP_EOL

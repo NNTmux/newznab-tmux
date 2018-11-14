@@ -53,23 +53,26 @@ class Releases
     }
 
     /**
-     * Used for browse results.
+     * Used for Browse results.
      *
-     * @param              $page
-     * @param array        $cat
-     * @param              $start
-     * @param              $num
-     * @param string|array $orderBy
-     * @param int          $maxAge
-     * @param array        $excludedCats
-     * @param string|int   $groupName
-     * @param int          $minSize
      *
-     * @return array
+     * @param       $page
+     * @param       $cat
+     * @param       $start
+     * @param       $num
+     * @param       $orderBy
+     * @param int   $maxAge
+     * @param array $excludedCats
+     * @param array $tags
+     * @param int   $groupName
+     * @param int   $minSize
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): array
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0, array $tags = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
+
         $qry = sprintf(
             "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
@@ -84,9 +87,10 @@ class Releases
 				SELECT r.*, g.name AS group_name
 				FROM releases r
 				LEFT JOIN groups g ON g.id = r.groups_id
+				%s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
-				%s %s %s %s %s
+				%s %s %s %s %s %s
 				ORDER BY %s %s %s
 			) r
 			LEFT JOIN categories c ON c.id = r.categories_id
@@ -97,9 +101,11 @@ class Releases
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			GROUP BY r.id
-			ORDER BY %8\$s %9\$s",
+			ORDER BY %10\$s %11\$s",
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
@@ -109,13 +115,14 @@ class Releases
             $orderBy[1],
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
+
         $releases = Cache::get(md5($qry.$page));
         if ($releases !== null) {
             return $releases;
         }
-        $sql = DB::select($qry);
+        $sql = Release::fromQuery($qry);
         if (\count($sql) > 0) {
-            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
+            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName, $tags);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -127,26 +134,31 @@ class Releases
     /**
      * Used for pager on browse page.
      *
-     * @param array  $cat
-     * @param int    $maxAge
-     * @param array  $excludedCats
+     * @param array      $cat
+     * @param int        $maxAge
+     * @param array      $excludedCats
      * @param string|int $groupName
+     *
+     * @param array      $tags
      *
      * @return int
      */
-    public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = ''): int
+    public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = '', array $tags = []): int
     {
         $sql = sprintf(
             'SELECT COUNT(r.id) AS count
 				FROM releases r
-				%s
+				%s %s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
-				%s %s %s %s',
+				%s
+				%s %s %s %s ',
             ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
+            ! empty($tags) ? ' AND tt.tag_name IN ('.escapeString(implode(',', $tags)).')' : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
@@ -155,7 +167,7 @@ class Releases
         if ($count !== null) {
             return $count;
         }
-        $count = DB::select($sql);
+        $count = Release::fromQuery($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
@@ -366,18 +378,18 @@ class Releases
     }
 
     /**
-     * Get TV for my shows page.
+     * Get TV for My Shows page.
      *
-     * @param          $userShows
-     * @param int|bool $offset
-     * @param int      $limit
-     * @param string|array   $orderBy
-     * @param int      $maxAge
-     * @param array    $excludedCats
      *
-     * @return array
+     * @param $userShows
+     * @param $offset
+     * @param $limit
+     * @param $orderBy
+     * @param int $maxAge
+     * @param array $excludedCats
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = []): array
+    public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
@@ -422,7 +434,7 @@ class Releases
             return $result;
         }
 
-        $result = DB::select($sql);
+        $result = Release::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -533,7 +545,7 @@ class Releases
     /**
      * Creates part of a query for some functions.
      *
-     * @param array  $userQuery
+     * @param array|\Illuminate\Database\Eloquent\Collection  $userQuery
      * @param string $type
      *
      * @return string
@@ -561,29 +573,31 @@ class Releases
     /**
      * Function for searching on the site (by subject, searchname or advanced).
      *
-     * @param string|int $searchName
-     * @param string|int $usenetName
-     * @param string|int $posterName
-     * @param string|int $fileName
-     * @param string|int $groupName
-     * @param int $sizeFrom
-     * @param int $sizeTo
-     * @param int $hasNfo
-     * @param int $hasComments
-     * @param int $daysNew
-     * @param int $daysOld
-     * @param int $offset
-     * @param int $limit
-     * @param string|array $orderBy
-     * @param int $maxAge
-     * @param int|array $excludedCats
-     * @param string $type
-     * @param array $cat
      *
-     * @param int $minSize
-     * @return array
+     * @param              $searchName
+     * @param              $usenetName
+     * @param              $posterName
+     * @param              $fileName
+     * @param              $groupName
+     * @param              $sizeFrom
+     * @param              $sizeTo
+     * @param              $hasNfo
+     * @param              $hasComments
+     * @param              $daysNew
+     * @param              $daysOld
+     * @param int          $offset
+     * @param int          $limit
+     * @param string|array $orderBy
+     * @param int          $maxAge
+     * @param array        $excludedCats
+     * @param string       $type
+     * @param array        $cat
+     * @param int          $minSize
+     * @param array        $tags
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0): array
+    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
         $sizeRange = [
             1 => 1,
@@ -625,10 +639,11 @@ class Releases
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
-            '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s',
+            '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s %s',
             $this->releaseSearch->getFullTextJoinString(),
             $this->showPasswords(),
             NZB::NZB_ADDED,
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(string) (104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
@@ -662,8 +677,9 @@ class Releases
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			%s",
+			%s %s",
             $this->getConcatenatedCategoryIDs(),
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -682,7 +698,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = DB::select($sql);
+        $releases = Release::fromQuery($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -695,19 +711,20 @@ class Releases
     /**
      * Search function for API.
      *
-     * @param string|int $searchName
-     * @param string|int $groupName
-     * @param int        $offset
-     * @param int        $limit
-     * @param int        $maxAge
-     * @param int|array  $excludedCats
-     * @param array      $cat
      *
-     * @param int        $minSize
+     * @param       $searchName
+     * @param       $groupName
+     * @param int   $offset
+     * @param int   $limit
+     * @param int   $maxAge
+     * @param array $excludedCats
+     * @param array $cat
+     * @param int   $minSize
+     * @param array $tags
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0): array
+    public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
     {
         $searchOptions = [];
         if ($searchName !== -1) {
@@ -717,10 +734,11 @@ class Releases
         $catQuery = Category::getCategorySearch($cat);
 
         $whereSql = sprintf(
-            '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s',
+            '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s',
             $this->releaseSearch->getFullTextJoinString(),
             $this->showPasswords(),
             NZB::NZB_ADDED,
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             $catQuery,
@@ -743,8 +761,9 @@ class Releases
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			%s",
+			%s %s",
             $this->getConcatenatedCategoryIDs(),
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -761,7 +780,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = DB::select($sql);
+        $releases = Release::fromQuery($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -772,22 +791,24 @@ class Releases
     }
 
     /**
-     * Search TV Shows via the API.
+     * Search TV Shows via API.
      *
-     * @param array  $siteIdArr Array containing all possible TV Processing site IDs desired
-     * @param string $series The series or season number requested
-     * @param string $episode The episode number requested
-     * @param string $airdate The airdate of the episode requested
-     * @param int    $offset Skip this many releases
-     * @param int    $limit Return this many releases
-     * @param string $name The show name to search
-     * @param array  $cat The category to search
-     * @param int    $maxAge The maximum age of releases to be returned
-     * @param int    $minSize The minimum size of releases to be returned
      *
-     * @return array
+     * @param array $siteIdArr
+     * @param string $series
+     * @param string $episode
+     * @param string $airdate
+     * @param int $offset
+     * @param int $limit
+     * @param string $name
+     * @param array $cat
+     * @param int $maxAge
+     * @param int $minSize
+     * @param array $excludedCategories
+     * @param array $tags
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = []): array
+    public function tvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $siteSQL = [];
         $showSql = '';
@@ -815,10 +836,10 @@ class Releases
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = DB::select($showQry);
+            $show = Release::fromQuery($showQry);
 
-            if (! empty($show)) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen($show[0]->episodes) > 0) {
+            if (! empty($show[0])) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
@@ -850,10 +871,11 @@ class Releases
             '%s
 			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s',
+			%s %s %s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
             $this->showPasswords(),
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             Category::getCategorySearch($cat),
@@ -881,8 +903,9 @@ class Releases
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
+			%s %s",
             $this->getConcatenatedCategoryIDs(),
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -897,7 +920,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = DB::select($sql);
+        $releases = Release::fromQuery($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -911,22 +934,23 @@ class Releases
     }
 
     /**
-     * Search TV Shows via the API.
+     * Search TV Shows via APIv2.
      *
-     * @param array  $siteIdArr Array containing all possible TV Processing site IDs desired
-     * @param string $series The series or season number requested
-     * @param string $episode The episode number requested
-     * @param string $airdate The airdate of the episode requested
-     * @param int    $offset Skip this many releases
-     * @param int    $limit Return this many releases
-     * @param string $name The show name to search
-     * @param array  $cat The category to search
-     * @param int    $maxAge The maximum age of releases to be returned
-     * @param int    $minSize The minimum size of releases to be returned
      *
-     * @return array
+     * @param array $siteIdArr
+     * @param string $series
+     * @param string $episode
+     * @param string $airdate
+     * @param int $offset
+     * @param int $limit
+     * @param string $name
+     * @param array $cat
+     * @param int $maxAge
+     * @param int $minSize
+     * @param array $excludedCategories
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = []): array
+    public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $siteSQL = [];
         $showSql = '';
@@ -953,7 +977,7 @@ class Releases
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = DB::select($showQry);
+            $show = Release::fromQuery($showQry);
 
             if (! empty($show)) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen($show[0]->episodes) > 0) {
@@ -988,10 +1012,11 @@ class Releases
             '%s
 			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s',
+			%s %s %s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
             $this->showPasswords(),
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             Category::getCategorySearch($cat),
@@ -1013,8 +1038,9 @@ class Releases
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT JOIN groups g ON g.id = r.groups_id
-			%s",
+			%s %s",
             $this->getConcatenatedCategoryIDs(),
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -1029,7 +1055,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = DB::select($sql);
+        $releases = Release::fromQuery($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -1043,16 +1069,19 @@ class Releases
     }
 
     /**
-     * @param        $aniDbID
-     * @param int    $offset
-     * @param int    $limit
-     * @param string $name
-     * @param array  $cat
-     * @param int    $maxAge
+     * Search anime releases.
      *
-     * @return array
+     *
+     * @param $aniDbID
+     * @param int $offset
+     * @param int $limit
+     * @param string $name
+     * @param array $cat
+     * @param int $maxAge
+     * @param array $excludedCategories
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = []): array
+    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
         $whereSql = sprintf(
             '%s
@@ -1097,7 +1126,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = DB::select($sql);
+        $releases = Release::fromQuery($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1108,32 +1137,34 @@ class Releases
     }
 
     /**
-     * @param int    $imDbId
-     * @param int    $tmDbId
-     * @param int    $traktId
-     * @param int    $offset
-     * @param int    $limit
+     * Movies search through API and site.
+     *
+     *
+     * @param int $imDbId
+     * @param int $tmDbId
+     * @param int $traktId
+     * @param int $offset
+     * @param int $limit
      * @param string $name
-     * @param array  $cat
-     * @param int    $maxAge
-     * @param int    $minSize
-     *
-     * @param array  $excludedCategories
-     *
-     * @return array
+     * @param array $cat
+     * @param int $maxAge
+     * @param int $minSize
+     * @param array $excludedCategories
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = []): array
+    public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         $whereSql = sprintf(
             '%s
             WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s %s %s',
+			%s %s %s %s %s %s %s %s',
             $name !== '' ? $this->releaseSearch->getFullTextJoinString() : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
             $name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : '',
+            ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
@@ -1154,8 +1185,9 @@ class Releases
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			%s",
+			%s %s",
             $this->getConcatenatedCategoryIDs(),
+            ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             $whereSql
         );
         $sql = sprintf(
@@ -1171,7 +1203,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = DB::select($sql);
+        $releases = Release::fromQuery($sql);
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1182,48 +1214,30 @@ class Releases
     }
 
     /**
-     * @param       $currentID
-     * @param       $name
-     *
+     * @param $currentID
+     * @param $name
      * @param array $excludedCats
-     *
-     * @return array
-     * @throws \Exception
+     * @return array|\Illuminate\Database\Eloquent\Collection
      */
-    public function searchSimilar($currentID, $name, array $excludedCats = []): array
+    public function searchSimilar($currentID, $name, array $excludedCats = [])
     {
         // Get the category for the parent of this release.
+        $ret = false;
         $currRow = Release::getCatByRelId($currentID);
-        $catRow = Category::find($currRow['categories_id']);
-        $parentCat = $catRow['parentid'];
+        if ($currRow !== null) {
+            $catRow = Category::find($currRow['categories_id']);
+            $parentCat = $catRow['parentid'];
 
-        $results = $this->search(
-            getSimilarName($name),
-            -1,
-            -1,
-            -1,
-            -1,
-            '',
-            '',
-            0,
-            0,
-            -1,
-            -1,
-            0,
-            '',
-            '',
-            -1,
-            $excludedCats,
-            [$parentCat]
-        );
-        if (! $results) {
-            return $results;
-        }
+            $results = $this->search(getSimilarName($name), -1, -1, -1, -1, '', '', 0, 0, -1, -1, 0, '', '', -1, $excludedCats, [$parentCat]);
+            if (! $results) {
+                return $results;
+            }
 
-        $ret = [];
-        foreach ($results as $res) {
-            if ($res['id'] !== $currentID && $res['categoryparentid'] === $parentCat) {
-                $ret[] = $res;
+            $ret = [];
+            foreach ($results as $res) {
+                if ($res['id'] !== $currentID && $res['categoryparentid'] === $parentCat) {
+                    $ret[] = $res;
+                }
             }
         }
 
@@ -1278,7 +1292,7 @@ class Releases
         if ($count !== null) {
             return $count;
         }
-        $count = DB::select($sql);
+        $count = Release::fromQuery($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 

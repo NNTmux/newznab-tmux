@@ -523,7 +523,7 @@ class TmuxRun extends Tmux
                         // Run remove crap releases.
                         shell_exec(
                             "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-							echo \"Running removeCrapReleases for {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]}\"; \
+							echo \"\nRunning removeCrapReleases for {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]}\"; \
 							{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/Releases/removeCrapReleases.php true  \
 							{$runVar['modsettings']['fc']['time']} {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]} $log; \
 							date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['crap_timer']}' 2>&1 1> /dev/null"

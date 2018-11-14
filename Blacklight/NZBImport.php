@@ -78,6 +78,11 @@ class NZBImport
     protected $nzbGuid;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Construct.
      *
      * @param array $options Class instances / various options.
@@ -102,6 +107,7 @@ class NZBImport
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
+        $this->colorCli = new ColorCLI();
 
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
         $this->browser = $options['Browser'];
@@ -390,6 +396,7 @@ class NZBImport
 
         if ($dupeCheck === null) {
             $escapedSearchName = $cleanName;
+            $determinedCategory = $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName);
             // Insert the release into the DB.
             $relID = Release::insertRelease(
                 [
@@ -401,13 +408,15 @@ class NZBImport
                     'postdate'        => $nzbDetails['postDate'],
                     'fromname'        => $escapedFromName,
                     'size'            => $nzbDetails['totalSize'],
-                    'categories_id'    => $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName),
+                    'categories_id'    => $determinedCategory['categories_id'],
                     'isrenamed'        => $renamed,
                     'reqidstatus'    => 0,
                     'predb_id'        => 0,
                     'nzbstatus'        => NZB::NZB_ADDED,
                 ]
             );
+            $release = Release::find($relID);
+            $release->tag($determinedCategory['tags']);
         } else {
             $this->echoOut('This release is already in our DB so skipping: '.$subject);
 
@@ -458,7 +467,7 @@ class NZBImport
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
         } elseif ($this->echoCLI) {
-            ColorCLI::notice($message);
+            $this->colorCli->notice($message);
         }
     }
 

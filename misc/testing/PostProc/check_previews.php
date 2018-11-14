@@ -15,6 +15,7 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
+$colorCli = new ColorCLI();
 
 $row = Settings::settingValue('site.main.coverspath');
 if ($row !== null) {
@@ -35,14 +36,14 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     if (isset($argv[2]) && is_numeric($argv[2])) {
         $limit = $argv[2];
     }
-    ColorCLI::header('Scanning for releases missing previews');
+    $colorCli->header('Scanning for releases missing previews');
     $res = $pdo->query('SELECT id, guid FROM releases where nzbstatus = 1 AND haspreview = 1');
     if ($res instanceof \Traversable) {
         foreach ($res as $row) {
             $nzbpath = $path2preview.$row['guid'].'_thumb.jpg';
             if (! file_exists($nzbpath)) {
                 $counterfixed++;
-                ColorCLI::warning('Missing preview '.$nzbpath);
+                $colorCli->warning('Missing preview '.$nzbpath);
                 if ($argv[1] === 'true') {
                     $pdo->exec(
                         sprintf('UPDATE releases SET consoleinfo_id = NULL, gamesinfo_id = 0, imdbid = NULL, musicinfo_id = NULL,	bookinfo_id = NULL, videos_id = 0, xxxinfo_id = 0, passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0, nfostatus = -1 WHERE id = %s', $row['id'])
@@ -55,9 +56,9 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
             }
         }
     }
-    ColorCLI::header('Total releases missing previews that '.$couldbe.'reset for reprocessing= '.number_format($counterfixed));
+    $colorCli->header('Total releases missing previews that '.$couldbe.'reset for reprocessing= '.number_format($counterfixed));
 } else {
-    ColorCLI::header("\nThis script checks if release previews actually exist on disk.\n\n"
+    $colorCli->header("\nThis script checks if release previews actually exist on disk.\n\n"
             ."Releases without previews may be reset for post-processing, thus regenerating them and related meta data.\n\n"
             ."Useful for recovery after filesystem corruption, or as an alternative re-postprocessing tool.\n\n"
             ."Optional LIMIT parameter restricts number of releases to be reset.\n\n"

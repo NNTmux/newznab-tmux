@@ -7,7 +7,7 @@ use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Mail\ForgottenPassword;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
+use App\Jobs\SendPasswordForgottenEmail;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
 class ForgotPasswordController extends Controller
@@ -48,7 +48,7 @@ class ForgotPasswordController extends Controller
         if (empty($email) && empty($rssToken)) {
             app('smarty.view')->assign('error', 'Missing parameter(email and/or apikey to send password reset');
         } else {
-            if (env('NOCAPTCHA_ENABLED') === true && (! empty(env('NOCAPTCHA_SECRET')) && ! empty(env('NOCAPTCHA_SITEKEY')))) {
+            if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
                 $this->validate($request, [
                     'g-recaptcha-response' => 'required|captcha',
                 ]);
@@ -60,18 +60,19 @@ class ForgotPasswordController extends Controller
             if ($ret === null) {
                 app('smarty.view')->assign('error', 'The email or apikey are not recognised.');
                 $sent = true;
+            } else {
+                //
+                // Generate a forgottenpassword guid, store it in the user table
+                //
+                $guid = \Token::random(32);
+                User::updatePassResetGuid($ret['id'], $guid);
+                //
+                // Send the email
+                //
+                $resetLink = url('/').'/resetpassword?guid='.$guid;
+                SendPasswordForgottenEmail::dispatch($ret, $resetLink);
+                $sent = true;
             }
-            //
-            // Generate a forgottenpassword guid, store it in the user table
-            //
-            $guid = \Token::random(32);
-            User::updatePassResetGuid($ret['id'], $guid);
-            //
-            // Send the email
-            //
-            $resetLink = url('/').'/resetpassword?guid='.$guid;
-            Mail::to($ret['email'])->send(new ForgottenPassword($resetLink));
-            $sent = true;
         }
 
         $theme = Settings::settingValue('site.main.style');

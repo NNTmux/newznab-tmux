@@ -1716,25 +1716,20 @@ class ProcessAdditional
             if ($retVal === false) {
 
                 // Get the media info for the file.
-                $xmlArray = runCmd(
-                    $this->_killString.Settings::settingValue('apps..mediainfopath').'" --Output=XML "'.$fileLocation.'"'
-                );
+                $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
-                // Convert to array.
-                $arrXml = Utility::objectsIntoArray(@simplexml_load_string($xmlArray));
-
-                if (isset($arrXml['File']['track'])) {
-                    foreach ($arrXml['File']['track'] as $track) {
-                        if (isset($track['Album'], $track['Performer'])) {
+                if ($xmlArray !== null) {
+                    foreach ($xmlArray->getAudios() as $track) {
+                        if ($track->get('album') !== null && $track->get('performer') !== null) {
                             if ((int) $this->_release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
                                 // Make the extension upper case.
                                 $ext = strtoupper($fileExtension);
 
                                 // Form a new search name.
-                                if (! empty($track['Recorded_date']) && preg_match('/(?:19|20)\d\d/', $track['Recorded_date'], $Year)) {
-                                    $newName = $track['Performer'].' - '.$track['Album'].' ('.$Year[0].') '.$ext;
+                                if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
+                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
                                 } else {
-                                    $newName = $track['Performer'].' - '.$track['Album'].' '.$ext;
+                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
                                 }
 
                                 // Get the category or try to determine it.
@@ -1755,10 +1750,12 @@ class ProcessAdditional
 											SET searchname = %s, categories_id = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
 											WHERE id = %d',
                                             $newTitle,
-                                            $newCat,
+                                            $newCat['categories_id'],
                                             $this->_release->id
                                         )
                                     );
+                                $release = Release::find($this->_release->id);
+                                $release->retag($newCat['tags']);
                                 $this->sphinx->updateRelease($this->_release->id);
 
                                 // Echo the changed name.
@@ -1924,6 +1921,8 @@ class ProcessAdditional
                     //We show no error at all, we failed to save the frame and move on
                 } catch (\InvalidArgumentException $e) {
                     //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
+                } catch (\Throwable $e) {
+                    //Again we do nothing, we just want to catch the error
                 }
             }
 
@@ -2330,7 +2329,7 @@ class ProcessAdditional
     protected function _echo($string, $type): void
     {
         if ($this->_echoCLI) {
-            ColorCLI::$type($string);
+            (new ColorCLI())->$type($string);
         }
     }
 

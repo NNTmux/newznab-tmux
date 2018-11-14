@@ -8,15 +8,16 @@ use Blacklight\ColorCLI;
 use App\Models\MovieInfo;
 
 $movie = new Movie(['Echo' => true]);
+$colorCli = new ColorCLI();
 
 $movies = MovieInfo::query()->where('cover', '=', 0)->orderBy('year')->orderByDesc('id')->get(['imdbid']);
 $count = $movies->count();
 if ($count > 0) {
-    ColorCLI::primary('Updating '.number_format($count).' movie covers.');
+    $colorCli->primary('Updating '.number_format($count).' movie covers.');
     foreach ($movies as $mov) {
         $startTime = microtime(true);
         $mov = $movie->updateMovieInfo($mov['imdbid']);
     }
 } else {
-    ColorCLI::header('No movie covers to update');
+    $colorCli->header('No movie covers to update');
 }

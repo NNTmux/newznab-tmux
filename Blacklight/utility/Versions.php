@@ -124,7 +124,7 @@ class Versions
                     $count++;
                 }
                 if ($count !== $this->_vers->git->commit) {
-                    ColorCLI::primary("Updating commit number to {$count}");
+                    $this->out->primary("Updating commit number to {$count}");
                     $this->_vers->git->commit = $count;
                     $this->_changes |= self::UPDATED_GIT_COMMIT;
                 }
@@ -163,18 +163,18 @@ class Versions
         // Check if version file's entry is the same as current branch's tag
         if (version_compare($this->_vers->git->tag, $latest, '!=')) {
             if ($update) {
-                ColorCLI::primaryOver('Updating tag version to ').ColorCLI::headerOver($latest);
+                $this->out->primaryOver('Updating tag version to ').$this->out->headerOver($latest);
                 $this->_vers->git->tag = $ver;
                 $this->_changes |= self::UPDATED_GIT_TAG;
             } else {
-                ColorCLI::primaryOver('Leaving tag version at ').
-                    ColorCLI::headerOver($this->_vers->git->tag);
+                $this->out->primaryOver('Leaving tag version at ').
+                    $this->out->headerOver($this->_vers->git->tag);
             }
 
             return $this->_vers->git->tag;
         }
 
-        ColorCLI::primaryOver('Tag version is ').ColorCLI::header($latest);
+        $this->out->primaryOver('Tag version is ').$this->out->header($latest);
 
         return false;
     }
@@ -192,7 +192,7 @@ class Versions
 
         if ($this->_vers->sql->db->__toString() !== $this->_vers->sql->file->__toString()) {
             if ($update) {
-                ColorCLI::primaryOver('Updating Db revision to '.$this->_vers->sql->file);
+                $this->out->primaryOver('Updating Db revision to '.$this->_vers->sql->file);
                 $this->_vers->sql->db = $this->_vers->sql->file->__toString();
                 $this->_changes |= self::UPDATED_SQL_DB_PATCH;
             }
@@ -215,7 +215,7 @@ class Versions
         $options = [
             'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
             'ext'   => 'sql',
-            'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'path'  => NN_RES.'db'.DS.'patches',
             'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
             'safe'  => true,
         ];
@@ -226,7 +226,7 @@ class Versions
 
         if ($update) {
             if ($last !== false && $this->_vers->sql->file->__toString() !== $last) {
-                ColorCLI::primary('Updating latest patch file to '.$last);
+                $this->out->primary('Updating latest patch file to '.$last);
                 $this->_vers->sql->file = $last;
                 $this->_changes |= self::UPDATED_SQL_FILE_LAST;
             }
@@ -285,7 +285,7 @@ class Versions
 
         if ($this->_xml === false) {
             if (Utility::isCLI()) {
-                ColorCLI::error('Your versions XML file ('.$filepath.') is broken, try updating from git.');
+                $this->out->error('Your versions XML file ('.$filepath.') is broken, try updating from git.');
             }
             throw new \RuntimeException('Failed to open versions XML file '.$filepath);
         }
@@ -294,10 +294,10 @@ class Versions
             $vers = $this->_xml->xpath('/nntmux/versions');
 
             if ($vers[0]->count() === 0) {
-                ColorCLI::error('Your versions XML file ('.NN_VERSIONS.') does not contain version info, try updating from git.');
+                $this->out->error('Your versions XML file ('.NN_VERSIONS.') does not contain version info, try updating from git.');
                 throw new \RuntimeException('Failed to find versions node in XML file '.$filepath);
             }
-            ColorCLI::primary('Your versions XML file ('.NN_VERSIONS.') looks okay, continuing.');
+            $this->out->primary('Your versions XML file ('.NN_VERSIONS.') looks okay, continuing.');
             $this->_vers = &$this->_xml->versions;
         } else {
             throw new \RuntimeException("No elements in file!\n");

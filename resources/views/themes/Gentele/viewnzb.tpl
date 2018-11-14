@@ -47,7 +47,7 @@
 					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
-					<a class="label label-primary" href="{$serverroot}anime?id={$release.anidbid}"
+					<a class="label label-primary" href="{$smarty.const.WWW_TOP}/anime?id={$release.anidbid}"
 					   title="View all releases from this anime">View all episodes</a>
 					<a class="label label-primary"
 					   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
@@ -59,7 +59,7 @@
 				{if $show && $release.videos_id > 0}
 					<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$release.videos_id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
 					   class="label label-success">Add to My Shows</a>
-					<a class="label label-primary" href="{$serverroot}series/{$release.videos_id}"
+					<a class="label label-primary" href="{$smarty.const.WWW_TOP}/series/{$release.videos_id}"
 					   title="View all releases for this series">View all episodes</a>
 					{if $show.tvdb > 0}
 						<a class="label label-primary" target="_blank"
@@ -522,6 +522,18 @@
 																   href="{$smarty.const.WWW_TOP}/browse/{$release.parent_category}/{$release.sub_category}"> {$release.category_name}</a>
 															</td>
 														</tr>
+                                                        {if !empty($release->tagSlugs())}
+                                                            <tr>
+                                                                <th width="140">Category Tags</th>
+                                                                <td>
+                                                                    {foreach $release->tagNames() as $tag}
+                                                                        <a title="Browse {$tag}"
+                                                                           href="{$smarty.const.WWW_TOP}/browse/tags?tags={$tag}"> {$tag}</a>
+                                                                    {/foreach}
+                                                                </td>
+
+                                                            </tr>
+                                                        {/if}
 														<tr>
 															<th width="140">Files</th>
 															<td>

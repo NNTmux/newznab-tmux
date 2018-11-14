@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Blacklight\NZB;
 use Blacklight\SphinxSearch;
+use Conner\Tagging\Taggable;
 use Illuminate\Support\Facades\DB;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
@@ -128,7 +129,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Release extends Model
 {
-    use Rememberable;
+    use Rememberable, Taggable;
 
     /**
      * @var bool
@@ -303,15 +304,16 @@ class Release extends Model
      * @param        $episodeId
      * @param int $imDbID
      * @param int $aniDbID
+     * @param string $tags
      * @throws \Exception
      */
-    public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID): void
+    public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID, string $tags = ''): void
     {
         $movieInfoId = null;
         if (! empty($imDbID)) {
-            $movieInfoId = MovieInfo::query()->where('imdbid', $imDbID)->first(['id']);
+            $movieInfoId = MovieInfo::whereImdbid($imDbID)->first(['id']);
         }
-        self::query()->where('id', $ID)->update(
+        self::whereId($ID)->update(
             [
                 'name' => $name,
                 'searchname' => $searchName,
@@ -330,6 +332,10 @@ class Release extends Model
             ]
         );
         (new SphinxSearch())->updateRelease($ID);
+        if (! empty($tags)) {
+            $newTags = explode(',', $tags);
+            self::find($ID)->retag($newTags);
+        }
     }
 
     /**
@@ -340,7 +346,7 @@ class Release extends Model
     {
         $updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
         if ($updateGrabs) {
-            self::query()->where('guid', $guid)->increment('grabs');
+            self::whereGuid($guid)->increment('grabs');
         }
     }
 
@@ -350,7 +356,7 @@ class Release extends Model
      */
     public static function getCatByRelId($id)
     {
-        return self::query()->where('id', $id)->first(['categories_id']);
+        return self::whereId($id)->first(['categories_id']);
     }
 
     /**
@@ -359,7 +365,7 @@ class Release extends Model
      */
     public static function removeVideoIdFromReleases($videoId): int
     {
-        return self::query()->where('videos_id', $videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
+        return self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
     }
 
     /**
@@ -368,7 +374,7 @@ class Release extends Model
      */
     public static function removeAnidbIdFromReleases($anidbID): int
     {
-        return self::query()->where('anidbid', $anidbID)->update(['anidbid' => -1]);
+        return self::whereAnidbid($anidbID)->update(['anidbid' => -1]);
     }
 
     /**
@@ -470,7 +476,7 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
-        $sql = self::query()
+        $sql = self::query()->with('tagged')
             ->select(
                 [
                     'releases.*',
@@ -542,7 +548,7 @@ class Release extends Model
      */
     public static function getAlternate($guid, $userid)
     {
-        $rel = self::query()->where('guid', $guid)->first(['id', 'searchname', 'categories_id']);
+        $rel = self::whereGuid($guid)->first(['id', 'searchname', 'categories_id']);
 
         if ($rel === null) {
             return false;
@@ -567,7 +573,7 @@ class Release extends Model
      */
     public static function checkGuidForApi($guid): bool
     {
-        $check = self::query()->where('guid', $guid)->first();
+        $check = self::whereGuid($guid)->first();
 
         return $check !== null;
     }

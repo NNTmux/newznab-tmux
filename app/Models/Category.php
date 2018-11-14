@@ -62,6 +62,7 @@ class Category extends Model
     public const MOVIE_BLURAY = 2060;
     public const MOVIE_DVD = 2070;
     public const MOVIE_WEBDL = 2080;
+    public const MOVIE_X265 = 2090;
     public const MUSIC_MP3 = 3010;
     public const MUSIC_VIDEO = 3020;
     public const MUSIC_AUDIOBOOK = 3030;
@@ -84,6 +85,7 @@ class Category extends Model
     public const TV_SPORT = 5060;
     public const TV_ANIME = 5070;
     public const TV_DOCU = 5080;
+    public const TV_X265 = 5090;
     public const XXX_DVD = 6010;
     public const XXX_WMV = 6020;
     public const XXX_XVID = 6030;
@@ -139,6 +141,7 @@ class Category extends Model
             self::MOVIE_BLURAY,
             self::MOVIE_DVD,
             self::MOVIE_WEBDL,
+            self::MOVIE_X265,
         ];
 
     public const TV_GROUP =
@@ -153,15 +156,86 @@ class Category extends Model
             self::TV_DOCU,
             self::TV_SPORT,
             self::TV_WEBDL,
+            self::TV_X265,
         ];
 
     /**
-     * Temporary category while we sort through the name.
-     * @var int
+     * Tag constants.
+     * Do NOT use the values, as they may change, always use the constant - that's what it's for.
      */
-    protected $tmpCat = self::OTHER_MISC;
+    public const TAG_OTHER_MISC = 'Other_Misc';
+    public const TAG_OTHER_HASHED = 'Other_Hashed';
+    public const TAG_GAME_NDS = 'Game_NDS';
+    public const TAG_GAME_PSP = 'Game_PSP';
+    public const TAG_GAME_WII = 'Game_Wii';
+    public const TAG_GAME_XBOX = 'Game_Xbox';
+    public const TAG_GAME_XBOX360 = 'Game_Xbox360';
+    public const TAG_GAME_WIIWARE = 'Game_WiiWare';
+    public const TAG_GAME_XBOX360DLC = 'Game_Xbox360_DLC';
+    public const TAG_GAME_PS3 = 'Game_PS3';
+    public const TAG_GAME_OTHER = 'Game_Other';
+    public const TAG_GAME_3DS = 'Game_3DS';
+    public const TAG_GAME_PSVITA = 'Game_PS_Vita';
+    public const TAG_GAME_WIIU = 'Game_WiiU';
+    public const TAG_GAME_XBOXONE = 'Game_Xbox_One';
+    public const TAG_GAME_PS4 = 'Game_PS4';
+    public const TAG_MOVIE_FOREIGN = 'Movie_Foreign';
+    public const TAG_MOVIE_OTHER = 'Movie_Other';
+    public const TAG_MOVIE_SD = 'Movie_SD';
+    public const TAG_MOVIE_HD = 'Movie_HD';
+    public const TAG_MOVIE_UHD = 'Movie_UHD';
+    public const TAG_MOVIE_3D = 'Movie_3D';
+    public const TAG_MOVIE_BLURAY = 'Movie_BluRay';
+    public const TAG_MOVIE_DVD = 'Movie_DVD';
+    public const TAG_MOVIE_WEBDL = 'Movie_Web_DL';
+    public const TAG_MOVIE_X265 = 'Movie_x265';
+    public const TAG_MUSIC_MP3 = 'Music_MP3';
+    public const TAG_MUSIC_VIDEO = 'Music_Video';
+    public const TAG_MUSIC_AUDIOBOOK = 'Music_Audio_Book';
+    public const TAG_MUSIC_LOSSLESS = 'Music_LossLess';
+    public const TAG_MUSIC_OTHER = 'Music_Other';
+    public const TAG_MUSIC_FOREIGN = 'Music_Foreign';
+    public const TAG_PC_0DAY = 'Pc_0Day';
+    public const TAG_PC_ISO = 'Pc_Iso';
+    public const TAG_PC_MAC = 'Pc_Mac';
+    public const TAG_PC_PHONE_OTHER = 'Pc_Phone_Other';
+    public const TAG_PC_GAMES = 'Pc_Games';
+    public const TAG_PC_PHONE_IOS = 'Pc_Phone_Ios';
+    public const TAG_PC_PHONE_ANDROID = 'Pc_Phone_Android';
+    public const TAG_TV_WEBDL = 'Tv_Web_DL';
+    public const TAG_TV_FOREIGN = 'Tv_Foreign';
+    public const TAG_TV_SD = 'Tv_SD';
+    public const TAG_TV_HD = 'Tv_HD';
+    public const TAG_TV_UHD = 'Tv_UHD';
+    public const TAG_TV_OTHER = 'Tv_Other';
+    public const TAG_TV_SPORT = 'Tv_Sport';
+    public const TAG_TV_ANIME = 'Tv_Anime';
+    public const TAG_TV_DOCU = 'Tv_Documentary';
+    public const TAG_TV_X265 = 'Tv_x265';
+    public const TAG_XXX_DVD = 'Xxx_DVD';
+    public const TAG_XXX_WMV = 'Xxx_Wmv';
+    public const TAG_XXX_XVID = 'Xxx_XvID';
+    public const TAG_XXX_X264 = 'Xxx_X264';
+    public const TAG_XXX_CLIPHD = 'Xxx_Clip_HD';
+    public const TAG_XXX_CLIPSD = 'Xxx_Clip_SD';
+    public const TAG_XXX_UHD = 'Xxx_UHD';
+    public const TAG_XXX_PACK = 'Xxx_Pack';
+    public const TAG_XXX_IMAGESET = 'Xxx_ImageSet';
+    public const TAG_XXX_OTHER = 'Xxx_Other';
+    public const TAG_XXX_SD = 'Xxx_SD';
+    public const TAG_XXX_WEBDL = 'Xxx_Web_DL';
+    public const TAG_BOOKS_MAGAZINES = 'Magazines';
+    public const TAG_BOOKS_EBOOK = 'Ebook';
+    public const TAG_BOOKS_COMICS = 'Comics';
+    public const TAG_BOOKS_TECHNICAL = 'Technical';
+    public const TAG_BOOKS_FOREIGN = 'Books_Foreign';
+    public const TAG_BOOKS_UNKNOWN = 'Books_Unknown';
 
+    /**
+     * @var string
+     */
     protected $table = 'categories';
+
     /**
      * @var bool
      */
@@ -220,12 +294,10 @@ class Category extends Model
 
     /**
      * @param array $cat
-     * @param null  $query
-     * @param bool  $builder
      *
-     * @return string|\Illuminate\Database\Query\Builder
+     * @return string
      */
-    public static function getCategorySearch(array $cat = [], $query = null, $builder = false)
+    public static function getCategorySearch(array $cat = [])
     {
         $categories = [];
         // If multiple categories were sent in a single array position, slice and add them
@@ -248,29 +320,19 @@ class Category extends Model
             }
         }
         $catCount = \count($categories);
-        $catsrch = '';
         switch ($catCount) {
             //No category constraint
             case 0:
-                if ($builder === false) {
                     $catsrch = 'AND 1=1';
-                }
                 break;
             // One category constraint
             case 1:
-                if ($builder === false) {
                     $catsrch = $categories[0] !== -1 ? '  AND r.categories_id = '.$categories[0] : '';
-                } else {
-                    return $query->where('r.categories_id', '=', $categories[0]);
-                }
                 break;
             // Multiple category constraints
             default:
-                if ($builder === false) {
+
                     $catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
-                } else {
-                    return $query->whereIn('r.categories_id', $categories);
-                }
                 break;
         }
 

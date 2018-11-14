@@ -167,11 +167,9 @@ class NZBContents
                     $artificialParts += $parts[1];
                 }
 
-                if ($foundNFO === false) {
-                    if (preg_match('/\.\b(nfo|inf|ofn)\b(?![ .-])/i', $subject)) {
-                        $messageID = (string) $nzbcontents->segments->segment;
-                        $foundNFO = true;
-                    }
+                if (($foundNFO === false) && preg_match('/\.\b(nfo|inf|ofn)\b(?![ .-])/i', $subject)) {
+                    $messageID = (string) $nzbcontents->segments->segment;
+                    $foundNFO = true;
                 }
 
                 if ($foundNFO === false && $hiddenNFO === false && preg_match('/\(1\/1\)$/i', $subject) && ! preg_match('/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini'.'|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}'.'|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i', $subject)) {
@@ -185,7 +183,7 @@ class NZBContents
                 }
             }
 
-            if ($artificialParts <= 0 || $actualParts <= 0) {
+            if ($artificialParts === 0 || $actualParts === 0) {
                 $completion = 0;
             } else {
                 $completion = ($actualParts / $artificialParts) * 100;

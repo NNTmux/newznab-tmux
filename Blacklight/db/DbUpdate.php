@@ -54,13 +54,7 @@ class DbUpdate
      */
     public $settings;
 
-    /**
-     * Has the Db been backed up?
-     *
-     *
-     * @var bool
-     */
-    private $backedUp = false;
+    protected $colorCli;
 
     /**
      * DbUpdate constructor.
@@ -80,6 +74,7 @@ class DbUpdate
         $this->git = $options['git'];
         $this->log = $options['logger'];
         $this->pdo = DB::connection()->getPdo();
+        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -98,7 +93,7 @@ class DbUpdate
     {
         $defaults = [
             'ext'    => 'sql',
-            'path'    => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'path'    => NN_RES.'db'.DS.'patches',
             'regex'    => '#^'.Utility::PATH_REGEX.'\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
             'safe'    => true,
         ];
@@ -106,21 +101,21 @@ class DbUpdate
 
         $this->processPatches(['safe' => $options['safe']]); // Make sure we are completely up to date!
 
-        ColorCLI::primaryOver('Looking for new patches...');
+        $this->colorCli->primaryOver('Looking for new patches...');
         $files = Utility::getDirFiles($options);
 
         $count = \count($files);
-        ColorCLI::header(" $count found");
+        $this->colorCli->header(" $count found");
         if ($count > 0) {
-            ColorCLI::header('Processing...');
+            $this->colorCli->header('Processing...');
             natsort($files);
             $local = $this->isLocalDb() ? '' : 'LOCAL ';
 
             foreach ($files as $file) {
                 if (! preg_match($options['regex'], $file, $matches)) {
-                    ColorCLI::error("$file does not match the pattern {$options['regex']}\nPlease fix this before continuing");
+                    $this->colorCli->error("$file does not match the pattern {$options['regex']}. Please fix this before continuing");
                 } else {
-                    ColorCLI::header('Processing patch file: '.$file);
+                    $this->colorCli->header('Processing patch file: '.$file);
                     $this->splitSQL($file, ['local' => $local]);
                     $current = Settings::settingValue('..sqlpatch');
                     $current++;
@@ -150,7 +145,7 @@ class DbUpdate
         $patched = 0;
         $defaults = [
             'ext'    => 'sql',
-            'path'    => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'path'    => NN_RES.'db'.DS.'patches',
             'regex'    => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
             'safe'    => true,
         ];
@@ -166,7 +161,7 @@ class DbUpdate
         if (\count($files)) {
             natsort($files);
             $local = $this->isLocalDb() ? '' : 'LOCAL ';
-            ColorCLI::primary('Looking for unprocessed patches...');
+            $this->colorCli->primary('Looking for unprocessed patches...');
             foreach ($files as $file) {
                 $setPatch = false;
                 $fp = fopen($file, 'rb');
@@ -186,7 +181,7 @@ class DbUpdate
                     throw new \RuntimeException('No patch information available, stopping!!');
                 }
                 if ($patch > $currentVersion) {
-                    ColorCLI::header('Processing patch file: '.$file);
+                    $this->colorCli->header('Processing patch file: '.$file);
                     $this->splitSQL($file, ['local' => $local]);
                     if ($setPatch) {
                         Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $patch]);
@@ -195,12 +190,12 @@ class DbUpdate
                 }
             }
         } else {
-            ColorCLI::error('Have you changed the path to the patches folder, or do you have the right permissions?');
+            $this->colorCli->error('Have you changed the path to the patches folder, or do you have the right permissions?');
             exit();
         }
 
         if ($patched === 0) {
-            ColorCLI::info("Nothing to patch, you are already on version $currentVersion");
+            $this->colorCli->info("Nothing to patch, you are already on version $currentVersion");
         }
 
         return $patched;
@@ -240,7 +235,7 @@ class DbUpdate
 
                     // Skip comments.
                     if (preg_match('!^\s*(#|--|//)\s*(.+?)\s*$!', $line, $matches)) {
-                        ColorCLI::info('COMMENT: '.$matches[2]).PHP_EOL;
+                        $this->colorCli->info('COMMENT: '.$matches[2]).PHP_EOL;
                         continue;
                     }
 
@@ -272,7 +267,7 @@ class DbUpdate
 
                         try {
                             $this->pdo->exec($query);
-                            ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query);
+                            $this->colorCli->alternateOver('SUCCESS: ').$this->colorCli->primary($query);
                         } catch (\PDOException $e) {
                             // Log the problem and the query.
                             file_put_contents(
@@ -289,12 +284,12 @@ class DbUpdate
                                 \in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
                             ) {
                                 if ($e->errorInfo[1] === 1060) {
-                                    ColorCLI::warning(
+                                    $this->colorCli->warning(
                                         "$query The column already exists - No need to worry \{".
                                         $e->errorInfo[1]."}.\n"
                                     );
                                 } else {
-                                    ColorCLI::warning(
+                                    $this->colorCli->warning(
                                         "$query Skipped - No need to worry \{".
                                         $e->errorInfo[1]."}.\n"
                                     );
@@ -303,13 +298,13 @@ class DbUpdate
                                 $this->pdo->exec('SET SESSION old_alter_table = 1');
                                 try {
                                     $this->pdo->exec($query);
-                                    ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query);
+                                    $this->colorCli->alternateOver('SUCCESS: ').$this->colorCli->primary($query);
                                 } catch (\PDOException $e) {
-                                    ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]);
+                                    $this->colorCli->error("$query Failed {".$e->errorInfo[1].'}'.$e->errorInfo[2]);
                                     exit();
                                 }
                             } else {
-                                ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]);
+                                $this->colorCli->error("$query Failed \{".$e->errorInfo[1].'}'.$e->errorInfo[2]);
                                 exit();
                             }
                         }

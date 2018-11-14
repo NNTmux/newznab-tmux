@@ -16,8 +16,7 @@ class ApiController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function api(Request $request)
     {
@@ -266,12 +265,7 @@ class ApiController extends BasePageController
                UserRequest::addApiRequest($uid, $request->getRequestUri());
                $data = Release::getByGuid($request->input('id'));
 
-               $relData = [];
-               if ($data) {
-                   $relData[] = $data;
-               }
-
-               $api->output($relData, $params, $outputXML, $offset, 'api');
+               $api->output($data, $params, $outputXML, $offset, 'api');
                break;
 
            // Get an NFO file for an individual release.

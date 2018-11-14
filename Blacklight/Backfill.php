@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Settings;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class Backfill
@@ -56,6 +55,11 @@ class Backfill
     protected $_disableBackfillGroup;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * Constructor.
      *
      * @param array $options Class instances / Echo to cli?
@@ -83,6 +87,8 @@ class Backfill
             ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI]
         );
 
+        $this->colorCli = new ColorCLI();
+
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2008-08-14';
         $this->_safePartRepair = (int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill';
@@ -90,31 +96,23 @@ class Backfill
     }
 
     /**
-     * Backfill all the groups up to user specified time/date.
-     *
-     * @param string     $groupName
+     * @param string $groupName
      * @param string|int $articles
-     * @param string     $type
-     *
-     * @return void
-     * @throws \Exception
+     * @param string $type
+     * @throws \Throwable
      */
     public function backfillAllGroups($groupName = '', $articles = '', $type = ''): void
     {
-        $res = [];
         if ($groupName !== '') {
-            $grp = Group::getByName($groupName);
-            if ($grp) {
-                $res = [$grp];
-            }
+            $grp[] = Group::getByName($groupName);
         } else {
-            $res = Group::getActiveBackfill($type);
+            $grp = Group::getActiveBackfill($type);
         }
 
-        $groupCount = \count($res);
+        $groupCount = \count($grp);
         if ($groupCount > 0) {
             $counter = 1;
-            $allTime = microtime(true);
+            $allTime = now();
             $dMessage = (
                 'Backfilling: '.
                 $groupCount.
@@ -123,7 +121,7 @@ class Backfill
             );
 
             if ($this->_echoCLI) {
-                ColorCLI::header($dMessage);
+                $this->colorCli->header($dMessage);
             }
 
             if ($articles !== '' && ! is_numeric($articles)) {
@@ -131,28 +129,28 @@ class Backfill
             }
 
             // Loop through groups.
-            foreach ($res as $groupArr) {
+            foreach ($grp as $groupArr) {
                 if ($groupName === '') {
                     $dMessage = 'Starting group '.$counter.' of '.$groupCount;
 
                     if ($this->_echoCLI) {
-                        ColorCLI::header($dMessage);
+                        $this->colorCli->header($dMessage);
                     }
                 }
                 $this->backfillGroup($groupArr, $groupCount - $counter, $articles);
                 $counter++;
             }
 
-            $dMessage = 'Backfilling completed in '.number_format(microtime(true) - $allTime, 2).' seconds.';
+            $dMessage = 'Backfilling completed in '.now()->diffInSeconds($allTime).' seconds.';
 
             if ($this->_echoCLI) {
-                ColorCLI::primary($dMessage);
+                $this->colorCli->primary($dMessage);
             }
         } else {
             $dMessage = 'No groups specified. Ensure groups are added to database for updating.';
 
             if ($this->_echoCLI) {
-                ColorCLI::warning($dMessage);
+                $this->colorCli->warning($dMessage);
             }
         }
     }
@@ -184,7 +182,7 @@ class Backfill
                 '. Otherwise the group is dead, you must disable it.';
 
             if ($this->_echoCLI) {
-                ColorCLI::error($dMessage);
+                $this->colorCli->error($dMessage);
             }
 
             return;
@@ -200,7 +198,7 @@ class Backfill
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary('Processing '.$groupName);
+            $this->colorCli->primary('Processing '.$groupName);
         }
 
         // Check if this is days or post backfill.
@@ -233,14 +231,14 @@ class Backfill
             }
 
             if ($this->_echoCLI) {
-                ColorCLI::notice($dMessage);
+                $this->colorCli->notice($dMessage);
             }
 
             return;
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     'Group '.
                     $groupName.
                     "'s oldest article is ".
@@ -268,7 +266,7 @@ class Backfill
         $done = false;
         while ($done === false) {
             if ($this->_echoCLI) {
-                ColorCLI::header('Getting '.
+                $this->colorCli->header('Getting '.
                     number_format($last - $first + 1).
                     ' articles from '.
                     $groupName.
@@ -315,7 +313,7 @@ class Backfill
         }
 
         if ($this->_echoCLI) {
-            ColorCLI::primary(
+            $this->colorCli->primary(
                     PHP_EOL.
                     'Group '.
                     $groupName.
@@ -327,18 +325,13 @@ class Backfill
     }
 
     /**
-     * Safe backfill using posts. Going back to a date specified by the user on the site settings.
-     * This does 1 group for x amount of parts until it reaches the date.
-     *
      * @param string $articles
-     *
-     * @return void
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function safeBackfill($articles = ''): void
     {
         $groupname = Group::query()
-            ->whereBetween('first_record_postdate', [$this->_safeBackFillDate, Carbon::now()])
+            ->whereBetween('first_record_postdate', [$this->_safeBackFillDate, now()])
             ->where('backfill', '=', 1)
             ->select('name')
             ->orderBy('name')

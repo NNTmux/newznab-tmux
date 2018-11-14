@@ -65,6 +65,11 @@ class XXX
     protected $cookie;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    protected $colorCli;
+
+    /**
      * @param array $options Echo to cli / Class instances.
      *
      * @throws \Exception
@@ -78,6 +83,7 @@ class XXX
         ];
         $options += $defaults;
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
+        $this->colorCli = new ColorCLI();
 
         $this->movieQty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = (new Releases())->showPasswords();
@@ -466,14 +472,14 @@ class XXX
         $this->whichClass = 'aebn';
         $mov = new AEBN();
         $mov->cookie = $this->cookie;
-        ColorCLI::info('Checking AEBN for movie info');
+        $this->colorCli->info('Checking AEBN for movie info');
         $res = $mov->processSite($movie);
 
         if ($res === false) {
             $this->whichClass = 'pop';
             $mov = new Popporn();
             $mov->cookie = $this->cookie;
-            ColorCLI::info('Checking PopPorn for movie info');
+            $this->colorCli->info('Checking PopPorn for movie info');
             $res = $mov->processSite($movie);
         }
 
@@ -481,14 +487,14 @@ class XXX
             $this->whichClass = 'adm';
             $mov = new ADM();
             $mov->cookie = $this->cookie;
-            ColorCLI::info('Checking ADM for movie info');
+            $this->colorCli->info('Checking ADM for movie info');
             $res = $mov->processSite($movie);
         }
 
         if ($res === false) {
             $this->whichClass = 'ade';
             $mov = new ADE();
-            ColorCLI::info('Checking ADE for movie info');
+            $this->colorCli->info('Checking ADE for movie info');
             $res = $mov->processSite($movie);
         }
 
@@ -496,7 +502,7 @@ class XXX
             $this->whichClass = 'hotm';
             $mov = new Hotmovies();
             $mov->cookie = $this->cookie;
-            ColorCLI::info('Checking HotMovies for movie info');
+            $this->colorCli->info('Checking HotMovies for movie info');
             $res = $mov->processSite($movie);
         }
 
@@ -522,7 +528,7 @@ class XXX
                     default:
                         $fromstr = '';
                 }
-                ColorCLI::primary('Fetching XXX info from: '.$fromstr);
+                $this->colorCli->primary('Fetching XXX info from: '.$fromstr);
             }
             $res = $mov->getAll();
         } else {
@@ -601,7 +607,7 @@ class XXX
         }
 
         if ($this->echoOutput) {
-            ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title'])));
+            $this->colorCli->headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.$this->colorCli->primary($mov['title']) : 'Nothing to update for XXX movie: '.$this->colorCli->primary($mov['title'])));
         }
 
         return $xxxID;
@@ -636,7 +642,7 @@ class XXX
 
         if ($movieCount > 0) {
             if ($this->echoOutput) {
-                ColorCLI::header('Processing '.$movieCount.' XXX releases.');
+                $this->colorCli->header('Processing '.$movieCount.' XXX releases.');
             }
 
             // Loop over releases.
@@ -648,17 +654,17 @@ class XXX
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
                         if ($this->echoOutput) {
-                            ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($this->currentTitle);
+                            $this->colorCli->primaryOver('Looking up: ').$this->colorCli->headerOver($this->currentTitle);
                         }
 
-                        ColorCLI::info('Local match not found, checking web!');
+                        $this->colorCli->info('Local match not found, checking web!');
                         $idcheck = $this->updateXXXInfo($this->currentTitle);
                     } else {
-                        ColorCLI::info('Local match found for XXX Movie: '.ColorCLI::headerOver($this->currentTitle));
+                        $this->colorCli->info('Local match found for XXX Movie: '.$this->colorCli->headerOver($this->currentTitle));
                         $idcheck = (int) $check['id'];
                     }
                 } else {
-                    ColorCLI::primary('.');
+                    $this->colorCli->primary('.');
                 }
                 Release::query()
                     ->where('id', $arr['id'])
@@ -666,7 +672,7 @@ class XXX
                     ->update(['xxxinfo_id' => $idcheck]);
             }
         } elseif ($this->echoOutput) {
-            ColorCLI::header('No xxx releases to process.');
+            $this->colorCli->header('No xxx releases to process.');
         }
     }
 

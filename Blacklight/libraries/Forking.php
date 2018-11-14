@@ -28,7 +28,7 @@ class Forking extends \fork_daemon
     /**
      * @var \Blacklight\ColorCLI
      */
-    public $_colorCLI;
+    public $colorCli;
 
     /**
      * @var int The type of output
@@ -85,11 +85,6 @@ class Forking extends \fork_daemon
     private $safeBackfillGroup = '';
 
     /**
-     * @var
-     */
-    public $pdo;
-
-    /**
      * @var int
      */
     protected $maxSize;
@@ -126,7 +121,7 @@ class Forking extends \fork_daemon
     {
         parent::__construct();
 
-        $this->_colorCLI = new ColorCLI();
+        $this->colorCli = new ColorCLI();
 
         $this->register_logging(
             [0 => $this, 1 => 'logger'],
@@ -192,17 +187,11 @@ class Forking extends \fork_daemon
         $this->processAdditional = $this->processNFO = $this->processTV = $this->processMovies = $this->ppRenamedOnly = false;
         $this->work = [];
 
-        // Init Settings here, as forking causes errors when it's destroyed.
-        $this->pdo = DB::connection()->getPdo();
-
         // Process extra work that should not be forked and done before forking.
         $this->processStartWork();
 
         // Get work to fork.
         $this->getWork();
-
-        // Now we destroy settings, to prevent errors from forking.
-        unset($this->pdo);
 
         // Process the work we got.
         $this->processWork();
@@ -211,7 +200,7 @@ class Forking extends \fork_daemon
         $this->processEndWork();
 
         if (config('nntmux.echocli')) {
-            ColorCLI::header(
+            $this->colorCli->header(
                     'Multi-processing for '.$this->workType.' finished in '.(microtime(true) - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
                 );
@@ -302,8 +291,8 @@ class Forking extends \fork_daemon
     {
         $this->_workCount = \count($this->work);
         if ($this->_workCount > 0) {
-            if (config('nntmux.echocli')) {
-                ColorCLI::header(
+            if (config('nntmux.echocli') === true) {
+                $this->colorCli->header(
                         'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
                         ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
                     );
@@ -311,8 +300,10 @@ class Forking extends \fork_daemon
 
             $this->addwork($this->work);
             $this->process_work(true);
-        } elseif (config('nntmux.echocli')) {
-            ColorCLI::header('No work to do!');
+        } else {
+            if (config('nntmux.echocli') === true) {
+                $this->colorCli->header('No work to do!');
+            }
         }
     }
 
@@ -958,9 +949,9 @@ class Forking extends \fork_daemon
     {
         $sharing = DB::select('SELECT enabled FROM sharing');
         if ($sharing > 0 && (int) $sharing[0]->enabled === 1) {
-            $nntp = new NNTP(['Settings' => $this->pdo]);
+            $nntp = new NNTP();
             if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
-                (new PostProcess(['ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
+                (new PostProcess(['ColorCLI' => $this->colorCli]))->processSharing($nntp);
             }
 
             return true;
@@ -1099,10 +1090,10 @@ class Forking extends \fork_daemon
     public function childExit($pid, $identifier = '')
     {
         if (config('nntmux.echocli')) {
-            ColorCLI::header(
+            $this->colorCli->header(
                     'Process ID #'.$pid.' has completed.'.PHP_EOL.
                     'There are '.($this->forked_children_count - 1).' process(es) still active with '.
-                    (--$this->_workCount).' job(s) left in the queue.'.PHP_EOL
+                    (--$this->_workCount).' job(s) left in the queue.', true
                 );
         }
     }
