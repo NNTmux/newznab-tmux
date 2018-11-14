@@ -1,4 +1,5 @@
 2018-11-14 DariusIII
+	* Chg: Update queries in NameFixer class
 	* Chg: Update phpunit/phpunit to version 7.4.4 and nesbot/carbon to version 1.35.0
 	* Chg: Update PNotify and fix notifications
 2018-11-13 DariusIII

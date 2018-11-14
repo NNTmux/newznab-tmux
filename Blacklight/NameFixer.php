@@ -210,11 +210,12 @@ class NameFixer
 					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rel.proc_nfo = %d',
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
+                Category::OTHER_HASHED,
                 self::PROC_NFO_NONE
             );
         }
@@ -482,10 +483,12 @@ class NameFixer
                 '
 					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
 					FROM releases rel
-					WHERE rel.isrenamed = %d
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rel.proc_par2 = %d',
                 self::IS_RENAMED_NONE,
+                Category::OTHER_MISC,
+                Category::OTHER_HASHED,
                 self::PROC_PAR2_NONE
             );
         }
@@ -567,9 +570,8 @@ class NameFixer
 				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
-				AND rel.isrenamed = %d
+				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
-				AND rel.categories_id IN (%d, %d)
 				AND rel.proc_uid = %d',
                 NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE,
@@ -703,9 +705,8 @@ class NameFixer
 					ph.hash AS hash
 				FROM releases rel
 				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = rel.id
-				AND rel.nzbstatus = %d
-				AND rel.isrenamed = %d
-				AND rel.categories_id IN (%d, %d)
+				WHERE rel.nzbstatus = %d
+				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
 				AND rel.proc_hash16k = %d',
                 NZB::NZB_ADDED,
