@@ -403,9 +403,6 @@ class Versions
         }
     }
 
-    /**
-     *
-     */
     protected function _init(): void
     {
         if ($this->_config['git'] instanceof Git) {
