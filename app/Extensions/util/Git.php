@@ -215,7 +215,7 @@ class Git
         ];
         $options += $default;
 
-        return $this->repo->pull($options['remote'], [$options['branch']]);
+        return $this->repo->pull($options['remote'].' '.$options['branch']);
     }
 
     /**
