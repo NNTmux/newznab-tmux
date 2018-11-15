@@ -1,6 +1,7 @@
 <p align="center">
     <a href="https://codeclimate.com/github/NNTmux/newznab-tmux"><img src="https://codeclimate.com/github/NNTmux/newznab-tmux/badges/gpa.svg"></a>
     <a href="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/build-status/dev"><img src="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/build.png?b=dev"></a>
+<a href="https://app.fossa.io/projects/git%2Bgithub.com%2FNNTmux%2Fnewznab-tmux?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FNNTmux%2Fnewznab-tmux.svg?type=shield"/></a>
     <a href="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/?branch=dev"><img src="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/quality-score.png?b=dev"></a>
     <a href="https://travis-ci.org/NNTmux/newznab-tmux"><img src="https://travis-ci.org/NNTmux/newznab-tmux.svg?branch=dev"></a>
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/v/stable.svg" alt="Latest Stable Version"></a>
@@ -26,6 +27,9 @@ NNTmux improves upon the original design, implementing several new features incl
 - SABnzbd/NZBGet integration (web, API and pause/resume)
 - CouchPotato integration (web and API)
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FNNTmux%2Fnewznab-tmux.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FNNTmux%2Fnewznab-tmux?ref=badge_large)
 
 ## Prerequisites
 
@@ -83,8 +87,3 @@ Use [mysqltuner.pl](http://mysqltuner.pl "MySQL tuner - Use it!") for recommenda
  simple_html_dom.php => MIT
 
  All external libraries will have their full licenses in their respectful folders.
-
-
-
-
-
