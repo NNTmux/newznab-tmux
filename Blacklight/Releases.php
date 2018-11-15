@@ -6,11 +6,11 @@ use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Blacklight\utility\Utility;
 use Chumper\Zipper\Zipper;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Releases.
@@ -1279,7 +1279,6 @@ class Releases
         $zipped->close();
 
         return File::isFile($zippedFilePath) ? $zippedFilePath : '';
-
     }
 
     /**
