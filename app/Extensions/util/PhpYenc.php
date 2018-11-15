@@ -17,12 +17,12 @@
  * @copyright 2016 nZEDb
  */
 
-namespace App\Extensions\util\yenc\adapter;
+namespace App\Extensions\util;
 
 /**
  * Class Php.
  */
-class Php
+class PhpYenc
 {
     /**
      * @param      $text

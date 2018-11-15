@@ -3,7 +3,7 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 require __DIR__.DIRECTORY_SEPARATOR.'app.php';
 require_once 'constants.php';
-require_once __DIR__.DIRECTORY_SEPARATOR.'yenc.php';
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'app/Extensions/util/PhpYenc.php';
 
 use Dotenv\Dotenv;
 

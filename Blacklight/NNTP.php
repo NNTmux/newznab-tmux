@@ -3,7 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Settings;
-use App\Extensions\util\Yenc;
+use App\Extensions\util\PhpYenc;
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -653,7 +653,7 @@ class NNTP extends \Net_NNTP_Client
                 }
             }
             // Finally we decode the message using yEnc.
-            $ret['Message'] = ($yEnc ? Yenc::decodeIgnore($body) : $body);
+            $ret['Message'] = ($yEnc ? PhpYenc::decodeIgnore($body) : $body);
         }
 
         return $ret;
@@ -771,7 +771,7 @@ class NNTP extends \Net_NNTP_Client
         // Check if we should encode to yEnc.
         if ($yEnc) {
             $bin = $compress ? gzdeflate($body, 4) : $body;
-            $body = Yenc::encode($bin, $subject);
+            $body = PhpYenc::encode($bin, $subject);
         // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
         } else {
             $body = $this->_splitLines($body, $compress);
@@ -1122,7 +1122,7 @@ class NNTP extends \Net_NNTP_Client
                 if ($line === ".\r\n") {
 
                     // Attempt to yEnc decode and return the body.
-                    return Yenc::decodeIgnore($body);
+                    return PhpYenc::decodeIgnore($body);
                 }
 
                 // Check for line that starts with double period, remove one.
