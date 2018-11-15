@@ -1285,6 +1285,7 @@ class Releases
     /**
      * Get count of releases for pager.
      *
+     *
      * @param string $query The query to get the count from.
      *
      * @return int

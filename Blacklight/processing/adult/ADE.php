@@ -52,9 +52,12 @@ class ADE extends AdultMovies
     protected $_tmpResponse;
     protected $_ch;
 
-    public function __construct(array $options = [])
+    /**
+     * ADE constructor.
+     */
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
     }
 
     /**
@@ -206,7 +209,7 @@ class ADE extends AdultMovies
                     $title = $ret->title;
                     $title = str_replace('/XXX/', '', $title);
                     $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
-                    $url = (string) trim($ret->href);
+                    $url = trim($ret->href);
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {
                         $this->_directUrl = self::ADE.$url;
@@ -218,7 +221,6 @@ class ADE extends AdultMovies
 
                         return true;
                     }
-                    continue;
                 }
 
                 return false;

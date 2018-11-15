@@ -62,9 +62,12 @@ class ADM extends AdultMovies
      */
     protected $_title = '';
 
-    public function __construct(array $options = [])
+    /**
+     * ADM constructor.
+     */
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
     }
 
     /**

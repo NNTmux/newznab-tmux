@@ -60,9 +60,12 @@ class Popporn extends AdultMovies
      */
     protected $_trailUrl = '';
 
-    public function __construct(array $options = [])
+    /**
+     * Popporn constructor.
+     */
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
     }
 
     /**
@@ -202,8 +205,7 @@ class Popporn extends AdultMovies
         if ($ret = $this->_html->find('div#lside', 0)) {
             foreach ($ret->find('text') as $e) {
                 $e = trim($e->innertext);
-                $e = str_replace(',', '', $e);
-                $e = str_replace('&nbsp;', '', $e);
+                $e = str_replace([',', '&nbsp;'], '', $e);
                 if (stripos($e, 'Cast') !== false) {
                     $cast = true;
                 }

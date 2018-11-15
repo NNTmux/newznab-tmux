@@ -2,6 +2,8 @@
 
 namespace Blacklight\processing\adult;
 
+use voku\helper\HtmlDomParser;
+
 abstract class AdultMovies
 {
     /**
@@ -21,14 +23,10 @@ abstract class AdultMovies
 
     /**
      * AdultMovies constructor.
-     *
-     * @param array $options
-     *
-     * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $this->_html = new \simple_html_dom();
+        $this->_html = new HtmlDomParser();
     }
 
     /**

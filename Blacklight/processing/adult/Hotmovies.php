@@ -72,14 +72,10 @@ class Hotmovies extends AdultMovies
 
     /**
      * Hotmovies constructor.
-     *
-     * @param array $options
-     *
-     * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
     }
 
     protected function trailers()
@@ -149,7 +145,7 @@ class Hotmovies extends AdultMovies
                 }
             }
         }
-        if (is_array($this->_res['productinfo'])) {
+        if (\is_array($this->_res['productinfo'])) {
             $this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
         }
 
