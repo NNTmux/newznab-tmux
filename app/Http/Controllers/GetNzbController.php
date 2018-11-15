@@ -19,7 +19,7 @@ class GetNzbController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
      * @throws \Exception
      */
     public function getNzb(Request $request)
