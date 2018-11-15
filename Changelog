@@ -1,4 +1,5 @@
 2018-11-15 DariusIII
+	* Chg: Remove YencServiceProvider from app.php
 	* Chg: Make PhpYenc the only yenc available, remove rest of the files used
 	* Chg: Update app/Extensions/util/Versions.php
 	* Chg: Replace nZEDb/Git.php with Cz\Git\GitRepository
