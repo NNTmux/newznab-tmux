@@ -1,4 +1,5 @@
 2018-11-15 DariusIII
+	* Chg: Use chumper/zipper to generate zipped nzb files
 	* Chg: Remove YencServiceProvider from app.php
 	* Chg: Make PhpYenc the only yenc available, remove rest of the files used
 	* Chg: Update app/Extensions/util/Versions.php

@@ -79,7 +79,7 @@ class GetNzbController extends BasePageController
             }
 
             $zip = $rel->getZipped($guids);
-            if (\strlen($zip) > 0) {
+            if ($zip !== '') {
                 User::incrementGrabs($uid, \count($guids));
                 foreach ($guids as $guid) {
                     Release::updateGrab($guid);
@@ -90,12 +90,10 @@ class GetNzbController extends BasePageController
                     }
                 }
 
-                return response()->streamDownload(function () use ($zip) {
-                    echo $zip;
-                }, now()->format('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/octet-stream']);
+                return response()->download($zip, now()->format('Ymdhis').'.nzb.zip', ['Content-type:' => 'application/zip'])->deleteFileAfterSend(true);
             }
 
-            $this->show404();
+            return response()->json(['message' => 'Unable to create .zip file'], 404);
         }
 
         $nzbPath = (new NZB())->getNZBPath($request->input('id'));
