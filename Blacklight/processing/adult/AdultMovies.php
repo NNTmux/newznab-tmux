@@ -7,7 +7,7 @@ use voku\helper\HtmlDomParser;
 abstract class AdultMovies
 {
     /**
-     * @var \simple_html_dom
+     * @var \voku\helper\HtmlDomParser
      */
     protected $_html;
 

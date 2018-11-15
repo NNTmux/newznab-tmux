@@ -1,4 +1,5 @@
 2018-11-15 DariusIII
+	* Fix: Fix _html property definition
 	* Fix: Fix Git class gitPull function
 	* Chg: Update adult movies, replace simple_html_dom with voku/simple_html_dom
 	* Chg: Update PHPDOC block return values in GetNzbController
