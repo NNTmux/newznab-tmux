@@ -35,9 +35,9 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
     $colorCli->header('Resetting all postprocessing');
     $qry = DB::select('SELECT id FROM releases');
     $affected = 0;
-        $total = \count($qry);
-        foreach ($qry as $releases) {
-            DB::update(
+    $total = \count($qry);
+    foreach ($qry as $releases) {
+        DB::update(
                 sprintf(
                     '
 						UPDATE releases
@@ -48,9 +48,8 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
                     $releases->id
                 )
             );
-            $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$affected, $total));
-        }
-
+        $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$affected, $total));
+    }
 }
 if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
     $ran = true;
@@ -72,10 +71,10 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
         $total = 0;
     }
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET consoleinfo_id = NULL WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting Console Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET consoleinfo_id = NULL WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting Console Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' consoleinfoIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
@@ -99,11 +98,11 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
     }
 
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET gamesinfo_id = 0 WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting Games Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
-        $colorCli->header(PHP_EOL.number_format($concount).' gameinfo_IDs reset.');
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET gamesinfo_id = 0 WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting Games Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
+    $colorCli->header(PHP_EOL.number_format($concount).' gameinfo_IDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
     $ran = true;
@@ -125,10 +124,10 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
         $total = 0;
     }
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET imdbid = NULL WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting Movie Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET imdbid = NULL WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting Movie Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' imdbIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
@@ -147,10 +146,10 @@ if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
     $qry = DB::select('SELECT id FROM releases'.$where);
     $total = \count($qry);
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update(sprintf('UPDATE releases SET musicinfo_id = NULL WHERE id = %s ', $releases->id));
-            $consoletools->overWritePrimary('Resetting Music Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update(sprintf('UPDATE releases SET musicinfo_id = NULL WHERE id = %s ', $releases->id));
+        $consoletools->overWritePrimary('Resetting Music Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' musicinfo_ids reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
@@ -173,10 +172,10 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
         $total = 0;
     }
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0 WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0 WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' Releases reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
@@ -201,10 +200,10 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
         $total = 0;
     }
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET videos_id = 0, tv_episodes_id = 0 WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting TV Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET videos_id = 0, tv_episodes_id = 0 WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting TV Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' Video IDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
@@ -228,10 +227,10 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
         $total = 0;
     }
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET anidbid = NULL WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting Anime Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET anidbid = NULL WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting Anime Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' anidbIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
@@ -250,10 +249,10 @@ if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
     $qry = DB::select('SELECT id FROM releases'.$where);
     $total = \count($qry);
     $concount = 0;
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET bookinfo_id = NULL WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting Book Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET bookinfo_id = NULL WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting Book Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' bookinfoIDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
@@ -271,14 +270,14 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
 
     $qry = DB::select('SELECT id FROM releases'.$where);
     $concount = 0;
-        $total = \count($qry);
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET xxxinfo_id = 0 WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting XXX Releases:  '.$consoletools->percentString(
+    $total = \count($qry);
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET xxxinfo_id = 0 WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting XXX Releases:  '.$consoletools->percentString(
                 ++$concount,
                     $total
             ));
-        }
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' xxxinfo_IDs reset.');
 }
 if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
@@ -296,17 +295,16 @@ if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
 
     $qry = DB::select('SELECT id FROM releases'.$where);
     $concount = 0;
-        $total = \count($qry);
-        foreach ($qry as $releases) {
-            DB::update('UPDATE releases SET nfostatus = -1 WHERE id = '.$releases->id);
-            $consoletools->overWritePrimary('Resetting NFO Releases:  '.$consoletools->percentString(++$concount, $total));
-        }
+    $total = \count($qry);
+    foreach ($qry as $releases) {
+        DB::update('UPDATE releases SET nfostatus = -1 WHERE id = '.$releases->id);
+        $consoletools->overWritePrimary('Resetting NFO Releases:  '.$consoletools->percentString(++$concount, $total));
+    }
     $colorCli->header(PHP_EOL.number_format($concount).' NFOs reset.');
 }
 
 if ($ran === false) {
-
-        $colorCli->error(
+    $colorCli->error(
             '\nThis script will reset postprocessing per category. It can also truncate the associated tables.'
             .'\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the '
             .'second argument false.\n'
@@ -324,6 +322,6 @@ if ($ran === false) {
             .'php reset_postprocessing.php nfos true        ...: To reset all nfos.'.PHP_EOL
             .'php reset_postprocessing.php all true         ...: To reset everything.'.PHP_EOL
         );
-        exit();
+    exit();
 }
 echo PHP_EOL;
