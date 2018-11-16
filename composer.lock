@@ -7121,16 +7121,16 @@
     "packages-dev": [
         {
             "name": "barryvdh/laravel-debugbar",
-            "version": "v3.2.0",
+            "version": "v3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-debugbar.git",
-                "reference": "5b68f3972083a7eeec0d6f161962fcda71a127c0"
+                "reference": "9d5caf43c5f3a3aea2178942f281054805872e7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/5b68f3972083a7eeec0d6f161962fcda71a127c0",
-                "reference": "5b68f3972083a7eeec0d6f161962fcda71a127c0",
+                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/9d5caf43c5f3a3aea2178942f281054805872e7c",
+                "reference": "9d5caf43c5f3a3aea2178942f281054805872e7c",
                 "shasum": ""
             },
             "require": {
@@ -7185,7 +7185,7 @@
                 "profiler",
                 "webprofiler"
             ],
-            "time": "2018-08-22T11:06:19+00:00"
+            "time": "2018-11-09T08:37:55+00:00"
         },
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -8888,26 +8888,24 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v3.7.4",
+            "version": "v3.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "c569608fcecc9ee044f2485d58c1ac5fab26ee2f"
+                "reference": "dcde71f6743575c9586d06fe607558263a6877bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/c569608fcecc9ee044f2485d58c1ac5fab26ee2f",
-                "reference": "c569608fcecc9ee044f2485d58c1ac5fab26ee2f",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/dcde71f6743575c9586d06fe607558263a6877bb",
+                "reference": "dcde71f6743575c9586d06fe607558263a6877bb",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "~5.7.4",
-                "orchestra/testbench-core": "~3.7.5",
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench-core": "~3.7.6",
                 "php": ">=7.1",
                 "phpunit/phpunit": "^7.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.0"
             },
             "type": "library",
             "extra": {
@@ -8936,20 +8934,20 @@
                 "orchestral",
                 "testing"
             ],
-            "time": "2018-10-07T02:44:38+00:00"
+            "time": "2018-11-15T01:50:49+00:00"
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v3.7.5",
+            "version": "v3.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "9ef7319cc288a613e38f456f0349907dfeb2587f"
+                "reference": "6cdbb96c26b0532c3ff659a0eab9cac5a114dd95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/9ef7319cc288a613e38f456f0349907dfeb2587f",
-                "reference": "9ef7319cc288a613e38f456f0349907dfeb2587f",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/6cdbb96c26b0532c3ff659a0eab9cac5a114dd95",
+                "reference": "6cdbb96c26b0532c3ff659a0eab9cac5a114dd95",
                 "shasum": ""
             },
             "require": {
@@ -9000,7 +8998,7 @@
                 "orchestral",
                 "testing"
             ],
-            "time": "2018-10-07T01:22:19+00:00"
+            "time": "2018-11-13T02:38:23+00:00"
         },
         {
             "name": "phar-io/manifest",
