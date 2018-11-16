@@ -138,13 +138,13 @@ class AEBN extends AdultMovies
     {
         $this->_res = false;
         $ret = $this->_html->findOne('div.starsFull');
-        if (!$ret instanceof SimpleHtmlDomNodeBlank) {
+        if (! $ret instanceof SimpleHtmlDomNodeBlank) {
             foreach ($ret->find('span[itemprop=name]') as $star) {
                 $this->_res['cast'][] = trim($star->plaintext);
             }
         } else {
             $ret = $this->_html->findOne('div.detailsLink');
-            if (!$ret instanceof SimpleHtmlDomNodeBlank) {
+            if (! $ret instanceof SimpleHtmlDomNodeBlank) {
                 foreach ($ret->find('span') as $star) {
                     if (strpos($star->plaintext, '/More/') !== false && strpos($star->plaintext, '/Stars/') !== false) {
                         $this->_res['cast'][] = trim($star->plaintext);

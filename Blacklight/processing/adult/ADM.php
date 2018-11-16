@@ -147,7 +147,7 @@ class ADM extends AdultMovies
         foreach ($this->_html->find('h3') as $heading) {
             if (trim($heading->plaintext) === 'Cast') {
                 foreach ($heading->nextSibling() as $next) {
-                    if (!$next instanceof SimpleHtmlDomNodeBlank && $next->nodeName !== 'h3') {
+                    if (! $next instanceof SimpleHtmlDomNodeBlank && $next->nodeName !== 'h3') {
                         $next = $next->nextSibling();
                     }
                     if (preg_match_all('/search_performerid/', $next->href, $matches)) {

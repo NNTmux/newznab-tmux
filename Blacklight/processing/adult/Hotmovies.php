@@ -104,7 +104,7 @@ class Hotmovies extends AdultMovies
     }
 
     /**
-     * Process ProductInfo
+     * Process ProductInfo.
      *
      * @param bool $extras
      *
