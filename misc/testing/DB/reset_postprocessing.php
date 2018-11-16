@@ -66,7 +66,7 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
     }
 
     $qry = DB::select('SELECT id FROM releases'.$where);
-    if ($qry !== false) {
+    if (! empty($qry)) {
         $total = \count($qry);
     } else {
         $total = 0;
@@ -94,7 +94,7 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
     $qry = DB::select('SELECT id FROM releases'.$where);
 
     $total = 0;
-    if ($qry !== false) {
+    if (! empty($qry)) {
         $total = \count($qry);
     }
 
@@ -119,7 +119,7 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
     }
 
     $qry = DB::select('SELECT id FROM releases'.$where);
-    if ($qry !== false) {
+    if (! empty($qry)) {
         $total = \count($qry);
     } else {
         $total = 0;
@@ -167,7 +167,7 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
 
     $colorCli->primary('SELECT id FROM releases'.$where);
     $qry = DB::select('SELECT id FROM releases'.$where);
-    if ($qry !== false) {
+    if (! empty($qry)) {
         $total = \count($qry);
     } else {
         $total = 0;
@@ -195,7 +195,7 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
     }
 
     $qry = DB::select('SELECT id FROM releases'.$where);
-    if ($qry !== false) {
+    if (! empty($qry)) {
         $total = \count($qry);
     } else {
         $total = 0;
@@ -222,7 +222,7 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
     }
 
     $qry = DB::select('SELECT id FROM releases'.$where);
-    if ($qry !== false) {
+    if (! empty($qry)) {
         $total = \count($qry);
     } else {
         $total = 0;
