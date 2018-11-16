@@ -2,6 +2,8 @@
 
 namespace Blacklight\processing\adult;
 
+use voku\helper\SimpleHtmlDomNodeBlank;
+
 class AEBN extends AdultMovies
 {
     /**
@@ -99,7 +101,7 @@ class AEBN extends AdultMovies
         if ($ret !== false) {
             $ret = trim($ret->src);
             if (strpos($ret, '//') === 0) {
-                $ret = 'http:'.$ret;
+                $ret = 'https:'.$ret;
             }
             $this->_res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
             $this->_res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
@@ -115,7 +117,7 @@ class AEBN extends AdultMovies
      */
     protected function genres()
     {
-        if ($ret = $this->_html->find('div.md-detailsCategories', 0)) {
+        if ($ret = $this->_html->findOne('div.md-detailsCategories')) {
             foreach ($ret->find('a[itemprop=genre]') as $genre) {
                 $this->_res['genres'][] = trim($genre->plaintext);
             }
@@ -135,12 +137,14 @@ class AEBN extends AdultMovies
     protected function cast()
     {
         $this->_res = false;
-        if ($ret = $this->_html->find('div.starsFull', 0)) {
+        $ret = $this->_html->findOne('div.starsFull');
+        if (!$ret instanceof SimpleHtmlDomNodeBlank) {
             foreach ($ret->find('span[itemprop=name]') as $star) {
                 $this->_res['cast'][] = trim($star->plaintext);
             }
         } else {
-            if ($ret = $this->_html->find('div.detailsLink', 0)) {
+            $ret = $this->_html->findOne('div.detailsLink');
+            if (!$ret instanceof SimpleHtmlDomNodeBlank) {
                 foreach ($ret->find('span') as $star) {
                     if (strpos($star->plaintext, '/More/') !== false && strpos($star->plaintext, '/Stars/') !== false) {
                         $this->_res['cast'][] = trim($star->plaintext);
@@ -189,9 +193,9 @@ class AEBN extends AdultMovies
      */
     protected function synopsis()
     {
-        if ($ret = $this->_html->find('span[itemprop=about]', 0)) {
+        if ($ret = $this->_html->findOne('span[itemprop=about]')) {
             if ($ret === null) {
-                if ($ret = $this->_html->find('div.movieDetailDescription', 0)) {
+                if ($ret = $this->_html->findOne('div.movieDetailDescription')) {
                     $this->_res['synopsis'] = preg_replace('/Description:\s/', '', $this->_res['plot']);
                 }
             } else {
@@ -217,23 +221,20 @@ class AEBN extends AdultMovies
         $this->_trailerUrl = self::TRAILINGSEARCH.urlencode($movie);
         $this->_response = getRawHtml(self::AEBNSURL.$this->_trailerUrl, $this->cookie);
         if ($this->_response !== false) {
-            $this->_html->load($this->_response);
             $i = 1;
-            foreach ($this->_html->find('div.movie') as $mov) {
+            foreach ($this->_html->loadHtml($this->_response)->find('div.movie') as $mov) {
                 $string = 'a#FTSMovieSearch_link_title_detail_'.$i;
-                if ($ret = $mov->find($string, 0)) {
+                if ($ret = $mov->findOne($string)) {
                     $title = str_replace('/XXX/', '', $ret->title);
-                    $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
-                    $title = trim($title);
+                    $title = trim(preg_replace('/\(.*?\)|[-._]/', ' ', $title));
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {
                         $this->_title = trim($ret->title);
                         $this->_trailerUrl = html_entity_decode($ret->href);
                         $this->_directUrl = self::AEBNSURL.$this->_trailerUrl;
-                        $this->_html->clear();
                         unset($this->_response);
                         $this->_response = getRawHtml(self::AEBNSURL.$this->_trailerUrl, $this->cookie);
-                        $this->_html->load($this->_response);
+                        $this->_html->loadHtml($this->_response);
 
                         return true;
                     }

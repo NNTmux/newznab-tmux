@@ -67,7 +67,7 @@ class ADE extends AdultMovies
     protected function trailers()
     {
         $this->_response = getRawHtml(self::ADE.$this->_trailers.$this->_directUrl);
-        $this->_html->load($this->_response);
+        $this->_html->loadHtml($this->_response);
         if (preg_match("/(\"|')(?P<swf>[^\"']+.swf)(\"|')/i", $this->_response, $matches)) {
             $this->_res['trailers']['url'] = self::ADE.trim(trim($matches['swf']), '"');
             if (preg_match('#(?:streamID:\s\")(?P<streamid>[0-9A-Z]+)(?:\")#',
@@ -108,7 +108,7 @@ class ADE extends AdultMovies
      */
     protected function synopsis()
     {
-        $ret = $this->_html->find('meta[name=og:description]', 0)->content;
+        $ret = $this->_html->findOne('meta[name=og:description]')->content;
         if ($ret !== false) {
             $this->_res['synopsis'] = trim($ret);
         }
@@ -125,7 +125,7 @@ class ADE extends AdultMovies
     protected function cast()
     {
         $cast = [];
-        foreach ($this->_html->find('[Label="Performers - detail"]') as $a) {
+        foreach ($this->_html->find('h3') as $a) {
             if ($a->plaintext !== false) {
                 $cast[] = trim($a->plaintext);
             }
@@ -162,10 +162,10 @@ class ADE extends AdultMovies
     {
         $dofeature = null;
         $this->_tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->_response);
-        $this->_html->load($this->_tmpResponse);
-        if ($ret = $this->_html->find('div[class=spdinfo]', 0)) {
+        $this->_html->loadHtml($this->_tmpResponse);
+        if ($ret = $this->_html->findOne('div[class=spdinfo]')) {
             $this->_tmpResponse = trim($ret->outertext);
-            $ret = $this->_html->load($this->_tmpResponse);
+            $ret = $this->_html->loadHtml($this->_tmpResponse);
             foreach ($ret->find('text') as $strong) {
                 if (trim($strong->innertext) === 'Features') {
                     $dofeature = true;
@@ -203,8 +203,7 @@ class ADE extends AdultMovies
         }
         $this->_response = getRawHtml(self::ADE.$this->_dvdQuery.rawurlencode($movie));
         if ($this->_response !== false) {
-            $this->_html->load($this->_response);
-            if ($res = $this->_html->find('a[class=boxcover]')) {
+            if ($res = $this->_html->loadHtml($this->_response)->find('a[class=fancybox-button]')) {
                 foreach ($res as $ret) {
                     $title = $ret->title;
                     $title = str_replace('/XXX/', '', $title);
@@ -214,10 +213,9 @@ class ADE extends AdultMovies
                     if ($p >= 90) {
                         $this->_directUrl = self::ADE.$url;
                         $this->_title = trim($title);
-                        $this->_html->clear();
                         unset($this->_response);
                         $this->_response = getRawHtml($this->_directUrl);
-                        $this->_html->load($this->_response);
+                        $this->_html->loadHtml($this->_response);
 
                         return true;
                     }

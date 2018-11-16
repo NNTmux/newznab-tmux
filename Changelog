@@ -1,4 +1,5 @@
 2018-11-16 DariusIII
+	* Fix: Partial fix for XXX releases processing after addition of new library
 	* Chg: Small additional fixes to reset_postprocessing.php script
 	* Chg: Update reset_postprocessing.php script
 	* Chg: Update barryvdh/laravel-debugbar, orchestra/testbench-core and orchestra/testbench to their latest versions

@@ -2,6 +2,8 @@
 
 namespace Blacklight\processing\adult;
 
+use voku\helper\SimpleHtmlDomNodeBlank;
+
 class ADM extends AdultMovies
 {
     /**
@@ -144,7 +146,10 @@ class ADM extends AdultMovies
         $cast = [];
         foreach ($this->_html->find('h3') as $heading) {
             if (trim($heading->plaintext) === 'Cast') {
-                for ($next = $heading->next_sibling(); $next && $next->nodeName !== 'h3'; $next = $next->next_sibling()) {
+                foreach ($heading->nextSibling() as $next) {
+                    if (!$next instanceof SimpleHtmlDomNodeBlank && $next->nodeName !== 'h3') {
+                        $next = $next->nextSibling();
+                    }
                     if (preg_match_all('/search_performerid/', $next->href, $matches)) {
                         $cast[] = trim($next->plaintext);
                     }
@@ -166,9 +171,8 @@ class ADM extends AdultMovies
         foreach ($this->_html->find('ul.list-unstyled') as $li) {
             $category = explode(':', $li->plaintext);
             if (trim($category[0]) === 'Category') {
-                $genre = explode(',', $category[1]);
-                foreach ($genre as $g) {
-                    $genres[] = trim($g);
+                foreach (explode(',', $category[1]) as $genre) {
+                    $genres[] = trim($genre);
                 }
                 $this->_res['genres'] = $genres;
             }
@@ -191,8 +195,7 @@ class ADM extends AdultMovies
             $this->_trailUrl = self::TRAILINGSEARCH.urlencode($movie);
             $this->_response = getRawHtml(self::ADMURL.$this->_trailUrl, $this->cookie);
             if ($this->_response !== false) {
-                $this->_html->load($this->_response);
-                $check = $this->_html->find('img[rel=license]');
+                $check = $this->_html->loadHtml($this->_response)->find('img[rel=license]');
                 if (\count($check) > 0) {
                     foreach ($check as $ret) {
                         if (isset($ret->alt)) {
@@ -203,12 +206,11 @@ class ADM extends AdultMovies
                             similar_text($comparetitle, $comparesearch, $p);
                             if ($p >= 90 && preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
                                 $this->_title = trim($title);
-                                $this->_trailUrl = '/dvd_view_'.(string) $matches['sku'].'.html';
+                                $this->_trailUrl = '/dvd_view_'.$matches['sku'].'.html';
                                 $this->_directUrl = self::ADMURL.$this->_trailUrl;
-                                $this->_html->clear();
                                 unset($this->_response);
                                 $this->_response = getRawHtml($this->_directUrl, $this->cookie);
-                                $this->_html->load($this->_response);
+                                $this->_html->loadHtml($this->_response);
                                 $result = true;
                             }
                         }

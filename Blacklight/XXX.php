@@ -603,11 +603,11 @@ class XXX
                 $backdrop = $this->releaseImage->saveImage($xxxID.'-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
             }
 
-            XxxInfo::query()->where('id', $xxxID)->update(['cover' => $cover, 'backdrop' => $backdrop]);
+            XxxInfo::whereId($xxxID)->update(['cover' => $cover, 'backdrop' => $backdrop]);
         }
 
         if ($this->echoOutput) {
-            $this->colorCli->headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.$this->colorCli->primary($mov['title']) : 'Nothing to update for XXX movie: '.$this->colorCli->primary($mov['title'])));
+            $this->colorCli->primary(($xxxID !== false ? 'Added/updated XXX movie: '.$mov['title'] : 'Nothing to update for XXX movie: '.$mov['title']), true);
         }
 
         return $xxxID;
@@ -657,10 +657,10 @@ class XXX
                             $this->colorCli->primaryOver('Looking up: ').$this->colorCli->headerOver($this->currentTitle);
                         }
 
-                        $this->colorCli->info('Local match not found, checking web!');
+                        $this->colorCli->info('Local match not found, checking web!', true);
                         $idcheck = $this->updateXXXInfo($this->currentTitle);
                     } else {
-                        $this->colorCli->info('Local match found for XXX Movie: '.$this->colorCli->headerOver($this->currentTitle));
+                        $this->colorCli->info('Local match found for XXX Movie: '.$this->currentTitle, true);
                         $idcheck = (int) $check['id'];
                     }
                 } else {
