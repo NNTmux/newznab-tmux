@@ -1,3 +1,5 @@
+2018-11-17 DariusIII
+	* Chg: Small adjustments in switch.php
 2018-11-16 DariusIII
 	* Chg: Update imdbphp/imdbphp to version 6.1.0
 	* Fix: Partial fix for XXX releases processing after addition of new library
