@@ -199,13 +199,13 @@ class Nfo
     public function addAlternateNfo(&$nfo, $release, $nntp): bool
     {
         if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
-            $check = ReleaseNfo::query()->where('releases_id', $release['id'])->first(['releases_id']);
+            $check = ReleaseNfo::whereReleasesId($release['id'])->first(['releases_id']);
 
             if ($check === null) {
                 ReleaseNfo::query()->insert(['releases_id' => $release['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($nfo)]);
             }
 
-            Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FOUND]);
+            Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FOUND]);
 
             if (! isset($release['completion'])) {
                 $release['completion'] = 0;
@@ -334,11 +334,11 @@ class Nfo
                 if ($fetchedBinary !== false) {
                     // Insert nfo into database.
 
-                    $ckReleaseId = ReleaseNfo::query()->where('releases_id', $arr['id'])->first(['releases_id']);
+                    $ckReleaseId = ReleaseNfo::whereReleasesId($arr['id'])->first(['releases_id']);
                     if ($ckReleaseId === null) {
                         ReleaseNfo::query()->insert(['releases_id' => $arr['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
                     }
-                    Release::query()->where('id', $arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
+                    Release::whereId($arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
                     $ret++;
                     $movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
@@ -365,10 +365,10 @@ class Nfo
 
         foreach ($qry->get(['id']) as $release) {
             // remove any releasenfo for failed
-            ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
+            ReleaseNfo::whereReleasesId($release['id'])->delete();
 
             // set release.nfostatus to failed
-            Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
+            Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FAILED]);
         }
 
         if ($this->echo) {
