@@ -1,4 +1,5 @@
 2018-11-18 DariusIII
+	* Chg: Increase number of checked files in PostProcess par2 check function
 	* Chg: Update Blacklight/utility/Country class
 	* Chg: Use short version of where query in Nfo class
 2018-11-17 DariusIII
