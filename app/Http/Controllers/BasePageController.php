@@ -134,7 +134,7 @@ class BasePageController extends Controller
                 [
                     'isadmin' => false,
                     'ismod' => false,
-                    'loggedin' => false
+                    'loggedin' => false,
                 ]
             );
         }
@@ -142,7 +142,7 @@ class BasePageController extends Controller
         $this->smarty->assign(
             [
                 'theme'=> $this->theme,
-                'site' => $this->settings
+                'site' => $this->settings,
             ]
         );
     }
