@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Blacklight\Contents;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ContentController extends BasePageController
 {
