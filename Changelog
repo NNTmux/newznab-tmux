@@ -1,4 +1,5 @@
 2018-11-19 DariusIII
+	* Chg: Update Console and Details controllers, change behaviour on missing data
 	* Chg: Update ContentController, do not show 404 page on missing content but return json message
 	* Fix: Fix display of contact form when logged in
 2018-11-18 DariusIII

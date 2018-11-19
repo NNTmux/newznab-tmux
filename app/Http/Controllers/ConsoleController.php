@@ -13,6 +13,7 @@ class ConsoleController extends BasePageController
      * @param \Illuminate\Http\Request $request
      * @param string                   $id
      *
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
     public function show(Request $request, $id = '')
@@ -92,7 +93,7 @@ class ConsoleController extends BasePageController
             if ($cdata !== null) {
                 $this->smarty->assign('catname', $cdata);
             } else {
-                $this->show404();
+                return response()->json(['message' => 'There are no categories set.'], 404);
             }
         }
 
