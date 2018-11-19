@@ -52,11 +52,6 @@ class GetNzbController extends BasePageController
             }
         }
 
-        // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
-        if ($request->has('id')) {
-            str_ireplace('.nzb', '', $request->input('id'));
-        }
-
         // Check download limit on user role.
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests > $maxDownloads) {
@@ -119,7 +114,7 @@ class GetNzbController extends BasePageController
         $headers = [
             'Content-Type' => 'application/x-nzb',
             'Expires' => date('r', now()->addDays(365)->timestamp),
-            'X-DNZB-Failure' => url('/').'/failed'.'?guid='.$request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken,
+            'X-DNZB-Failure' => url('/').'/failed'.'?guid='.$request->input('id').'&userid='.$uid.'&api_token='.$rssToken,
             'X-DNZB-Category' => $relData['category_name'],
             'X-DNZB-Details' => url('/').'/details/'.$request->input('id'),
         ];
