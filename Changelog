@@ -1,3 +1,5 @@
+2018-11-19 DariusIII
+	* Fix: Fix display of contact form when logged in
 2018-11-18 DariusIII
 	* Chg: Increase number of checked files in PostProcess par2 check function
 	* Chg: Update Blacklight/utility/Country class

@@ -118,20 +118,33 @@ class BasePageController extends Controller
         if (Auth::check()) {
             $this->userdata = User::find(Auth::id());
             $this->setUserPreferences();
+            if ($this->theme === 'None') {
+                $this->theme = Settings::settingValue('site.main.style');
+            }
         } else {
             $this->theme = Settings::settingValue('site.main.style');
+            // Tell Smarty which directories to use for templates
+            $this->smarty->setTemplateDir([
+                'user' => config('ytake-laravel-smarty.template_path').DIRECTORY_SEPARATOR.$this->theme,
+                'shared' => config('ytake-laravel-smarty.template_path').'/shared',
+                'default' => config('ytake-laravel-smarty.template_path').'/Gentele',
+            ]);
 
-            $this->smarty->assign('isadmin', 'false');
-            $this->smarty->assign('ismod', 'false');
-            $this->smarty->assign('loggedin', 'false');
+            $this->smarty->assign(
+                [
+                    'isadmin' => false,
+                    'ismod' => false,
+                    'loggedin' => false
+                ]
+            );
         }
 
-        if ($this->theme === 'None') {
-            $this->theme = Settings::settingValue('site.main.style');
-        }
-
-        $this->smarty->assign('theme', $this->theme);
-        $this->smarty->assign('site', $this->settings);
+        $this->smarty->assign(
+            [
+                'theme'=> $this->theme,
+                'site' => $this->settings
+            ]
+        );
     }
 
     /**
