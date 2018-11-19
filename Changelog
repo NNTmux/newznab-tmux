@@ -1,4 +1,5 @@
 2018-11-19 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.26.0
 	* Chg: Update MovieController
 	* Fix: Fix wrong link with bad data sent to failed releases controller in GetNzbController
 	* Chg: Update Console and Details controllers, change behaviour on missing data
