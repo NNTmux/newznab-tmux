@@ -39,7 +39,6 @@ class VerifyNNTmuxVersion extends Command
     }
 
     /**
-     *
      * @throws \Cz\Git\GitException
      */
     public function handle()
@@ -58,7 +57,6 @@ class VerifyNNTmuxVersion extends Command
     }
 
     /**
-     *
      * @throws \Cz\Git\GitException
      */
     public function all()
