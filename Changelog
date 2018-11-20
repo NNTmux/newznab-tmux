@@ -1,6 +1,7 @@
 2018-11-20 DariusIII
+	* Chg: Update maxim-db/reader to version 1.4.0
 	* Chg: Update ReleaseExtra class addXml function
-	* CHg: Update artisan commands PHPDOC blocks
+	* Chg: Update artisan commands PHPDOC blocks
 	* Chg: Update composer install process to prefer dist in dev branches too, we will not be making changes to composer packages
 	* Chg: Update PCGames categorization function, use categorization by poster
 	* Chg: Update isPC function to check if release is PCGame before isISO check
