@@ -1,5 +1,6 @@
 2018-11-20 DariusIII
-	* CHg: Update query style in NameFixer class
+	* Chg: Update isPC function to check if release is PCGame before isISO check
+	* Chg: Update query style in NameFixer class
 	* Chg: Update spatie/laravel-permission to version 2.26.1
 2018-11-19 DariusIII
 	* Chg: Update config/permission.php

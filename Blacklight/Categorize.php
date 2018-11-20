@@ -1110,8 +1110,8 @@ class Categorize
                 return false;
             case $this->isPhone():
             case $this->isMac():
-            case $this->isISO():
             case $this->isPCGame():
+            case $this->isISO():
             case $this->is0day():
                 return true;
             default:
