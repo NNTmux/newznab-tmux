@@ -1,4 +1,5 @@
 2018-11-20 DariusIII
+	* Chg: Update User model and install testC
 	* Chg: Update maxim-db/reader to version 1.4.0
 	* Chg: Update ReleaseExtra class addXml function
 	* Chg: Update artisan commands PHPDOC blocks

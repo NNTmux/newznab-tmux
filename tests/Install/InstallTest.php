@@ -25,21 +25,17 @@ use App\Models\Settings;
  */
 class InstallTest extends \PHPUnit\Framework\TestCase
 {
-
-
+    /**
+     * @throws \Cz\Git\GitException
+     */
 	public function testFullInstall()
 	{
-        if (! \defined('NN_INSTALLER')) {
-            \define('NN_INSTALLER', true);
-        }
-
         $error = false;
 
         passthru('php '.NN_ROOT.'artisan migrate:fresh --seed');
 
         // Check one of the standard tables was created and has data.
-        $ver = new Versions();
-        $patch = $ver->getSQLPatchFromFile();
+        $patch = (new Versions())->getSQLPatchFromFile();
         $updateSettings = false;
         if ($patch > 0) {
             $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);

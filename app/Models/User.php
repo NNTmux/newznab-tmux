@@ -802,11 +802,7 @@ class User extends Authenticatable
         $rateLimit = $roleData->value('rate_limit');
         $roleName = $roleData->value('name');
 
-        if (\defined('NN_INSTALLER')) {
-            $storeips = '';
-        } else {
-            $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
-        }
+        $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
 
         $user = self::create(
             [
@@ -817,7 +813,7 @@ class User extends Authenticatable
                 'roles_id' => $role,
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
-                'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
+                'invitedby' => (int) $invitedBy === 0 ? null : $invitedBy,
                 'userseed' => md5(Str::uuid()->toString()),
                 'notes' => $notes,
                 'rate_limit' => $rateLimit,
@@ -859,6 +855,7 @@ class User extends Authenticatable
      * @param int $userID ID of the user.
      *
      * @return array
+     * @throws \Exception
      */
     public static function getCategoryExclusion($userID): array
     {
