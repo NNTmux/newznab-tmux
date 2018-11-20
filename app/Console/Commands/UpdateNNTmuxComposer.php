@@ -66,7 +66,7 @@ class UpdateNNTmuxComposer extends Command
         if (\in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
             $command .= ' --prefer-dist --no-dev';
         } else {
-            $command .= ' --prefer-source';
+            $command .= ' --prefer-dist';
         }
         $this->output->writeln('<comment>Running composer install process...</comment>');
         $process = new Process($command);

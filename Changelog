@@ -1,4 +1,5 @@
 2018-11-20 DariusIII
+	* Chg: Update composer install process to prefer dist in dev branches too, we will not be making changes to composer packages
 	* Chg: Update PCGames categorization function, use categorization by poster
 	* Chg: Update isPC function to check if release is PCGame before isISO check
 	* Chg: Update query style in NameFixer class
