@@ -38,9 +38,6 @@ class UpdateNNTmuxComposer extends Command
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return mixed
      * @throws \Cz\Git\GitException
      */
     public function handle()
@@ -52,9 +49,9 @@ class UpdateNNTmuxComposer extends Command
      * Issues the command to 'install' the composer package.
      *
      * It first checks the current branch for stable versions. If found then the '--no-dev'
-     * option is added to the command to prevent development packages being also downloded.
+     * option is added to the command to prevent development packages being also downloaded.
      *
-     * @return int Return status from Composer.
+     * @return string
      * @throws \Cz\Git\GitException
      */
     protected function composer()
