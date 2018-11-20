@@ -1206,6 +1206,10 @@ class Categorize
             return true;
         }
 
+        if ($this->checkPoster('/\<PC\@MASTER\.RACE\>/i', $this->poster, Category::PC_GAMES) === true) {
+            return true;
+        }
+
         return false;
     }
 
