@@ -36,7 +36,7 @@ class UpdateNNTmuxGit extends Command
     }
 
     /**
-     * @throws \Exception
+     * @throws \Cz\Git\GitException
      */
     public function handle()
     {

@@ -138,11 +138,11 @@ class InstallNntmux extends Command
 
     /**
      * @return bool
+     * @throws \Cz\Git\GitException
      */
     private function updatePatch(): bool
     {
-        $ver = new Versions();
-        $patch = $ver->getSQLPatchFromFile();
+        $patch = (new Versions())->getSQLPatchFromFile();
         $updateSettings = false;
         if ($patch > 0) {
             $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
