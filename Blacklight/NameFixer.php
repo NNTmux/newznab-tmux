@@ -282,7 +282,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE nzbstatus = %d
 					AND predb_id = 0',
                 NZB::NZB_ADDED
@@ -295,8 +295,8 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
-					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND proc_files = %d',
                 self::IS_RENAMED_NONE,
@@ -347,7 +347,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE nzbstatus = %d
 					AND predb_id = 0',
                 NZB::NZB_ADDED
@@ -359,7 +359,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rf.name LIKE %s',
@@ -410,7 +410,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE nzbstatus = %d
 					AND predb_id = 0',
                 NZB::NZB_ADDED
@@ -422,7 +422,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rf.name LIKE %s
@@ -506,8 +506,7 @@ class NameFixer
                         'Echo'        => $this->echooutput,
                         'NNTP'        => $nntp,
                         'Nfo'         => $Nfo,
-                        'Settings'    => null,
-                        'PostProcess' => new PostProcess(['Settings' => null, 'Nfo' => $Nfo]),
+                        'PostProcess' => new PostProcess(['Nfo' => $Nfo]),
                     ]
                 );
 
@@ -618,7 +617,7 @@ class NameFixer
                 "
 				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
 				FROM releases rel
-				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
+				INNER JOIN releaseextrafull rf ON rf.releases_id = rel.id
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
                 AND rf.mediainfo REGEXP '\<Movie_name\>'
                 AND rel.nzbstatus = %d
@@ -632,7 +631,7 @@ class NameFixer
                 "
 				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
 				FROM releases rel
-				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
+				INNER JOIN releaseextrafull rf ON rf.releases_id = rel.id
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
 				AND rf.mediainfo REGEXP '\<Movie_name\>'
 				AND rel.nzbstatus = %d
