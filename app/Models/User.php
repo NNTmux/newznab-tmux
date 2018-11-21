@@ -693,7 +693,8 @@ class User extends Authenticatable
             $invitedBy = self::checkAndUseInvite($inviteCode);
             if ($invitedBy < 0) {
                 return self::ERR_SIGNUP_BADINVITECODE;
-            }  }
+            }
+        }
 
         return self::add($user['userName'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
     }
