@@ -261,7 +261,7 @@ class Movie
             $catsrch = Category::getCategorySearch($cat);
         }
         $order = $this->getMovieOrder($orderBy);
-        $expiresAt = now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $moviesSql =
             sprintf(
                 "
