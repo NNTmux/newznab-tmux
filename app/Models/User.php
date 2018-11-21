@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Jobs\SendInviteEmail;
@@ -411,7 +412,7 @@ class User extends Authenticatable
 				SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
-				LEFT JOIN user_requests ON user_requests.users_id = users.id
+				LEFT JOIN user_requests ON user_requests.users_id = users.ied
 				WHERE users.id != 0 %s %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
@@ -679,7 +680,7 @@ class User extends Authenticatable
         ]);
 
         if ($validator->fails()) {
-            echo implode('', array_collapse($validator->errors()->toArray()));
+            (new ColorCLI())->error(implode('', array_collapse($validator->errors()->toArray())));
         }
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
@@ -692,8 +693,7 @@ class User extends Authenticatable
             $invitedBy = self::checkAndUseInvite($inviteCode);
             if ($invitedBy < 0) {
                 return self::ERR_SIGNUP_BADINVITECODE;
-            }
-        }
+            }  }
 
         return self::add($user['userName'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
     }
@@ -701,11 +701,11 @@ class User extends Authenticatable
     /**
      * If a invite is used, decrement the person who invited's invite count.
      *
-     * @param int $inviteCode
+     * @param string $inviteCode
      *
      * @return int
      */
-    public static function checkAndUseInvite($inviteCode): int
+    public static function checkAndUseInvite(string $inviteCode): int
     {
         $invite = Invitation::getInvite($inviteCode);
         if (! $invite) {
