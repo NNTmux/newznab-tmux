@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +12,7 @@ use App\Jobs\SendAccountExpiredEmail;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Traits\UserVerification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -670,7 +670,7 @@ class User extends Authenticatable
         $user = [
             'username' => trim($userName),
             'password' => trim($password),
-            'email' => trim($email)
+            'email' => trim($email),
         ];
 
         $validator = Validator::make($user, [
