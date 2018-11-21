@@ -176,7 +176,7 @@ class ProfileController extends BasePageController
                         $data['roles_id'],
                         $data['notes'],
                         $data['invites'],
-                        $request->has('movieview')  ? 1 : 0,
+                        $request->has('movieview') ? 1 : 0,
                         $request->has('musicview') ? 1 : 0,
                         $request->has('gameview') ? 1 : 0,
                         $request->has('xxxview') ? 1 : 0,
