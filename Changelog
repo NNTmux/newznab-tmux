@@ -1,4 +1,5 @@
 2018-11-21 DariusIII
+	* Chg: Replace custom user email and password validation with laravel validation for user profile updates
 	* Chg: Update spatie/laravel-permission to version 2.26.2
 2018-11-20 DariusIII
 	* Chg: Update User model and install testC

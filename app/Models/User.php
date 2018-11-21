@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Facades\DB;
@@ -293,25 +294,7 @@ class User extends Authenticatable
         $userName = trim($userName);
         $email = trim($email);
 
-        $rateLimit = Role::query()->where('id', $role)->get();
-
-        if (! self::isValidUsername($userName)) {
-            return self::ERR_SIGNUP_BADUNAME;
-        }
-
-        if (! self::isValidEmail($email)) {
-            return self::ERR_SIGNUP_BADEMAIL;
-        }
-
-        $res = self::getByUsername($userName);
-        if ($res && (int) $res['id'] !== (int) $id) {
-            return self::ERR_SIGNUP_UNAMEINUSE;
-        }
-
-        $res = self::getByEmail($email);
-        if ($res && (int) $res['id'] !== (int) $id) {
-            return self::ERR_SIGNUP_EMAILINUSE;
-        }
+        $rateLimit = Role::query()->where('id', $role)->first();
 
         $sql = [
             'username' => $userName,
@@ -339,37 +322,15 @@ class User extends Authenticatable
             'nzbvortex_api_key' => $nzbvortexApiKey,
             'cp_url' => $cp_url,
             'cp_api' => $cp_api,
-            'rate_limit' => $rateLimit[0]['rate_limit'],
+            'rate_limit' => $rateLimit ? $rateLimit['rate_limit'] : 60,
         ];
 
         self::whereId($id)->update($sql);
 
         $user = self::find($id);
-        $user->syncRoles([$rateLimit[0]['name']]);
+        $user->syncRoles([$rateLimit['name']]);
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @param string $userName
-     *
-     * @return int
-     */
-    public static function isValidUsername(string $userName): int
-    {
-        return preg_match('/^[a-z][a-z0-9_]{2,}$/i', $userName);
-    }
-
-    /**
-     * When a user is registering or updating their profile, check if the email is valid.
-     *
-     * @param string $email
-     *
-     * @return bool
-     */
-    public static function isValidEmail(string $email): bool
-    {
-        return (bool) preg_match('/^([\w\+-]+)(\.[\w\+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/i', $email);
     }
 
     /**
@@ -705,30 +666,20 @@ class User extends Authenticatable
      */
     public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER)
     {
-        $userName = trim($userName);
-        $password = trim($password);
-        $email = trim($email);
+        $user = [
+            'username' => trim($userName),
+            'password' => trim($password),
+            'email' => trim($email)
+        ];
 
-        if (! self::isValidUsername($userName)) {
-            return self::ERR_SIGNUP_BADUNAME;
-        }
+        $validator = Validator::make($user, [
+            'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+        ]);
 
-        if (! self::isValidPassword($password)) {
-            return self::ERR_SIGNUP_BADPASS;
-        }
-
-        if (! self::isValidEmail($email)) {
-            return self::ERR_SIGNUP_BADEMAIL;
-        }
-
-        $res = self::getByUsername($userName);
-        if ($res !== null) {
-            return self::ERR_SIGNUP_UNAMEINUSE;
-        }
-
-        $res = self::getByEmail($email);
-        if ($res !== null) {
-            return self::ERR_SIGNUP_EMAILINUSE;
+        if ($validator->fails()) {
+            echo implode('', array_collapse($validator->errors()->toArray()));
         }
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
@@ -744,16 +695,7 @@ class User extends Authenticatable
             }
         }
 
-        return self::add($userName, $password, $email, $role, $notes, $host, $invites, $invitedBy);
-    }
-
-    /**
-     * @param string $password
-     * @return bool
-     */
-    public static function isValidPassword(string $password): bool
-    {
-        return \strlen($password) > 8 && preg_match('#[0-9]+#', $password) && preg_match('#[A-Z]+#', $password) && preg_match('#[a-z]+#', $password);
+        return self::add($user['userName'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
     }
 
     /**
