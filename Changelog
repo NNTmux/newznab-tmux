@@ -1,4 +1,5 @@
 2018-11-21 DariusIII
+	* Chg: Add php-cs-fixer to dev requirement
 	* Fix: Fix bad movie caching
 	* Chg: Update config/permission.php
 	* Chg: Update used libraries to their latest versions
