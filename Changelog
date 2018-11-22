@@ -1,4 +1,5 @@
 2018-11-22 DariusIII
+	* Chg: Rename .php-cs to .php-cs.dist
 	* Chg: Update nunomaduro/larastan to version 0.3.10
 	* Fix: Fix adding of movies to MyMovies (RSS still does not work)
 	* Chg: Change pointless 404 page usage where not needed, replace with redirects
