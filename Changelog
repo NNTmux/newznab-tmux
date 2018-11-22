@@ -1,4 +1,5 @@
 2018-11-22 DariusIII
+	* Chg: Update RSS class
 	* Chg: Rename .php-cs to .php-cs.dist
 	* Chg: Update nunomaduro/larastan to version 0.3.10
 	* Fix: Fix adding of movies to MyMovies (RSS still does not work)
