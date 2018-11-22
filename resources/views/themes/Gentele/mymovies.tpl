@@ -67,10 +67,10 @@
 						<td class="mid" style="width:100px;">
 							<div class="btn-group">
 								<a class="btn btn-mini btn-warning mymovies"
-								   href="{$smarty.const.WWW_TOP}/mymovies/edit/{$movie.imdbid}" rel="edit"
+								   href="{$smarty.const.WWW_TOP}/mymovies?id=edit&imdb={$movie.imdbid}" rel="edit"
 								   name="movies{$movie.imdbid}" title="Edit Categories">Edit</a>&nbsp;&nbsp;
 								<a class="btn btn-mini btn-danger mymovies"
-								   href="{$smarty.const.WWW_TOP}/mymovies/delete/{$movie.imdbid}" rel="remove"
+								   href="{$smarty.const.WWW_TOP}/mymovies?id=delete&imdb={$movie.imdbid}" rel="remove"
 								   name="movies{$movie.imdbid}" title="Remove from My Movies">Remove</a>
 							</div>
 						</td>

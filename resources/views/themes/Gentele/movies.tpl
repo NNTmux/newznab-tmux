@@ -119,7 +119,7 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -264,7 +264,7 @@
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"

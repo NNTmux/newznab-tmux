@@ -149,7 +149,7 @@ class MovieController extends BasePageController
             if ($cdata !== null) {
                 $this->smarty->assign('catname', $cdata);
             } else {
-                return response()->json(['message' => 'There are no categories set.'], 404);
+                $this->smarty->assign('catname', 'All');
             }
         }
 

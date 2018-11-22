@@ -69,7 +69,7 @@ class GamesController extends BasePageController
             if ($cdata !== null) {
                 $this->smarty->assign('catname', $cdata);
             } else {
-                $this->show404();
+                $this->smarty->assign('catname', 'All');
             }
         }
 

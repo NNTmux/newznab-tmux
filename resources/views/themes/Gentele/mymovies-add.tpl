@@ -3,8 +3,8 @@
 		<h1>Add to category</h1>
 	</div>
 	<h3>{$type|ucwords} {$movie.title|escape:"htmlall"} in</h3>
-    {{Form::open(['id' => 'mymovies', 'class' => 'form-horizontal', 'url' => "mymovies/do{$type}"])}}
-		<input type="hidden" name="subpage" value="{$imdbid}"/>
+    {{Form::open(['id' => 'mymovies', 'class' => 'form-horizontal', 'url' => "mymovies?id=do{$type}"])}}
+		<input type="hidden" name="imdb" value="{$imdbid}"/>
 		<div class="control-group">
 			<label class="control-label" for="category">Choose</label>
 			<div class="controls">

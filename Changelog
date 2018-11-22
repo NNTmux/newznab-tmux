@@ -1,3 +1,6 @@
+2018-11-22 DariusIII
+	* Fix: Fix adding of movies to MyMovies (RSS still does not work)
+	* Chg: Change pointless 404 page usage where not needed, replace with redirects
 2018-11-21 DariusIII
 	* Chg: Add php-cs-fixer to dev requirement
 	* Fix: Fix bad movie caching
