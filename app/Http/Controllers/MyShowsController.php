@@ -47,12 +47,12 @@ class MyShowsController extends BasePageController
             case 'doadd':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
                 if ($show) {
-                    $this->show404('Already subscribed');
-                } else {
-                    $show = Video::getByVideoID($videoId);
-                    if (! $show) {
-                        $this->show404('No matching show.');
-                    }
+                    return redirect('myshows');
+                }
+
+                $show = Video::getByVideoID($videoId);
+                if (! $show) {
+                    return redirect('myshows');
                 }
 
                 if ($action === 'doadd') {
@@ -91,7 +91,7 @@ class MyShowsController extends BasePageController
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
 
                 if (! $show) {
-                    $this->show404();
+                    return redirect('myshows');
                 }
 
                 if ($action === 'doedit') {

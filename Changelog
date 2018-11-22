@@ -1,3 +1,5 @@
+2018-11-22 DariusIII
+	* Chg: Change pointless 404 page usage where not needed, replace with redirects
 2018-11-21 DariusIII
 	* Fix: Fix bad movie caching
 	* Chg: Update config/permission.php

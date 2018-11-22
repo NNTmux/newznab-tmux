@@ -51,7 +51,7 @@ class AnimeController extends BasePageController
             $meta_description = 'View '.$aniDbInfo->title.' Anime';
 
             if (! $this->releases && ! $aniDbInfo) {
-                $this->show404();
+                $this->smarty->assign('nodata', 'No releases and AniDB info for this series.');
             } elseif (! $aniDbInfo) {
                 $this->smarty->assign('nodata', 'No AniDB information for this series.');
             } elseif (! $aniDbReleases) {
