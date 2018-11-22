@@ -8,7 +8,6 @@ use App\Models\Settings;
 use Blacklight\Releases;
 use App\Models\UserMovie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MyMoviesController extends BasePageController
 {
@@ -149,12 +148,11 @@ class MyMoviesController extends BasePageController
                     }
                 }
 
-
                 $ordering = (new Releases(['Settings' => $this->settings]))->getBrowseOrdering();
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
-                $results = $mv->getMovieRange($page, $movie['categoryNames'], $offset, config('nntmux.items_per_cover_page'), $ordering,-1, $this->userdata['categoryexclusions']);
+                $results = $mv->getMovieRange($page, $movie['categoryNames'], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata['categoryexclusions']);
 
                 $this->smarty->assign('covgroup', '');
 
