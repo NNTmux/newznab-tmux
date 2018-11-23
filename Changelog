@@ -1,3 +1,5 @@
+2018-11-23 DariusIII
+	* Fix: Fix MyMovies RSS feed
 2018-11-22 DariusIII
 	* Chg: Update RSS class
 	* Chg: Rename .php-cs to .php-cs.dist

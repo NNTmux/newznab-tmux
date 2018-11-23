@@ -186,14 +186,14 @@ class RSS extends Capabilities
      * Get movies for RSS.
      *
      *
-     * @param       $limit
+     * @param int   $limit
      * @param int   $userID
      * @param array $excludedCats
      *
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
      * @throws \Exception
      */
-    public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = [])
+    public function getMyMoviesRss($limit = 0, $userID = 0, array $excludedCats = [])
     {
         $sql = sprintf(
             "
@@ -205,7 +205,7 @@ class RSS extends Capabilities
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
 				LEFT JOIN groups g ON g.id = r.groups_id
-				LEFT JOIN movieinfo mi ON mi.imdbid = r.imdbid
+				LEFT JOIN movieinfo mi ON mi.id = r.movieinfo_id
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
@@ -229,7 +229,7 @@ class RSS extends Capabilities
             Category::MOVIE_ROOT,
             Category::MOVIE_OTHER,
             $this->releases->showPasswords(),
-            ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
+            $limit > 0 ? ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0' : ''
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
