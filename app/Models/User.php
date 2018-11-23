@@ -260,19 +260,19 @@ class User extends Authenticatable
     }
 
     /**
-     * @param        $id
-     * @param        $userName
-     * @param        $email
-     * @param        $grabs
-     * @param        $role
-     * @param        $notes
-     * @param        $invites
-     * @param        $movieview
-     * @param        $musicview
-     * @param        $gameview
-     * @param        $xxxview
-     * @param        $consoleview
-     * @param        $bookview
+     * @param  int      $id
+     * @param  string      $userName
+     * @param  string      $email
+     * @param   int     $grabs
+     * @param   int     $role
+     * @param    string    $notes
+     * @param   int     $invites
+     * @param   bool     $movieview
+     * @param    bool    $musicview
+     * @param    bool   $gameview
+     * @param    bool    $xxxview
+     * @param    bool    $consoleview
+     * @param    bool    $bookview
      * @param string $queueType
      * @param string $nzbgetURL
      * @param string $nzbgetUsername
@@ -293,13 +293,11 @@ class User extends Authenticatable
     public static function updateUser($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None'): int
     {
         $userName = trim($userName);
-        $email = trim($email);
 
         $rateLimit = Role::query()->where('id', $role)->first();
 
         $sql = [
             'username' => $userName,
-            'email' => $email,
             'grabs' => $grabs,
             'roles_id' => $role,
             'notes' => substr($notes, 0, 255),
@@ -325,6 +323,11 @@ class User extends Authenticatable
             'cp_api' => $cp_api,
             'rate_limit' => $rateLimit ? $rateLimit['rate_limit'] : 60,
         ];
+
+        if (! empty($email)) {
+            $email = trim($email);
+            $sql += ['email' => $email];
+        }
 
         self::whereId($id)->update($sql);
 

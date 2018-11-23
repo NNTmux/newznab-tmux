@@ -1,4 +1,5 @@
 2018-11-23 DariusIII
+	* Fix: Fix empty email on profile save
 	* Fix: Fix MyMovies RSS feed
 2018-11-22 DariusIII
 	* Chg: Update RSS class
