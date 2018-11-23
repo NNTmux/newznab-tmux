@@ -263,16 +263,16 @@ class User extends Authenticatable
      * @param  int      $id
      * @param  string      $userName
      * @param  string      $email
-     * @param   int     $grabs
-     * @param   int     $role
-     * @param    string    $notes
-     * @param   int     $invites
-     * @param   bool     $movieview
-     * @param    bool    $musicview
-     * @param    bool   $gameview
-     * @param    bool    $xxxview
-     * @param    bool    $consoleview
-     * @param    bool    $bookview
+     * @param  int     $grabs
+     * @param  int     $role
+     * @param  string    $notes
+     * @param  int     $invites
+     * @param  int     $movieview
+     * @param  int    $musicview
+     * @param  int   $gameview
+     * @param  int    $xxxview
+     * @param  int    $consoleview
+     * @param  int    $bookview
      * @param string $queueType
      * @param string $nzbgetURL
      * @param string $nzbgetUsername
