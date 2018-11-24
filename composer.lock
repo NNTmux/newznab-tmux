@@ -1775,16 +1775,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.1.0",
+            "version": "v6.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "076f6e7a050fccb3d60884830a6be98f3e19708f"
+                "reference": "02986b4312f56a71c7299ee57316f2a65d70fe77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/076f6e7a050fccb3d60884830a6be98f3e19708f",
-                "reference": "076f6e7a050fccb3d60884830a6be98f3e19708f",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/02986b4312f56a71c7299ee57316f2a65d70fe77",
+                "reference": "02986b4312f56a71c7299ee57316f2a65d70fe77",
                 "shasum": ""
             },
             "require": {
@@ -1811,7 +1811,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-11-16T19:16:15+00:00"
+            "time": "2018-11-24T13:30:26+00:00"
         },
         {
             "name": "intervention/image",
@@ -2916,16 +2916,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.48",
+            "version": "1.0.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "a6ded5b2f6055e2db97b4b859fdfca2b952b78aa"
+                "reference": "a63cc83d8a931b271be45148fa39ba7156782ffd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/a6ded5b2f6055e2db97b4b859fdfca2b952b78aa",
-                "reference": "a6ded5b2f6055e2db97b4b859fdfca2b952b78aa",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/a63cc83d8a931b271be45148fa39ba7156782ffd",
+                "reference": "a63cc83d8a931b271be45148fa39ba7156782ffd",
                 "shasum": ""
             },
             "require": {
@@ -2996,7 +2996,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2018-10-15T13:53:10+00:00"
+            "time": "2018-11-23T23:41:29+00:00"
         },
         {
             "name": "league/fractal",
