@@ -4,22 +4,21 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
-use DariusIII\ItunesApi\Exceptions\InvalidProviderException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
-use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
+use DariusIII\ItunesApi\iTunes;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
+use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
  * Class Music.
@@ -356,7 +355,6 @@ class Music
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
-
         $ri = new ReleaseImage();
 
         $mus = [];
