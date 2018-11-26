@@ -395,7 +395,6 @@ class Music
             );
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
             MusicInfo::query()->where('id', $musicId)->update(['cover' => $mus['cover']]);
-
         } else {
             $musicId = $check['id'];
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
