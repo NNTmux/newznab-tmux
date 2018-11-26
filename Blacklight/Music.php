@@ -362,7 +362,9 @@ class Music
             $mus = $amazdata;
         } elseif ($title !== '') {
             $mus = $this->fetchAmazonProperties($title);
-        } elseif ($mus === false) {
+        }
+
+        if ($mus === false) {
             $mus = $this->fetchItunesProperties($title);
         } else {
             $mus = false;
@@ -394,6 +396,7 @@ class Music
             );
         } else {
             $musicId = $check['id'];
+            $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
             MusicInfo::query()->where('id', $musicId)->update(
                 [
                     'title' => $mus['title'],
@@ -404,7 +407,7 @@ class Music
                     'publisher' => $mus['publisher'],
                     'releasedate' => $mus['releasedate'],
                     'review' => $mus['review'],
-                    'year' => $mus['year'],
+                    'year' => $year,
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
@@ -421,7 +424,7 @@ class Music
                     '   Title:  '.
                     $mus['title'].
                     '   Year:   '.
-                    $mus['year']
+                    $year
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -437,7 +440,7 @@ class Music
                     $artist.
                     $mus['title'].
                     ' ('.
-                    $mus['year'].
+                    $year.
                     ')'
             );
         }
@@ -667,7 +670,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        $this->colorCli->headerOver('Looking up: '.$newname);
+                        $this->colorCli->header('Looking up: '.$newname);
                     }
 
                     // Do a local lookup first
@@ -898,7 +901,7 @@ class Music
                 'publisher' => $album->getPublisher(),
                 'releasedate' => $album->getReleaseDate(),
                 'review' => '',
-                'cover' => str_replace('100x100', '800x800', $album->getCover()),
+                'coverurl' => str_replace('100x100', '800x800', $album->getCover()),
                 'tracks' => '',
                 'musicgenre' => $genreName,
                 'musicgenres_id' => $genreKey,

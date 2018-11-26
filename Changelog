@@ -1,4 +1,5 @@
 2018-11-26 DariusIII
+	* Chg: Change Music lookup logic
 	* Fix: Fix typo in $this->coloCLi
 	* Chg: Fetch music information from iTunes too
 2018-11-25 DariusIII
