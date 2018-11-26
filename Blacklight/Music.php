@@ -419,11 +419,11 @@ class Music
         if ($musicId) {
             if ($this->echooutput) {
                 $this->colorCli->header(
-                    PHP_EOL.'Added/updated album: '.
+                    PHP_EOL.'Added/updated album: '. PHP_EOL.
                     '   Artist: '.
-                    $mus['artist'].
+                    $mus['artist'].  PHP_EOL .
                     '   Title:  '.
-                    $mus['title'].
+                    $mus['title'].  PHP_EOL.
                     '   Year:   '.
                     $year
                 );
@@ -866,16 +866,20 @@ class Music
     protected function fetchItunesProperties($title)
     {
         $mus = true;
+        // Load genres.
+        $defaultGenres = (new Genres())->loadGenres(Genres::MUSIC_TYPE);
 
         try {
             $album = iTunes::load('album')->fetchOneByName($title);
             $track = iTunes::load('track')->fetchOneByName($title);
             $artist = iTunes::load('artist')->fetchById($track->getArtistId());
+            $genreName = $album->getGenre();
         } catch (AlbumNotFoundException $e) {
             try {
                 $track = iTunes::load('track')->fetchOneByName($title);
                 $album = iTunes::load('album')->fetchById($track->getAlbumId());
                 $artist = iTunes::load('artist')->fetchById($track->getArtistId());
+                $genreName = $album->getGenre();
             } catch (TrackNotFoundException $e) {
                 $mus = false;
             } catch (SearchNoResultsException $e) {
@@ -885,9 +889,6 @@ class Music
             $mus = false;
         }
         if ($mus !== false) {
-            // Load genres.
-            $defaultGenres = (new Genres())->loadGenres(Genres::MUSIC_TYPE);
-            $genreName = $album->getGenre();
             if (\in_array(strtolower($genreName), $defaultGenres, false)) {
                 $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
             } else {

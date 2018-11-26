@@ -552,16 +552,16 @@
         },
         {
             "name": "dariusiii/php-itunes-api",
-            "version": "v1.0.1",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/php-itunes-api.git",
-                "reference": "c27329ec23aa22a4121782aa3f31de0f416399a6"
+                "reference": "ddf7113dfd90011ed8fa0c1192985bf1faff6bf2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/php-itunes-api/zipball/c27329ec23aa22a4121782aa3f31de0f416399a6",
-                "reference": "c27329ec23aa22a4121782aa3f31de0f416399a6",
+                "url": "https://api.github.com/repos/DariusIII/php-itunes-api/zipball/ddf7113dfd90011ed8fa0c1192985bf1faff6bf2",
+                "reference": "ddf7113dfd90011ed8fa0c1192985bf1faff6bf2",
                 "shasum": ""
             },
             "require": {
@@ -600,7 +600,7 @@
                 "music",
                 "query"
             ],
-            "time": "2018-11-26T12:23:08+00:00"
+            "time": "2018-11-26T21:13:18+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
