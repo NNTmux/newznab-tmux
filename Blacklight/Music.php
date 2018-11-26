@@ -389,11 +389,13 @@ class Music
                     'year' => $year,
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
-                    'cover' => $mus['cover'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
             );
+            $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
+            MusicInfo::query()->where('id', $musicId)->update(['cover' => $mus['cover']]);
+
         } else {
             $musicId = $check['id'];
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);

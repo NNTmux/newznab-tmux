@@ -1,4 +1,5 @@
 2018-11-26 DariusIII
+	* Chg: Update saving of cover value
 	* Chg: Update symfony components to their latest versions and laravel/framework to version 5.7.15
 	* Chg: Change Music lookup logic
 	* Fix: Fix typo in $this->coloCLi
