@@ -29,7 +29,7 @@
     "discard-changes": true,
     "process-timeout": 3600,
     "preferred-install": {
-      "*": "source"
+      "*": "dist"
     },
     "sort-packages": true,
     "optimize-autoloader": true
@@ -87,6 +87,7 @@
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "chumper/zipper": "^1.0",
     "czproject/git-php": "^3.14",
+    "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "^1.0",
     "dirape/token": "^2.1",

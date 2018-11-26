@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "341d1a912572806425fc0d7998ca4342",
+    "content-hash": "ea5a51cda24f90966f724428d16126d8",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -549,6 +549,58 @@
                 "git"
             ],
             "time": "2018-04-17T08:52:47+00:00"
+        },
+        {
+            "name": "dariusiii/php-itunes-api",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/php-itunes-api.git",
+                "reference": "c27329ec23aa22a4121782aa3f31de0f416399a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/php-itunes-api/zipball/c27329ec23aa22a4121782aa3f31de0f416399a6",
+                "reference": "c27329ec23aa22a4121782aa3f31de0f416399a6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DariusIII\\ItunesApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jacopo Andrea Nuzzi",
+                    "email": "jacoz@php.net"
+                },
+                {
+                    "name": "DariusIII"
+                }
+            ],
+            "description": "Query iTunes API System",
+            "homepage": "https://github.com/DariusIII/php-itunes-api",
+            "keywords": [
+                "api",
+                "apple",
+                "itunes",
+                "movies",
+                "music",
+                "query"
+            ],
+            "time": "2018-11-26T12:23:08+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
@@ -8876,16 +8928,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.3.10",
+            "version": "v0.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "22e6d8e0689442a0d294384381ca4a64882d8b8f"
+                "reference": "640b17027c0a88f621cc5ae3a92fc220e695d5f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/22e6d8e0689442a0d294384381ca4a64882d8b8f",
-                "reference": "22e6d8e0689442a0d294384381ca4a64882d8b8f",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/640b17027c0a88f621cc5ae3a92fc220e695d5f9",
+                "reference": "640b17027c0a88f621cc5ae3a92fc220e695d5f9",
                 "shasum": ""
             },
             "require": {
@@ -8939,7 +8991,7 @@
                 "php",
                 "static analysis"
             ],
-            "time": "2018-11-22T20:28:59+00:00"
+            "time": "2018-11-26T08:39:43+00:00"
         },
         {
             "name": "ocramius/package-versions",

@@ -4,6 +4,11 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
+use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
+use DariusIII\ItunesApi\Exceptions\InvalidProviderException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
+use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -351,117 +356,23 @@ class Music
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
-        $gen = new Genres(['Settings' => null]);
+
         $ri = new ReleaseImage();
-        $titlepercent = 0;
 
         $mus = [];
-        if ($title !== '') {
-            $amaz = $this->fetchAmazonProperties($title);
-        } elseif ($amazdata !== null) {
-            $amaz = $amazdata;
+        if ($amazdata !== null) {
+            $mus = $amazdata;
+        } elseif ($title !== '') {
+            $mus = $this->fetchAmazonProperties($title);
+        } elseif ($mus === false) {
+            $mus = $this->fetchItunesProperties($title);
         } else {
-            $amaz = false;
+            $mus = false;
         }
 
-        if (! $amaz) {
+        if ($mus === false) {
             return false;
         }
-
-        if (isset($amaz->ItemAttributes->Title)) {
-            $mus['title'] = (string) $amaz->ItemAttributes->Title;
-            if (empty($mus['title'])) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        // Load genres.
-        $defaultGenres = $gen->loadGenres(Genres::MUSIC_TYPE);
-
-        // Get album properties.
-        $mus['coverurl'] = (string) $amaz->LargeImage->URL;
-        if ($mus['coverurl'] !== '') {
-            $mus['cover'] = 1;
-        } else {
-            $mus['cover'] = 0;
-        }
-
-        $mus['asin'] = (string) $amaz->ASIN;
-
-        $mus['url'] = (string) $amaz->DetailPageURL;
-        $mus['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $mus['url']);
-
-        $mus['salesrank'] = (string) $amaz->SalesRank;
-        if ($mus['salesrank'] === '') {
-            $mus['salesrank'] = 'null';
-        }
-
-        $mus['artist'] = (string) $amaz->ItemAttributes->Artist;
-        if (empty($mus['artist'])) {
-            $mus['artist'] = (string) $amaz->ItemAttributes->Creator;
-            if (empty($mus['artist'])) {
-                $mus['artist'] = '';
-            }
-        }
-
-        $mus['publisher'] = (string) $amaz->ItemAttributes->Publisher;
-
-        $mus['releasedate'] = escapeString((string) $amaz->ItemAttributes->ReleaseDate);
-        if ($mus['releasedate'] === "''") {
-            $mus['releasedate'] = 'null';
-        }
-
-        $mus['review'] = '';
-        if (isset($amaz->EditorialReviews)) {
-            $mus['review'] = trim(strip_tags((string) $amaz->EditorialReviews->EditorialReview->Content));
-        }
-
-        $mus['year'] = $year;
-        if ($mus['year'] === '') {
-            $mus['year'] = ($mus['releasedate'] !== 'null' ? substr($mus['releasedate'], 1, 4) : date('Y'));
-        }
-
-        $mus['tracks'] = '';
-        if (isset($amaz->Tracks)) {
-            $tmpTracks = (array) $amaz->Tracks->Disc;
-            $tracks = $tmpTracks['Track'];
-            $mus['tracks'] = (\is_array($tracks) && ! empty($tracks)) ? implode('|', $tracks) : '';
-        }
-
-        similar_text($mus['artist'].' '.$mus['title'], $title, $titlepercent);
-        if ($titlepercent < 60) {
-            return false;
-        }
-
-        $genreKey = -1;
-        $genreName = '';
-        if (isset($amaz->BrowseNodes)) {
-            // Had issues getting this out of the browsenodes obj.
-            // Workaround is to get the xml and load that into its own obj.
-            $amazGenresXml = $amaz->BrowseNodes->asXml();
-            $amazGenres = simplexml_load_string($amazGenresXml)->xpath('//BrowseNodeId');
-
-            foreach ($amazGenres as $amazGenre) {
-                $currNode = trim($amazGenre[0]);
-                if (empty($genreName)) {
-                    $genreMatch = $this->matchBrowseNode($currNode);
-                    if ($genreMatch !== false) {
-                        $genreName = $genreMatch;
-                        break;
-                    }
-                }
-            }
-
-            if (\in_array(strtolower($genreName), $defaultGenres, false)) {
-                $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
-            } else {
-                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
-            }
-        }
-        $mus['musicgenre'] = $genreName;
-        $mus['musicgenres_id'] = $genreKey;
 
         $check = MusicInfo::query()->where('asin', $mus['asin'])->first(['id']);
         if ($check === null) {
@@ -475,7 +386,7 @@ class Music
                     'publisher' => $mus['publisher'],
                     'releasedate' => $mus['releasedate'],
                     'review' => $mus['review'],
-                    'year' => $mus['year'],
+                    'year' => $year,
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
@@ -505,7 +416,8 @@ class Music
 
         if ($musicId) {
             if ($this->echooutput) {
-                $this->colorCli->header(PHP_EOL.'Added/updated album: '.
+                $this->colorCli->header(
+                    PHP_EOL.'Added/updated album: '.
                     '   Artist: '.
                     $mus['artist'].
                     '   Title:  '.
@@ -515,22 +427,21 @@ class Music
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
-        } else {
-            if ($this->echooutput) {
-                if ($mus['artist'] === '') {
-                    $artist = '';
-                } else {
-                    $artist = 'Artist: '.$mus['artist'].', Album: ';
-                }
-
-                $this->colorCli->headerOver('Nothing to update: '.
-                        $artist.
-                        $mus['title'].
-                        ' ('.
-                        $mus['year'].
-                        ')'
-                );
+        } elseif ($this->echooutput) {
+            if ($mus['artist'] === '') {
+                $artist = '';
+            } else {
+                $artist = 'Artist: '.$mus['artist'].', Album: ';
             }
+
+            $this->colorCli->headerOver(
+                'Nothing to update: '.
+                    $artist.
+                    $mus['title'].
+                    ' ('.
+                    $mus['year'].
+                    ')'
+            );
         }
 
         return $musicId;
@@ -539,10 +450,14 @@ class Music
     /**
      * @param $title
      *
-     * @return false|mixed
+     * @return array|bool
+     * @throws \Exception
      */
-    public function fetchAmazonProperties($title)
+    protected function fetchAmazonProperties($title)
     {
+        $gen = new Genres(['Settings' => null]);
+        $titlepercent = 0;
+        $mus = [];
         $responses = false;
         $conf = new GenericConfiguration();
         $client = new Client();
@@ -564,9 +479,9 @@ class Music
         // Try Music category.
         try {
             $search = new Search();
-            $search->setCategory('Music');
-            $search->setKeywords($title);
-            $search->setResponseGroup(['Large']);
+            $search->setCategory('Music')
+            ->setKeywords($title)
+            ->setResponseGroup(['Large']);
             $responses = $apaiIo->runOperation($search);
         } catch (\Throwable $e) {
             // Empty because we try another method.
@@ -577,9 +492,9 @@ class Music
             usleep(700000);
             try {
                 $search = new Search();
-                $search->setCategory('MP3Downloads');
-                $search->setKeywords($title);
-                $search->setResponseGroup(['Large']);
+                $search->setCategory('MP3Downloads')
+                ->setKeywords($title)
+                ->setResponseGroup(['Large']);
                 $responses = $apaiIo->runOperation($search);
             } catch (\Throwable $e) {
                 // Empty because we try another method.
@@ -591,9 +506,9 @@ class Music
             usleep(700000);
             try {
                 $search = new Search();
-                $search->setCategory('DigitalMusic');
-                $search->setKeywords($title);
-                $search->setResponseGroup(['Large']);
+                $search->setCategory('DigitalMusic')
+                ->setKeywords($title)
+                ->setResponseGroup(['Large']);
                 $responses = $apaiIo->runOperation($search);
             } catch (\Throwable $e) {
                 // Empty because we try another method.
@@ -605,9 +520,9 @@ class Music
             usleep(700000);
             try {
                 $search = new Search();
-                $search->setCategory('MusicTracks');
-                $search->setKeywords($title);
-                $search->setResponseGroup(['Large']);
+                $search->setCategory('MusicTracks')
+                ->setKeywords($title)
+                ->setResponseGroup(['Large']);
                 $responses = $apaiIo->runOperation($search);
             } catch (\Throwable $e) {
                 // Empty because we exhausted all possibilities.
@@ -619,7 +534,101 @@ class Music
         foreach ($responses->Items->Item as $response) {
             similar_text($title, $response->ItemAttributes->Title, $percent);
             if ($percent > self::MATCH_PERCENT && isset($response->ItemAttributes->Title)) {
-                return $response;
+                if (isset($response->ItemAttributes->Title)) {
+                    $mus['title'] = (string) $response->ItemAttributes->Title;
+                    if (empty($mus['title'])) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+
+                // Load genres.
+                $defaultGenres = $gen->loadGenres(Genres::MUSIC_TYPE);
+
+                // Get album properties.
+                $mus['coverurl'] = (string) $response->LargeImage->URL;
+                if ($mus['coverurl'] !== '') {
+                    $mus['cover'] = 1;
+                } else {
+                    $mus['cover'] = 0;
+                }
+
+                $mus['asin'] = (string) $response->ASIN;
+
+                $mus['url'] = (string) $response->DetailPageURL;
+                $mus['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $mus['url']);
+
+                $mus['salesrank'] = (string) $response->SalesRank;
+                if ($mus['salesrank'] === '') {
+                    $mus['salesrank'] = 'null';
+                }
+
+                $mus['artist'] = (string) $response->ItemAttributes->Artist;
+                if (empty($mus['artist'])) {
+                    $mus['artist'] = (string) $response->ItemAttributes->Creator;
+                    if (empty($mus['artist'])) {
+                        $mus['artist'] = '';
+                    }
+                }
+
+                $mus['publisher'] = (string) $response->ItemAttributes->Publisher;
+
+                $mus['releasedate'] = escapeString((string) $response->ItemAttributes->ReleaseDate);
+                if ($mus['releasedate'] === "''") {
+                    $mus['releasedate'] = 'null';
+                }
+
+                $mus['review'] = '';
+                if (isset($response->EditorialReviews)) {
+                    $mus['review'] = trim(strip_tags((string) $response->EditorialReviews->EditorialReview->Content));
+                }
+
+                if ($mus['year'] === '') {
+                    $mus['year'] = ($mus['releasedate'] !== 'null' ? substr($mus['releasedate'], 1, 4) : date('Y'));
+                }
+
+                $mus['tracks'] = '';
+                if (isset($response->Tracks)) {
+                    $tmpTracks = (array) $response->Tracks->Disc;
+                    $tracks = $tmpTracks['Track'];
+                    $mus['tracks'] = (\is_array($tracks) && ! empty($tracks)) ? implode('|', $tracks) : '';
+                }
+
+                similar_text($mus['artist'].' '.$mus['title'], $title, $titlepercent);
+                if ($titlepercent < 60) {
+                    return false;
+                }
+
+                $genreKey = -1;
+                $genreName = '';
+                if (isset($response->BrowseNodes)) {
+                    // Had issues getting this out of the browsenodes obj.
+                    // Workaround is to get the xml and load that into its own obj.
+                    $amazGenresXml = $response->BrowseNodes->asXml();
+                    $amazGenres = simplexml_load_string($amazGenresXml)->xpath('//BrowseNodeId');
+
+                    foreach ($amazGenres as $amazGenre) {
+                        $currNode = trim($amazGenre[0]);
+                        if (empty($genreName)) {
+                            $genreMatch = $this->matchBrowseNode($currNode);
+                            if ($genreMatch !== false) {
+                                $genreName = $genreMatch;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (\in_array(strtolower($genreName), $defaultGenres, false)) {
+                        $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
+                    } else {
+                        $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
+                    }
+                }
+                $mus['musicgenre'] = $genreName;
+                $mus['musicgenres_id'] = $genreKey;
+
+                return $mus;
             }
         }
 
@@ -632,7 +641,9 @@ class Music
      */
     public function processMusicReleases($local = false)
     {
-        $res = DB::select(sprintf('
+        $res = DB::select(
+            sprintf(
+            '
 					SELECT searchname, id
 					FROM releases
 					WHERE musicinfo_id IS NULL
@@ -841,5 +852,61 @@ class Music
         }
 
         return ($str !== '') ? $str : false;
+    }
+
+    /**
+     * @param string $title
+     *
+     * @return array|bool
+     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
+     * @throws \Exception
+     */
+    protected function fetchItunesProperties($title)
+    {
+        $mus = true;
+
+        try {
+            $album = iTunes::load('album')->fetchOneByName($title);
+            $track = iTunes::load('track')->fetchOneByName($title);
+            $artist = iTunes::load('artist')->fetchById($track->getArtistId());
+        } catch (AlbumNotFoundException $e) {
+            try {
+                $track = iTunes::load('track')->fetchOneByName($title);
+                $album = iTunes::load('album')->fetchById($track->getAlbumId());
+                $artist = iTunes::load('artist')->fetchById($track->getArtistId());
+            } catch (TrackNotFoundException $e) {
+                $mus = false;
+            } catch (SearchNoResultsException $e) {
+                $mus = false;
+            }
+        } catch (SearchNoResultsException $e) {
+            $mus = false;
+        }
+        if ($mus !== false) {
+            // Load genres.
+            $defaultGenres = (new Genres())->loadGenres(Genres::MUSIC_TYPE);
+            $genreName = $album->getGenre();
+            if (\in_array(strtolower($genreName), $defaultGenres, false)) {
+                $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
+            } else {
+                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
+            }
+            $mus = [
+                'title' => $album->getName(),
+                'asin' => $album->getItunesId(),
+                'url' => $album->getStoreUrl(),
+                'salesrank' => '',
+                'artist' => $artist->getName(),
+                'publisher' => $album->getPublisher(),
+                'releasedate' => $album->getReleaseDate(),
+                'review' => '',
+                'cover' => str_replace('100x100', '800x800', $album->getCover()),
+                'tracks' => '',
+                'musicgenre' => $genreName,
+                'musicgenres_id' => $genreKey,
+            ];
+        }
+
+        return $mus;
     }
 }

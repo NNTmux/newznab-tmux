@@ -75,7 +75,7 @@
 																 target="_blank"
 																 href="{$site->dereferrer_link}{$result->url}"
 																 name="amazon{$result->musicinfo_id}"
-																 title="View Amazon page">
+																 title="View Amazon/iTunes page">
 												Amazon</a>{/if}
 										{if $result->nfoid > 0}<a
 											href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
