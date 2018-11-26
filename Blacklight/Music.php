@@ -419,11 +419,11 @@ class Music
         if ($musicId) {
             if ($this->echooutput) {
                 $this->colorCli->header(
-                    PHP_EOL.'Added/updated album: '. PHP_EOL.
+                    PHP_EOL.'Added/updated album: '.PHP_EOL.
                     '   Artist: '.
-                    $mus['artist'].  PHP_EOL .
+                    $mus['artist'].PHP_EOL.
                     '   Title:  '.
-                    $mus['title'].  PHP_EOL.
+                    $mus['title'].PHP_EOL.
                     '   Year:   '.
                     $year
                 );
