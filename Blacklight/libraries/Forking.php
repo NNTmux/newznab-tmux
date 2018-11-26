@@ -967,7 +967,7 @@ class Forking extends \fork_daemon
      */
     private function processSingle()
     {
-        $postProcess = new PostProcess(['ColorCLI' => $this->_colorCLI]);
+        $postProcess = new PostProcess(['ColorCLI' => $this->colorCli]);
         //$postProcess->processAnime();
         $postProcess->processBooks();
         $postProcess->processConsoles();
