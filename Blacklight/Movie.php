@@ -2,6 +2,9 @@
 
 namespace Blacklight;
 
+use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use DariusIII\ItunesApi\iTunes;
 use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
@@ -583,11 +586,12 @@ class Movie
      * @param string $variable1
      * @param string $variable2
      * @param string $variable3
-     * @param $variable4
+     * @param string $variable4
+     * @param string $variable5
      *
      * @return array|string
      */
-    protected function setVariables($variable1, $variable2, $variable3, $variable4)
+    protected function setVariables($variable1, $variable2, $variable3, $variable4, $variable5)
     {
         if (! empty($variable1)) {
             return $variable1;
@@ -601,12 +605,15 @@ class Movie
         if (! empty($variable4)) {
             return $variable4;
         }
+        if (! empty($variable5)) {
+            return $variable5;
+        }
 
         return '';
     }
 
     /**
-     * Fetch IMDB/TMDB/TRAKT info for the movie.
+     * Fetch IMDB/TMDB/TRAKT/OMDB/iTunes info for the movie.
      *
      * @param $imdbId
      *
@@ -616,7 +623,7 @@ class Movie
     public function updateMovieInfo($imdbId): bool
     {
         if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
-            $this->colorCli->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId);
+            $this->colorCli->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/iTunes using IMDB id: '.$imdbId);
         }
 
         // Check TMDB for IMDB info.
@@ -630,7 +637,12 @@ class Movie
 
         // Check OMDb for movie info
         $omdb = $this->fetchOmdbAPIProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
-        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb) {
+
+        // Check iTunes for movie info as last resort (iTunes do not provide all the info we need)
+
+        $iTunes = $this->fetchItunesMovieProperties($this->currentTitle);
+
+        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb && ! $iTunes) {
             return false;
         }
 
@@ -646,7 +658,7 @@ class Movie
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
-        // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
+        // Prefer Fanart.tv cover over TMDB,TMDB over IMDB,IMDB over OMDB and OMDB over iTunes.
         if (! empty($fanart['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $fanart['cover'], $this->imgSavePath);
         } elseif (! empty($tmdb['cover'])) {
@@ -655,6 +667,8 @@ class Movie
             $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $imdb['cover'], $this->imgSavePath);
         } elseif (! empty($omdb['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $omdb['cover'], $this->imgSavePath);
+        } elseif (! empty($iTunes['cover'])) {
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $iTunes['cover'], $this->imgSavePath);
         }
 
         // Backdrops.
@@ -674,12 +688,12 @@ class Movie
             $mov['rtrating'] = $omdb['rtRating'];
         }
 
-        $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title']);
-        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '');
-        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot']);
-        $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline']);
-        $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year']);
-        $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre']);
+        $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title'], $iTunes['title']);
+        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '', $iTunes['rating'] ?? '');
+        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot'], $iTunes['description']);
+        $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline'], $iTunes['tagline']);
+        $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year'], $iTunes['year']);
+        $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre'], $iTunes['genre']);
 
         if (! empty($imdb['type'])) {
             $mov['type'] = $imdb['type'];
@@ -1045,6 +1059,44 @@ class Movie
         }
 
         return false;
+    }
+
+    /**
+     * @param string $title
+     *
+     * @return array|bool
+     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
+     * @throws \Exception
+     */
+    public function fetchItunesMovieProperties($title)
+    {
+        $movie = true;
+        try {
+            $iTunesMovie = iTunes::load('movie')->fetchOneByName($title);
+        } catch (MovieNotFoundException $e) {
+            $movie = false;
+        } catch (SearchNoResultsException $e) {
+            $movie = false;
+        }
+
+        if ($movie !== false) {
+            similar_text($this->currentTitle, $iTunesMovie->getName(), $percent);
+            if ($percent > self::MATCH_PERCENT) {
+                $movie = [
+                    'title' => $iTunesMovie->getName(),
+                    'director' => $iTunesMovie->getDirector(),
+                    'tagline' => $iTunesMovie->getTagLine(),
+                    'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
+                    'genre' => $iTunesMovie->getGenre(),
+                    'plot' => $iTunesMovie->getDescription(),
+                    'year' => $iTunesMovie->getReleaseDate()->format('Y'),
+                ];
+            } else {
+                $movie = false;
+            }
+        }
+
+        return $movie;
     }
 
     /**

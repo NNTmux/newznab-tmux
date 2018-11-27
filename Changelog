@@ -1,3 +1,5 @@
+2018-11-27 DariusIII
+	* Chg: Update dariusiii/php-itunes-api to version 1.0.4 an add itunes to movie class movie info fetching
 2018-11-26 DariusIII
 	* Chg: Update Music class and dariusiii/php-itunes-api to version 1.0.3
 	* Chg: Update saving of cover value
