@@ -2,9 +2,6 @@
 
 namespace Blacklight;
 
-use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\iTunes;
 use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
@@ -19,12 +16,15 @@ use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
 use Tmdb\Client as TmdbClient;
 use Blacklight\utility\Utility;
+use DariusIII\ItunesApi\iTunes;
 use Blacklight\libraries\FanartTV;
 use Illuminate\Support\Facades\DB;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use Tmdb\Repository\ConfigurationRepository;
+use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
  * Class Movie.
