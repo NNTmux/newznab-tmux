@@ -1,4 +1,5 @@
 2018-11-27 DariusIII
+	* Chg: Add BooksTest
 	* Chg: Replace is_dir and is_file in PPA class with File::isDirectory and File::isFile respectively
 	* Chg: Update Books class
 	* Chg: Update books page to show both Amazon and iTunes text
