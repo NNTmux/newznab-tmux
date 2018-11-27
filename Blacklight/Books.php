@@ -3,6 +3,9 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
+use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\BookInfo;
@@ -325,11 +328,13 @@ class Books
      *
      * @return false|mixed,
      */
-    public function fetchAmazonProperties($title)
+    public function fetchAmazonBookProperties($title)
     {
         $conf = new GenericConfiguration();
         $client = new Client();
         $request = new GuzzleRequest($client);
+
+        $book = [];
 
         try {
             $conf
@@ -348,9 +353,7 @@ class Books
         $search->setKeywords($title);
         $search->setResponseGroup(['Large']);
 
-        $apaiIo = new ApaiIO($conf);
-
-        $response = $apaiIo->runOperation($search);
+        $response = (new ApaiIO($conf))->runOperation($search);
         if ($response === false) {
             throw new \RuntimeException('Could not connect to Amazon');
         }
@@ -358,7 +361,68 @@ class Books
         if (isset($response->Items->Item->ItemAttributes->Title)) {
             $this->colorCli->info('Found matching title: '.$response->Items->Item->ItemAttributes->Title);
 
-            return $response;
+            $book['title'] = (string) $response->Items->Item->ItemAttributes->Title;
+            $book['author'] = (string) $response->Items->Item->ItemAttributes->Author;
+            $book['asin'] = (string) $response->Items->Item->ASIN;
+            $book['isbn'] = (string) $response->Items->Item->ItemAttributes->ISBN;
+            if ($book['isbn'] === '') {
+                $book['isbn'] = 'null';
+            }
+
+            $book['ean'] = (string) $response->Items->Item->ItemAttributes->EAN;
+            if ($book['ean'] === '') {
+                $book['ean'] = 'null';
+            }
+
+            $book['url'] = (string) $response->Items->Item->DetailPageURL;
+            $book['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $book['url']);
+
+            $book['salesrank'] = (string) $response->Items->Item->SalesRank;
+            if ($book['salesrank'] === '') {
+                $book['salesrank'] = 'null';
+            }
+
+            $book['publisher'] = (string) $response->Items->Item->ItemAttributes->Publisher;
+            if ($book['publisher'] === '') {
+                $book['publisher'] = 'null';
+            }
+
+            $book['publishdate'] = date('Y-m-d', strtotime((string) $response->Items->Item->ItemAttributes->PublicationDate));
+            if ($book['publishdate'] === '') {
+                $book['publishdate'] = 'null';
+            }
+
+            $book['pages'] = (string) $response->Items->Item->ItemAttributes->NumberOfPages;
+            if ($book['pages'] === '') {
+                $book['pages'] = 'null';
+            }
+
+            if (isset($response->Items->Item->EditorialReviews->EditorialReview->Content)) {
+                $book['overview'] = strip_tags((string) $response->Items->Item->EditorialReviews->EditorialReview->Content);
+                if ($book['overview'] === '') {
+                    $book['overview'] = 'null';
+                }
+            } else {
+                $book['overview'] = 'null';
+            }
+
+            if (isset($response->Items->Item->BrowseNodes->BrowseNode->Name)) {
+                $book['genre'] = (string) $response->Items->Item->BrowseNodes->BrowseNode->Name;
+                if ($book['genre'] === '') {
+                    $book['genre'] = 'null';
+                }
+            } else {
+                $book['genre'] = 'null';
+            }
+
+            $book['coverurl'] = (string) $response->Items->Item->LargeImage->URL;
+            if ($book['coverurl'] !== '') {
+                $book['cover'] = 1;
+            } else {
+                $book['cover'] = 0;
+            }
+
+            return $book;
         }
 
         $this->colorCli->notice('Could not find a match on Amazon!');
@@ -532,81 +596,21 @@ class Books
     {
         $ri = new ReleaseImage();
 
-        $book = [];
         $bookId = -2;
 
-        $amaz = false;
+        $book = false;
         if ($bookInfo !== '') {
             $this->colorCli->info('Fetching data from Amazon for '.$bookInfo);
 
-            $amaz = $this->fetchAmazonProperties($bookInfo);
+            $book = $this->fetchAmazonBookProperties($bookInfo);
+        } elseif ($book === false) {
+            $book = $this->fetchItunesBookProperties($bookInfo);
         } elseif ($amazdata !== null) {
-            $amaz = $amazdata;
+            $book = $amazdata;
         }
 
-        if (! $amaz) {
+        if (empty($book)) {
             return false;
-        }
-
-        $book['title'] = (string) $amaz->Items->Item->ItemAttributes->Title;
-        $book['author'] = (string) $amaz->Items->Item->ItemAttributes->Author;
-        $book['asin'] = (string) $amaz->Items->Item->ASIN;
-        $book['isbn'] = (string) $amaz->Items->Item->ItemAttributes->ISBN;
-        if ($book['isbn'] === '') {
-            $book['isbn'] = 'null';
-        }
-
-        $book['ean'] = (string) $amaz->Items->Item->ItemAttributes->EAN;
-        if ($book['ean'] === '') {
-            $book['ean'] = 'null';
-        }
-
-        $book['url'] = (string) $amaz->Items->Item->DetailPageURL;
-        $book['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $book['url']);
-
-        $book['salesrank'] = (string) $amaz->Items->Item->SalesRank;
-        if ($book['salesrank'] === '') {
-            $book['salesrank'] = 'null';
-        }
-
-        $book['publisher'] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
-        if ($book['publisher'] === '') {
-            $book['publisher'] = 'null';
-        }
-
-        $book['publishdate'] = date('Y-m-d', strtotime((string) $amaz->Items->Item->ItemAttributes->PublicationDate));
-        if ($book['publishdate'] === '') {
-            $book['publishdate'] = 'null';
-        }
-
-        $book['pages'] = (string) $amaz->Items->Item->ItemAttributes->NumberOfPages;
-        if ($book['pages'] === '') {
-            $book['pages'] = 'null';
-        }
-
-        if (isset($amaz->Items->Item->EditorialReviews->EditorialReview->Content)) {
-            $book['overview'] = strip_tags((string) $amaz->Items->Item->EditorialReviews->EditorialReview->Content);
-            if ($book['overview'] === '') {
-                $book['overview'] = 'null';
-            }
-        } else {
-            $book['overview'] = 'null';
-        }
-
-        if (isset($amaz->Items->Item->BrowseNodes->BrowseNode->Name)) {
-            $book['genre'] = (string) $amaz->Items->Item->BrowseNodes->BrowseNode->Name;
-            if ($book['genre'] === '') {
-                $book['genre'] = 'null';
-            }
-        } else {
-            $book['genre'] = 'null';
-        }
-
-        $book['coverurl'] = (string) $amaz->Items->Item->LargeImage->URL;
-        if ($book['coverurl'] !== '') {
-            $book['cover'] = 1;
-        } else {
-            $book['cover'] = 0;
         }
 
         $check = BookInfo::query()->where('asin', $book['asin'])->first();
@@ -623,7 +627,7 @@ class Books
                     'publisher' => $book['publisher'],
                     'publishdate' => $book['publishdate'],
                     'pages' => $book['pages'],
-                    'overview' =>$book['overview'],
+                    'overview' => $book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
                     'created_at' => now(),
@@ -674,5 +678,42 @@ class Books
         }
 
         return $bookId;
+    }
+
+    /**
+     * @param string $bookInfo
+     * @return array|bool
+     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
+     */
+    public function fetchItunesBookProperties(string $bookInfo)
+    {
+        $book = true;
+        try {
+            $iTunesBook = iTunes::load('ebook')->fetchOneByName($bookInfo);
+        } catch (EbookNotFoundException $e) {
+            $book = false;
+        } catch (SearchNoResultsException $e) {
+            $book = false;
+        }
+
+        if ($book !== false) {
+            $book = [
+                    'title' => $iTunesBook->getName(),
+                    'author' => $iTunesBook->getAuthor(),
+                    'asin' => $iTunesBook->getItunesId(),
+                    'isbn' => 'null',
+                    'ean' => 'null',
+                    'url' => $iTunesBook->getStoreUrl(),
+                    'salesrank' => '',
+                    'publisher' => '',
+                    'pages' => '',
+                    'cover' => str_replace('100x100', '800x800', $iTunesBook->getCover()),
+                    'genre' => implode(', ', $iTunesBook->getGenre()),
+                    'overview' => strip_tags($iTunesBook->getDescription()),
+                    'publishdate' => $iTunesBook->getReleaseDate()->format('Y-m-d'),
+                ];
+        }
+
+        return $book;
     }
 }

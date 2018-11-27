@@ -1,4 +1,5 @@
 2018-11-27 DariusIII
+	* Chg: Update dariusiii/php-itunes-api to version 1.0.6 and update Books to fetch data from iTunes too
 	* Chg: Update travis.yml, use xenial and add php 7.3 test
 	* Chg: Update css and js for tinymce 4.9.0 release
 	* Chg: Update dariusiii/php-itunes-api to version 1.0.5.1
