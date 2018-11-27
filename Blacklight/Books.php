@@ -3,21 +3,21 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
-use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Settings;
 use ApaiIO\Operations\Search;
+use DariusIII\ItunesApi\iTunes;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 class Books
 {
