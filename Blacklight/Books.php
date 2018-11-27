@@ -603,7 +603,10 @@ class Books
             $this->colorCli->info('Fetching data from Amazon for '.$bookInfo);
 
             $book = $this->fetchAmazonBookProperties($bookInfo);
-        } elseif ($book === false) {
+        }
+
+        if ($book === false) {
+            $this->colorCli->info('Fetching data from iTunes for '.$bookInfo);
             $book = $this->fetchItunesBookProperties($bookInfo);
         } elseif ($amazdata !== null) {
             $book = $amazdata;
@@ -697,6 +700,7 @@ class Books
         }
 
         if ($book !== false) {
+            $this->colorCli->info('Found matching title: '.$iTunesBook->getName());
             $book = [
                     'title' => $iTunesBook->getName(),
                     'author' => $iTunesBook->getAuthor(),
@@ -712,6 +716,8 @@ class Books
                     'overview' => strip_tags($iTunesBook->getDescription()),
                     'publishdate' => $iTunesBook->getReleaseDate()->format('Y-m-d'),
                 ];
+        } else {
+            $this->colorCli->notice('Could not find a match on iTunes!');
         }
 
         return $book;
