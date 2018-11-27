@@ -365,7 +365,7 @@ class Music
         }
 
         if ($mus === false) {
-            $mus = $this->fetchItunesProperties($title);
+            $mus = $this->fetchItunesMusicProperties($title);
         } else {
             $mus = false;
         }
@@ -863,7 +863,7 @@ class Music
      * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      * @throws \Exception
      */
-    protected function fetchItunesProperties($title)
+    protected function fetchItunesMusicProperties($title)
     {
         $mus = true;
         // Load genres.
