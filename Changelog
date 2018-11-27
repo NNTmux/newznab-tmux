@@ -1,4 +1,5 @@
 2018-11-27 DariusIII
+	* Chg: Update pnotify to latest version and update js and css accordingly
 	* Chg: Rename fetchItunesProperties to fetchItunesMusicProperties
 	* Chg: Update dariusiii/php-itunes-api to version 1.0.4 an add itunes to movie class movie info fetching
 2018-11-26 DariusIII

@@ -40,7 +40,7 @@
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
-        "pnotify": "^4.0.0-alpha.4",
+        "pnotify": "^4.0.0-beta.1",
         "tinymce": "^4.8.5"
     }
 }
