@@ -642,7 +642,7 @@ class Movie
 
         $iTunes = $this->fetchItunesMovieProperties($this->currentTitle);
 
-        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb && ! $iTunes) {
+        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb && empty($iTunes)) {
             return false;
         }
 
