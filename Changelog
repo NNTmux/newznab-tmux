@@ -1,4 +1,5 @@
 2018-11-27 DariusIII
+	* Chg: Replace is_dir and is_file in PPA class with File::isDirectory and File::isFile respectively
 	* Chg: Update Books class
 	* Chg: Update books page to show both Amazon and iTunes text
 	* Chg: Update dariusiii/php-itunes-api to version 1.0.6 and update Books to fetch data from iTunes too
