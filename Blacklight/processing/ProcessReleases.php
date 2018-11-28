@@ -776,7 +776,7 @@ class ProcessReleases
                 if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
                     if ($this->echoCLI) {
-                        echo "Creating NZBs and deleting Collections: $nzbCount/$count.\r";
+                        echo "Creating NZBs and deleting Collections: $nzbCount/$total.\r";
                     }
                 }
             }
