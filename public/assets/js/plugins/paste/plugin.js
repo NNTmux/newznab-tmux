@@ -1221,9 +1221,15 @@ var paste = (function () {
         text: editor.selection.getContent({ format: 'text' })
       };
     };
+    var isTableSelection = function (editor) {
+      return !!editor.dom.getParent(editor.selection.getStart(), 'td[data-mce-selected],th[data-mce-selected]', editor.getBody());
+    };
+    var hasSelectedContent = function (editor) {
+      return !editor.selection.isCollapsed() || isTableSelection(editor);
+    };
     var cut = function (editor) {
       return function (evt) {
-        if (editor.selection.isCollapsed() === false) {
+        if (hasSelectedContent(editor)) {
           setClipboardData(evt, getData(editor), fallback(editor), function () {
             setTimeout(function () {
               editor.execCommand('Delete');
@@ -1234,7 +1240,7 @@ var paste = (function () {
     };
     var copy = function (editor) {
       return function (evt) {
-        if (editor.selection.isCollapsed() === false) {
+        if (hasSelectedContent(editor)) {
           setClipboardData(evt, getData(editor), fallback(editor), noop);
         }
       };
@@ -1436,26 +1442,20 @@ var paste = (function () {
     };
     var Quirks = { setup: setup$2 };
 
-    var curry = function (f) {
-      var x = [];
+    function curry(fn) {
+      var initialArgs = [];
       for (var _i = 1; _i < arguments.length; _i++) {
-        x[_i - 1] = arguments[_i];
+        initialArgs[_i - 1] = arguments[_i];
       }
-      var args = new Array(arguments.length - 1);
-      for (var i = 1; i < arguments.length; i++)
-        args[i - 1] = arguments[i];
       return function () {
-        var x = [];
+        var restArgs = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-          x[_i] = arguments[_i];
+          restArgs[_i] = arguments[_i];
         }
-        var newArgs = new Array(arguments.length);
-        for (var j = 0; j < newArgs.length; j++)
-          newArgs[j] = arguments[j];
-        var all = args.concat(newArgs);
-        return f.apply(null, all);
+        var all = initialArgs.concat(restArgs);
+        return fn.apply(null, all);
       };
-    };
+    }
 
     var stateChange = function (editor, clipboard, e) {
       var ctrl = e.control;

@@ -150,9 +150,9 @@ var modern = (function () {
     var global$7 = tinymce.util.Tools.resolve('tinymce.util.Delay');
 
     var noop = function () {
-      var x = [];
+      var args = [];
       for (var _i = 0; _i < arguments.length; _i++) {
-        x[_i] = arguments[_i];
+        args[_i] = arguments[_i];
       }
     };
     var constant = function (value) {

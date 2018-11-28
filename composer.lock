@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea5a51cda24f90966f724428d16126d8",
+    "content-hash": "92dd90c0f9665bbebed77be48d7fc002",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -4084,16 +4084,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "2.1.15",
+            "version": "2.1.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "25bf656d0f9220f962221091e7cb3561d70d7b7e"
+                "reference": "53925e50c0541b20a24f4cfc89b253b251a236c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/25bf656d0f9220f962221091e7cb3561d70d7b7e",
-                "reference": "25bf656d0f9220f962221091e7cb3561d70d7b7e",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/53925e50c0541b20a24f4cfc89b253b251a236c7",
+                "reference": "53925e50c0541b20a24f4cfc89b253b251a236c7",
                 "shasum": ""
             },
             "require": {
@@ -4148,7 +4148,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2018-05-03T18:05:46+00:00"
+            "time": "2018-11-28T20:35:27+00:00"
         },
         {
             "name": "pragmarx/firewall",
@@ -11121,6 +11121,7 @@
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",
+        "ext-sodium": "*",
         "ext-spl": "*",
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
