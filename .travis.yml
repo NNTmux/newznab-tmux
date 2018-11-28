@@ -1,6 +1,6 @@
 language: php
 sudo: required
-dist: trusty
+dist: xenial
 group: edge
 
 branches:
@@ -21,7 +21,6 @@ notifications:
 
 php:
   - '7.2'
-  - '7.3'
 
 addons:
   mariadb: '10.2'
