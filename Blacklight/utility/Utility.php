@@ -6,8 +6,8 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\File;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class Utility.

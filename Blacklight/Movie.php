@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Illuminate\Support\Facades\File;
 use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
@@ -20,6 +19,7 @@ use Blacklight\utility\Utility;
 use DariusIII\ItunesApi\iTunes;
 use Blacklight\libraries\FanartTV;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
