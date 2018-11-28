@@ -1,4 +1,5 @@
 2018-11-28 DariusIII
+	* Chg: Update composer.json and package.json
 	* Chg: Replace mkdir, is_file, is_dir with File facade functions in Blacklight namespace
 	* Chg: Use trusty build on travis, xenial does not support php 7.3
 	* Chg: Update ProcessReleases class and use ConsoleTools to show nzbs creation count

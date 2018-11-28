@@ -13,9 +13,9 @@
         "axios": "^0.18",
         "cross-env": "^5.2.0",
         "jquery": "^3.2",
-        "laravel-mix": "^2.1.14",
+        "laravel-mix": "^3.0.0",
         "lodash": "^4.17.11",
-        "popper.js": "^1.14.5",
+        "popper.js": "^1.14.6",
         "vue": "^2.5.7"
     },
     "dependencies": {
