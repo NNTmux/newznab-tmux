@@ -772,7 +772,7 @@ class ProcessReleases
                 if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
                     if ($this->echoCLI) {
-                        $this->colorCli->primaryOver('Creating NZBs and deleting Collections: '.$nzbCount.'/'.$total);
+                        (new ConsoleTools())->overWritePrimary('Creating NZBs and deleting Collections: '.$nzbCount.'/'.$total);
                     }
                 }
             }

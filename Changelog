@@ -1,4 +1,5 @@
 2018-11-28 DariusIII
+	* Chg: Update ProcessReleases class and use ConsoleTools to show nzbs creation count
 	* Chg: Update package.json
 2018-11-27 DariusIII
 	* Chg: Add BooksTest
