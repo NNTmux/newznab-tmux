@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use Illuminate\Support\Facades\File;
 use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
@@ -473,14 +474,12 @@ class Movie
 
         if (! empty($data['trailer'])) {
             $data['trailer'] = str_ireplace(
-                'http://',
-                'https://',
-                str_ireplace('watch?v=', 'embed/', $data['trailer'])
+                ['watch?v=', 'http://'], ['embed/', 'https://'], $data['trailer']
             );
         }
         $imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
         $cover = 0;
-        if (is_file($this->imgSavePath.$imdbid).'-cover.jpg') {
+        if (File::isFile($this->imgSavePath.$imdbid).'-cover.jpg') {
             $cover = 1;
         }
 

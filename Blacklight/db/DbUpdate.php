@@ -26,6 +26,7 @@ use Blacklight\ColorCLI;
 use Blacklight\utility\Git;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class DbUpdate
 {
@@ -219,7 +220,7 @@ class DbUpdate
 
         set_time_limit(0);
 
-        if (is_file($file)) {
+        if (File::isFile($file)) {
             $file = fopen($file, 'r, b');
 
             if (\is_resource($file)) {
