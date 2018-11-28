@@ -1,4 +1,5 @@
 2018-11-28 DariusIII
+	* Chg: Use trusty build on travis, xenial does not support php 7.3
 	* Chg: Update ProcessReleases class and use ConsoleTools to show nzbs creation count
 	* Chg: Update package.json
 2018-11-27 DariusIII

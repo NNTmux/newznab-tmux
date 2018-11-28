@@ -1,6 +1,6 @@
 language: php
 sudo: required
-dist: xenial
+dist: trusty
 group: edge
 
 branches:
