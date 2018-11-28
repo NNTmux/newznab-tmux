@@ -328,7 +328,8 @@ class ProcessReleases
 
             $this->colorCli->primary(
                     ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    now()->diffInSeconds($startTime).' seconds', true
+                    now()->diffInSeconds($startTime).' seconds',
+                true
                 );
         }
     }
@@ -369,7 +370,8 @@ class ProcessReleases
         );
         if ($checked > 0 && $this->echoCLI) {
             $this->colorCli->primary(
-                    $checked.' collections set to filecheck = 3(size calculated)', true
+                    $checked.' collections set to filecheck = 3(size calculated)',
+                true
                 );
             $this->colorCli->primary(now()->diffInSeconds($startTime).' seconds', true);
         }
@@ -500,7 +502,8 @@ class ProcessReleases
                     $minSizeDeleted.' smaller than, '.
                     $maxSizeDeleted.' bigger than, '.
                     $minFilesDeleted.' with less files than site/group settings in: '.
-                    now()->diffInSeconds($startTime).' seconds', true
+                    now()->diffInSeconds($startTime).' seconds',
+                true
                 );
         }
     }
@@ -723,7 +726,8 @@ class ProcessReleases
                     ' Releases added and '.
                     number_format($duplicate).
                     ' duplicate collections deleted in '.
-                    now()->diffInSeconds($startTime).' seconds', true
+                    now()->diffInSeconds($startTime).' seconds',
+                true
                 );
         }
 
@@ -772,7 +776,7 @@ class ProcessReleases
                 if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
                     if ($this->echoCLI) {
-                        (new ConsoleTools())->overWritePrimary('Creating NZBs and deleting Collections: '.$nzbCount.'/'.$total);
+                        echo "Creating NZBs and deleting Collections: $nzbCount/$count.\r";
                     }
                 }
             }
@@ -784,7 +788,9 @@ class ProcessReleases
             $this->colorCli->primary(
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
-                    'Total time: '.$totalTime.' seconds', true);
+                    'Total time: '.$totalTime.' seconds',
+                true
+            );
         }
 
         return $nzbCount;
@@ -895,7 +901,8 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                $firstQuery->diffInSeconds($startTime).' seconds.', true
+                $firstQuery->diffInSeconds($startTime).' seconds.',
+                true
             );
         }
 
@@ -936,7 +943,8 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' orphaned collections in '.
-                    $secondQuery->diffInSeconds($firstQuery).' seconds.', true
+                    $secondQuery->diffInSeconds($firstQuery).' seconds.',
+                    true
                 );
             }
 
@@ -973,7 +981,8 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' binaries with no collections or parts in '.
-                    $thirdQuery->diffInSeconds($secondQuery).' seconds.', true
+                    $thirdQuery->diffInSeconds($secondQuery).' seconds.',
+                    true
                 );
             }
 
@@ -1009,14 +1018,16 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' parts with no binaries in '.
-                    $fourthQuery->diffInSeconds($thirdQuery).' seconds.', true
+                    $fourthQuery->diffInSeconds($thirdQuery).' seconds.',
+                    true
                 );
             }
         } // done cleaning up Binaries/Parts orphans
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                'Deleting collections that were missed after NZB creation.', true
+                'Deleting collections that were missed after NZB creation.',
+                true
             );
         }
 
@@ -1057,7 +1068,8 @@ class ProcessReleases
                     'Removed '.
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
-                    $fourthQuery->diffInSeconds($startTime).' seconds', true
+                    $fourthQuery->diffInSeconds($startTime).' seconds',
+                true
                 );
         }
     }
@@ -1151,7 +1163,8 @@ class ProcessReleases
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
-                    now()->diffInSeconds($startTime).' seconds', true
+                    now()->diffInSeconds($startTime).' seconds',
+                true
                 );
         }
     }
@@ -1372,7 +1385,8 @@ class ProcessReleases
                         $this->completion > 0
                         ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
                         : '.'
-                    ), true
+                    ),
+                true
                 );
 
             $totalDeleted = (
@@ -1383,7 +1397,8 @@ class ProcessReleases
             if ($totalDeleted > 0) {
                 $this->colorCli->primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
-                        now()->diffInSeconds($startTime).' seconds', true
+                        now()->diffInSeconds($startTime).' seconds',
+                    true
                     );
             }
         }
