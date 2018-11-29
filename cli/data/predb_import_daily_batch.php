@@ -27,14 +27,14 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use Blacklight\ColorCLI;
 use Blacklight\db\PreDb;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\File;
 
-$canExeRead = Utility::canExecuteRead(NN_RES);
-    if (is_string($canExeRead)) {
-        exit($canExeRead);
-    }
-    unset($canExeRead);
+if (! File::isReadable(NN_RES)) {
+    exit('The  '.NN_RES. ' folder must be readable.' . PHP_EOL);
+}
 
-if (! is_writable(NN_RES)) {
+
+if (! File::isWritable(NN_RES)) {
     exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);
 }
 
@@ -93,7 +93,6 @@ $progress = $predb->progress(settings_array());
 
 foreach ($data as $dir => $files) {
     foreach ($files as $file) {
-        //var_dump($file);
         if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#", $file['download_url'])) {
             if (preg_match("#^$filePattern$#", $file['name'], $match)) {
                 $timematch = $progress['last'];

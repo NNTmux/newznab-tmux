@@ -119,9 +119,9 @@ class PreDb
 
         $sql = <<<SQL_EXPORT
 SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name
-	FROM {$this->tableMain} p LEFT OUTER JOIN groups g ON p.groups_id = g.id $limit
+	FROM {$this->tableMain} p LEFT OUTER JOIN groups g ON p.groups_id = g.id {$limit}
 	INTO OUTFILE '{$options['path']}'
-	FIELDS TERMINATED BY '{$options['fields']}' $enclosedby
+	FIELDS TERMINATED BY '{$options['fields']}' {$enclosedby}
 	LINES TERMINATED BY '{$options['lines']}';
 SQL_EXPORT;
 
@@ -313,18 +313,18 @@ SQL_INSERT;
             'enclosedby'    => "'",
             'fields'        => '\t',
             'lines'            => '\r\n',    // Windows' style EOL to allow \n to be used in text.
-            'local'            => false,
+            'local'            => true,
             'optional'        => true,
         ];
         $options += $defaults;
 
-        $local = $options['local'] === false ? 'LOCAL' : '';
+        $local = $options['local'] === true ? 'LOCAL' : '';
         if (! empty($options['enclosedby'])) {
             $optional = $options['optional'] === true ? ' OPTIONALLY' : '';
             $enclosedby = "$optional ENCLOSED BY \"{$options['enclosedby']}\"";
         }
         $sql = <<<SQL_LOAD_DATA
-LOAD DATA $local INFILE :path
+LOAD DATA {$local} INFILE '{$options['path']}'
   IGNORE INTO TABLE predb_imports
   FIELDS TERMINATED BY '{$options['fields']}' {$enclosedby}
   LINES TERMINATED BY '{$options['lines']}'

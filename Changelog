@@ -1,4 +1,5 @@
 2018-11-29 DariusIII
+	* Chg: Update predb_import script, it should work now
 	* Chg: Update tmux install script to use latest tmux release (version 2.8)
 2018-11-28 DariusIII
 	* Chg: Update php-tmdb/api to version 2.1.16 and update all-js.js and all-css.css files
