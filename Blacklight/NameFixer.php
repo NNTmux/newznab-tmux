@@ -345,7 +345,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 '
-					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -358,7 +358,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 '
-					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
@@ -2374,7 +2374,7 @@ class NameFixer
             $result = DB::select(
                 sprintf(
                     "
-				    SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+				    SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON rf.releases_id = {$release->releases_id}
@@ -2393,7 +2393,7 @@ class NameFixer
                     $this->updateRelease(
                         $release,
                         $res->searchname,
-                        'hashCheck: PAR2 hash_16K',
+                        'crcCheck: CRC32',
                         $echo,
                         $type,
                         $nameStatus,
@@ -2405,7 +2405,7 @@ class NameFixer
                 }
             }
         }
-        $this->_updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $release->releases_id);
+        $this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release->releases_id);
 
         return false;
     }
