@@ -125,7 +125,7 @@ class DbUpdate
                         str_pad($current, 4, '0', STR_PAD_LEFT).'~'.
                         $matches['table'].'.sql';
                     rename($matches[0], $newName);
-                    $this->git->add($newName);
+                    $this->git->addFile($newName);
                     if ($this->git->isCommited($this->git->getBranch().':'.str_replace(NN_ROOT, '', $matches[0]))) {
                         $this->git->add(" -u {$matches[0]}"); // remove old filename from the index.
                     }
