@@ -326,6 +326,72 @@ class NameFixer
     }
 
     /**
+     * Attempts to fix release names using the rar file crc32 hash
+     *
+     *
+     * @param $time
+     * @param $echo
+     * @param $cats
+     * @param $nameStatus
+     * @param $show
+     * @throws \Exception
+     */
+    public function fixNamesWithCrc($time, $echo, $cats, $nameStatus, $show): void
+    {
+        $this->_echoStartMessage($time, 'CRC32');
+        $type = 'CRC32, ';
+
+        $preId = false;
+        if ($cats === 3) {
+            $query = sprintf(
+                '
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE nzbstatus = %d
+					AND predb_id = 0',
+                NZB::NZB_ADDED
+            );
+            $cats = 2;
+            $preId = true;
+        } else {
+            $query = sprintf(
+                '
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rel.predb_id = 0
+					AND proc_files = %d',
+                self::IS_RENAMED_NONE,
+                Category::OTHER_MISC,
+                Category::OTHER_HASHED,
+                self::PROC_FILES_NONE
+            );
+        }
+
+        $releases = $this->_getReleases($time, $cats, $query);
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            $this->colorCli->primary(number_format($total).' CRC32\'s to process.');
+
+            foreach ($releases as $release) {
+                $this->reset();
+                $this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+                $this->checked++;
+                $this->_echoRenamed($show);
+            }
+
+            $this->_echoFoundCount($echo, ' crc32\'s');
+        } else {
+            $this->colorCli->info('Nothing to fix.');
+        }
+    }
+
+    /**
      * Attempts to fix XXX release names using the File name.
      *
      *
@@ -1314,7 +1380,7 @@ class NameFixer
 
         if (! empty($row)) {
             if ($row[0]->title !== $release->searchname) {
-                $this->updateRelease($release, $row[0]->title, $method = 'predb hash release name: '.$row[0]->source, $echo, $hashtype, $nameStatus, $show, $row[0]->predb_id);
+                $this->updateRelease($release, $row[0]->title, 'predb hash release name: '.$row[0]->source, $echo, $hashtype, $nameStatus, $show, $row[0]->predb_id);
                 $matching++;
             }
         } else {
@@ -1413,7 +1479,7 @@ class NameFixer
                 foreach ($match as $val) {
                     $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
                     if ($title !== null) {
-                        $this->updateRelease($release, $title['title'], $method = 'preDB: Match', $echo, $type, $nameStatus, $show, $title['id']);
+                        $this->updateRelease($release, $title['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $title['id']);
                         $preid = true;
                     }
                 }
@@ -1437,6 +1503,9 @@ class NameFixer
                     break;
                 case 'SRR, ':
                     $this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
+                    break;
+                case 'CRC32, ':
+                    $this->crcCheck($release, $echo, $type, $nameStatus, $show);
                     break;
                 case 'NFO, ':
                     $this->nfoCheckTV($release, $echo, $type, $nameStatus, $show);
@@ -2073,7 +2142,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $res->searchname,
-                            $method = 'uidCheck: Unique_ID',
+                            'uidCheck: Unique_ID',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2166,7 +2235,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $match['0'],
-                            $method = 'fileCheck: XXX SDPORN',
+                            'fileCheck: XXX SDPORN',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2219,7 +2288,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $match['1'],
-                            $method = 'fileCheck: SRR extension',
+                            'fileCheck: SRR extension',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2269,13 +2338,68 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $res->searchname,
-                            $method = 'hashCheck: PAR2 hash_16K',
+                            'hashCheck: PAR2 hash_16K',
                             $echo,
                             $type,
                             $nameStatus,
                             $show,
                             $res->predb_id
                         );
+
+                    return true;
+                }
+            }
+        }
+        $this->_updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $release->releases_id);
+
+        return false;
+    }
+
+    /**
+     * Look for a name based on rar crc32 hash.
+     *
+     *
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function crcCheck($release, $echo, $type, $nameStatus, $show): bool
+    {
+        if ($this->done === false && $this->relid !== (int) $release->releases_id && $release->textstring !== '') {
+            $result = DB::select(
+                sprintf(
+                    "
+				    SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON rf.releases_id = {$release->releases_id}
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rf.crc32 = %s",
+                    self::IS_RENAMED_NONE,
+                    Category::OTHER_MISC,
+                    Category::OTHER_HASHED,
+                    $release->textstring
+                )
+            );
+
+            foreach ($result as $res) {
+                $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
+                if ($floor >= -5 && $floor <= 5) {
+                    $this->updateRelease(
+                        $release,
+                        $res->searchname,
+                        'hashCheck: PAR2 hash_16K',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show,
+                        $res->predb_id
+                    );
 
                     return true;
                 }

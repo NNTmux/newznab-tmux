@@ -1211,7 +1211,7 @@ class ProcessAdditional
              */
             if ($this->_addedFileInfo < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release->id, 'name' => $file['name'], 'size' => $file
                 ['size'], ])->first() === null) {
-                if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], '', $file['size'], $file['date'], $file['pass'])) {
+                if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'])) {
                     $this->_addedFileInfo++;
 
                     if ($this->_echoCLI) {
@@ -1226,7 +1226,7 @@ class ProcessAdditional
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     } //Run a PreDB filename check on insert to try and match the release
-                    elseif (strpos($file['name'], '.') !== 0 && \strlen($file['name']) > 0) {
+                    elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
                         $this->_release['releases_id'] = $this->_release->id;
                         $this->_nameFixer->matchPreDbFiles($this->_release, 1, 1, true);
@@ -2165,7 +2165,7 @@ class ProcessAdditional
                 ) {
 
                     // Try to add the files to the DB.
-                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['hash_16K'], $file['size'], $releaseInfo->postdate, 0)) {
+                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $releaseInfo->postdate, 0, $file['hash_16K'])) {
                         $filesAdded++;
                     }
                 }
