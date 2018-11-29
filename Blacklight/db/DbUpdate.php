@@ -127,7 +127,7 @@ class DbUpdate
                     rename($matches[0], $newName);
                     $this->git->addFile($newName);
                     if ($this->git->isCommited($this->git->getBranch().':'.str_replace(NN_ROOT, '', $matches[0]))) {
-                        $this->git->add(" -u {$matches[0]}"); // remove old filename from the index.
+                        $this->git->addFile(" -u {$matches[0]}"); // remove old filename from the index.
                     }
                 }
             }
