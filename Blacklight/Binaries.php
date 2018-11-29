@@ -281,7 +281,7 @@ class Binaries
         $groupCount = \count($groups);
         if ($groupCount > 0) {
             $counter = 1;
-            $allTime = now()->timestamp;
+            $allTime = now();
 
             $this->log(
                 'Updating: '.$groupCount.' group(s) - Using compression? '.($this->_compressedHeaders ? 'Yes' : 'No'),
@@ -301,7 +301,7 @@ class Binaries
             }
 
             $this->log(
-                'Updating completed in '.number_format(now()->timestamp - $allTime, 2).' seconds.',
+                'Updating completed in '.str_plural(' second', now()->diffInSeconds($allTime)),
                 __FUNCTION__,
                 'primary'
             );
@@ -334,7 +334,7 @@ class Binaries
      */
     public function updateGroup($groupMySQL, $maxHeaders = 0): void
     {
-        $startGroup = now()->timestamp;
+        $startGroup = now();
 
         $this->logIndexerStart();
 
@@ -541,7 +541,7 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        number_format(now()->timestamp - $startGroup, 2).' seconds.'
+                        str_plural(' second', now()->diffInSeconds($startGroup))
                     );
             }
         } elseif ($this->_echoCLI) {
