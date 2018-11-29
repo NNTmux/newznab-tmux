@@ -30,9 +30,8 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 if (! File::isReadable(NN_RES)) {
-    exit('The  '.NN_RES. ' folder must be readable.' . PHP_EOL);
+    exit('The  '.NN_RES.' folder must be readable.'.PHP_EOL);
 }
-
 
 if (! File::isWritable(NN_RES)) {
     exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);
