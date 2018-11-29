@@ -896,7 +896,7 @@ class ProcessReleases
             $deletedCount += $deleted;
         }
 
-        $firstQuery = $fourthQuery = now();
+        $firstQuery = now();
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
