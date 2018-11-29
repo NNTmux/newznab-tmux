@@ -43,8 +43,7 @@ class NntmuxResetDb extends Command
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
             $timestart = now();
 
-            DB::unprepared('SET FOREIGN_KEY_CHECKS = 0;');
-            DB::commit();
+            DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
             Group::query()->update([
                 'first_record' => 0,
@@ -80,16 +79,12 @@ class NntmuxResetDb extends Command
                 'releases_groups',
             ];
             foreach ($arr as &$value) {
-                $rel = DB::unprepared("TRUNCATE TABLE $value");
-                DB::commit();
-                if ($rel === true) {
-                    $this->info('Truncating '.$value.' completed.');
-                }
+                DB::statement("TRUNCATE TABLE $value");
+                $this->info('Truncating '.$value.' completed.');
             }
             unset($value);
             $this->info('Truncating binaries, collections, missed_parts and parts tables...');
-            DB::unprepared("CALL loop_cbpm('truncate')");
-            DB::commit();
+            DB::statement("CALL loop_cbpm('truncate')");
             $this->info('Truncating completed.');
 
             (new SphinxSearch())->truncateRTIndex();
@@ -108,8 +103,7 @@ class NntmuxResetDb extends Command
             }
 
             $this->info('Deleted all releases, images, previews and samples. This script finished '.now()->diffForHumans($timestart).' start');
-            DB::unprepared('SET FOREIGN_KEY_CHECKS = 1;');
-            DB::commit();
+            DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
         } else {
             $this->info('Script execution stopped');
         }

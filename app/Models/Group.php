@@ -347,7 +347,7 @@ class Group extends Model
         MissedPart::query()->where('groups_id', $id)->delete();
 
         foreach (self::$cbpm as $tablePrefix) {
-            DB::unprepared(
+            DB::statement(
                 "DROP TABLE IF EXISTS {$tablePrefix}_{$id}"
             );
         }
@@ -374,7 +374,7 @@ class Group extends Model
     public static function resetall(): bool
     {
         foreach (self::$cbpm as $tablePrefix) {
-            DB::unprepared("TRUNCATE TABLE {$tablePrefix}");
+            DB::statement("TRUNCATE TABLE {$tablePrefix}");
         }
 
         $groups = self::query()->select(['id'])->get();
@@ -382,7 +382,7 @@ class Group extends Model
         if ($groups instanceof \Traversable) {
             foreach ($groups as $group) {
                 foreach (self::$cbpm as $tablePrefix) {
-                    DB::unprepared("DROP TABLE IF EXISTS {$tablePrefix}_{$group['id']}");
+                    DB::statement("DROP TABLE IF EXISTS {$tablePrefix}_{$group['id']}");
                 }
             }
         }
@@ -570,12 +570,9 @@ class Group extends Model
     public static function createNewTPGTables($groupID): bool
     {
         foreach (self::$cbpm as $tablePrefix) {
-            if (DB::unprepared(
+            DB::statement(
                     "CREATE TABLE IF NOT EXISTS {$tablePrefix}_{$groupID} LIKE {$tablePrefix}"
-                ) === null
-            ) {
-                return false;
-            }
+                );
         }
 
         return true;

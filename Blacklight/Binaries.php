@@ -1082,8 +1082,7 @@ class Binaries
 				ORDER BY numberid ASC LIMIT %d', $tableNames['prname'], $groupArr['id'], $this->_partRepairMaxTries, $this->_partRepairLimit));
         } catch (\PDOException $e) {
             if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                DB::unprepared("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
-                DB::commit();
+                DB::statement("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
             }
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                 $this->colorCli->notice('Deadlock occurred');

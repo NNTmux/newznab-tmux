@@ -161,7 +161,7 @@ SQL_EXPORT;
             $this->prepareSQLLoadData($options);
         }
 
-        return $this->ps['LoadData']->execute([':path' => $options['path']]);
+        return $this->ps['LoadData']->execute($options['path']);
     }
 
     /**
@@ -200,7 +200,7 @@ SQL_EXPORT;
 
         $this->ps['Truncate']->execute();
 
-        $this->ps['LoadData']->execute([':path' => $filespec]);
+        $this->ps['LoadData']->execute(['path' => $filespec]);
 
         $this->ps['DeleteShort']->execute();
 

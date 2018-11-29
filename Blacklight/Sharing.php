@@ -141,8 +141,7 @@ class Sharing
      */
     public function initSettings(&$siteGuid = '')
     {
-        DB::unprepared('TRUNCATE TABLE sharing');
-        DB::commit();
+        DB::statement('TRUNCATE TABLE sharing');
         $siteName = uniqid('nntmux_', true);
         DB::insert(
             sprintf(

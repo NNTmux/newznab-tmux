@@ -151,14 +151,14 @@ foreach ($data as $dir => $files) {
                 $predb->executeTruncate();
 
                 // Import file into predb_imports
-                $predb->executeLoadData(
+                dd($predb->executeLoadData(
                     [
                         'fields' => '\\t\\t',
                         'lines'  => '\\r\\n',
                         'local'  => $local,
                         'path'   => $dumpFile,
                     ]
-                );
+                ));
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
@@ -173,7 +173,7 @@ foreach ($data as $dir => $files) {
                 $predb->executeUpdateGroupID();
 
                 $colorCli->info('Inserting records from temporary table into predb table');
-                $predb->executeInsert();
+                $inserted =$predb->executeInsert();
 
                 // Delete the dump.
                 unlink($dumpFile);
@@ -182,12 +182,9 @@ foreach ($data as $dir => $files) {
                     settings_array($match[2] + 1, $progress),
                     ['read' => false]
                 );
-                echo sprintf(
-                    "Successfully imported PreDB dump %d (%s), %d dumps remaining\n",
-                    $match[2],
-                    date('Y-m-d', $match[2]),
-                    --$total
-                );
+                if ($inserted === true) {
+                    echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n", $match[2], date('Y-m-d', $match[2]), --$total);
+                }
             } else {
                 echo "Ignoring: {$file['download_url']}\n";
             }

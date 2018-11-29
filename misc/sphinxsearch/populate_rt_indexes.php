@@ -23,8 +23,7 @@ if (! isset($argv[1]) || $argv[1] !== 'releases_rt') {
 function populate_rt($table, $max)
 {
     if ($table === 'releases_rt') {
-        DB::unprepared('SET SESSION group_concat_max_len=16384;');
-        DB::commit();
+        DB::statement('SET SESSION group_concat_max_len=16384;');
         $query = 'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 				FROM releases r
 				LEFT JOIN release_files rf ON(r.id=rf.releases_id)
