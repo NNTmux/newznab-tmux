@@ -1,4 +1,5 @@
 2018-11-29 DariusIII
+	* Chg: Use str_plural for duration
 	* Chg: Update composer/xdebug-handler to version 1.3.1
 	* Chg: Update predb_import script, it should work now
 	* Chg: Update tmux install script to use latest tmux release (version 2.8)
