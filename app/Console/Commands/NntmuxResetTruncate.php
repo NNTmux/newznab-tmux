@@ -60,7 +60,6 @@ class NntmuxResetTruncate extends Command
                 } else {
                     DB::statement("TRUNCATE TABLE $tbl");
                     $this->info("Truncating $tbl completed.");
-
                 }
             }
         }
