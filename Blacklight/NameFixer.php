@@ -2383,7 +2383,7 @@ class NameFixer
                     self::IS_RENAMED_NONE,
                     Category::OTHER_MISC,
                     Category::OTHER_HASHED,
-                    $release->textstring
+                    escapeString($release->textstring)
                 )
             );
 
