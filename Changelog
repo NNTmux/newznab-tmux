@@ -1,4 +1,5 @@
 2018-11-29 DariusIII
+	* Chg: Update variable definitions
 	* Chg: Use now() helper for calculating scripts runtime
 	* Chg: Simplify functions that check for mgrPoster variable
 	* Chg: Update imdbphp/imdbphp to version 6.1.2

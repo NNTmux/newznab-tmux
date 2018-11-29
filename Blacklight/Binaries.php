@@ -124,12 +124,12 @@ class Binaries
     protected $_binaryBlacklistIdsToUpdate = [];
 
     /**
-     * @var float microseconds time of cleaning process start
+     * @var \DateTime
      */
     protected $startCleaning;
 
     /**
-     * @var float microseconds time of the start of the scan function
+     * @var \DateTime
      */
     protected $startLoop;
 
@@ -144,17 +144,17 @@ class Binaries
     protected $allAsMgr;
 
     /**
-     * @var string How long it took in seconds to download headers
+     * @var int How long it took in seconds to download headers
      */
     protected $timeHeaders;
 
     /**
-     * @var string How long it took in seconds to clean/parse headers
+     * @var int How long it took in seconds to clean/parse headers
      */
     protected $timeCleaning;
 
     /**
-     * @var float microseconds time part repair was started
+     * @var \DateTime
      */
     protected $startPR;
 
@@ -164,12 +164,12 @@ class Binaries
     protected $tableNames;
 
     /**
-     * @var float microseconds time header update was started
+     * @var \DateTime
      */
     protected $startUpdate;
 
     /**
-     * @var string The time it took to insert the headers
+     * @var int The time it took to insert the headers
      */
     protected $timeInsert;
 
