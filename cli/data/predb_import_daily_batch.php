@@ -173,7 +173,7 @@ foreach ($data as $dir => $files) {
                 $predb->executeUpdateGroupID();
 
                 $colorCli->info('Inserting records from temporary table into predb table');
-                $inserted =$predb->executeInsert();
+                $inserted = $predb->executeInsert();
 
                 // Delete the dump.
                 unlink($dumpFile);
