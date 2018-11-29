@@ -1828,16 +1828,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.1.1",
+            "version": "v6.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "02986b4312f56a71c7299ee57316f2a65d70fe77"
+                "reference": "b7b99083cc52eadfd7a0dd027bbc2212fe8a5624"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/02986b4312f56a71c7299ee57316f2a65d70fe77",
-                "reference": "02986b4312f56a71c7299ee57316f2a65d70fe77",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/b7b99083cc52eadfd7a0dd027bbc2212fe8a5624",
+                "reference": "b7b99083cc52eadfd7a0dd027bbc2212fe8a5624",
                 "shasum": ""
             },
             "require": {
@@ -1864,7 +1864,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-11-24T13:30:26+00:00"
+            "time": "2018-11-29T17:44:22+00:00"
         },
         {
             "name": "intervention/image",
