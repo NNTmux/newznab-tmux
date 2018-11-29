@@ -219,6 +219,11 @@ class Binaries
     protected $headersNotInserted;
 
     /**
+     * @var \Blacklight\Binaries[]|\Illuminate\Database\Eloquent\Collection
+     */
+    protected $mgrPosters;
+
+    /**
      * Constructor.
      *
      * @param array $options Class instances / echo to CLI?
@@ -255,6 +260,7 @@ class Binaries
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
         $this->allAsMgr = (int) Settings::settingValue('..allasmgr') === 1;
+        $this->mgrPosters = $this->getMultiGroupPosters();
 
         $this->blackList = $this->whiteList = [];
     }
@@ -357,8 +363,7 @@ class Binaries
                 }
                 $this->partRepair($groupMySQL);
 
-                $mgrPosters = $this->getMultiGroupPosters();
-                if ($this->allAsMgr === true || ! empty($mgrPosters)) {
+                if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
                     $tableNames = ProcessReleasesMultiGroup::tableNames();
                     $this->partRepair($groupMySQL, $tableNames);
                 }
@@ -575,11 +580,9 @@ class Binaries
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
         $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
 
-        $mgrPosters = $this->getMultiGroupPosters();
-
-        if ($this->allAsMgr === true || ! empty($mgrPosters)) {
+        if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
             $mgrActive = true;
-            $mgrPosters = ! empty($mgrPosters) ? array_flip(array_column($mgrPosters, 'poster')) : '';
+            $this->mgrPosters = ! empty($this->mgrPosters) ? array_flip(array_pluck($this->mgrPosters, 'poster')) : '';
         } else {
             $mgrActive = false;
         }
@@ -707,7 +710,7 @@ class Binaries
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
 
-            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
+            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $this->mgrPosters))) {
                 $mgrHeaders[] = $header;
             } else {
                 $stdHeaders[] = $header;
@@ -1661,7 +1664,7 @@ class Binaries
             return $poster;
         }
 
-        $poster = MultigroupPoster::query()->get(['poster'])->toArray();
+        $poster = MultigroupPoster::query()->get(['poster']);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put('mgrposter', $poster, $expiresAt);
 

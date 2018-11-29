@@ -1,4 +1,5 @@
 2018-11-29 DariusIII
+	* Chg: Simplify functions that check for mgrPoster variable
 	* Chg: Update imdbphp/imdbphp to version 6.1.2
 	* Chg: Use DB::statement in place of DB::unprepared + DB::commit
 	* Chg: Use str_plural for duration
