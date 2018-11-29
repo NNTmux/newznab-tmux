@@ -19,7 +19,7 @@ if ($total > 0) {
     $colorCli->header('Updating game covers for '.number_format($total).' releases.');
 
     foreach ($res as $arr) {
-        $starttime = microtime(true);
+        $starttime = now()->timestamp;
         $gameInfo = $game->parseTitle($arr['title']);
         if ($gameInfo !== false) {
             $colorCli->primary('Looking up: '.$gameInfo['release']);
@@ -34,7 +34,7 @@ if ($total > 0) {
         }
 
         // amazon limits are 1 per 1 sec
-        $diff = floor((microtime(true) - $starttime) * 1000000);
+        $diff = floor((now()->timestamp - $starttime) * 1000000);
         if (1000000 - $diff > 0) {
             $colorCli->alternate('Sleeping');
             usleep(1000000 - $diff);

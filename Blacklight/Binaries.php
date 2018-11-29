@@ -281,7 +281,7 @@ class Binaries
         $groupCount = \count($groups);
         if ($groupCount > 0) {
             $counter = 1;
-            $allTime = microtime(true);
+            $allTime = now()->timestamp;
 
             $this->log(
                 'Updating: '.$groupCount.' group(s) - Using compression? '.($this->_compressedHeaders ? 'Yes' : 'No'),
@@ -301,7 +301,7 @@ class Binaries
             }
 
             $this->log(
-                'Updating completed in '.number_format(microtime(true) - $allTime, 2).' seconds.',
+                'Updating completed in '.number_format(now()->timestamp - $allTime, 2).' seconds.',
                 __FUNCTION__,
                 'primary'
             );
@@ -334,7 +334,7 @@ class Binaries
      */
     public function updateGroup($groupMySQL, $maxHeaders = 0): void
     {
-        $startGroup = microtime(true);
+        $startGroup = now()->timestamp;
 
         $this->logIndexerStart();
 
@@ -541,7 +541,7 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        number_format(microtime(true) - $startGroup, 2).' seconds.'
+                        number_format(now()->timestamp - $startGroup, 2).' seconds.'
                     );
             }
         } elseif ($this->_echoCLI) {
@@ -570,7 +570,7 @@ class Binaries
     public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null): array
     {
         // Start time of scan method and of fetching headers.
-        $this->startLoop = microtime(true);
+        $this->startLoop = now();
         $this->groupMySQL = $groupMySQL;
         $this->last = $last;
         $this->first = $first;
@@ -642,10 +642,10 @@ class Binaries
         }
 
         // Start of processing headers.
-        $this->startCleaning = microtime(true);
+        $this->startCleaning = now();
 
         // End of the getting data from usenet.
-        $this->timeHeaders = number_format($this->startCleaning - $this->startLoop, 2);
+        $this->timeHeaders = $this->startCleaning->diffInSeconds($this->startLoop);
 
         // Check if we got headers.
         $msgCount = \count($headers);
@@ -742,10 +742,10 @@ class Binaries
         unset($stdHeaders);
 
         // Start of part repair.
-        $this->startPR = microtime(true);
+        $this->startPR = now();
 
         // End of inserting.
-        $this->timeInsert = number_format($this->startPR - $this->startUpdate, 2);
+        $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate);
 
         if ($partRepair && \count($headersRepaired) > 0) {
             $this->removeRepairedParts($headersRepaired, $this->tableNames['prname'], $this->groupMySQL['id']);
@@ -933,10 +933,10 @@ class Binaries
         //unset($headers); // Reclaim memory.
 
         // Start of inserting into SQL.
-        $this->startUpdate = microtime(true);
+        $this->startUpdate = now();
 
         // End of processing headers.
-        $this->timeCleaning = number_format($this->startUpdate - $this->startCleaning, 2);
+        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning);
         $binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
         foreach ($binariesUpdate as $binaryID => $binary) {
             $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
@@ -1023,7 +1023,7 @@ class Binaries
      */
     protected function outputHeaderDuration(): void
     {
-        $currentMicroTime = microtime(true);
+        $currentMicroTime = now();
         if ($this->_echoCLI) {
             $this->colorCli->alternateOver($this->timeHeaders.'s').
                 $this->colorCli->primaryOver(' to download articles, ').
@@ -1031,9 +1031,9 @@ class Binaries
                 $this->colorCli->primaryOver(' to process collections, ').
                 $this->colorCli->alternateOver($this->timeInsert.'s').
                 $this->colorCli->primaryOver(' to insert binaries/parts, ').
-                $this->colorCli->alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
+                $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startPR).'s').
                 $this->colorCli->primaryOver(' for part repair, ').
-                $this->colorCli->alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
+                $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startLoop).'s').
                 $this->colorCli->primary(' total.');
         }
     }

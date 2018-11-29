@@ -18,11 +18,11 @@ if ($movies instanceof \Traversable) {
         $colorCli->header('Updating movie info for '.number_format($count).' movies.');
 
         foreach ($movies as $mov) {
-            $startTime = microtime(true);
+            $startTime = now()->timestamp;
             $mov = $movie->updateMovieInfo($mov['imdbid']);
 
             // tmdb limits are 30 per 10 sec, not certain for imdb
-            $diff = floor((microtime(true) - $startTime) * 1000000);
+            $diff = floor((now()->timestamp - $startTime) * 1000000);
             if (333333 - $diff > 0) {
                 echo "sleeping\n";
                 usleep(333333 - $diff);

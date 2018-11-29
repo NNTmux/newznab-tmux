@@ -475,7 +475,7 @@ class Books
 
             $bookId = -2;
             foreach ($res as $arr) {
-                $startTime = microtime(true);
+                $startTime = now()->timestamp;
                 $usedAmazon = false;
                 // audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
                 if ($arr['categories_id'] === '3030') {
@@ -519,7 +519,7 @@ class Books
                     }
                 }
                 // Sleep to not flood amazon.
-                $diff = floor((microtime(true) - $startTime) * 1000000);
+                $diff = floor((now()->timestamp - $startTime) * 1000000);
                 if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
                     usleep($this->sleeptime * 1000 - $diff);
                 }

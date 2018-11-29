@@ -168,7 +168,7 @@ class Backfill
     public function backfillGroup($groupArr, $left, $articles = ''): void
     {
         // Start time for this group.
-        $startGroup = microtime(true);
+        $startGroup = now()->timestamp;
 
         $this->_binaries->logIndexerStart();
 
@@ -318,7 +318,7 @@ class Backfill
                     'Group '.
                     $groupName.
                     ' processed in '.
-                    number_format(microtime(true) - $startGroup, 2).
+                    number_format(now()->timestamp - $startGroup, 2).
                     ' seconds.'
                 );
         }
