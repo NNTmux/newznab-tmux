@@ -2397,8 +2397,7 @@ class NameFixer
                         $echo,
                         $type,
                         $nameStatus,
-                        $show,
-                        $res->predb_id
+                        $show
                     );
 
                     return true;
