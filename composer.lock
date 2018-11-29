@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea5a51cda24f90966f724428d16126d8",
+    "content-hash": "a96aa076bf4831517b12c06f955015c7",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3456,16 +3456,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.5.3",
+            "version": "2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "d5603a1540ea9acff343f31a14ffe9849b56132a"
+                "reference": "ab9bfecb5b9ea9557f027dcd01762495c351632f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/d5603a1540ea9acff343f31a14ffe9849b56132a",
-                "reference": "d5603a1540ea9acff343f31a14ffe9849b56132a",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ab9bfecb5b9ea9557f027dcd01762495c351632f",
+                "reference": "ab9bfecb5b9ea9557f027dcd01762495c351632f",
                 "shasum": ""
             },
             "require": {
@@ -3511,7 +3511,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2018-11-13T14:41:34+00:00"
+            "time": "2018-11-22T16:45:03+00:00"
         },
         {
             "name": "neutron/temporary-filesystem",
@@ -11087,7 +11087,7 @@
         {
             "alias": "1.35.0",
             "alias_normalized": "1.35.0.0",
-            "version": "2.5.3.0",
+            "version": "2.6.1.0",
             "package": "nesbot/carbon"
         }
     ],

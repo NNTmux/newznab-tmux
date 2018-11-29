@@ -1,4 +1,5 @@
 2018-11-29 DariusIII
+	* Chg: Update nesbot/Carbon to version 2.6.1 (fixes 86399 seconds output)
 	* Chg: Update variable definitions
 	* Chg: Use now() helper for calculating scripts runtime
 	* Chg: Simplify functions that check for mgrPoster variable
