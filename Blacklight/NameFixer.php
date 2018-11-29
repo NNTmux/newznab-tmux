@@ -326,7 +326,7 @@ class NameFixer
     }
 
     /**
-     * Attempts to fix release names using the rar file crc32 hash
+     * Attempts to fix release names using the rar file crc32 hash.
      *
      *
      * @param $time
