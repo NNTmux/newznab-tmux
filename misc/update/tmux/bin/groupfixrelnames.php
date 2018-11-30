@@ -118,7 +118,7 @@ switch (true) {
 
             if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && ! empty($release->uid)) {
                 $colorCli->primaryOver('U');
-                $nameFixer->uidCheck($release, true, 'UID, ', 1, 1);
+                $nameFixer->uidCheck($release, true, 'UID, ', 1, true);
             }
             // Not all gate requirements in query always set column status as PP Add check is in query
             $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
@@ -130,7 +130,7 @@ switch (true) {
 
             if ((int) $release->proc_crc32 === NameFixer::PROC_CRC_NONE && ! empty($release->crc)) {
                 $colorCli->primaryOver('C');
-                $nameFixer->crcCheck($release, true, 'CRC32, ', 1, 1);
+                $nameFixer->crcCheck($release, true, 'CRC32, ', 1, true);
             }
             // Not all gate requirements in query always set column status as PP Add check is in query
             $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
@@ -142,7 +142,7 @@ switch (true) {
 
             if ((int) $release->proc_srr === NameFixer::PROC_SRR_NONE) {
                 $colorCli->primaryOver('sr');
-                $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
+                $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, true);
             }
             // Not all gate requirements in query always set column status as PP Add check is in query
             $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
@@ -154,7 +154,7 @@ switch (true) {
 
             if ((int) $release->proc_hash16k === NameFixer::PROC_HASH16K_NONE && ! empty($release->hash)) {
                 $colorCli->primaryOver('H');
-                $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
+                $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, true);
             }
             // Not all gate requirements in query always set column status as PP Add check is in query
             $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
@@ -168,7 +168,7 @@ switch (true) {
                 if (! empty($release->textstring) && ! preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
                     $colorCli->primaryOver('n');
                     $nameFixer->done = $nameFixer->matched = false;
-                    $nameFixer->checkName($release, true, 'NFO, ', 1, 1);
+                    $nameFixer->checkName($release, true, 'NFO, ', 1, true);
                 }
                 $nameFixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release->releases_id);
             }
@@ -188,7 +188,7 @@ switch (true) {
                         if ($nameFixer->matched === false) {
                             $colorCli->primaryOver('f');
                             $releaseFile->textstring = $fileName;
-                            $nameFixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
+                            $nameFixer->checkName($releaseFile, true, 'Filenames, ', 1, true);
                         }
                     }
                 }
@@ -217,7 +217,7 @@ switch (true) {
                     ]);
                 }
 
-                $nzbcontents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, 1, 1);
+                $nzbcontents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, 1, true);
             }
 
             // Not all gate requirements in query always set column status as PP Add check is in query
