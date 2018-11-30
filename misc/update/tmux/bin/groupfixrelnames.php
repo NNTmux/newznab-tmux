@@ -2,17 +2,17 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Category;
+use Blacklight\Nfo;
+use Blacklight\NZB;
+use Blacklight\NNTP;
 use App\Models\Predb;
+use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
-use Blacklight\Nfo;
-use Blacklight\NNTP;
-use Blacklight\NZB;
 use Blacklight\NZBContents;
-use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB;
+use Blacklight\processing\PostProcess;
 
 $colorCli = new ColorCLI();
 if (! isset($argv[1])) {
