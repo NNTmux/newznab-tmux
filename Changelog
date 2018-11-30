@@ -1,4 +1,5 @@
 2018-11-30 DariusIII
+	* Chg: Update symfony components to their latest versions
 	* Chg: Update updateRelease function
 	* Chg: Update groupFixRelNames.php
 	* Chg: Add prox_crc32 column to releases table and adjust NameFixer class
