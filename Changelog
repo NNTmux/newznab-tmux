@@ -1,4 +1,5 @@
 2018-11-30 DariusIII
+	* Fix: Fix wrong updated column when doing crcCheck
 	* Chg: Reduce number of releases checked for match_prefiles script from 1000 to 100 to reduce time it takes to match releases
 	* Fix: Fix undefined index crc32 when adding data from rar
 	* Chg: Update more symfony components

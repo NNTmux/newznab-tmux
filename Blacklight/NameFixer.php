@@ -2407,7 +2407,7 @@ class NameFixer
                 }
             }
         }
-        $this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release->releases_id);
+        $this->_updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $release->releases_id);
 
         return false;
     }
