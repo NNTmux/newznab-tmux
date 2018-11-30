@@ -1010,6 +1010,9 @@ class NameFixer
                             case 'SRR, ':
                                 $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1];
                                 break;
+                            case 'CRC32, ':
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_crc32' => 1];
+                                break;
                         }
 
                         $updateColumns = [
