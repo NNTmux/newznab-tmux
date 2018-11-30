@@ -37,12 +37,13 @@ switch (true) {
 					SELECT
 						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
 						r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
-						r.size AS relsize, r.predb_id, r.proc_hash16k, r.proc_srr,
+						r.size AS relsize, r.predb_id, r.proc_hash16k, r.proc_srr, r.proc_crc32,
 						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
 						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
 						IFNULL(ru.uniqueid, '') AS uid,
-						IFNULL(ph.hash, 0) AS hash
+						IFNULL(ph.hash, 0) AS hash,
+					    IFNULL(rf.crc32, '') as crc
 					FROM releases r
 					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
 					LEFT JOIN release_files rf ON r.id = rf.releases_id
@@ -65,6 +66,7 @@ switch (true) {
 						OR r.proc_par2 = %d
 						OR r.proc_srr = %d
 						OR r.proc_hash16k = %d
+						OR r.proc_crc32 = %d
 						OR
 						(
 							r.ishashed = 1
@@ -86,6 +88,7 @@ switch (true) {
                 NameFixer::PROC_PAR2_NONE,
                 NameFixer::PROC_SRR_NONE,
                 NameFixer::PROC_HASH16K_NONE,
+                NameFixer::PROC_CRC_NONE,
                 Category::getCategoryOthersGroup(),
                 $maxPerRun
             )
@@ -119,6 +122,18 @@ switch (true) {
             }
             // Not all gate requirements in query always set column status as PP Add check is in query
             $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
+
+            if ($nameFixer->matched) {
+                continue;
+            }
+            $nameFixer->reset();
+
+            if ((int) $release->proc_crc32 === NameFixer::PROC_CRC_NONE && ! empty($release->crc)) {
+                $colorCli->primaryOver('C');
+                $nameFixer->crcCheck($release, true, 'CRC32, ', 1, 1);
+            }
+            // Not all gate requirements in query always set column status as PP Add check is in query
+            $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
