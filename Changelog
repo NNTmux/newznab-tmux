@@ -1,4 +1,5 @@
 2018-11-30 DariusIII
+	* Chg: Update more symfony components
 	* Chg: Move column status updates to inside function checks
 	* Chg: Use true switch in place of numerical 1 in NameFixer functions used in groupFixRelNames.php
 	* Chg: Update symfony components to their latest versions
