@@ -2,17 +2,17 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Nfo;
-use Blacklight\NZB;
-use Blacklight\NNTP;
-use App\Models\Predb;
 use App\Models\Category;
+use App\Models\Predb;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
+use Blacklight\Nfo;
+use Blacklight\NNTP;
+use Blacklight\NZB;
 use Blacklight\NZBContents;
-use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
+use Illuminate\Support\Facades\DB;
 
 $colorCli = new ColorCLI();
 if (! isset($argv[1])) {
@@ -31,9 +31,7 @@ switch (true) {
 
         // Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
         // in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
-        $releases = DB::select(
-            sprintf(
-                "
+        $releases = DB::select(sprintf("
 					SELECT
 						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
 						r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
@@ -76,23 +74,7 @@ switch (true) {
 					AND r.categories_id IN (%s)
 					GROUP BY r.id
 					ORDER BY r.id DESC
-					LIMIT %s",
-                escapeString($guidChar),
-                NZB::NZB_ADDED,
-                NameFixer::IS_RENAMED_NONE,
-                Nfo::NFO_UNPROC,
-                Nfo::NFO_FOUND,
-                NameFixer::PROC_NFO_NONE,
-                NameFixer::PROC_FILES_NONE,
-                NameFixer::PROC_UID_NONE,
-                NameFixer::PROC_PAR2_NONE,
-                NameFixer::PROC_SRR_NONE,
-                NameFixer::PROC_HASH16K_NONE,
-                NameFixer::PROC_CRC_NONE,
-                Category::getCategoryOthersGroup(),
-                $maxPerRun
-            )
-        );
+					LIMIT %s", escapeString($guidChar), NZB::NZB_ADDED, NameFixer::IS_RENAMED_NONE, Nfo::NFO_UNPROC, Nfo::NFO_FOUND, NameFixer::PROC_NFO_NONE, NameFixer::PROC_FILES_NONE, NameFixer::PROC_UID_NONE, NameFixer::PROC_PAR2_NONE, NameFixer::PROC_SRR_NONE, NameFixer::PROC_HASH16K_NONE, NameFixer::PROC_CRC_NONE, Category::getCategoryOthersGroup(), $maxPerRun));
 
         foreach ($releases as $release) {
             $nameFixer->checked++;
@@ -119,9 +101,9 @@ switch (true) {
             if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && ! empty($release->uid)) {
                 $colorCli->primaryOver('U');
                 $nameFixer->uidCheck($release, true, 'UID, ', 1, true);
+
+                $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
             }
-            // Not all gate requirements in query always set column status as PP Add check is in query
-            $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -131,9 +113,9 @@ switch (true) {
             if ((int) $release->proc_crc32 === NameFixer::PROC_CRC_NONE && ! empty($release->crc)) {
                 $colorCli->primaryOver('C');
                 $nameFixer->crcCheck($release, true, 'CRC32, ', 1, true);
+
+                $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
             }
-            // Not all gate requirements in query always set column status as PP Add check is in query
-            $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -143,9 +125,9 @@ switch (true) {
             if ((int) $release->proc_srr === NameFixer::PROC_SRR_NONE) {
                 $colorCli->primaryOver('sr');
                 $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, true);
+
+                $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
             }
-            // Not all gate requirements in query always set column status as PP Add check is in query
-            $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -155,9 +137,9 @@ switch (true) {
             if ((int) $release->proc_hash16k === NameFixer::PROC_HASH16K_NONE && ! empty($release->hash)) {
                 $colorCli->primaryOver('H');
                 $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, true);
+
+                $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
             }
-            // Not all gate requirements in query always set column status as PP Add check is in query
-            $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -226,33 +208,27 @@ switch (true) {
         break;
 
     case $type === 'predbft' && isset($maxPerRun) && is_numeric($maxPerRun) && isset($thread) && is_numeric($thread):
-        $pres = Predb::query()
-            ->where('searched', '=', 0)
-            ->where('predate', '<', now()->subDay())
-            ->where(DB::raw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"'))
-            ->where('predate', '<', now()->subDay())
-            ->select(['id as predb_id', 'title', 'source', 'searched'])
-            ->orderBy('predate')
-            ->limit($maxPerRun)
-            ->offset($thread * $maxPerRun - $maxPerRun)
-            ->get();
+        $pres = Predb::query()->where('searched', '=', 0)->where('predate', '<', now()->subDay())->where(DB::raw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"'))->where('predate', '<', now()->subDay())->select([
+                'id as predb_id',
+                'title',
+                'source',
+                'searched',
+            ])->orderBy('predate')->limit($maxPerRun)->offset($thread * $maxPerRun - $maxPerRun)->get();
 
-        if ($pres instanceof \Traversable) {
-            foreach ($pres as $pre) {
-                $nameFixer->done = $nameFixer->matched = false;
-                $searched = 0;
-                $ftmatched = $nameFixer->matchPredbFT($pre, true, 1, true);
-                if ($ftmatched > 0) {
-                    $searched = 1;
-                } elseif ($ftmatched < 0) {
-                    $searched = -6;
-                    echo '*';
-                } else {
-                    $searched = $pre['searched'] - 1;
-                    echo '.';
-                }
-                Predb::query()->where('id', $pre['predb_id'])->update(['searched' => $searched]);
-                $nameFixer->checked++;
+        foreach ($pres as $pre) {
+            $nameFixer->done = $nameFixer->matched = false;
+            $searched = 0;
+            $ftmatched = $nameFixer->matchPredbFT($pre, true, 1, true);
+            if ($ftmatched > 0) {
+                $searched = 1;
+            } elseif ($ftmatched < 0) {
+                $searched = -6;
+                echo '*';
+            } else {
+                $searched = $pre['searched'] - 1;
+                echo '.';
             }
+            Predb::query()->where('id', $pre['predb_id'])->update(['searched' => $searched]);
+            $nameFixer->checked++;
         }
 }
