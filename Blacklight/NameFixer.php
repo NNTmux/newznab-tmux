@@ -30,6 +30,8 @@ class NameFixer
     public const PROC_HASH16K_DONE = 1;
     public const PROC_SRR_NONE = 0;
     public const PROC_SRR_DONE = 1;
+    public const PROC_CRC_NONE = 0;
+    public const PROC_CRC_DONE = 1;
 
     // Constants for overall rename status
     public const IS_RENAMED_NONE = 0;
@@ -364,11 +366,11 @@ class NameFixer
 					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
-					AND proc_files = %d',
+					AND rel.proc_crc32 = %d',
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
                 Category::OTHER_HASHED,
-                self::PROC_FILES_NONE
+                self::PROC_CRC_NONE
             );
         }
 
@@ -2374,7 +2376,7 @@ class NameFixer
             $result = DB::select(
                 sprintf(
                     '
-				    SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.predb_id as predb_id,
+				    SELECT rf.crc32, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.predb_id as predb_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					LEFT JOIN release_files rf ON rf.releases_id = rel.id
@@ -2395,7 +2397,7 @@ class NameFixer
                         $type,
                         $nameStatus,
                         $show,
-                        $res->predbid
+                        $res->predb_id
                     );
 
                     return true;
