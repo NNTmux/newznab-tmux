@@ -2373,16 +2373,13 @@ class NameFixer
         if ($this->done === false && $this->relid !== (int) $release->releases_id && $release->textstring !== '') {
             $result = DB::select(
                 sprintf(
-                    "
-				    SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
+                    '
+				    SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.predb_id as predb_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON rf.releases_id = {$release->releases_id}
-					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-					AND rf.crc32 = %s",
-                    self::IS_RENAMED_NONE,
-                    Category::OTHER_MISC,
-                    Category::OTHER_HASHED,
+					LEFT JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE rel.predb_id > 0
+					AND rf.crc32 = %s',
                     escapeString($release->textstring)
                 )
             );
@@ -2397,7 +2394,8 @@ class NameFixer
                         $echo,
                         $type,
                         $nameStatus,
-                        $show
+                        $show,
+                        $res->predbid
                     );
 
                     return true;
