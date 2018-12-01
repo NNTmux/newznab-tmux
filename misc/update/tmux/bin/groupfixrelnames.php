@@ -214,10 +214,10 @@ switch (true) {
                 '
 					SELECT p.id AS predb_id, p.title, p.source, p.searched
 					FROM predb p
-					WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
-					AND searched = 0
-					AND created < (NOW() - INTERVAL 1 DAY)
-					ORDER BY created ASC
+					WHERE LENGTH(p.title) >= 15 AND p.title NOT REGEXP "[\"\<\> ]"
+					AND p.searched = 0
+					AND p.predate < (NOW() - INTERVAL 1 DAY)
+					ORDER BY p.predate ASC
 					LIMIT %s
 					OFFSET %s',
                 $maxPerRun,
