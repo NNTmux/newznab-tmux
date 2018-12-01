@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Release;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
@@ -31,7 +32,7 @@ switch (true) {
 
         // Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
         // in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
-        $releases = DB::select(sprintf("
+        $releases = Release::fromQuery(sprintf("
 					SELECT
 						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
 						r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
@@ -208,12 +209,21 @@ switch (true) {
         break;
 
     case $type === 'predbft' && isset($maxPerRun) && is_numeric($maxPerRun) && isset($thread) && is_numeric($thread):
-        $pres = Predb::query()->where('searched', '=', 0)->where('predate', '<', now()->subDay())->where(DB::raw('LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"'))->where('predate', '<', now()->subDay())->select([
-                'id as predb_id',
-                'title',
-                'source',
-                'searched',
-            ])->orderBy('predate')->limit($maxPerRun)->offset($thread * $maxPerRun - $maxPerRun)->get();
+        $pres = Predb::fromQuery(
+            sprintf(
+                '
+					SELECT p.id AS predb_id, p.title, p.source, p.searched
+					FROM predb p
+					WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
+					AND searched = 0
+					AND created < (NOW() - INTERVAL 1 DAY)
+					ORDER BY created ASC
+					LIMIT %s
+					OFFSET %s',
+                $maxPerRun,
+                $thread * $maxPerRun - $maxPerRun
+            )
+        );
 
         foreach ($pres as $pre) {
             $nameFixer->done = $nameFixer->matched = false;
