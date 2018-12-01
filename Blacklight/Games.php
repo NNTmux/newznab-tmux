@@ -569,7 +569,7 @@ class Games
         if (now() > $this->igdbSleep) {
             $this->igdbSleep = null;
         }
-        if ($this->igdbSleep === null && env('IGDB_KEY') !== '') {
+        if ($this->igdbSleep === null && config('services.igdb.key') !== '') {
             try {
                 if ($steamGameID === false || $this->_gameResults === false) {
                     $bestMatch = false;

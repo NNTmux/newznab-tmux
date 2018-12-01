@@ -1,3 +1,5 @@
+2018-12-01 DariusIII
+	* Chg: Use config file to fetch IGDB key in COnsole and Games classes
 2018-11-30 DariusIII
 	* Fix: Fix wrong updated column when doing crcCheck
 	* Chg: Reduce number of releases checked for match_prefiles script from 1000 to 100 to reduce time it takes to match releases

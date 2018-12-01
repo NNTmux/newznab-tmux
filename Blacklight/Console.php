@@ -816,7 +816,7 @@ class Console
         if (now() > $this->igdbSleep) {
             $this->igdbSleep = null;
         }
-        if ($this->igdbSleep === null && env('IGDB_KEY') !== '') {
+        if ($this->igdbSleep === null && config('services.igdb.key') !== '') {
             try {
                 $result = IGDB::searchGames($gameInfo);
                 if (! empty($result)) {
