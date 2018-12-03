@@ -77,6 +77,7 @@ switch (true) {
 					ORDER BY r.id DESC
 					LIMIT %s", escapeString($guidChar), NZB::NZB_ADDED, NameFixer::IS_RENAMED_NONE, Nfo::NFO_UNPROC, Nfo::NFO_FOUND, NameFixer::PROC_NFO_NONE, NameFixer::PROC_FILES_NONE, NameFixer::PROC_UID_NONE, NameFixer::PROC_PAR2_NONE, NameFixer::PROC_SRR_NONE, NameFixer::PROC_HASH16K_NONE, NameFixer::PROC_CRC_NONE, Category::getCategoryOthersGroup(), $maxPerRun));
 
+
         foreach ($releases as $release) {
             $nameFixer->checked++;
             $nameFixer->reset();
@@ -102,9 +103,9 @@ switch (true) {
             if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && ! empty($release->uid)) {
                 $colorCli->primaryOver('U');
                 $nameFixer->uidCheck($release, true, 'UID, ', 1, true);
-
-                $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
             }
+
+            $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -114,9 +115,9 @@ switch (true) {
             if ((int) $release->proc_crc32 === NameFixer::PROC_CRC_NONE && ! empty($release->crc)) {
                 $colorCli->primaryOver('C');
                 $nameFixer->crcCheck($release, true, 'CRC32, ', 1, true);
-
-                $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
             }
+
+            $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -126,9 +127,9 @@ switch (true) {
             if ((int) $release->proc_srr === NameFixer::PROC_SRR_NONE) {
                 $colorCli->primaryOver('sr');
                 $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, true);
-
-                $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
             }
+
+            $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
@@ -138,23 +139,22 @@ switch (true) {
             if ((int) $release->proc_hash16k === NameFixer::PROC_HASH16K_NONE && ! empty($release->hash)) {
                 $colorCli->primaryOver('H');
                 $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, true);
-
-                $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
             }
+
+            $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
 
-            if ((int) $release->nfostatus === Nfo::NFO_FOUND && (int) $release->proc_nfo === NameFixer::PROC_NFO_NONE) {
-                if (! empty($release->textstring) && ! preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
-                    $colorCli->primaryOver('n');
-                    $nameFixer->done = $nameFixer->matched = false;
-                    $nameFixer->checkName($release, true, 'NFO, ', 1, true);
-                }
-                $nameFixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release->releases_id);
+            if ((int) $release->nfostatus === Nfo::NFO_FOUND && (int) $release->proc_nfo === NameFixer::PROC_NFO_NONE && ! empty($release->textstring) && ! preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
+                $colorCli->primaryOver('n');
+                $nameFixer->done = $nameFixer->matched = false;
+                $nameFixer->checkName($release, true, 'NFO, ', 1, true);
             }
+
+            $nameFixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release->releases_id);
 
             if ($nameFixer->matched) {
                 continue;

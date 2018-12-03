@@ -3,36 +3,35 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateParHashesTable extends Migration {
+class CreateParHashesTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('par_hashes', function(Blueprint $table)
-		{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('par_hashes', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
             $table->collation = 'utf8_unicode_ci';
-		    $table->integer('releases_id')->unsigned()->comment('FK to releases.id');
-			$table->string('hash', 32)->comment('hash_16k block of par2');
-			$table->primary(['releases_id','hash']);
+            $table->integer('releases_id')->unsigned()->comment('FK to releases.id');
+            $table->string('hash', 32)->comment('hash_16k block of par2');
+            $table->primary(['releases_id','hash']);
             $table->foreign('releases_id', 'FK_ph_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
-		});
-	}
+        });
+    }
 
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('par_hashes');
-	}
-
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('par_hashes');
+    }
 }
