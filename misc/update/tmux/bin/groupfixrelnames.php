@@ -77,7 +77,6 @@ switch (true) {
 					ORDER BY r.id DESC
 					LIMIT %s", escapeString($guidChar), NZB::NZB_ADDED, NameFixer::IS_RENAMED_NONE, Nfo::NFO_UNPROC, Nfo::NFO_FOUND, NameFixer::PROC_NFO_NONE, NameFixer::PROC_FILES_NONE, NameFixer::PROC_UID_NONE, NameFixer::PROC_PAR2_NONE, NameFixer::PROC_SRR_NONE, NameFixer::PROC_HASH16K_NONE, NameFixer::PROC_CRC_NONE, Category::getCategoryOthersGroup(), $maxPerRun));
 
-
         foreach ($releases as $release) {
             $nameFixer->checked++;
             $nameFixer->reset();
