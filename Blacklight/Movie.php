@@ -24,6 +24,7 @@ use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use Tmdb\Model\Configuration;
 
 /**
  * Class Movie.
@@ -191,12 +192,14 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
 
-        $this->helper = ImageHelper::class;
+        $this->helper = new ImageHelper(new Configuration());
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
         $this->config = new Config();
         $this->config->language = $this->lookuplanguage;
         $this->config->throwHttpExceptions = false;
+        $this->config->usecache = false;
+        $this->config->storecache = false;
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;

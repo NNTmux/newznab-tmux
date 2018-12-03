@@ -1,4 +1,5 @@
 2018-12-03 DariusIII
+	* Fix: Fix issues in Movie class
 	* Fix: Check if $mus['year'] is empty
 	* Chg: Replace tmdb-php/api with tmdb-php/laravel package
 	* Chg: Update used libraries to their latest versions
