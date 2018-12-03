@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use Imdb\Title;
 use Imdb\Config;
-use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use Imdb\TitleSearch;
 use GuzzleHttp\Client;
@@ -12,9 +11,7 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
-use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
-use Tmdb\Client as TmdbClient;
 use Blacklight\utility\Utility;
 use DariusIII\ItunesApi\iTunes;
 use Blacklight\libraries\FanartTV;
@@ -23,7 +20,8 @@ use Illuminate\Support\Facades\File;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
-use Tmdb\Repository\ConfigurationRepository;
+use Tmdb\Helper\ImageHelper;
+use Tmdb\Laravel\Facades\Tmdb;
 use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
@@ -147,29 +145,14 @@ class Movie
     private $config;
 
     /**
-     * @var \Tmdb\Repository\ConfigurationRepository
-     */
-    protected $configRepository;
-
-    /**
      * @var \Tmdb\Helper\ImageHelper
      */
     protected $helper;
 
     /**
-     * @var \Tmdb\Model\Configuration
-     */
-    protected $tmdbconfig;
-
-    /**
      * @var null|string
      */
     protected $traktcheck;
-
-    /**
-     * @var null|string
-     */
-    protected $tmdbtokencheck;
 
     /**
      * @var \Blacklight\ColorCLI
@@ -199,18 +182,6 @@ class Movie
             $this->traktTv = new TraktTv(['Settings' => null]);
         }
         $this->client = new Client();
-        $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey');
-        if ($this->tmdbtokencheck !== null) {
-            $this->tmdbtoken = new ApiToken($this->tmdbtokencheck);
-            $this->tmdbclient = new TmdbClient($this->tmdbtoken, [
-                    'cache' => [
-                        'enabled' => false,
-                    ],
-                ]);
-            $this->configRepository = new ConfigurationRepository($this->tmdbclient);
-            $this->tmdbconfig = $this->configRepository->load();
-            $this->helper = new ImageHelper($this->tmdbconfig);
-        }
         $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
         if ($this->fanartapikey !== null) {
             $this->fanart = new FanartTV($this->fanartapikey);
@@ -219,6 +190,8 @@ class Movie
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
+
+        $this->helper = ImageHelper::class;
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
         $this->config = new Config();
@@ -474,7 +447,9 @@ class Movie
 
         if (! empty($data['trailer'])) {
             $data['trailer'] = str_ireplace(
-                ['watch?v=', 'http://'], ['embed/', 'https://'], $data['trailer']
+                ['watch?v=', 'http://'],
+                ['embed/', 'https://'],
+                $data['trailer']
             );
         }
         $imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
@@ -824,7 +799,7 @@ class Movie
         $lookupId = $text === false && \strlen($imdbId) === 7 ? 'tt'.$imdbId : $imdbId;
 
         try {
-            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
+            $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
         } catch (TmdbApiException $error) {
             if (Utility::isCLI()) {
                 $this->colorCli->error($error->getMessage());
@@ -1270,7 +1245,7 @@ class Movie
 
                 // Check on The Movie Database.
                 if ($movieUpdated === false) {
-                    $data = $this->tmdbclient->getSearchApi()->searchMovies($this->currentTitle);
+                    $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
                     if (($data['total_results'] > 0) && ! empty($data['results'])) {
                         foreach ($data['results'] as $result) {
                             if (! empty($result['id'])) {
