@@ -31,14 +31,15 @@ use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
  */
 class Movie
 {
+    /**
+     * @var int
+     */
     protected const MATCH_PERCENT = 75;
 
-    protected const YEAR_MATCH_PERCENT = 80;
-
     /**
-     * @var \PDO
+     * @var int
      */
-    public $pdo;
+    protected const YEAR_MATCH_PERCENT = 80;
 
     /**
      * Current title being passed through various sites/api's.
@@ -175,7 +176,6 @@ class Movie
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->colorCli = new ColorCLI();
         $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
@@ -198,8 +198,11 @@ class Movie
         $this->config = new Config();
         $this->config->language = $this->lookuplanguage;
         $this->config->throwHttpExceptions = false;
-        $this->config->usecache = false;
-        $this->config->storecache = false;
+        $cacheDir = resource_path().'/tmp/imdb_cache';
+        if (! File::isDirectory($cacheDir)) {
+            File::makeDirectory($cacheDir, 0777, false, true);
+        }
+        $this->config->cachedir = $cacheDir;
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
@@ -516,8 +519,7 @@ class Movie
      * Update movie on movie-edit page.
      *
      * @param array $values Array of keys/values to update. See $validKeys
-     *
-     * @return bool|string
+     * @return bool
      */
     public function update(array $values)
     {
@@ -552,9 +554,7 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        DB::insert($query[0].') '.$query[1].') '.$query[2]);
-
-        return $this->pdo->lastInsertId();
+        MovieInfo::fromQuery($query[0].') '.$query[1].') '.$query[2]);
     }
 
     /**
