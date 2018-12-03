@@ -1,4 +1,5 @@
 2018-12-03 DariusIII
+	* Chg: Update NameFixer class use Release and Predb models to query database
 	* Chg: Update Movie class, add back tmdb caching, move cache to resources/tmp/imdb_cache
 	* Fix: Fix issues in Movie class
 	* Fix: Check if $mus['year'] is empty
