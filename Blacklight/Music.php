@@ -586,7 +586,7 @@ class Music
                     $mus['review'] = trim(strip_tags((string) $response->EditorialReviews->EditorialReview->Content));
                 }
 
-                if ($mus['year'] === '') {
+                if (empty($mus['year'])) {
                     $mus['year'] = ($mus['releasedate'] !== 'null' ? substr($mus['releasedate'], 1, 4) : date('Y'));
                 }
 
