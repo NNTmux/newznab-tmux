@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
 use Tmdb\Helper\ImageHelper;
+use Tmdb\Model\Configuration;
 use Illuminate\Support\Carbon;
 use Tmdb\Laravel\Facades\Tmdb;
 use Blacklight\utility\Utility;
@@ -24,7 +25,6 @@ use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use Tmdb\Model\Configuration;
 
 /**
  * Class Movie.
