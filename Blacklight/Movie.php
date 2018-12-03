@@ -11,7 +11,9 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
+use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
+use Tmdb\Laravel\Facades\Tmdb;
 use Blacklight\utility\Utility;
 use DariusIII\ItunesApi\iTunes;
 use Blacklight\libraries\FanartTV;
@@ -20,8 +22,6 @@ use Illuminate\Support\Facades\File;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
-use Tmdb\Helper\ImageHelper;
-use Tmdb\Laravel\Facades\Tmdb;
 use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
