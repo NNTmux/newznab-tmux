@@ -84,7 +84,7 @@ switch (true) {
             $colorCli->primary("[{$release->releases_id}]", true);
 
             if ((int) $release->ishashed === 1 && (int) $release->dehashstatus >= -6 && (int) $release->dehashstatus <= 0) {
-                $colorCli->primaryOver('m');
+                $colorCli->primaryOver('dh');
                 if (preg_match('/[a-fA-F0-9]{32,40}/i', $release->name, $matches)) {
                     $nameFixer->matchPredbHash($matches[0], $release, true, 1, true);
                 }
@@ -101,7 +101,7 @@ switch (true) {
 
             if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && ! empty($release->uid)) {
                 $colorCli->primaryOver('U');
-                $nameFixer->uidCheck($release, true, 'UID, ', 1, true);
+                $nameFixer->checkName($release, true, 'UID, ', 1, true);
             }
 
             $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
@@ -113,7 +113,7 @@ switch (true) {
 
             if ((int) $release->proc_crc32 === NameFixer::PROC_CRC_NONE && ! empty($release->crc)) {
                 $colorCli->primaryOver('C');
-                $nameFixer->crcCheck($release, true, 'CRC32, ', 1, true);
+                $nameFixer->checkName($release, true, 'CRC32, ', 1, true);
             }
 
             $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
@@ -125,7 +125,7 @@ switch (true) {
 
             if ((int) $release->proc_srr === NameFixer::PROC_SRR_NONE) {
                 $colorCli->primaryOver('sr');
-                $nameFixer->srrNameCheck($release, true, 'SRR, ', 1, true);
+                $nameFixer->checkName($release, true, 'SRR, ', 1, true);
             }
 
             $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
@@ -137,7 +137,7 @@ switch (true) {
 
             if ((int) $release->proc_hash16k === NameFixer::PROC_HASH16K_NONE && ! empty($release->hash)) {
                 $colorCli->primaryOver('H');
-                $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, true);
+                $nameFixer->checkName($release, true, 'PAR2 hash, ', 1, true);
             }
 
             $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
