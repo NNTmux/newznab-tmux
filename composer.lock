@@ -858,16 +858,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.8.0",
+            "version": "v2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "5140a64c08b4b607b9bedaae0cedd26f04a0e621"
+                "reference": "21fdabe2fc01e004e1966f200d900554876bc63c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/5140a64c08b4b607b9bedaae0cedd26f04a0e621",
-                "reference": "5140a64c08b4b607b9bedaae0cedd26f04a0e621",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/21fdabe2fc01e004e1966f200d900554876bc63c",
+                "reference": "21fdabe2fc01e004e1966f200d900554876bc63c",
                 "shasum": ""
             },
             "require": {
@@ -877,11 +877,10 @@
                 "php": "^7.1"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^4.0",
+                "doctrine/coding-standard": "^5.0",
                 "jetbrains/phpstorm-stubs": "^2018.1.2",
                 "phpstan/phpstan": "^0.10.1",
-                "phpunit/phpunit": "^7.1.2",
-                "phpunit/phpunit-mock-objects": "!=3.2.4,!=3.2.5",
+                "phpunit/phpunit": "^7.4",
                 "symfony/console": "^2.0.5|^3.0|^4.0",
                 "symfony/phpunit-bridge": "^3.4.5|^4.0.5"
             },
@@ -894,13 +893,13 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.8.x-dev",
+                    "dev-master": "2.9.x-dev",
                     "dev-develop": "3.0.x-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Doctrine\\DBAL\\": "lib/"
+                "psr-4": {
+                    "Doctrine\\DBAL\\": "lib/Doctrine/DBAL"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -925,15 +924,19 @@
                     "email": "jonwage@gmail.com"
                 }
             ],
-            "description": "Database Abstraction Layer",
-            "homepage": "http://www.doctrine-project.org",
+            "description": "Powerful PHP database abstraction layer (DBAL) with many features for database schema introspection and management.",
+            "homepage": "https://www.doctrine-project.org/projects/dbal.html",
             "keywords": [
+                "abstraction",
                 "database",
                 "dbal",
+                "mysql",
                 "persistence",
+                "pgsql",
+                "php",
                 "queryobject"
             ],
-            "time": "2018-07-13T03:16:35+00:00"
+            "time": "2018-12-04T04:39:48+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -9292,22 +9295,22 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v3.7.5",
+            "version": "v3.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "dcde71f6743575c9586d06fe607558263a6877bb"
+                "reference": "57c9dc9271e60421b8402f477c44589156fb67b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/dcde71f6743575c9586d06fe607558263a6877bb",
-                "reference": "dcde71f6743575c9586d06fe607558263a6877bb",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/57c9dc9271e60421b8402f477c44589156fb67b6",
+                "reference": "57c9dc9271e60421b8402f477c44589156fb67b6",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "~5.7.4",
+                "laravel/framework": "~5.7.14",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench-core": "~3.7.6",
+                "orchestra/testbench-core": "~3.7.7",
                 "php": ">=7.1",
                 "phpunit/phpunit": "^7.0"
             },
@@ -9338,20 +9341,20 @@
                 "orchestral",
                 "testing"
             ],
-            "time": "2018-11-15T01:50:49+00:00"
+            "time": "2018-12-04T01:01:32+00:00"
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v3.7.6",
+            "version": "v3.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "6cdbb96c26b0532c3ff659a0eab9cac5a114dd95"
+                "reference": "b5c97f3f3ae488c9e92196c2a7fcf3def9d23e36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/6cdbb96c26b0532c3ff659a0eab9cac5a114dd95",
-                "reference": "6cdbb96c26b0532c3ff659a0eab9cac5a114dd95",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/b5c97f3f3ae488c9e92196c2a7fcf3def9d23e36",
+                "reference": "b5c97f3f3ae488c9e92196c2a7fcf3def9d23e36",
                 "shasum": ""
             },
             "require": {
@@ -9359,12 +9362,12 @@
                 "php": ">=7.1"
             },
             "require-dev": {
-                "laravel/framework": "~5.7.4",
+                "laravel/framework": "~5.7.14",
                 "mockery/mockery": "^1.0",
                 "phpunit/phpunit": "^7.0"
             },
             "suggest": {
-                "laravel/framework": "Required for testing (~5.7.4).",
+                "laravel/framework": "Required for testing (~5.7.14).",
                 "mockery/mockery": "Allow to use Mockery for testing (^1.0).",
                 "orchestra/testbench-browser-kit": "Allow to use legacy Laravel BrowserKit for testing (~3.7).",
                 "orchestra/testbench-dusk": "Allow to use Laravel Dusk for testing (~3.7).",
@@ -9402,7 +9405,7 @@
                 "orchestral",
                 "testing"
             ],
-            "time": "2018-11-13T02:38:23+00:00"
+            "time": "2018-12-04T00:47:44+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -9903,16 +9906,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.10.5",
+            "version": "0.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "c6a8cd1fe08a23b9d101a55ffa9ff6b91d71ef5d"
+                "reference": "f0252a5ab6b4a293fb25f218d9c64386f272280f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c6a8cd1fe08a23b9d101a55ffa9ff6b91d71ef5d",
-                "reference": "c6a8cd1fe08a23b9d101a55ffa9ff6b91d71ef5d",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/f0252a5ab6b4a293fb25f218d9c64386f272280f",
+                "reference": "f0252a5ab6b4a293fb25f218d9c64386f272280f",
                 "shasum": ""
             },
             "require": {
@@ -9927,6 +9930,9 @@
                 "phpstan/phpdoc-parser": "^0.3",
                 "symfony/console": "~3.2 || ~4.0",
                 "symfony/finder": "~3.2 || ~4.0"
+            },
+            "conflict": {
+                "symfony/console": "3.4.16 || 4.1.5"
             },
             "require-dev": {
                 "brianium/paratest": "^2.0",
@@ -9944,7 +9950,8 @@
                 "phpstan/phpstan-phpunit": "^0.10",
                 "phpstan/phpstan-strict-rules": "^0.10",
                 "phpunit/phpunit": "^7.0",
-                "slevomat/coding-standard": "^4.7.2"
+                "slevomat/coding-standard": "^4.7.2",
+                "squizlabs/php_codesniffer": "^3.3.2"
             },
             "bin": [
                 "bin/phpstan"
@@ -9968,7 +9975,7 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2018-10-20T17:24:55+00:00"
+            "time": "2018-12-04T07:28:04+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
