@@ -34,7 +34,7 @@ switch (true) {
         // in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
         $releases = Release::fromQuery(sprintf("
 					SELECT
-						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
+						r.id AS releases_id, r.fromname, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
 						r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
 						r.size AS relsize, r.predb_id, r.proc_hash16k, r.proc_srr, r.proc_crc32,
 						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
@@ -42,12 +42,14 @@ switch (true) {
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
 						IFNULL(ru.uniqueid, '') AS uid,
 						IFNULL(ph.hash, 0) AS hash,
-					    IFNULL(rf.crc32, '') as crc
+					    IFNULL(rf.crc32, '') AS crc,
+					    IFNULL(re.mediainfo, '') AS mediainfo
 					FROM releases r
-					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
-					LEFT JOIN release_files rf ON r.id = rf.releases_id
+					LEFT JOIN release_nfos rn ON rn.releases_id = r.id
+					LEFT JOIN release_files rf ON rf.releases_id = r.id
 					LEFT JOIN release_unique ru ON ru.releases_id = r.id
-					LEFT JOIN par_hashes ph ON r.id = ph.releases_id
+					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
+					INNER JOIN releaseextrafull re ON re.releases_id = r.id
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
@@ -59,6 +61,10 @@ switch (true) {
 						(
 							r.nfostatus = %d
 							AND r.proc_nfo = %d
+						)
+						OR (
+						    r.name REGEXP '[a-z0-9]{32,64}'
+				            AND re.mediainfo REGEXP '\<Movie_name\>'
 						)
 						OR r.proc_files = %d
 						OR r.proc_uid = %d
@@ -99,9 +105,14 @@ switch (true) {
             }
             $nameFixer->reset();
 
-            if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && ! empty($release->uid)) {
+            if ((int) $release->proc_uid === NameFixer::PROC_UID_NONE && (! empty($release->uid) || ! empty($release->mediainfo))) {
                 $colorCli->primaryOver('U');
-                $nameFixer->checkName($release, true, 'UID, ', 1, true);
+                if (! empty($release->uid)) {
+                    $nameFixer->checkName($release, true, 'UID, ', 1, true);
+                }
+                if (empty($nameFixer->matched) && ! empty($release->mediainfo)) {
+                    $nameFixer->checkName($release, true, 'Mediainfo, ', 1, true);
+                }
             }
 
             $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
