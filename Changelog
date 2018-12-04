@@ -1,3 +1,5 @@
+2018-12-04 DariusIII
+	* Chg: Update web routes and LoginController
 2018-12-03 DariusIII
 	* Chg: Update groupfixrelnames script
 	* Chg: Update NameFixer class use Release and Predb models to query database

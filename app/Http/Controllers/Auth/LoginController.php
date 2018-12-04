@@ -121,9 +121,18 @@ class LoginController extends Controller
         app('smarty.view')->display($theme.'/basepage.tpl');
     }
 
-    public function logout()
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function logout(Request $request)
     {
-        Auth::logout();
+        $this->guard()->logout();
+
+        $request->session()->flush();
+        $request->session()->regenerate();
+
 
         return redirect('/login');
     }
