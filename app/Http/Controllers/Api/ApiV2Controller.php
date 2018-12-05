@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
@@ -12,17 +13,17 @@ use App\Models\UserRequest;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Extensions\util\Versions;
-use App\Http\Controllers\Controller;
 use App\Transformers\ApiTransformer;
 use Illuminate\Support\Facades\Auth;
 use App\Transformers\TagsTransformer;
 use App\Transformers\DetailsTransformer;
 use App\Transformers\CategoryTransformer;
 
-class ApiV2Controller extends Controller
+class ApiV2Controller extends BasePageController
 {
     /**
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Cz\Git\GitException
      */
     public function capabilities(): \Illuminate\Http\JsonResponse
     {
@@ -67,13 +68,12 @@ class ApiV2Controller extends Controller
      */
     public function movie(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = Auth::user();
         $api = new API();
         $releases = new Releases();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $api->maxAge();
-        $catExclusions = User::getCategoryExclusion($user->id);
-        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        $catExclusions = User::getCategoryExclusion($this->userdata->id);
+        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
 
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
@@ -96,7 +96,7 @@ class ApiV2Controller extends Controller
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($user)),
+            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
         ];
 
         return response()->json($response);
@@ -110,16 +110,15 @@ class ApiV2Controller extends Controller
      */
     public function search(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = Auth::user();
         $api = new API();
         $releases = new Releases();
         $offset = $api->offset();
-        $catExclusions = User::getCategoryExclusion($user->id);
+        $catExclusions = User::getCategoryExclusion($this->userdata->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
@@ -152,7 +151,7 @@ class ApiV2Controller extends Controller
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($user)),
+            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
         ];
 
         return response()->json($response);
@@ -166,10 +165,9 @@ class ApiV2Controller extends Controller
      */
     public function tv(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = Auth::user();
         $api = new API();
         $releases = new Releases();
-        $catExclusions = User::getCategoryExclusion($user->id);
+        $catExclusions = User::getCategoryExclusion($this->userdata->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $api->verifyEmptyParameter('id');
@@ -183,7 +181,7 @@ class ApiV2Controller extends Controller
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
 
         $siteIdArr = [
             'id'     => $request->input('vid') ?? '0',
@@ -221,7 +219,7 @@ class ApiV2Controller extends Controller
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($user)),
+            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
         ];
 
         return response()->json($response);
@@ -234,11 +232,10 @@ class ApiV2Controller extends Controller
      */
     public function getNzb(Request $request)
     {
-        $user = Auth::user();
-        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData !== false) {
-            return redirect('/getnzb?i='.$user->id.'&r='.$user->api_token.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+            return redirect('/getnzb?i='.$this->userdata->id.'&r='.$this->userdata->api_token.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 
         Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -251,15 +248,14 @@ class ApiV2Controller extends Controller
      */
     public function details(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = Auth::user();
         if (! $request->has('id')) {
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 
-        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
         $relData = Release::getByGuid($request->input('id'));
 
-        $relData = fractal($relData, new DetailsTransformer($user));
+        $relData = fractal($relData, new DetailsTransformer($this->userdata));
 
         return response()->json($relData);
     }
