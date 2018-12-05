@@ -1,4 +1,5 @@
 2018-12-05 DariusIII
+	* Chg: Update laravel/framework to version 5.7.16
 	* Chg: Catch ArtistNotFoundException
 	* Chg: Remove unneeded code from FailedReleasesController
 	* Chg: Update ApiV2 controller
