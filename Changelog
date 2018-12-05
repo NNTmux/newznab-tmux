@@ -1,3 +1,5 @@
+2018-12-05 DariusIII
+	* Chg: Update guzzlehttp/psr7 and egulias/email-validator to their latest versions
 2018-12-04 DariusIII
 	* Chg: Update groupfixrelnames renaming
 	* Chg: Update groupfixrelnames script once again
