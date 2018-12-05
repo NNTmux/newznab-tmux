@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -19,6 +18,7 @@ use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
 use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
+use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
