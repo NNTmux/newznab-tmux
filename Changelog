@@ -1,4 +1,5 @@
 2018-12-05 DariusIII
+	* Chg: Catch ArtistNotFoundException
 	* Chg: Remove unneeded code from FailedReleasesController
 	* Chg: Update ApiV2 controller
 	* Chg: Update guzzlehttp/psr7 and egulias/email-validator to their latest versions

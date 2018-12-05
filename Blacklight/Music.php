@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
+use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
@@ -884,8 +885,12 @@ class Music
                 $mus = false;
             } catch (SearchNoResultsException $e) {
                 $mus = false;
+            } catch (ArtistNotFoundException $e) {
+                $mus = false;
             }
         } catch (SearchNoResultsException $e) {
+            $mus = false;
+        } catch (ArtistNotFoundException $e) {
             $mus = false;
         }
         if ($mus !== false) {
