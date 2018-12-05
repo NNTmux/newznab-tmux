@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
@@ -14,10 +13,10 @@ use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use App\Extensions\util\Versions;
 use App\Transformers\ApiTransformer;
-use Illuminate\Support\Facades\Auth;
 use App\Transformers\TagsTransformer;
 use App\Transformers\DetailsTransformer;
 use App\Transformers\CategoryTransformer;
+use App\Http\Controllers\BasePageController;
 
 class ApiV2Controller extends BasePageController
 {
