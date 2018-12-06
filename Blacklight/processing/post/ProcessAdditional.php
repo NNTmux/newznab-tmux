@@ -785,18 +785,13 @@ class ProcessAdditional
      * Create a temporary storage folder for the current release.
      *
      * @return bool
-     * @throws \RuntimeException
      */
     protected function _createTempFolder(): bool
     {
         // Per release defaults.
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
         if (! File::isDirectory($this->tmpPath)) {
-            if (! File::makeDirectory($this->tmpPath, 0777, true, true) && ! File::isDirectory($this->tmpPath)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->tmpPath));
-            }
-
-            if (! File::isDirectory($this->tmpPath)) {
+            if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
 
                 return $this->_decrementPasswordStatus();
@@ -843,15 +838,13 @@ class ProcessAdditional
     /**
      * Decrement password status for the current release.
      *
-     * @param bool $return Return value.
-     *
-     * @return bool
+     * @return false
      */
-    protected function _decrementPasswordStatus($return = false): bool
+    protected function _decrementPasswordStatus(): bool
     {
-        Release::query()->where('id', $this->_release->id)->decrement('passwordstatus');
+        Release::whereId($this->_release->id)->decrement('passwordstatus');
 
-        return $return;
+        return false;
     }
 
     /**

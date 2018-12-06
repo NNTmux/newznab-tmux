@@ -1,4 +1,5 @@
 2018-12-07 DariusIII
+	* Chg: Update PPA class, change _createTempFolder function
 	* Chg: Update symfony components to their latest versions
 	* Chg: Update PPA class _rersivePathDelete function
 2018-12-05 DariusIII
