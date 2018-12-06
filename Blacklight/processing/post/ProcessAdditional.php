@@ -590,12 +590,9 @@ class ProcessAdditional
         }
 
         if (! File::isDirectory($this->_mainTmpPath)) {
-            $old = umask(0777);
             if (! File::makeDirectory($this->_mainTmpPath, 0777, true, true) && ! File::isDirectory($this->_mainTmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->_mainTmpPath));
             }
-            @chmod($this->_mainTmpPath, 0777);
-            @umask($old);
         }
 
         if (! File::isDirectory($this->_mainTmpPath)) {
@@ -774,7 +771,7 @@ class ProcessAdditional
             if (\in_array($path, $ignoredFolders, false)) {
                 return;
             }
-            foreach (File::files($path) as $file) {
+            foreach (File::allFiles($path) as $file) {
                 $this->_recursivePathDelete($file, $ignoredFolders);
             }
 
@@ -795,12 +792,9 @@ class ProcessAdditional
         // Per release defaults.
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
         if (! File::isDirectory($this->tmpPath)) {
-            $old = umask(0777);
             if (! File::makeDirectory($this->tmpPath, 0777, true, true) && ! File::isDirectory($this->tmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->tmpPath));
             }
-            @chmod($this->tmpPath, 0777);
-            @umask($old);
 
             if (! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
