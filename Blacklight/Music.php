@@ -18,6 +18,7 @@ use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
 use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
+use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
@@ -884,8 +885,12 @@ class Music
                 $mus = false;
             } catch (SearchNoResultsException $e) {
                 $mus = false;
+            } catch (ArtistNotFoundException $e) {
+                $mus = false;
             }
         } catch (SearchNoResultsException $e) {
+            $mus = false;
+        } catch (ArtistNotFoundException $e) {
             $mus = false;
         }
         if ($mus !== false) {

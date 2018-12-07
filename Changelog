@@ -1,6 +1,12 @@
 2018-12-07 DariusIII
 	* Fix: Fix continue usage inside case statements in NameFixer class (PHP 7.3 fix)
+2018-12-06 DariusIII
+	* Chg: Update PPA class, change _createTempFolder function
+	* Chg: Update symfony components to their latest versions
+	* Chg: Update PPA class _rersivePathDelete function
 2018-12-05 DariusIII
+	* Chg: Update laravel/framework to version 5.7.16
+	* Chg: Catch ArtistNotFoundException
 	* Chg: Remove unneeded code from FailedReleasesController
 	* Chg: Update ApiV2 controller
 	* Chg: Update guzzlehttp/psr7 and egulias/email-validator to their latest versions
