@@ -100,7 +100,7 @@ switch (true) {
                 }
             }
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
@@ -117,7 +117,7 @@ switch (true) {
 
             $nameFixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release->releases_id);
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
@@ -129,7 +129,7 @@ switch (true) {
 
             $nameFixer->_updateSingleColumn('proc_crc32', NameFixer::PROC_CRC_DONE, $release->releases_id);
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
@@ -141,7 +141,7 @@ switch (true) {
 
             $nameFixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release->releases_id);
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
@@ -153,7 +153,7 @@ switch (true) {
 
             $nameFixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release->releases_id);
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
@@ -166,7 +166,7 @@ switch (true) {
 
             $nameFixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release->releases_id);
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
@@ -189,7 +189,7 @@ switch (true) {
             // Not all gate requirements in query always set column status as PP Add check is in query
             $nameFixer->_updateSingleColumn('proc_files', NameFixer::PROC_FILES_DONE, $release->releases_id);
 
-            if (! empty($nameFixer->matched)) {
+            if ($nameFixer->matched) {
                 continue;
             }
             $nameFixer->reset();
