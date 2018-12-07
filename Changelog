@@ -1,4 +1,5 @@
 2018-12-07 DariusIII
+	* Chg: Update orangehill/iseed to version 2.6.1 and phpunit/phpunit to version 7.5.0
 	* Fix: Fix continue usage inside case statements in NameFixer class (PHP 7.3 fix)
 2018-12-06 DariusIII
 	* Chg: Update PPA class, change _createTempFolder function
