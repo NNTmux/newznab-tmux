@@ -16,7 +16,7 @@ return [
         */
         env('TEMP_UNRAR_PATH', resource_path().'/tmp/unrar') => [
             'deleteAllOlderThanMinutes' => 60 * 4,
-        ]
+        ],
     ],
 
     /*
