@@ -12,7 +12,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
 use Tmdb\Helper\ImageHelper;
-use Tmdb\Model\Configuration;
 use Illuminate\Support\Carbon;
 use Tmdb\Laravel\Facades\Tmdb;
 use Blacklight\utility\Utility;
@@ -192,7 +191,7 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
 
-        $token  = new \Tmdb\ApiToken(config('tmdb.api_key'));
+        $token = new \Tmdb\ApiToken(config('tmdb.api_key'));
         $tmdbClient = new \Tmdb\Client($token);
         $config = (new \Tmdb\Repository\ConfigurationRepository($tmdbClient))->load();
 
