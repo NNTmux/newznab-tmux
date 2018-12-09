@@ -192,7 +192,7 @@ class Movie
         }
 
         $token = new \Tmdb\ApiToken(config('tmdb.api_key'));
-        $tmdbClient = new \Tmdb\Client($token);
+        $tmdbClient = new \Tmdb\Client($token, ['cache' => ['enabled' => false,]]);
         $config = (new \Tmdb\Repository\ConfigurationRepository($tmdbClient))->load();
 
         $this->helper = new ImageHelper($config);
