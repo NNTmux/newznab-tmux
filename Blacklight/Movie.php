@@ -192,7 +192,11 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
 
-        $this->helper = new ImageHelper(new Configuration());
+        $token  = new \Tmdb\ApiToken(config('tmdb.api_key'));
+        $tmdbClient = new \Tmdb\Client($token);
+        $config = (new \Tmdb\Repository\ConfigurationRepository($tmdbClient))->load();
+
+        $this->helper = new ImageHelper($config);
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
         $this->config = new Config();
