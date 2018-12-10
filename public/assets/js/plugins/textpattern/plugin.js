@@ -386,6 +386,9 @@ var textpattern = (function () {
       return Option.none();
     };
 
+    var isText = function (node) {
+      return node && node.nodeType === 3;
+    };
     var setSelection = function (editor, textNode, offset) {
       var newRng = editor.dom.createRng();
       newRng.setStart(textNode, offset);
@@ -399,7 +402,7 @@ var textpattern = (function () {
       container.deleteData(container.data.length - pattern.end.length, pattern.end.length);
       return container;
     };
-    var splitAndApply = function (editor, container, found) {
+    var splitAndApply = function (editor, container, found, inline) {
       var formatArray = global$4.isArray(found.pattern.format) ? found.pattern.format : [found.pattern.format];
       var validFormats = global$4.grep(formatArray, function (formatName) {
         var format = editor.formatter.get(formatName);
@@ -408,6 +411,9 @@ var textpattern = (function () {
       if (validFormats.length !== 0) {
         editor.undoManager.transact(function () {
           container = splitContainer(container, found.pattern, found.endOffset, found.startOffset);
+          if (inline) {
+            editor.selection.setCursorLocation(container.nextSibling, 1);
+          }
           formatArray.forEach(function (format) {
             editor.formatter.apply(format, {}, container);
           });
@@ -415,10 +421,10 @@ var textpattern = (function () {
         return container;
       }
     };
-    var applyInlinePattern = function (editor, patterns, space) {
+    var applyInlinePattern = function (editor, patterns, inline) {
       var rng = editor.selection.getRng();
-      return Option.from(findInlinePattern(patterns, rng, space)).map(function (foundPattern) {
-        return splitAndApply(editor, rng.startContainer, foundPattern);
+      return Option.from(findInlinePattern(patterns, rng, inline)).map(function (foundPattern) {
+        return splitAndApply(editor, rng.startContainer, foundPattern, inline);
       });
     };
     var applyInlinePatternSpace = function (editor, patterns) {
@@ -448,7 +454,7 @@ var textpattern = (function () {
       if (textBlockElm) {
         walker = new global$3(textBlockElm, textBlockElm);
         while (node = walker.next()) {
-          if (node.nodeType === 3) {
+          if (isText(node)) {
             firstTextNode = node;
             break;
           }
@@ -486,44 +492,60 @@ var textpattern = (function () {
         }
       }
     };
-    var replaceData = function (target, match) {
-      target.deleteData(match.startOffset, match.pattern.start.length);
-      target.insertData(match.startOffset, match.pattern.replacement);
-    };
-    var replaceMiddle = function (editor, target, match) {
-      var startOffset = editor.selection.getRng().startOffset;
-      replaceData(target, match);
-      var newOffset = startOffset - match.pattern.start.length + match.pattern.replacement.length;
-      setSelection(editor, target, newOffset);
-    };
-    var replaceEnd = function (editor, target, match) {
-      replaceData(target, match);
-      setSelection(editor, target, target.data.length);
-    };
-    var replace = function (editor, target, match) {
-      if (match.startOffset < target.data.length) {
-        replaceMiddle(editor, target, match);
+    var selectionInsertText = function (editor, string) {
+      var rng = editor.selection.getRng();
+      var container = rng.startContainer;
+      if (isText(container)) {
+        var offset = rng.startOffset;
+        container.insertData(offset, string);
+        setSelection(editor, container, offset + string.length);
       } else {
-        replaceEnd(editor, target, match);
+        var newNode = editor.dom.doc.createTextNode(string);
+        rng.insertNode(newNode);
+        setSelection(editor, newNode, newNode.length);
       }
     };
-    var applyReplacementPattern = function (editor, patterns) {
+    var applyReplacement = function (editor, target, match) {
+      target.deleteData(match.startOffset, match.pattern.start.length);
+      editor.insertContent(match.pattern.replacement);
+      Option.from(target.nextSibling).filter(isText).each(function (nextSibling) {
+        nextSibling.insertData(0, target.data);
+        editor.dom.remove(target);
+      });
+    };
+    var extractChar = function (node, match) {
+      var offset = match.startOffset + match.pattern.start.length;
+      var char = node.data.slice(offset, offset + 1);
+      node.deleteData(offset, 1);
+      return char;
+    };
+    var applyReplacementPattern = function (editor, patterns, inline) {
       var rng = editor.selection.getRng();
-      if (rng.collapsed && rng.startContainer.nodeType === 3) {
-        var container_1 = rng.startContainer;
-        findReplacementPattern(patterns, rng.startOffset, container_1.data).each(function (match) {
-          replace(editor, container_1, match);
+      var container = rng.startContainer;
+      if (rng.collapsed && isText(container)) {
+        findReplacementPattern(patterns, rng.startOffset, container.data).each(function (match) {
+          var char = inline ? Option.some(extractChar(container, match)) : Option.none();
+          applyReplacement(editor, container, match);
+          char.each(function (ch) {
+            return selectionInsertText(editor, ch);
+          });
         });
       }
     };
+    var applyReplacementPatternSpace = function (editor, patterns) {
+      applyReplacementPattern(editor, patterns, true);
+    };
+    var applyReplacementPatternEnter = function (editor, patterns) {
+      applyReplacementPattern(editor, patterns, false);
+    };
 
     var handleEnter = function (editor, patternSet) {
-      applyReplacementPattern(editor, patternSet.replacementPatterns);
+      applyReplacementPatternEnter(editor, patternSet.replacementPatterns);
       applyInlinePatternEnter(editor, patternSet.inlinePatterns);
       applyBlockPattern(editor, patternSet.blockPatterns);
     };
     var handleInlineKey = function (editor, patternSet) {
-      applyReplacementPattern(editor, patternSet.replacementPatterns);
+      applyReplacementPatternSpace(editor, patternSet.replacementPatterns);
       applyInlinePatternSpace(editor, patternSet.inlinePatterns);
     };
     var checkKeyEvent = function (codes, event, predicate) {
