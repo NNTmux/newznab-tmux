@@ -49,7 +49,7 @@ switch (true) {
 					LEFT JOIN release_files rf ON rf.releases_id = r.id
 					LEFT JOIN release_unique ru ON ru.releases_id = r.id
 					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
-					INNER JOIN releaseextrafull re ON re.releases_id = r.id
+					LEFT JOIN releaseextrafull re ON re.releases_id = r.id
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
