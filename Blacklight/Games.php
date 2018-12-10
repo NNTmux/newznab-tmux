@@ -613,12 +613,17 @@ class Games
 
                             $genreName = $this->_matchGenre(implode(',', $genres));
 
+                            $releaseDate = now()->format('Y-m-d');
+                            if (isset($this->_gameResults->first_release_date) && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->first_release_date)) {
+                                $releaseDate = Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d');
+                            }
+
                             $game = [
                                 'title' => $this->_gameResults->name,
                                 'asin' => $this->_gameResults->id,
                                 'review' => $this->_gameResults->summary ?? '',
                                 'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover->url : '',
-                                'releasedate' => isset($this->_gameResults->first_release_date) ? Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
+                                'releasedate' => $releaseDate,
                                 'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
                                 'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.$this->_gameResults->screenshots[0]->url : '',

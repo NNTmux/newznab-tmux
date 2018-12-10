@@ -1,3 +1,5 @@
+2018-12-10 DariusIII
+	* Chg: Check IGDB for TBA/TBD release dates that could cause problems with date creation
 2018-12-09 DariusIIi
 	* Fix: Fix missing covers on movies (tmdb)
 2018-12-08 DariusIII
