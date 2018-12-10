@@ -11,7 +11,6 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
-use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
 use Tmdb\Laravel\Facades\Tmdb;
 use Blacklight\utility\Utility;
@@ -146,11 +145,6 @@ class Movie
     private $config;
 
     /**
-     * @var \Tmdb\Helper\ImageHelper
-     */
-    protected $helper;
-
-    /**
      * @var null|string
      */
     protected $traktcheck;
@@ -190,12 +184,6 @@ class Movie
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
-
-        $token = new \Tmdb\ApiToken(config('tmdb.api_key'));
-        $tmdbClient = new \Tmdb\Client($token, ['cache' => ['enabled' => false]]);
-        $config = (new \Tmdb\Repository\ConfigurationRepository($tmdbClient))->load();
-
-        $this->helper = new ImageHelper($config);
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
         $this->config = new Config();
@@ -883,13 +871,13 @@ class Movie
             }
             $posterp = $tmdbLookup['poster_path'];
             if (! empty($posterp)) {
-                $ret['cover'] = 'https:'.$this->helper->getUrl($posterp);
+                $ret['cover'] = 'https://image.tmdb.org/t/p/original'.$posterp;
             } else {
                 $ret['cover'] = '';
             }
             $backdrop = $tmdbLookup['backdrop_path'];
             if (! empty($backdrop)) {
-                $ret['backdrop'] = 'https:'.$this->helper->getUrl($backdrop);
+                $ret['backdrop'] = 'https://image.tmdb.org/t/p/original'.$backdrop;
             } else {
                 $ret['backdrop'] = '';
             }
