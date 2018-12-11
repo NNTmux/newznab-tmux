@@ -13,13 +13,13 @@
         "axios": "^0.18",
         "cross-env": "^5.2.0",
         "jquery": "^3.2",
-        "laravel-mix": "^3.0.0",
+        "laravel-mix": "^4.0.3",
         "lodash": "^4.17.11",
         "popper.js": "^1.14.6",
         "vue": "^2.5.19"
     },
     "dependencies": {
-        "@fancyapps/fancybox": "^3.5.2",
+        "@fancyapps/fancybox": "^3.5.3",
         "@fortawesome/fontawesome-free": "^5.6.0",
         "animate.css": "^3.7.0",
         "autosize": "^4.0.2",
