@@ -72,14 +72,10 @@ class Hotmovies extends AdultMovies
 
     /**
      * Hotmovies constructor.
-     *
-     * @param array $options
-     *
-     * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        parent::__construct($options);
+        parent::__construct();
     }
 
     protected function trailers()
@@ -97,17 +93,18 @@ class Hotmovies extends AdultMovies
     protected function synopsis(): array
     {
         $this->_res['synopsis'] = 'N/A';
-        if ($this->_html->find('.desc_link', 0)) {
-            $ret = $this->_html->find('.video_description', 0);
+        if ($this->_html->findOne('.desc_link')) {
+            $ret = $this->_html->findOne('.video_description');
             if ($ret !== false) {
-                $this->_res['synopsis'] = trim($ret->innertext);
+                $this->_res['synopsis'] = trim($ret->innerText);
             }
         }
 
         return $this->_res;
     }
 
-    /**Process ProductInfo
+    /**
+     * Process ProductInfo.
      *
      * @param bool $extras
      *
@@ -117,9 +114,9 @@ class Hotmovies extends AdultMovies
     {
         $studio = false;
         $director = false;
-        if ($ret = $this->_html->find('div.page_video_info', 0)) {
+        if ($ret = $this->_html->findOne('div.page_video_info')) {
             foreach ($ret->find('text') as $e) {
-                $e = trim($e->innertext);
+                $e = trim($e->plaintext);
                 $rArray = [',', '...', '&nbsp:'];
                 $e = str_replace($rArray, '', $e);
                 if (stripos($e, 'Studio:') !== false) {
@@ -149,7 +146,7 @@ class Hotmovies extends AdultMovies
                 }
             }
         }
-        if (is_array($this->_res['productinfo'])) {
+        if (\is_array($this->_res['productinfo'])) {
             $this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
         }
 
@@ -165,7 +162,6 @@ class Hotmovies extends AdultMovies
     {
         $cast = [];
         if ($this->_html->find('.stars bottom_margin')) {
-            file_put_contents('hm_cast.txt', $this->_html->find('.stars bottom_margin'));
             foreach ($this->_html->find('a[title]') as $e) {
                 $e = trim($e->title);
                 $e = preg_replace('/\((.*)\)/', '', $e);
@@ -185,7 +181,7 @@ class Hotmovies extends AdultMovies
     protected function genres()
     {
         $genres = [];
-        if ($ret = $this->_html->find('div.categories', 0)) {
+        if ($ret = $this->_html->findOne('div.categories')) {
             foreach ($ret->find('a') as $e) {
                 if (strpos($e->title, ' -> ') !== false) {
                     $e = explode(' -> ', $e->plaintext);
@@ -232,10 +228,9 @@ class Hotmovies extends AdultMovies
         $this->_getLink = self::HMURL.self::TRAILINGSEARCH.urlencode($movie).self::EXTRASEARCH;
         $this->_response = getRawHtml($this->_getLink, $this->cookie);
         if ($this->_response !== false) {
-            $this->_html->load($this->_response);
-            if ($ret = $this->_html->find('h3[class=title]', 0)) {
-                if ($ret->find('a[title]', 0)) {
-                    $ret = $ret->find('a[title]', 0);
+            if ($ret = $this->_html->loadHtml($this->_response)->findOne('h3[class=title]')) {
+                if ($ret->findOne('a[title]')) {
+                    $ret = $ret->findOne('a[title]');
                     $title = trim($ret->title);
                     $title = str_replace('/XXX/', '', $title);
                     $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
@@ -245,14 +240,13 @@ class Hotmovies extends AdultMovies
                             $this->_title = $title;
                             $this->_getLink = trim($ret->href);
                             $this->_directUrl = trim($ret->href);
-                            $this->_html->clear();
                             unset($this->_response);
                             if ($this->_getLink !== false) {
                                 $this->_response = getRawHtml($this->_getLink, $this->cookie);
-                                $this->_html->load($this->_response);
+                                $this->_html->loadHtml($this->_response);
                             } else {
                                 $this->_response = getRawHtml($this->_directUrl, $this->cookie);
-                                $this->_html->load($this->_response);
+                                $this->_html->loadHtml($this->_response);
                             }
 
                             return true;

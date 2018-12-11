@@ -6,8 +6,10 @@ use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
+use Chumper\Zipper\Zipper;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -1246,13 +1248,16 @@ class Releases
 
     /**
      * @param array $guids
+     *
      * @return string
      * @throws \Exception
      */
-    public function getZipped($guids): string
+    public function getZipped(array $guids = []): string
     {
         $nzb = new NZB();
-        $zipFile = new \ZipFile();
+        $zipped = new Zipper();
+        $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
+        $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
 
         foreach ($guids as $guid) {
             $nzbPath = $nzb->NZBPath($guid);
@@ -1266,16 +1271,19 @@ class Releases
                     if ($r) {
                         $filename = $r['searchname'];
                     }
-                    $zipFile->addFile($nzbContents, $filename.'.nzb');
+                    $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
                 }
             }
         }
 
-        return $zipFile->file();
+        $zipped->close();
+
+        return File::isFile($zippedFilePath) ? $zippedFilePath : '';
     }
 
     /**
      * Get count of releases for pager.
+     *
      *
      * @param string $query The query to get the count from.
      *

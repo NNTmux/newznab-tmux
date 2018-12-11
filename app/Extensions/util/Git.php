@@ -19,13 +19,13 @@
 
 namespace App\Extensions\util;
 
-use GitRepo;
+use Cz\Git\GitRepository;
 use Symfony\Component\Process\Process;
 
 class Git
 {
     /**
-     * @var \GitRepo object
+     * @var \Cz\Git\GitRepository
      */
     protected $repo;
 
@@ -48,33 +48,30 @@ class Git
      * Git constructor.
      *
      * @param array $config
+     * @throws \Cz\Git\GitException
      */
     public function __construct(array $config = [])
     {
         $defaults = [
-			'branches' => [
-				'stable' => [
+            'branches' => [
+                'stable' => [
                         'master',
                         '\d+\.\d+\.\d+(\.\d+)?',
                     ],
-				'development' => [
+                'development' => [
                         'dev',
                     ],
-			],
-			'create' => false,
-			'initialise' => false,
-			'filepath' => NN_ROOT,
-		];
+            ],
+            'filepath' => NN_ROOT,
+        ];
 
         $config += $defaults;
         $this->_config = $config;
 
-        $this->repo = new GitRepo(
-			$this->_config['filepath'],
-			$this->_config['create'],
-			$this->_config['initialise']
-		);
-        $this->branch = $this->repo->active_branch();
+        $this->repo = new GitRepository(
+            $defaults['filepath']
+        );
+        $this->branch = $this->repo->getCurrentBranchName();
     }
 
     /**
@@ -207,18 +204,18 @@ class Git
 
     /**
      * @param array $options
-     *
-     * @return string
+     * @return \Cz\Git\GitRepository
+     * @throws \Cz\Git\GitException
      */
     public function gitPull(array $options = [])
     {
         $default = [
-			'branch'	=> $this->getBranch(),
-			'remote'	=> 'origin',
-		];
+            'branch'	=> $this->getBranch(),
+            'remote'	=> 'origin',
+        ];
         $options += $default;
 
-        return $this->repo->pull($options['remote'], $options['branch']);
+        return $this->repo->pull($options['remote'].' '.$options['branch']);
     }
 
     /**
@@ -226,13 +223,14 @@ class Git
      * Accepts a git command to run.
      *
      *
-     * @param   string  $command Command to run
+     * @param   string $command Command to run
      *
      * @return  string
+     * @throws \Cz\Git\GitException
      */
     public function gitRun($command)
     {
-        return $this->repo->run($command);
+        return $this->repo->execute($command);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\File;
 
 /**
  * Import NZB files into the database.
@@ -142,7 +143,7 @@ class NZBImport
             $this->nzbGuid = '';
 
             // Check if the file is really there.
-            if (is_file($nzbFile)) {
+            if (File::isFile($nzbFile)) {
 
                 // Get the contents of the NZB file as a string.
                 if (strtolower(substr($nzbFile, -7)) === '.nzb.gz') {
@@ -186,7 +187,7 @@ class NZBImport
                     gzwrite($fp, $nzbString);
                     gzclose($fp);
 
-                    if (! is_file($path)) {
+                    if (! File::isFile($path)) {
                         $this->echoOut('ERROR: Problem compressing NZB file to: '.$path);
 
                         // Remove the release.

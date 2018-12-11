@@ -11,17 +11,17 @@ class MovieController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
     public function showMovie(Request $request)
     {
         $this->setPrefs();
         if ($request->has('modal') && $request->has('id') && ctype_digit($request->input('id'))) {
-            $movie = new Movie(['Settings' => $this->settings]);
-            $mov = $movie->getMovieInfo($request->input('id'));
+            $mov = (new Movie(['Settings' => $this->settings]))->getMovieInfo($request->input('id'));
 
             if (! $mov) {
-                $this->show404();
+                return response()->json(['message' => 'No movie with imdbid: '.$request->input('id').' found'], 404);
             }
 
             $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
@@ -79,8 +79,7 @@ class MovieController extends BasePageController
         $category = $request->has('imdb') ? -1 : Category::MOVIE_ROOT;
         if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
-                ->where('title', $id)
-                ->where('parentid', '=', Category::MOVIE_ROOT)
+                ->where(['title'=> $id, 'parentid' => Category::MOVIE_ROOT])
                 ->first(['id']);
             $category = $cat !== null ? $cat['id'] : Category::MOVIE_ROOT;
         }
@@ -150,7 +149,7 @@ class MovieController extends BasePageController
             if ($cdata !== null) {
                 $this->smarty->assign('catname', $cdata);
             } else {
-                $this->show404();
+                $this->smarty->assign('catname', 'All');
             }
         }
 
@@ -184,6 +183,7 @@ class MovieController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
     public function showTrailer(Request $request)
@@ -194,7 +194,7 @@ class MovieController extends BasePageController
             $mov = $movie->getMovieInfo($request->input('id'));
 
             if (! $mov) {
-                $this->show404();
+                return response()->json(['message' => 'There is no trailer for this movie.'], 404);
             }
 
             $this->smarty->assign('movie', $mov);

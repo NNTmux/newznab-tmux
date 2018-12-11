@@ -30,7 +30,7 @@ if (! Utility::isCLI()) {
 
 $error = false;
 $git = new Git();
-$branch = $git->active_branch();
+$branch = $git->getCurrentBranchName();
 
 if (in_array($branch, $git->mainBranches(), false)) {
     // Only update patches, etc. on specific branches to lessen conflicts

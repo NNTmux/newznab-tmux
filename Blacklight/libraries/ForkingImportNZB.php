@@ -55,7 +55,7 @@ class ForkingImportNZB extends Forking
      */
     public function start($folder, $maxProcesses, $deleteComplete, $deleteFailed, $useFileName, $maxPerProcess): void
     {
-        $startTime = microtime(true);
+        $startTime = now()->timestamp;
         $directories = glob($folder.'/*', GLOB_ONLYDIR);
 
         $this->_workCount = \count($directories);
@@ -85,7 +85,7 @@ class ForkingImportNZB extends Forking
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                    'Multi-processing for import finished in '.(microtime(true) - $startTime).
+                    'Multi-processing for import finished in '.(now()->timestamp - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
                 );
         }

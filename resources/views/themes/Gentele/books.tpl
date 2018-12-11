@@ -76,8 +76,8 @@
 												{if isset($result->url) && $result->url != ""}<a
 													class="label label-primary" target="_blank"
 													href="{$site->dereferrer_link}{$result->url}"
-													name="amazon{$result->bookinfo_id}" title="View amazon page">
-														Amazon</a>{/if}
+													name="amazon{$result->bookinfo_id}" title="View amazon/iTunes page">
+														Amazon/iTunes</a>{/if}
 												{if isset($result->nfoid) && $result->nfoid > 0}<a
 													href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 													title="View Nfo" class="label label-primary" rel="nfo">

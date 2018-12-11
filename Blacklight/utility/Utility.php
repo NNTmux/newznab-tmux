@@ -6,6 +6,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
@@ -143,7 +144,7 @@ class Utility
         $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
         $themeList[] = 'None';
         foreach ($themes as $theme) {
-            if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && is_dir(base_path().'/resources/views/themes/'.$theme)) {
+            if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && File::isDirectory(base_path().'/resources/views/themes/'.$theme)) {
                 $themeList[] = $theme;
             }
         }

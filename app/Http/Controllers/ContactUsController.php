@@ -16,6 +16,7 @@ class ContactUsController extends BasePageController
      */
     public function contact(Request $request)
     {
+        $this->setPrefs();
         $this->validate($request, [
             'useremail' => 'required',
             'username' => 'required',
@@ -45,33 +46,35 @@ class ContactUsController extends BasePageController
             }
             $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
         }
-        app('smarty.view')->assign('msg', $msg);
 
-        return redirect('contact-us');
+        return $this->showContactForm($msg);
     }
 
     /**
+     * @param string $msg
+     *
      * @throws \Exception
      */
-    public function showContactForm()
+    public function showContactForm($msg = '')
     {
-        $theme = Settings::settingValue('site.main.style');
+        $this->setPrefs();
         $title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_title = 'Contact '.Settings::settingValue('site.main.title');
         $meta_keywords = 'contact us,contact,get in touch,email';
         $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
-        $content = app('smarty.view')->fetch($theme.'/contact.tpl');
+        $content = $this->smarty->fetch('contact.tpl');
 
-        app('smarty.view')->assign(
+        $this->smarty->assign(
             [
                 'title' => $title,
                 'content' => $content,
                 'meta_title' => $meta_title,
                 'meta_keywords' => $meta_keywords,
                 'meta_description' => $meta_description,
+                'msg' => $msg,
             ]
         );
 
-        app('smarty.view')->display($theme.'/basepage.tpl');
+        $this->pagerender();
     }
 }

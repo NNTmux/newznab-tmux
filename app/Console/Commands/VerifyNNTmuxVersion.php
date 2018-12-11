@@ -28,7 +28,9 @@ class VerifyNNTmuxVersion extends Command
     private $versions;
 
     /**
-     * Create a new command instance.
+     * VerifyNNTmuxVersion constructor.
+     *
+     * @throws \Cz\Git\GitException
      */
     public function __construct()
     {
@@ -37,9 +39,7 @@ class VerifyNNTmuxVersion extends Command
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return mixed
+     * @throws \Cz\Git\GitException
      */
     public function handle()
     {
@@ -56,6 +56,9 @@ class VerifyNNTmuxVersion extends Command
         }
     }
 
+    /**
+     * @throws \Cz\Git\GitException
+     */
     public function all()
     {
         $this->git();
@@ -68,7 +71,7 @@ class VerifyNNTmuxVersion extends Command
     }
 
     /**
-     * Fetch git tag for latest version.
+     * @throws \Cz\Git\GitException
      */
     public function git()
     {

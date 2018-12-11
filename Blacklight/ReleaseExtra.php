@@ -411,7 +411,7 @@ class ReleaseExtra
     {
         $ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();
         if ($ckid === null) {
-            $xml = $xmlArray->__toXML();
+            $xml = $xmlArray->__toXML()->asXML();
             ReleaseExtraFull::query()->insert(['releases_id' => $id, 'mediainfo' => $xml]);
         }
     }

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use App\Jobs\SendAccountDeletedEmail;
+use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController
@@ -151,132 +152,128 @@ class ProfileController extends BasePageController
                     $request->merge(['saburl' => $request->input('saburl').'/']);
                 }
 
-                if ($request->has('password') && $request->input('password') !== $request->input('password_confirmation')) {
-                    $errorStr = 'Password Mismatch';
-                } elseif ($request->has('password') && ! empty($request->input('password')) && ! User::isValidPassword($request->input('password'))) {
-                    $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
+                $validator = Validator::make($request->all(), [
+                    'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+                    'password' => ['nullable', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+                ]);
+
+                if ($validator->fails()) {
+                    $errorStr = implode('', array_collapse($validator->errors()->toArray()));
                 } elseif (! empty($request->input('nzbgeturl')) && $nzbGet->verifyURL($request->input('nzbgeturl')) === false) {
                     $errorStr = 'The NZBGet URL you entered is invalid!';
-                } elseif (! User::isValidEmail($request->input('email'))) {
-                    $errorStr = 'Your email is not a valid format.';
+                } elseif ((! $request->has('saburl') && $request->has('sabapikey')) || ($request->has('saburl') && ! $request->has('sabapikey'))) {
+                    $errorStr = 'Insert a SABnzdb URL and API key.';
                 } else {
-                    $res = User::getByEmail($request->input('email'));
-                    if ($res && (int) $res['id'] !== $userid) {
-                        $errorStr = 'Sorry, the email is already in use.';
-                    } elseif ((! $request->has('saburl') && $request->has('sabapikey')) || ($request->has('saburl') && ! $request->has('sabapikey'))) {
-                        $errorStr = 'Insert a SABnzdb URL and API key.';
-                    } else {
-                        if ($request->has('sasetting') && $request->input('sabsetting') === 2) {
-                            $sab->setCookie($request->input('saburl'), $request->input('sabapikey'), $request->input('sabpriority'), $request->input('sabapikeytype'));
-                        }
-
-                        User::updateUser(
-                            $userid,
-                            $data['username'],
-                            $request->input('email'),
-                            $data['grabs'],
-                            $data['roles_id'],
-                            $data['notes'],
-                            $data['invites'],
-                            $request->has('movieview') ? 1 : 0,
-                            $request->has('musicview') ? 1 : 0,
-                            $request->has('gameview') ? 1 : 0,
-                            $request->has('xxxview') ? 1 : 0,
-                            $request->has('consoleview') ? 1 : 0,
-                            $request->has('bookview') ? 1 : 0,
-                            $request->input('queuetypeids'),
-                            $request->input('nzbgeturl') ?? '',
-                            $request->input('nzbgetusername') ?? '',
-                            $request->input('nzbgetpassword') ?? '',
-                            $request->has('saburl') ? str_finish($request->input('saburl'), '/') : '',
-                            $request->input('sabapikey') ?? '',
-                            $request->input('sabpriority') ?? '',
-                            $request->input('sabapikeytype') ?? '',
-                            $request->input('nzbvortex_server_url') ?? '',
-                            $request->input('nzbvortex_api_key') ?? '',
-                            $request->input('cp_url') ?? '',
-                            $request->input('cp_api') ?? '',
-                            (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
-                        );
-
-                        if ((int) $request->input('viewconsole') === 1 && $data->role->hasPermissionTo('view console') === true && $data->hasDirectPermission('view console') === false) {
-                            $data->givePermissionTo('view console');
-                        } elseif ((int) $request->input('viewconsole') === 0 && $data->role->hasPermissionTo('view console') === true && $data->hasPermissionTo('view console') === true) {
-                            $data->revokePermissionTo('view console');
-                        } elseif ($data->role->hasPermissionTo('view console') === false && $data->hasDirectPermission('view console') === true && ((int) $request->input('viewconsole') === 0 || (int) $request->input('viewconsole') === 1)) {
-                            $data->revokePermissionTo('view console');
-                        }
-
-                        if ((int) $request->input('viewmovies') === 1 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies') === false) {
-                            $data->givePermissionTo('view movies');
-                        } elseif ((int) $request->input('viewmovies') === 0 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies') === true) {
-                            $data->revokePermissionTo('view movies');
-                        } elseif ($data->role->hasPermissionTo('view movies') === false && $data->hasDirectPermission('view movies') === true && ((int) $request->input('viewmovies') === 0 || (int) $request->input('viewmovies') === 1)) {
-                            $data->revokePermissionTo('view movies');
-                        }
-
-                        if ((int) $request->input('viewaudio') === 1 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio') === false) {
-                            $data->givePermissionTo('view audio');
-                        } elseif ((int) $request->input('viewaudio') === 0 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio') === true) {
-                            $data->revokePermissionTo('view audio');
-                        } elseif ($data->role->hasPermissionTo('view audio') === false && $data->hasDirectPermission('view audio') === true && ((int) $request->input('viewaudio') === 0 || (int) $request->input('viewaudio') === 1)) {
-                            $data->revokePermissionTo('view audio');
-                        }
-
-                        if ((int) $request->input('viewpc') === 1 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc') === false) {
-                            $data->givePermissionTo('view pc');
-                        } elseif ((int) $request->input('viewpc') === 0 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc') === true) {
-                            $data->revokePermissionTo('view pc');
-                        } elseif ($data->role->hasPermissionTo('view pc') === false && $data->hasDirectPermission('view pc') === true && ((int) $request->input('viewpc') === 0 || (int) $request->input('viewpc') === 1)) {
-                            $data->revokePermissionTo('view pc');
-                        }
-
-                        if ((int) $request->input('viewtv') === 1 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv') === false) {
-                            $data->givePermissionTo('view tv');
-                        } elseif ((int) $request->input('viewtv') === 0 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv') === true) {
-                            $data->revokePermissionTo('view tv');
-                        } elseif ($data->role->hasPermissionTo('view tv') === false && $data->hasDirectPermission('view tv') === true && ((int) $request->input('viewtv') === 0 || (int) $request->input('viewtv') === 1)) {
-                            $data->revokePermissionTo('view tv');
-                        }
-
-                        if ((int) $request->input('viewadult') === 1 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult') === false) {
-                            $data->givePermissionTo('view adult');
-                        } elseif ((int) $request->input('viewadult') === 0 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult') === true) {
-                            $data->revokePermissionTo('view adult');
-                        } elseif ($data->role->hasPermissionTo('view adult') === false && $data->hasDirectPermission('view adult') === true && ((int) $request->input('viewadult') === 0 || (int) $request->input('viewadult') === 1)) {
-                            $data->revokePermissionTo('view adult');
-                        }
-
-                        if ((int) $request->input('viewbooks') === 1 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books') === false) {
-                            $data->givePermissionTo('view books');
-                        } elseif ((int) $request->input('viewbooks') === 0 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books') === true) {
-                            $data->revokePermissionTo('view books');
-                        } elseif ($data->role->hasPermissionTo('view books') === false && $data->hasDirectPermission('view books') === true && ((int) $request->input('viewbooks') === 0 || (int) $request->input('viewbooks') === 1)) {
-                            $data->revokePermissionTo('view books');
-                        }
-
-                        if ((int) $request->input('viewother') === 1 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other') === false) {
-                            $data->givePermissionTo('view other');
-                        } elseif ((int) $request->input('viewother') === 0 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other') === true) {
-                            $data->revokePermissionTo('view other');
-                        } elseif ($data->role->hasPermissionTo('view other') === false && $data->hasDirectPermission('view other') === true && ((int) $request->input('viewother') === 0 || (int) $request->input('viewother') === 1)) {
-                            $data->revokePermissionTo('view other');
-                        }
-
-                        if ($request->has('password') && ! empty($request->input('password'))) {
-                            User::updatePassword($userid, $request->input('password'));
-                        }
-
-                        if ($data['email'] !== $request->input('email')) {
-                            $data['email'] = $request->input('email');
-
-                            UserVerification::generate($data);
-
-                            UserVerification::send($data, 'User email verification required');
-                        }
-
-                        return redirect('profile');
+                    if ($request->has('sabetting') && $request->input('sabsetting') === 2) {
+                        $sab->setCookie($request->input('saburl'), $request->input('sabapikey'), $request->input('sabpriority'), $request->input('sabapikeytype'));
                     }
+
+                    User::updateUser(
+                        $userid,
+                        $data['username'],
+                        $request->input('email'),
+                        $data['grabs'],
+                        $data['roles_id'],
+                        $data['notes'],
+                        $data['invites'],
+                        $request->has('movieview') ? 1 : 0,
+                        $request->has('musicview') ? 1 : 0,
+                        $request->has('gameview') ? 1 : 0,
+                        $request->has('xxxview') ? 1 : 0,
+                        $request->has('consoleview') ? 1 : 0,
+                        $request->has('bookview') ? 1 : 0,
+                        $request->input('queuetypeids'),
+                        $request->input('nzbgeturl') ?? '',
+                        $request->input('nzbgetusername') ?? '',
+                        $request->input('nzbgetpassword') ?? '',
+                        $request->has('saburl') ? str_finish($request->input('saburl'), '/') : '',
+                        $request->input('sabapikey') ?? '',
+                        $request->input('sabpriority') ?? '',
+                        $request->input('sabapikeytype') ?? '',
+                        $request->input('nzbvortex_server_url') ?? '',
+                        $request->input('nzbvortex_api_key') ?? '',
+                        $request->input('cp_url') ?? '',
+                        $request->input('cp_api') ?? '',
+                        (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
+                    );
+
+                    if ((int) $request->input('viewconsole') === 1 && $data->role->hasPermissionTo('view console') === true && $data->hasDirectPermission('view console') === false) {
+                        $data->givePermissionTo('view console');
+                    } elseif ((int) $request->input('viewconsole') === 0 && $data->role->hasPermissionTo('view console') === true && $data->hasPermissionTo('view console') === true) {
+                        $data->revokePermissionTo('view console');
+                    } elseif ($data->role->hasPermissionTo('view console') === false && $data->hasDirectPermission('view console') === true && ((int) $request->input('viewconsole') === 0 || (int) $request->input('viewconsole') === 1)) {
+                        $data->revokePermissionTo('view console');
+                    }
+
+                    if ((int) $request->input('viewmovies') === 1 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies') === false) {
+                        $data->givePermissionTo('view movies');
+                    } elseif ((int) $request->input('viewmovies') === 0 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies') === true) {
+                        $data->revokePermissionTo('view movies');
+                    } elseif ($data->role->hasPermissionTo('view movies') === false && $data->hasDirectPermission('view movies') === true && ((int) $request->input('viewmovies') === 0 || (int) $request->input('viewmovies') === 1)) {
+                        $data->revokePermissionTo('view movies');
+                    }
+
+                    if ((int) $request->input('viewaudio') === 1 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio') === false) {
+                        $data->givePermissionTo('view audio');
+                    } elseif ((int) $request->input('viewaudio') === 0 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio') === true) {
+                        $data->revokePermissionTo('view audio');
+                    } elseif ($data->role->hasPermissionTo('view audio') === false && $data->hasDirectPermission('view audio') === true && ((int) $request->input('viewaudio') === 0 || (int) $request->input('viewaudio') === 1)) {
+                        $data->revokePermissionTo('view audio');
+                    }
+
+                    if ((int) $request->input('viewpc') === 1 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc') === false) {
+                        $data->givePermissionTo('view pc');
+                    } elseif ((int) $request->input('viewpc') === 0 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc') === true) {
+                        $data->revokePermissionTo('view pc');
+                    } elseif ($data->role->hasPermissionTo('view pc') === false && $data->hasDirectPermission('view pc') === true && ((int) $request->input('viewpc') === 0 || (int) $request->input('viewpc') === 1)) {
+                        $data->revokePermissionTo('view pc');
+                    }
+
+                    if ((int) $request->input('viewtv') === 1 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv') === false) {
+                        $data->givePermissionTo('view tv');
+                    } elseif ((int) $request->input('viewtv') === 0 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv') === true) {
+                        $data->revokePermissionTo('view tv');
+                    } elseif ($data->role->hasPermissionTo('view tv') === false && $data->hasDirectPermission('view tv') === true && ((int) $request->input('viewtv') === 0 || (int) $request->input('viewtv') === 1)) {
+                        $data->revokePermissionTo('view tv');
+                    }
+
+                    if ((int) $request->input('viewadult') === 1 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult') === false) {
+                        $data->givePermissionTo('view adult');
+                    } elseif ((int) $request->input('viewadult') === 0 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult') === true) {
+                        $data->revokePermissionTo('view adult');
+                    } elseif ($data->role->hasPermissionTo('view adult') === false && $data->hasDirectPermission('view adult') === true && ((int) $request->input('viewadult') === 0 || (int) $request->input('viewadult') === 1)) {
+                        $data->revokePermissionTo('view adult');
+                    }
+
+                    if ((int) $request->input('viewbooks') === 1 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books') === false) {
+                        $data->givePermissionTo('view books');
+                    } elseif ((int) $request->input('viewbooks') === 0 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books') === true) {
+                        $data->revokePermissionTo('view books');
+                    } elseif ($data->role->hasPermissionTo('view books') === false && $data->hasDirectPermission('view books') === true && ((int) $request->input('viewbooks') === 0 || (int) $request->input('viewbooks') === 1)) {
+                        $data->revokePermissionTo('view books');
+                    }
+
+                    if ((int) $request->input('viewother') === 1 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other') === false) {
+                        $data->givePermissionTo('view other');
+                    } elseif ((int) $request->input('viewother') === 0 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other') === true) {
+                        $data->revokePermissionTo('view other');
+                    } elseif ($data->role->hasPermissionTo('view other') === false && $data->hasDirectPermission('view other') === true && ((int) $request->input('viewother') === 0 || (int) $request->input('viewother') === 1)) {
+                        $data->revokePermissionTo('view other');
+                    }
+
+                    if ($request->has('password') && ! empty($request->input('password'))) {
+                        User::updatePassword($userid, $request->input('password'));
+                    }
+
+                    if (! empty($request->input('email')) && $data['email'] !== $request->input('email')) {
+                        $data['email'] = $request->input('email');
+
+                        UserVerification::generate($data);
+
+                        UserVerification::send($data, 'User email verification required');
+                    }
+
+                    return redirect('profile');
                 }
                 break;
 

@@ -97,15 +97,16 @@ class ReleaseFile extends Model
      *
      * @param        $id
      * @param        $name
-     * @param string $hash
      * @param        $size
      * @param        $createdTime
      * @param        $hasPassword
      *
+     * @param string $hash
+     * @param string $crc
      * @return int
      * @throws \Exception
      */
-    public static function addReleaseFiles($id, $name, $hash = '', $size, $createdTime, $hasPassword): int
+    public static function addReleaseFiles($id, $name, $size, $createdTime, $hasPassword, $hash = '', $crc = ''): int
     {
         // Check if we already have this data in table
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
@@ -121,6 +122,7 @@ class ReleaseFile extends Model
                         'size' => $size,
                         'created_at' => $createdTime,
                         'passworded' => $hasPassword,
+                        'crc32' => $crc,
                     ])->id;
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());

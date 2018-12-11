@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Blacklight\ColorCLI;
 use Illuminate\Support\Str;
 use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,7 @@ use App\Jobs\SendAccountExpiredEmail;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Traits\UserVerification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -258,19 +260,19 @@ class User extends Authenticatable
     }
 
     /**
-     * @param        $id
-     * @param        $userName
-     * @param        $email
-     * @param        $grabs
-     * @param        $role
-     * @param        $notes
-     * @param        $invites
-     * @param        $movieview
-     * @param        $musicview
-     * @param        $gameview
-     * @param        $xxxview
-     * @param        $consoleview
-     * @param        $bookview
+     * @param  int      $id
+     * @param  string      $userName
+     * @param  string      $email
+     * @param  int     $grabs
+     * @param  int     $role
+     * @param  string    $notes
+     * @param  int     $invites
+     * @param  int     $movieview
+     * @param  int    $musicview
+     * @param  int   $gameview
+     * @param  int    $xxxview
+     * @param  int    $consoleview
+     * @param  int    $bookview
      * @param string $queueType
      * @param string $nzbgetURL
      * @param string $nzbgetUsername
@@ -291,31 +293,11 @@ class User extends Authenticatable
     public static function updateUser($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None'): int
     {
         $userName = trim($userName);
-        $email = trim($email);
 
-        $rateLimit = Role::query()->where('id', $role)->get();
-
-        if (! self::isValidUsername($userName)) {
-            return self::ERR_SIGNUP_BADUNAME;
-        }
-
-        if (! self::isValidEmail($email)) {
-            return self::ERR_SIGNUP_BADEMAIL;
-        }
-
-        $res = self::getByUsername($userName);
-        if ($res && (int) $res['id'] !== (int) $id) {
-            return self::ERR_SIGNUP_UNAMEINUSE;
-        }
-
-        $res = self::getByEmail($email);
-        if ($res && (int) $res['id'] !== (int) $id) {
-            return self::ERR_SIGNUP_EMAILINUSE;
-        }
+        $rateLimit = Role::query()->where('id', $role)->first();
 
         $sql = [
             'username' => $userName,
-            'email' => $email,
             'grabs' => $grabs,
             'roles_id' => $role,
             'notes' => substr($notes, 0, 255),
@@ -339,37 +321,20 @@ class User extends Authenticatable
             'nzbvortex_api_key' => $nzbvortexApiKey,
             'cp_url' => $cp_url,
             'cp_api' => $cp_api,
-            'rate_limit' => $rateLimit[0]['rate_limit'],
+            'rate_limit' => $rateLimit ? $rateLimit['rate_limit'] : 60,
         ];
+
+        if (! empty($email)) {
+            $email = trim($email);
+            $sql += ['email' => $email];
+        }
 
         self::whereId($id)->update($sql);
 
         $user = self::find($id);
-        $user->syncRoles([$rateLimit[0]['name']]);
+        $user->syncRoles([$rateLimit['name']]);
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @param string $userName
-     *
-     * @return int
-     */
-    public static function isValidUsername(string $userName): int
-    {
-        return preg_match('/^[a-z][a-z0-9_]{2,}$/i', $userName);
-    }
-
-    /**
-     * When a user is registering or updating their profile, check if the email is valid.
-     *
-     * @param string $email
-     *
-     * @return bool
-     */
-    public static function isValidEmail(string $email): bool
-    {
-        return (bool) preg_match('/^([\w\+-]+)(\.[\w\+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/i', $email);
     }
 
     /**
@@ -705,30 +670,20 @@ class User extends Authenticatable
      */
     public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER)
     {
-        $userName = trim($userName);
-        $password = trim($password);
-        $email = trim($email);
+        $user = [
+            'username' => trim($userName),
+            'password' => trim($password),
+            'email' => trim($email),
+        ];
 
-        if (! self::isValidUsername($userName)) {
-            return self::ERR_SIGNUP_BADUNAME;
-        }
+        $validator = Validator::make($user, [
+            'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+        ]);
 
-        if (! self::isValidPassword($password)) {
-            return self::ERR_SIGNUP_BADPASS;
-        }
-
-        if (! self::isValidEmail($email)) {
-            return self::ERR_SIGNUP_BADEMAIL;
-        }
-
-        $res = self::getByUsername($userName);
-        if ($res !== null) {
-            return self::ERR_SIGNUP_UNAMEINUSE;
-        }
-
-        $res = self::getByEmail($email);
-        if ($res !== null) {
-            return self::ERR_SIGNUP_EMAILINUSE;
+        if ($validator->fails()) {
+            (new ColorCLI())->error(implode('', array_collapse($validator->errors()->toArray())));
         }
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
@@ -744,26 +699,17 @@ class User extends Authenticatable
             }
         }
 
-        return self::add($userName, $password, $email, $role, $notes, $host, $invites, $invitedBy);
-    }
-
-    /**
-     * @param string $password
-     * @return bool
-     */
-    public static function isValidPassword(string $password): bool
-    {
-        return \strlen($password) > 8 && preg_match('#[0-9]+#', $password) && preg_match('#[A-Z]+#', $password) && preg_match('#[a-z]+#', $password);
+        return self::add($user['userName'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
     }
 
     /**
      * If a invite is used, decrement the person who invited's invite count.
      *
-     * @param int $inviteCode
+     * @param string $inviteCode
      *
      * @return int
      */
-    public static function checkAndUseInvite($inviteCode): int
+    public static function checkAndUseInvite(string $inviteCode): int
     {
         $invite = Invitation::getInvite($inviteCode);
         if (! $invite) {
@@ -802,11 +748,7 @@ class User extends Authenticatable
         $rateLimit = $roleData->value('rate_limit');
         $roleName = $roleData->value('name');
 
-        if (\defined('NN_INSTALLER')) {
-            $storeips = '';
-        } else {
-            $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
-        }
+        $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
 
         $user = self::create(
             [
@@ -817,7 +759,7 @@ class User extends Authenticatable
                 'roles_id' => $role,
                 'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
-                'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
+                'invitedby' => (int) $invitedBy === 0 ? null : $invitedBy,
                 'userseed' => md5(Str::uuid()->toString()),
                 'notes' => $notes,
                 'rate_limit' => $rateLimit,
@@ -859,6 +801,7 @@ class User extends Authenticatable
      * @param int $userID ID of the user.
      *
      * @return array
+     * @throws \Exception
      */
     public static function getCategoryExclusion($userID): array
     {

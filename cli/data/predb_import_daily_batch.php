@@ -27,14 +27,13 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use Blacklight\ColorCLI;
 use Blacklight\db\PreDb;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\File;
 
-$canExeRead = Utility::canExecuteRead(NN_RES);
-    if (is_string($canExeRead)) {
-        exit($canExeRead);
-    }
-    unset($canExeRead);
+if (! File::isReadable(NN_RES)) {
+    exit('The  '.NN_RES.' folder must be readable.'.PHP_EOL);
+}
 
-if (! is_writable(NN_RES)) {
+if (! File::isWritable(NN_RES)) {
     exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);
 }
 
@@ -93,7 +92,6 @@ $progress = $predb->progress(settings_array());
 
 foreach ($data as $dir => $files) {
     foreach ($files as $file) {
-        //var_dump($file);
         if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#", $file['download_url'])) {
             if (preg_match("#^$filePattern$#", $file['name'], $match)) {
                 $timematch = $progress['last'];
@@ -153,14 +151,14 @@ foreach ($data as $dir => $files) {
                 $predb->executeTruncate();
 
                 // Import file into predb_imports
-                $predb->executeLoadData(
+                dd($predb->executeLoadData(
                     [
                         'fields' => '\\t\\t',
                         'lines'  => '\\r\\n',
                         'local'  => $local,
                         'path'   => $dumpFile,
                     ]
-                );
+                ));
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
@@ -175,7 +173,7 @@ foreach ($data as $dir => $files) {
                 $predb->executeUpdateGroupID();
 
                 $colorCli->info('Inserting records from temporary table into predb table');
-                $predb->executeInsert();
+                $inserted = $predb->executeInsert();
 
                 // Delete the dump.
                 unlink($dumpFile);
@@ -184,12 +182,9 @@ foreach ($data as $dir => $files) {
                     settings_array($match[2] + 1, $progress),
                     ['read' => false]
                 );
-                echo sprintf(
-                    "Successfully imported PreDB dump %d (%s), %d dumps remaining\n",
-                    $match[2],
-                    date('Y-m-d', $match[2]),
-                    --$total
-                );
+                if ($inserted === true) {
+                    echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n", $match[2], date('Y-m-d', $match[2]), --$total);
+                }
             } else {
                 echo "Ignoring: {$file['download_url']}\n";
             }

@@ -29,6 +29,7 @@ class DetailsController extends BasePageController
     /**
      * @param $guid
      *
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function show($guid)
@@ -45,7 +46,7 @@ class DetailsController extends BasePageController
             $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
 
             if (! $data) {
-                $this->show404();
+                return redirect()->back();
             }
 
             if ($this->isPostBack()) {
@@ -105,32 +106,27 @@ class DetailsController extends BasePageController
 
             $game = '';
             if ($data['gamesinfo_id'] !== '') {
-                $g = new Games();
-                $game = $g->getGamesInfoById($data['gamesinfo_id']);
+                $game = (new Games())->getGamesInfoById($data['gamesinfo_id']);
             }
 
             $mus = '';
             if ($data['musicinfo_id'] !== '') {
-                $music = new Music(['Settings' => $this->settings]);
-                $mus = $music->getMusicInfo($data['musicinfo_id']);
+                $mus = (new Music(['Settings' => $this->settings]))->getMusicInfo($data['musicinfo_id']);
             }
 
             $book = '';
             if ($data['bookinfo_id'] !== '') {
-                $b = new Books();
-                $book = $b->getBookInfo($data['bookinfo_id']);
+                $book = (new Books())->getBookInfo($data['bookinfo_id']);
             }
 
             $con = '';
             if ($data['consoleinfo_id'] !== '') {
-                $c = new Console();
-                $con = $c->getConsoleInfo($data['consoleinfo_id']);
+                $con = (new Console())->getConsoleInfo($data['consoleinfo_id']);
             }
 
             $AniDBAPIArray = '';
             if ($data['anidbid'] > 0) {
-                $AniDB = new AniDB();
-                $AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
+                $AniDBAPIArray = (new AniDB())->getAnimeInfo($data['anidbid']);
             }
 
             $pre = Predb::getForRelease($data['predb_id']);

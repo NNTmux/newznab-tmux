@@ -35,13 +35,17 @@
 														<td colspan="2" style="padding-left: 8px;">
 															<strong>Profile</strong></td>
 													</tr>
+                                                    <tr>
+                                                        <th width="200">Current email</th>
+                                                        <td>{$user.email|escape:"htmlall"}</td>
+                                                    </tr>
 													<tr>
 														<th width="200">E-Mail</th>
 														<td>
                                                             <input id="email" class="form-control" name="email"
 																   type="text"
-																   value="{$user.email|escape:"htmlall"}">
-                                                            <div class="hint">If you change your email you will need to verify it. You will not be able to access the site until verification is complete.
+																   value="">
+                                                            <div class="hint">Only enter your email if you want to change it. If you change your email you will need to verify it. You will not be able to access the site until verification is complete.
                                                             </div>
                                                         </td>
 													</tr>
@@ -74,8 +78,7 @@
 												<table class="data table table-striped responsive-utilities jambo-table">
 													<tbody>
 													<tr class="bg-aqua-active">
-														<th colspan="2" style="padding-left: 8px;"><strong>Excluded
-																Categories</strong></th>
+														<th colspan="2" style="padding-left: 8px;"><strong>Excluded Categories</strong></th>
 													</tr>
 													<tr>
 														<th width="200"></th>

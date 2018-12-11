@@ -39,7 +39,7 @@ class Country
     public static function countryCode($country)
     {
         if (\strlen($country) > 2) {
-            $code = CountryModel::query()->where('full_name', $country)->orWhere('name', $country)->first(['iso_3166_2']);
+            $code = CountryModel::whereFullName($country)->orWhere('name', $country)->first(['iso_3166_2']);
             if ($code !== null && isset($code['iso_3166_2'])) {
                 return $code['iso_3166_2'];
             }

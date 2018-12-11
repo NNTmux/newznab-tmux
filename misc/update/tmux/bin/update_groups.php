@@ -29,8 +29,7 @@ if ($nntp->isError($data)) {
 
 $colorCli->header('Inserting new values into short_groups table.');
 
-DB::unprepared('TRUNCATE TABLE short_groups');
-DB::commit();
+DB::statement('TRUNCATE TABLE short_groups');
 
 // Put into an array all active groups
 $result = array_pluck(Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');

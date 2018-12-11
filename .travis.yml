@@ -1,12 +1,11 @@
 language: php
 sudo: required
-dist: trusty
+dist: xenial
 group: edge
 
 branches:
   only:
-    - 0.x
-    - Latest-testing
+    - master
     - dev
 
 notifications:

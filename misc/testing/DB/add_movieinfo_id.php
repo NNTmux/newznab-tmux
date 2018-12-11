@@ -11,7 +11,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $sql = Release::query()->whereNotNull('imdbid')->where('imdbid', '<>', '0000000')->get(['imdbid', 'id']);
 
-DB::unprepared('
+DB::statement('
     DROP TABLE IF EXISTS movie_temp;
     CREATE TABLE movie_temp (
         releases_id INT(11),
@@ -21,8 +21,6 @@ DB::unprepared('
     DEFAULT CHARACTER SET utf8
     COLLATE utf8_unicode_ci;
     ');
-
-DB::commit();
 
 $count = $sql->count();
 
@@ -48,6 +46,5 @@ echo 'Finished inserting new values into releases table'.PHP_EOL;
 $check = Release::query()->whereNotNull('movieinfo_id')->count('id');
 
 if ($check === $count) {
-    DB::unprepared('DROP TABLE movie_temp');
-    DB::commit();
+    DB::statement('DROP TABLE movie_temp');
 }

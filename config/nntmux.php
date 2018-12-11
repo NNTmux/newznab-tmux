@@ -10,7 +10,7 @@ return [
     'echocli' => env('ECHOCLI', true),
     'rename_par2' => env('RENAME_PAR2', true),
     'rename_music_mediainfo' => env('RENAME_MUSIC_MEDIAINFO', true),
-    'cache_expiry_short' => env('CACHE_EXPIRY_SHORT', 300),
-    'cache_expiry_medium' =>env('CACHE_EXPIRY_MEDIUM', 600),
-    'cache_expiry_long' => env('CACHE_EXPIRY_LONG', 900),
+    'cache_expiry_short' => env('CACHE_EXPIRY_SHORT', 5),
+    'cache_expiry_medium' =>env('CACHE_EXPIRY_MEDIUM', 10),
+    'cache_expiry_long' => env('CACHE_EXPIRY_LONG', 15),
 ];

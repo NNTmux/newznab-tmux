@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Group;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class NZBExport.
@@ -80,7 +81,7 @@ class NZBExport
         }
 
         // Check if it's a directory.
-        if (! is_dir($path)) {
+        if (! File::isDirectory($path)) {
             $this->echoOut('Folder does not exist: '.$path);
 
             return $this->returnValue();
@@ -145,7 +146,7 @@ class NZBExport
 
             // Create a path to store the new NZB files.
             $currentPath = $path.$this->safeFilename($group['name']).DS;
-            if (! is_dir($currentPath) && ! mkdir($currentPath) && ! is_dir($currentPath)) {
+            if (! File::isDirectory($currentPath) && ! File::makeDirectory($currentPath) && ! File::isDirectory($currentPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $currentPath));
             }
             foreach ($releases as $release) {

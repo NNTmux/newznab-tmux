@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use Imdb\Title;
 use Imdb\Config;
-use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use Imdb\TitleSearch;
 use GuzzleHttp\Client;
@@ -12,30 +11,33 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
-use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
-use Tmdb\Client as TmdbClient;
+use Tmdb\Laravel\Facades\Tmdb;
 use Blacklight\utility\Utility;
+use DariusIII\ItunesApi\iTunes;
 use Blacklight\libraries\FanartTV;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
-use Tmdb\Repository\ConfigurationRepository;
+use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
  * Class Movie.
  */
 class Movie
 {
+    /**
+     * @var int
+     */
     protected const MATCH_PERCENT = 75;
 
-    protected const YEAR_MATCH_PERCENT = 80;
-
     /**
-     * @var \PDO
+     * @var int
      */
-    public $pdo;
+    protected const YEAR_MATCH_PERCENT = 80;
 
     /**
      * Current title being passed through various sites/api's.
@@ -143,29 +145,9 @@ class Movie
     private $config;
 
     /**
-     * @var \Tmdb\Repository\ConfigurationRepository
-     */
-    protected $configRepository;
-
-    /**
-     * @var \Tmdb\Helper\ImageHelper
-     */
-    protected $helper;
-
-    /**
-     * @var \Tmdb\Model\Configuration
-     */
-    protected $tmdbconfig;
-
-    /**
      * @var null|string
      */
     protected $traktcheck;
-
-    /**
-     * @var null|string
-     */
-    protected $tmdbtokencheck;
 
     /**
      * @var \Blacklight\ColorCLI
@@ -187,7 +169,6 @@ class Movie
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->colorCli = new ColorCLI();
         $this->traktcheck = Settings::settingValue('APIs..trakttvclientkey');
@@ -195,18 +176,6 @@ class Movie
             $this->traktTv = new TraktTv(['Settings' => null]);
         }
         $this->client = new Client();
-        $this->tmdbtokencheck = Settings::settingValue('APIs..tmdbkey');
-        if ($this->tmdbtokencheck !== null) {
-            $this->tmdbtoken = new ApiToken($this->tmdbtokencheck);
-            $this->tmdbclient = new TmdbClient($this->tmdbtoken, [
-                    'cache' => [
-                        'enabled' => false,
-                    ],
-                ]);
-            $this->configRepository = new ConfigurationRepository($this->tmdbclient);
-            $this->tmdbconfig = $this->configRepository->load();
-            $this->helper = new ImageHelper($this->tmdbconfig);
-        }
         $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
         if ($this->fanartapikey !== null) {
             $this->fanart = new FanartTV($this->fanartapikey);
@@ -220,6 +189,11 @@ class Movie
         $this->config = new Config();
         $this->config->language = $this->lookuplanguage;
         $this->config->throwHttpExceptions = false;
+        $cacheDir = resource_path().'/tmp/imdb_cache';
+        if (! File::isDirectory($cacheDir)) {
+            File::makeDirectory($cacheDir, 0777, false, true);
+        }
+        $this->config->cachedir = $cacheDir;
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
@@ -261,7 +235,7 @@ class Movie
             $catsrch = Category::getCategorySearch($cat);
         }
         $order = $this->getMovieOrder($orderBy);
-        $expiresAt = now()->addSeconds(config('nntmux.cache_expiry_medium'));
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         $moviesSql =
             sprintf(
                 "
@@ -470,14 +444,14 @@ class Movie
 
         if (! empty($data['trailer'])) {
             $data['trailer'] = str_ireplace(
-                'http://',
-                'https://',
-                str_ireplace('watch?v=', 'embed/', $data['trailer'])
+                ['watch?v=', 'http://'],
+                ['embed/', 'https://'],
+                $data['trailer']
             );
         }
         $imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
         $cover = 0;
-        if (is_file($this->imgSavePath.$imdbid).'-cover.jpg') {
+        if (File::isFile($this->imgSavePath.$imdbid).'-cover.jpg') {
             $cover = 1;
         }
 
@@ -536,8 +510,7 @@ class Movie
      * Update movie on movie-edit page.
      *
      * @param array $values Array of keys/values to update. See $validKeys
-     *
-     * @return bool|string
+     * @return bool
      */
     public function update(array $values)
     {
@@ -572,9 +545,7 @@ class Movie
             $query[$key] = rtrim($value, ', ');
         }
 
-        DB::insert($query[0].') '.$query[1].') '.$query[2]);
-
-        return $this->pdo->lastInsertId();
+        MovieInfo::fromQuery($query[0].') '.$query[1].') '.$query[2]);
     }
 
     /**
@@ -583,11 +554,12 @@ class Movie
      * @param string $variable1
      * @param string $variable2
      * @param string $variable3
-     * @param $variable4
+     * @param string $variable4
+     * @param string $variable5
      *
      * @return array|string
      */
-    protected function setVariables($variable1, $variable2, $variable3, $variable4)
+    protected function setVariables($variable1, $variable2, $variable3, $variable4, $variable5)
     {
         if (! empty($variable1)) {
             return $variable1;
@@ -601,12 +573,15 @@ class Movie
         if (! empty($variable4)) {
             return $variable4;
         }
+        if (! empty($variable5)) {
+            return $variable5;
+        }
 
         return '';
     }
 
     /**
-     * Fetch IMDB/TMDB/TRAKT info for the movie.
+     * Fetch IMDB/TMDB/TRAKT/OMDB/iTunes info for the movie.
      *
      * @param $imdbId
      *
@@ -616,7 +591,7 @@ class Movie
     public function updateMovieInfo($imdbId): bool
     {
         if ($this->echooutput && $this->service !== '' && Utility::isCLI()) {
-            $this->colorCli->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId);
+            $this->colorCli->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/iTunes using IMDB id: '.$imdbId);
         }
 
         // Check TMDB for IMDB info.
@@ -630,7 +605,12 @@ class Movie
 
         // Check OMDb for movie info
         $omdb = $this->fetchOmdbAPIProperties(str_pad($imdbId, 7, '0', STR_PAD_LEFT));
-        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb) {
+
+        // Check iTunes for movie info as last resort (iTunes do not provide all the info we need)
+
+        $iTunes = $this->fetchItunesMovieProperties($this->currentTitle);
+
+        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb && empty($iTunes)) {
             return false;
         }
 
@@ -646,7 +626,7 @@ class Movie
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
-        // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
+        // Prefer Fanart.tv cover over TMDB,TMDB over IMDB,IMDB over OMDB and OMDB over iTunes.
         if (! empty($fanart['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $fanart['cover'], $this->imgSavePath);
         } elseif (! empty($tmdb['cover'])) {
@@ -655,6 +635,8 @@ class Movie
             $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $imdb['cover'], $this->imgSavePath);
         } elseif (! empty($omdb['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $omdb['cover'], $this->imgSavePath);
+        } elseif (! empty($iTunes['cover'])) {
+            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 7, '0', STR_PAD_LEFT).'-cover', $iTunes['cover'], $this->imgSavePath);
         }
 
         // Backdrops.
@@ -674,12 +656,12 @@ class Movie
             $mov['rtrating'] = $omdb['rtRating'];
         }
 
-        $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title']);
-        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '');
-        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot']);
-        $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline']);
-        $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year']);
-        $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre']);
+        $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title'], $iTunes['title']);
+        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '', $iTunes['rating'] ?? '');
+        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot'], $iTunes['description']);
+        $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline'], $iTunes['tagline']);
+        $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year'], $iTunes['year']);
+        $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre'], $iTunes['genre']);
 
         if (! empty($imdb['type'])) {
             $mov['type'] = $imdb['type'];
@@ -811,7 +793,7 @@ class Movie
         $lookupId = $text === false && \strlen($imdbId) === 7 ? 'tt'.$imdbId : $imdbId;
 
         try {
-            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
+            $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
         } catch (TmdbApiException $error) {
             if (Utility::isCLI()) {
                 $this->colorCli->error($error->getMessage());
@@ -889,13 +871,13 @@ class Movie
             }
             $posterp = $tmdbLookup['poster_path'];
             if (! empty($posterp)) {
-                $ret['cover'] = 'https:'.$this->helper->getUrl($posterp);
+                $ret['cover'] = 'https://image.tmdb.org/t/p/original'.$posterp;
             } else {
                 $ret['cover'] = '';
             }
             $backdrop = $tmdbLookup['backdrop_path'];
             if (! empty($backdrop)) {
-                $ret['backdrop'] = 'https:'.$this->helper->getUrl($backdrop);
+                $ret['backdrop'] = 'https://image.tmdb.org/t/p/original'.$backdrop;
             } else {
                 $ret['backdrop'] = '';
             }
@@ -1045,6 +1027,44 @@ class Movie
         }
 
         return false;
+    }
+
+    /**
+     * @param string $title
+     *
+     * @return array|bool
+     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
+     * @throws \Exception
+     */
+    public function fetchItunesMovieProperties($title)
+    {
+        $movie = true;
+        try {
+            $iTunesMovie = iTunes::load('movie')->fetchOneByName($title);
+        } catch (MovieNotFoundException $e) {
+            $movie = false;
+        } catch (SearchNoResultsException $e) {
+            $movie = false;
+        }
+
+        if ($movie !== false) {
+            similar_text($this->currentTitle, $iTunesMovie->getName(), $percent);
+            if ($percent > self::MATCH_PERCENT) {
+                $movie = [
+                    'title' => $iTunesMovie->getName(),
+                    'director' => $iTunesMovie->getDirector(),
+                    'tagline' => $iTunesMovie->getTagLine(),
+                    'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
+                    'genre' => $iTunesMovie->getGenre(),
+                    'plot' => $iTunesMovie->getDescription(),
+                    'year' => $iTunesMovie->getReleaseDate()->format('Y'),
+                ];
+            } else {
+                $movie = false;
+            }
+        }
+
+        return $movie;
     }
 
     /**
@@ -1219,7 +1239,7 @@ class Movie
 
                 // Check on The Movie Database.
                 if ($movieUpdated === false) {
-                    $data = $this->tmdbclient->getSearchApi()->searchMovies($this->currentTitle);
+                    $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
                     if (($data['total_results'] > 0) && ! empty($data['results'])) {
                         foreach ($data['results'] as $result) {
                             if (! empty($result['id'])) {

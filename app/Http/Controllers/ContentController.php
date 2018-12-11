@@ -4,17 +4,22 @@ namespace App\Http\Controllers;
 
 use Blacklight\Contents;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ContentController extends BasePageController
 {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function show(Request $request)
     {
         $this->setPrefs();
         $contents = new Contents();
 
         $role = 0;
-        if (! empty($this->userdata) && Auth::check()) {
+        if (! empty($this->userdata)) {
             $role = $this->userdata['role'];
         }
 
@@ -64,7 +69,7 @@ class ContentController extends BasePageController
         }
 
         if (empty($content)) {
-            $this->show404();
+            return response()->json(['message' => 'There is nothing to see here, no content provided.'], 404);
         }
 
         $this->smarty->assign('content', $content);

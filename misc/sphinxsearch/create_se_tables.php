@@ -36,10 +36,8 @@ $tables = [];
 $tables['releases_se'] = sprintf($tableSQL_releases, $sphinxConnection);
 
 foreach ($tables as $table => $query) {
-    DB::unprepared("DROP TABLE IF EXISTS $table;");
-    DB::commit();
-    DB::unprepared($query);
-    DB::commit();
+    DB::statement("DROP TABLE IF EXISTS $table;");
+    DB::statement($query);
 }
 
 echo 'All done! If you messed up your sphinx connection info, you can rerun this script.'.PHP_EOL;

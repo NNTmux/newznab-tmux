@@ -30,6 +30,8 @@ class NameFixer
     public const PROC_HASH16K_DONE = 1;
     public const PROC_SRR_NONE = 0;
     public const PROC_SRR_DONE = 1;
+    public const PROC_CRC_NONE = 0;
+    public const PROC_CRC_DONE = 1;
 
     // Constants for overall rename status
     public const IS_RENAMED_NONE = 0;
@@ -210,11 +212,12 @@ class NameFixer
 					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rel.proc_nfo = %d',
                 self::IS_RENAMED_NONE,
                 Category::OTHER_MISC,
+                Category::OTHER_HASHED,
                 self::PROC_NFO_NONE
             );
         }
@@ -228,7 +231,7 @@ class NameFixer
             $this->colorCli->primary(number_format($total).' releases to process.');
 
             foreach ($releases as $rel) {
-                $releaseRow = DB::select(
+                $releaseRow = Release::fromQuery(
                         sprintf(
                             '
 							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
@@ -281,7 +284,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE nzbstatus = %d
 					AND predb_id = 0',
                 NZB::NZB_ADDED
@@ -294,8 +297,8 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
-					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND proc_files = %d',
                 self::IS_RENAMED_NONE,
@@ -325,6 +328,72 @@ class NameFixer
     }
 
     /**
+     * Attempts to fix release names using the rar file crc32 hash.
+     *
+     *
+     * @param $time
+     * @param $echo
+     * @param $cats
+     * @param $nameStatus
+     * @param $show
+     * @throws \Exception
+     */
+    public function fixNamesWithCrc($time, $echo, $cats, $nameStatus, $show): void
+    {
+        $this->_echoStartMessage($time, 'CRC32');
+        $type = 'CRC32, ';
+
+        $preId = false;
+        if ($cats === 3) {
+            $query = sprintf(
+                '
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE nzbstatus = %d
+					AND predb_id = 0',
+                NZB::NZB_ADDED
+            );
+            $cats = 2;
+            $preId = true;
+        } else {
+            $query = sprintf(
+                '
+					SELECT rf.crc32 AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rel.predb_id = 0
+					AND rel.proc_crc32 = %d',
+                self::IS_RENAMED_NONE,
+                Category::OTHER_MISC,
+                Category::OTHER_HASHED,
+                self::PROC_CRC_NONE
+            );
+        }
+
+        $releases = $this->_getReleases($time, $cats, $query);
+        $total = \count($releases);
+        if ($total > 0) {
+            $this->_totalReleases = $total;
+            $this->colorCli->primary(number_format($total).' CRC32\'s to process.');
+
+            foreach ($releases as $release) {
+                $this->reset();
+                $this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+                $this->checked++;
+                $this->_echoRenamed($show);
+            }
+
+            $this->_echoFoundCount($echo, ' crc32\'s');
+        } else {
+            $this->colorCli->info('Nothing to fix.');
+        }
+    }
+
+    /**
      * Attempts to fix XXX release names using the File name.
      *
      *
@@ -346,7 +415,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE nzbstatus = %d
 					AND predb_id = 0',
                 NZB::NZB_ADDED
@@ -358,7 +427,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rf.name LIKE %s',
@@ -409,7 +478,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE nzbstatus = %d
 					AND predb_id = 0',
                 NZB::NZB_ADDED
@@ -421,7 +490,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rf.name LIKE %s
@@ -482,10 +551,12 @@ class NameFixer
                 '
 					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
 					FROM releases rel
-					WHERE rel.isrenamed = %d
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.predb_id = 0
 					AND rel.proc_par2 = %d',
                 self::IS_RENAMED_NONE,
+                Category::OTHER_MISC,
+                Category::OTHER_HASHED,
                 self::PROC_PAR2_NONE
             );
         }
@@ -503,8 +574,7 @@ class NameFixer
                         'Echo'        => $this->echooutput,
                         'NNTP'        => $nntp,
                         'Nfo'         => $Nfo,
-                        'Settings'    => null,
-                        'PostProcess' => new PostProcess(['Settings' => null, 'Nfo' => $Nfo]),
+                        'PostProcess' => new PostProcess(['Nfo' => $Nfo]),
                     ]
                 );
 
@@ -567,9 +637,8 @@ class NameFixer
 				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
 				WHERE ru.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
-				AND rel.isrenamed = %d
+				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
-				AND rel.categories_id IN (%d, %d)
 				AND rel.proc_uid = %d',
                 NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE,
@@ -616,7 +685,7 @@ class NameFixer
                 "
 				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
 				FROM releases rel
-				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
+				INNER JOIN releaseextrafull rf ON rf.releases_id = rel.id
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
                 AND rf.mediainfo REGEXP '\<Movie_name\>'
                 AND rel.nzbstatus = %d
@@ -630,7 +699,7 @@ class NameFixer
                 "
 				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
 				FROM releases rel
-				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
+				INNER JOIN releaseextrafull rf ON rf.releases_id = rel.id
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
 				AND rf.mediainfo REGEXP '\<Movie_name\>'
 				AND rel.nzbstatus = %d
@@ -685,9 +754,10 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					ph.hash AS hash
+					IFNULL(ph.hash, "") AS hash
 				FROM releases rel
-				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = rel.id
+				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
+				WHERE ph.hash != ""
 				AND rel.nzbstatus = %d
 				AND rel.predb_id = 0',
                 NZB::NZB_ADDED
@@ -700,13 +770,13 @@ class NameFixer
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-					ph.hash AS hash
+					IFNULL(ph.hash, "") AS hash
 				FROM releases rel
-				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = rel.id
-				AND rel.nzbstatus = %d
-				AND rel.isrenamed = %d
-				AND rel.categories_id IN (%d, %d)
+				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
+				WHERE rel.nzbstatus = %d
+				AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 				AND rel.predb_id = 0
+				AND ph.hash != ""
 				AND rel.proc_hash16k = %d',
                 NZB::NZB_ADDED,
                 self::IS_RENAMED_NONE,
@@ -749,19 +819,19 @@ class NameFixer
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
             $this->colorCli->header($query.$this->timeother.$queryLimit.';');
-            $releases = DB::select($query.$this->timeother.$queryLimit);
+            $releases = Release::fromQuery($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
             $this->colorCli->header($query.$this->timeall.$queryLimit.';');
-            $releases = DB::select($query.$this->timeall.$queryLimit);
+            $releases = Release::fromQuery($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
             $this->colorCli->header($query.$this->fullother.$queryLimit.';');
-            $releases = DB::select($query.$this->fullother.$queryLimit);
+            $releases = Release::fromQuery($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
             $this->colorCli->header($query.$this->fullall.$queryLimit.';');
-            $releases = DB::select($query.$this->fullall.$queryLimit);
+            $releases = Release::fromQuery($query.$this->fullall.$queryLimit);
         }
 
         return $releases;
@@ -942,6 +1012,9 @@ class NameFixer
                             case 'SRR, ':
                                 $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1];
                                 break;
+                            case 'CRC32, ':
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_crc32' => 1];
+                                break;
                         }
 
                         $updateColumns = [
@@ -1056,7 +1129,7 @@ class NameFixer
         }
 
         //Find release matches with fulltext and then identify exact matches with cleaned LIKE string
-        $res = DB::select(
+        $res = Release::fromQuery(
             sprintf(
                 '
 				SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1079,7 +1152,7 @@ class NameFixer
         if ($total > 0 && $total <= 15) {
             foreach ($res as $row) {
                 if ($pre['title'] !== $row->searchname) {
-                    $this->updateRelease($row, $pre['title'], $method = 'Title Match source: '.$pre['source'], $echo, 'PreDB FT Exact, ', $nameStatus, $show, $pre['predb_id']);
+                    $this->updateRelease($row, $pre['title'], 'Title Match source: '.$pre['source'], $echo, 'PreDB FT Exact, ', $nameStatus, $show, $pre['predb_id']);
                     $matching++;
                 } else {
                     $this->_updateSingleColumn('predb_id', $pre['predb_id'], $row->releases_id);
@@ -1138,7 +1211,7 @@ class NameFixer
         $counter = $counted = 0;
         $timestart = now();
 
-        $query = DB::select(
+        $query = Release::fromQuery(
             sprintf(
                 "
 					SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1213,7 +1286,7 @@ class NameFixer
                                     $this->_fileName = $result['filename'];
                                     $release->filename = $this->_fileName;
                                     if ($result['title'] !== $release->searchname) {
-                                        $this->updateRelease($release, $result['title'], $method = 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                                        $this->updateRelease($release, $result['title'], 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
                                     } else {
                                         $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
                                     }
@@ -1248,22 +1321,22 @@ class NameFixer
                 case strpos($this->_fileName, '.') !== false:
                     //some filenames start with a period that ends up creating bad matches so we don't process them
                     $this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
-                    continue;
+                    break;
 
                 //if filename has a .part001, send it back to the function to cut the next period
                 case preg_match('/\.part\d+$/', $this->_fileName):
                     $this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
-                    continue;
+                    break;
 
                 //if filename has a .vol001, send it back to the function to cut the next period
                 case preg_match('/\.vol\d+(\+\d+)?$/', $this->_fileName):
                     $this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
-                    continue;
+                    break;
 
                 //if filename contains a slash, cut the string and keep string to the right of the last slash to remove dir
                 case strpos($this->_fileName, '\\') !== false:
                     $this->_fileName = Utility::cutStringUsingLast('\\', $this->_fileName, 'right', false);
-                    continue;
+                    break;
 
                 // A lot of obscured releases have one NFO file properly named with a track number (Audio) at the front of it
                 // This will strip out the track and match it to its pre title
@@ -1301,7 +1374,7 @@ class NameFixer
             $hashtype = 'MD5, ';
         }
 
-        $row = DB::select(
+        $row = Predb::fromQuery(
             sprintf(
                 '
 						SELECT p.id AS predb_id, p.title, p.source
@@ -1312,13 +1385,15 @@ class NameFixer
             )
         );
 
-        if (! empty($row)) {
-            if ($row[0]->title !== $release->searchname) {
-                $this->updateRelease($release, $row[0]->title, $method = 'predb hash release name: '.$row[0]->source, $echo, $hashtype, $nameStatus, $show, $row[0]->predb_id);
-                $matching++;
+        foreach ($row as $item) {
+            if (! empty($item)) {
+                if ($item->title !== $release->searchname) {
+                    $this->updateRelease($release, $item->title, 'predb hash release name: '.$item->source, $echo, $hashtype, $nameStatus, $show, $item->predb_id);
+                    $matching++;
+                }
+            } else {
+                $this->_updateSingleColumn('dehashstatus', $release->dehashstatus - 1, $release->releases_id);
             }
-        } else {
-            $this->_updateSingleColumn('dehashstatus', $release->dehashstatus - 1, $release->releases_id);
         }
 
         return $matching;
@@ -1370,7 +1445,7 @@ class NameFixer
                 .'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
         }
 
-        $res = DB::select($query);
+        $res = Release::fromQuery($query);
         $total = \count($res);
         $this->colorCli->primary(number_format($total).' releases to process.');
         foreach ($res as $row) {
@@ -1398,8 +1473,8 @@ class NameFixer
      * @param         $release
      * @param bool $echo
      * @param string $type
-     * @param         $nameStatus
-     * @param         $show
+     * @param int $nameStatus
+     * @param bool $show
      * @param bool $preid
      *
      * @return bool
@@ -1413,7 +1488,7 @@ class NameFixer
                 foreach ($match as $val) {
                     $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
                     if ($title !== null) {
-                        $this->updateRelease($release, $title['title'], $method = 'preDB: Match', $echo, $type, $nameStatus, $show, $title['id']);
+                        $this->updateRelease($release, $title['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $title['id']);
                         $preid = true;
                     }
                 }
@@ -1438,16 +1513,19 @@ class NameFixer
                 case 'SRR, ':
                     $this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
                     break;
+                case 'CRC32, ':
+                    $this->crcCheck($release, $echo, $type, $nameStatus, $show);
+                    break;
                 case 'NFO, ':
                     $this->nfoCheckTV($release, $echo, $type, $nameStatus, $show);
                     $this->nfoCheckMov($release, $echo, $type, $nameStatus, $show);
                     $this->nfoCheckMus($release, $echo, $type, $nameStatus, $show);
                     $this->nfoCheckTY($release, $echo, $type, $nameStatus, $show);
                     $this->nfoCheckG($release, $echo, $type, $nameStatus, $show);
-                    continue;
+                    break;
                 case 'Filenames, ':
                     $this->fileCheck($release, $echo, $type, $nameStatus, $show);
-                    continue;
+                    break;
                 default:
                     $this->tvCheck($release, $echo, $type, $nameStatus, $show);
                     $this->movieCheck($release, $echo, $type, $nameStatus, $show);
@@ -1514,19 +1592,19 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|(?<!\d)[S|]\d{1,2}[E|x]\d{1,}(?!\d)|ep[._ -]?\d{2})[-\w.\',;.()]+(BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -][-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.Text.source.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Title.SxxExx.Text.source.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[-\w.\',;& ]+((19|20)\d\d)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.Text.year.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Title.SxxExx.Text.year.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[-\w.\',;& ]+(480|720|1080)[ip][._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.Text.resolution.source.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Title.SxxExx.Text.resolution.source.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.source.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Title.SxxExx.source.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](480|720|1080)[ip][._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.acodec.source.res.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Title.SxxExx.acodec.source.res.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -]((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.year.###(season/episode).source.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Title.year.###(season/episode).source.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w(19|20)\d\d[._ -]\d{2}[._ -]\d{2}[._ -](IndyCar|NBA|NCW([TY])S|NNS|NSCS?)([._ -](19|20)\d\d)?[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'tvCheck: Sports', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'tvCheck: Sports', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1547,31 +1625,31 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[-\w.\',;& ]+(480|720|1080)[ip][._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.Text.res.vcod.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.Text.res.vcod.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[._ -](480|720|1080)[ip][-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.source.vcodec.res.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.source.vcodec.res.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.source.vcodec.acodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.source.vcodec.acodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+(Brazilian|Chinese|Croatian|Danish|Deutsch|Dutch|Estonian|English|Finnish|Flemish|Francais|French|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.language.acodec.source.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.language.acodec.source.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -](480|720|1080)[ip][._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.resolution.source.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.resolution.source.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -](480|720|1080)[ip][._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.resolution.source.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.resolution.source.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](480|720|1080)[ip][._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.source.resolution.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.source.resolution.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -](480|720|1080)[ip][._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.resolution.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.resolution.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/[-\w.\',;& ]+((19|20)\d\d)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BR(RIP)?|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](480|720|1080)[ip][._ -][-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.source.res.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.source.res.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -][-\w.\',;& ]+[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BR(RIP)?|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.year.eptitle.source.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.year.eptitle.source.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+(480|720|1080)[ip][._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.resolution.source.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.resolution.source.acodec.vcodec.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+(480|720|1080)[ip][._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[-\w.\',;& ]+(BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -]((19|20)\d\d)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.resolution.acodec.eptitle.source.year.group', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.resolution.acodec.eptitle.source.year.group', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+(Brazilian|Chinese|Croatian|Danish|Deutsch|Dutch|Estonian|English|Finnish|Flemish|Francais|French|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)[._ -]((19|20)\d\d)[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'movieCheck: Title.language.year.acodec.src', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'movieCheck: Title.language.year.acodec.src', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1592,15 +1670,15 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/\w[-\w.\',;& ]+(ASIA|DLC|EUR|GOTY|JPN|KOR|MULTI\d{1}|NTSCU?|PAL|RF|Region[._ -]?Free|USA|XBLA)[._ -](DLC[._ -]Complete|FRENCH|GERMAN|MULTI\d{1}|PROPER|PSN|READ[._ -]?NFO|UMD)?[._ -]?(GC|NDS|NGC|PS3|PSP|WII|XBOX(360)?)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'gameCheck: Videogames 1', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'gameCheck: Videogames 1', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+(GC|NDS|NGC|PS3|WII|XBOX(360)?)[._ -](DUPLEX|iNSOMNi|OneUp|STRANGE|SWAG|SKY)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'gameCheck: Videogames 2', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'gameCheck: Videogames 2', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[\w.\',;-].+-OUTLAWS/i', $release->textstring, $result)) {
                 $result = str_replace('OUTLAWS', 'PC GAME OUTLAWS', $result['0']);
-                $this->updateRelease($release, $result['0'], $method = 'gameCheck: PC Games -OUTLAWS', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'gameCheck: PC Games -OUTLAWS', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[\w.\',;-].+\-ALiAS/i', $release->textstring, $result)) {
                 $newresult = str_replace('-ALiAS', ' PC GAME ALiAS', $result['0']);
-                $this->updateRelease($release, $newresult, $method = 'gameCheck: PC Games -ALiAS', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $newresult, 'gameCheck: PC Games -ALiAS', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1621,9 +1699,9 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/\w[-\w.\',;& ]+(\d{1,10}|Linux|UNIX)[._ -](RPM)?[._ -]?(X64)?[._ -]?(Incl)[._ -](Keygen)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'appCheck: Apps 1', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'appCheck: Apps 1', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/\w[-\w.\',;& ]+\d{1,8}[._ -](winall-freeware)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['0'], $method = 'appCheck: Apps 2', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['0'], 'appCheck: Apps 2', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1644,9 +1722,9 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/:\s*.*[\\\\\/]([A-Z0-9].+?S\d+[.-_ ]?[ED]\d+.+?)\.\w{2,}\s+/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['1'], $method = 'nfoCheck: Generic TV 1', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['1'], 'nfoCheck: Generic TV 1', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/(?:(\:\s{1,}))(.+?S\d{1,3}[.-_ ]?[ED]\d{1,3}.+?)(\s{2,}|\r|\n)/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['2'], $method = 'nfoCheck: Generic TV 2', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['2'], 'nfoCheck: Generic TV 2', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1667,11 +1745,11 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             if (preg_match('/(?:((?!Source\s)\:\s{1,}))(.+?(19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['2'], $method = 'nfoCheck: Generic Movies 1', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['2'], 'nfoCheck: Generic Movies 1', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/(?:(\s{2,}))((?!Source).+?[\.\-_ ](19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['2'], $method = 'nfoCheck: Generic Movies 2', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['2'], 'nfoCheck: Generic Movies 2', $echo, $type, $nameStatus, $show);
             } elseif (preg_match('/(?:(\s{2,}))(.+?[\.\-_ ](NTSC|MULTi).+?(MULTi|DVDR)[\.\-_ ].+?)(\s{2,}|\r|\n)/i', $release->textstring, $result)) {
-                $this->updateRelease($release, $result['2'], $method = 'nfoCheck: Generic Movies 3', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result['2'], 'nfoCheck: Generic Movies 3', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1690,7 +1768,7 @@ class NameFixer
 
         if ($this->done === false && $this->relid !== (int) $release->releases_id && preg_match('/(?:\s{2,})(.+?-FM-\d{2}-\d{2})/i', $release->textstring, $result)) {
             $newname = str_replace('-FM-', '-FM-Radio-MP3-', $result['1']);
-            $this->updateRelease($release, $newname, $method = 'nfoCheck: Music FM RADIO', $echo, $type, $nameStatus, $show);
+            $this->updateRelease($release, $newname, 'nfoCheck: Music FM RADIO', $echo, $type, $nameStatus, $show);
         }
     }
 
@@ -1866,7 +1944,7 @@ class NameFixer
                 $releaseName = $releaseName.'.'.$result['audio'];
             }
             $releaseName .= '-NoGroup';
-            $this->updateRelease($release, $releaseName, $method = 'nfoCheck: Title (Year)', $echo, $type, $nameStatus, $show);
+            $this->updateRelease($release, $releaseName, 'nfoCheck: Title (Year)', $echo, $type, $nameStatus, $show);
         }
     }
 
@@ -1888,10 +1966,10 @@ class NameFixer
             if (preg_match('/ALiAS|BAT-TEAM|FAiRLiGHT|Game Type|Glamoury|HI2U|iTWINS|JAGUAR|(LARGE|MEDIUM)ISO|MAZE|nERv|PROPHET|PROFiT|PROCYON|RELOADED|REVOLVER|ROGUE|ViTALiTY/i', $release->textstring)) {
                 if (preg_match('/\w[\w.+&*\/\()\',;: -]+\(c\)[-\w.\',;& ]+\w/i', $release->textstring, $result)) {
                     $releaseName = str_replace(['(c)', '(C)'], '(GAMES) (c)', $result['0']);
-                    $this->updateRelease($release, $releaseName, $method = 'nfoCheck: PC Games (c)', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $releaseName, 'nfoCheck: PC Games (c)', $echo, $type, $nameStatus, $show);
                 } elseif (preg_match('/\w[\w.+&*\/()\',;: -]+\*ISO\*/i', $release->textstring, $result)) {
                     $releaseName = str_replace('*ISO*', '*ISO* (PC GAMES)', $result['0']);
-                    $this->updateRelease($release, $releaseName, $method = 'nfoCheck: PC Games *ISO*', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $releaseName, 'nfoCheck: PC Games *ISO*', $echo, $type, $nameStatus, $show);
                 }
             }
         }
@@ -1934,7 +2012,7 @@ class NameFixer
                     $releaseName = $releaseName.'.'.$result[1];
                 }
                 $result = $releaseName.'.IGUANA';
-                $this->updateRelease($release, $result, $method = 'nfoCheck: IGUANA', $echo, $type, $nameStatus, $show);
+                $this->updateRelease($release, $result, 'nfoCheck: IGUANA', $echo, $type, $nameStatus, $show);
             }
         }
     }
@@ -1958,74 +2036,74 @@ class NameFixer
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
             switch (true) {
                 case preg_match('/^(.+?(x264|XviD)\-TVP)\\\\/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['1'], $method = 'fileCheck: TVP', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['1'], 'fileCheck: TVP', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^(\\\\|\/)?(.+(\\\\|\/))*(.+?S\d{1,3}[.-_ ]?[ED]\d{1,3}.+)\.(.+)$/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['4'], $method = 'fileCheck: Generic TV', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['4'], 'fileCheck: Generic TV', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^(\\\\|\/)?(.+(\\\\|\/))*(.+?([\.\-_ ]\d{4}[\.\-_ ].+?(BDRip|bluray|DVDRip|XVID)).+)\.(.+)$/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['4'], $method = 'fileCheck: Generic movie 1', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['4'], 'fileCheck: Generic movie 1', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^([a-z0-9\.\-_]+(19|20)\d\d[a-z0-9\.\-_]+[\.\-_ ](720p|1080p|BDRip|bluray|DVDRip|x264|XviD)[a-z0-9\.\-_]+)\.[a-z]{2,}$/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['1'], $method = 'fileCheck: Generic movie 2', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['1'], 'fileCheck: Generic movie 2', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/(.+?([\.\-_ ](CD|FM)|[\.\-_ ]\dCD|CDR|FLAC|SAT|WEB).+?(19|20)\d\d.+?)\\\\.+/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['1'], $method = 'fileCheck: Generic music', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['1'], 'fileCheck: Generic music', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^(.+?(19|20)\d\d\-([a-z0-9]{3}|[a-z]{2,}|C4))\\\\/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['1'], $method = 'fileCheck: music groups', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['1'], 'fileCheck: music groups', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/.+\\\\(.+\((19|20)\d\d\)\.avi)$/i', $release->textstring, $result):
                     $newname = str_replace('.avi', ' DVDRip XVID NoGroup', $result['1']);
-                    $this->updateRelease($release, $newname, $method = 'fileCheck: Movie (year) avi', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $newname, 'fileCheck: Movie (year) avi', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/.+\\\\(.+\((19|20)\d\d\)\.iso)$/i', $release->textstring, $result):
                     $newname = str_replace('.iso', ' DVD NoGroup', $result['1']);
-                    $this->updateRelease($release, $newname, $method = 'fileCheck: Movie (year) iso', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $newname, 'fileCheck: Movie (year) iso', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^(.+?IMAGESET.+?)\\\\.+/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['1'], $method = 'fileCheck: XXX Imagesets', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['1'], 'fileCheck: XXX Imagesets', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $release->textstring, $result):
-                    $this->updateRelease($release, $result['1'].' XXX DVDRIP XviD-VIDEOOT', $method = 'fileCheck: XXX XviD VIDEOOT', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['1'].' XXX DVDRIP XviD-VIDEOOT', 'fileCheck: XXX XviD VIDEOOT', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^.+?SDPORN/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: XXX SDPORN', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: XXX SDPORN', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w[-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)$/i', $release->textstring, $result):
                     $result = str_replace('MPEG2', 'MPEG2.HDTV', $result['0']);
-                    $this->updateRelease($release, $result, $method = 'fileCheck: R&C', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result, 'fileCheck: R&C', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](480|720|1080)[ip][._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -]nSD[._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[._ -]NhaNC3[-\w.\',;& ]+\w/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: NhaNc3', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: NhaNc3', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\wtvp-[\w.\-\',;]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](720p|1080p|xvid)(?=\.(avi|mkv))$/i', $release->textstring, $result):
                     $result = str_replace('720p', '720p.HDTV.X264', $result['0']);
                     $result = str_replace('1080p', '1080p.Bluray.X264', $result['0']);
                     $result = str_replace('xvid', 'XVID.DVDrip', $result['0']);
-                    $this->updateRelease($release, $result, $method = 'fileCheck: tvp', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result, 'fileCheck: tvp', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w[-\w.\',;& ]+\d{3,4}\.hdtv-lol\.(avi|mp4|mkv|ts|nfo|nzb)/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: Title.211.hdtv-lol.extension', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: Title.211.hdtv-lol.extension', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w[-\w.\',;& ]+-S\d{1,2}[EX]\d{1,2}-XVID-DL.avi/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: Title-SxxExx-XVID-DL.avi', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: Title-SxxExx-XVID-DL.avi', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}[ex]\d{2}\s\-\s[\w.\-\',;].+\./i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: Title - SxxExx - Eptitle', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: Title - SxxExx - Eptitle', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w.+?\)\.nds$/i', $release->textstring, $result):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: ).nds Nintendo DS', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: ).nds Nintendo DS', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/3DS_\d{4}.+\d{4} - (.+?)\.3ds/i', $release->textstring, $result):
-                    $this->updateRelease($release, '3DS '.$result['1'], $method = 'fileCheck: .3ds Nintendo 3DS', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, '3DS '.$result['1'], 'fileCheck: .3ds Nintendo 3DS', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w.+?\.(epub|mobi|azw|opf|fb2|prc|djvu|cb[rz])/i', $release->textstring, $result):
                     $result = str_replace('.'.$result['1'], ' ('.$result['1'].')', $result['0']);
-                    $this->updateRelease($release, $result, $method = 'fileCheck: EBook', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result, 'fileCheck: EBook', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/\w+[-\w.\',;& ]+$/i', $release->textstring, $result) && preg_match(self::PREDB_REGEX, $release->textstring):
-                    $this->updateRelease($release, $result['0'], $method = 'fileCheck: Folder name', $echo, $type, $nameStatus, $show);
+                    $this->updateRelease($release, $result['0'], 'fileCheck: Folder name', $echo, $type, $nameStatus, $show);
                     break;
                 default:
                     return false;
@@ -2053,7 +2131,7 @@ class NameFixer
     public function uidCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if (! empty($release->uid) && $this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(sprintf(
+            $result = Release::fromQuery(sprintf(
                 '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
@@ -2073,7 +2151,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $res->searchname,
-                            $method = 'uidCheck: Unique_ID',
+                            'uidCheck: Unique_ID',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2119,7 +2197,7 @@ class NameFixer
             }
 
             if ($newName !== '') {
-                $this->updateRelease($release, $newName, $method = 'MediaInfo: Movie Name', $echo, $type, $nameStatus, $show, $release->predb_id);
+                $this->updateRelease($release, $newName, 'MediaInfo: Movie Name', $echo, $type, $nameStatus, $show, $release->predb_id);
 
                 return true;
             }
@@ -2145,7 +2223,7 @@ class NameFixer
     public function xxxNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(
+            $result = Release::fromQuery(
                 sprintf(
                     "
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -2166,7 +2244,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $match['0'],
-                            $method = 'fileCheck: XXX SDPORN',
+                            'fileCheck: XXX SDPORN',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2198,7 +2276,7 @@ class NameFixer
     public function srrNameCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(
+            $result = Release::fromQuery(
                 sprintf(
                     "
 				    SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -2219,7 +2297,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $match['1'],
-                            $method = 'fileCheck: SRR extension',
+                            'fileCheck: SRR extension',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2251,11 +2329,11 @@ class NameFixer
     public function hashCheck($release, $echo, $type, $nameStatus, $show): bool
     {
         if ($this->done === false && $this->relid !== (int) $release->releases_id) {
-            $result = DB::select(sprintf(
+            $result = Release::fromQuery(sprintf(
                 '
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
-				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = r.id
+				LEFT JOIN par_hashes ph ON ph.releases_id = r.id
 				WHERE ph.hash = %s
 				AND ph.releases_id != %d
 				AND (r.predb_id > 0 OR r.anidbid > 0)',
@@ -2269,7 +2347,7 @@ class NameFixer
                     $this->updateRelease(
                             $release,
                             $res->searchname,
-                            $method = 'hashCheck: PAR2 hash_16K',
+                            'hashCheck: PAR2 hash_16K',
                             $echo,
                             $type,
                             $nameStatus,
@@ -2282,6 +2360,58 @@ class NameFixer
             }
         }
         $this->_updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $release->releases_id);
+
+        return false;
+    }
+
+    /**
+     * Look for a name based on rar crc32 hash.
+     *
+     *
+     * @param $release
+     * @param $echo
+     * @param $type
+     * @param $nameStatus
+     * @param $show
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function crcCheck($release, $echo, $type, $nameStatus, $show): bool
+    {
+        if ($this->done === false && $this->relid !== (int) $release->releases_id && $release->textstring !== '') {
+            $result = Release::fromQuery(
+                sprintf(
+                    '
+				    SELECT rf.crc32, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.predb_id as predb_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					LEFT JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE rel.predb_id > 0
+					AND rf.crc32 = %s',
+                    escapeString($release->textstring)
+                )
+            );
+
+            foreach ($result as $res) {
+                $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
+                if ($floor >= -5 && $floor <= 5) {
+                    $this->updateRelease(
+                        $release,
+                        $res->searchname,
+                        'crcCheck: CRC32',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show,
+                        $res->predb_id
+                    );
+
+                    return true;
+                }
+            }
+        }
+        $this->_updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $release->releases_id);
 
         return false;
     }

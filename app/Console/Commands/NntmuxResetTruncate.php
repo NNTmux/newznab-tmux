@@ -41,17 +41,13 @@ class NntmuxResetTruncate extends Command
     {
         Group::query()->update(['first_record' => 0, 'first_record_postdate' => null, 'last_record' => 0, 'last_record_postdate' => null, 'last_updated' => null]);
         $this->info('Reseting all groups completed.');
-        DB::unprepared('SET FOREIGN_KEY_CHECKS = 0;');
-        DB::commit();
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
         $arr = ['parts', 'missed_parts', 'binaries', 'collections', 'multigroup_parts', 'multigroup_missed_parts', 'multigroup_binaries', 'multigroup_collections'];
 
         foreach ($arr as &$value) {
-            $rel = DB::unprepared("TRUNCATE TABLE $value");
-            DB::commit();
-            if ($rel === true) {
-                $this->info("Truncating $value completed.");
-            }
+            DB::statement("TRUNCATE TABLE $value");
+            $this->info("Truncating $value completed.");
         }
         unset($value);
 
@@ -59,24 +55,17 @@ class NntmuxResetTruncate extends Command
             $tbl = $row->Name;
             if (preg_match('/collections_\d+/', $tbl) || preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/missed_parts_\d+/', $tbl) || preg_match('/\d+_collections/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_missed_parts_\d+/', $tbl)) {
                 if ($this->argument('type') === 'true') {
-                    $rel = DB::unprepared("DROP TABLE $tbl");
-                    DB::commit();
-                    if ($rel === true) {
-                        $this->info("Dropping $tbl completed.");
-                    }
+                    DB::statement("DROP TABLE $tbl");
+                    $this->info("Dropping $tbl completed.");
                 } else {
-                    $rel = DB::unprepared("TRUNCATE TABLE $tbl");
-                    DB::commit();
-                    if ($rel === true) {
-                        $this->info("Truncating $tbl completed.");
-                    }
+                    DB::statement("TRUNCATE TABLE $tbl");
+                    $this->info("Truncating $tbl completed.");
                 }
             }
         }
 
         $delcount = Release::query()->where('nzbstatus', '=', 0)->delete();
         $this->info($delcount.' releases had no nzb, deleted.');
-        DB::unprepared('SET FOREIGN_KEY_CHECKS = 1;');
-        DB::commit();
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
     }
 }

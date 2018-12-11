@@ -298,7 +298,8 @@ class PostProcess
 
         $query = Release::query()
             ->where(['isrenamed' => 0, 'id' => $relID])
-            ->first(['id', 'groups_id', 'categories_id', 'name', 'searchname', 'postdate', 'id as releases_id']);
+            ->select(['id', 'groups_id', 'categories_id', 'name', 'searchname', 'postdate', 'id as releases_id'])
+            ->first();
 
         if ($query === null) {
             return false;
@@ -333,14 +334,14 @@ class PostProcess
                     continue;
                 }
 
-                // If we found a name and added 10 files, stop.
-                if ($foundName === true && $filesAdded > 10) {
+                // If we found a name and added 20 files, stop.
+                if ($foundName === true && $filesAdded > 20) {
                     break;
                 }
 
                 if ($this->addpar2) {
                     // Add to release files.
-                    if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first() === null) {
+                    if ($filesAdded < 21 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first() === null) {
 
                         // Try to add the files to the DB.
                         if (ReleaseFile::addReleaseFiles($relID, $file['name'], $file['hash_16K'], $file['size'], $query['postdate'] !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate']) : now(), 0)) {
@@ -364,7 +365,7 @@ class PostProcess
             if ($filesAdded > 0) {
 
                 // Update the file count with the new file count + old file count.
-                Release::query()->where('id', $relID)->increment('rarinnerfilecount', $filesAdded);
+                Release::whereId($relID)->increment('rarinnerfilecount', $filesAdded);
             }
             if ($foundName === true) {
                 return true;

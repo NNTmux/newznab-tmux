@@ -589,16 +589,13 @@ class ProcessAdditional
             $this->_mainTmpPath .= ($guidChar.DS);
         }
 
-        if (! is_dir($this->_mainTmpPath)) {
-            $old = umask(0777);
-            if (! File::makeDirectory($this->_mainTmpPath, 0777, true, true) && ! is_dir($this->_mainTmpPath)) {
+        if (! File::isDirectory($this->_mainTmpPath)) {
+            if (! File::makeDirectory($this->_mainTmpPath, 0777, true, true) && ! File::isDirectory($this->_mainTmpPath)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->_mainTmpPath));
             }
-            @chmod($this->_mainTmpPath, 0777);
-            @umask($old);
         }
 
-        if (! is_dir($this->_mainTmpPath)) {
+        if (! File::isDirectory($this->_mainTmpPath)) {
             throw new \RuntimeException('Could not create the tmpunrar folder ('.$this->_mainTmpPath.')');
         }
 
@@ -770,16 +767,16 @@ class ProcessAdditional
      */
     protected function _recursivePathDelete($path, $ignoredFolders = []): void
     {
-        if (is_dir($path)) {
+        if (File::isDirectory($path)) {
             if (\in_array($path, $ignoredFolders, false)) {
                 return;
             }
-            foreach (File::files($path) as $file) {
+            foreach (File::allFiles($path) as $file) {
                 $this->_recursivePathDelete($file, $ignoredFolders);
             }
 
             File::deleteDirectory($path);
-        } elseif (is_file($path)) {
+        } elseif (File::isFile($path)) {
             File::delete($path);
         }
     }
@@ -788,21 +785,13 @@ class ProcessAdditional
      * Create a temporary storage folder for the current release.
      *
      * @return bool
-     * @throws \RuntimeException
      */
     protected function _createTempFolder(): bool
     {
         // Per release defaults.
         $this->tmpPath = $this->_mainTmpPath.$this->_release->guid.DS;
-        if (! is_dir($this->tmpPath)) {
-            $old = umask(0777);
-            if (! mkdir($this->tmpPath) && ! is_dir($this->tmpPath)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $this->tmpPath));
-            }
-            @chmod($this->tmpPath, 0777);
-            @umask($old);
-
-            if (! \is_dir($this->tmpPath)) {
+        if (! File::isDirectory($this->tmpPath)) {
+            if (! File::makeDirectory($this->tmpPath, 0777, true, false) && ! File::isDirectory($this->tmpPath)) {
                 $this->_echo('Unable to create directory: '.$this->tmpPath, 'warning');
 
                 return $this->_decrementPasswordStatus();
@@ -849,15 +838,13 @@ class ProcessAdditional
     /**
      * Decrement password status for the current release.
      *
-     * @param bool $return Return value.
-     *
-     * @return bool
+     * @return false
      */
-    protected function _decrementPasswordStatus($return = false): bool
+    protected function _decrementPasswordStatus(): bool
     {
-        Release::query()->where('id', $this->_release->id)->decrement('passwordstatus');
+        Release::whereId($this->_release->id)->decrement('passwordstatus');
 
-        return $return;
+        return false;
     }
 
     /**
@@ -1211,7 +1198,7 @@ class ProcessAdditional
              */
             if ($this->_addedFileInfo < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release->id, 'name' => $file['name'], 'size' => $file
                 ['size'], ])->first() === null) {
-                if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], '', $file['size'], $file['date'], $file['pass'])) {
+                if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $file['date'], $file['pass'], '', $file['crc32'] ?? '')) {
                     $this->_addedFileInfo++;
 
                     if ($this->_echoCLI) {
@@ -1226,7 +1213,7 @@ class ProcessAdditional
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     } //Run a PreDB filename check on insert to try and match the release
-                    elseif (strpos($file['name'], '.') !== 0 && \strlen($file['name']) > 0) {
+                    elseif ($file['name'] !== '' && strpos($file['name'], '.') !== 0) {
                         $this->_release['filename'] = $file['name'];
                         $this->_release['releases_id'] = $this->_release->id;
                         $this->_nameFixer->matchPreDbFiles($this->_release, 1, 1, true);
@@ -1262,7 +1249,7 @@ class ProcessAdditional
                 foreach ($files as $file) {
 
                     // Check if the file exists.
-                    if (is_file($file[0])) {
+                    if (File::isFile($file[0])) {
                         $rarData = @file_get_contents($file[0]);
                         if ($rarData !== false) {
                             $this->_processCompressedData($rarData);
@@ -1294,7 +1281,7 @@ class ProcessAdditional
                     continue;
                 }
 
-                if (is_file($file)) {
+                if (File::isFile($file)) {
 
                     // Process PAR2 files.
                     if ($this->_foundPAR2Info === false && preg_match('/\.par2$/', $file)) {
@@ -1578,15 +1565,15 @@ class ProcessAdditional
         $iSQL = ', haspreview = 0';
 
         // If samples exist from previous runs, set flags.
-        if (is_file($this->_releaseImage->imgSavePath.$this->_release->guid.'_thumb.jpg')) {
+        if (File::isFile($this->_releaseImage->imgSavePath.$this->_release->guid.'_thumb.jpg')) {
             $iSQL = ', haspreview = 1';
         }
 
-        if (is_file($this->_releaseImage->vidSavePath.$this->_release->guid.'.ogv')) {
+        if (File::isFile($this->_releaseImage->vidSavePath.$this->_release->guid.'.ogv')) {
             $vSQL = ', videostatus = 1';
         }
 
-        if (is_file($this->_releaseImage->jpgSavePath.$this->_release->guid.'_thumb.jpg')) {
+        if (File::isFile($this->_releaseImage->jpgSavePath.$this->_release->guid.'_thumb.jpg')) {
             $jSQL = ', jpgstatus = 1';
         }
 
@@ -1710,7 +1697,7 @@ class ProcessAdditional
             return false;
         }
 
-        if (is_file($fileLocation)) {
+        if (File::isFile($fileLocation)) {
 
             // Check if media info is enabled.
             if ($retVal === false) {
@@ -1807,7 +1794,7 @@ class ProcessAdditional
                 }
 
                 // Check if the new file was created.
-                if (is_file($this->tmpPath.$audioFileName)) {
+                if (File::isFile($this->tmpPath.$audioFileName)) {
 
                     // Try to move the temp audio file.
                     $renamed = rename($this->tmpPath.$audioFileName, $this->_audioSavePath.$audioFileName);
@@ -1906,7 +1893,7 @@ class ProcessAdditional
             return false;
         }
 
-        if (is_file($fileLocation)) {
+        if (File::isFile($fileLocation)) {
 
             // Create path to temp file.
             $fileName = ($this->tmpPath.'zzzz'.random_int(5, 12).random_int(5, 12).'.jpg');
@@ -1927,7 +1914,7 @@ class ProcessAdditional
             }
 
             // Check if the file exists.
-            if (is_file($fileName)) {
+            if (File::isFile($fileName)) {
 
                 // Try to resize/move the image.
                 $saved = $this->_releaseImage->saveImage(
@@ -1967,7 +1954,7 @@ class ProcessAdditional
         }
 
         // Try to find an avi file.
-        if (is_file($fileLocation)) {
+        if (File::isFile($fileLocation)) {
 
             // Create a filename to store the temp file.
             $fileName = ($this->tmpPath.'zzzz'.$this->_release->guid.'.ogv');
@@ -2036,7 +2023,7 @@ class ProcessAdditional
             }
 
             // Until we find the video file.
-            if (is_file($fileName)) {
+            if (File::isFile($fileName)) {
 
                 // Create a path to where the file should be moved.
                 $newFile = ($this->_releaseImage->vidSavePath.$this->_release->guid.'.ogv');
@@ -2085,7 +2072,7 @@ class ProcessAdditional
         }
 
         // Look for the video file.
-        if (is_file($fileLocation)) {
+        if (File::isFile($fileLocation)) {
             $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
 
             // Check if we got it.
@@ -2165,7 +2152,7 @@ class ProcessAdditional
                 ) {
 
                     // Try to add the files to the DB.
-                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['hash_16K'], $file['size'], $releaseInfo->postdate, 0)) {
+                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $releaseInfo->postdate, 0, $file['hash_16K'])) {
                         $filesAdded++;
                     }
                 }

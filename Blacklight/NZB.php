@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Settings;
 use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -256,7 +257,7 @@ class NZB
         gzwrite($fp, $XMLWriter->outputMemory());
         gzclose($fp);
         unset($XMLWriter);
-        if (! is_file($path)) {
+        if (! File::isFile($path)) {
             echo "ERROR: $path does not exist.\n";
 
             return false;
@@ -312,7 +313,7 @@ class NZB
 
         $nzbPath = $this->siteNzbPath.$nzbPath;
 
-        if ($createIfNotExist === true && ! is_dir($nzbPath) && ! mkdir($nzbPath, 0777, true) && ! is_dir($nzbPath)) {
+        if ($createIfNotExist === true && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
         }
 
@@ -349,7 +350,7 @@ class NZB
     {
         $nzbFile = $this->getNZBPath($releaseGuid);
 
-        return is_file($nzbFile) ? $nzbFile : false;
+        return File::isFile($nzbFile) ? $nzbFile : false;
     }
 
     /**

@@ -483,7 +483,7 @@ class Games
                 }
 
                 if (! empty($this->_gameResults['releasedate'])) {
-                    $dateReleased = $this->_gameResults['releasedate'] === 'TBA' ? '' : $this->_gameResults['releasedate'];
+                    $dateReleased = preg_match('/(TBA|TBD)/i', $this->_gameResults['releasedate']) ? '' : $this->_gameResults['releasedate'];
                     $game['releasedate'] = $this->_gameResults['releasedate'] === '' ? null : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
                 }
 
@@ -544,7 +544,7 @@ class Games
                             $game['esrb'] = 'Not Rated';
                         }
 
-                        if ($this->_gameResults->original_release_date !== '') {
+                        if ($this->_gameResults->original_release_date !== '' && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->original_release_date)) {
                             $dateReleased = $this->_gameResults->original_release_date;
                             $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : now();
                             $game['releasedate'] = (string) $date->format('Y-m-d');
@@ -569,7 +569,7 @@ class Games
         if (now() > $this->igdbSleep) {
             $this->igdbSleep = null;
         }
-        if ($this->igdbSleep === null && env('IGDB_KEY') !== '') {
+        if ($this->igdbSleep === null && config('services.igdb.key') !== '') {
             try {
                 if ($steamGameID === false || $this->_gameResults === false) {
                     $bestMatch = false;
@@ -613,12 +613,17 @@ class Games
 
                             $genreName = $this->_matchGenre(implode(',', $genres));
 
+                            $releaseDate = now()->format('Y-m-d');
+                            if (isset($this->_gameResults->first_release_date) && ! preg_match('/(TBA|TBD)/i', $this->_gameResults->first_release_date)) {
+                                $releaseDate = Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d');
+                            }
+
                             $game = [
                                 'title' => $this->_gameResults->name,
                                 'asin' => $this->_gameResults->id,
                                 'review' => $this->_gameResults->summary ?? '',
                                 'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover->url : '',
-                                'releasedate' => isset($this->_gameResults->first_release_date) ? Carbon::createFromTimestamp(substr($this->_gameResults->first_release_date, 0, -3))->format('Y-m-d') : now()->format('Y-m-d'),
+                                'releasedate' => $releaseDate,
                                 'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
                                 'url' => $this->_gameResults->url ?? '',
                                 'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.$this->_gameResults->screenshots[0]->url : '',

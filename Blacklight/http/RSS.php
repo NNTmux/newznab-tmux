@@ -186,7 +186,7 @@ class RSS extends Capabilities
      * Get movies for RSS.
      *
      *
-     * @param       $limit
+     * @param int   $limit
      * @param int   $userID
      * @param array $excludedCats
      *
@@ -195,7 +195,7 @@ class RSS extends Capabilities
      */
     public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = [])
     {
-        $sql = printf(
+        $sql = sprintf(
             "
 				SELECT r.*, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
@@ -205,7 +205,7 @@ class RSS extends Capabilities
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
 				LEFT JOIN groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = r.imdbid
+				LEFT JOIN movieinfo mi ON mi.id = r.movieinfo_id
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categories_id BETWEEN %d AND %d
@@ -224,12 +224,12 @@ class RSS extends Capabilities
                 ),
                 'imdbid'
             ),
-            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             NZB::NZB_ADDED,
             Category::MOVIE_ROOT,
             Category::MOVIE_OTHER,
             $this->releases->showPasswords(),
-            ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
+            ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', $limit > 100 ? 100 : $limit) : ''
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -239,6 +239,7 @@ class RSS extends Capabilities
         }
 
         $result = Release::fromQuery($sql);
+
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;

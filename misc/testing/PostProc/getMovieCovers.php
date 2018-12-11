@@ -15,7 +15,7 @@ $count = $movies->count();
 if ($count > 0) {
     $colorCli->primary('Updating '.number_format($count).' movie covers.');
     foreach ($movies as $mov) {
-        $startTime = microtime(true);
+        $startTime = now()->timestamp;
         $mov = $movie->updateMovieInfo($mov['imdbid']);
     }
 } else {

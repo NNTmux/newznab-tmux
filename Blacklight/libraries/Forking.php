@@ -181,7 +181,7 @@ class Forking extends \fork_daemon
     public function processWorkType($type, array $options = [])
     {
         // Set/reset some variables.
-        $startTime = microtime(true);
+        $startTime = now()->timestamp;
         $this->workType = $type;
         $this->workTypeOptions = $options;
         $this->processAdditional = $this->processNFO = $this->processTV = $this->processMovies = $this->ppRenamedOnly = false;
@@ -201,7 +201,7 @@ class Forking extends \fork_daemon
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                    'Multi-processing for '.$this->workType.' finished in '.(microtime(true) - $startTime).
+                    'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
                 );
         }
@@ -967,7 +967,7 @@ class Forking extends \fork_daemon
      */
     private function processSingle()
     {
-        $postProcess = new PostProcess(['ColorCLI' => $this->_colorCLI]);
+        $postProcess = new PostProcess(['ColorCLI' => $this->colorCli]);
         //$postProcess->processAnime();
         $postProcess->processBooks();
         $postProcess->processConsoles();

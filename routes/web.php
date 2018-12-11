@@ -27,6 +27,7 @@ Route::get('terms-and-conditions', 'TermsController@terms');
 
 Route::get('login', 'Auth\LoginController@showLoginForm');
 Route::post('login', 'Auth\LoginController@login')->name('login');
+Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function () {
     Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
@@ -208,8 +209,6 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
 
     Route::post('nzbvortex', 'QueueController@nzbvortex');
 });
-
-Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('forum-delete/{id}', 'ForumController@destroy')->middleware('role:Admin');
 

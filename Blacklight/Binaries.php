@@ -124,12 +124,12 @@ class Binaries
     protected $_binaryBlacklistIdsToUpdate = [];
 
     /**
-     * @var float microseconds time of cleaning process start
+     * @var \DateTime
      */
     protected $startCleaning;
 
     /**
-     * @var float microseconds time of the start of the scan function
+     * @var \DateTime
      */
     protected $startLoop;
 
@@ -144,17 +144,17 @@ class Binaries
     protected $allAsMgr;
 
     /**
-     * @var string How long it took in seconds to download headers
+     * @var int How long it took in seconds to download headers
      */
     protected $timeHeaders;
 
     /**
-     * @var string How long it took in seconds to clean/parse headers
+     * @var int How long it took in seconds to clean/parse headers
      */
     protected $timeCleaning;
 
     /**
-     * @var float microseconds time part repair was started
+     * @var \DateTime
      */
     protected $startPR;
 
@@ -164,12 +164,12 @@ class Binaries
     protected $tableNames;
 
     /**
-     * @var float microseconds time header update was started
+     * @var \DateTime
      */
     protected $startUpdate;
 
     /**
-     * @var string The time it took to insert the headers
+     * @var int The time it took to insert the headers
      */
     protected $timeInsert;
 
@@ -219,6 +219,11 @@ class Binaries
     protected $headersNotInserted;
 
     /**
+     * @var \Blacklight\Binaries[]|\Illuminate\Database\Eloquent\Collection
+     */
+    protected $mgrPosters;
+
+    /**
      * Constructor.
      *
      * @param array $options Class instances / echo to CLI?
@@ -255,6 +260,7 @@ class Binaries
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
         $this->allAsMgr = (int) Settings::settingValue('..allasmgr') === 1;
+        $this->mgrPosters = $this->getMultiGroupPosters();
 
         $this->blackList = $this->whiteList = [];
     }
@@ -275,7 +281,7 @@ class Binaries
         $groupCount = \count($groups);
         if ($groupCount > 0) {
             $counter = 1;
-            $allTime = microtime(true);
+            $allTime = now();
 
             $this->log(
                 'Updating: '.$groupCount.' group(s) - Using compression? '.($this->_compressedHeaders ? 'Yes' : 'No'),
@@ -295,7 +301,7 @@ class Binaries
             }
 
             $this->log(
-                'Updating completed in '.number_format(microtime(true) - $allTime, 2).' seconds.',
+                'Updating completed in '.str_plural(' second', now()->diffInSeconds($allTime)),
                 __FUNCTION__,
                 'primary'
             );
@@ -328,7 +334,7 @@ class Binaries
      */
     public function updateGroup($groupMySQL, $maxHeaders = 0): void
     {
-        $startGroup = microtime(true);
+        $startGroup = now();
 
         $this->logIndexerStart();
 
@@ -357,8 +363,7 @@ class Binaries
                 }
                 $this->partRepair($groupMySQL);
 
-                $mgrPosters = $this->getMultiGroupPosters();
-                if ($this->allAsMgr === true || ! empty($mgrPosters)) {
+                if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
                     $tableNames = ProcessReleasesMultiGroup::tableNames();
                     $this->partRepair($groupMySQL, $tableNames);
                 }
@@ -536,7 +541,7 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        number_format(microtime(true) - $startGroup, 2).' seconds.'
+                        str_plural(' second', now()->diffInSeconds($startGroup))
                     );
             }
         } elseif ($this->_echoCLI) {
@@ -565,7 +570,7 @@ class Binaries
     public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null): array
     {
         // Start time of scan method and of fetching headers.
-        $this->startLoop = microtime(true);
+        $this->startLoop = now();
         $this->groupMySQL = $groupMySQL;
         $this->last = $last;
         $this->first = $first;
@@ -575,11 +580,9 @@ class Binaries
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
         $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
 
-        $mgrPosters = $this->getMultiGroupPosters();
-
-        if ($this->allAsMgr === true || ! empty($mgrPosters)) {
+        if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
             $mgrActive = true;
-            $mgrPosters = ! empty($mgrPosters) ? array_flip(array_column($mgrPosters, 'poster')) : '';
+            $this->mgrPosters = ! empty($this->mgrPosters) ? array_flip(array_pluck($this->mgrPosters, 'poster')) : '';
         } else {
             $mgrActive = false;
         }
@@ -639,10 +642,10 @@ class Binaries
         }
 
         // Start of processing headers.
-        $this->startCleaning = microtime(true);
+        $this->startCleaning = now();
 
         // End of the getting data from usenet.
-        $this->timeHeaders = number_format($this->startCleaning - $this->startLoop, 2);
+        $this->timeHeaders = $this->startCleaning->diffInSeconds($this->startLoop);
 
         // Check if we got headers.
         $msgCount = \count($headers);
@@ -707,7 +710,7 @@ class Binaries
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
 
-            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
+            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $this->mgrPosters))) {
                 $mgrHeaders[] = $header;
             } else {
                 $stdHeaders[] = $header;
@@ -739,10 +742,10 @@ class Binaries
         unset($stdHeaders);
 
         // Start of part repair.
-        $this->startPR = microtime(true);
+        $this->startPR = now();
 
         // End of inserting.
-        $this->timeInsert = number_format($this->startPR - $this->startUpdate, 2);
+        $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate);
 
         if ($partRepair && \count($headersRepaired) > 0) {
             $this->removeRepairedParts($headersRepaired, $this->tableNames['prname'], $this->groupMySQL['id']);
@@ -930,10 +933,10 @@ class Binaries
         //unset($headers); // Reclaim memory.
 
         // Start of inserting into SQL.
-        $this->startUpdate = microtime(true);
+        $this->startUpdate = now();
 
         // End of processing headers.
-        $this->timeCleaning = number_format($this->startUpdate - $this->startCleaning, 2);
+        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning);
         $binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
         foreach ($binariesUpdate as $binaryID => $binary) {
             $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
@@ -1020,7 +1023,7 @@ class Binaries
      */
     protected function outputHeaderDuration(): void
     {
-        $currentMicroTime = microtime(true);
+        $currentMicroTime = now();
         if ($this->_echoCLI) {
             $this->colorCli->alternateOver($this->timeHeaders.'s').
                 $this->colorCli->primaryOver(' to download articles, ').
@@ -1028,9 +1031,9 @@ class Binaries
                 $this->colorCli->primaryOver(' to process collections, ').
                 $this->colorCli->alternateOver($this->timeInsert.'s').
                 $this->colorCli->primaryOver(' to insert binaries/parts, ').
-                $this->colorCli->alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
+                $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startPR).'s').
                 $this->colorCli->primaryOver(' for part repair, ').
-                $this->colorCli->alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
+                $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startLoop).'s').
                 $this->colorCli->primary(' total.');
         }
     }
@@ -1082,8 +1085,7 @@ class Binaries
 				ORDER BY numberid ASC LIMIT %d', $tableNames['prname'], $groupArr['id'], $this->_partRepairMaxTries, $this->_partRepairLimit));
         } catch (\PDOException $e) {
             if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                DB::unprepared("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
-                DB::commit();
+                DB::statement("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
             }
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                 $this->colorCli->notice('Deadlock occurred');
@@ -1662,7 +1664,7 @@ class Binaries
             return $poster;
         }
 
-        $poster = MultigroupPoster::query()->get(['poster'])->toArray();
+        $poster = MultigroupPoster::query()->get(['poster']);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put('mgrposter', $poster, $expiresAt);
 

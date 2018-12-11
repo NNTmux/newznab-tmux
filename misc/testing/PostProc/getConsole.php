@@ -25,7 +25,7 @@ if ($res instanceof \Traversable) {
     $colorCli->header('Updating console info for '.number_format($res->rowCount()).' releases.');
 
     foreach ($res as $arr) {
-        $starttime = microtime(true);
+        $starttime = now()->timestamp;
         $gameInfo = $console->parseTitle($arr['searchname']);
         if ($gameInfo !== false) {
             $game = $console->updateConsoleInfo($gameInfo);
@@ -35,7 +35,7 @@ if ($res instanceof \Traversable) {
         }
 
         // amazon limits are 1 per 1 sec
-        $diff = floor((microtime(true) - $starttime) * 1000000);
+        $diff = floor((now()->timestamp - $starttime) * 1000000);
         if (1000000 - $diff > 0) {
             $colorCli->alternate('Sleeping');
             usleep(1000000 - $diff);

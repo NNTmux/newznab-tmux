@@ -1110,8 +1110,8 @@ class Categorize
                 return false;
             case $this->isPhone():
             case $this->isMac():
-            case $this->isISO():
             case $this->isPCGame():
+            case $this->isISO():
             case $this->is0day():
                 return true;
             default:
@@ -1203,6 +1203,10 @@ class Categorize
             $this->tmpCat = Category::PC_GAMES;
             $this->tmpTag[] = Category::TAG_PC_GAMES;
 
+            return true;
+        }
+
+        if ($this->checkPoster('/\<PC\@MASTER\.RACE\>/i', $this->poster, Category::PC_GAMES) === true) {
             return true;
         }
 

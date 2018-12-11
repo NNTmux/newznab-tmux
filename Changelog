@@ -1,4 +1,169 @@
+2018-12-11 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.28.2
+2018-12-10 DariusIII
+	* Chg: Remove usage of ImageHelper just to fetch full URL to tmdb images, use URL directly
+	* Chg: Update all-css.css and all-js.js and additional images/modules related to them
+	* Chg: Use LEFT JOIN for releaseextrafull join in groupfixrelnames
+	* Chg: Check IGDB for TBA/TBD release dates that could cause problems with date creation
+2018-12-09 DariusIIi
+	* Fix: Fix missing covers on movies (tmdb)
+2018-12-08 DariusIII
+	* Chg: Add spatie/laravel-directory-cleanup to clean temp unrar folder of leftover files and folders
+2018-12-07 DariusIII
+	* Chg: Update spatie/laravel-permission 2.28.1
+	* Chg: Update orangehill/iseed to version 2.6.1 and phpunit/phpunit to version 7.5.0
+	* Fix: Fix continue usage inside case statements in NameFixer class (PHP 7.3 fix)
+2018-12-06 DariusIII
+	* Chg: Update PPA class, change _createTempFolder function
+	* Chg: Update symfony components to their latest versions
+	* Chg: Update PPA class _rersivePathDelete function
+2018-12-05 DariusIII
+	* Chg: Update laravel/framework to version 5.7.16
+	* Chg: Catch ArtistNotFoundException
+	* Chg: Remove unneeded code from FailedReleasesController
+	* Chg: Update ApiV2 controller
+	* Chg: Update guzzlehttp/psr7 and egulias/email-validator to their latest versions
+2018-12-04 DariusIII
+	* Chg: Update groupfixrelnames renaming
+	* Chg: Update groupfixrelnames script once again
+	* Chg: Use checkName function in groufixrelnames where it was not used
+	* Chg: Remove unneeded '$method =' when updatin release in NameFixer
+	* Chg: Update used libraries to their latest versions
+	* Chg: Update web routes and LoginController
+2018-12-03 DariusIII
+	* Chg: Update groupfixrelnames script
+	* Chg: Update NameFixer class use Release and Predb models to query database
+	* Chg: Update Movie class, add back tmdb caching, move cache to resources/tmp/imdb_cache
+	* Fix: Fix issues in Movie class
+	* Fix: Check if $mus['year'] is empty
+	* Chg: Replace tmdb-php/api with tmdb-php/laravel package
+	* Chg: Update used libraries to their latest versions
+2018-12-02 DariusIII
+	* Chg: Update symfony/contracts to version 1.0.1
+2018-12-01 DariusIII
+	* CHg: Update groupfixrelnames script
+	* Chg: Use config file to fetch IGDB key in COnsole and Games classes
+2018-11-30 DariusIII
+	* Fix: Fix wrong updated column when doing crcCheck
+	* Chg: Reduce number of releases checked for match_prefiles script from 1000 to 100 to reduce time it takes to match releases
+	* Fix: Fix undefined index crc32 when adding data from rar
+	* Chg: Update more symfony components
+	* Chg: Move column status updates to inside function checks
+	* Chg: Use true switch in place of numerical 1 in NameFixer functions used in groupFixRelNames.php
+	* Chg: Update symfony components to their latest versions
+	* Chg: Update updateRelease function
+	* Chg: Update groupFixRelNames.php
+	* Chg: Add prox_crc32 column to releases table and adjust NameFixer class
+	* Chg: Update spatie/laravel-permission to version 2.28
+2018-11-29 DariusIII
+	* Fix: Fix wrong git commands used
+	* Chg: Add crc32 file check
+	* Chg: Do more time conversion/updates changes in Binaries class
+	* Chg: Update nesbot/Carbon to version 2.6.1 (fixes 86399 seconds output)
+	* Chg: Update variable definitions
+	* Chg: Use now() helper for calculating scripts runtime
+	* Chg: Simplify functions that check for mgrPoster variable
+	* Chg: Update imdbphp/imdbphp to version 6.1.2
+	* Chg: Use DB::statement in place of DB::unprepared + DB::commit
+	* Chg: Use str_plural for duration
+	* Chg: Update composer/xdebug-handler to version 1.3.1
+	* Chg: Update predb_import script, it should work now
+	* Chg: Update tmux install script to use latest tmux release (version 2.8)
+2018-11-28 DariusIII
+	* Chg: Update php-tmdb/api to version 2.1.16 and update all-js.js and all-css.css files
+	* Chg: Update composer.json and package.json
+	* Chg: Replace mkdir, is_file, is_dir with File facade functions in Blacklight namespace
+	* Chg: Use trusty build on travis, xenial does not support php 7.3
+	* Chg: Update ProcessReleases class and use ConsoleTools to show nzbs creation count
+	* Chg: Update package.json
+2018-11-27 DariusIII
+	* Chg: Add BooksTest
+	* Chg: Replace is_dir and is_file in PPA class with File::isDirectory and File::isFile respectively
+	* Chg: Update Books class
+	* Chg: Update books page to show both Amazon and iTunes text
+	* Chg: Update dariusiii/php-itunes-api to version 1.0.6 and update Books to fetch data from iTunes too
+	* Chg: Update travis.yml, use xenial and add php 7.3 test
+	* Chg: Update css and js for tinymce 4.9.0 release
+	* Chg: Update dariusiii/php-itunes-api to version 1.0.5.1
+	* Chg: Update pnotify to latest version and update js and css accordingly
+	* Chg: Rename fetchItunesProperties to fetchItunesMusicProperties
+	* Chg: Update dariusiii/php-itunes-api to version 1.0.4 an add itunes to movie class movie info fetching
+2018-11-26 DariusIII
+	* Chg: Update Music class and dariusiii/php-itunes-api to version 1.0.3
+	* Chg: Update saving of cover value
+	* Chg: Update symfony components to their latest versions and laravel/framework to version 5.7.15
+	* Chg: Change Music lookup logic
+	* Fix: Fix typo in $this->coloCLi
+	* Chg: Fetch music information from iTunes too
+2018-11-25 DariusIII
+	* Chg: Update sebastian/environment to version 4.0.1
+2018-11-24 DariusIII
+	* Chg: Update imdbphp/imdbphp to version 6.1.1 and league/flysystem to version 1.0.49
+2018-11-23 DariusIII
+	* Chg: Update getMyMoviesRSS function
+	* Fix: Fix empty email on profile save
+	* Fix: Fix MyMovies RSS feed
+2018-11-22 DariusIII
+	* Chg: Update RSS class
+	* Chg: Rename .php-cs to .php-cs.dist
+	* Chg: Update nunomaduro/larastan to version 0.3.10
+	* Fix: Fix adding of movies to MyMovies (RSS still does not work)
+	* Chg: Change pointless 404 page usage where not needed, replace with redirects
+2018-11-21 DariusIII
+	* Chg: Add php-cs-fixer to dev requirement
+	* Fix: Fix bad movie caching
+	* Chg: Update config/permission.php
+	* Chg: Update used libraries to their latest versions
+	* Chg: Update laravel/framework to version 5.7.14
+	* Chg: Update psr/log to version 1.1.0
+	* Chg: Update User model
+	* Chg: Replace custom user email and password validation with laravel validation for user profile updates
+	* Chg: Update spatie/laravel-permission to version 2.26.2
+2018-11-20 DariusIII
+	* Chg: Update User model and install testC
+	* Chg: Update maxim-db/reader to version 1.4.0
+	* Chg: Update ReleaseExtra class addXml function
+	* Chg: Update artisan commands PHPDOC blocks
+	* Chg: Update composer install process to prefer dist in dev branches too, we will not be making changes to composer packages
+	* Chg: Update PCGames categorization function, use categorization by poster
+	* Chg: Update isPC function to check if release is PCGame before isISO check
+	* Chg: Update query style in NameFixer class
+	* Chg: Update spatie/laravel-permission to version 2.26.1
+2018-11-19 DariusIII
+	* Chg: Update config/permission.php
+	* Chg: Update spatie/laravel-permission to version 2.26.0
+	* Chg: Update MovieController
+	* Fix: Fix wrong link with bad data sent to failed releases controller in GetNzbController
+	* Chg: Update Console and Details controllers, change behaviour on missing data
+	* Chg: Update ContentController, do not show 404 page on missing content but return json message
+	* Fix: Fix display of contact form when logged in
+2018-11-18 DariusIII
+	* Chg: Increase number of checked files in PostProcess par2 check function
+	* Chg: Update Blacklight/utility/Country class
+	* Chg: Use short version of where query in Nfo class
+2018-11-17 DariusIII
+	* Chg: Small adjustments in switch.php
+2018-11-16 DariusIII
+	* Chg: Update imdbphp/imdbphp to version 6.1.0
+	* Fix: Partial fix for XXX releases processing after addition of new library
+	* Chg: Small additional fixes to reset_postprocessing.php script
+	* Chg: Update reset_postprocessing.php script
+	* Chg: Update barryvdh/laravel-debugbar, orchestra/testbench-core and orchestra/testbench to their latest versions
+2018-11-15 DariusIII
+	* Fix: Fix _html property definition
+	* Fix: Fix Git class gitPull function
+	* Chg: Update adult movies, replace simple_html_dom with voku/simple_html_dom
+	* Chg: Update PHPDOC block return values in GetNzbController
+	* Chg: Use chumper/zipper to generate zipped nzb files
+	* Chg: Remove YencServiceProvider from app.php
+	* Chg: Make PhpYenc the only yenc available, remove rest of the files used
+	* Chg: Update app/Extensions/util/Versions.php
+	* Chg: Replace nZEDb/Git.php with Cz\Git\GitRepository
 2018-11-14 DariusIII
+	* Chg: Use nesbot/carbon 2.5.3
+	* Chg: Update package.json
+	* Chg: Update queries in NameFixer class
+	* Chg: Update phpunit/phpunit to version 7.4.4 and nesbot/carbon to version 1.35.0
 	* Chg: Update PNotify and fix notifications
 2018-11-13 DariusIII
 	* Chg: Update assets

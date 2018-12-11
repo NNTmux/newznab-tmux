@@ -10,7 +10,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $sql = Release::query()->whereNotNull('imdbid')->where('imdbid', '<>', '0000000')->get(['imdbid', 'id']);
 
-DB::unprepared('
+DB::statement('
     DROP TABLE IF EXISTS movie_temp;
     CREATE TABLE movie_temp (
         releases_id INT(11),
@@ -20,8 +20,6 @@ DB::unprepared('
     DEFAULT CHARACTER SET utf8
     COLLATE utf8_unicode_ci;
     ');
-
-DB::commit();
 
 $count = $sql->count();
 
@@ -34,10 +32,8 @@ foreach ($sql as $movie) {
 
 echo PHP_EOL.'Finished copying '.$sql->count().' imdbid values'.PHP_EOL;
 
-DB::unprepared('ALTER TABLE releases DROP imdbid');
-DB::commit();
-DB::unprepared('ALTER TABLE releases ADD imdbid VARCHAR(15) DEFAULT NULL');
-DB::commit();
+DB::statement('ALTER TABLE releases DROP imdbid');
+DB::statement('ALTER TABLE releases ADD imdbid VARCHAR(15) DEFAULT NULL');
 
 echo 'Updating releases table with new values'.PHP_EOL;
 
@@ -51,6 +47,5 @@ echo 'Finished inserting new values into releases table'.PHP_EOL;
 $check = Release::query()->whereNotNull('imdbid')->where('imdbid', '<>', '0000000')->count('id');
 
 if ($check === $count) {
-    DB::unprepared('DROP TABLE movie_temp');
-    DB::commit();
+    DB::statement('DROP TABLE movie_temp');
 }

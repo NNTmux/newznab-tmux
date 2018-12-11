@@ -21,9 +21,8 @@ namespace App\Extensions\util;
 
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use Illuminate\Database\Eloquent\Collection;
 
-class Versions extends Collection
+class Versions
 {
     /**
      * These constants are bitwise for checking what has changed.
@@ -38,7 +37,7 @@ class Versions extends Collection
     protected $changes = 0;
 
     /**
-     * @var Git object.
+     * @var \App\Extensions\util\Git
      */
     protected $git;
 
@@ -57,6 +56,12 @@ class Versions extends Collection
      */
     protected $xml;
 
+    /**
+     * Versions constructor.
+     *
+     * @param array $config
+     * @throws \Cz\Git\GitException
+     */
     public function __construct(array $config = [])
     {
         $defaults = [
@@ -66,13 +71,11 @@ class Versions extends Collection
         $config += $defaults;
 
         $this->_config = $config;
-        parent::__construct($config + $defaults);
+        $this->initialiseGit();
     }
 
     /**
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \RuntimeException
+     * @throws \Cz\Git\GitException
      */
     public function checkGitTag(): void
     {
@@ -86,14 +89,12 @@ class Versions extends Collection
      * @param bool $update
      *
      * @return false|string version string if matched or false.
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \RuntimeException
+     * @throws \Cz\Git\GitException
      */
     public function checkGitTagInFile($update = false)
     {
         $this->initialiseGit();
-        $result = preg_match(Utility::VERSION_REGEX, $this->git->tagLatest(), $matches) ? $matches['all'] : false;
+        $result = preg_match(Utility::VERSION_REGEX, $this->git->getHeadHash(), $matches) ? $matches['all'] : false;
 
         if ($result !== false) {
             if (! $this->git->isStable($this->git->getBranch())) {
@@ -201,6 +202,7 @@ class Versions extends Collection
 
     /**
      * @return string
+     * @throws \Cz\Git\GitException
      */
     public function getGitBranch(): string
     {
@@ -211,6 +213,7 @@ class Versions extends Collection
 
     /**
      * @return string
+     * @throws \Cz\Git\GitException
      */
     public function getGitHeadHash(): string
     {
@@ -232,8 +235,7 @@ class Versions extends Collection
 
     /**
      * @return string
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Cz\Git\GitException
      */
     public function getGitTagInRepo(): string
     {
@@ -261,7 +263,7 @@ class Versions extends Collection
      * @return null|string
      * @throws \RuntimeException
      */
-    public function getSQLPatchFromFile()
+    public function getSQLPatchFromFile(): ?string
     {
         $this->loadXMLFile();
 
@@ -288,8 +290,7 @@ class Versions extends Collection
 
     /**
      * @return string
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Cz\Git\GitException
      */
     public function getTagVersion(): string
     {
@@ -353,6 +354,9 @@ class Versions extends Collection
         // TODO handle console error message.
     }
 
+    /**
+     * @throws \Cz\Git\GitException
+     */
     protected function initialiseGit(): void
     {
         if (! ($this->git instanceof Git)) {

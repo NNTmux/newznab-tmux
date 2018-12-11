@@ -38,11 +38,7 @@ class UpdateNNTmuxComposer extends Command
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return mixed
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Cz\Git\GitException
      */
     public function handle()
     {
@@ -53,11 +49,10 @@ class UpdateNNTmuxComposer extends Command
      * Issues the command to 'install' the composer package.
      *
      * It first checks the current branch for stable versions. If found then the '--no-dev'
-     * option is added to the command to prevent development packages being also downloded.
+     * option is added to the command to prevent development packages being also downloaded.
      *
-     * @return int Return status from Composer.
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @return string
+     * @throws \Cz\Git\GitException
      */
     protected function composer()
     {
@@ -66,7 +61,7 @@ class UpdateNNTmuxComposer extends Command
         if (\in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
             $command .= ' --prefer-dist --no-dev';
         } else {
-            $command .= ' --prefer-source';
+            $command .= ' --prefer-dist';
         }
         $this->output->writeln('<comment>Running composer install process...</comment>');
         $process = new Process($command);
@@ -79,6 +74,9 @@ class UpdateNNTmuxComposer extends Command
         return $process->getOutput();
     }
 
+    /**
+     * @throws \Cz\Git\GitException
+     */
     protected function initialiseGit()
     {
         if (! ($this->git instanceof Git)) {

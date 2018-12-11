@@ -40,19 +40,19 @@ $error = false;
  */
 if ($error === false) {
     $git = new Git();
-    $branch = $git->active_branch();
+    $branch = $git->getCurrentBranchName();
     if (in_array($branch, $git->mainBranches(), false)) {
         // Only update versions, etc. on specific branches to lessen conflicts
 
         if ($error === false) {
             try {
                 $vers = new Versions();
-                $vers->checkGitTag(true);
+                $vers->checkGitTag();
                 $vers->checkSQLFileLatest(false);
                 $vers->checkSQLDb(false);
                 $vers->save();
 
-                $git->add(NN_VERSIONS);
+                $git->addFile(NN_VERSIONS);
             } catch (\Exception $e) {
                 $error = 1;
                 echo "Error while checking versions!\n";
