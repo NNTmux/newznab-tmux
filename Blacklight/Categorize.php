@@ -189,6 +189,8 @@ class Categorize
                         case $this->isPCGame():
                         case $this->is0day():
                         case $this->isConsole():
+                        case $this->isTV():
+                        case $this->isMovie():
                             break;
                         default:
                             $this->tmpCat = Category::PC_ISO;
