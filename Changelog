@@ -1,3 +1,5 @@
+2018-12-11 DariusIII
+	* Chg: Update spatie/laravel-permission to version 2.28.2
 2018-12-10 DariusIII
 	* Chg: Remove usage of ImageHelper just to fetch full URL to tmdb images, use URL directly
 	* Chg: Update all-css.css and all-js.js and additional images/modules related to them
