@@ -229,7 +229,7 @@ class BasePageController extends Controller
      */
     protected function setUserPreferences(): void
     {
-        $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
+        $this->userdata['categoryexclusions'] = User::getCategoryExclusionById(Auth::id());
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {

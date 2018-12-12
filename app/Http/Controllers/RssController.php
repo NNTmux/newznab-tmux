@@ -122,9 +122,9 @@ class RssController extends BasePageController
                 ];
 
             if ($userCat === -3) {
-                $relData = $rss->getShowsRss($userNum, $uid, User::getCategoryExclusion($uid), $userAirDate);
+                $relData = $rss->getShowsRss($userNum, $uid, User::getCategoryExclusionById($uid), $userAirDate);
             } elseif ($userCat === -4) {
-                $relData = $rss->getMyMoviesRss($userNum, $uid, User::getCategoryExclusion($uid));
+                $relData = $rss->getMyMoviesRss($userNum, $uid, User::getCategoryExclusionById($uid));
             } else {
                 $relData = $rss->getRss(explode(',', $userCat), $userShow, $userAnidb, $uid, $userAirDate, $userLimit, $userNum);
             }

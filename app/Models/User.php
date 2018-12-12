@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Facades\DB;
@@ -803,7 +804,7 @@ class User extends Authenticatable
      * @return array
      * @throws \Exception
      */
-    public static function getCategoryExclusion($userID): array
+    public static function getCategoryExclusionById($userID): array
     {
         $ret = [];
 
@@ -852,6 +853,17 @@ class User extends Authenticatable
         $exclusion = Category::query()->whereIn('parentid', $ret)->pluck('id')->toArray();
 
         return $exclusion;
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     * @throws \Exception
+     */
+    public static function getCategoryExclusionForApi(Request $request): array
+    {
+        $user = self::getByRssToken($request->input('api_token'));
+        return self::getCategoryExclusionById($user->id);
     }
 
     /**

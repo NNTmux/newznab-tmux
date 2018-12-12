@@ -83,7 +83,7 @@ class ApiController extends BasePageController
             }
 
             $uid = $res['id'];
-            $catExclusions = User::getCategoryExclusion($uid);
+            $catExclusions = User::getCategoryExclusionForApi($request);
             $maxRequests = $res->role->apirequests;
         }
 

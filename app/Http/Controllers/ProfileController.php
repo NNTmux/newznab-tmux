@@ -288,7 +288,7 @@ class ProfileController extends BasePageController
 
         $this->smarty->assign('error', $errorStr);
         $this->smarty->assign('user', $data);
-        $this->smarty->assign('userexccat', User::getCategoryExclusion($userid));
+        $this->smarty->assign('userexccat', User::getCategoryExclusionById($userid));
 
         $this->smarty->assign('saburl_selected', $sab->url);
         $this->smarty->assign('sabapikey_selected', $sab->apikey);
