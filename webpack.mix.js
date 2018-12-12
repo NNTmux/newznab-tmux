@@ -45,7 +45,7 @@ mix
             'node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
             'node_modules/autosize/dist/autosize.min.js',
             'node_modules/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js',
-            'node_modules/bootstrap-progressbar/bootstrap-progressbar.min.j',
+            'node_modules/bootstrap-progressbar/bootstrap-progressbar.min.js',
             'node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js',
             'node_modules/pnotify/dist/umd/PNotify.js',
             'node_modules/pnotify/dist/umd/PNotifyAnimate.js',
