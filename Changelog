@@ -1,3 +1,5 @@
+2018-12-12 DariusIII
+	* Chg: Update phpunit/phpunit to version 7.5.1
 2018-12-11 DariusIII
 	* Chg: Update all-css.css,all-js.js and package.json
 	* Chg: Update categorization for a.b.cd.image group
