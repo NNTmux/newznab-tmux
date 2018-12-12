@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -863,6 +863,7 @@ class User extends Authenticatable
     public static function getCategoryExclusionForApi(Request $request): array
     {
         $user = self::getByRssToken($request->input('api_token'));
+
         return self::getCategoryExclusionById($user->id);
     }
 
