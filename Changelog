@@ -1,4 +1,5 @@
 2018-12-12 DariusIII
+	* Chg: Update code style of movieinfo table migration
 	* Chg: Update font-awesome to version 5.6.1 and update all-css.css and all-js.js files, also update package.json
 	* Chg: Update laravel/framework to version 5.7.17
 	* Chg: Update laravel/slack-notification-channel to version 1.0.3
