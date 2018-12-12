@@ -954,6 +954,8 @@ class Movie
                             $ret['id'] = $resp['ids']['trakt'];
                         }
 
+                        $ret['overview'] = $resp['overview'] ?? '';
+
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
                         } else {
