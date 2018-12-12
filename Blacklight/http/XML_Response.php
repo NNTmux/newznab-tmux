@@ -375,7 +375,7 @@ class XML_Response
         $this->xml->writeElement(
             'link',
             "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
-            "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
+            "&r={$this->parameters['token']}".
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
         $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
@@ -391,7 +391,7 @@ class XML_Response
             $this->xml->writeAttribute(
                 'url',
                 "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
-                "&i={$this->parameters['uid']}"."&r={$this->parameters['token']}".
+                "&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );
             $this->xml->writeAttribute('length', $this->release->size);

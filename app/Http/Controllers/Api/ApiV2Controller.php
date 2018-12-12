@@ -237,7 +237,7 @@ class ApiV2Controller extends BasePageController
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData !== false) {
-            return redirect('/getnzb?r='.$this->userdata->api_token.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+            return redirect('/getnzb?r='.$request->input('api_token').'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 
         Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -255,9 +255,10 @@ class ApiV2Controller extends BasePageController
         }
 
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        $userData = User::query()->where('api_token', $request->input('api_token'))->first();
         $relData = Release::getByGuid($request->input('id'));
 
-        $relData = fractal($relData, new DetailsTransformer($this->userdata));
+        $relData = fractal($relData, new DetailsTransformer($userData));
 
         return response()->json($relData);
     }

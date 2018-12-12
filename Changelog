@@ -1,4 +1,5 @@
 2018-12-12 DariusIII
+	* Fix: Fix couple of issues introduced with API changes
 	* Chg: Check if request has api_token(v2 API) or apikey(v1 API)
 	* Fix: Fix User error on APIv2 and ApiTransformer data
 	* Chg: Update user category exclusion handling in API and APIv2

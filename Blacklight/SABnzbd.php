@@ -166,8 +166,6 @@ class SABnzbd
                         $this->serverurl.
                         'getnzb?id='.
                         $guid.
-                        '&i='.
-                        $this->uid.
                         '&r='.
                         $this->api_token
                     )

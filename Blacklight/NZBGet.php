@@ -171,8 +171,6 @@ class NZBGet
             $this->serverurl.
             'getnzb?id='.
             $guid.
-            '%26i%3D'.
-            $this->uid.
             '%26r%3D'.
             $this->api_token
             .
