@@ -862,7 +862,8 @@ class User extends Authenticatable
      */
     public static function getCategoryExclusionForApi(Request $request): array
     {
-        $user = self::getByRssToken($request->input('api_token'));
+        $apiToken = $request->has('api_token') ? $request->input('api_token') : $request->input('apikey');
+        $user = self::getByRssToken($apiToken);
 
         return self::getCategoryExclusionById($user->id);
     }

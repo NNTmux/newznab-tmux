@@ -1,4 +1,5 @@
 2018-12-12 DariusIII
+	* Chg: Check if request has api_token(v2 API) or apikey(v1 API)
 	* Fix: Fix User error on APIv2 and ApiTransformer data
 	* Chg: Update user category exclusion handling in API and APIv2
 	* Chg: Remove requirement for userid when using RSS, API and APIv2, its useless as we already have the token
