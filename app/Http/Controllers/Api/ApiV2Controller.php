@@ -72,7 +72,7 @@ class ApiV2Controller extends BasePageController
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $api->maxAge();
         $catExclusions = User::getCategoryExclusion($this->userdata->id);
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
 
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
@@ -117,7 +117,7 @@ class ApiV2Controller extends BasePageController
         $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
@@ -180,7 +180,7 @@ class ApiV2Controller extends BasePageController
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
 
         $siteIdArr = [
             'id'     => $request->input('vid') ?? '0',
@@ -231,10 +231,10 @@ class ApiV2Controller extends BasePageController
      */
     public function getNzb(Request $request)
     {
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData !== false) {
-            return redirect('/getnzb?i='.$this->userdata->id.'&r='.$this->userdata->api_token.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+            return redirect('/getnzb?r='.$this->userdata->api_token.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 
         Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -251,7 +251,7 @@ class ApiV2Controller extends BasePageController
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::getByGuid($request->input('id'));
 
         $relData = fractal($relData, new DetailsTransformer($this->userdata));

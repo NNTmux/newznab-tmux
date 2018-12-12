@@ -14,7 +14,7 @@ class RssController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function rss(Request $request)
     {
@@ -72,11 +72,11 @@ class RssController extends BasePageController
                 $rssToken = $this->userdata['api_token'];
                 $maxRequests = $this->userdata->role->apirequests;
             } else {
-                if (! $request->has('i') || ! $request->has('r')) {
-                    Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
+                if (! $request->has('r')) {
+                    Utility::showApiError(100, 'API key is required for viewing the RSS!');
                 }
 
-                $res = User::getByIdAndRssToken($request->input('i'), $request->input('r'));
+                $res = User::getByRssToken($request->input('r'));
 
                 if (! $res) {
                     Utility::showApiError(100);
@@ -94,7 +94,7 @@ class RssController extends BasePageController
             if (UserRequest::getApiRequests($uid) > $maxRequests) {
                 Utility::showApiError(500, 'You have reached your daily limit for API requests!');
             } else {
-                UserRequest::addApiRequest($uid, $request->getRequestUri());
+                UserRequest::addApiRequest($rssToken, $request->getRequestUri());
             }
 
             // Valid or logged in user, get them the requested feed.

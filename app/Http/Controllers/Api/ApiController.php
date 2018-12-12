@@ -116,7 +116,7 @@ class ApiController extends BasePageController
                $api->verifyEmptyParameter('q');
                $maxAge = $api->maxAge();
                $groupName = $api->group();
-               UserRequest::addApiRequest($uid, $request->getRequestUri());
+               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $categoryID = $api->categoryID();
                $limit = $api->limit();
 
@@ -170,7 +170,7 @@ class ApiController extends BasePageController
                $api->verifyEmptyParameter('season');
                $api->verifyEmptyParameter('ep');
                $maxAge = $api->maxAge();
-               UserRequest::addApiRequest($uid, $request->getRequestUri());
+               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
                $siteIdArr = [
                    'id'     => $request->input('vid') ?? '0',
@@ -214,7 +214,7 @@ class ApiController extends BasePageController
                $api->verifyEmptyParameter('q');
                $api->verifyEmptyParameter('imdbid');
                $maxAge = $api->maxAge();
-               UserRequest::addApiRequest($uid, $request->getRequestUri());
+               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
 
                $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
                $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
@@ -247,10 +247,10 @@ class ApiController extends BasePageController
            // Get NZB.
            case 'g':
                $api->verifyEmptyParameter('g');
-               UserRequest::addApiRequest($uid, $request->getRequestUri());
+               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $relData = Release::checkGuidForApi($request->input('id'));
                if ($relData !== false) {
-                   return redirect(WWW_TOP.'/getnzb?i='.$uid.'&r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+                   return redirect(WWW_TOP.'/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
                }
 
                Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -262,7 +262,7 @@ class ApiController extends BasePageController
                    Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
                }
 
-               UserRequest::addApiRequest($uid, $request->getRequestUri());
+               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $data = Release::getByGuid($request->input('id'));
 
                $api->output($data, $params, $outputXML, $offset, 'api');
@@ -274,7 +274,7 @@ class ApiController extends BasePageController
                    Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
                }
 
-               UserRequest::addApiRequest($uid, $request->getRequestUri());
+               UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
                $data = ReleaseNfo::getReleaseNfo($rel['id']);
 

@@ -84,11 +84,12 @@ class UserRequest extends Model
     /**
      * If a user accesses the API, log it.
      *
-     * @param int    $userID  ID of the user.
+     * @param string $token API token of the user
      * @param string $request The API request.
      */
-    public static function addApiRequest($userID, $request): void
+    public static function addApiRequest($token, $request): void
     {
+        $userID = User::query()->select(['id'])->where('api_token', $token)->value('id');
         self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> now()]);
     }
 
