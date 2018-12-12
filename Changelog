@@ -1,4 +1,5 @@
 2018-12-12 DariusIII
+	* Fix: Fix User error on APIv2 and ApiTransformer data
 	* Chg: Update user category exclusion handling in API and APIv2
 	* Chg: Remove requirement for userid when using RSS, API and APIv2, its useless as we already have the token
 	* Chg: Update code style of movieinfo table migration

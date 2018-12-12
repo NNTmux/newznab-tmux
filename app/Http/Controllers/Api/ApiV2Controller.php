@@ -69,6 +69,7 @@ class ApiV2Controller extends BasePageController
     {
         $api = new API();
         $releases = new Releases();
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $api->maxAge();
         $catExclusions = User::getCategoryExclusionForApi($request);
@@ -95,7 +96,7 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -111,6 +112,7 @@ class ApiV2Controller extends BasePageController
     {
         $api = new API();
         $releases = new Releases();
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $offset = $api->offset();
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
@@ -150,7 +152,7 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -166,6 +168,7 @@ class ApiV2Controller extends BasePageController
     {
         $api = new API();
         $releases = new Releases();
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
@@ -218,7 +221,7 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
