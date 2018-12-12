@@ -1,4 +1,5 @@
 2018-12-12 DariusIII
+	* Chg: Update laravel/framework to version 5.7.17
 	* Chg: Update laravel/slack-notification-channel to version 1.0.3
 	* Fix: Fix missing overview index returned from trakt
 	* Chg: Update css and js files
