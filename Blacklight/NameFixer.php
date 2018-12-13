@@ -1282,7 +1282,7 @@ class NameFixer
                             $preFtMatch = $this->preMatch($result['filename']);
                             if ($preFtMatch[0] === true) {
                                 similar_text($preMatch[1], $preFtMatch[1], $percent);
-                                if ($percent >= 93) {
+                                if ($percent >= 97) {
                                     $this->_fileName = $result['filename'];
                                     $release->filename = $this->_fileName;
                                     if ($result['title'] !== $release->searchname) {
@@ -1315,7 +1315,7 @@ class NameFixer
         // first strip all non-printing chars  from filename
         $this->_fileName = Utility::stripNonPrintingChars($this->_fileName);
 
-        if (\strlen($this->_fileName) > 0 && strpos($this->_fileName, '.') !== 0) {
+        if ($this->_fileName !== '' && strpos($this->_fileName, '.') !== 0) {
             switch (true) {
 
                 case strpos($this->_fileName, '.') !== false:
@@ -2431,7 +2431,7 @@ class NameFixer
      */
     private function preMatch($fileName): array
     {
-        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w\-.]+[\w]$/i', $fileName, $match);
+        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+([\w\-.]+[\w]$)/i', $fileName, $match);
 
         return [$result === 1, $match[0] ?? ''];
     }

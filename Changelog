@@ -1,3 +1,5 @@
+2018-12-13 DariusIII
+	* Chg: Increase percentage for matching in matchPreDbFiles function
 2018-12-12 DariusIII
 	* Chg: Prevent query error on empty movie page (when no movies have been added yet)
 	* Fix: Fix couple of issues introduced with API changes
