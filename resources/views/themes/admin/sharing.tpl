@@ -181,7 +181,7 @@
 						</tr>
 					</table>
 				</fieldset>
-				<input class="btn btn-default" type="submit" value="Save Settings"/>
+				<input class="btn btn-success" type="submit" value="Save Settings"/>
 			</form>
 			<br/>
 		{else}

@@ -14,23 +14,23 @@
 			<div class="well well-sm">
 				<div id="moviefull" style="min-height:340px;">
 					{if $result->cover == 1}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"/>
 					{else}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}
 					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"} ({$result->year})</span>
-					<a class="btn btn-transparent btn-primary" target="_blank"
+					<a class="btn btn-transparent btn-success" target="_blank"
 					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 					   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page">IMDB</a>
-					<a class="btn btn-transparent btn-primary" target="_blank"
+					<a class="btn btn-transparent btn-success" target="_blank"
 					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 					   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page" rel="trakt">TRAKT</a>
                     {if (!empty($result->tmdbid))}
-                        <a class="btn btn-transparent btn-primary" target="_blank"
+                        <a class="btn btn-transparent btn-success" target="_blank"
                             href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                             name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                     {/if}
@@ -83,7 +83,7 @@
 
 							{if isset($sabintegrated) && $sabintegrated !=""}
 								<button type="button"
-										class="nzb_multi_operations_sab btn btn-sm btn-primary"
+										class="nzb_multi_operations_sab btn btn-sm btn-success"
 										data-toggle="tooltip" data-placement="top" title
 										data-original-title="Send to Queue">
 									<i class="fa fa-share"></i></button>
@@ -99,9 +99,9 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-lg-12 col-sm-12 col-xs-12">
-							<div class="panel panel-default">
-								<div class="panel-body pagination2">
+						<div class="col-lg-12 col-sm-12 col-12">
+							<div class="card card-default">
+								<div class="card-body pagination2">
 									<table style="width:100%;"
 										   class="data table table-striped responsive-utilities jambo-table">
 										<tr>
@@ -136,11 +136,11 @@
 													<a title="View details"
 													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 													<br/>
-													<span class="label label-primary">{$mgrabs[$m@index]}
+													<span class="badge badge-primary">{$mgrabs[$m@index]}
 														grab{if $mgrabs[$m@index] != 1}s{/if}</span>
 													{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-																class="modal_nfo label label-primary text-muted">NFO</a>
+																class="modal_nfo badge badge-primary text-muted">NFO</a>
 														</span>{/if}
 													{if $mpass[$m@index] == 2}
 														<i class="fa fa-icon-lock"></i>
@@ -149,7 +149,7 @@
 													{/if}
 												</td>
 												<td class="less"><span
-															class="label label-primary">{$mcatname[$m@index]}</span>
+															class="badge badge-primary">{$mcatname[$m@index]}</span>
 												</td>
 												<td class="less mid"
 													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
@@ -217,7 +217,7 @@
 
 														{if isset($sabintegrated) && $sabintegrated !=""}
 															<button type="button"
-																	class="nzb_multi_operations_sab btn btn-sm btn-primary"
+																	class="nzb_multi_operations_sab btn btn-sm btn-success"
 																	data-toggle="tooltip" data-placement="top" title
 																	data-original-title="Send to Queue">
 																<i class="fa fa-share"></i></button>

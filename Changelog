@@ -1,4 +1,8 @@
 2018-12-14 DariusIII
+	* Chg: More theme adjsutments
+	* Chg: Fix some issues in theme
+	* Chg: Update Gentele
+	* Chg: Use Bootstrap 4 and adjust Gentele for BS4
 	* Chg: Update doctrine/dbal to version 2.9.1
 2018-12-13 DariusIII
 	* Chg: Update package.json

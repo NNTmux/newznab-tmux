@@ -1,6 +1,6 @@
 <div class="container nzb_multi_operations">
 	{$results->onEachSide(5)->links()}
-	<div class="pull-right">
+	<div class="float-right">
 		With Selected:
 		<button type="button" class="btn btn-info btn-sm nzb_multi_operations_download" data-toggle="tooltip"
 				data-placement="top" title data-original-title="Download NZBs"> Download NZBs

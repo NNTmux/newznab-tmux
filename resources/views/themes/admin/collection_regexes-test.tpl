@@ -11,7 +11,7 @@
 		<input id="regex" type="text" name="regex" value="{$regex|htmlentities}" size="100"/><br/>
 		<label for="limit" style="padding-right:7px">Limit:</label>
 		<input id="limit" type="text" name="limit" value="{$limit}" size="8"/><br/>
-		<input class="btn btn-default" type="submit" value="Test"/>
+		<input class="btn btn-success" type="submit" value="Test"/>
 	</form>
 	{if isset($data)}
 

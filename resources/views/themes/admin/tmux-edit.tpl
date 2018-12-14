@@ -881,7 +881,7 @@
 			</table>
 		</fieldset>
 
-		<input class="btn btn-default" type="submit" value="Save Tmux Settings"/>
+		<input class="btn btn-success" type="submit" value="Save Tmux Settings"/>
 
 	</form>
 </div>

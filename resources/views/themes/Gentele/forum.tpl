@@ -1,7 +1,7 @@
 <div class="well well-sm">
 	<h2>{if $title !=''}{$title}{else}Forum{/if}</h2>
 	{if count($results) > 0}
-		<div class=".pagination pagination-centered">
+		<div class="pagination pagination-centered">
 			{$results->onEachSide(5)->links()}
 		</div>
 		<a id="top"></a>
@@ -81,7 +81,7 @@
 		</table>
 		<div style="float:right;margin-top:5px;"><a class="btn btn-small" href="#top">Top</a></div>
 		<br/>
-		<div class=".pagination pagination-centered">
+		<div class="pagination pagination-centered">
 			{$results->onEachSide(5)->links()}
 		</div>
 	{/if}
@@ -92,14 +92,14 @@
 		<div class="body">
             {{Form::open(['id' => 'new-forum-thread', 'class' => 'form-horizontal'])}}
 				<div class="control-group">
-					<label class="control-label" for="addSubject">Subject</label>
+					<label class="col-form-label" for="addSubject">Subject</label>
 					<div class="controls">
-						<input class="input input-xlarge" type="text" maxlength="200" id="addSubject"
+						<input class="input form-control-lg" type="text" maxlength="200" id="addSubject"
 							   name="addSubject"/>
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="addMessage">Message</label>
+					<label class="col-form-label" for="addMessage">Message</label>
 					<div class="controls">
 						<textarea maxlength="5000" id="addMessage" name="addMessage"></textarea>
 					</div>

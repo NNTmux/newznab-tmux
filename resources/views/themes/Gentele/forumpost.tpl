@@ -59,7 +59,7 @@
                     {{Form::open(['id' => 'forum-post-reply', 'class' => 'form-horizontal'])}}
 						{{csrf_field()}}
 						<div class="control-group">
-							<label class="control-label" for="addMessage">Message</label>
+							<label class="col-form-label" for="addMessage">Message</label>
 							<div class="controls">
 								<textarea id="addMessage" name="addMessage"></textarea>
 							</div>
@@ -70,7 +70,7 @@
 					{{Form::close()}}
 				</div>
 			{else}
-				<label class="label label-warning" title="Topic Locked">Topic Locked</label>
+				<label class="badge badge-warning" title="Topic Locked">Topic Locked</label>
 			{/if}
 		</div>
 	{/if}

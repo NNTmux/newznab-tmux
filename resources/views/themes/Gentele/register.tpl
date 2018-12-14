@@ -43,7 +43,7 @@
                         <div class="hint">Retype your password</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-8">
+						<div class="col-8">
 							<div class="checkbox">
 								<label>
 									<input type="checkbox"> I agree to the <a
@@ -51,8 +51,8 @@
 								</label>
 							</div>
 						</div><!-- /.col -->
-						<div class="col-xs-4">
-							<button type="submit" value="Register" class="btn btn-primary btn-block btn-flat">Register
+						<div class="col-4">
+							<button type="submit" value="Register" class="btn btn-success btn-block btn-flat">Register
 							</button>
 						</div><!-- /.col -->
 						<hr>

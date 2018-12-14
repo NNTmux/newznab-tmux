@@ -22,7 +22,7 @@
 					<span class="fas fa-lock form-control-feedback"></span>
 				</div>
 				<div class="row">
-					<div class="col-xs-8">
+					<div class="col-8">
 						<div class="checkbox icheck">
 							<label>
 								<input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if}
@@ -34,8 +34,8 @@
 							{/if}
 						</div>
 					</div><!-- /.col -->
-					<div class="col-xs-4">
-						<button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+					<div class="col-4">
+						<button type="submit" class="btn btn-success btn-block btn-flat">Sign In</button>
 
 					</div><!-- /.col -->
 				</div>

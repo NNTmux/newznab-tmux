@@ -12,23 +12,23 @@
 	<div class="col-md-12">
 		<div class="row">
 			<div class="col-lg-12 portlets">
-				<div class="panel panel-default">
-					<div class="panel-body pagination2">
-						<div class="panel-body">
+				<div class="card card-default">
+					<div class="card-body">
+						<div class="card-body">
 							<ul class="nav nav-tabs nav-primary">
 								<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="fa fa-user"></i>
 										Main</a></li>
 							</ul>
 							<div class="tab-content">
 								<div class="tab-pane fade active in" id="tab2_1">
-									<div id="tab-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+									<div id="tab-1" class="ui-tabs-card ui-widget-content ui-corner-bottom">
 										<table cellpadding="0" cellspacing="0" width="100%">
 											<tbody>
 											<tr valign="top">
 												<td>
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
-														<tr class="bg-aqua-active">
+														<tr class="bg-blue-sky">
 															<td colspan="2" style="padding-left: 8px;">
 																<strong>General</strong>
 															</td>
@@ -67,9 +67,9 @@
 														{/if}
 														</tbody>
 													</table>
-													<table class="data data table table-striped responsive-utilities jambo-table">
+													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
-														<tr class="bg-aqua-active">
+														<tr class="bg-blue-sky">
 															<td colspan="2" style="padding-left: 8px;"><strong>UI
 																	Preferences</strong></td>
 														</tr>
@@ -98,7 +98,7 @@
 													</table>
 													<table class="data data table table-striped responsive-utilities jambo-table">
 														<tbody>
-														<tr class="bg-aqua-active">
+														<tr class="bg-blue-sky">
 															<td colspan="2" style="padding-left: 8px;"><strong>API &
 																	Downloads</strong></td>
 														</tr>
@@ -108,7 +108,7 @@
 																<span id="uatd">{$apirequests}</span> {if isset($isadmin) && $apirequests > 0}
 																<a
 																		onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
-																		href="#" class="label label-danger">
+																		href="#" class="badge badge-danger">
 																		Reset</a>{/if}</td>
 														</tr>
 														<tr>
@@ -117,7 +117,7 @@
 																{$user->role->downloadrequests}
 																{if isset($isadmin) && $grabstoday > 0}
 																	<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
-																	   href="#" class="label label-danger">
+																	   href="#" class="badge badge-danger">
 																		Reset</a>
 																{/if}</td>
 														</tr>
@@ -147,7 +147,7 @@
 																<td>
 																	<a href="{$smarty.const.WWW_TOP}rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.api_token}">{$user.api_token}</a>
 																	<a href="{$smarty.const.WWW_TOP}profileedit?action=newapikey"
-																	   class="label label-danger">GENERATE NEW
+																	   class="badge badge-danger">GENERATE NEW
 																		KEY</a>
 																</td>
 															</tr>
@@ -157,7 +157,7 @@
 																		<br/>
 																	{/if}{if isset($isadmin)}<a
 																		href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes"
-																		class="label label-info">Add/Edit</a>{/if}</td>
+																		class="badge badge-info">Add/Edit</a>{/if}</td>
 															</tr>
 														{/if}
 														</tbody>
@@ -165,7 +165,7 @@
 													{if ($user.id == $userdata.id || $isadmin) && $site->registerstatus == 1}
 														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
-															<tr class="bg-aqua-active">
+															<tr class="bg-blue-sky">
 																<td colspan="2" style="padding-left: 8px;"><strong>Invites</strong>
 																</td>
 															</tr>
@@ -216,7 +216,7 @@
 													{if isset($isadmin) && $downloadlist|@count > 0}
 														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
-															<tr class="bg-aqua-active">
+															<tr class="bg-blue-sky">
 																<td colspan="2" style="padding-left: 8px;"><strong>Downloads
 																		for user</strong>
 																</td>
@@ -253,7 +253,7 @@
 							</div>
 						</div>
 						{if isset($isadmin) || !$publicview}
-							<a class="btn btn-primary" href="{$smarty.const.WWW_TOP}profileedit">Edit
+							<a class="btn btn-success" href="{$smarty.const.WWW_TOP}profileedit">Edit
 								Profile</a>
 						{/if}
 						{if !isset($isadmin)}

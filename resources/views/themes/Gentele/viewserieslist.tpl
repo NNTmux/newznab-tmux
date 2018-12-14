@@ -18,15 +18,15 @@
 		{/foreach}]
 	</p>
 	<div class="btn-group">
-		<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
-		<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my
+		<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
+		<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my
 			shows</a>
 	</div>
 	{$site->adbrowse}
 	{if $serieslist|@count > 0}
 		<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
-			<div class="col-md-12 pull-right">
-			    {{Form::open(['class' => 'form pull-right', 'style' => 'margin-top:-35px;'])}}
+			<div class="col-md-12 float-right">
+			    {{Form::open(['class' => 'form float-right', 'style' => 'margin-top:-35px;'])}}
                     {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
 						<div class="input-group">
 							<input class="form-control" style="width: 150px;"
@@ -69,7 +69,7 @@
 					<tr>
 						<td><a class="title" title="View series"
 							   href="{$smarty.const.WWW_TOP}/series/{$s.id}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}
-						<br/><span class="label label-info">Last: {$s.previnfo|escape:"htmlall"}
+						<br/><span class="badge badge-info">Last: {$s.previnfo|escape:"htmlall"}
 							aired {$s.prevdate|date_format}</span>{/if}</td>
 						<td>{$s.publisher|escape:"htmlall"}</td>
 						<td>{$s.countries_id|escape:"htmlall"}</td>
@@ -84,7 +84,7 @@
 								   title="Remove from My Shows">Remove</a>
 							{else}
 								<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
-								   class="myshows btn btn-sm btn-primary" rel="add" name="series{$s.id}"
+								   class="myshows btn btn-sm btn-success" rel="add" name="series{$s.id}"
 								   title="Add to My Shows">Add</a>
 							{/if}
 						</td>

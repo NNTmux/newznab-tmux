@@ -24,11 +24,11 @@
 				<tr>
 					<td colspan="10">
 						<h2>{$aletter}...</h2>
-                        {{Form::open(['class' => 'form pull-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
+                        {{Form::open(['class' => 'form float-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
 							{{Form::label('title', 'Search:')}}
                             {{Form::text('title', $animetitle, ['class' => 'form-control', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
                             'placeholder' => 'Search here'])}}
-                            {{Form::button('Search', ['class' => 'btn btn-default', 'type' => 'submit'])}}
+                            {{Form::button('Search', ['class' => 'btn btn-success', 'type' => 'submit'])}}
 						{{Form::close()}}
 					</td>
 				</tr>
@@ -43,12 +43,12 @@
 					<tr>
 						<td><a class="title" title="View anime"
 							   href="{$smarty.const.WWW_TOP}/anime?id={$a->anidbid}">{$a->title|escape:"htmlall"}</a>{if {$a->startdate} != ''}
-							<br/><span class="label label-info">({$a->startdate|date_format}
+							<br/><span class="badge badge-info">({$a->startdate|date_format}
 								- {/if}{if $a->enddate != ''}{$a->enddate|date_format}){/if}</span></td>
 						<td>{if {$a->type} != ''}{$a->type|escape:"htmlall"}{/if}</td>
 						<td>{if {$a->categories} != ''}{$a->categories|escape:"htmlall"|replace:'|':', '}{/if}</td>
 						<td>{if {$a->rating} != ''}{$a->rating}{/if}</td>
-						<td><a title="View at AniDB" target="_blank" class="label label-primary"
+						<td><a title="View at AniDB" target="_blank" class="badge badge-primary"
 							   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$a->anidbid}">AniDB</a>
 						</td>
 					</tr>

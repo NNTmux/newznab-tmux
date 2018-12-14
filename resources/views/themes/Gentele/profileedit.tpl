@@ -10,9 +10,9 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="row">
-			<div class="col-lg-12 col-sm-12 col-xs-12">
-				<div class="panel panel-default">
-					<div class="panel-body pagination2">
+			<div class="col-lg-12 col-sm-12 col-12">
+				<div class="card card-default">
+					<div class="card-body">
 						{if $error != ''}
 							<div class="alert alert-danger">{$error}</div>
 						{/if}
@@ -252,7 +252,7 @@
 															<th width="200">Select type</th>
 															<td>
 																{html_options id="queuetypeids" name='queuetypeids' values=$queuetypeids output=$queuetypes selected=$user.queuetype}
-																<span class="help-block">Pick the type of queue you wish to use, once you save your profile, the page will reload, the box will appear and you can fill out the details.</span>
+																<span class="form-text.text-muted">Pick the type of queue you wish to use, once you save your profile, the page will reload, the box will appear and you can fill out the details.</span>
 															</td>
 														</tr>
 														</tbody>
@@ -365,7 +365,7 @@
 									</table>
 								</div>
 							</div>
-							<input type="submit" value="Save" class="btn btn-primary"/>
+							<input type="submit" value="Save" class="btn btn-success"/>
 						{{Form::close()}}
 					</div>
 				</div>

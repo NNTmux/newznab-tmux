@@ -49,7 +49,7 @@
 				<tr>
 					<td></td>
 					<td>
-						<input class="btn btn-default" type="submit" value="Import"/>
+						<input class="btn btn-success" type="submit" value="Import"/>
 					</td>
 				</tr>
 			</table>
@@ -71,7 +71,7 @@
 					<td></td>
 					<td>
 						<b>These NZBs will not be deleted once imported.</b><br/>
-						<input class="btn btn-default" type="submit" value="Import"/>
+						<input class="btn btn-success" type="submit" value="Import"/>
 					</td>
 				</tr>
 			</table>

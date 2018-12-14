@@ -11,7 +11,7 @@
                 {{Form::label('grouopname', 'Group')}}
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
 				&nbsp;&nbsp;
-				<input class="btn btn-default" type="submit" value="Go"/>
+				<input class="btn btn-success" type="submit" value="Go"/>
 			{{Form::close()}}
             </div>
 			<div class="col-md-4">
@@ -88,7 +88,7 @@
                 {{Form::label('grouopname', 'Group')}}
                 <input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
                 &nbsp;&nbsp;
-                <input class="btn btn-default" type="submit" value="Go"/>
+                <input class="btn btn-success" type="submit" value="Go"/>
                 {{Form::close()}}
             </div>
             <div class="col-md-4">

@@ -56,7 +56,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input class="btn btn-default" type="submit" value="Export"/>
+					<input class="btn btn-success" type="submit" value="Export"/>
 				</td>
 			</tr>
 

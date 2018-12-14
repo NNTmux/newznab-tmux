@@ -13,9 +13,9 @@
 		<div class="col-md-12">
 			<div class="row">
 				<div class="col-lg-12 portlets">
-					<div class="panel panel-default">
-						<div class="panel-body pagination2">
-                            <div class="col-md-4">
+					<div class="card card-default">
+						<div class="card-body pagination2">
+                            <div class="col-md-8">
                                 {$results->onEachSide(5)->links()}
                             </div>
 							<table class="data table table-striped responsive-utilities jambo-table Sortable"
@@ -40,7 +40,7 @@
 								{/foreach}
 								</tbody>
 							</table>
-                            <div class="col-md-4">
+                            <div class="col-md-8">
                                 {$results->onEachSide(5)->links()}
                             </div>
 						</div>
