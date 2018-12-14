@@ -13,7 +13,7 @@
 		<div class="row">
 			<div class="col-lg-12 portlets">
 				<div class="card card-default">
-					<div class="card-body pagination2">
+					<div class="card-body">
 						<div class="card-body">
 							<ul class="nav nav-tabs nav-primary">
 								<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="fa fa-user"></i>
@@ -28,7 +28,7 @@
 												<td>
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
-														<tr class="bg-aqua-active">
+														<tr class="bg-blue-sky">
 															<td colspan="2" style="padding-left: 8px;">
 																<strong>General</strong>
 															</td>
@@ -67,9 +67,9 @@
 														{/if}
 														</tbody>
 													</table>
-													<table class="data data table table-striped responsive-utilities jambo-table">
+													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
-														<tr class="bg-aqua-active">
+														<tr class="bg-blue-sky">
 															<td colspan="2" style="padding-left: 8px;"><strong>UI
 																	Preferences</strong></td>
 														</tr>
@@ -98,7 +98,7 @@
 													</table>
 													<table class="data data table table-striped responsive-utilities jambo-table">
 														<tbody>
-														<tr class="bg-aqua-active">
+														<tr class="bg-blue-sky">
 															<td colspan="2" style="padding-left: 8px;"><strong>API &
 																	Downloads</strong></td>
 														</tr>
@@ -165,7 +165,7 @@
 													{if ($user.id == $userdata.id || $isadmin) && $site->registerstatus == 1}
 														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
-															<tr class="bg-aqua-active">
+															<tr class="bg-blue-sky">
 																<td colspan="2" style="padding-left: 8px;"><strong>Invites</strong>
 																</td>
 															</tr>
@@ -216,7 +216,7 @@
 													{if isset($isadmin) && $downloadlist|@count > 0}
 														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
-															<tr class="bg-aqua-active">
+															<tr class="bg-blue-sky">
 																<td colspan="2" style="padding-left: 8px;"><strong>Downloads
 																		for user</strong>
 																</td>

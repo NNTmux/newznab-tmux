@@ -283,30 +283,32 @@
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu ml-auto">
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/cart/index"><i class="fa fa-shopping-basket"></i>My Download Basket</a>
+                            <a href="{$smarty.const.WWW_TOP}/cart/index"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
                         </li>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-list-alt"></i>My Queue</a>
+                            <a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-list-alt"></i> My Queue</a>
                         </li>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i>My Movies</a>
+                            <a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i> My Movies</a>
                         </li>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i>My Shows</a>
+                            <a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a>
                         </li>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i>Account Settings</a>
+                            <a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
                         </li>
                         {if isset($isadmin)}
                             <li class="dropdown-item">
-                                <a href="{$smarty.const.WWW_TOP}/admin/index"><i class="fa fa-cogs fa-spin"></i>Admin</a>
+                                <a href="{$smarty.const.WWW_TOP}/admin/index"><i class="fa fa-cogs fa-spin"></i> Admin</a>
                             </li>
                         {/if}
+                        <hr>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-default btn-flat"><i class="fa fa-user"></i>Profile</a>
+                            <a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-primary btn-outline-info"><i class="fa fa-user"></i> Profile</a>
                         </li>
+                        <hr>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-default btn-flat"><i class="fa fa-unlock-alt"></i>Sign out</a>
+                            <a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-primary btn-outline-info"><i class="fa fa-unlock-alt"></i> Sign out</a>
                         </li>
                         {/if}
                     </ul>
