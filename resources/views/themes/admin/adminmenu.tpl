@@ -1,5 +1,5 @@
 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-	<div class="menu_section">
+    <div class="menu_section">
 		<h3>Admin Functions</h3>
 		<ul class="nav side-menu">
 			<li><a title="Home" href="{$smarty.const.WWW_TOP}/..{$site->home_link}">Home</a></li>

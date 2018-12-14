@@ -24,7 +24,7 @@
 				<tr>
 					<td colspan="10">
 						<h2>{$aletter}...</h2>
-                        {{Form::open(['class' => 'form pull-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
+                        {{Form::open(['class' => 'form float-right', 'method' => 'get', 'name' => 'anidbsearch', 'style' =>'margin-top:-35px;'])}}
 							{{Form::label('title', 'Search:')}}
                             {{Form::text('title', $animetitle, ['class' => 'form-control', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
                             'placeholder' => 'Search here'])}}

@@ -1,7 +1,7 @@
 <h1>{$title}</h1>
 <div class="well well-sm">
 	<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/admin/predb" id="custom-search-form"
-		  class="form-inline form-horizontal col-4 col-lg-4 pull-right">
+		  class="form-inline form-horizontal col-4 col-lg-4 float-right">
 		{{csrf_field()}}
 		<div id="search" class="input-group col-12 col-lg-12">
 			<input type="text" class="form-control" placeholder="Search predb" id="presearch" name="presearch"

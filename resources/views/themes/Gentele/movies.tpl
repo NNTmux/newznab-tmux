@@ -18,7 +18,7 @@
 			<div class="card card-default">
 				<div class="card-body">
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a><br/>
@@ -53,7 +53,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-8">
 							{$results->onEachSide(5)->links()}
 						</div>
 					</div>
@@ -361,7 +361,7 @@
 						{/if}
 					{/foreach}
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a>
@@ -397,7 +397,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-8">
 							{$results->onEachSide(5)->links()}
 						</div>
 					</div>

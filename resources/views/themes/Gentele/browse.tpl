@@ -18,7 +18,7 @@
 					<div class="card card-default">
 						<div class="card-body pagination2">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-4">
 									{if isset($shows)}
 										<p>
 											<a href="{$smarty.const.WWW_TOP}/series"
@@ -70,7 +70,7 @@
 									</div>
 								</div>
 								{if    count($results) > 0}
-									<div class="col-md-4">
+									<div class="col-md-8">
 										{$results->onEachSide(5)->links()}
 									</div>
 								{/if}
@@ -190,7 +190,7 @@
 							</div>
 							<hr>
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-4">
 									<div class="nzb_multi_operations">
 										{if isset($covgroup) && $covgroup != ''}View:
 											<a href="{$smarty.const.WWW_TOP}/{$covgroup}/{$category}">Covers</a>
@@ -230,7 +230,7 @@
 									</div>
 								</div>
 								{if    count($results) > 0}
-									<div class="col-md-4">
+									<div class="col-md-8">
 										{$results->onEachSide(5)->links()}
 									</div>
 								{/if}

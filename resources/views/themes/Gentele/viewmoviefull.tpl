@@ -14,11 +14,11 @@
 			<div class="well well-sm">
 				<div id="moviefull" style="min-height:340px;">
 					{if $result->cover == 1}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"/>
 					{else}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}

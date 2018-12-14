@@ -54,7 +54,8 @@
 						<h3>Main</h3>
 						<ul class="nav side-menu">
 							{if Auth::check()}
-								<li><a><i class="fa fa-home"></i><span> Browse</span> <span
+								<li>
+                                    <a><i class="fa fa-home"></i><span> Browse</span> <span
 												class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
 										{if $userdata->hasPermissionTo('view console') == true && $userdata->hasDirectPermission('view console') == true}
@@ -85,47 +86,50 @@
 										<li><a href="{$smarty.const.WWW_TOP}/Books"><i class="fa fa-book"></i><span> Books</span></a>
 										</li>
 										{/if}
-										<li><a href="{$smarty.const.WWW_TOP}/browse/All"><i
-														class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
+										<li><a href="{$smarty.const.WWW_TOP}/browse/All"><i class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i
-														class="fa fa-object-group"></i><span> Browse Groups</span></a>
+										<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a>
 										</li>
 									</ul>
 								</li>
 							{/if}
 							<div class="clearfix"></div>
 							{if Auth::check()}
-								<li><a><i class="fa fa-edit"></i> Articles & Links <span
-												class="fa fa-chevron-down"></span></a>
+								<li>
+                                    <a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
 
 									<ul class="nav child_menu" style="display: none">
-
 										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i>
 												Search</a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS
-												Feeds</a></li>
-										<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>
-												API</a></li>
-                                        <li><a href="{$smarty.const.WWW_TOP}/apiv2help"><i class="fa fa-cloud"></i>
-                                                API V2</a></li>
+										<li>
+                                            <a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i>RSS Feeds</a>
+                                        </li>
+										<li>
+                                            <a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>API</a>
+                                        </li>
+                                        <li>
+                                            <a href="{$smarty.const.WWW_TOP}/apiv2help"><i class="fa fa-cloud"></i>API V2</a>
+                                        </li>
 									</ul>
-									<div class="clearfix"></div>
-								<li><a href="{{route('logout')}}"
+                                </li>
+                                <div class="clearfix"></div>
+								<li>
+                                    <a href="{{route('logout')}}"
 									   onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
-										<i class="fa fa-unlock"></i><span> Sign Out</span>
+										<i class="fa fa-unlock"></i><span>Sign Out</span>
 									</a>
 								</li>
 							{else}
-								<li><a href="{$smarty.const.WWW_TOP}/login"><i
-												class="fa fa-lock"></i><span> Sign In</span></a>
+								<li>
+                                    <a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
 								</li>
 							{/if}
-							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
-											class="far fa-envelope"></i><span> Contact</span></a></li>
+							<li>
+                                <a href="{$smarty.const.WWW_TOP}/contact-us"><i class="far fa-envelope"></i><span> Contact</span></a>
+                            </li>
 						</ul>
 					</div>
 				</div>

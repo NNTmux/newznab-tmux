@@ -244,10 +244,10 @@
                 {/if}
             {/foreach}
         {/if}
-        <ul class="nav navbar-left">
-            <li>
-                {{Form::open(['id' => 'headsearch_form', 'class' => 'navbar-form', 'url' => 'search', 'method' => 'get'])}}
-                <select class="form-control" id="headcat" name="t">
+        <div class="nav navbar-left">
+            {{Form::open(['id' => 'headsearch_form', 'class' => 'navbar-form', 'url' => 'search', 'method' => 'get'])}}
+            <div class="col-md-4">
+                <select class="form-control-static" id="headcat" name="t">
                     <option class="grouping" value="-1">All</option>
                     {foreach $parentcatlist as $parentcat}
                         <option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} class="grouping"
@@ -258,15 +258,19 @@
                         {/foreach}
                     {/foreach}
                 </select>
-                <input class="form-control" id="headsearch" name="search"
+            </div>
+            <div class="col-md-6">
+                <input class="form-control-static" id="headsearch" name="search"
                        value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}"
                        placeholder="Search" type="text"/>
-                <button id="headsearch_go" type="submit" class="btn btn-success"><i class="fab fa-searchengin"></i>
+            </div>
+            <div class="col-md-2">
+                <button id="headsearch_go" type="submit" class="btn btn-success">
+                    <i class="fab fa-searchengin"></i>
                 </button>
+            </div>
                 {{Form::close()}}
-            </li>
-        </ul>
-
+        </div>
         <li class="nav-parent">
             <ul class="nav navbar">
                 <li class="">
@@ -275,7 +279,7 @@
                         {if $loggedin == "true"}
                         <img src="{$smarty.const.WWW_ASSETS}/images/userimage.png"
                              alt="User Image"> {$userdata.username}
-                        <span class=" fa fa-angle-down"></span>
+                        <span class="fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu navbar-right">
                         <li class="dropdown-item">
@@ -299,11 +303,10 @@
                             </li>
                         {/if}
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-default btn-flat"><i
-                                    class="fa fa-user"></i> Profile</a>
+                            <a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-default btn-flat"><i class="fa fa-user"></i>Profile</a>
                         </li>
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-default btn-flat"><i class="fa fa-unlock-alt"></i> Sign out</a>
+                            <a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-default btn-flat"><i class="fa fa-unlock-alt"></i>Sign out</a>
                         </li>
                         {/if}
                     </ul>

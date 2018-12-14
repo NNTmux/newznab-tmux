@@ -144,7 +144,7 @@
 				<div class="well well-sm">
 					{{Form::open(['id' => 'nzb_multi_operations_form','style' => 'padding-top:10px;', 'method' => 'get', 'url' => 'search'])}}
 						<div class="row">
-							<div class="col-md-8">
+							<div class="col-md-4">
 								{if isset($shows)}
 									<p>
 										<a href="{$smarty.const.WWW_TOP}/series"
@@ -194,8 +194,8 @@
 									</div>
 								</div>
 							</div>
-							{if    count($results) > 0}
-								<div class="col-md-4">
+							{if count($results) > 0}
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							{/if}
@@ -395,7 +395,7 @@
 						</table>
 						<br/>
 						<div class="row">
-							<div class="col-md-8">
+							<div class="col-md-4">
 								<div class="nzb_multi_operations">
 									<small>With Selected:</small>
 									<div class="btn-group">
@@ -429,7 +429,7 @@
 								</div>
 							</div>
 							{if    count($results) > 0}
-								<div class="col-md-4">
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							{/if}

@@ -25,8 +25,8 @@
 	{$site->adbrowse}
 	{if $serieslist|@count > 0}
 		<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
-			<div class="col-md-12 pull-right">
-			    {{Form::open(['class' => 'form pull-right', 'style' => 'margin-top:-35px;'])}}
+			<div class="col-md-12 float-right">
+			    {{Form::open(['class' => 'form float-right', 'style' => 'margin-top:-35px;'])}}
                     {{Form::open(['name' => 'showsearch', 'class' => 'navbar-form', 'method' => 'get'])}}
 						<div class="input-group">
 							<input class="form-control" style="width: 150px;"

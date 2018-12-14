@@ -13,11 +13,11 @@
 			<div class="well well small">
 				<div id="moviefull" style="min-height:340px;">
 					{if $result->cover == 1}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg"/>
 					{else}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}
@@ -178,7 +178,7 @@
 									<hr>
 									{if $results|@count > 10}
 										<div class="row">
-											<div class="col-md-8">
+											<div class="col-md-4">
 												<div class="nzb_multi_operations">
 													{if isset($section) && $section != ''}View:
 														<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
@@ -217,7 +217,7 @@
 													</div>
 												</div>
 											</div>
-											<div class="col-md-4">
+											<div class="col-md-8">
 												{$results->onEachSide(5)->links()}
 											</div>
 										</div>

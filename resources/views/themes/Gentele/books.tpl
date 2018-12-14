@@ -19,7 +19,7 @@
 					<div class="card card-default">
 						<div class="card-body pagination2">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-4">
 									<div class="nzb_multi_operations">
 										View: <strong>Covers</strong> | <a
 												href="{$smarty.const.WWW_TOP}/browse/Books/{$categorytitle}">List</a><br/>
@@ -54,7 +54,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-3">
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							</div>
@@ -182,7 +182,7 @@
 								</div>
 							{/foreach}
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-4">
 									{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
@@ -218,7 +218,7 @@
 											</div>
 										</div>
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							</div>
