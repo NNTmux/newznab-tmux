@@ -1,4 +1,5 @@
 2018-12-14 DariusIII
+	* Chg: Update all-js.js with new version on fancybox (3.5.6)
 	* Chg: Update package.json
 	* Chg: More theme adjsutments
 	* Chg: Fix some issues in theme
