@@ -15,7 +15,7 @@
 	<div class="row">
 		<div class="col-md-12">
 			<div class="row">
-				<div class="col-lg-12 col-sm-12 col-xs-12">
+				<div class="col-lg-12 col-sm-12 col-12">
 					<div class="card card-default">
 						<div class="card-body pagination2">
 							<div class="row">
@@ -74,15 +74,15 @@
 													   title="This release has failed to download for some users"></i>{/if}
 												</a>
 												{if isset($result->url) && $result->url != ""}<a
-													class="label label-primary" target="_blank"
+													class="badge badge-primary" target="_blank"
 													href="{$site->dereferrer_link}{$result->url}"
 													name="amazon{$result->bookinfo_id}" title="View amazon/iTunes page">
 														Amazon/iTunes</a>{/if}
 												{if isset($result->nfoid) && $result->nfoid > 0}<a
 													href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-													title="View Nfo" class="label label-primary" rel="nfo">
+													title="View Nfo" class="badge badge-primary" rel="nfo">
 														NFO</a>{/if}
-												<a class="label label-primary"
+												<a class="badge badge-primary"
 												   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 												   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if isset($result->failed) && $result->failed > 0}
@@ -105,8 +105,8 @@
 																	   value="{$result->guid}"
 																	   id="chksingle"/>
 															</label>
-															<span class="label label-primary">{$result->size|filesize}</span>
-															<span class="label label-primary">Posted {$result->postdate|timeago}
+															<span class="badge badge-primary">{$result->size|filesize}</span>
+															<span class="badge badge-primary">Posted {$result->postdate|timeago}
 																ago</span>
 															<br/>
 															{if isset($result->review) && $result->review != ""}<span

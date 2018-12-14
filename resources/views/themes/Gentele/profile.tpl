@@ -108,7 +108,7 @@
 																<span id="uatd">{$apirequests}</span> {if isset($isadmin) && $apirequests > 0}
 																<a
 																		onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
-																		href="#" class="label label-danger">
+																		href="#" class="badge badge-danger">
 																		Reset</a>{/if}</td>
 														</tr>
 														<tr>
@@ -117,7 +117,7 @@
 																{$user->role->downloadrequests}
 																{if isset($isadmin) && $grabstoday > 0}
 																	<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
-																	   href="#" class="label label-danger">
+																	   href="#" class="badge badge-danger">
 																		Reset</a>
 																{/if}</td>
 														</tr>
@@ -147,7 +147,7 @@
 																<td>
 																	<a href="{$smarty.const.WWW_TOP}rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.api_token}">{$user.api_token}</a>
 																	<a href="{$smarty.const.WWW_TOP}profileedit?action=newapikey"
-																	   class="label label-danger">GENERATE NEW
+																	   class="badge badge-danger">GENERATE NEW
 																		KEY</a>
 																</td>
 															</tr>
@@ -157,7 +157,7 @@
 																		<br/>
 																	{/if}{if isset($isadmin)}<a
 																		href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes"
-																		class="label label-info">Add/Edit</a>{/if}</td>
+																		class="badge badge-info">Add/Edit</a>{/if}</td>
 															</tr>
 														{/if}
 														</tbody>

@@ -131,7 +131,7 @@
 			<a id="latest"></a>
 
 			<div class="row">
-				<div class="col-lg-12 col-sm-12 col-xs-12">
+				<div class="col-lg-12 col-sm-12 col-12">
 					<div class="card card-default">
 						<div class="card-body pagination2">
 							<div class="tabbable">
@@ -178,7 +178,7 @@
 																<div>
 																	{if $result->nfoid > 0}<span>
 																		<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-																		   class="modal_nfo label label-primary text-muted">NFO</a>
+																		   class="modal_nfo badge badge-primary text-muted">NFO</a>
 																		</span>{/if}
 																	{if $result->image == 1 && $userdata->can('preview') == true}
 																	<a
@@ -186,16 +186,16 @@
 																			name="name{$result->guid}"
 																			data-fancybox
 																			title="View Screenshot"
-																			class="label label-primary"
+																			class="badge badge-primary"
 																			rel="preview">Preview</a>{/if}
-																	<span class="label label-primary">{$result->grabs}
+																	<span class="badge badge-primary">{$result->grabs}
 																		Grab{if $result->grabs != 1}s{/if}</span>
 																	{if $result->firstaired != ""}<span
-																		class="label label-success"
+																		class="badge badge-success"
 																		title="{$result->title} Aired on {$result->firstaired|date_format}">
 																		Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
 																	{if $result->reid > 0}<span
-																		class="mediainfo label label-primary"
+																		class="mediainfo badge badge-primary"
 																		title="{$result->guid}">Media</span>{/if}
 																</div>
 															</td>
@@ -205,7 +205,7 @@
 																		class="flat" name="table_data{$seasonnum}"
 																		value="{$result->guid}"/></td>
 															<td>
-																<span class="label label-primary">{$result->category_name}</span>
+																<span class="badge badge-primary">{$result->category_name}</span>
 															</td>
 															<td width="40"
 																title="{$result->postdate}">{$result->postdate|timeago}</td>

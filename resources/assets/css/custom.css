@@ -375,10 +375,10 @@ body {
 .overflow_hidden {
     overflow: hidden; }
 
-.progress-bar-dark {
+.bg-dark {
     background-color: #34495E !important; }
 
-.progress-bar-gray {
+.bg-gray {
     background-color: #BDC3C7 !important; }
 
 table.no-margin .progress {
@@ -3730,10 +3730,10 @@ fieldset {
 .progress {
     border-radius: 0; }
 
-.progress-bar-info {
+.bg-info {
     background-color: #3498DB; }
 
-.progress-bar-success {
+.bg-success {
     background-color: #26B99A; }
 
 .progress_summary .progress {

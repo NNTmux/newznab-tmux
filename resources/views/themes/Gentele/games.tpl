@@ -16,7 +16,7 @@
 {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="box-body">
 		<div class="row">
-			<div class="col-lg-12 col-sm-12 col-xs-12">
+			<div class="col-lg-12 col-sm-12 col-12">
 				<div class="card card-default">
 					<div class="card-body pagination2">
 						<div class="row">
@@ -61,7 +61,7 @@
 
 <div class="box-body">
 	<div class="row">
-		<div class="col-lg-12 col-sm-12 col-xs-12">
+		<div class="col-lg-12 col-sm-12 col-12">
 			<div class="card card-default">
 				<div class="card-body">
 					<div class="row">
@@ -82,21 +82,21 @@
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
 													{if $result->classused == "GiantBomb"}<a
-														class="label label-default"
+														class="badge badge-default"
 														target="_blank"
 														href="{$site->dereferrer_link}{$result->url}"
 														name="giantbomb{$result->gamesinfo_id}"
 														title="View GiantBomb page">
 															GiantBomb</a>{/if}
 													{if $result->classused == "Steam"}<a
-														class="label label-default"
+														class="badge badge-default"
 														target="_blank"
 														href="{$site->dereferrer_link}{$result->url|escape:"htmlall"}"
 														name="steam{$result->gamesinfo_id}"
 														title="View Steam page">
 															Steam</a>{/if}
                                                     {if $result->classused == "IGDB"}<a
-                                                        class="label label-default"
+                                                        class="badge badge-default"
                                                         target="_blank"
                                                         href="{$site->dereferrer_link}{$result->url}"
                                                         name="igdb{$result->gamesinfo_id}"
@@ -104,10 +104,10 @@
                                                             IGDB</a>{/if}
 													{if $result->nfoid > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-														title="View NFO" class="modal_nfo label label-default"
+														title="View NFO" class="modal_nfo badge badge-default"
 														rel="nfo">
 															NFO</a>{/if}
-													<a class="label label-default"
+													<a class="badge badge-default"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result->failed)}
@@ -132,11 +132,11 @@
 																		   value="{$result->guid}"
 																		   id="chksingle"/>
 																</label>
-																<span class="label label-default">{$result->size|filesize}</span>
-																<span class="label label-default">Posted {$result->postdate|timeago}
+																<span class="badge badge-default">{$result->size|filesize}</span>
+																<span class="badge badge-default">Posted {$result->postdate|timeago}
 																	ago</span>
 																{if isset($isadmin)}<a
-																	class="label label-warning"
+																	class="badge badge-warning"
 																	href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result->guid}"
 																	title="Edit release">
 																		Edit</a>{/if}
@@ -223,7 +223,7 @@
 {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="box-body">
 		<div class="row">
-			<div class="col-lg-12 col-sm-12 col-xs-12">
+			<div class="col-lg-12 col-sm-12 col-12">
 				<div class="card card-default">
 					<div class="card-body pagination2">
 						<div class="row">

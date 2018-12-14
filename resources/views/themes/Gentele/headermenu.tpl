@@ -244,7 +244,7 @@
                 {/if}
             {/foreach}
         {/if}
-        <div class="nav navbar-left">
+        <div class="nav mr-auto">
             {{Form::open(['id' => 'headsearch_form', 'class' => 'navbar-form', 'url' => 'search', 'method' => 'get'])}}
             <div class="col-md-4">
                 <select class="form-control-static" id="headcat" name="t">
@@ -281,7 +281,7 @@
                              alt="User Image"> {$userdata.username}
                         <span class="fa fa-angle-down"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-usermenu navbar-right">
+                    <ul class="dropdown-menu dropdown-usermenu ml-auto">
                         <li class="dropdown-item">
                             <a href="{$smarty.const.WWW_TOP}/cart/index"><i class="fa fa-shopping-basket"></i>My Download Basket</a>
                         </li>

@@ -70,7 +70,7 @@
 					{{Form::close()}}
 				</div>
 			{else}
-				<label class="label label-warning" title="Topic Locked">Topic Locked</label>
+				<label class="badge badge-warning" title="Topic Locked">Topic Locked</label>
 			{/if}
 		</div>
 	{/if}

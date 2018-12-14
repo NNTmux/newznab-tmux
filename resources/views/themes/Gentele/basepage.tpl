@@ -155,31 +155,28 @@
 		<div class="right_col" role="main">
 			<div class="clearfix"></div>
 			<div class="row">
-				<div class="col-md-12 col-sm-12 col-xs-12">
+				<div class="col-md-12 col-sm-12 col-12">
 					{$content}
 					<div class="clearfix"></div>
 				</div>
 			</div>
-			<div class="container">
-				<!-- footer content -->
-				<footer>
-					<div class="copyright-info">
-						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
-							<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
-									class="fab fa-github-alt"></i>.</strong> This software is
-						open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
-						<a href="https://github.com/laravel/framework/">Laravel</a>
-					</div>
-					<div class="clearfix"></div>
-				</footer>
-				<!-- /footer content -->
-			</div>
-
 		</div>
 		<!-- /page content -->
 	</div>
-
 </div>
+<!-- footer content -->
+<footer>
+    <div class="copyright-info">
+        <strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
+            <a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
+                class="fab fa-github-alt"></i>.</strong> This software is
+        open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
+        <a href="https://github.com/laravel/framework/">Laravel</a>
+    </div>
+    <div class="clearfix"></div>
+</footer>
+<!-- /footer content -->
+
 <!-- jQuery 3.3.0 -->
 {{Html::script("{$smarty.const.WWW_ASSETS}/js/all-js.js")}}
 

@@ -8,7 +8,7 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-lg-12 col-sm-12 col-xs-12">
+	<div class="col-lg-12 col-sm-12 col-12">
 		<div class="card card-default">
 			<div class="card-body pagination2">
 				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-success btn-xs"title="This release has failed to download for some users">
@@ -17,98 +17,98 @@
 						<i class="fa fa-thumbs-o-down"></i>
 						{$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 				{if $isadmin == true || $ismod == true}
-					<a class="label label-warning"
+					<a class="badge badge-warning"
 					   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$release.guid}"
 					   title="Edit release">Edit</a>
                 {/if}
                 {if isset($isadmin)}
-					<a class="label label-danger"
+					<a class="badge badge-danger"
 					   href="{$smarty.const.WWW_TOP}/admin/release-delete/{$release.guid}"
 					   title="Delete release">Delete</a>
 				{/if}
 				{if $movie && $release.videos_id <= 0 }
 					{if $movie.imdbid > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}/"
 						   title="View at IMDB">IMDB</a>
 						<a target="_blank"
 						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$movie.imdbid}/"
 						   name="trakt{$release.imdbid}" title="View Trakt page"
-						   class="label label-primary" rel="trakt">TRAKT</a>
+						   class="badge badge-primary" rel="trakt">TRAKT</a>
 					{/if}
 					{if $movie.tmdbid > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 						   title="View at TMDb">TMDb</a>
 					{/if}
 					{if $movie.imdbid > 0}
-						<a class="label label-primary" href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}"
+						<a class="badge badge-primary" href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}"
 						   title="View all versions">Movie View</a>
 					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
-					<a class="label label-primary" href="{$smarty.const.WWW_TOP}/anime?id={$release.anidbid}"
+					<a class="badge badge-primary" href="{$smarty.const.WWW_TOP}/anime?id={$release.anidbid}"
 					   title="View all releases from this anime">View all episodes</a>
-					<a class="label label-primary"
+					<a class="badge badge-primary"
 					   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 					   title="View at AniDB" target="_blank">AniDB</a>
-					<a class="label label-primary"
+					<a class="badge badge-primary"
 					   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">Anime
 						RSS Feed</a>
 				{/if}
 				{if $show && $release.videos_id > 0}
 					<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$release.videos_id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
-					   class="label label-success">Add to My Shows</a>
-					<a class="label label-primary" href="{$smarty.const.WWW_TOP}/series/{$release.videos_id}"
+					   class="badge badge-success">Add to My Shows</a>
+					<a class="badge badge-primary" href="{$smarty.const.WWW_TOP}/series/{$release.videos_id}"
 					   title="View all releases for this series">View all episodes</a>
 					{if $show.tvdb > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
 						   title="View at TheTVDB">TheTVDB</a>
 					{/if}
 					{if $show.tvmaze > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 						   title="View at TVMaze">TVMaze</a>
 					{/if}
 					{if $show.trakt > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 						   title="View at TraktTv">Trakt</a>
 					{/if}
 					{if $show.tvrage > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 						   title="View at TV Rage">TV Rage</a>
 					{/if}
 					{if $show.tmdb > 0}
-						<a class="label label-primary" target="_blank"
+						<a class="badge badge-primary" target="_blank"
 						   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
 						   title="View at TheMovieDB">TMDb</a>
 					{/if}
 				{/if}
 				{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
-											  class="label label-primary" target="_blank">Amazon</a>{/if}
+											  class="badge badge-primary" target="_blank">Amazon</a>{/if}
 				{if $book && $book.url != ""}<a href="{$site->dereferrer_link}{$book.url}/"
-												class="label label-primary" target="_blank">Amazon</a>{/if}
+												class="badge badge-primary" target="_blank">Amazon</a>{/if}
 				{if $music && $music.url != ""}<a href="{$site->dereferrer_link}{$music.url}/"
-												  class="label label-primary" target="_blank">
+												  class="badge badge-primary" target="_blank">
 						Amazon</a>{/if}
 				{if $xxx}
-					{if $xxx.classused === "ade"}<a class="label label-primary" target="_blank"
+					{if $xxx.classused === "ade"}<a class="badge badge-primary" target="_blank"
 													href="{$site->dereferrer_link}{$xxx.directurl}"
 													title="View at Adult DVD Empire">ADE</a>
-					{elseif $xxx.classused === "adm"}<a class="label label-primary" target="_blank"
+					{elseif $xxx.classused === "adm"}<a class="badge badge-primary" target="_blank"
 														href="{$site->dereferrer_link}{$xxx.directurl}"
 														title="View at Adult DVD Marketplace">ADM</a>
-					{elseif $xxx.classused === "pop"}<a class="label label-primary" target="_blank"
+					{elseif $xxx.classused === "pop"}<a class="badge badge-primary" target="_blank"
 														href="{$site->dereferrer_link}{$xxx.directurl}"
 														title="View at Popporn">PopPorn</a>
-					{elseif $xxx.classused === "aebn"}<a class="label label-primary" target="_blank"
+					{elseif $xxx.classused === "aebn"}<a class="badge badge-primary" target="_blank"
 														 href="{$site->dereferrer_link}{$xxx.directurl}"
 														 title="View at Adult Entertainment Broadcast Network">
 							AEBN</a>
-					{elseif $xxx.classused === "hm"}<a class="label label-primary" target="_blank"
+					{elseif $xxx.classused === "hm"}<a class="badge badge-primary" target="_blank"
 													   href="{$site->dereferrer_link}{$xxx.directurl}"
 													   title="View at Hot Movies">HotMovies</a>
 					{/if}
@@ -552,13 +552,13 @@
 																	<br/>
 																	{if $rf.passworded != 1}
 																		<i class="fa fa-unlock"></i>
-																		<span class="label label-success">No Password</span>
+																		<span class="badge badge-success">No Password</span>
 																	{else}
 																		<i class="fa fa-lock"></i>
-																		<span class="label label-danger">Passworded</span>
+																		<span class="badge badge-danger">Passworded</span>
 																	{/if}
-																	<span class="label label-primary">{$rf.size|filesize}</span>
-																	<span class="label label-primary">{$rf.created_at|date_format}</span>
+																	<span class="badge badge-primary">{$rf.size|filesize}</span>
+																	<span class="badge badge-primary">{$rf.created_at|date_format}</span>
 																	<br/>
 																{/foreach}
 															</td>

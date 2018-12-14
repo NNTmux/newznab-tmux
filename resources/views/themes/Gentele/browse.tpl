@@ -14,7 +14,7 @@
 	{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 		<div class="box-body">
 			<div class="row">
-				<div class="col-md-12 col-xs-12">
+				<div class="col-md-12 col-12">
 					<div class="card card-default">
 						<div class="card-body pagination2">
 							<div class="row">
@@ -109,44 +109,44 @@
 												<i class="fa fa-exclamation-circle" style="color: red"
 												   title="This release has failed to download for some users"></i>{/if}
 												<br/>
-												<span class="label label-primary">{$result->grabs}
+												<span class="badge badge-primary">{$result->grabs}
 													Grab{if $result->grabs != 1}s{/if}</span>
 												{if $result->nfoid > 0}<span><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-															class="modal_nfo label label-primary" rel="nfo">NFO</a>
+															class="modal_nfo badge badge-primary" rel="nfo">NFO</a>
 													</span>{/if}
 												{if $result->jpgstatus == 1 && $userdata->can('preview') == true}<span><a
 															href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
 															name="name{$result->guid}"
 															data-fancybox
-															class="label label-primary"
+															class="badge badge-primary"
 															rel="preview">Sample</a></span>{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}<span><a
 															href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 															name="name{$result->guid}"
 															data-fancybox
-															class="label label-primary"
+															class="badge badge-primary"
 															rel="preview">Preview</a></span>{/if}
 												{if $result->videos_id > 0}<span><a
 															href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}"
-															class="label label-primary" rel="series">View TV</a>
+															class="badge badge-primary" rel="series">View TV</a>
 													</span>{/if}
 												{if !empty($result->firstaired)}<span
-													class="seriesinfo label label-primary" title="{$result->guid}">
+													class="seriesinfo badge badge-primary" title="{$result->guid}">
 													Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
-												{if $result->anidbid > 0}<span><a class="label label-primary"
+												{if $result->anidbid > 0}<span><a class="badge badge-primary"
 																				 href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}">View
 												Anime</a></span>{/if}
-												{if !empty($result->failed)}<span class="label label-primary">
+												{if !empty($result->failed)}<span class="badge badge-primary">
 													<i class="fa fa-thumbs-o-up"></i>
 													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>
 													{$result->failed} Failed Download{if $result->failed != 1}s{/if}
 													</span>{/if}
-												<span class="label label-primary">{$result->group_name}</span>
-												<span class="label label-primary">{$result->fromname}</span>
+												<span class="badge badge-primary">{$result->group_name}</span>
+												<span class="badge badge-primary">{$result->fromname}</span>
 											</td>
-											<td><span class="label label-primary">{$result->category_name}</span>
+											<td><span class="badge badge-primary">{$result->category_name}</span>
 											</td>
 											<td>{$result->postdate|timeago}</td>
 											<td>{$result->size|filesize}</td>

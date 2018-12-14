@@ -87,7 +87,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-lg-12 col-sm-12 col-xs-12">
+						<div class="col-lg-12 col-sm-12 col-12">
 							<div class="card card-default">
 								<div class="card-body pagination2">
 									<table style="width:100%;"
@@ -124,11 +124,11 @@
 													<a title="View details"
 													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 													<br/>
-													<span class="label label-primary">{$mgrabs[$m@index]}
+													<span class="badge badge-primary">{$mgrabs[$m@index]}
 														grab{if $mgrabs[$m@index] != 1}s{/if}</span>
 													{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-																class="modal_nfo label label-primary text-muted">NFO</a>
+																class="modal_nfo badge badge-primary text-muted">NFO</a>
 														</span>{/if}
 													{if $mpass[$m@index] == 2}
 														<i class="fa fa-lock"></i>
@@ -137,7 +137,7 @@
 													{/if}
 												</td>
 												<td class="less"><span
-															class="label label-primary">{$mcatname[$m@index]}</span>
+															class="badge badge-primary">{$mcatname[$m@index]}</span>
 												</td>
 												<td class="less mid"
 													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
