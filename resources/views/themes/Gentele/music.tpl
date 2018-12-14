@@ -14,8 +14,8 @@
 	<div class="box-body"
 	<div class="row">
 		<div class="col-lg-12 col-sm-12 col-xs-12">
-			<div class="panel panel-default">
-				<div class="panel-body pagination2">
+			<div class="card card-default">
+				<div class="card-body pagination2">
 					<div class="row">
 						<div class="col-md-8">
 							<div class="nzb_multi_operations">
@@ -36,7 +36,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
@@ -58,14 +58,14 @@
 					</div>
 					<hr>
 					{foreach $resultsadd as $result}
-						<div class="panel panel-default">
-							<div class="panel-body">
+						<div class="card card-default">
+							<div class="card-body">
 								<div class="row">
 									<div class="col-md-2 small-gutter-left">
 										<a title="View details"
 										   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">
 											<img src="{$smarty.const.WWW_TOP}/covers/music/{if $result->cover == 1}{$result->musicinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
-												 class="img-responsive img-rounded"
+												 class="img-fluid rounded"
 												 width="140" border="0"
 												 alt="{$result->artist|escape:"htmlall"} - {$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
 											<i class="fa fa-exclamation-circle" style="color: red"
@@ -85,7 +85,7 @@
 										   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 										   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 										{if !empty($result->failed)}
-											<span class="btn btn-default btn-xs"
+											<span class="btn btn-success btn-xs"
 												  title="This release has failed to download for some users">
 														<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
 												Grab{if {$result->grabs} != 1}s{/if} / <i
@@ -132,26 +132,26 @@
 														<br/>
 													{/if}
 													<div>
-														<a role="button" class="btn btn-default btn-xs"
+														<a role="button" class="btn btn-success btn-xs"
 														   data-toggle="tooltip" data-placement="top" title
 														   data-original-title="Download NZB"
 														   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																	class="fa fa-cloud-download"></i><span
 																	class="badge"> {$result->grabs}
 																Grab{if $result->grabs != 1}s{/if}</span></a>
-														<a role="button" class="btn btn-default btn-xs"
+														<a role="button" class="btn btn-success btn-xs"
 														   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 																	class="fa fa-comment-o"></i><span
 																	class="badge"> {$result->comments}
 																Comment{if $result->comments != 1}s{/if}</span></a>
-														<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+														<span class="btn btn-hover btn-success btn-xs icon icon_cart text-muted"
 															  id="guid{$result->guid}"
 															  data-toggle="tooltip" data-placement="top"
 															  title
 															  data-original-title="Send to my download basket"><i
 																	class="fa fa-shopping-basket"></i></span>
 														{if isset($sabintegrated) && $sabintegrated !=""}
-															<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+															<span class="btn btn-hover btn-success btn-xs icon icon_sab text-muted"
 																  id="guid{$result->guid}"
 																  data-toggle="tooltip" data-placement="top"
 																  title
@@ -159,7 +159,7 @@
 																		class="fa fa-share"></i></span>
 														{/if}
 														{if !empty($result->failed)}
-															<span class="btn btn-default btn-xs"
+															<span class="btn btn-success btn-xs"
 																  title="This release has failed to download for some users">
 																		<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
 																Grab{if {$result->grabs} != 1}s{/if} / <i
@@ -196,7 +196,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>

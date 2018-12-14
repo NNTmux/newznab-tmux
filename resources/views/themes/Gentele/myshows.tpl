@@ -9,11 +9,11 @@
 		</div>
 	</div>
 	<div class="btn-group">
-		<a class="btn btn-sm btn-default" title="View available TV series" href="{$smarty.const.WWW_TOP}/series">View
+		<a class="btn btn-sm btn-success" title="View available TV series" href="{$smarty.const.WWW_TOP}/series">View
 			all series</a>
-		<a class="btn btn-sm btn-default" title="View a list of all releases in your shows"
+		<a class="btn btn-sm btn-success" title="View a list of all releases in your shows"
 		   href="{$smarty.const.WWW_TOP}/myshows/browse">View releases for My Shows</a>
-		<a class="btn btn-sm btn-default" title="All releases in your shows as an RSS feed"
+		<a class="btn btn-sm btn-success" title="All releases in your shows as an RSS feed"
 		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS Feed for
 			My Shows <i class="fa fa-rss"></i></a>
 	</div>
@@ -22,8 +22,8 @@
 		<div class="box-body">
 			<div class="row">
 				<div class="col-lg-12 portlets">
-					<div class="panel panel-default">
-						<div class="panel-body pagination2">
+					<div class="card card-default">
+						<div class="card-body pagination2">
 							<table class="data table table-striped responsive-utilities jambo-table">
 								<tr>
 									<th>Name</th>

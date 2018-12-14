@@ -28,7 +28,7 @@
 							{{Form::label('title', 'Search:')}}
                             {{Form::text('title', $animetitle, ['class' => 'form-control', 'style' => 'width: 150px;', 'id'=> 'title appendedInputButton',
                             'placeholder' => 'Search here'])}}
-                            {{Form::button('Search', ['class' => 'btn btn-default', 'type' => 'submit'])}}
+                            {{Form::button('Search', ['class' => 'btn btn-success', 'type' => 'submit'])}}
 						{{Form::close()}}
 					</td>
 				</tr>

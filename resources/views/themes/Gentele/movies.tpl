@@ -1,5 +1,5 @@
-<div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-	 xmlns="http://www.w3.org/1999/html">
+<div class="header"
+	>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -15,8 +15,8 @@
 	<div class="box-body"
 	<div class="row">
 		<div class="col-lg-12 col-sm-12 col-xs-12">
-			<div class="panel panel-default">
-				<div class="panel-body pagination2">
+			<div class="card card-default">
+				<div class="card-body">
 					<div class="row">
 						<div class="col-md-8">
 							<div class="nzb_multi_operations">
@@ -37,7 +37,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
@@ -68,8 +68,8 @@
 							<div class="row">
 								<!-- Left -->
 								<div class="col-md-6 small-gutter-right movie-height">
-									<div class="panel panel-default">
-										<div class="panel-body">
+									<div class="card card-default">
+										<div class="card-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{foreach $result->languages as $movielanguage}
@@ -92,7 +92,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
-																class="cover img-responsive img-rounded"
+																class="cover img-fluid rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -155,25 +155,25 @@
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-success btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-success btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	<span class="btn btn-hover btn-success btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
 																		  data-toggle="tooltip" data-placement="top" title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		<span class="btn btn-hover btn-success btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
@@ -184,14 +184,14 @@
 																		<span
 																				id="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"
 																				href="javascript:;"
-																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				class="btn btn-hover btn-success btn-xs sendtocouch text-muted"
 																				data-toggle="tooltip" data-placement="top"
 																				title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
-																		<span class="btn btn-default btn-xs"
+																		<span class="btn btn-success btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -213,8 +213,8 @@
 								{else}
 								<!-- Right -->
 								<div class="col-md-6 small-gutter-left movie-height">
-									<div class="panel panel-default">
-										<div class="panel-body">
+									<div class="card card-default">
+										<div class="card-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{foreach $result->languages as $movielanguage}
@@ -237,7 +237,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
-																class="cover img-responsive img-rounded"
+																class="cover img-fluid rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -300,25 +300,25 @@
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-success btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-success btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	<span class="btn btn-hover btn-success btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
 																		  data-toggle="tooltip" data-placement="top" title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		<span class="btn btn-hover btn-success btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
@@ -329,14 +329,14 @@
 																		<span
 																				id="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"
 																				href="javascript:;"
-																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				class="btn btn-hover btn-success btn-xs sendtocouch text-muted"
 																				data-toggle="tooltip" data-placement="top"
 																				title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
-																		<span class="btn btn-default btn-xs"
+																		<span class="btn btn-success btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -381,7 +381,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>

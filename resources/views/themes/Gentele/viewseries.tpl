@@ -39,7 +39,7 @@
 		</div>
 	</div>
 	<div class="btn-group">
-		<a class="btn btn-sm btn-default"
+		<a class="btn btn-sm btn-success"
 		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS
 			for TV Show <i class="fa fa-rss"></i></a>
 		{if $show.tvdb > 0}
@@ -87,7 +87,7 @@
 
 					{if isset($sabintegrated) && $sabintegrated !=""}
 						<button type="button"
-								class="nzb_multi_operations_sab btn btn-sm btn-primary"
+								class="nzb_multi_operations_sab btn btn-sm btn-success"
 								data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
 							<i class="fa fa-share"></i></button>
 					{/if}
@@ -132,8 +132,8 @@
 
 			<div class="row">
 				<div class="col-lg-12 col-sm-12 col-xs-12">
-					<div class="panel panel-default">
-						<div class="panel-body pagination2">
+					<div class="card card-default">
+						<div class="card-body pagination2">
 							<div class="tabbable">
 								<ul class="nav nav-tabs">
 									{foreach $seasons as $seasonnum => $season}

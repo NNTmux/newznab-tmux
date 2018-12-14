@@ -23,14 +23,14 @@
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}
 					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"} ({$result->year})</span>
-					<a class="btn btn-transparent btn-primary" target="_blank"
+					<a class="btn btn-transparent btn-success" target="_blank"
 					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 					   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page">IMDB</a>
-					<a class="btn btn-transparent btn-primary" target="_blank"
+					<a class="btn btn-transparent btn-success" target="_blank"
 					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 					   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page" rel="trakt">TRAKT</a>
                     {if (!empty($result->tmdbid))}
-                        <a class="btn btn-transparent btn-primary" target="_blank"
+                        <a class="btn btn-transparent btn-success" target="_blank"
                             href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                             name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                     {/if}
@@ -83,7 +83,7 @@
 
 							{if isset($sabintegrated) && $sabintegrated !=""}
 								<button type="button"
-										class="nzb_multi_operations_sab btn btn-sm btn-primary"
+										class="nzb_multi_operations_sab btn btn-sm btn-success"
 										data-toggle="tooltip" data-placement="top" title
 										data-original-title="Send to Queue">
 									<i class="fa fa-share"></i></button>
@@ -100,8 +100,8 @@
 					</div>
 					<div class="row">
 						<div class="col-lg-12 col-sm-12 col-xs-12">
-							<div class="panel panel-default">
-								<div class="panel-body pagination2">
+							<div class="card card-default">
+								<div class="card-body pagination2">
 									<table style="width:100%;"
 										   class="data table table-striped responsive-utilities jambo-table">
 										<tr>
@@ -217,7 +217,7 @@
 
 														{if isset($sabintegrated) && $sabintegrated !=""}
 															<button type="button"
-																	class="nzb_multi_operations_sab btn btn-sm btn-primary"
+																	class="nzb_multi_operations_sab btn btn-sm btn-success"
 																	data-toggle="tooltip" data-placement="top" title
 																	data-original-title="Send to Queue">
 																<i class="fa fa-share"></i></button>

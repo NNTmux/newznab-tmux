@@ -52,7 +52,7 @@
 							</div>
 						</div><!-- /.col -->
 						<div class="col-xs-4">
-							<button type="submit" value="Register" class="btn btn-primary btn-block btn-flat">Register
+							<button type="submit" value="Register" class="btn btn-success btn-block btn-flat">Register
 							</button>
 						</div><!-- /.col -->
 						<hr>

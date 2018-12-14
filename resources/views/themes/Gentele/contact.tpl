@@ -23,8 +23,8 @@
                 <div class="box-content">
                     <div class="row">
                         <div class="col-lg-12 col-sm-12 col-xs-12">
-                            <div class="panel panel-default">
-                                <div class="panel-body pagination2">
+                            <div class="card card-default">
+                                <div class="card-body pagination2">
                                     <div class="box-body">
                                         <div class="row">
                                             <div class="col-sm-8">
@@ -55,7 +55,7 @@
                                                 {if {config('captcha.enabled')} == 1 && !empty({config('captcha.sitekey')}) && !empty({config('captcha.secret')})}
                                                     {NoCaptcha::display()}{NoCaptcha::renderJs()}
                                                 {/if}
-                                                <button type="submit" class="btn btn-primary m-t-20">
+                                                <button type="submit" class="btn btn-success m-t-20">
                                                     Send message
                                                 </button>
                                                 {{Form::close()}}

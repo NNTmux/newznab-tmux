@@ -9,9 +9,9 @@
 </div>
 <div class="row">
 	<div class="col-lg-12 col-sm-12 col-xs-12">
-		<div class="panel panel-default">
-			<div class="panel-body pagination2">
-				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"title="This release has failed to download for some users">
+		<div class="card card-default">
+			<div class="card-body pagination2">
+				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-success btn-xs"title="This release has failed to download for some users">
 						<i class="fa fa-thumbs-o-up"></i>
 						{$release.grabs} Grab{if $release.grabs != 1}s{/if} /
 						<i class="fa fa-thumbs-o-down"></i>
@@ -236,17 +236,17 @@
 										{/if}
 										<br/><br/>
 										<div class="btn-group btn-group-vertical">
-											<a class="btn btn-primary btn-sm btn-success btn-transparent"
+											<a class="btn btn-success btn-sm btn-success btn-transparent"
 											   href="{$smarty.const.WWW_TOP}/getnzb?id={$release.guid}"><i
 														class="fa fa-cloud-download"></i> Download</a>
 											<button type="button"
-													class="btn btn-primary btn-sm btn-info btn-transparent cartadd">
+													class="btn btn-success btn-sm btn-info btn-transparent cartadd">
 												<i class="icon_cart fa fa-shopping-basket guid"
 												   id="guid{$release.guid}"></i> Add to Cart
 											</button>
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
-														class="btn btn-primary btn-sm btn-transparent sabsend">
+														class="btn btn-success btn-sm btn-transparent sabsend">
 													<i class="icon_sab fa fa-arrow-right"
 													   id="guid{$release.guid}"></i> Send to Queue
 												</button>
@@ -257,7 +257,7 @@
 															type="button"
 															id="imdb{$movie.imdbid}"
 															href="javascript:;"
-															class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
+															class="btn btn-success btn-sm btn-info btn-transparent sendtocouch">
 														<i class="fa fa-bed"></i>
 														Send to CouchPotato
 													</button>
@@ -265,7 +265,7 @@
 											{/if}
 											{if $weHasVortex}
 												<button type="button"
-														class="btn btn-primary btn-sm btn-transparent vortexsend">
+														class="btn btn-success btn-sm btn-transparent vortexsend">
 													<i class="icon_sab fa fa-arrow-right"
 													   id="guid{$release.guid}"></i> Send to
 													NZBVortex
@@ -679,7 +679,7 @@
 									<label for="txtAddComment">Add Comment:</label><br/>
 									<textarea id="txtAddComment" name="txtAddComment" rows="6" cols="60"></textarea>
 									<br/>
-                                    {{Form::submit('Submit', ['class' => 'btn btn-default'])}}
+                                    {{Form::submit('Submit', ['class' => 'btn btn-success'])}}
 								{{Form::close()}}
 							</div>
 							{if $release.jpgstatus == 1 && $userdata->can('preview') == true}

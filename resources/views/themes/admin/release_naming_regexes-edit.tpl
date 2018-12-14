@@ -1,5 +1,5 @@
 <div class="well well-sm">
-	<h1 xmlns="http://www.w3.org/1999/html">{$title}</h1>
+	<h1>{$title}</h1>
 	{if isset($error) && $error != ''}
 		<div class="error">{$error}</div>
 	{/if}
@@ -74,7 +74,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input class="btn btn-default" type="submit" value="Save"/>
+					<input class="btn btn-success" type="submit" value="Save"/>
 				</td>
 			</tr>
 		</table>

@@ -20,6 +20,7 @@ mix
     .styles(
         [
             'node_modules/bootstrap/dist/css/bootstrap.min.css',
+            'node_modules/bootstrap/dist/css/bootstrap-reboot.css',
             'node_modules/icheck/skins/flat/green.css',
             'node_modules/datatables/media/css/jquery.dataTables.min.css',
             'node_modules/animate.css/animate.min.css',
@@ -30,14 +31,13 @@ mix
             'node_modules/pnotify/dist/PNotifyBrightTheme.css',
             'node_modules/flexboxgrid2/flexboxgrid2.min.css',
             'node_modules/multiselect/css/multi-select.css',
-            'node_modules/normalize.css/normalize.css',
             'resources/assets/css/custom.css'
     ], 'public/assets/css/all-css.css')
     .scripts(
         [
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/jquery-migrate/dist/jquery-migrate.min.js',
-            'node_modules/bootstrap/dist/js/bootstrap.min.js',
+            'node_modules/bootstrap/dist/js/bootstrap.bundle.js',
             'node_modules/@fortawesome/fontawesome-free/js/all.min.js',
             'node_modules/@fortawesome/fontawesome-free/js/v4-shims.min.js',
             'node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js',

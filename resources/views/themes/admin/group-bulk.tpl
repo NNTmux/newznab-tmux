@@ -50,7 +50,7 @@
 				<tr>
 					<td></td>
 					<td>
-						<input class="btn btn-default" type="submit" value="Add Groups"/>
+						<input class="btn btn-success" type="submit" value="Add Groups"/>
 					</td>
 				</tr>
 

@@ -53,7 +53,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input class="btn btn-default" type="submit" value="Test"/>
+					<input class="btn btn-success" type="submit" value="Test"/>
 				</td>
 			</tr>
 		</table>

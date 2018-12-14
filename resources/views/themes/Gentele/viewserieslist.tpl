@@ -18,8 +18,8 @@
 		{/foreach}]
 	</p>
 	<div class="btn-group">
-		<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
-		<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my
+		<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
+		<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my
 			shows</a>
 	</div>
 	{$site->adbrowse}
@@ -84,7 +84,7 @@
 								   title="Remove from My Shows">Remove</a>
 							{else}
 								<a href="{$smarty.const.WWW_TOP}/myshows?action=add&id={$s.id}&from={$smarty.server.REQUEST_URI|escape:"url"}"
-								   class="myshows btn btn-sm btn-primary" rel="add" name="series{$s.id}"
+								   class="myshows btn btn-sm btn-success" rel="add" name="series{$s.id}"
 								   title="Add to My Shows">Add</a>
 							{/if}
 						</td>

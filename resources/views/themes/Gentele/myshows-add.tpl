@@ -5,6 +5,6 @@
 		{if isset($from)}<input type="hidden" name="from" value="{$from}" />{/if}
 		{html_checkboxes name='category' values=$cat_ids output=$cat_names selected=$cat_selected separator='<br />'}
 		<br/>
-		<input class="btn btn-primary" type="submit" name="{$type}" value="{$type|ucwords}"/>
+		<input class="btn btn-success" type="submit" name="{$type}" value="{$type|ucwords}"/>
 	{{Form::close()}}
 </div>

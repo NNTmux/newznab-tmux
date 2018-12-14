@@ -39,7 +39,7 @@
 					</div><!-- /.col -->
 					<hr>
 					<div class="col-xs-12">
-						<button type="submit" class="btn btn-primary btn-block btn-flat">Request Password Reset</button>
+						<button type="submit" class="btn btn-success btn-block btn-flat">Request Password Reset</button>
 					</div><!-- /.col -->
 				</div>
 			{{Form::close()}}

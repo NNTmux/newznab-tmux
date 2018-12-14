@@ -12,16 +12,16 @@
 	<div class="col-md-12">
 		<div class="row">
 			<div class="col-lg-12 portlets">
-				<div class="panel panel-default">
-					<div class="panel-body pagination2">
-						<div class="panel-body">
+				<div class="card card-default">
+					<div class="card-body pagination2">
+						<div class="card-body">
 							<ul class="nav nav-tabs nav-primary">
 								<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="fa fa-user"></i>
 										Main</a></li>
 							</ul>
 							<div class="tab-content">
 								<div class="tab-pane fade active in" id="tab2_1">
-									<div id="tab-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+									<div id="tab-1" class="ui-tabs-card ui-widget-content ui-corner-bottom">
 										<table cellpadding="0" cellspacing="0" width="100%">
 											<tbody>
 											<tr valign="top">
@@ -253,7 +253,7 @@
 							</div>
 						</div>
 						{if isset($isadmin) || !$publicview}
-							<a class="btn btn-primary" href="{$smarty.const.WWW_TOP}profileedit">Edit
+							<a class="btn btn-success" href="{$smarty.const.WWW_TOP}profileedit">Edit
 								Profile</a>
 						{/if}
 						{if !isset($isadmin)}
