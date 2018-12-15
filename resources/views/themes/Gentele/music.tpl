@@ -71,7 +71,7 @@
 											<i class="fa fa-exclamation-circle" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 										</a>
-										{if $result->url != ""}<a class="badge badge-primary"
+										{if $result->url != ""}<a class="badge badge-info"
 																 target="_blank"
 																 href="{$site->dereferrer_link}{$result->url}"
 																 name="amazon{$result->musicinfo_id}"
@@ -79,9 +79,9 @@
 												Amazon</a>{/if}
 										{if $result->nfoid > 0}<a
 											href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-											title="View NFO" class="badge badge-primary" rel="nfo">
+											title="View NFO" class="badge badge-info" rel="nfo">
 												NFO</a>{/if}
-										<a class="badge badge-primary"
+										<a class="badge badge-info"
 										   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 										   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 										{if !empty($result->failed)}
@@ -108,8 +108,8 @@
 															   class="flat"
 															   value="{$result->guid}" id="chksingle"/>
 													</label>
-													<span class="badge badge-primary">{$result->size|filesize}</span>
-													<span class="badge badge-primary">Posted {$result->postdate|timeago}
+													<span class="badge badge-info">{$result->size|filesize}</span>
+													<span class="badge badge-info">Posted {$result->postdate|timeago}
 														ago</span>
 													{if isset($isadmin)}<a class="badge badge-warning"
 																		   href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result->guid}"

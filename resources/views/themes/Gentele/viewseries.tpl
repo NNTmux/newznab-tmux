@@ -178,7 +178,7 @@
 																<div>
 																	{if $result->nfoid > 0}<span>
 																		<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-																		   class="modal_nfo badge badge-primary text-muted">NFO</a>
+																		   class="modal_nfo badge badge-info text-muted">NFO</a>
 																		</span>{/if}
 																	{if $result->image == 1 && $userdata->can('preview') == true}
 																	<a
@@ -186,16 +186,16 @@
 																			name="name{$result->guid}"
 																			data-fancybox
 																			title="View Screenshot"
-																			class="badge badge-primary"
+																			class="badge badge-info"
 																			rel="preview">Preview</a>{/if}
-																	<span class="badge badge-primary">{$result->grabs}
+																	<span class="badge badge-info">{$result->grabs}
 																		Grab{if $result->grabs != 1}s{/if}</span>
 																	{if $result->firstaired != ""}<span
 																		class="badge badge-success"
 																		title="{$result->title} Aired on {$result->firstaired|date_format}">
 																		Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>{/if}
 																	{if $result->reid > 0}<span
-																		class="mediainfo badge badge-primary"
+																		class="mediainfo badge badge-info"
 																		title="{$result->guid}">Media</span>{/if}
 																</div>
 															</td>
@@ -205,7 +205,7 @@
 																		class="flat" name="table_data{$seasonnum}"
 																		value="{$result->guid}"/></td>
 															<td>
-																<span class="badge badge-primary">{$result->category_name}</span>
+																<span class="badge badge-info">{$result->category_name}</span>
 															</td>
 															<td width="40"
 																title="{$result->postdate}">{$result->postdate|timeago}</td>

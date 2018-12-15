@@ -121,21 +121,21 @@
 												<div>
 													{if $result->nfoid > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-																class="modal_nfo badge badge-primary text-muted">NFO</a>
+																class="modal_nfo badge badge-info text-muted">NFO</a>
 														</span>{/if}
 													{if $result->haspreview == 1 && $userdata->can('preview') == true}<a
 														href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 														name="name{$result->guid}"
 														title="Screenshot of {$result->searchname|escape:"htmlall"}"
-														class="badge badge-primary" rel="preview">Preview</a>{/if}
-													<span class="badge badge-primary">{$result->grabs}
+														class="badge badge-info" rel="preview">Preview</a>{/if}
+													<span class="badge badge-info">{$result->grabs}
 														Grab{if $result->grabs != 1}s{/if}</span>
-													{if $result->reid > 0}<span class="mediainfo badge badge-primary"
+													{if $result->reid > 0}<span class="mediainfo badge badge-info"
 																			   title="{$result->guid}">Media</span>{/if}
 												</div>
 											</div>
 										</td>
-										<td><span class="badge badge-primary">{$result->category_name}</span></td>
+										<td><span class="badge badge-info">{$result->category_name}</span></td>
 										<td width="40" title="{$result->postdate}">{$result->postdate|timeago}</td>
 										<td>{$result->size|filesize}</td>
 										<td class="icon_nzb"><a

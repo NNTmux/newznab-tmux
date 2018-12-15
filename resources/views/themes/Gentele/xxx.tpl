@@ -145,9 +145,9 @@
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View NFO" class="badge badge-primary"
+															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="badge badge-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->grp_release_grpname}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
@@ -172,10 +172,10 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="badge badge-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br>
 																<div class="release-subtitle">{if $result->genre != ''}Genre: {$result->genre}, {/if}</div>
@@ -313,9 +313,9 @@
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View NFO" class="badge badge-primary"
+															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="badge badge-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->grp_release_grpname}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
@@ -339,10 +339,10 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="badge badge-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br>
 																<div class="release-subtitle">{if $result->genre != ''}Genre: {$result->genre}, {/if}</div>

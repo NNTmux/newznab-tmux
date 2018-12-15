@@ -38,7 +38,7 @@
 											   href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 										</td>
 										<td>
-											<span class="badge badge-primary">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
+											<span class="badge badge-info">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
 										</td>
 										<td title="Added on {$show.created_at}">{$show.created_at|date_format}</td>
 										<td>

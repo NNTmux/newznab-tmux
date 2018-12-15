@@ -103,24 +103,24 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page"
-													   class="badge badge-primary" rel="imdb">IMDB</a>
+													   class="badge badge-info" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
-													   class="badge badge-primary" rel="trakt">TRAKT</a>
+													   class="badge badge-info" rel="trakt">TRAKT</a>
                                                     {if (!empty($result->tmdbid))}
-                                                        <a class="badge badge-primary" rel="tmdb" target="_blank"
+                                                        <a class="badge badge-info" rel="tmdb" target="_blank"
                                                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View NFO" class="modal_nfo badge badge-primary"
+															title="View NFO" class="modal_nfo badge badge-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="badge badge-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="badge badge-primary" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
+													<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -143,13 +143,13 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-primary">{$result->year}</span>
-																<span class="badge badge-primary">{if $result->rating != ''}{$result->rating}/10{/if}</span>
-																<span class="badge badge-primary">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
-																<span class="badge badge-primary">{$msize[$m@index]|filesize}</span>
-																<span class="badge badge-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{$result->year}</span>
+																<span class="badge badge-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
+																<span class="badge badge-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
+																<span class="badge badge-info">{$msize[$m@index]|filesize}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
@@ -248,24 +248,24 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page"
-													   class="badge badge-primary" rel="imdb">IMDB</a>
+													   class="badge badge-info" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
-													   class="badge badge-primary" rel="trakt">TRAKT</a>
+													   class="badge badge-info" rel="trakt">TRAKT</a>
                                                     {if (!empty($result->tmdbid))}
-                                                        <a class="badge badge-primary" rel="tmdb" target="_blank"
+                                                        <a class="badge badge-info" rel="tmdb" target="_blank"
                                                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-																title="View NFO" class="modal_nfo badge badge-primary">NFO</a>
+																title="View NFO" class="modal_nfo badge badge-info">NFO</a>
 														</span>{/if}
-													<a class="badge badge-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="badge badge-primary" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
+													<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -288,13 +288,13 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="badge badge-primary">{$result->year}</span>
-																<span class="badge badge-primary">{if $result->rating != ''}{$result->rating}/10{/if}</span>
-																<span class="badge badge-primary">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
-																<span class="badge badge-primary">{$msize[$m@index]|filesize}</span>
-																<span class="badge badge-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{$result->year}</span>
+																<span class="badge badge-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
+																<span class="badge badge-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
+																<span class="badge badge-info">{$msize[$m@index]|filesize}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a

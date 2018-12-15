@@ -48,7 +48,7 @@
 						<td>{if {$a->type} != ''}{$a->type|escape:"htmlall"}{/if}</td>
 						<td>{if {$a->categories} != ''}{$a->categories|escape:"htmlall"|replace:'|':', '}{/if}</td>
 						<td>{if {$a->rating} != ''}{$a->rating}{/if}</td>
-						<td><a title="View at AniDB" target="_blank" class="badge badge-primary"
+						<td><a title="View at AniDB" target="_blank" class="badge badge-info"
 							   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$a->anidbid}">AniDB</a>
 						</td>
 					</tr>
