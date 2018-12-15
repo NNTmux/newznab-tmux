@@ -49,88 +49,117 @@
 				<br/>
 				<div class="clearfix"></div>
 				<!-- sidebar menu -->
-				<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-					<div class="menu_section">
-						<h3>Main</h3>
-						<ul class="nav side-menu">
-							{if Auth::check()}
-								<li>
-                                    <a><i class="fa fa-home"></i><span> Browse</span> <span
-												class="fa fa-chevron-down"></span></a>
-									<ul class="nav child_menu" style="display: none">
-										{if $userdata->hasPermissionTo('view console') == true && $userdata->hasDirectPermission('view console') == true}
-											<li><a href="{$smarty.const.WWW_TOP}/Console"><i
-														class="fa fa-gamepad"></i><span> Console</span></a></li>
-										{/if}
-										{if $userdata->hasPermissionTo('view movies') == true && $userdata->hasDirectPermission('view movies') == true}
-										<li><a href="{$smarty.const.WWW_TOP}/Movies"><i
-														class="fa fa-film"></i><span> Movies</span></a></li>
-										{/if}
-										{if $userdata->hasPermissionTo('view audio') == true && $userdata->hasDirectPermission('view audio') == true}
-										<li><a href="{$smarty.const.WWW_TOP}/Audio"><i
-														class="fa fa-music"></i><span> Audio</span></a></li>
-										{/if}
-										{if $userdata->hasPermissionTo('view pc') == true && $userdata->hasDirectPermission('view pc') == true}
-										<li><a href="{$smarty.const.WWW_TOP}/Games"><i
-														class="fa fa-gamepad"></i><span> Games</span></a></li>
-										{/if}
-										{if $userdata->hasPermissionTo('view tv') == true && $userdata->hasDirectPermission('view tv') == true}
-										<li><a href="{$smarty.const.WWW_TOP}/series"><i
-														class="fa fa-television"></i><span> TV</span></a></li>
-										{/if}
-										{if $userdata->hasPermissionTo('view adult') == true && $userdata->hasDirectPermission('view adult') == true}
-										<li><a href="{$smarty.const.WWW_TOP}/XXX"><i class="fa fa-venus-mars"></i><span> Adult</span></a>
-										</li>
-										{/if}
-										{if $userdata->hasPermissionTo('view books') == true && $userdata->hasDirectPermission('view books') == true}
-										<li><a href="{$smarty.const.WWW_TOP}/Books"><i class="fa fa-book"></i><span> Books</span></a>
-										</li>
-										{/if}
-										<li><a href="{$smarty.const.WWW_TOP}/browse/All"><i class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
-										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a>
-										</li>
-									</ul>
-								</li>
-							{/if}
-							<div class="clearfix"></div>
-							{if Auth::check()}
-								<li>
-                                    <a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
-
-									<ul class="nav child_menu" style="display: none">
-										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
-										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i> Search</a>
-										</li>
-										<li>
-                                            <a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a>
-                                        </li>
-										<li>
-                                            <a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a>
-                                        </li>
-                                        <li>
-                                            <a href="{$smarty.const.WWW_TOP}/apiv2help"><i class="fa fa-cloud"></i> API V2</a>
-                                        </li>
-									</ul>
-                                </li>
-                                <div class="clearfix"></div>
-								<li>
-                                    <a href="{{route('logout')}}"
-									   onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
-										<i class="fa fa-unlock"></i><span>Sign Out</span>
+				<div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
+					<ul class="list-group">
+						<li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+							<small>MAIN MENU</small>
+						</li>
+						{if Auth::check()}
+							<a href="#submenu1" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+								<div class="d-flex w-100 justify-content-start align-items-center">
+									<span class="fa fa-dashboard fa-fw mr-3"></span>
+									<span class="menu-collapsed">Browse</span>
+									<span class="submenu-icon ml-auto"></span>
+								</div>
+							</a>
+							<div id='submenu1' class="collapse sidebar-submenu">
+								{if $userdata->hasPermissionTo('view console') == true && $userdata->hasDirectPermission('view console') == true}
+									<a href="{$smarty.const.WWW_TOP}/Console" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-gamepad"></span>
+										<span class="menu-collapsed">Console</span>
 									</a>
-								</li>
-							{else}
-								<li>
-                                    <a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
-								</li>
-							{/if}
-							<li>
-                                <a href="{$smarty.const.WWW_TOP}/contact-us"><i class="far fa-envelope"></i><span> Contact</span></a>
-                            </li>
-						</ul>
-					</div>
+								{/if}
+								{if $userdata->hasPermissionTo('view movies') == true && $userdata->hasDirectPermission('view movies') == true}
+									<a href="{$smarty.const.WWW_TOP}/Movies" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-film"></span>
+										<span class="menu-collapsed">Movies</span>
+									</a>
+								{/if}
+								{if $userdata->hasPermissionTo('view audio') == true && $userdata->hasDirectPermission('view audio') == true}
+									<a href="{$smarty.const.WWW_TOP}/Audio" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-music"></span>
+										<span class="menu-collapsed">Audio</span>
+									</a>
+								{/if}
+								{if $userdata->hasPermissionTo('view pc') == true && $userdata->hasDirectPermission('view pc') == true}
+									<a href="{$smarty.const.WWW_TOP}/Games" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-gamepad"></span>
+										<span class="menu-collapsed">Games</span>
+									</a>
+								{/if}
+								{if $userdata->hasPermissionTo('view tv') == true && $userdata->hasDirectPermission('view tv') == true}
+									<a href="{$smarty.const.WWW_TOP}/series" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-television"></span>
+										<span class="menu-collapsed">TV</span>
+									</a>
+								{/if}
+								{if $userdata->hasPermissionTo('view adult') == true && $userdata->hasDirectPermission('view adult') == true}
+									<a href="{$smarty.const.WWW_TOP}/XXX" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-venus-mars"></span>
+										<span class="menu-collapsed">Adult</span>
+									</a>
+								{/if}
+								{if $userdata->hasPermissionTo('view books') == true && $userdata->hasDirectPermission('view books') == true}
+									<a href="{$smarty.const.WWW_TOP}/Books" class="list-group-item list-group-item-action bg-dark text-white">
+										<span class="fa fa-book-open"></span>
+										<span class="menu-collapsed">Books</span>
+									</a>
+								{/if}
+								<a href="{$smarty.const.WWW_TOP}/browse/All" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-list-ul"></span>
+									<span class="menu-collapsed">Browse All Releases</span>
+								</a>
+								<a href="{$smarty.const.WWW_TOP}/browsegroup" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-layer-group"></span>
+									<span class="menu-collapsed">Browse Groups</span>
+								</a>
+							</div>
+							<a href="#submenu2" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+								<div class="d-flex w-100 justify-content-start align-items-center">
+									<span class="fa fa-edit fa-fw mr-3"></span>
+									<span class="menu-collapsed">Articles & Links</span>
+									<span class="submenu-icon ml-auto"></span>
+								</div>
+							</a>
+							<!-- Submenu content -->
+							<div id='submenu2' class="collapse sidebar-submenu">
+								<a href="{$smarty.const.WWW_TOP}/forum" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-forumbee"></span>
+									<span class="menu-collapsed">Forum</span>
+								</a>
+								<a href="{$smarty.const.WWW_TOP}/search" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-searchengin"></span>
+									<span class="menu-collapsed">Search</span>
+								</a>
+								<a href="{$smarty.const.WWW_TOP}/rss" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-rss-square"></span>
+									<span class="menu-collapsed">RSS Feeds</span>
+								</a>
+								<a href="{$smarty.const.WWW_TOP}/apihelp" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-hire-a-helper"></span>
+									<span class="menu-collapsed">API</span>
+								</a>
+								<a href="{$smarty.const.WWW_TOP}/apiv2help" class="list-group-item list-group-item-action bg-dark text-white">
+									<span class="fa fa-hire-a-helper"></span>
+									<span class="menu-collapsed">API V2</span>
+								</a>
+							</div>
+							<a href="{{route('logout')}}" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white"
+							   onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
+								<span class="fa fa-unlock"></span>
+								<span>Sign Out</span>
+							</a>
+						{else}
+							<a href="{$smarty.const.WWW_TOP}/login" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+								<span class="fa fa-lock"></span>
+								<span>Sign In</span>
+							</a>
+						{/if}
+						<a href="{$smarty.const.WWW_TOP}/contact-us" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+							<span class="fa fa-envelope-open-text"></span>
+							<span>Contact</span>
+						</a>
+					</ul>
 				</div>
 				<!-- /sidebar menu -->
 			</div>
@@ -165,14 +194,14 @@
 </div>
 <!-- footer content -->
 <footer>
-    <div class="copyright-info">
-        <strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
-            <a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
-                class="fab fa-github-alt"></i>.</strong> This software is
-        open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
-        <a href="https://github.com/laravel/framework/">Laravel</a>
-    </div>
-    <div class="clearfix"></div>
+	<div class="copyright-info">
+		<strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
+			<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
+					class="fab fa-github-alt"></i>.</strong> This software is
+		open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
+		<a href="https://github.com/laravel/framework/">Laravel</a>
+	</div>
+	<div class="clearfix"></div>
 </footer>
 <!-- /footer content -->
 
