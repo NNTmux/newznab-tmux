@@ -101,17 +101,16 @@
 									<ul class="nav child_menu" style="display: none">
 										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
 										</li>
-										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i>
-												Search</a>
+										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fab fa-searchengin"></i> Search</a>
 										</li>
 										<li>
-                                            <a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i>RSS Feeds</a>
+                                            <a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a>
                                         </li>
 										<li>
-                                            <a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>API</a>
+                                            <a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a>
                                         </li>
                                         <li>
-                                            <a href="{$smarty.const.WWW_TOP}/apiv2help"><i class="fa fa-cloud"></i>API V2</a>
+                                            <a href="{$smarty.const.WWW_TOP}/apiv2help"><i class="fa fa-cloud"></i> API V2</a>
                                         </li>
 									</ul>
                                 </li>
