@@ -201,7 +201,7 @@
 
 														{if isset($sabintegrated) && $sabintegrated !=""}
 															<button type="button"
-																	class="nzb_multi_operations_sab btn btn-sm btn-success"
+																	class="nzb_multi_operations_sab btn btn-sm btn-light"
 																	data-toggle="tooltip" data-placement="top" title
 																	data-original-title="Send to Queue">
 																<i class="fa fa-share"></i></button>

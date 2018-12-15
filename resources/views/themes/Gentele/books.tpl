@@ -86,7 +86,7 @@
 												   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 												   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if isset($result->failed) && $result->failed > 0}
-												<span class="btn btn-hover btn-success btn-xs"><i
+												<span class="btn btn-hover btn-light btn-xs"><i
 															class="fa fa-thumbs-o-down"></i><span
 															class="badge"> {$result->failed}
 														Failed Download{if $result->failed > 1}s{/if}</span>
@@ -137,26 +137,26 @@
 																<br/>
 															{/if}
 															<div>
-																<a role="button" class="btn btn-success btn-xs"
+																<a role="button" class="btn btn-light btn-xs"
 																   data-toggle="tooltip" data-placement="top" title
 																   data-original-title="Download NZB"
 																   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																			class="fa fa-cloud-download"></i><span
 																			class="badge"> {$result->grabs}
 																		Grab{if $result->grabs != 1}s{/if}</span></a>
-																<a role="button" class="btn btn-success btn-xs"
+																<a role="button" class="btn btn-light btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 																			class="fa fa-comment-o"></i><span
 																			class="badge"> {$result->comments}
 																		Comment{if $result->comments != 1}s{/if}</span></a>
-																<span class="btn btn-hover btn-success btn-xs icon icon_cart text-muted"
+																<span class="btn btn-hover btn-light btn-xs icon icon_cart text-muted"
 																	  id="guid{$result->guid}"
 																	  data-toggle="tooltip" data-placement="top"
 																	  title
 																	  data-original-title="Send to my download basket"><i
 																			class="fa fa-shopping-basket"></i></span>
 																{if isset($sabintegrated) && $sabintegrated !=""}
-																	<span class="btn btn-hover btn-success btn-xs icon icon_sab text-muted"
+																	<span class="btn btn-hover btn-light btn-xs icon icon_sab text-muted"
 																		  id="guid{$result->guid}"
 																		  data-toggle="tooltip" data-placement="top"
 																		  title
@@ -164,7 +164,7 @@
 																				class="fa fa-share"></i></span>
 																{/if}
 																{if !empty($result->failed)}
-																	<span class="btn btn-success btn-xs"
+																	<span class="btn btn-light btn-xs"
 																		  title="This release has failed to download for some users">
 																		<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
 																		Grab{if {$result->grabs} != 1}s{/if}
