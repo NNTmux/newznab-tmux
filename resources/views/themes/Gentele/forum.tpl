@@ -1,11 +1,11 @@
-<div class="well well-sm">
+<div class="card card-header">
 	<h2>{if $title !=''}{$title}{else}Forum{/if}</h2>
 	{if count($results) > 0}
-		<div class="pagination pagination-centered">
+		<div>
 			{$results->onEachSide(5)->links()}
 		</div>
 		<a id="top"></a>
-		<table style="width:100%;" class="data highlight table" id="forumtable">
+		<table style="width:100%;" class="data table table-bordered" id="forumtable">
 			<tr>
 				<th style="padding-top:0px; padding-bottom:0px;" width="60%">Topic</th>
 				<th style="padding-top:0px; padding-bottom:0px;">Posted By</th>
@@ -81,7 +81,7 @@
 		</table>
 		<div style="float:right;margin-top:5px;"><a class="btn btn-small" href="#top">Top</a></div>
 		<br/>
-		<div class="pagination pagination-centered">
+		<div>
 			{$results->onEachSide(5)->links()}
 		</div>
 	{/if}

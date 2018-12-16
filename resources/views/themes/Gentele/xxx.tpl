@@ -8,7 +8,7 @@
 		</ol>
 	</div>
 </div>
-<div class="well well-sm">
+<div class="card card-header">
 	{include file='search-filter.tpl'}
 </div>
 {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
