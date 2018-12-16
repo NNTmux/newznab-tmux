@@ -12,9 +12,7 @@
         /* ]]> */
 	</script>
 	{/literal}
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<!-- Meta, title, CSS, favicons, etc. -->
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{csrf_token()}}">
 
@@ -168,12 +166,7 @@
 		{if Auth::check()}
 			<div class="top_nav">
 				<div class="nav_menu">
-					<nav class="" role="navigation">
-						<div class="nav toggle">
-							<a id="menu_toggle"><i class="fa fa-bars"></i></a>
-						</div>
-						{$header_menu}
-					</nav>
+					{$header_menu}
 				</div>
 			</div>
 		{/if}
