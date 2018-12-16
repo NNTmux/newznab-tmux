@@ -11,7 +11,7 @@
 	<table class="data table table-sm responsive-utilities jambo-table">
 		{foreach $donation as $donate}
             {{Form::open(['url' => 'btc_payment?action=submit'])}}
-				<thead>
+				<thead class="thead-light">
 				<tr>
 					<th>{$donate->name} ({$donate->donation}$)</th>
 				</tr>

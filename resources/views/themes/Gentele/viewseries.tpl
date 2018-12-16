@@ -149,7 +149,7 @@
 											 id="{$seasonnum}">
 											<table class="tb_{$seasonnum} data table table-striped responsive-utilities jambo-table"
 												   id="browsetable">
-												<thead>
+												<thead class="thead-light">
 												<tr>
 													<th>Ep</th>
 													<th>Name</th>

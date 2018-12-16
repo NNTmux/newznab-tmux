@@ -202,7 +202,7 @@
 						</div>
 						<hr>
 						<table class="data table table-striped responsive-utilities jambo-table" id="browsetable">
-							<thead>
+							<thead class="thead-light">
 							<tr>
 								<th><input id="check-all" type="checkbox" class="flat-all"/></th>
 								<th>Name

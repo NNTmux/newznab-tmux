@@ -35,7 +35,7 @@
 				<div class="card card-default">
 					<div class="card-body pagination2 table-responsive">
 						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
-							<thead>
+							<thead class="thead-light">
 							<tr class="headings">
 								<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
 								<th class="column-title" style="display: table-cell;">Name</th>

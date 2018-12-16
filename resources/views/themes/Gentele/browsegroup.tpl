@@ -20,7 +20,7 @@
                             </div>
 							<table class="data table table-striped responsive-utilities jambo-table Sortable"
 								   style="table-layout: auto;" data-sort-order="desc">
-								<thead>
+								<thead class="thead-light">
 								<tr>
 									<th data-field="name" data-sortable="true">Name</th>
 									<th>Description</th>
