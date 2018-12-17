@@ -503,7 +503,7 @@ class Releases
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
         if ($nzbPath) {
-            @unlink($nzbPath);
+            File::delete($nzbPath);
         }
 
         // Delete images.
