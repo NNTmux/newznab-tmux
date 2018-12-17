@@ -7984,7 +7984,7 @@ var modern = (function () {
       }
     };
     var setupHideFloatPanels = function (editor) {
-      editor.on('mousedown', function () {
+      editor.on('mousedown progressstate', function () {
         FloatPanel.hideAll();
       });
     };

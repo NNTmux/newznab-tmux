@@ -7112,6 +7112,7 @@ var table = (function () {
       var start = getStart$1(selection);
       return defaultView(start);
     };
+    var domRange = type$2.domRange;
     var relative$1 = type$2.relative;
     var exact = type$2.exact;
 
@@ -7269,6 +7270,8 @@ var table = (function () {
         }
       });
     };
+    var ltr$2 = adt$1.ltr;
+    var rtl$2 = adt$1.rtl;
 
     var searchForPoint = function (rectForOffset, x, y, maxX, length) {
       if (length === 0)
