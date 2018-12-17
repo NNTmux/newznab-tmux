@@ -1054,11 +1054,11 @@ class Movie
             if ($percent > self::MATCH_PERCENT) {
                 $movie = [
                     'title' => $iTunesMovie->getName(),
-                    'director' => $iTunesMovie->getDirector(),
-                    'tagline' => $iTunesMovie->getTagLine(),
+                    'director' => $iTunesMovie->getDirector() ?? '',
+                    'tagline' => $iTunesMovie->getTagLine() ?? '',
                     'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
-                    'genre' => $iTunesMovie->getGenre(),
-                    'plot' => $iTunesMovie->getDescription(),
+                    'genre' => $iTunesMovie->getGenre() ?? '',
+                    'plot' => $iTunesMovie->getDescription() ?? '',
                     'year' => $iTunesMovie->getReleaseDate()->format('Y'),
                 ];
             } else {
