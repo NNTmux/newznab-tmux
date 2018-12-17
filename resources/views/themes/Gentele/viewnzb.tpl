@@ -10,7 +10,7 @@
 <div class="row">
 	<div class="col-lg-12 col-sm-12 col-12">
 		<div class="card card-default">
-			<div class="card-body pagination2">
+			<div class="card-body">
 				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-light btn-xs"title="This release has failed to download for some users">
 						<i class="fa fa-thumbs-o-up"></i>
 						{$release.grabs} Grab{if $release.grabs != 1}s{/if} /
