@@ -4,7 +4,7 @@
 	<div class="error">{$error}</div>
 {/if}
 
-<div class="well well-sm">
+<div class="card card-body">
 	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/category-list"><i class="fa fa-arrow-left"></i> Go
 		back</a>
 	<form action="category-edit?action=submit" method="POST">

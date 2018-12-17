@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	Removing Videos\Episode ID {$videoid} from releases:
 	{if $success = true}Succeeded.{/if}

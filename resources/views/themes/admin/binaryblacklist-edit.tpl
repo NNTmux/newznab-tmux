@@ -2,7 +2,7 @@
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
-<div class="well well-sm">
+<div class="card card-body">
 	<form action="binaryblacklist-edit?action=submit" method="POST">
 		{{csrf_field()}}
 		<table class="input">

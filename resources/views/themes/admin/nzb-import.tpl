@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<p>
 		Import NZB's from a folder or via the browser into the system. Specify the full file path to a folder containing

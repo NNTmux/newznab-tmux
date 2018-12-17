@@ -2,7 +2,7 @@
 
 {if $anidblist}
 
-<div class="well well-sm">
+<div class="card card-body">
 	<div style="float:right;">
 
 		<form name="anidbsearch" action="">

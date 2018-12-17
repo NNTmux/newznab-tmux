@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	<p>Below is a dump of system settings and mysql table status to assist others in debuging problems.

@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/group-list"><i class="fa fa-arrow-left"></i> Go
 		back</a>

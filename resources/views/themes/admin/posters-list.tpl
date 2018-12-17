@@ -1,10 +1,10 @@
-<div class="well well-sm" id="group_list">
+<div class="card card-body" id="group_list">
 	<h1>{$title}</h1>
 	{if $check != null}
 		<p>
 			Below is a list of MultiGroup posters
 		</p>
-		<table style="width:100%;" class="data table table-striped responsive-utilities sortable">
+		<table style="width:100%;" class="data table table-striped sortable">
 			<tr>
 				<th>Poster name</th>
 			</tr>

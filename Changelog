@@ -1,4 +1,5 @@
 2018-12-17 DariusIII
+	* Chg: Update admin area template files
 	* Fix: Fix checks of missing itunes data
 	* Chg: Switch from groupfixrelnames to fixRelNames script
 	* Fix: Fix profile and profile edit pages

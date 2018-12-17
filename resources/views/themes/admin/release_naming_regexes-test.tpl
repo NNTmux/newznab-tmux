@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<p>This page is used for testing regex for getting release names from usenet subject.
 		<br/>Maximum releases to display will limit the amount of results displayed on the page. 0 for no limit.

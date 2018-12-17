@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 
-<div class="well well-sm">
+<div class="card card-body">
 	{if $consolelist}
 		{$consolelist->onEachSide(5)->links()}
 		<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">

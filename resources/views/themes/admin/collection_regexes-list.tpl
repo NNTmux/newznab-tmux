@@ -1,5 +1,5 @@
 <h1>{$title}</h1>
-<div class="well well-sm">
+<div class="card card-body">
 	<p>This page lists regex used for grouping usenet collections.</p>
 	<div id="message"></div>
 

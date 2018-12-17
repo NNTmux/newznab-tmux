@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 
-<div class="well well-small">
+<div class="card card-body">
 	<form action="site-edit?action=submit" method="post">
 		{{csrf_field()}}
 

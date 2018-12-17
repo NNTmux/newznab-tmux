@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<p>This page lists regex used for getting names for releases from usenet subjects.</p>
 	<div id="message"></div>

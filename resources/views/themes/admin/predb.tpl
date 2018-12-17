@@ -1,5 +1,5 @@
 <h1>{$title}</h1>
-<div class="well well-sm">
+<div class="card card-body">
 	<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/admin/predb" id="custom-search-form"
 		  class="form-inline form-horizontal col-4 col-lg-4 float-right">
 		{{csrf_field()}}

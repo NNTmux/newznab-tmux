@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	<form action="tmux-edit?action=submit" method="post">

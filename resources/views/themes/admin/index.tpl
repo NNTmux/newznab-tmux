@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	<div style="{if $site->showadminwelcome != "1"}display:none;{/if}" id="adminwelcome">

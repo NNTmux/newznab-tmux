@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<p>This page lists regex used for categorizing releases.<br/>
 		You can recategorize all releases by running misc/update/update_releases 6 true

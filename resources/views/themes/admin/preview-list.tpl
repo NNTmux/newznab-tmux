@@ -1,4 +1,4 @@
-<div class="well wellsm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	<label for="previewcat"> Select Category :

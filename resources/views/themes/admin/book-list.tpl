@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 
-<div class="well well-sm">
+<div class="card card-body">
 	{if $booklist}
 		{if $booklist->count() > 0}
 			<div class="col-md-4">

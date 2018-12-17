@@ -1,4 +1,4 @@
-<div class="well well-sm" id="updatePanel">
+<div class="card card-body" id="updatePanel">
 	{if $success}
 		<h4>Successfully updated!</h4>
 	{if $from != ''}

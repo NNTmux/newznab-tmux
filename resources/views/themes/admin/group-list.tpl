@@ -1,4 +1,4 @@
-<div class="well well-sm" id="group_list">
+<div class="card card-body" id="group_list">
 	<h1>{$title}</h1>
 	<p>
 		Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
