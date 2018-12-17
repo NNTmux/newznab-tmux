@@ -1,4 +1,5 @@
 2018-12-17 DariusIII
+	* Chg: Switch from groupfixrelnames to fixRelNames script
 	* Fix: Fix profile and profile edit pages
 	* Chg: Update Gentele theme various parts
 	* Chg: Update search-filter.tpl

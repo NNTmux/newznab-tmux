@@ -179,7 +179,16 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][0]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/fixrelnames.php standard $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 1 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 3 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 5 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 7 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 9 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 11 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 13 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 15 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 17 true other yes show $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 19 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/fixrelnames.php predbft $log; date +\"{$this->_dateFormat}\"; \
 						{$runVar['commands']['_sleep']} {$runVar['settings']['fix_timer']}' 2>&1 1> /dev/null"
                 );
