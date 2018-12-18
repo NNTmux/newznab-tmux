@@ -1,4 +1,5 @@
 2018-12-18 DariusIII
+	* Chg: Update laravel/framework to version 5.7.19
 	* Chg: Update PPA class, use File facade in additional postprocessing and files management
 	* Chg: Update PPA class
 	* Chg: Update deleteSingle function in Releases class
