@@ -1,4 +1,5 @@
 2018-12-18 DariusIII
+	* Chg: Update configuration files
 	* Chg: Add back logoutOtherDevices Auth function
 	* Chg: Make login page prettier
 	* Fix: Exclude ApiV2 functions from auth middleware in BasePageController
