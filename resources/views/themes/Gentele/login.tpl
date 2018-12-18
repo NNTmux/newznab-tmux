@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body card-header">
 	{if isset($error) && $error != ''}
 		<div class="alert alert-danger">{$error}</div>
 	{/if}
