@@ -1579,7 +1579,7 @@ class ProcessAdditional
 
         // Get the amount of files we found inside the RAR/ZIP files.
 
-        $releaseFilesCount = ReleaseFile::query()->where('releases_id', $this->_release->id)->count('releases_id');
+        $releaseFilesCount = ReleaseFile::whereReleasesId($this->_release->id)->count('releases_id');
 
         if ($releaseFilesCount === null) {
             $releaseFilesCount = 0;
@@ -1619,7 +1619,7 @@ class ProcessAdditional
             );
         }
 
-        DB::update($query);
+        Release::fromQuery($query);
     }
 
     /**
@@ -1674,13 +1674,7 @@ class ProcessAdditional
             $retVal = true;
         }
 
-        // Make sure the category is music or other.
-        $rQuery = DB::selectOne(
-            sprintf(
-                'SELECT searchname, fromname,  categories_id AS id, groups_id FROM releases WHERE proc_pp = 0 AND id = %d',
-                $this->_release->id
-            )
-        );
+        $rQuery = Release::query()->where('proc_pp', '=', 0)->where('id', $this->_release->id)->select(['searchname', 'fromname', 'categories_id'])->first();
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
@@ -1750,10 +1744,10 @@ class ProcessAdditional
                                     NameFixer::echoChangedReleaseName(
                                             [
                                                 'new_name' => $newName,
-                                                'old_name' => $rQuery['searchname'],
+                                                'old_name' => $rQuery->searchname,
                                                 'new_category' => $newCat,
-                                                'old_category' => $rQuery['id'],
-                                                'group' => $rQuery['groups_id'],
+                                                'old_category' => $rQuery->id,
+                                                'group' => $rQuery->groups_id,
                                                 'releases_id' => $this->_release->id,
                                                 'method' => 'ProcessAdditional->_getAudioInfo',
                                             ]
