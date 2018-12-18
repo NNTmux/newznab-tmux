@@ -1641,6 +1641,7 @@ class ProcessAdditional
                         $allFiles .= $file;
                     }
                 }
+
                 return $allFiles;
             }
 
