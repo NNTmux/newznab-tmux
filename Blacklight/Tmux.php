@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Models\Category;
 use App\Models\Settings;
-use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -34,15 +33,6 @@ class Tmux
     {
         $this->pdo = DB::connection()->getPdo();
         $this->colorCli = new ColorCLI();
-    }
-
-    /**
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function version(): string
-    {
-        return (new Versions())->getGitTagInFile();
     }
 
     /**
@@ -245,8 +235,6 @@ class Tmux
         foreach ($rows as $row) {
             $obj->{$row['setting']} = $row['value'];
         }
-
-        $obj->{'version'} = $this->version();
 
         return $obj;
     }

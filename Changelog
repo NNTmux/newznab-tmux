@@ -1,4 +1,5 @@
 2018-12-18 DariusIII
+	* Chg: Remove Versions classes and all related data
 	* Chg: Update configuration files
 	* Chg: Add back logoutOtherDevices Auth function
 	* Chg: Make login page prettier

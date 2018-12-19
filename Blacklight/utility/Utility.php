@@ -3,8 +3,6 @@
 namespace Blacklight\utility;
 
 use App\Models\Settings;
-use Blacklight\ColorCLI;
-use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -198,30 +196,6 @@ class Utility
         }
 
         return $gzipped;
-    }
-
-    /**
-     * @return bool
-     * @throws \Exception
-     */
-    public static function isPatched(): bool
-    {
-        $versions = (new Versions())->getValidVersionsFile();
-
-        $patch = Settings::settingValue('..sqlpatch');
-        $ver = $versions->versions->sql->file;
-
-        // Check database patch version
-        if ($patch < $ver) {
-            $message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php ".
-                NN_ROOT."./tmux nntmux:db\n";
-            if (self::isCLI()) {
-                (new ColorCLI())->error($message);
-            }
-            throw new \RuntimeException($message);
-        }
-
-        return true;
     }
 
     /**

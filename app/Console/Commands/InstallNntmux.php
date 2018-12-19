@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
-use App\Extensions\util\Versions;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command
@@ -98,19 +97,18 @@ class InstallNntmux extends Command
                     });
                 }
 
-                if ($this->updatePatch()) {
-                    $paths = $this->updatePaths();
-                    if ($paths !== false) {
-                        $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
-                        $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
-                        $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
-                        if ($sql1 === null || $sql2 === null || $sql3 === null) {
-                            $error = true;
-                        } else {
-                            $this->info('Settings table updated successfully');
-                        }
+                $paths = $this->updatePaths();
+                if ($paths !== false) {
+                    $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
+                    $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
+                    $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
+                    if ($sql1 === null || $sql2 === null || $sql3 === null) {
+                        $error = true;
+                    } else {
+                        $this->info('Settings table updated successfully');
                     }
                 }
+
 
                 if (! $error && $this->addAdminUser()) {
                     @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
@@ -134,30 +132,6 @@ class InstallNntmux extends Command
                 exit;
             }
         }
-    }
-
-    /**
-     * @return bool
-     * @throws \Cz\Git\GitException
-     */
-    private function updatePatch(): bool
-    {
-        $patch = (new Versions())->getSQLPatchFromFile();
-        $updateSettings = false;
-        if ($patch > 0) {
-            $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
-        }
-
-        // If it all worked, continue the install process.
-        if ($updateSettings !== false) {
-            $this->info('Database updated successfully');
-
-            return true;
-        }
-
-        $this->error('Could not update sqlpatch to '.$patch.' for your database.');
-
-        return false;
     }
 
     /**

@@ -8,7 +8,6 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 
 $DIR = NN_TMUX;
-$patch = Settings::settingValue('..sqlpatch');
 $import = Settings::settingValue('site.tmux.import') ?? 0;
 $tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
 $seq = Settings::settingValue('site.tmux.sequential') ?? 0;
@@ -16,11 +15,6 @@ $delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
 $colorCli = new ColorCLI();
 
-try {
-    Utility::isPatched();
-} catch (Exception $e) {
-    echo $e;
-}
 Utility::clearScreen();
 
 echo 'Starting Tmux...'.PHP_EOL;

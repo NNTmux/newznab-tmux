@@ -418,7 +418,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 function errorOnSQL()
 {
-    $colorCli->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
+    (new ColorCLI())->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
 }
 
 /**

@@ -11,7 +11,6 @@ use Blacklight\Releases;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
-use App\Extensions\util\Versions;
 use App\Transformers\ApiTransformer;
 use App\Transformers\TagsTransformer;
 use App\Transformers\DetailsTransformer;
@@ -22,7 +21,6 @@ class ApiV2Controller extends BasePageController
 {
     /**
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Cz\Git\GitException
      */
     public function capabilities(): \Illuminate\Http\JsonResponse
     {
@@ -32,8 +30,6 @@ class ApiV2Controller extends BasePageController
 
         $capabilities = [
             'server' => [
-                'appversion' => (new Versions())->getGitTagInFile(),
-                'version'    => (new Versions())->getGitTagInRepo(),
                 'title'      => Settings::settingValue('site.main.title'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
                 'email'      => Settings::settingValue('site.main.email'),
