@@ -29,8 +29,8 @@ $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['cli'] = NN_ROOT.'cli/';
 $runVar['paths']['scraper'] = NN_MISC.'IRCScraper'.DS.'scrape.php';
 
-$db_name = env('DB_NAME', 'nntmux');
-$dbtype = env('DB_SYSTEM', 'mysql');
+$db_name = config('nntmux.db_name');
+$dbtype = config('nntmux.db_system');
 
 $tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
 

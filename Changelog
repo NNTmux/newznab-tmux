@@ -1,5 +1,7 @@
+2018-12-19 DariusIII
+	* Chg: Update tmux related files and classes
+        * Chg: Remove Versions classes and all related data
 2018-12-18 DariusIII
-	* Chg: Remove Versions classes and all related data
 	* Chg: Update configuration files
 	* Chg: Add back logoutOtherDevices Auth function
 	* Chg: Make login page prettier
