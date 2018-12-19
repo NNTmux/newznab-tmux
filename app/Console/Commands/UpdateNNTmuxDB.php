@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Process\Process;
 
 class UpdateNNTmuxDB extends Command
 {
@@ -37,6 +38,18 @@ class UpdateNNTmuxDB extends Command
     {
         // also prevent web access.
         $this->output->writeln('<info>Updating database</info>');
-        $this->call('migrate');
+        if (env('APP_ENV') !== 'production') {
+            $this->call('migrate');
+        } else {
+            $process = new Process('php artisan migrate --force');
+            $process->setTimeout(600);
+            $process->run(function ($type, $buffer) {
+                if (Process::ERR === $type) {
+                    echo 'ERR > '.$buffer;
+                } else {
+                    echo $buffer;
+                }
+            });
+        }
     }
 }
