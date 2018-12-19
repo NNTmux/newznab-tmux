@@ -139,13 +139,13 @@
                 <ul class="nav nav-tabs" id="{$seasonnum}" role="tablist">
                     {foreach $seasons as $seasonnum => $season}
                         <li class="nav-item">
-                            <a class="nav-link" title="View Season {$seasonnum}" href="#{$seasonnum}" id="season{$seasonnum}-tab" data-toggle="tab" role="tab" aria-controls="{$seasonnum}" aria-selected="false">{$seasonnum}</a>
+                            <a class="nav-link" title="View Season {$seasonnum}" href="#season{$seasonnum}" id="season{$seasonnum}-tab" data-toggle="tab" role="tab" aria-controls="{$seasonnum}" aria-selected="{if $season@first} true {else} false{/if}">{$seasonnum}</a>
                         </li>
                     {/foreach}
                 </ul>
                 <div class="tab-content" id="{$seasonnum}Content">
                     {foreach $seasons as $seasonnum => $season}
-                        <div class="tab-pane{if $season@first} active{/if} fade in show" id="{$seasonnum}" role="tabpanel" aria-labelledby="{$seasonnum}">
+                        <div class="tab-pane{if $season@first} active{/if} fade in show" id="season{$seasonnum}" role="tabpanel" aria-labelledby="{$seasonnum}">
                             <table class="data table table-striped">
                                 <tbody>
                                 <thead class="thead-light">
