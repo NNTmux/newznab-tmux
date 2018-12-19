@@ -1,4 +1,5 @@
 2018-12-19 DariusIII
+	* Chg: Update barryvdh/laravel-ide-helper to latest version
 	* Chg: Update VIEW_COMPILED_PATH with default value in .env.example
 	* Chg: Force migration if NNTmux application is in production when updating database
 	* Chg: Add migrations_table.sql so users that are patched run it and be able to use laravel's migrate method from now on
