@@ -9,10 +9,6 @@ namespace Blacklight;
  */
 class TmuxOutput extends Tmux
 {
-    /**
-     * @var \simpleXMLElement
-     */
-    protected $_vers;
 
     /**
      * @var
