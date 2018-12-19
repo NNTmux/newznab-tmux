@@ -33,9 +33,6 @@ class UpdateNNTmuxDB extends Command
         parent::__construct();
     }
 
-    /**
-     *
-     */
     public function handle()
     {
         // also prevent web access.
