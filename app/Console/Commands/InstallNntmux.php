@@ -109,7 +109,6 @@ class InstallNntmux extends Command
                     }
                 }
 
-
                 if (! $error && $this->addAdminUser()) {
                     @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
