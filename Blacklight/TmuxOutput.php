@@ -9,7 +9,6 @@ namespace Blacklight;
  */
 class TmuxOutput extends Tmux
 {
-
     /**
      * @var
      */
