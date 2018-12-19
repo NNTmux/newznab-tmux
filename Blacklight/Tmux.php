@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Models\Category;
 use App\Models\Settings;
-use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -34,15 +33,6 @@ class Tmux
     {
         $this->pdo = DB::connection()->getPdo();
         $this->colorCli = new ColorCLI();
-    }
-
-    /**
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function version(): string
-    {
-        return (new Versions())->getGitTagInFile();
     }
 
     /**
@@ -152,7 +142,6 @@ class Tmux
 					(%1\$s 'sequential') AS sequential,
 					(%1\$s 'tmux_session') AS tmux_session,
 					(%1\$s 'run_ircscraper') AS run_ircscraper,
-					(%1\$s 'sqlpatch') AS sqlpatch,
 					(%1\$s 'alternate_nntp') AS alternate_nntp,
 					(%1\$s 'delaytime') AS delaytime",
             $settstr
@@ -232,23 +221,6 @@ class Tmux
         );
 
         return $sql;
-    }
-
-    /**
-     * @param $rows
-     *
-     * @return \stdClass
-     */
-    public function rows2Object($rows): \stdClass
-    {
-        $obj = new \stdClass;
-        foreach ($rows as $row) {
-            $obj->{$row['setting']} = $row['value'];
-        }
-
-        $obj->{'version'} = $this->version();
-
-        return $obj;
     }
 
     /**

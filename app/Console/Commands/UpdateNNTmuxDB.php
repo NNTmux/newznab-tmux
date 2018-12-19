@@ -2,10 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\db\DbUpdate;
-use App\Extensions\util\Git;
 use Illuminate\Console\Command;
-use App\Extensions\util\Versions;
 
 class UpdateNNTmuxDB extends Command
 {
@@ -36,36 +33,10 @@ class UpdateNNTmuxDB extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     * @throws \RuntimeException
-     * @throws \Exception
-     */
     public function handle()
     {
         // also prevent web access.
-        $this->output->writeln('<info>Checking database version</info>');
-
-        $versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
-
-        try {
-            $currentDb = $versions->getSQLPatchFromDB();
-            $currentXML = $versions->getSQLPatchFromFile();
-        } catch (\PDOException $e) {
-            $this->error('Error fetching patch versions!');
-
-            return 1;
-        }
-
-        $this->info("Db: $currentDb,\tFile: $currentXML");
-
-        if ($currentDb < $currentXML) {
-            $db = new DbUpdate(['backup' => false]);
-            $db->processPatches(['safe' => false]);
-        } else {
-            $this->info('Up to date.');
-        }
+        $this->output->writeln('<info>Updating database</info>');
+        $this->call('migrate');
     }
 }

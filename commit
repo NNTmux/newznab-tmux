@@ -11,14 +11,7 @@ nano Changelog
 # Add changes to changelog.
 git add Changelog
 
-php build/NewPatches.php
-
-EXIT_STATUS="$?"
-if [ ${EXIT_STATUS} -gt 0 ]
-then
-	echo "\nProblem while converting SQL patch files!\n";
-	exit ${EXIT_STATUS}
-fi
+php artisan migrate
 
 # Commit changes.
 git commit

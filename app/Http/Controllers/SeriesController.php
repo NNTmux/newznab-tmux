@@ -61,7 +61,7 @@ class SeriesController extends BasePageController
                     $series[$r->series][$r->episode][] = $r;
                 }
 
-                $this->smarty->assign('seasons', $series);
+                $this->smarty->assign('seasons', array_sort_recursive($series));
                 $this->smarty->assign('show', $show);
                 $this->smarty->assign('myshows', $myshows);
 
