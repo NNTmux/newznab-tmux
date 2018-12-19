@@ -1,4 +1,5 @@
 2018-12-19 DariusIII
+	* Chg: Add migrations_table.sql so users that are patched run it and be able to use laravel's migrate method from now on
 	* Chg: Update TmuxOutput class
 	* Chg: Update tmux related files and classes
         * Chg: Remove Versions classes and all related data
