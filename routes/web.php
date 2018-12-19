@@ -72,9 +72,9 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
 
     Route::post('content', 'ContentController@show');
 
-    Route::get('failed', 'FailedReleasesController@show');
+    Route::get('failed', 'FailedReleasesController@failed');
 
-    Route::post('failed', 'FailedReleasesController@show');
+    Route::post('failed', 'FailedReleasesController@failed');
 
     Route::group(['middleware' => 'clearance'], function () {
         Route::get('Games', 'GamesController@show');
