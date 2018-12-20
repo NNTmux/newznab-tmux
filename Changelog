@@ -1,4 +1,5 @@
 2018-12-20 DariusIII
+	* Chg: Use user-badge icon for user menu
 	* Chg: Update fontawesome to version 5.6.3
 	* Chg: Slowly start adding support for postgresql
 	* Chg: Update scripts and config by removing unused env settings

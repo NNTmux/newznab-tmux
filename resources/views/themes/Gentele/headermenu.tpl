@@ -289,7 +289,7 @@
                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
                    data-close-others="true" data-delay="30" aria-expanded="false">
                     {if $loggedin == "true"}
-                    <i class="fa fa-user-circle"></i>
+                    <i class="fa fa-id-badge"></i>
                     {$userdata.username}
                 </a>
                 <ul class="dropdown-menu">
