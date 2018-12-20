@@ -130,7 +130,7 @@ class TmuxOutput extends Tmux
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
-            "Monitor $state ".': ',
+            "Monitor $state ".':',
             $this->relativeTime($this->runVar['timers']['timer1'])
         );
 
