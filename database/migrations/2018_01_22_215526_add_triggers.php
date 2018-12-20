@@ -13,7 +13,7 @@ class AddTriggers extends Migration
      */
     public function up()
     {
-        DB::statement('CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}"
+        DB::unprepared('CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}"
       THEN SET NEW.ishashed = 1;
     END IF;
   END;
