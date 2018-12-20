@@ -2,7 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\utility\Git;
+
+use App\Extensions\util\Git;
 
 /**
  * Tmux output functions for printing monitor data.
@@ -130,7 +131,7 @@ class TmuxOutput extends Tmux
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
-        $version = (string) (new Git())->tagLatest();
+        $version = (new Git())->tagLatest();
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
