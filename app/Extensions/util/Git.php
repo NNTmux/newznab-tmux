@@ -128,7 +128,7 @@ class Git
     }
 
     /**
-     * @return NULL|string
+     * @return null|string
      * @throws \Cz\Git\GitException
      */
     public function getHeadHash()
