@@ -13,7 +13,7 @@ class AddTriggers extends Migration
      */
     public function up()
     {
-        DB::unprepared('CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}"
+        DB::statement('CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP "[a-fA-F0-9]{32}" OR NEW.name REGEXP "[a-fA-F0-9]{32}"
       THEN SET NEW.ishashed = 1;
     END IF;
   END;
@@ -58,6 +58,6 @@ CREATE TRIGGER insert_MD5 BEFORE INSERT ON release_comments FOR EACH ROW
      */
     public function down()
     {
-        DB::unprepared('DROP TRIGGER check_insert; DROP TRIGGER check_update; DROP TRIGGER check_rfinsert; DROP TRIGGER check_rfupdate; DROP TRIGGER insert_hashes; DROP TRIGGER update_hashes; DROP TRIGGER delete_hashes; DROP TRIGGER insert_MD5;');
+        DB::statement('DROP TRIGGER check_insert; DROP TRIGGER check_update; DROP TRIGGER check_rfinsert; DROP TRIGGER check_rfupdate; DROP TRIGGER insert_hashes; DROP TRIGGER update_hashes; DROP TRIGGER delete_hashes; DROP TRIGGER insert_MD5;');
     }
 }

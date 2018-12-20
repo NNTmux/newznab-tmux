@@ -32,7 +32,7 @@ class CreateMusicinfoTable extends Migration
             $table->boolean('cover')->default(0);
             $table->timestamps();
         });
-        DB::unprepared('ALTER TABLE musicinfo ADD FULLTEXT ix_musicinfo_artist_title_ft (artist, title)');
+        DB::statement('ALTER TABLE musicinfo ADD FULLTEXT ix_musicinfo_artist_title_ft (artist, title)');
     }
 
 

@@ -11,7 +11,7 @@ class AddStoredProcedures extends Migration
      */
     public function up()
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS loop_cbpm; DROP PROCEDURE IF EXISTS delete_release; CREATE PROCEDURE loop_cbpm(IN method CHAR(10))
+        DB::statement('DROP PROCEDURE IF EXISTS loop_cbpm; DROP PROCEDURE IF EXISTS delete_release; CREATE PROCEDURE loop_cbpm(IN method CHAR(10))
   COMMENT "Performs tasks on All CBPM tables one by one -- REPAIR/ANALYZE/OPTIMIZE or DROP/TRUNCATE"
 
     main: BEGIN
@@ -57,6 +57,6 @@ class AddStoredProcedures extends Migration
      */
     public function down()
     {
-        DB::unprepared('DROP PROCEDURE loop_cbpm;');
+        DB::statement('DROP PROCEDURE loop_cbpm;');
     }
 }

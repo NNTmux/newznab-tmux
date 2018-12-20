@@ -45,8 +45,8 @@ class InstallNntmux extends Command
     {
         $error = false;
 
-        if (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION)) {
-            $this->error('Version of MariaDB/MySQL used is lower than required version: '.NN_MINIMUM_MARIA_VERSION.PHP_EOL.' Please update your install of Mariadb/MySQL');
+        if (env('DB_CONNECTION') === 'mysql' && (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION))) {
+            $this->error('Version of MariaDB/MySQL/ used is lower than required version: '.NN_MINIMUM_MARIA_VERSION.PHP_EOL.' Please update your install of Mariadb/MySQL');
             $error = true;
         }
 

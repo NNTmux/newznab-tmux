@@ -33,7 +33,7 @@ class CreateGamesinfoTable extends Migration {
 			$table->timestamps();
 		});
 
-        DB::unprepared('ALTER TABLE gamesinfo ADD FULLTEXT ix_title_ft(title)');
+        DB::statement('ALTER TABLE gamesinfo ADD FULLTEXT ix_title_ft(title)');
 	}
 
 

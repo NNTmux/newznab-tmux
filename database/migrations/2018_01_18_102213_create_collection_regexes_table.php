@@ -3,40 +3,43 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateCollectionRegexesTable extends Migration {
+class CreateCollectionRegexesTable extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('collection_regexes', function(Blueprint $table)
-		{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('collection_regexes', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
             $table->collation = 'utf8_unicode_ci';
-		    $table->increments('id');
-			$table->string('group_regex', 255)->default('')->index('ix_collection_regexes_group_regex')->comment('This is a regex to match against usenet groups');
-			$table->string('regex', 5000)->default('')->comment('Regex used for collection grouping');
-			$table->boolean('status')->default(1)->index('ix_collection_regexes_status')->comment('1=ON 0=OFF');
-			$table->string('description', 1000)->comment('Optional extra details on this regex');
-			$table->integer('ordinal')->default(0)->index('ix_collection_regexes_ordinal')->comment('Order to run the regex in');
-		});
+            $table->increments('id');
+            $table->string('group_regex', 255)->default('')->index('ix_collection_regexes_group_regex')->comment('This is a regex to match against usenet groups');
+            $table->string('regex', 5000)->default('')->comment('Regex used for collection grouping');
+            $table->boolean('status')->default(1)->index('ix_collection_regexes_status')->comment('1=ON 0=OFF');
+            $table->string('description', 1000)->comment('Optional extra details on this regex');
+            $table->integer('ordinal')->default(0)->index('ix_collection_regexes_ordinal')->comment('Order to run the regex in');
+        });
 
-        DB::unprepared('ALTER TABLE collection_regexes AUTO_INCREMENT 100000');
-	}
+        if (env('DB_CONNECTION') !== 'pgsql') {
+            DB::statement('ALTER TABLE collection_regexes AUTO_INCREMENT = 100000;');
+        } else {
+            DB::statement('ALTER SEQUENCE collection_regexes_id_seq RESTART 1000000;');
+        }
+    }
 
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('collection_regexes');
-	}
-
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('collection_regexes');
+    }
 }
