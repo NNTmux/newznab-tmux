@@ -1,4 +1,5 @@
 2018-12-20 DariusIII
+	* Chg: Do not show used query in NameFixer, clutters screen and is not needed if not debugging
 	* Chg: Align text in monitor pane
 2018-12-19 DariusIII
 	* Chg: Update failed releases controller, related route and BasePageController

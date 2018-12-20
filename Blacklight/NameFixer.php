@@ -818,19 +818,15 @@ class NameFixer
         $queryLimit = ($limit === '') ? '' : ' LIMIT '.$limit;
         // 24 hours, other cats
         if ($time === 1 && $cats === 1) {
-            $this->colorCli->header($query.$this->timeother.$queryLimit.';');
             $releases = Release::fromQuery($query.$this->timeother.$queryLimit);
         } // 24 hours, all cats
         if ($time === 1 && $cats === 2) {
-            $this->colorCli->header($query.$this->timeall.$queryLimit.';');
             $releases = Release::fromQuery($query.$this->timeall.$queryLimit);
         } //other cats
         if ($time === 2 && $cats === 1) {
-            $this->colorCli->header($query.$this->fullother.$queryLimit.';');
             $releases = Release::fromQuery($query.$this->fullother.$queryLimit);
         } // all cats
         if ($time === 2 && $cats === 2) {
-            $this->colorCli->header($query.$this->fullall.$queryLimit.';');
             $releases = Release::fromQuery($query.$this->fullall.$queryLimit);
         }
 
