@@ -1,5 +1,6 @@
 2018-12-20 DariusIII
-	* Chg: BC remove nntmux and edit mysql database connection, make mysql default connection
+	* Chg: BC! Update database configuration and unify env settings(DB_NAME => DB_DATABASE, DB_USER => DB_USERNAME) and remove unused settings
+	* Chg: BC! Remove nntmux and edit mysql database connection, make mysql default connection
 	* Chg: Add used branch to tmux output
 	* Fix: Fix wrong class used in TmuxOutput class _getHeader function
 	* Chg: Update TmuxOutput _getHeader function
