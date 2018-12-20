@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-
 use App\Extensions\util\Git;
 
 /**
