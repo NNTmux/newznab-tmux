@@ -1,4 +1,5 @@
 2018-12-20 DariusIII
+	* Chg: Update migrations_table.sql for old users so new migrations are not run as we already have the triggers added
 	* Chg: Remove old add_triggers migration and create completely new with new code
 	* Fix: Replace DB::statement with previously used DB::unprepared for trigger and stored procedure migrations
 	* Chg: Use user-badge icon for user menu
