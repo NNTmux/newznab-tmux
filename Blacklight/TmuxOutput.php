@@ -131,10 +131,11 @@ class TmuxOutput extends Tmux
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
         $version = (new Git())->tagLatest();
+        $branch = (new Git())->getBranch();
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
-            "Monitor $state $version".':',
+            "Monitor $state $version [".$branch.'] :',
             $this->relativeTime($this->runVar['timers']['timer1'])
         );
 
