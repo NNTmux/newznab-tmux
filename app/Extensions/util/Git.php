@@ -128,14 +128,12 @@ class Git
     }
 
     /**
-     * @return string
+     * @return NULL|string
+     * @throws \Cz\Git\GitException
      */
     public function getHeadHash()
     {
-        $command = new Process('git rev-parse HEAD');
-        $command->run();
-
-        return $command->getOutput();
+        return $this->repo->getLastCommitId();
     }
 
     /**

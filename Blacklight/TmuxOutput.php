@@ -2,6 +2,8 @@
 
 namespace Blacklight;
 
+use Blacklight\utility\Git;
+
 /**
  * Tmux output functions for printing monitor data.
  *
@@ -122,15 +124,17 @@ class TmuxOutput extends Tmux
 
     /**
      * @return string
+     * @throws \Cz\Git\GitException
      */
     protected function _getHeader(): string
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
+        $version = (new Git())->tagLatest();
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
-            "Monitor $state ".':',
+            "Monitor $state $version".':',
             $this->relativeTime($this->runVar['timers']['timer1'])
         );
 

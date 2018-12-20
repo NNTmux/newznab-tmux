@@ -36,7 +36,7 @@ class Git extends GitRepository
     /**
      * @var array
      */
-    private $mainBranches = ['dev', '0.5.x', '0.x'];
+    private $mainBranches = ['dev', 'master'];
 
     /**
      * Git constructor.
