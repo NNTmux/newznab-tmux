@@ -1,4 +1,5 @@
 2018-12-20 DariusIII
+	* Chg: BC remove nntmux and edit mysql database connection, make mysql default connection
 	* Chg: Add used branch to tmux output
 	* Fix: Fix wrong class used in TmuxOutput class _getHeader function
 	* Chg: Update TmuxOutput _getHeader function
