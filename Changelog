@@ -1,4 +1,5 @@
 2018-12-20 DariusIII
+	* Chg: Remove old add_triggers migration and create completely new with new code
 	* Fix: Replace DB::statement with previously used DB::unprepared for trigger and stored procedure migrations
 	* Chg: Use user-badge icon for user menu
 	* Chg: Update fontawesome to version 5.6.3

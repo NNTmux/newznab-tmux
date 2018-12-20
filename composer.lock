@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f08561a68325fb1f32d84179bbc605fd",
+    "content-hash": "1045b5cf5fc7c773b95e6822735c52ca",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3830,6 +3830,61 @@
                 "php"
             ],
             "time": "2018-10-10T09:24:14+00:00"
+        },
+        {
+            "name": "ntimyeboah/laravel-database-trigger",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/NtimYeboah/laravel-database-trigger.git",
+                "reference": "1f9e44ad0faf351ae60cbb025d33d63af9ec2e41"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/NtimYeboah/laravel-database-trigger/zipball/1f9e44ad0faf351ae60cbb025d33d63af9ec2e41",
+                "reference": "1f9e44ad0faf351ae60cbb025d33d63af9ec2e41",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "~5.5.0|~5.6.0|~5.7.0",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^6.5 || ^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "NtimYeboah\\LaravelDatabaseTrigger\\TriggerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "NtimYeboah\\LaravelDatabaseTrigger\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ntim Yeboah",
+                    "email": "ntimobedyeboah@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A package to add database trigger to laravel migrations",
+            "keywords": [
+                "NtimYeboah",
+                "database",
+                "laravel-database-trigger",
+                "trigger"
+            ],
+            "time": "2018-09-20T18:09:58+00:00"
         },
         {
             "name": "opis/closure",
