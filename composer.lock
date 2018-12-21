@@ -9524,16 +9524,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.3.12",
+            "version": "v0.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "e1d221052753f6a2ac0f742d4fe63567fd48d9ca"
+                "reference": "78856272fa6f14bbd06c468ed88067647123db08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/e1d221052753f6a2ac0f742d4fe63567fd48d9ca",
-                "reference": "e1d221052753f6a2ac0f742d4fe63567fd48d9ca",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/78856272fa6f14bbd06c468ed88067647123db08",
+                "reference": "78856272fa6f14bbd06c468ed88067647123db08",
                 "shasum": ""
             },
             "require": {
@@ -9587,7 +9587,7 @@
                 "php",
                 "static analysis"
             ],
-            "time": "2018-12-02T22:53:01+00:00"
+            "time": "2018-12-21T21:40:50+00:00"
         },
         {
             "name": "ocramius/package-versions",
