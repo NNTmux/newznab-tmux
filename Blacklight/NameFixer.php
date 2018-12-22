@@ -2444,7 +2444,9 @@ class NameFixer
      */
     public function preDbFileCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
     {
-        $preDbRelease = Predb::query()->where('filename', $release->textstring)->first();
+        $this->_fileName = $release->textstring;
+        $this->_cleanMatchFiles();
+        $preDbRelease = Predb::query()->where('filename', 'like', $this->_fileName)->first();
 
         if ($preDbRelease !== null) {
             $this->updateRelease(
