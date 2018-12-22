@@ -1521,6 +1521,7 @@ class NameFixer
                     break;
                 case 'Filenames, ':
                     $this->fileCheck($release, $echo, $type, $nameStatus, $show);
+                    $this->preDbFileCheck($release, $echo, $type, $nameStatus, $show);
                     break;
                 default:
                     $this->tvCheck($release, $echo, $type, $nameStatus, $show);
@@ -2430,5 +2431,35 @@ class NameFixer
         $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+([\w\-.]+[\w]$)/i', $fileName, $match);
 
         return [$result === 1, $match[0] ?? ''];
+    }
+
+    /**
+     * @param $release
+     * @param bool $echo
+     * @param string $type
+     * @param int $nameStatus
+     * @param bool $show
+     * @return bool
+     * @throws \Exception
+     */
+    public function preDbFileCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
+    {
+        $preDbRelease = Predb::search($release->textstring)->first();
+
+        if ($preDbRelease !== null) {
+            $this->updateRelease(
+                 $release,
+                 $preDbRelease->title,
+                 'PreDb: Filename match',
+                 $echo,
+                 $type,
+                 $nameStatus,
+                 $show,
+                 $preDbRelease->id
+             );
+
+            return true;
+        }
+        return false;
     }
 }
