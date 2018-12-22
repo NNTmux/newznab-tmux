@@ -2460,6 +2460,7 @@ class NameFixer
 
             return true;
         }
+
         return false;
     }
 }
