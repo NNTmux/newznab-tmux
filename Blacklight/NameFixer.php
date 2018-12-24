@@ -8,7 +8,6 @@ use App\Models\Release;
 use App\Models\Category;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
-use Illuminate\Database\QueryException;
 
 /**
  * Class NameFixer.
@@ -1233,15 +1232,13 @@ class NameFixer
             if ($total > 0) {
                 $this->colorCli->header(PHP_EOL.number_format($total).' releases to process.');
 
-                foreach (collect($query)->chunk(100) as $chunked) {
-                    foreach ($chunked as $row) {
-                        $success = $this->matchPreDbFiles($row, true, 1, $show);
-                        if ($success === 1) {
-                            $counted++;
-                        }
-                        if ($show === 0) {
-                            $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
-                        }
+                foreach ($query as $row) {
+                    $success = $this->matchPreDbFiles($row, true, 1, $show);
+                    if ($success === 1) {
+                        $counted++;
+                    }
+                    if ($show === 0) {
+                        $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
                     }
                 }
                 $this->colorCli->header(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timestart).' seconds'.'.');
@@ -1271,20 +1268,39 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
-                $results = Predb::search($preMatch[1])->get()->chunk(1000)->first();
+                $results = $this->sphinx->searchPreDbFilename($preMatch[1]);
                 if (! empty($results)) {
                     foreach ($results as $result) {
                         if (! empty($result)) {
-                            $preFtMatch = $this->preMatch($result['filename']);
+                            $preMatch = Predb::whereId($result['id'])->first();
+                            $preFtMatch = $this->preMatch($preMatch->filename);
                             if ($preFtMatch[0] === true) {
-                                similar_text($preMatch[1], $preFtMatch[1], $percent);
-                                if ($percent >= 97) {
-                                    $this->_fileName = $result['filename'];
+                                $this->_fileName = $preMatch->filename;
+                                $release->filename = $this->_fileName;
+                                if ($preMatch->title !== $release->searchname) {
+                                    $this->updateRelease($release, $preMatch->title, 'file matched source: '.$preMatch->source, $echo, 'PreDB file match, ', $nameStatus, $show, $preMatch->id);
+                                } else {
+                                    $this->_updateSingleColumn('predb_id', $preMatch->id, $release->releases_id);
+                                }
+                                $matching++;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $results = $this->sphinx->searchPreDbTitle($preMatch[1]);
+                    if (! empty($results)) {
+                        foreach ($results as $result) {
+                            if (! empty($result)) {
+                                $preMatch = Predb::whereId($result['id'])->first();
+                                $preFtMatch = $this->preMatch($preMatch->title);
+                                if ($preFtMatch[0] === true) {
+                                    $this->_fileName = $preMatch->title;
                                     $release->filename = $this->_fileName;
-                                    if ($result['title'] !== $release->searchname) {
-                                        $this->updateRelease($release, $result['title'], 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
+                                    if ($preMatch->title !== $release->searchname) {
+                                        $this->updateRelease($release, $preMatch->title, 'file matched source: '.$preMatch->source, $echo, 'PreDB file match, ', $nameStatus, $show, $preMatch->id);
                                     } else {
-                                        $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
+                                        $this->_updateSingleColumn('predb_id', $preMatch->id, $release->releases_id);
                                     }
                                     $matching++;
                                     break;
@@ -2446,22 +2462,19 @@ class NameFixer
     {
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
-        try {
-            if (! empty($this->_fileName)) {
-                foreach ($this->sphinx->searchPreDbFilename($this->_fileName) as $match) {
-                    if (! empty($match)) {
-                        $preTitle = Predb::whereId($match['id'])->first();
-                        similar_text($this->_fileName, $preTitle->title, $percent);
-                        if ($percent >= 97) {
-                            $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
 
-                            return true;
-                        }
+        if (! empty($this->_fileName)) {
+            foreach ($this->sphinx->searchPreDbFilename($this->_fileName) as $match) {
+                if (! empty($match)) {
+                    $preTitle = Predb::whereId($match['id'])->first();
+                    similar_text($this->_fileName, $preTitle->title, $percent);
+                    if ($percent >= 97) {
+                        $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
+
+                        return true;
                     }
                 }
             }
-        } catch (QueryException $e) {
-            //do nothing, carry on
         }
 
         return false;

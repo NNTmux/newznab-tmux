@@ -88,7 +88,7 @@ class SphinxSearch
             }
         }
         if ($identifiers['i'] !== false) {
-            $this->sphinxQL->delete()->from([$this->config['indexes.releases']])->where('id', '=', $identifiers['i']);
+            $this->sphinxQL->delete()->from([$this->config['indexes']['releases']])->where('id', '=', $identifiers['i']);
         }
     }
 
