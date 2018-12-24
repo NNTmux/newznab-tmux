@@ -2467,12 +2467,9 @@ class NameFixer
             foreach ($this->sphinx->searchPreDbFilename($this->_fileName) as $match) {
                 if (! empty($match)) {
                     $preTitle = Predb::whereId($match['id'])->first();
-                    similar_text($this->_fileName, $preTitle->title, $percent);
-                    if ($percent >= 97) {
-                        $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
+                    $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
 
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
