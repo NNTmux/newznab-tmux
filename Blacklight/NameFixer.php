@@ -7,8 +7,8 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\utility\Utility;
-use Illuminate\Database\QueryException;
 use Blacklight\processing\PostProcess;
+use Illuminate\Database\QueryException;
 
 /**
  * Class NameFixer.
