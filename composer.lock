@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e81a08b2998a33071c7ef5e359665192",
+    "content-hash": "8835ec25ee919a0b1b47b186d600803f",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1443,20 +1443,20 @@
         },
         {
             "name": "foolz/sphinxql-query-builder",
-            "version": "1.2.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FoolCode/SphinxQL-Query-Builder.git",
-                "reference": "ca6e6836b5f1bc5077e0d179874aa252440ea4dc"
+                "reference": "a599b87b27b49d39fcf00f8fc98750e3b26bcd3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FoolCode/SphinxQL-Query-Builder/zipball/ca6e6836b5f1bc5077e0d179874aa252440ea4dc",
-                "reference": "ca6e6836b5f1bc5077e0d179874aa252440ea4dc",
+                "url": "https://api.github.com/repos/FoolCode/SphinxQL-Query-Builder/zipball/a599b87b27b49d39fcf00f8fc98750e3b26bcd3c",
+                "reference": "a599b87b27b49d39fcf00f8fc98750e3b26bcd3c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": "^5.6 || ^7.0"
             },
             "replace": {
                 "foolz/sphinxql": "self.version"
@@ -1490,7 +1490,7 @@
                 "sphinxql",
                 "sql"
             ],
-            "time": "2017-11-07T14:00:57+00:00"
+            "time": "2018-06-01T04:28:35+00:00"
         },
         {
             "name": "genealabs/laravel-caffeine",

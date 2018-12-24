@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Models\Predb;
 use App\Models\Release;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
@@ -40,8 +41,8 @@ class SphinxSearch
         $this->connection = new Connection();
         $this->config = config('sphinxsearch');
         $this->connection->setParams(['host' => $this->config['host'], 'port' => $this->config['port']]);
-        $this->sphinxQL = SphinxQL::create($this->connection);
-        $this->helper = Helper::create($this->connection);
+        $this->sphinxQL = new SphinxQL($this->connection);
+        $this->helper = new Helper($this->connection);
     }
 
     /**
@@ -53,8 +54,23 @@ class SphinxSearch
         if ($this->sphinxQL !== null && $parameters['id']) {
             $this->sphinxQL
                 ->replace()
-                ->into($this->config['index'])
+                ->into($this->config['indexes']['releases'])
                 ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
+                ->execute();
+        }
+    }
+
+    /**
+     * Insert release into Sphinx RT table.
+     * @param $parameters
+     */
+    public function insertPredb($parameters): void
+    {
+        if ($this->sphinxQL !== null && $parameters['id']) {
+            $this->sphinxQL
+                ->replace()
+                ->into($this->config['indexes']['predb'])
+                ->set(['id' => $parameters['id'], 'title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
                 ->execute();
         }
     }
@@ -72,7 +88,7 @@ class SphinxSearch
             }
         }
         if ($identifiers['i'] !== false) {
-            $this->sphinxQL->delete()->from([$this->config['index']])->where('id', '=', $identifiers['i']);
+            $this->sphinxQL->delete()->from([$this->config['indexes.releases']])->where('id', '=', $identifiers['i']);
         }
     }
 
@@ -112,11 +128,31 @@ class SphinxSearch
     }
 
     /**
+     * Update Sphinx Predb index for given predb_id.
+     *
+     * @param int $title
+     * @throws \Exception
+     */
+    public function updatePreDb($title): void
+    {
+        $new = Predb::query()
+            ->where('title', $title)
+            ->select(['id', 'title', 'filename'])
+            ->groupBy('id')
+            ->first();
+
+        if ($new !== null) {
+            $this->insertPredb($new);
+        }
+    }
+
+    /**
      * Truncate the RT index.
      */
     public function truncateRTIndex(): void
     {
-        $this->helper->truncateRtIndex($this->config['index']);
+        $this->helper->truncateRtIndex($this->config['indexes.releases']);
+        $this->helper->truncateRtIndex($this->config['indexes.predb']);
     }
 
     /**
@@ -124,7 +160,27 @@ class SphinxSearch
      */
     public function optimizeRTIndex(): void
     {
-        $this->helper->flushRtIndex($this->config['index']);
-        $this->helper->optimizeIndex($this->config['index']);
+        $this->helper->flushRtIndex($this->config['indexes.releases']);
+        $this->helper->optimizeIndex($this->config['indexes.releases']);
+        $this->helper->flushRtIndex($this->config['indexes.predb']);
+        $this->helper->optimizeIndex($this->config['indexes.predb']);
+    }
+
+    /**
+     * @param $search
+     * @return array
+     */
+    public function searchPreDbFilename($search)
+    {
+        return $this->sphinxQL->select('id')->from('predb_rt')->match('filename', $search)->execute()->fetchAllAssoc();
+    }
+
+    /**
+     * @param $search
+     * @return array
+     */
+    public function searchPreDbTitle($search)
+    {
+        return $this->sphinxQL->select('id')->from('predb_rt')->match('title', $search)->execute()->fetchAllAssoc();
     }
 }

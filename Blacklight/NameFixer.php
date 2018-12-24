@@ -7,7 +7,7 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Blacklight\processing\PostProcess;
 
 /**
@@ -2446,21 +2446,17 @@ class NameFixer
     {
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
-        $preDbRelease = Predb::query()->where('filename', 'like', $this->_fileName)->first();
+        try {
+            foreach (Predb::search($this->_fileName)->get() as $match) {
+                similar_text($this->_fileName, $match->filename, $percent);
+                if ($percent >= 97) {
+                    $this->updateRelease($release, $match->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match->id);
 
-        if ($preDbRelease !== null) {
-            $this->updateRelease(
-                 $release,
-                 $preDbRelease->title,
-                 'PreDb: Filename match',
-                 $echo,
-                 $type,
-                 $nameStatus,
-                 $show,
-                 $preDbRelease->id
-             );
-
-            return true;
+                    return true;
+                }
+            }
+        } catch (QueryException $e) {
+            //do nothing, carry on
         }
 
         return false;

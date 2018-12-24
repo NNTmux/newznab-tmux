@@ -319,6 +319,14 @@ class IRCScraper extends IRCClient
             )
         );
 
+        $parameters = [
+            'id' => DB::connection()->getPdo()->lastInsertId(),
+            'title' => $this->_curPre['title'],
+            'filename' => $this->_curPre['filename'],
+        ];
+
+        (new SphinxSearch())->insertPredb($parameters);
+
         $this->_doEcho(true);
     }
 
@@ -358,6 +366,14 @@ class IRCScraper extends IRCClient
         $query .= ' WHERE title = '.escapeString($this->_curPre['title']);
 
         DB::update($query);
+
+        $parameters = [
+            'id' => DB::connection()->getPdo()->lastInsertId(),
+            'title' => $this->_curPre['title'],
+            'filename' => $this->_curPre['filename'],
+        ];
+
+        (new SphinxSearch())->updatePreDb($parameters);
 
         $this->_doEcho(false);
     }
