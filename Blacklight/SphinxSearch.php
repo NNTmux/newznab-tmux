@@ -151,8 +151,8 @@ class SphinxSearch
      */
     public function truncateRTIndex(): void
     {
-        $this->helper->truncateRtIndex($this->config['indexes.releases']);
-        $this->helper->truncateRtIndex($this->config['indexes.predb']);
+        $this->helper->truncateRtIndex($this->config['indexes']['releases']);
+        $this->helper->truncateRtIndex($this->config['indexes']['predb']);
     }
 
     /**
@@ -160,27 +160,27 @@ class SphinxSearch
      */
     public function optimizeRTIndex(): void
     {
-        $this->helper->flushRtIndex($this->config['indexes.releases']);
-        $this->helper->optimizeIndex($this->config['indexes.releases']);
-        $this->helper->flushRtIndex($this->config['indexes.predb']);
-        $this->helper->optimizeIndex($this->config['indexes.predb']);
+        $this->helper->flushRtIndex($this->config['indexes']['releases']);
+        $this->helper->optimizeIndex($this->config['indexes']['releases']);
+        $this->helper->flushRtIndex($this->config['indexes']['predb']);
+        $this->helper->optimizeIndex($this->config['indexes']['predb']);
     }
 
     /**
      * @param $search
      * @return array
      */
-    public function searchPreDbFilename($search)
+    public function searchPreDbFilename($search): array
     {
-        return $this->sphinxQL->select('id')->from('predb_rt')->match('filename', $search)->execute()->fetchAllAssoc();
+        return $this->sphinxQL->select()->from('predb_rt')->match('filename', $search)->execute()->fetchAssoc();
     }
 
     /**
      * @param $search
      * @return array
      */
-    public function searchPreDbTitle($search)
+    public function searchPreDbTitle($search): array
     {
-        return $this->sphinxQL->select('id')->from('predb_rt')->match('title', $search)->execute()->fetchAllAssoc();
+        return $this->sphinxQL->select()->from('predb_rt')->match('title', $search)->execute()->fetchAssoc();
     }
 }

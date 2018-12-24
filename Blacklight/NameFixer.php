@@ -2447,12 +2447,17 @@ class NameFixer
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
         try {
-            foreach (Predb::search($this->_fileName)->get() as $match) {
-                similar_text($this->_fileName, $match->filename, $percent);
-                if ($percent >= 97) {
-                    $this->updateRelease($release, $match->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match->id);
+            if (! empty($this->_fileName)) {
+                foreach ($this->sphinx->searchPreDbFilename($this->_fileName) as $match) {
+                    if (! empty($match)) {
+                        $preTitle = Predb::whereId($match['id'])->first()->value('title');
+                        similar_text($this->_fileName, $preTitle, $percent);
+                        if ($percent >= 97) {
+                            $this->updateRelease($release, $match->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match->id);
 
-                    return true;
+                            return true;
+                        }
+                    }
                 }
             }
         } catch (QueryException $e) {

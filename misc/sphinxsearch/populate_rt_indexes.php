@@ -18,8 +18,6 @@ if (! isset($argv[1]) && ($argv[1] !== 'releases_rt' || $argv[1] !== 'predb_rt')
     );
 }
 
-dump($argv[1]);
-
 populate_rt($argv[1], (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : 10000));
 
 // Bulk insert releases into sphinx RT index.
@@ -29,18 +27,18 @@ function populate_rt($table, $max)
         DB::statement('SET SESSION group_concat_max_len=16384;');
         $query = 'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 				FROM releases r
-				LEFT JOIN release_files rf ON(r.id=rf.releases_id)
+				LEFT JOIN release_files rf ON r.id = rf.releases_id
 				WHERE r.id > %d
 				GROUP BY r.id
 				ORDER BY r.id ASC
 				LIMIT %d';
 
-        $totals = Release::query()->select(DB::raw('COUNT(id) AS c, MIN(id) AS min'))->first();
+        $totals = Release::fromQuery('SELECT COUNT(id) AS c, MIN(id) AS min FROM releases')->first();
         if (! $totals) {
             exit("Could not get database information for releases table.\n");
         }
-        $total = $totals['c'];
-        $minId = $totals['min'];
+        $total = $totals->c;
+        $minId = $totals->min;
     }
 
     if ($table === 'predb_rt') {
@@ -52,30 +50,28 @@ function populate_rt($table, $max)
 				ORDER BY id ASC
 				LIMIT %d';
 
-        $totals = Predb::query()->select(DB::raw('COUNT(id) AS c, MIN(id) AS min'))->first();
+        $totals = Predb::fromQuery('SELECT COUNT(id) AS c, MIN(id) AS min FROM predb')->first();
         if (! $totals) {
             exit("Could not get database information for predb table.\n");
         }
-        $total = $totals['c'];
-        $minId = $totals['min'];
+        $total = $totals->c;
+        $minId = $totals->min;
     }
 
-    try {
-        $sphinx = new SphinxSearch();
-        $lastId = $minId - 1;
-        echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
-        for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
-            $rows = DB::select(sprintf($query, $lastId, $max));
-            if ($rows === 0) {
-                continue;
-            }
+    $sphinx = new SphinxSearch();
+    $lastId = $minId - 1;
+    echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
+    for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
+        $rows = DB::select(sprintf($query, $lastId, $max));
+        if ($rows === 0) {
+            continue;
+        }
 
-            $tempString = '';
-            foreach ($rows as $row) {
-                if ($row->id > $lastId) {
-                    $lastId = $row->id;
-                }
-                switch ($table) {
+        foreach ($rows as $row) {
+            if ($row->id > $lastId) {
+                $lastId = $row->id;
+            }
+            switch ($table) {
                     case 'releases_rt':
                         $sphinx->insertRelease(
                             [
@@ -98,14 +94,9 @@ function populate_rt($table, $max)
                         );
                         break;
                 }
-            }
-            if (! $tempString) {
-                continue;
-            }
-            echo '.';
         }
-        echo "\n[Done]\n";
-    } catch (Exception $e) {
-        echo $e->getMessage();
+
+        echo '.';
     }
+    echo "\n[Done]\n";
 }
