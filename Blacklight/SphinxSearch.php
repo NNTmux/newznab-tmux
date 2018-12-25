@@ -172,7 +172,7 @@ class SphinxSearch
      */
     public function searchPreDbFilename($search): array
     {
-        return $this->sphinxQL->select()->from('predb_rt')->match('filename', $search)->execute()->fetchAllAssoc() ?? [];
+        return $this->sphinxQL->select()->from('predb_rt')->match('filename', $search)->option('max_matches', 10000)->execute()->fetchAllAssoc() ?? [];
     }
 
     /**
@@ -181,6 +181,6 @@ class SphinxSearch
      */
     public function searchPreDbTitle($search): array
     {
-        return $this->sphinxQL->select()->from('predb_rt')->match('title', $search)->execute()->fetchAllAssoc() ?? [];
+        return $this->sphinxQL->select()->from('predb_rt')->match('title', $search)->option('max_matches', 10000)->execute()->fetchAllAssoc() ?? [];
     }
 }

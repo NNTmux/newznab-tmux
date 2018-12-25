@@ -1,3 +1,5 @@
+2018-12-25 DariusIII
+	* Chg: Add max_matches option to SphinxSearch queries
 2018-12-24 DariusIII
 	* Chg: Remove similar_text check from preDbFileCheck function
 	* Chg: Update NameFixer and SphinxSearch classes
