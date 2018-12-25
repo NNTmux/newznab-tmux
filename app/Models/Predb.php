@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
+use Blacklight\SphinxSearch;
 use Laravel\Scout\Searchable;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
@@ -172,23 +173,17 @@ class Predb extends Model
     }
 
     /**
-     * @param string|array $search
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
+     * @param string $search
+     * @return mixed
+     * @throws \Exception
      */
     public static function getAll($search = '')
     {
-        if ($search !== '') {
-            $search = explode(' ', trim($search));
-        }
-
         $sql = self::query()->remember(config('nntmux.cache_expiry_medium'))->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if ($search !== '') {
-            $sql->where(function ($query) use ($search) {
-                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->where('title', 'like', '%'.$search[$i].'%');
-                }
-            });
+            $sphinx = new SphinxSearch();
+            $ids = array_pluck($sphinx->searchIndexes($search, 'title', 'predb_rt'), 'id');
+            $sql->whereIn('predb.id', $ids);
         }
 
         return $sql->paginate(config('nntmux.items_per_page'));

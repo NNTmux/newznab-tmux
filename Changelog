@@ -1,4 +1,5 @@
 2018-12-25 DariusIII
+	* Chg: Update searchIndexes function and use it in NameFixer and speedup predb search in admin area
 	* Chg: Update webmozart/assert to version 1.4.0
 	* Chg: Add max_matches option to SphinxSearch queries
 2018-12-24 DariusIII

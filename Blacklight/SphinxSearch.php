@@ -167,20 +167,13 @@ class SphinxSearch
     }
 
     /**
-     * @param $search
+     * @param string $searchString (what are we looking for?)
+     * @param string|array $column (one or multiple columns from the columns that exist in indexes)
+     * @param string $rt_index (releases_rt or predb_rt)
      * @return array
      */
-    public function searchPreDbFilename($search): array
+    public function searchIndexes(string $searchString, $column, string $rt_index): array
     {
-        return $this->sphinxQL->select()->from('predb_rt')->match('filename', $search)->option('max_matches', 10000)->execute()->fetchAllAssoc() ?? [];
-    }
-
-    /**
-     * @param $search
-     * @return array
-     */
-    public function searchPreDbTitle($search): array
-    {
-        return $this->sphinxQL->select()->from('predb_rt')->match('title', $search)->option('max_matches', 10000)->execute()->fetchAllAssoc() ?? [];
+        return $this->sphinxQL->select()->from($rt_index)->match($column, $searchString)->option('max_matches', 10000)->execute()->fetchAllAssoc() ?? [];
     }
 }
