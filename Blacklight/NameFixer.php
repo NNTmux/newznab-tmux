@@ -2486,11 +2486,10 @@ class NameFixer
     }
 
     /**
-     * Clean filenames for predb title match
+     * Clean filenames for predb title match.
      *
      *
      * @return string|string[]|null
-     *
      */
     private function cleanFileNames()
     {
