@@ -2470,22 +2470,12 @@ class NameFixer
     {
         $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
-        $this->_fileName = preg_replace('/\.4k$/', '.2160p', $this->_fileName);
-        if (preg_match('/\.fullhd$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.fullhd/i', '.1080p', $this->_fileName);
-        }
-        if (preg_match('/\.hd$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.hd/i', '.720p', $this->_fileName);
-        }
-        if (preg_match('/\.int$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.int/i', '.INTERNAL', $this->_fileName);
-        }
-
+        $this->cleanFileNames();
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
+            foreach ($this->sphinx->searchIndexes($this->_fileName, 'title', 'predb_rt') as $match) {
                 if (! empty($match)) {
                     $preTitle = Predb::whereId($match['id'])->first();
-                    $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
+                    $this->updateRelease($release, $preTitle->title, 'PreDb: Title match', $echo, $type, $nameStatus, $show, $preTitle->id);
 
                     return true;
                 }
@@ -2493,5 +2483,34 @@ class NameFixer
         }
 
         return false;
+    }
+
+    /**
+     * Clean filenames for predb title match
+     *
+     *
+     * @return string|string[]|null
+     *
+     */
+    private function cleanFileNames()
+    {
+        $this->_fileName = preg_replace('/\.4k$/', '.2160p', $this->_fileName);
+        if (preg_match('/\.fullhd$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.fullhd$/i', '.1080p', $this->_fileName);
+        }
+        if (preg_match('/\.hd$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.hd$/i', '.720p', $this->_fileName);
+        }
+        if (preg_match('/\.int$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.int$/i', '.INTERNAL', $this->_fileName);
+        }
+        if (preg_match('/\.\d+$', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.\d+$/', '', $this->_fileName);
+        }
+        if (preg_match('^[a-zA-Z]{0,3}\.', $this->_fileName)) {
+            $this->_fileName = preg_replace('^[a-zA-Z]{0,3}\.', '', $this->_fileName);
+        }
+
+        return $this->_fileName;
     }
 }
