@@ -2503,11 +2503,11 @@ class NameFixer
         if (preg_match('/\.int$/i', $this->_fileName)) {
             $this->_fileName = preg_replace('/\.int$/i', '.INTERNAL', $this->_fileName);
         }
-        if (preg_match('/\.\d+$', $this->_fileName)) {
+        if (preg_match('/\.\d+$/', $this->_fileName)) {
             $this->_fileName = preg_replace('/\.\d+$/', '', $this->_fileName);
         }
-        if (preg_match('^[a-zA-Z]{0,3}\.', $this->_fileName)) {
-            $this->_fileName = preg_replace('^[a-zA-Z]{0,3}\.', '', $this->_fileName);
+        if (preg_match('/^[a-zA-Z]{0,3}\./', $this->_fileName)) {
+            $this->_fileName = preg_replace('/^[a-zA-Z]{0,3}\./', '', $this->_fileName);
         }
 
         return $this->_fileName;
