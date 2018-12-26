@@ -1,4 +1,5 @@
 2018-12-26 DariusIII
+	* Chg: Update releases renaming, especialy XXX releases
 	* Chg: Add small shadow on movie and xxx covers images
 	* Chg: Update NameFixer PreDB matching
 	* Chg: Update TmuxRun class, increase number of releases for matching for match_prefiles script

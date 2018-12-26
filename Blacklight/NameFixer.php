@@ -1516,6 +1516,7 @@ class NameFixer
                     break;
                 case 'Filenames, ':
                     $this->preDbFileCheck($release, $echo, $type, $nameStatus, $show);
+                    $this->preDbTitleCheck($release, $echo, $type, $nameStatus, $show);
                     $this->fileCheck($release, $echo, $type, $nameStatus, $show);
                     break;
                 default:
@@ -2440,6 +2441,37 @@ class NameFixer
     public function preDbFileCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
     {
         $this->_fileName = $release->textstring;
+        $this->_cleanMatchFiles();
+
+        if (! empty($this->_fileName)) {
+            foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
+                if (! empty($match)) {
+                    $preTitle = Predb::whereId($match['id'])->first();
+                    $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $release
+     * @param bool $echo
+     * @param string $type
+     * @param int $nameStatus
+     * @param bool $show
+     * @return bool
+     * @throws \Exception
+     */
+    public function preDbTitleCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
+    {
+        $this->_fileName = preg_replace('/\.4k$/', '.2160p', $release->textstring);
+        if (preg_match('/\.fullhd$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.fullhd/i', '.1080p', $release->textstring);
+        }
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
