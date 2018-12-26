@@ -93,7 +93,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
-																class="cover img-fluid rounded"
+																class="cover shadow img-fluid rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -238,7 +238,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
-																class="cover img-fluid rounded"
+																class="cover shadow img-fluid rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
