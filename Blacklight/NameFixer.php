@@ -2477,6 +2477,9 @@ class NameFixer
         if (preg_match('/\.hd$/i', $this->_fileName)) {
             $this->_fileName = preg_replace('/\.hd/i', '.720p', $this->_fileName);
         }
+        if (preg_match('/\.int$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.int/i', '.INTERNAL', $this->_fileName);
+        }
 
         if (! empty($this->_fileName)) {
             foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
