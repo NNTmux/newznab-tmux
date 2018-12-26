@@ -2468,11 +2468,15 @@ class NameFixer
      */
     public function preDbTitleCheck($release, bool $echo, string $type, int $nameStatus, bool $show): bool
     {
-        $this->_fileName = preg_replace('/\.4k$/', '.2160p', $release->textstring);
-        if (preg_match('/\.fullhd$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.fullhd/i', '.1080p', $release->textstring);
-        }
+        $this->_fileName = $release->textstring;
         $this->_cleanMatchFiles();
+        $this->_fileName = preg_replace('/\.4k$/', '.2160p', $this->_fileName);
+        if (preg_match('/\.fullhd$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.fullhd/i', '.1080p', $this->_fileName);
+        }
+        if (preg_match('/\.hd$/i', $this->_fileName)) {
+            $this->_fileName = preg_replace('/\.hd/i', '.720p', $this->_fileName);
+        }
 
         if (! empty($this->_fileName)) {
             foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
