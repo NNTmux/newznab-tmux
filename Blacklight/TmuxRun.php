@@ -139,7 +139,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][3]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 100 show $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 3000 show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
                 break;

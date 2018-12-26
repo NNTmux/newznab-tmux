@@ -1,3 +1,5 @@
+2018-12-26 DariusIII
+	* Chg: Update TmuxRun class, increase number of releases for matching for match_prefiles script
 2018-12-25 DariusIII
 	* Chg: Update searchIndexes function and use it in NameFixer and speedup predb search in admin area
 	* Chg: Update webmozart/assert to version 1.4.0
