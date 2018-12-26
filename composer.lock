@@ -1833,16 +1833,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.1.2",
+            "version": "v6.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "b7b99083cc52eadfd7a0dd027bbc2212fe8a5624"
+                "reference": "00c06221226087f28e7d9bc9ba5d3039ced28c9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/b7b99083cc52eadfd7a0dd027bbc2212fe8a5624",
-                "reference": "b7b99083cc52eadfd7a0dd027bbc2212fe8a5624",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/00c06221226087f28e7d9bc9ba5d3039ced28c9f",
+                "reference": "00c06221226087f28e7d9bc9ba5d3039ced28c9f",
                 "shasum": ""
             },
             "require": {
@@ -1869,7 +1869,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-11-29T17:44:22+00:00"
+            "time": "2018-12-25T14:17:22+00:00"
         },
         {
             "name": "intervention/image",
@@ -3782,16 +3782,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.1.0",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "d0230c5c77a7e3cfa69446febf340978540958c0"
+                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/d0230c5c77a7e3cfa69446febf340978540958c0",
-                "reference": "d0230c5c77a7e3cfa69446febf340978540958c0",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
+                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
                 "shasum": ""
             },
             "require": {
@@ -3829,7 +3829,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-10-10T09:24:14+00:00"
+            "time": "2018-12-26T11:32:39+00:00"
         },
         {
             "name": "ntimyeboah/laravel-database-trigger",

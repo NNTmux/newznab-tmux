@@ -1,4 +1,5 @@
 2018-12-26 DariusIII
+	* Chg: Update imdbphp/imdbphp to version 6.1.3 and nikic/php-parser to version 4.1.1
 	* Chg: Update NameFixer for predb title match
 	* Chg: Update releases renaming, especialy XXX releases
 	* Chg: Add small shadow on movie and xxx covers images
