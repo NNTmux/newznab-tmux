@@ -1515,8 +1515,8 @@ class NameFixer
                     $this->nfoCheckG($release, $echo, $type, $nameStatus, $show);
                     break;
                 case 'Filenames, ':
-                    $this->fileCheck($release, $echo, $type, $nameStatus, $show);
                     $this->preDbFileCheck($release, $echo, $type, $nameStatus, $show);
+                    $this->fileCheck($release, $echo, $type, $nameStatus, $show);
                     break;
                 default:
                     $this->tvCheck($release, $echo, $type, $nameStatus, $show);
@@ -2443,7 +2443,7 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes($this->_fileName, 'filename', 'predb_rt') as $match) {
+            foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
                 if (! empty($match)) {
                     $preTitle = Predb::whereId($match['id'])->first();
                     $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
