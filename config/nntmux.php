@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'db_name' => env('DB_NAME', 'nntmux'),
     'items_per_page' => env('ITEMS_PER_PAGE', 50),
     'items_per_cover_page' => env('ITEMS_PER_COVER_PAGE', 20),
     'max_pager_results' => env('MAX_PAGER_RESULTS', 125000),

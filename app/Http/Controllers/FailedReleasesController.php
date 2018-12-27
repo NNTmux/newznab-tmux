@@ -14,15 +14,15 @@ class FailedReleasesController extends BasePageController
      * @return mixed
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function failed(Request $request)
     {
-        if (! $request->has('userid') || ! $request->has('api_token')) {
+        if (! $request->has('api_token')) {
             return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
         }
 
-        $res = User::getByIdAndRssToken($request->input('userid'), $request->input('api_token'));
+        $res = User::getByRssToken($request->input('api_token'));
         if ($res === null) {
-            return response('Unauthorised, wrong user ID or rss key!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong user ID or rss key!']);
+            return response('Unauthorised, wrong rss key!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong rss key!']);
         }
 
         $uid = $res['id'];
@@ -35,7 +35,7 @@ class FailedReleasesController extends BasePageController
                 return response('No NZB found for alternate match!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
             }
 
-            return response('Success', 200)->withHeaders(['Location' => url('/').'/getnzb?id='.$alt['guid'].'&i='.$uid.'&r='.$rssToken]);
+            return response('Success', 200)->withHeaders(['Location' => url('/').'/getnzb?id='.$alt['guid'].'&r='.$rssToken]);
         }
 
         return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);

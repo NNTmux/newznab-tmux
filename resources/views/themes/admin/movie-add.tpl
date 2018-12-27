@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	<form enctype="multipart/form-data" action="movie-add" method="post">
@@ -20,7 +20,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input class="btn btn-default" type="submit" value="Add"/>
+					<input class="btn btn-success" type="submit" value="Add"/>
 				</td>
 			</tr>
 

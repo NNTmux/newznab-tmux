@@ -38,7 +38,7 @@
 							<input type="hidden" name="t" value="{if $category[0]!=""}{$category[0]}{else}-1{/if}"
 								   id="search_cat"/>
 							<input type="hidden" name="search_type" value="basic" id="search_type"/>
-							<input id="search_search_button" class="btn btn-primary" type="submit" value="Search"/>
+							<input id="search_search_button" class="btn btn-success" type="submit" value="Search"/>
 						</div>
 					</div>
 				{{Form::close()}}
@@ -107,7 +107,7 @@
 									<input type="checkbox" name="searchadvhascomments" value="1">
 									<div style="float:right;"><input type="hidden" name="search_type" value="adv"
 																	 id="search_type">
-										<input id="search_adv_button" class="btn btn-primary" type="submit"
+										<input id="search_adv_button" class="btn btn-success" type="submit"
 											   value="Search">
 									</div>
 								</td>
@@ -144,7 +144,7 @@
 				<div class="well well-sm">
 					{{Form::open(['id' => 'nzb_multi_operations_form','style' => 'padding-top:10px;', 'method' => 'get', 'url' => 'search'])}}
 						<div class="row">
-							<div class="col-md-8">
+							<div class="col-md-4">
 								{if isset($shows)}
 									<p>
 										<a href="{$smarty.const.WWW_TOP}/series"
@@ -178,7 +178,7 @@
 
 										{if isset($sabintegrated) && $sabintegrated !=""}
 											<button type="button"
-													class="nzb_multi_operations_sab btn btn-sm btn-primary"
+													class="nzb_multi_operations_sab btn btn-sm btn-success"
 													data-toggle="tooltip" data-placement="top" title
 													data-original-title="Send to Queue">
 												<i class="fa fa-share"></i></button>
@@ -194,15 +194,15 @@
 									</div>
 								</div>
 							</div>
-							{if    count($results) > 0}
-								<div class="col-md-4">
+							{if count($results) > 0}
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							{/if}
 						</div>
 						<hr>
 						<table class="data table table-striped responsive-utilities jambo-table" id="browsetable">
-							<thead>
+							<thead class="thead-light">
 							<tr>
 								<th><input id="check-all" type="checkbox" class="flat-all"/></th>
 								<th>Name
@@ -254,7 +254,7 @@
 												{/if}
 												{if $result->videostatus > 0}
 													<a
-															class="model_prev label label-primary"
+															class="model_prev badge badge-info"
 															href="{$smarty.const.WWW_TOP}/details/{$result->guid}"
 															title="This release has a video preview."
 															rel="preview"
@@ -264,56 +264,56 @@
 												{if $result->nfoid > 0}
 													<a href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
 													   title="View Nfo"
-													   class="modal_nfo label label-primary" rel="nfo">Nfo</a>
+													   class="modal_nfo badge badge-info" rel="nfo">Nfo</a>
 												{/if}
 												{if $result->imdbid > 0}
 													<a href="#" name="name{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View movie info"
-													   class="modal_imdb label label-primary" rel="movie">Cover</a>
+													   class="modal_imdb badge badge-info" rel="movie">Cover</a>
 												{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}
 												<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Screenshot of {$result->searchname|escape:"htmlall"}"
-												   class="label label-primary" rel="preview">Preview</a>{/if}
+												   class="badge badge-info" rel="preview">Preview</a>{/if}
 												{if $result->jpgstatus == 1 && $userdata->can('preview') == true}
 												<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result->guid}_thumb.jpg"
 												   name="name{$result->guid}"
 												   data-fancybox
 												   title="Sample of {$result->searchname|escape:"htmlall"}"
-												   class="label label-primary" rel="preview">Sample</a>{/if}
+												   class="badge badge-info" rel="preview">Sample</a>{/if}
 												{if $result->musicinfo_id > 0}
 													<a href="#" name="name{$result->musicinfo_id}"
 													   title="View music info"
-													   class="modal_music label label-primary" rel="music">Cover</a>
+													   class="modal_music badge badge-info" rel="music">Cover</a>
 												{/if}
 												{if $result->consoleinfo_id > 0}
 													<a href="#" name="name{$result->consoleinfo_id}"
 													   title="View console info"
-													   class="modal_console label label-primary" rel="console">Cover</a>
+													   class="modal_console badge badge-info" rel="console">Cover</a>
 												{/if}
 												{if $result->videos_id > 0}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/series/{$result->videos_id}"
 													   title="View all episodes">View
 														Series</a>
 												{/if}
 												{if $result->anidbid > 0}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/anime?id={$result->anidbid}"
 													   title="View all episodes">View
 														Anime</a>
 												{/if}
 												{if isset($result->firstaired) && $result->firstaired != ''}
-													<span class="seriesinfo label label-primary"
+													<span class="seriesinfo badge badge-info"
 														  title="{$result->guid}">Aired {if $result->firstaired|strtotime > $smarty.now}in future{else}{$result->firstaired|daysago}{/if}</span>
 												{/if}
 												{if $result->group_name != ""}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name|escape:"htmlall"}"
 													   title="Browse {$result->group_name}">{$result->group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 												{/if}
-												{if !empty($result->failed)}<span class="label label-primary">
+												{if !empty($result->failed)}<span class="badge badge-info">
 													<i class="fa fa-thumbs-o-up"></i>
 													{$result->grabs} Grab{if $result->grabs != 1}s{/if} /
 													<i class="fa fa-thumbs-o-down"></i>
@@ -395,7 +395,7 @@
 						</table>
 						<br/>
 						<div class="row">
-							<div class="col-md-8">
+							<div class="col-md-4">
 								<div class="nzb_multi_operations">
 									<small>With Selected:</small>
 									<div class="btn-group">
@@ -412,7 +412,7 @@
 
 										{if isset($sabintegrated) && $sabintegrated !=""}
 											<button type="button"
-													class="nzb_multi_operations_sab btn btn-sm btn-primary"
+													class="nzb_multi_operations_sab btn btn-sm btn-success"
 													data-toggle="tooltip" data-placement="top" title
 													data-original-title="Send to Queue">
 												<i class="fa fa-share"></i></button>
@@ -429,7 +429,7 @@
 								</div>
 							</div>
 							{if    count($results) > 0}
-								<div class="col-md-4">
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							{/if}

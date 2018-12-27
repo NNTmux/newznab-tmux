@@ -28,8 +28,8 @@ class CreateMultigroupBinariesTable extends Migration {
             $table->foreign('collections_id', 'FK_MGR_Collections')->references('id')->on('multigroup_collections')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 
-        DB::unprepared("ALTER TABLE multigroup_binaries ADD COLUMN binaryhash BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
-        DB::unprepared('ALTER TABLE multigroup_binaries ADD UNIQUE INDEX ix_binaries_binaryhash (binaryhash)');
+        DB::statement("ALTER TABLE multigroup_binaries ADD COLUMN binaryhash BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
+        DB::statement('ALTER TABLE multigroup_binaries ADD UNIQUE INDEX ix_binaries_binaryhash (binaryhash)');
 	}
 
 

@@ -1,4 +1,4 @@
-<div class="well well-sm" id="group_list">
+<div class="card card-body" id="group_list">
 	<h1>{$title}</h1>
 	<p>
 		Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
@@ -11,7 +11,7 @@
                 {{Form::label('grouopname', 'Group')}}
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
 				&nbsp;&nbsp;
-				<input class="btn btn-default" type="submit" value="Go"/>
+				<input class="btn btn-success" type="submit" value="Go"/>
 			{{Form::close()}}
             </div>
 			<div class="col-md-4">
@@ -88,7 +88,7 @@
                 {{Form::label('grouopname', 'Group')}}
                 <input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
                 &nbsp;&nbsp;
-                <input class="btn btn-default" type="submit" value="Go"/>
+                <input class="btn btn-success" type="submit" value="Go"/>
                 {{Form::close()}}
             </div>
             <div class="col-md-4">

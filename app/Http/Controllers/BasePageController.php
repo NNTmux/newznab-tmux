@@ -82,7 +82,7 @@ class BasePageController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms');
+        $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'search', 'tv', 'details', 'failed');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->smarty = app('smarty.view');
@@ -229,7 +229,7 @@ class BasePageController extends Controller
      */
     protected function setUserPreferences(): void
     {
-        $this->userdata['categoryexclusions'] = User::getCategoryExclusion(Auth::id());
+        $this->userdata['categoryexclusions'] = User::getCategoryExclusionById(Auth::id());
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {

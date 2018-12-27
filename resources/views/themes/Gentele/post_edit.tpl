@@ -6,7 +6,7 @@
 		<div class="body">
             {{Form::open(['id' => 'forum-post-edit', 'class' => 'form-horizontal', 'url' => "forumpost/{$result.id}"])}}
 				<div class="control-group">
-					<label class="control-label" for="addMessage">Edit Post</label>
+					<label class="col-form-label" for="addMessage">Edit Post</label>
 					<div class="controls">
 						<textarea id="addMessage" name="addMessage">{$result.message}</textarea>
 					</div>

@@ -1,4 +1,116 @@
+2018-12-26 DariusIII
+	* Chg: Update imdbphp/imdbphp to version 6.1.3 and nikic/php-parser to version 4.1.1
+	* Chg: Update NameFixer for predb title match
+	* Chg: Update releases renaming, especialy XXX releases
+	* Chg: Add small shadow on movie and xxx covers images
+	* Chg: Update NameFixer PreDB matching
+	* Chg: Update TmuxRun class, increase number of releases for matching for match_prefiles script
+2018-12-25 DariusIII
+	* Chg: Update searchIndexes function and use it in NameFixer and speedup predb search in admin area
+	* Chg: Update webmozart/assert to version 1.4.0
+	* Chg: Add max_matches option to SphinxSearch queries
+2018-12-24 DariusIII
+	* Chg: Remove similar_text check from preDbFileCheck function
+	* Chg: Update NameFixer and SphinxSearch classes
+	* Chg: Update SphinxSearch predb search functions
+	* Chg: Update NameFixer preDbFileCheck function
+	* Chg: Use sphinx for predb filename matching
+	* Chg: Update foolz/sphinxql-query-builder to version 2.0.0, add predb_rt index to sphinx
+2018-12-22 DariusIII
+	* Chg: Update laravel/scout to version 6.1.3 and yab/laravel-scout-mysql-driver to version 2.1.0
+	* Chg: Further improve preDbFileCheck function
+	* Chg: Update NameFixer fixNamesWithFiles method
+	* Fix: Fix copy-paste error in submenu definition for admin predb link
+2018-12-21 DariusIII
+	* Chg: Update nunomaduro/larastan to version 0.3.13
+	* Chg: Update Bootstrap to version 4.2.1
+2018-12-20 DariusIII
+	* Chg: Update migrations_table.sql for old users so new migrations are not run as we already have the triggers added
+	* Chg: Remove old add_triggers migration and create completely new with new code
+	* Fix: Replace DB::statement with previously used DB::unprepared for trigger and stored procedure migrations
+	* Chg: Use user-badge icon for user menu
+	* Chg: Update fontawesome to version 5.6.3
+	* Chg: Slowly start adding support for postgresql
+	* Chg: Update scripts and config by removing unused env settings
+	* Chg: BC! Update database configuration and unify env settings(DB_NAME => DB_DATABASE, DB_USER => DB_USERNAME) and remove unused settings
+	* Chg: BC! Remove nntmux and edit mysql database connection, make mysql default connection
+	* Chg: Add used branch to tmux output
+	* Fix: Fix wrong class used in TmuxOutput class _getHeader function
+	* Chg: Update TmuxOutput _getHeader function
+	* Chg: Update Git related classes and add back version to tmux monitor pane
+	* Chg: Do not show used query in NameFixer, clutters screen and is not needed if not debugging
+	* Chg: Align text in monitor pane
+2018-12-19 DariusIII
+	* Chg: Update failed releases controller, related route and BasePageController
+	* Chg: Fix phpdoc block in ClearanceMiddleware
+	* Fix: Fix series view
+	* Chg: Update barryvdh/laravel-ide-helper to latest version
+	* Chg: Update VIEW_COMPILED_PATH with default value in .env.example
+	* Chg: Force migration if NNTmux application is in production when updating database
+	* Chg: Add migrations_table.sql so users that are patched run it and be able to use laravel's migrate method from now on
+	* Chg: Update TmuxOutput class
+	* Chg: Update tmux related files and classes
+        * Chg: Remove Versions classes and all related data
+2018-12-18 DariusIII
+	* Chg: Update configuration files
+	* Chg: Add back logoutOtherDevices Auth function
+	* Chg: Make login page prettier
+	* Fix: Exclude ApiV2 functions from auth middleware in BasePageController
+	* Fix: Fix wrong index used for results returned from iTunes
+	* Chg: Update laravel/framework to version 5.7.19
+	* Chg: Update PPA class, use File facade in additional postprocessing and files management
+	* Chg: Update PPA class
+	* Chg: Update deleteSingle function in Releases class
+2018-12-17 DariusIII
+	* Chg: Update ProcessReleases and Releases classes in an attempt to fix deletion of unwanted releases
+	* Chg: Update package.json and tinymce to version 4.9.2
+	* Chg: Update barryvdh/reflection-docblock to version 2.0.6 and laravel/framework to version 5.7.18
+	* Chg: Update opis/closure to version 3.1.2
+	* Chg: Update admin area template files
+	* Fix: Fix checks of missing itunes data
+	* Chg: Switch from groupfixrelnames to fixRelNames script
+	* Fix: Fix profile and profile edit pages
+	* Chg: Update Gentele theme various parts
+	* Chg: Update search-filter.tpl
+	* Chg: Update tables
+	* Chg: Update spatie/laravel-permission to version 2.29.0
+	* Chg: Update header menu in Gentele theme
+2018-12-16 DariusIII
+	* Chg: Update button colors
+	* Chg: Update sidebar navigation, fix the layout
+2018-12-15 DariusIII
+	* Chg: Update package.json
+	* Chg: Use badge-info in place of badge-primary
+	* Chg: Change spacing in articles & links menu
+2018-12-14 DariusIII
+	* Chg: Update all-js.js with new version on fancybox (3.5.6)
+	* Chg: Update package.json
+	* Chg: More theme adjsutments
+	* Chg: Fix some issues in theme
+	* Chg: Update Gentele
+	* Chg: Use Bootstrap 4 and adjust Gentele for BS4
+	* Chg: Update doctrine/dbal to version 2.9.1
+2018-12-13 DariusIII
+	* Chg: Update package.json
+	* Chg: Increase percentage for matching in matchPreDbFiles function
+2018-12-12 DariusIII
+	* Chg: Prevent query error on empty movie page (when no movies have been added yet)
+	* Fix: Fix couple of issues introduced with API changes
+	* Chg: Check if request has api_token(v2 API) or apikey(v1 API)
+	* Fix: Fix User error on APIv2 and ApiTransformer data
+	* Chg: Update user category exclusion handling in API and APIv2
+	* Chg: Remove requirement for userid when using RSS, API and APIv2, its useless as we already have the token
+	* Chg: Update code style of movieinfo table migration
+	* Chg: Update font-awesome to version 5.6.1 and update all-css.css and all-js.js files, also update package.json
+	* Chg: Update laravel/framework to version 5.7.17
+	* Chg: Update laravel/slack-notification-channel to version 1.0.3
+	* Fix: Fix missing overview index returned from trakt
+	* Chg: Update css and js files
+	* Chg: Update phpunit/phpunit to version 7.5.1
 2018-12-11 DariusIII
+	* Chg: Update all-css.css,all-js.js and package.json
+	* Chg: Update categorization for a.b.cd.image group
+	* Chg: Publish the genealabs-laravel-caffeine config
 	* Chg: Update spatie/laravel-permission to version 2.28.2
 2018-12-10 DariusIII
 	* Chg: Remove usage of ImageHelper just to fetch full URL to tmdb images, use URL directly

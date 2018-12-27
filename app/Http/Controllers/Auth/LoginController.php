@@ -81,6 +81,8 @@ class LoginController extends Controller
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
                     User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
 
+                    Auth::logoutOtherDevices($request->input('password'));
+
                     return redirect()->intended($this->redirectPath());
                 }
 

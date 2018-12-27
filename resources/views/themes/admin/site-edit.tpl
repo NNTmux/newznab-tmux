@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 
-<div class="well well-small">
+<div class="card card-body">
 	<form action="site-edit?action=submit" method="post">
 		{{csrf_field()}}
 
@@ -171,7 +171,7 @@
 					<td>
 						<input id="google_adsense_search" name="google_adsense_search" type="text"
 							   value="{$site->google_adsense_search}"/>
-						<div class="hint">The id of the google search ad panel displayed at the bottom of the left
+						<div class="hint">The id of the google search ad card displayed at the bottom of the left
 							menu.
 						</div>
 					</td>
@@ -1541,7 +1541,7 @@
 			</table>
 		</fieldset>
 
-		<input class="btn btn-default" type="submit" value="Save Site Settings"/>
+		<input class="btn btn-success" type="submit" value="Save Site Settings"/>
 
 	</form>
 </div>

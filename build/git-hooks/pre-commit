@@ -43,8 +43,6 @@ do
     echo ${PROJECT}/${FILE} >> ${FILE_LIST}
 done
 
-/usr/bin/php ${HOOKS}/runHooks.php
-
 EXIT_STATUS=$?
 
 if [ -e ${FILE_LIST} ]

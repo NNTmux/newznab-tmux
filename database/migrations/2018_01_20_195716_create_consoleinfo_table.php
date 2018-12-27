@@ -31,7 +31,7 @@ class CreateConsoleinfoTable extends Migration {
 			$table->boolean('cover')->default(0);
 			$table->timestamps();
 		});
-        DB::unprepared('ALTER TABLE consoleinfo ADD FULLTEXT ix_consoleinfo_title_platform_ft (title, platform)');
+        DB::statement('ALTER TABLE consoleinfo ADD FULLTEXT ix_consoleinfo_title_platform_ft (title, platform)');
 	}
 
 

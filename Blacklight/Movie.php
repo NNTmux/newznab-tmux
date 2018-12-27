@@ -312,8 +312,8 @@ class Movie
 			AND r.id IN (%s) %s
 			GROUP BY m.imdbid
 			ORDER BY %s %s",
-            (\is_array($movieIDs) ? implode(',', $movieIDs) : -1),
-            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            (\is_array($movieIDs) && ! empty($movieIDs) ? implode(',', $movieIDs) : -1),
+            (\is_array($releaseIDs) && ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
             (! empty($catsrch) ? $catsrch : ''),
             $order[0],
             $order[1]
@@ -658,7 +658,7 @@ class Movie
 
         $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title'], $iTunes['title']);
         $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '', $iTunes['rating'] ?? '');
-        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot'], $iTunes['description']);
+        $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot'], $iTunes['plot']);
         $mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline'], $iTunes['tagline']);
         $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year'], $iTunes['year']);
         $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre'], $iTunes['genre']);
@@ -954,6 +954,8 @@ class Movie
                             $ret['id'] = $resp['ids']['trakt'];
                         }
 
+                        $ret['overview'] = $resp['overview'] ?? '';
+
                         if (isset($resp['title'])) {
                             $ret['title'] = $resp['title'];
                         } else {
@@ -1052,11 +1054,11 @@ class Movie
             if ($percent > self::MATCH_PERCENT) {
                 $movie = [
                     'title' => $iTunesMovie->getName(),
-                    'director' => $iTunesMovie->getDirector(),
-                    'tagline' => $iTunesMovie->getTagLine(),
+                    'director' => $iTunesMovie->getDirector() ?? '',
+                    'tagline' => $iTunesMovie->getTagLine() ?? '',
                     'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
-                    'genre' => $iTunesMovie->getGenre(),
-                    'plot' => $iTunesMovie->getDescription(),
+                    'genre' => $iTunesMovie->getGenre() ?? '',
+                    'plot' => $iTunesMovie->getDescription() ?? '',
                     'year' => $iTunesMovie->getReleaseDate()->format('Y'),
                 ];
             } else {

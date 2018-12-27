@@ -32,10 +32,10 @@
 		{{Form::close()}}
 		<div class="row">
 			<div class="col-lg-12 portlets">
-				<div class="panel panel-default">
-					<div class="panel-body pagination2 table-responsive">
+				<div class="card card-default">
+					<div class="card-body pagination2 table-responsive">
 						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
-							<thead>
+							<thead class="thead-light">
 							<tr class="headings">
 								<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
 								<th class="column-title" style="display: table-cell;">Name</th>

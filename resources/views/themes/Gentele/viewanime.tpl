@@ -54,10 +54,10 @@
 		</p>
 		<div style="text-align: center;">
 			<div class="btn-group">
-				<a class="btn btn-sm btn-default"
+				<a class="btn btn-sm btn-success"
 				   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
 				   title="View AniDB">View AniDB</a>
-				<a class="btn btn-sm btn-default"
+				<a class="btn btn-sm btn-success"
 				   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS
 					feed for this Anime <i class="fa fa-rss"></i></a>
 			</div>
@@ -80,7 +80,7 @@
 
 					{if isset($sabintegrated) && $sabintegrated !=""}
 						<button type="button"
-								class="nzb_multi_operations_sab btn btn-sm btn-primary"
+								class="nzb_multi_operations_sab btn btn-sm btn-success"
 								data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
 							<i class="fa fa-share"></i></button>
 					{/if}
@@ -95,9 +95,9 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-lg-12 col-sm-12 col-xs-12">
-					<div class="panel panel-default">
-						<div class="panel-body pagination2">
+				<div class="col-lg-12 col-sm-12 col-12">
+					<div class="card card-default">
+						<div class="card-body pagination2">
 							<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table"
 								   id="browsetable">
 								<tr>
@@ -121,21 +121,21 @@
 												<div>
 													{if $result->nfoid > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-																class="modal_nfo label label-primary text-muted">NFO</a>
+																class="modal_nfo badge badge-info text-muted">NFO</a>
 														</span>{/if}
 													{if $result->haspreview == 1 && $userdata->can('preview') == true}<a
 														href="{$smarty.const.WWW_TOP}/covers/preview/{$result->guid}_thumb.jpg"
 														name="name{$result->guid}"
 														title="Screenshot of {$result->searchname|escape:"htmlall"}"
-														class="label label-primary" rel="preview">Preview</a>{/if}
-													<span class="label label-primary">{$result->grabs}
+														class="badge badge-info" rel="preview">Preview</a>{/if}
+													<span class="badge badge-info">{$result->grabs}
 														Grab{if $result->grabs != 1}s{/if}</span>
-													{if $result->reid > 0}<span class="mediainfo label label-primary"
+													{if $result->reid > 0}<span class="mediainfo badge badge-info"
 																			   title="{$result->guid}">Media</span>{/if}
 												</div>
 											</div>
 										</td>
-										<td><span class="label label-primary">{$result->category_name}</span></td>
+										<td><span class="badge badge-info">{$result->category_name}</span></td>
 										<td width="40" title="{$result->postdate}">{$result->postdate|timeago}</td>
 										<td>{$result->size|filesize}</td>
 										<td class="icon_nzb"><a

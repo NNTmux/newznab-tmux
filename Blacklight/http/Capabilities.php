@@ -24,7 +24,6 @@ namespace Blacklight\http;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use App\Extensions\util\Versions;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -125,8 +124,6 @@ abstract class Capabilities
 
         return [
             'server' => [
-                'appversion' => (new Versions())->getGitTagInFile(),
-                'version'    => (new Versions())->getGitTagInRepo(),
                 'title'      => Settings::settingValue('site.main.title'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
                 'email'      => Settings::settingValue('site.main.email'),

@@ -34,7 +34,7 @@ class DetailsTransformer extends TransformerAbstract
             return [
                 'title' => $releases->searchname,
                 'details' => url('/').'/details/'.$releases->guid,
-                'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
+                'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category_name' => $releases->category_name,
                 'tags' => $releases->tagNames() ?? $this->null(),
@@ -55,7 +55,7 @@ class DetailsTransformer extends TransformerAbstract
             return [
                 'title' => $releases->searchname,
                 'details' => url('/').'/details/'.$releases->guid,
-                'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
+                'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.'&r='.$this->user->api_token,
                 'category' => $releases->categories_id,
                 'category_name' => $releases->category_name,
                 'tags' => $releases->tagNames() ?? $this->null(),
@@ -81,7 +81,7 @@ class DetailsTransformer extends TransformerAbstract
         return [
             'title' => $releases->searchname,
             'details' => url('/').'/details/'.$releases->guid,
-            'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.$this->user->id.'&r='.$this->user->api_token,
+            'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.'&r='.$this->user->api_token,
             'category' => $releases->categories_id,
             'category_name' => $releases->category_name,
             'tags' => $releases->tagNames() ?? $this->null(),

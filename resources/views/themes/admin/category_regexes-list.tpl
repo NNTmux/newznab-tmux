@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<p>This page lists regex used for categorizing releases.<br/>
 		You can recategorize all releases by running misc/update/update_releases 6 true
@@ -10,7 +10,7 @@
 		<label for="group">Search a group:</label>
 		<input id="group" type="text" name="group" value="{$group}" size="15"/>
 		&nbsp;&nbsp;
-		<input class="btn btn-default" type="submit" value="Go"/>
+		<input class="btn btn-success" type="submit" value="Go"/>
 	</form>
 	{if $regex}
 		<div>{$regex->onEachSide(5)->links()}</div>

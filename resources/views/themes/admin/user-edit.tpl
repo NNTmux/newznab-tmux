@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	{if isset($error) && $error != ''}
 		<div class="error">{$error}</div>
@@ -105,7 +105,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input class="btn btn-primary" type="submit" value="Save"/>
+					<input class="btn btn-success" type="submit" value="Save"/>
 					{if !empty($user.id) && $user->role->id != 2}<a class="confirm_action btn btn-danger"
 																	href="{$smarty.const.WWW_TOP}/admin/user-delete?id={$user.id}">
 							Delete user</a>{/if}

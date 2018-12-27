@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 
-<div class="well well-sm">
+<div class="card card-body">
 
 	<form enctype="multipart/form-data" action="anidb-edit?action=submit" method="POST">
 		{{csrf_field()}}
@@ -121,7 +121,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input class="btn btn-default" type="submit" value="Save"/>
+					<input class="btn btn-success" type="submit" value="Save"/>
 				</td>
 			</tr>
 

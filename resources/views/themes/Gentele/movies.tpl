@@ -1,5 +1,5 @@
-<div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-	 xmlns="http://www.w3.org/1999/html">
+<div class="header"
+	>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -8,17 +8,17 @@
 		</ol>
 	</div>
 </div>
-<div class="well well-sm">
+<div class="card card-header">
 	{include file='search-filter.tpl'}
 </div>
-{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="box-body"
 	<div class="row">
-		<div class="col-lg-12 col-sm-12 col-xs-12">
-			<div class="panel panel-default">
-				<div class="panel-body pagination2">
+		<div class="col-lg-12 col-sm-12 col-12">
+			<div class="card card-default">
+				<div class="card-body">
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-4">
+                            {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a><br/>
@@ -37,7 +37,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
@@ -53,7 +53,8 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+                        {{Form::close()}}
+						<div class="col-md-8">
 							{$results->onEachSide(5)->links()}
 						</div>
 					</div>
@@ -68,8 +69,8 @@
 							<div class="row">
 								<!-- Left -->
 								<div class="col-md-6 small-gutter-right movie-height">
-									<div class="panel panel-default">
-										<div class="panel-body">
+									<div class="card card-default">
+										<div class="card-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{foreach $result->languages as $movielanguage}
@@ -92,7 +93,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
-																class="cover img-responsive img-rounded"
+																class="cover shadow img-fluid rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -102,24 +103,24 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page"
-													   class="label label-primary" rel="imdb">IMDB</a>
+													   class="badge badge-info" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
-													   class="label label-primary" rel="trakt">TRAKT</a>
+													   class="badge badge-info" rel="trakt">TRAKT</a>
                                                     {if (!empty($result->tmdbid))}
-                                                        <a class="label label-primary" rel="tmdb" target="_blank"
+                                                        <a class="badge badge-info" rel="tmdb" target="_blank"
                                                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View NFO" class="modal_nfo label label-primary"
+															title="View NFO" class="modal_nfo badge badge-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
+													<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -142,38 +143,38 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="label label-primary">{$result->year}</span>
-																<span class="label label-primary">{if $result->rating != ''}{$result->rating}/10{/if}</span>
-																<span class="label label-primary">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
-																<span class="label label-primary">{$msize[$m@index]|filesize}</span>
-																<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge badge-info">{$result->year}</span>
+																<span class="badge badge-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
+																<span class="badge badge-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
+																<span class="badge badge-info">{$msize[$m@index]|filesize}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
 																		  data-toggle="tooltip" data-placement="top" title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
@@ -184,14 +185,14 @@
 																		<span
 																				id="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"
 																				href="javascript:;"
-																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				class="btn btn-hover btn-light btn-xs sendtocouch text-muted"
 																				data-toggle="tooltip" data-placement="top"
 																				title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
-																		<span class="btn btn-default btn-xs"
+																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -213,8 +214,8 @@
 								{else}
 								<!-- Right -->
 								<div class="col-md-6 small-gutter-left movie-height">
-									<div class="panel panel-default">
-										<div class="panel-body">
+									<div class="card card-default">
+										<div class="card-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{foreach $result->languages as $movielanguage}
@@ -237,7 +238,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"><img
-																class="cover img-responsive img-rounded"
+																class="cover shadow img-fluid rounded"
 																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -247,24 +248,24 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page"
-													   class="label label-primary" rel="imdb">IMDB</a>
+													   class="badge badge-info" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
 													   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page"
-													   class="label label-primary" rel="trakt">TRAKT</a>
+													   class="badge badge-info" rel="trakt">TRAKT</a>
                                                     {if (!empty($result->tmdbid))}
-                                                        <a class="label label-primary" rel="tmdb" target="_blank"
+                                                        <a class="badge badge-info" rel="tmdb" target="_blank"
                                                            href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-																title="View NFO" class="modal_nfo label label-primary">NFO</a>
+																title="View NFO" class="modal_nfo badge badge-info">NFO</a>
 														</span>{/if}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
+													<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
@@ -287,38 +288,38 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="label label-primary">{$result->year}</span>
-																<span class="label label-primary">{if $result->rating != ''}{$result->rating}/10{/if}</span>
-																<span class="label label-primary">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
-																<span class="label label-primary">{$msize[$m@index]|filesize}</span>
-																<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge badge-info">{$result->year}</span>
+																<span class="badge badge-info">{if $result->rating != ''}{$result->rating}/10{/if}</span>
+																<span class="badge badge-info">{if $result->rtrating != ''}RottenTomatoes Score {$result->rtrating}{/if}</span>
+																<span class="badge badge-info">{$msize[$m@index]|filesize}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
 																		  data-toggle="tooltip" data-placement="top" title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
@@ -329,14 +330,14 @@
 																		<span
 																				id="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}"
 																				href="javascript:;"
-																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				class="btn btn-hover btn-light btn-xs sendtocouch text-muted"
 																				data-toggle="tooltip" data-placement="top"
 																				title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
-																		<span class="btn btn-default btn-xs"
+																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -361,7 +362,7 @@
 						{/if}
 					{/foreach}
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a>
@@ -381,7 +382,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
@@ -397,7 +398,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-8">
 							{$results->onEachSide(5)->links()}
 						</div>
 					</div>
@@ -405,4 +406,3 @@
 			</div>
 		</div>
 	</div>
-{{Form::close()}}

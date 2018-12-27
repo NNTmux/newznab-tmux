@@ -28,8 +28,8 @@ class CreateBinariesTable extends Migration {
             $table->foreign('collections_id', 'FK_Collections')->references('id')->on('collections')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 
-        DB::unprepared("ALTER TABLE binaries ADD COLUMN binaryhash BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
-        DB::unprepared('ALTER TABLE binaries ADD UNIQUE INDEX ix_binaries_binaryhash (binaryhash)');
+        DB::statement("ALTER TABLE binaries ADD COLUMN binaryhash BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
+        DB::statement('ALTER TABLE binaries ADD UNIQUE INDEX ix_binaries_binaryhash (binaryhash)');
 	}
 
 

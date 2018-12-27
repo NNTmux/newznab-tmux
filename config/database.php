@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'nntmux'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,23 +43,22 @@ return [
             'driver'      => 'mysql',
             'host'        => env('DB_HOST', '127.0.0.1'),
             'port'        => env('DB_PORT', '3306'),
-            'database'    => env('DB_DATABASE', 'forge'),
-            'username'    => env('DB_USERNAME', 'forge'),
+            'database'    => env('DB_DATABASE', 'nntmux'),
+            'username'    => env('DB_USERNAME', 'nntmux'),
             'password'    => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
-            'charset'     => 'utf8mb4',
-            'collation'   => 'utf8mb4_unicode_ci',
-            'prefix'      => '',
-            'strict'      => true,
-            'engine'      => null,
+            'charset'     => 'utf8',
+            'collation'   => 'utf8_unicode_ci',
+            'strict'      => false,
+            'engine'      => 'InnoDB ROW_FORMAT=DYNAMIC',
         ],
 
         'pgsql' => [
             'driver'   => 'pgsql',
             'host'     => env('DB_HOST', '127.0.0.1'),
             'port'     => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
+            'database' => env('DB_DATABASE', 'nntmux'),
+            'username' => env('DB_USERNAME', 'nntmux'),
             'password' => env('DB_PASSWORD', ''),
             'charset'  => 'utf8',
             'prefix'   => '',
@@ -71,25 +70,11 @@ return [
             'driver'   => 'sqlsrv',
             'host'     => env('DB_HOST', 'localhost'),
             'port'     => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
+            'database' => env('DB_DATABASE', 'nntmux'),
+            'username' => env('DB_USERNAME', 'nntmux'),
             'password' => env('DB_PASSWORD', ''),
             'charset'  => 'utf8',
             'prefix'   => '',
-        ],
-
-        'nntmux' => [
-            'driver'      => env('DB_SYSTEM', 'mysql'),
-            'host'        => env('DB_HOST', '127.0.0.1'),
-            'port'        => env('DB_PORT', '3306'),
-            'database'    => env('DB_NAME', 'nntmux'),
-            'username'    => env('DB_USER', 'root'),
-            'password'    => env('DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset'     => 'utf8',
-            'collation'   => 'utf8_unicode_ci',
-            'strict'      => false,
-            'engine'      => 'InnoDB ROW_FORMAT=DYNAMIC',
         ],
 
         'sphinx' => [

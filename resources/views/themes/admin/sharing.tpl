@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<div style="width:700px">
 		<strong>
@@ -181,7 +181,7 @@
 						</tr>
 					</table>
 				</fieldset>
-				<input class="btn btn-default" type="submit" value="Save Settings"/>
+				<input class="btn btn-success" type="submit" value="Save Settings"/>
 			</form>
 			<br/>
 		{else}

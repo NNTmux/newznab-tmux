@@ -253,7 +253,7 @@ class ProcessReleases
     {
         $cat = new Categorize();
         $categorized = $total = 0;
-        $releases = DB::select(
+        $releases = Release::fromQuery(
             sprintf(
                 '
 				SELECT id, fromname, %s, groups_id
@@ -758,7 +758,7 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
         }
 
-        $releases = DB::select(
+        $releases = Release::fromQuery(
             sprintf(
                 "
 				SELECT SQL_NO_CACHE
@@ -1117,7 +1117,7 @@ class ProcessReleases
         $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
                     '
 					SELECT SQL_NO_CACHE r.guid, r.id
@@ -1137,7 +1137,7 @@ class ProcessReleases
             }
 
             if ($maxSizeSetting > 0) {
-                $releases = DB::select(
+                $releases = Release::fromQuery(
                     sprintf(
                         '
 						SELECT SQL_NO_CACHE id, guid
@@ -1154,7 +1154,7 @@ class ProcessReleases
                 }
             }
             if ($minFilesSetting > 0) {
-                $releases = DB::select(
+                $releases = Release::fromQuery(
                      sprintf(
                          '
 				SELECT SQL_NO_CACHE r.id, r.guid
@@ -1210,9 +1210,9 @@ class ProcessReleases
 
         // Releases past retention.
         if ((int) Settings::settingValue('..releaseretentiondays') !== 0) {
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
-                    'SELECT SQL_NO_CACHE id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
+                    'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
                     (int) Settings::settingValue('..releaseretentiondays')
                 )
             );
@@ -1224,9 +1224,9 @@ class ProcessReleases
 
         // Passworded releases.
         if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
-                    'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
+                    'SELECT id, guid FROM releases WHERE passwordstatus = %d',
                     Releases::PASSWD_RAR
                 )
             );
@@ -1238,9 +1238,9 @@ class ProcessReleases
 
         // Possibly passworded releases.
         if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
-                    'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
+                    'SELECT id, guid FROM releases WHERE passwordstatus = %d',
                     Releases::PASSWD_POTENTIAL
                 )
             );
@@ -1252,9 +1252,9 @@ class ProcessReleases
 
         if ((int) $this->crossPostTime !== 0) {
             // Crossposted releases.
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
-                    'SELECT SQL_NO_CACHE id, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
+                    'SELECT id, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
                     $this->crossPostTime
                 )
             );
@@ -1265,8 +1265,8 @@ class ProcessReleases
         }
 
         if ($this->completion > 0) {
-            $releases = DB::select(
-                sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
+            $releases = Release::fromQuery(
+                sprintf('SELECT id, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
             );
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
@@ -1278,8 +1278,8 @@ class ProcessReleases
         $disabledCategories = Category::getDisabledIDs();
         if (\count($disabledCategories) > 0) {
             foreach ($disabledCategories as $disabledCategory) {
-                $releases = DB::select(
-                    sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE categories_id = %d', (int) $disabledCategory['id'])
+                $releases = Release::fromQuery(
+                    sprintf('SELECT id, guid FROM releases WHERE categories_id = %d', (int) $disabledCategory['id'])
                 );
                 foreach ($releases as $release) {
                     $disabledCategoryDeleted++;
@@ -1289,7 +1289,7 @@ class ProcessReleases
         }
 
         // Delete smaller than category minimum sizes.
-        $categories = DB::select(
+        $categories = Category::fromQuery(
             '
 			SELECT SQL_NO_CACHE c.id AS id,
 			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
@@ -1300,13 +1300,13 @@ class ProcessReleases
 
         foreach ($categories as $category) {
             if ((int) $category->minsize > 0) {
-                $releases = DB::select(
+                $releases = Release::fromQuery(
                         sprintf(
                             '
-							SELECT SQL_NO_CACHE r.id, r.guid
-							FROM releases r
-							WHERE r.categories_id = %d
-							AND r.size < %d
+							SELECT id, guid
+							FROM releases
+							WHERE categories_id = %d
+							AND size < %d
 							LIMIT 1000',
                             (int) $category->id,
                             (int) $category->minsize
@@ -1323,17 +1323,17 @@ class ProcessReleases
         $genrelist = $genres->getDisabledIDs();
         if (\count($genrelist) > 0) {
             foreach ($genrelist as $genre) {
-                $releases = DB::select(
+                $releases = Release::fromQuery(
                     sprintf(
                         '
-						SELECT SQL_NO_CACHE id, guid
-						FROM releases
+						SELECT id, guid
+						FROM releases r
 						INNER JOIN
 						(
 							SELECT id AS mid
 							FROM musicinfo
 							WHERE musicinfo.genre_id = %d
-						) mi ON musicinfo_id = mid',
+						) mi ON musicinfo_id = mi.mid',
                         (int) $genre['id']
                     )
                 );
@@ -1346,7 +1346,7 @@ class ProcessReleases
 
         // Misc other.
         if (Settings::settingValue('..miscotherretentionhours') > 0) {
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
                     '
 					SELECT SQL_NO_CACHE id, guid
@@ -1365,7 +1365,7 @@ class ProcessReleases
 
         // Misc hashed.
         if ((int) Settings::settingValue('..mischashedretentionhours') > 0) {
-            $releases = DB::select(
+            $releases = Release::fromQuery(
                 sprintf(
                     '
 					SELECT SQL_NO_CACHE id, guid

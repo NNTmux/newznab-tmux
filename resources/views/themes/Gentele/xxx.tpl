@@ -1,5 +1,5 @@
-<div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-	 xmlns="http://www.w3.org/1999/html">
+<div class="header"
+	>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -8,17 +8,17 @@
 		</ol>
 	</div>
 </div>
-<div class="well well-sm">
+<div class="card card-header">
 	{include file='search-filter.tpl'}
 </div>
 {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="box-body"
 	<div class="row">
-		<div class="col-lg-12 col-sm-12 col-xs-12">
-			<div class="panel panel-default">
-				<div class="panel-body pagination2">
+		<div class="col-lg-12 col-sm-12 col-12">
+			<div class="card card-default">
+				<div class="card-body pagination2">
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse/XXX/{$categorytitle}">List</a><br/>
@@ -37,7 +37,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
@@ -53,7 +53,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-8">
 							{$results->onEachSide(5)->links()}
 						</div>
 					</div>
@@ -68,8 +68,8 @@
 							<div class="row">
 								<!-- Left -->
 								<div class="col-md-6 small-gutter-right movie-height">
-									<div class="panel panel-default">
-										<div class="panel-body">
+									<div class="card card-default">
+										<div class="card-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{assign var="msplits" value=","|explode:$result->grp_release_id}
@@ -89,7 +89,7 @@
 													{foreach $msplits as $m}
 													{if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
-																class="cover img-responsive img-rounded"
+																class="cover shadow img-fluid rounded"
 																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
@@ -145,13 +145,13 @@
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View NFO" class="label label-primary"
+															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->grp_release_grpname}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
-													<span class="btn btn-default btn-xs"
+													<span class="btn btn-light btn-xs"
 														  title="This release has failed to download for some users">
 															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 														Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -172,10 +172,10 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge badge-info">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br>
 																<div class="release-subtitle">{if $result->genre != ''}Genre: {$result->genre}, {/if}</div>
@@ -188,25 +188,25 @@
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	<span class="btn btn-hover btn-light btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
 																		  data-toggle="tooltip" data-placement="top" title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
@@ -214,7 +214,7 @@
 																					class="fa fa-share"></i></span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
-																		<span class="btn btn-default btn-xs"
+																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -236,8 +236,8 @@
 								{else}
 								<!-- Right -->
 								<div class="col-md-6 small-gutter-left movie-height">
-									<div class="panel panel-default">
-										<div class="panel-body">
+									<div class="card card-default">
+										<div class="card-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
 													{assign var="msplits" value=","|explode:$result->grp_release_id}
@@ -257,7 +257,7 @@
                                                     {foreach $msplits as $m}
                                                     {if $m@first}
 													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
-																class="cover img-responsive img-rounded"
+																class="cover shadow img-fluid rounded"
 																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
@@ -313,13 +313,13 @@
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View NFO" class="label label-primary"
+															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
-													<a class="label label-primary"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->grp_release_grpname}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
-													<span class="btn btn-default btn-xs"
+													<span class="btn btn-light btn-xs"
 														  title="This release has failed to download for some users">
 															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 														Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -339,10 +339,10 @@
 																		   value="{$mguid[$m@index]}"
 																		   id="chksingle"/>
 																</label>
-																<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
+																<span class="badge badge-info">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="badge badge-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="badge badge-info">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="badge badge-info">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																<br>
 																<div class="release-subtitle">{if $result->genre != ''}Genre: {$result->genre}, {/if}</div>
@@ -355,25 +355,25 @@
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
 																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-default btn-xs"
+																	<a role="button" class="btn btn-light btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																	<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	<span class="btn btn-hover btn-success btn-xs icon_cart text-muted"
 																		  id="guid{$mguid[$m@index]}"
 																		  data-toggle="tooltip" data-placement="top" title
 																		  data-original-title="Send to my download basket"><i
 																				class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		<span class="btn btn-hover btn-light btn-xs icon_sab text-muted"
 																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
@@ -381,7 +381,7 @@
 																					class="fa fa-share"></i></span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
-																		<span class="btn btn-default btn-xs"
+																		<span class="btn btn-light btn-xs"
 																			  title="This release has failed to download for some users">
 																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
@@ -406,7 +406,7 @@
 						{/if}
 					{/foreach}
 					<div class="row">
-						<div class="col-md-8">
+						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse/XXX/{$categorytitle}">List</a><br/>
@@ -425,7 +425,7 @@
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
-												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												class="nzb_multi_operations_sab btn btn-sm btn-success"
 												data-toggle="tooltip" data-placement="top" title
 												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
@@ -441,7 +441,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-8">
 							{$results->onEachSide(5)->links()}
 						</div>
 					</div>

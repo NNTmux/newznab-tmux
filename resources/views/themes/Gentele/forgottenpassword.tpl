@@ -32,14 +32,14 @@
 					<span class="glyphicon glyphicon-user form-control-feedback"></span>
 				</div>
 				<div class="row">
-					<div class="col-xs-6">
+					<div class="col-6">
                         {if {config('captcha.enabled')} == 1 && !empty({config('captcha.sitekey')}) && !empty({config('captcha.secret')})}
 							{NoCaptcha::display()}{NoCaptcha::renderJs()}
 						{/if}
 					</div><!-- /.col -->
 					<hr>
-					<div class="col-xs-12">
-						<button type="submit" class="btn btn-primary btn-block btn-flat">Request Password Reset</button>
+					<div class="col-12">
+						<button type="submit" class="btn btn-success btn-block btn-flat">Request Password Reset</button>
 					</div><!-- /.col -->
 				</div>
 			{{Form::close()}}

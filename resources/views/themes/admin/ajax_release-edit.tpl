@@ -1,4 +1,4 @@
-<div class="well well-sm" id="updatePanel">
+<div class="card card-body" id="updatePanel">
 	{if $success}
 		<h4>Successfully updated!</h4>
 	{if $from != ''}
@@ -69,7 +69,7 @@
 				<tr>
 					<td></td>
 					<td>
-						<input class="btn btn-default" type="submit" value="Save" id="save"/>
+						<input class="btn btn-success" type="submit" value="Save" id="save"/>
 					</td>
 				</tr>
 			</table>

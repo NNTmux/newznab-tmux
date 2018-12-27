@@ -1389,7 +1389,6 @@ var lists = (function () {
     var assimilateEntry = function (adherent, source) {
       adherent.listType = source.listType;
       adherent.listAttributes = merge({}, source.listAttributes);
-      adherent.itemAttributes = merge({}, source.itemAttributes);
     };
     var normalizeShallow = function (outline, entry) {
       var matchingEntryDepth = entry.depth - 1;

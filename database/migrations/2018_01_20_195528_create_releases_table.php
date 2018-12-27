@@ -79,9 +79,9 @@ processed');
             $table->index(['dehashstatus','ishashed'], 'ix_releases_dehashstatus');
         });
 
-        DB::unprepared('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
-        DB::unprepared('ALTER TABLE releases ADD COLUMN nzb_guid BINARY(16) NULL');
-        DB::unprepared('ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid)');
+        DB::statement('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
+        DB::statement('ALTER TABLE releases ADD COLUMN nzb_guid BINARY(16) NULL');
+        DB::statement('ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid)');
     }
 
 

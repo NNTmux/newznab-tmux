@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	<table class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>

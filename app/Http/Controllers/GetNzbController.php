@@ -35,11 +35,11 @@ class GetNzbController extends BasePageController
                 Utility::showApiError(101);
             }
         } else {
-            if (! $request->has('i') || ! $request->has('r')) {
+            if (! $request->has('r')) {
                 Utility::showApiError(200);
             }
 
-            $res = User::getByIdAndRssToken($request->input('i'), $request->input('r'));
+            $res = User::getByRssToken($request->input('r'));
             if (! $res) {
                 Utility::showApiError(100);
             }

@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 	{if $tvshowlist}
 		<div style="float:right;">
@@ -7,7 +7,7 @@
 				<label for="showname">Title</label>
 				<input id="showname" type="text" name="showname" value="{$showname}" size="15"/>
 				&nbsp;&nbsp;
-				<input class="btn btn-default" type="submit" value="Go"/>
+				<input class="btn btn-success" type="submit" value="Go"/>
 			</form>
 		</div>
 		{$tvshowlist->onEachSide(5)->links()}

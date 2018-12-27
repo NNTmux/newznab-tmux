@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	<form action="tmux-edit?action=submit" method="post">
@@ -881,7 +881,7 @@
 			</table>
 		</fieldset>
 
-		<input class="btn btn-default" type="submit" value="Save Tmux Settings"/>
+		<input class="btn btn-success" type="submit" value="Save Tmux Settings"/>
 
 	</form>
 </div>

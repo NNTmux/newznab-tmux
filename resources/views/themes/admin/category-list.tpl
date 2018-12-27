@@ -1,6 +1,6 @@
 <h1>{$title}</h1>
 
-<div class="well well-sm">
+<div class="card card-body">
 
 	<p>
 		Make a category inactive to remove it from the menu. This does not prevent binaries being matched into an

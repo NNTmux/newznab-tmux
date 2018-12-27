@@ -494,16 +494,19 @@ class Releases
     /**
      * Deletes a single release by GUID, and all the corresponding files.
      *
-     * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass false)]
-     * @param NZB          $nzb
-     * @param ReleaseImage $releaseImage
+     * @param array                    $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
+     *                                              false)]
+     * @param \Blacklight\NZB          $nzb
+     * @param \Blacklight\ReleaseImage $releaseImage
+     *
+     * @throws \Exception
      */
-    public function deleteSingle($identifiers, $nzb, $releaseImage): void
+    public function deleteSingle($identifiers, NZB $nzb, ReleaseImage $releaseImage): void
     {
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
-        if ($nzbPath) {
-            @unlink($nzbPath);
+        if (! empty($nzbPath)) {
+            File::delete($nzbPath);
         }
 
         // Delete images.
@@ -513,7 +516,7 @@ class Releases
         $this->sphinxSearch->deleteRelease($identifiers);
 
         // Delete from DB.
-        Release::query()->where('guid', $identifiers['g'])->delete();
+        Release::whereGuid($identifiers['g'])->delete();
     }
 
     /**

@@ -37,7 +37,7 @@ class CreateReleaseCommentsTable extends Migration {
             $table->foreign('releases_id', 'FK_rc_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 
-        DB::unprepared("ALTER TABLE release_comments ADD COLUMN nzb_guid BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
+        DB::statement("ALTER TABLE release_comments ADD COLUMN nzb_guid BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
 	}
 
 

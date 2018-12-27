@@ -1,5 +1,5 @@
 <h1>{$title}</h1>
-<div class="well well-sm">
+<div class="card card-body">
 	<p>This page is used for testing regex for grouping usenet collections.<br/>Enter the group name to test and a
 		regex. Limit is how many collections to show max on the page, 0 for no limit(slow).</p>
 
@@ -11,7 +11,7 @@
 		<input id="regex" type="text" name="regex" value="{$regex|htmlentities}" size="100"/><br/>
 		<label for="limit" style="padding-right:7px">Limit:</label>
 		<input id="limit" type="text" name="limit" value="{$limit}" size="8"/><br/>
-		<input class="btn btn-default" type="submit" value="Test"/>
+		<input class="btn btn-success" type="submit" value="Test"/>
 	</form>
 	{if isset($data)}
 

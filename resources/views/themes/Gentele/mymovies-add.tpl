@@ -6,14 +6,14 @@
     {{Form::open(['id' => 'mymovies', 'class' => 'form-horizontal', 'url' => "mymovies?id=do{$type}"])}}
 		<input type="hidden" name="imdb" value="{$imdbid}"/>
 		<div class="control-group">
-			<label class="control-label" for="category">Choose</label>
+			<label class="col-form-label" for="category">Choose</label>
 			<div class="controls">
 				{if $from}<input type="hidden" name="from" value="{$from}" />{/if}
 				{html_checkboxes id="category" name='category' values=$cat_ids output=$cat_names selected=$cat_selected separator=''}
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label"></label>
+			<label class="col-form-label"></label>
 			<div class="controls">
 				<input class="btn btn-success" type="submit" name="{$type}" value="{$type|ucwords}"/>
 			</div>

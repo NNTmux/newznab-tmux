@@ -22,7 +22,7 @@ class CreateSteamAppsTable extends Migration {
 			$table->primary(['appid','name']);
 		});
 
-		DB::unprepared('ALTER TABLE steam_apps ADD FULLTEXT ix_name_ft (name)');
+		DB::statement('ALTER TABLE steam_apps ADD FULLTEXT ix_name_ft (name)');
 	}
 
 

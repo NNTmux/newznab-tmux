@@ -20,8 +20,8 @@ class CreatePredbHashesTable extends Migration {
 		    $table->integer('predb_id')->unsigned()->default(0)->comment('id, of the predb entry, this hash belongs to');
 		});
 
-		DB::unprepared('ALTER TABLE predb_hashes ADD COLUMN hash VARBINARY(40) DEFAULT ""');
-        DB::unprepared('ALTER TABLE predb_hashes ADD PRIMARY KEY (hash)');
+		DB::statement('ALTER TABLE predb_hashes ADD COLUMN hash VARBINARY(40) DEFAULT ""');
+        DB::statement('ALTER TABLE predb_hashes ADD PRIMARY KEY (hash)');
 	}
 
 

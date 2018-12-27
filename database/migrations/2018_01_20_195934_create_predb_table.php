@@ -33,7 +33,7 @@ class CreatePredbTable extends Migration
             $table->boolean('searched')->default(0)->index('ix_predb_searched');
             $table->index(['requestid','groups_id'], 'ix_predb_requestid');
         });
-        DB::unprepared('ALTER TABLE predb ADD FULLTEXT ft_predb_filename (filename)');
+        DB::statement('ALTER TABLE predb ADD FULLTEXT ft_predb_filename (filename)');
     }
 
 

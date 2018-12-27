@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\db\DbUpdate;
-use App\Extensions\util\Git;
 use Illuminate\Console\Command;
-use App\Extensions\util\Versions;
+use Symfony\Component\Process\Process;
 
 class UpdateNNTmuxDB extends Command
 {
@@ -36,36 +34,22 @@ class UpdateNNTmuxDB extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     * @throws \RuntimeException
-     * @throws \Exception
-     */
     public function handle()
     {
         // also prevent web access.
-        $this->output->writeln('<info>Checking database version</info>');
-
-        $versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
-
-        try {
-            $currentDb = $versions->getSQLPatchFromDB();
-            $currentXML = $versions->getSQLPatchFromFile();
-        } catch (\PDOException $e) {
-            $this->error('Error fetching patch versions!');
-
-            return 1;
-        }
-
-        $this->info("Db: $currentDb,\tFile: $currentXML");
-
-        if ($currentDb < $currentXML) {
-            $db = new DbUpdate(['backup' => false]);
-            $db->processPatches(['safe' => false]);
+        $this->output->writeln('<info>Updating database</info>');
+        if (env('APP_ENV') !== 'production') {
+            $this->call('migrate');
         } else {
-            $this->info('Up to date.');
+            $process = new Process('php artisan migrate --force');
+            $process->setTimeout(600);
+            $process->run(function ($type, $buffer) {
+                if (Process::ERR === $type) {
+                    echo 'ERR > '.$buffer;
+                } else {
+                    echo $buffer;
+                }
+            });
         }
     }
 }

@@ -10,7 +10,7 @@ if ($argc === 3 && is_numeric($argv[2])) {
 } elseif ($argc === 2) {
     // Checks that argv[1] exists AND that there are no other arguments, which would be an error.
     $socket = preg_replace('#^(?:unix://)?(.*)$#', '$1', $argv[1]);
-    if ($socket[0] === '/') {
+    if (strpos($socket, '/') === 0) {
         // Make sure the socket path is fully qualified (and using correct separator).
         $sphinxConnection = sprintf('unix://%s:', $socket);
     }
@@ -36,6 +36,26 @@ $tables = [];
 $tables['releases_se'] = sprintf($tableSQL_releases, $sphinxConnection);
 
 foreach ($tables as $table => $query) {
+    DB::statement("DROP TABLE IF EXISTS $table;");
+    DB::statement($query);
+}
+
+$tableSQL_predb = <<<'DDLSQL'
+CREATE TABLE predb_se
+(
+	id          BIGINT UNSIGNED NOT NULL,
+	weight      INTEGER NOT NULL,
+	query       VARCHAR(1024) NOT NULL,
+	title        VARCHAR(255) NOT NULL DEFAULT '',
+	filename  VARCHAR(1000) NULL,
+	INDEX(query)
+) ENGINE=SPHINX CONNECTION="%spredb_rt"
+DDLSQL;
+
+$tables2 = [];
+$tables2['predb_se'] = sprintf($tableSQL_predb, $sphinxConnection);
+
+foreach ($tables2 as $table => $query) {
     DB::statement("DROP TABLE IF EXISTS $table;");
     DB::statement($query);
 }

@@ -1375,6 +1375,7 @@ var mobile = (function () {
     var strict = adt.strict;
     var asOption = adt.asOption;
     var defaultedThunk = adt.defaultedThunk;
+    var asDefaultedOptionThunk = adt.asDefaultedOptionThunk;
     var mergeWithThunk = adt.mergeWithThunk;
 
     var comparison = Adt.generate([
@@ -4309,6 +4310,13 @@ var mobile = (function () {
       fDefaults,
       fOverrides
     ]);
+    var externalSpec = objOf([
+      fFactory,
+      fSchema,
+      fName,
+      fDefaults,
+      fOverrides
+    ]);
     var optionalSpec = objOf([
       fFactory,
       fSchema,
@@ -4342,6 +4350,7 @@ var mobile = (function () {
       };
     };
     var required = convert(adt$3.required, requiredSpec);
+    var external = convert(adt$3.external, externalSpec);
     var optional = convert(adt$3.optional, optionalSpec);
     var group = convert(adt$3.group, groupSpec);
     var original = constant('entirety');
@@ -12604,7 +12613,10 @@ var mobile = (function () {
       return {
         getNotificationManagerImpl: function () {
           return {
-            open: identity,
+            open: constant({
+              progressBar: { value: noop },
+              close: noop
+            }),
             close: noop,
             reposition: noop,
             getArgs: identity

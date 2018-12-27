@@ -1159,7 +1159,7 @@ class ProcessAdditional
                 if ($this->_extractUsingRarInfo === true) {
                     // Extract files from the rar.
                     if (isset($file['compressed']) && (int) $file['compressed'] === 0) {
-                        @file_put_contents(
+                        File::put(
                             $this->tmpPath.random_int(10, 999999).'_'.$fileName,
                             $this->_archiveInfo->getFileData($file['name'], $file['source'])
                         );
@@ -1255,7 +1255,7 @@ class ProcessAdditional
                             $this->_processCompressedData($rarData);
                             $foundCompressedFile = true;
                         }
-                        @unlink($file[0]);
+                        File::delete($file[0]);
                     }
                 }
             }
@@ -1272,53 +1272,52 @@ class ProcessAdditional
 
         // Get all the remaining files in the temp dir.
         $files = $this->_getTempDirectoryContents();
-        if ($files instanceof \Traversable) {
-            foreach ($files as $file) {
-                $file = (string) $file;
+        foreach ($files as $file) {
+            $file = $file->getPathname();
 
-                // Skip /. and /..
-                if (preg_match('/[\/\\\\]\.{1,2}$/', $file)) {
-                    continue;
-                }
+            // Skip /. and /..
+            if (preg_match('/[\/\\\\]\.{1,2}$/', $file)) {
+                continue;
+            }
 
-                if (File::isFile($file)) {
+            if (File::isFile($file)) {
 
                     // Process PAR2 files.
-                    if ($this->_foundPAR2Info === false && preg_match('/\.par2$/', $file)) {
-                        $this->_siftPAR2Info($file);
-                    } // Process NFO files.
-                    elseif ($this->_releaseHasNoNFO === true && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
-                        $this->_processNfoFile($file);
-                    } // Process audio files.
-                    elseif (
+                if ($this->_foundPAR2Info === false && preg_match('/\.par2$/', $file)) {
+                    $this->_siftPAR2Info($file);
+                } // Process NFO files.
+                elseif ($this->_releaseHasNoNFO === true && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
+                    $this->_processNfoFile($file);
+                } // Process audio files.
+                elseif (
                         ($this->_foundAudioInfo === false ||
                             $this->_foundAudioSample === false) &&
                         preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
                     ) {
-                        // Try to get audio sample/audio media info.
-                        @rename($file, $this->tmpPath.'audiofile.'.$fileType[2]);
-                        $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
-                        @unlink($this->tmpPath.'audiofile.'.$fileType[2]);
-                    } // Process JPG files.
-                    elseif ($this->_foundJPGSample === false && preg_match('/\.jpe?g$/i', $file)) {
-                        $this->_getJPGSample($file);
-                        @unlink($file);
-                    } // Video sample // video clip // video media info.
-                    elseif (($this->_foundSample === false || $this->_foundVideo === false || $this->_foundMediaInfo === false) &&
+                    // Try to get audio sample/audio media info.
+                    File::move($file, $this->tmpPath.'audiofile.'.$fileType[2]);
+                    $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
+                    File::delete($this->tmpPath.'audiofile.'.$fileType[2]);
+                } // Process JPG files.
+                elseif ($this->_foundJPGSample === false && preg_match('/\.jpe?g$/i', $file)) {
+                    $this->_getJPGSample($file);
+                    File::delete($file);
+                } // Video sample // video clip // video media info.
+                elseif (($this->_foundSample === false || $this->_foundVideo === false || $this->_foundMediaInfo === false) &&
                         preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
                     ) {
-                        $this->_processVideoFile($file);
-                    }
+                    $this->_processVideoFile($file);
+                }
 
-                    // Check file's magic info.
-                    else {
-                        $output = Utility::fileInfo($file);
-                        if (! empty($output)) {
-                            switch (true) {
+                // Check file's magic info.
+                else {
+                    $output = Utility::fileInfo($file);
+                    if (! empty($output)) {
+                        switch (true) {
 
                                 case $this->_foundJPGSample === false && preg_match('/^JPE?G/i', $output):
                                     $this->_getJPGSample($file);
-                                    @unlink($file);
+                                    File::delete($file);
                                     break;
 
                                 case
@@ -1341,16 +1340,15 @@ class ProcessAdditional
                                             $fileType = 'OGG';
                                             break;
                                     }
-                                    @rename($file, $this->tmpPath.'audiofile.'.$fileType);
+                                    File::move($file, $this->tmpPath.'audiofile.'.$fileType);
                                     $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
-                                    @unlink($this->tmpPath.'audiofile.'.$fileType);
+                                    File::delete($this->tmpPath.'audiofile.'.$fileType);
                                     break;
 
                                 case $this->_foundPAR2Info === false && stripos($output, 'Parity') === 0:
                                     $this->_siftPAR2Info($file);
                                     break;
                             }
-                        }
                     }
                 }
             }
@@ -1398,7 +1396,7 @@ class ProcessAdditional
                     if (\strlen($sampleBinary) > 40) {
                         $fileLocation = $this->tmpPath.'sample_'.random_int(0, 99999).'.avi';
                         // Try to create the file.
-                        @file_put_contents($fileLocation, $sampleBinary);
+                        File::put($fileLocation, $sampleBinary);
 
                         // Try to get a sample picture.
                         if ($this->_foundSample === false) {
@@ -1445,7 +1443,7 @@ class ProcessAdditional
                     if (\strlen($mediaBinary) > 40) {
                         $fileLocation = $this->tmpPath.'media.avi';
                         // Create a file on the disk with it.
-                        @file_put_contents($fileLocation, $mediaBinary);
+                        File::put($fileLocation, $mediaBinary);
 
                         // Try to get media info.
                         if ($this->_foundMediaInfo === false) {
@@ -1493,7 +1491,7 @@ class ProcessAdditional
 
                     $fileLocation = $this->tmpPath.'audio.'.$this->_AudioInfoExtension;
                     // Create a file with it.
-                    @file_put_contents($fileLocation, $audioBinary);
+                    File::put($fileLocation, $audioBinary);
 
                     // Try to get media info / sample of the audio file.
                     $this->_getAudioInfo($fileLocation, $this->_AudioInfoExtension);
@@ -1527,7 +1525,7 @@ class ProcessAdditional
                 }
 
                 // Try to create a file with it.
-                @file_put_contents($this->tmpPath.'samplepicture.jpg', $jpgBinary);
+                File::put($this->tmpPath.'samplepicture.jpg', $jpgBinary);
 
                 // Try to resize and move it.
                 $this->_foundJPGSample = (
@@ -1549,7 +1547,7 @@ class ProcessAdditional
                     }
                 }
 
-                @unlink($this->tmpPath.'samplepicture.jpg');
+                File::delete($this->tmpPath.'samplepicture.jpg');
             } elseif ($this->_echoCLI) {
                 $this->_echo('f', 'warningOver');
             }
@@ -1579,7 +1577,7 @@ class ProcessAdditional
 
         // Get the amount of files we found inside the RAR/ZIP files.
 
-        $releaseFilesCount = ReleaseFile::query()->where('releases_id', $this->_release->id)->count('releases_id');
+        $releaseFilesCount = ReleaseFile::whereReleasesId($this->_release->id)->count('releases_id');
 
         if ($releaseFilesCount === null) {
             $releaseFilesCount = 0;
@@ -1619,33 +1617,35 @@ class ProcessAdditional
             );
         }
 
-        DB::update($query);
+        Release::fromQuery($query);
     }
 
     /**
      * @param string $pattern
      * @param string $path
-     * @return false|\RecursiveIteratorIterator|\RegexIterator
+     *
+     * @return bool|string|\Symfony\Component\Finder\SplFileInfo[]
      */
     protected function _getTempDirectoryContents($pattern = '', $path = '')
     {
         if ($path === '') {
             $path = $this->tmpPath;
         }
+
+        $files = File::allFiles($path);
         try {
             if ($pattern !== '') {
-                return new \RegexIterator(
-                    new \RecursiveIteratorIterator(
-                        new \RecursiveDirectoryIterator($path)
-                    ),
-                    $pattern,
-                    \RecursiveRegexIterator::GET_MATCH
-                );
+                $allFiles = [];
+                foreach ($files as $file) {
+                    if (preg_match($pattern, $file->getRelativePathname())) {
+                        $allFiles .= $file;
+                    }
+                }
+
+                return $allFiles;
             }
 
-            return new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($path)
-            );
+            return $files;
         } catch (\Throwable $e) {
             $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
 
@@ -1674,13 +1674,7 @@ class ProcessAdditional
             $retVal = true;
         }
 
-        // Make sure the category is music or other.
-        $rQuery = DB::selectOne(
-            sprintf(
-                'SELECT searchname, fromname,  categories_id AS id, groups_id FROM releases WHERE proc_pp = 0 AND id = %d',
-                $this->_release->id
-            )
-        );
+        $rQuery = Release::query()->where('proc_pp', '=', 0)->where('id', $this->_release->id)->select(['searchname', 'fromname', 'categories_id'])->first();
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
@@ -1750,10 +1744,10 @@ class ProcessAdditional
                                     NameFixer::echoChangedReleaseName(
                                             [
                                                 'new_name' => $newName,
-                                                'old_name' => $rQuery['searchname'],
+                                                'old_name' => $rQuery->searchname,
                                                 'new_category' => $newCat,
-                                                'old_category' => $rQuery['id'],
-                                                'group' => $rQuery['groups_id'],
+                                                'old_category' => $rQuery->id,
+                                                'group' => $rQuery->groups_id,
                                                 'releases_id' => $this->_release->id,
                                                 'method' => 'ProcessAdditional->_getAudioInfo',
                                             ]
@@ -1926,7 +1920,7 @@ class ProcessAdditional
                 );
 
                 // Delete the temp file we created.
-                @unlink($fileName);
+                File::delete($fileName);
 
                 // Check if it saved.
                 if ($saved === 1) {
@@ -2036,7 +2030,7 @@ class ProcessAdditional
                     $copied = @copy($fileName, $newFile);
 
                     // Delete the old file.
-                    @unlink($fileName);
+                    File::delete($fileName);
 
                     // If it didn't copy, continue.
                     if (! $copied) {

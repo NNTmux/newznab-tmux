@@ -11,7 +11,6 @@ use Blacklight\Releases;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
-use App\Extensions\util\Versions;
 use App\Transformers\ApiTransformer;
 use App\Transformers\TagsTransformer;
 use App\Transformers\DetailsTransformer;
@@ -22,7 +21,6 @@ class ApiV2Controller extends BasePageController
 {
     /**
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Cz\Git\GitException
      */
     public function capabilities(): \Illuminate\Http\JsonResponse
     {
@@ -32,8 +30,6 @@ class ApiV2Controller extends BasePageController
 
         $capabilities = [
             'server' => [
-                'appversion' => (new Versions())->getGitTagInFile(),
-                'version'    => (new Versions())->getGitTagInRepo(),
                 'title'      => Settings::settingValue('site.main.title'),
                 'strapline'  => Settings::settingValue('site.main.strapline'),
                 'email'      => Settings::settingValue('site.main.email'),
@@ -69,10 +65,11 @@ class ApiV2Controller extends BasePageController
     {
         $api = new API();
         $releases = new Releases();
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $api->maxAge();
-        $catExclusions = User::getCategoryExclusion($this->userdata->id);
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        $catExclusions = User::getCategoryExclusionForApi($request);
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
 
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
@@ -95,7 +92,7 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -111,13 +108,14 @@ class ApiV2Controller extends BasePageController
     {
         $api = new API();
         $releases = new Releases();
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $offset = $api->offset();
-        $catExclusions = User::getCategoryExclusion($this->userdata->id);
+        $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
@@ -150,7 +148,7 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -166,7 +164,8 @@ class ApiV2Controller extends BasePageController
     {
         $api = new API();
         $releases = new Releases();
-        $catExclusions = User::getCategoryExclusion($this->userdata->id);
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
+        $catExclusions = User::getCategoryExclusionForApi($request);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $tags = $request->has('tags') && ! empty($request->input('tags')) ? explode(',', $request->input('tags')) : [];
         $api->verifyEmptyParameter('id');
@@ -180,7 +179,7 @@ class ApiV2Controller extends BasePageController
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
 
         $siteIdArr = [
             'id'     => $request->input('vid') ?? '0',
@@ -218,7 +217,7 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'Results' => fractal($relData, new ApiTransformer($this->userdata)),
+            'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
         return response()->json($response);
@@ -231,10 +230,10 @@ class ApiV2Controller extends BasePageController
      */
     public function getNzb(Request $request)
     {
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData !== false) {
-            return redirect('/getnzb?i='.$this->userdata->id.'&r='.$this->userdata->api_token.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+            return redirect('/getnzb?r='.$request->input('api_token').'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 
         Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -251,10 +250,11 @@ class ApiV2Controller extends BasePageController
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 
-        UserRequest::addApiRequest($this->userdata->id, $request->getRequestUri());
+        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        $userData = User::query()->where('api_token', $request->input('api_token'))->first();
         $relData = Release::getByGuid($request->input('id'));
 
-        $relData = fractal($relData, new DetailsTransformer($this->userdata));
+        $relData = fractal($relData, new DetailsTransformer($userData));
 
         return response()->json($relData);
     }

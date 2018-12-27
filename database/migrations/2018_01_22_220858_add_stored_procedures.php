@@ -57,6 +57,6 @@ class AddStoredProcedures extends Migration
      */
     public function down()
     {
-        DB::unprepared('DROP PROCEDURE loop_cbpm;');
+        DB::statement('DROP PROCEDURE loop_cbpm;');
     }
 }

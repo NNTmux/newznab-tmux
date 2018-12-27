@@ -13,11 +13,11 @@
 			<div class="well well small">
 				<div id="moviefull" style="min-height:340px;">
 					{if $result->cover == 1}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg"/>
 					{else}
-						<img class="pull-right" style="margin-right:50px; max-height:278px;"
+						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
 							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 					{/if}
@@ -71,7 +71,7 @@
 
 							{if isset($sabintegrated) && $sabintegrated !=""}
 								<button type="button"
-										class="nzb_multi_operations_sab btn btn-sm btn-primary"
+										class="nzb_multi_operations_sab btn btn-sm btn-success"
 										data-toggle="tooltip" data-placement="top" title
 										data-original-title="Send to Queue">
 									<i class="fa fa-share"></i></button>
@@ -87,9 +87,9 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-lg-12 col-sm-12 col-xs-12">
-							<div class="panel panel-default">
-								<div class="panel-body pagination2">
+						<div class="col-lg-12 col-sm-12 col-12">
+							<div class="card card-default">
+								<div class="card-body pagination2">
 									<table style="width:100%;"
 										   class="data table table-striped responsive-utilities jambo-table">
 										<tr>
@@ -124,11 +124,11 @@
 													<a title="View details"
 													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 													<br/>
-													<span class="label label-primary">{$mgrabs[$m@index]}
+													<span class="badge badge-info">{$mgrabs[$m@index]}
 														grab{if $mgrabs[$m@index] != 1}s{/if}</span>
 													{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span><a
 																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-																class="modal_nfo label label-primary text-muted">NFO</a>
+																class="modal_nfo badge badge-info text-muted">NFO</a>
 														</span>{/if}
 													{if $mpass[$m@index] == 2}
 														<i class="fa fa-lock"></i>
@@ -137,7 +137,7 @@
 													{/if}
 												</td>
 												<td class="less"><span
-															class="label label-primary">{$mcatname[$m@index]}</span>
+															class="badge badge-info">{$mcatname[$m@index]}</span>
 												</td>
 												<td class="less mid"
 													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
@@ -178,7 +178,7 @@
 									<hr>
 									{if $results|@count > 10}
 										<div class="row">
-											<div class="col-md-8">
+											<div class="col-md-4">
 												<div class="nzb_multi_operations">
 													{if isset($section) && $section != ''}View:
 														<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
@@ -201,7 +201,7 @@
 
 														{if isset($sabintegrated) && $sabintegrated !=""}
 															<button type="button"
-																	class="nzb_multi_operations_sab btn btn-sm btn-primary"
+																	class="nzb_multi_operations_sab btn btn-sm btn-light"
 																	data-toggle="tooltip" data-placement="top" title
 																	data-original-title="Send to Queue">
 																<i class="fa fa-share"></i></button>
@@ -217,7 +217,7 @@
 													</div>
 												</div>
 											</div>
-											<div class="col-md-4">
+											<div class="col-md-8">
 												{$results->onEachSide(5)->links()}
 											</div>
 										</div>

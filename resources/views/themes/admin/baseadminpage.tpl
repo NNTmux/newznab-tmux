@@ -12,10 +12,8 @@
         /* ]]> */
 	</script>
 	{/literal}
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<!-- Meta, title, CSS, favicons, etc. -->
 	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
@@ -57,7 +55,7 @@
 		<div class="right_col" role="main">
 			<div class="clearfix"></div>
 			<div class="row">
-				<div class="col-md-12 col-sm-12 col-xs-12">
+				<div class="col-md-12 col-sm-12 col-12">
 					{$content}
 					<div class="clearfix"></div>
 				</div>

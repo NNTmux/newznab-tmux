@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use Blacklight\utility\Versions;
+use App\Extensions\util\Git;
 
 /**
  * Tmux output functions for printing monitor data.
@@ -11,11 +11,6 @@ use Blacklight\utility\Versions;
  */
 class TmuxOutput extends Tmux
 {
-    /**
-     * @var \simpleXMLElement
-     */
-    protected $_vers;
-
     /**
      * @var
      */
@@ -39,7 +34,6 @@ class TmuxOutput extends Tmux
     public function __construct()
     {
         parent::__construct();
-        $this->_vers = (new Versions())->getValidVersionsFile();
 
         $this->_setColourMasks();
     }
@@ -130,16 +124,18 @@ class TmuxOutput extends Tmux
 
     /**
      * @return string
+     * @throws \Cz\Git\GitException
      */
     protected function _getHeader(): string
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
-        $version = $this->_vers->versions->git->tag;
+        $version = (new Git())->tagLatest();
+        $branch = (new Git())->getBranch();
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
-            "Monitor $state $version [".$this->runVar['constants']['sqlpatch'].']: ',
+            "Monitor $state $version [".$branch.'] :',
             $this->relativeTime($this->runVar['timers']['timer1'])
         );
 

@@ -1,5 +1,5 @@
-<div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-	 xmlns="http://www.w3.org/1999/html">
+<div class="header"
+	>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -8,18 +8,18 @@
 		</ol>
 	</div>
 </div>
-<div class="well well-sm">
+<div class="card card-header">
 	{include file='search-filter.tpl'}
 </div>
 {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 	<div class="row">
 		<div class="col-md-12">
 			<div class="row">
-				<div class="col-lg-12 col-sm-12 col-xs-12">
-					<div class="panel panel-default">
-						<div class="panel-body pagination2">
+				<div class="col-lg-12 col-sm-12 col-12">
+					<div class="card card-default">
+						<div class="card-body pagination2">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-4">
 									<div class="nzb_multi_operations">
 										View: <strong>Covers</strong> | <a
 												href="{$smarty.const.WWW_TOP}/browse/Books/{$categorytitle}">List</a><br/>
@@ -38,7 +38,7 @@
 
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
-														class="nzb_multi_operations_sab btn btn-sm btn-primary"
+														class="nzb_multi_operations_sab btn btn-sm btn-success"
 														data-toggle="tooltip" data-placement="top" title
 														data-original-title="Send to Queue">
 													<i class="fa fa-share"></i></button>
@@ -54,39 +54,39 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							</div>
 							<hr>
 							{foreach $resultsadd as $result}
-								<div class="panel panel-default">
-									<div class="panel-body">
+								<div class="card card-default">
+									<div class="card-body">
 										<div class="row">
 											<div class="col-md-2 small-gutter-left">
 												<a title="View details"
 												   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">
 													<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result->cover == 1}{$result->bookinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
-														 class="img-responsive img-rounded"
+														 class="img-fluid rounded"
 														 width="140" border="0"
 														 alt="{$result->author|escape:"htmlall"} - {$result->title|escape:"htmlall"}"/>{if isset($result->failed) && $result->failed > 0}
 													<i class="fa fa-exclamation-circle" style="color: red"
 													   title="This release has failed to download for some users"></i>{/if}
 												</a>
 												{if isset($result->url) && $result->url != ""}<a
-													class="label label-primary" target="_blank"
+													class="badge badge-info" target="_blank"
 													href="{$site->dereferrer_link}{$result->url}"
 													name="amazon{$result->bookinfo_id}" title="View amazon/iTunes page">
 														Amazon/iTunes</a>{/if}
 												{if isset($result->nfoid) && $result->nfoid > 0}<a
 													href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-													title="View Nfo" class="label label-primary" rel="nfo">
+													title="View Nfo" class="badge badge-info" rel="nfo">
 														NFO</a>{/if}
-												<a class="label label-primary"
+												<a class="badge badge-info"
 												   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 												   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if isset($result->failed) && $result->failed > 0}
-												<span class="btn btn-hover btn-default btn-xs"><i
+												<span class="btn btn-hover btn-light btn-xs"><i
 															class="fa fa-thumbs-o-down"></i><span
 															class="badge"> {$result->failed}
 														Failed Download{if $result->failed > 1}s{/if}</span>
@@ -105,8 +105,8 @@
 																	   value="{$result->guid}"
 																	   id="chksingle"/>
 															</label>
-															<span class="label label-primary">{$result->size|filesize}</span>
-															<span class="label label-primary">Posted {$result->postdate|timeago}
+															<span class="badge badge-info">{$result->size|filesize}</span>
+															<span class="badge badge-info">Posted {$result->postdate|timeago}
 																ago</span>
 															<br/>
 															{if isset($result->review) && $result->review != ""}<span
@@ -137,26 +137,26 @@
 																<br/>
 															{/if}
 															<div>
-																<a role="button" class="btn btn-default btn-xs"
+																<a role="button" class="btn btn-light btn-xs"
 																   data-toggle="tooltip" data-placement="top" title
 																   data-original-title="Download NZB"
 																   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
 																			class="fa fa-cloud-download"></i><span
 																			class="badge"> {$result->grabs}
 																		Grab{if $result->grabs != 1}s{/if}</span></a>
-																<a role="button" class="btn btn-default btn-xs"
+																<a role="button" class="btn btn-light btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
 																			class="fa fa-comment-o"></i><span
 																			class="badge"> {$result->comments}
 																		Comment{if $result->comments != 1}s{/if}</span></a>
-																<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+																<span class="btn btn-hover btn-light btn-xs icon icon_cart text-muted"
 																	  id="guid{$result->guid}"
 																	  data-toggle="tooltip" data-placement="top"
 																	  title
 																	  data-original-title="Send to my download basket"><i
 																			class="fa fa-shopping-basket"></i></span>
 																{if isset($sabintegrated) && $sabintegrated !=""}
-																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																	<span class="btn btn-hover btn-light btn-xs icon icon_sab text-muted"
 																		  id="guid{$result->guid}"
 																		  data-toggle="tooltip" data-placement="top"
 																		  title
@@ -164,7 +164,7 @@
 																				class="fa fa-share"></i></span>
 																{/if}
 																{if !empty($result->failed)}
-																	<span class="btn btn-default btn-xs"
+																	<span class="btn btn-light btn-xs"
 																		  title="This release has failed to download for some users">
 																		<i class="fa fa-thumbs-o-up"></i> {$result->grabs}
 																		Grab{if {$result->grabs} != 1}s{/if}
@@ -182,7 +182,7 @@
 								</div>
 							{/foreach}
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-4">
 									{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
@@ -202,7 +202,7 @@
 
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<button type="button"
-															class="nzb_multi_operations_sab btn btn-sm btn-primary"
+															class="nzb_multi_operations_sab btn btn-sm btn-success"
 															data-toggle="tooltip" data-placement="top" title
 															data-original-title="Send to Queue">
 														<i class="fa fa-share"></i></button>
@@ -218,7 +218,7 @@
 											</div>
 										</div>
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-8">
 									{$results->onEachSide(5)->links()}
 								</div>
 							</div>

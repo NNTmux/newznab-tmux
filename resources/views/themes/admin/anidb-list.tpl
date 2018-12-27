@@ -2,7 +2,7 @@
 
 {if $anidblist}
 
-<div class="well well-sm">
+<div class="card card-body">
 	<div style="float:right;">
 
 		<form name="anidbsearch" action="">
@@ -10,7 +10,7 @@
 			<label for="animetitle">Title</label>
 			<input id="animetitle" type="text" name="animetitle" value="{$animetitle}" size="15"/>
 			&nbsp;&nbsp;
-			<input class="btn btn-default" type="submit" value="Go"/>
+			<input class="btn btn-success" type="submit" value="Go"/>
 		</form>
 	</div>
 

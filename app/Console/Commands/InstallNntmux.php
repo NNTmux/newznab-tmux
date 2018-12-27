@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
-use App\Extensions\util\Versions;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command
@@ -46,13 +45,8 @@ class InstallNntmux extends Command
     {
         $error = false;
 
-        if (env('DB_SYSTEM') !== 'mysql') {
-            $this->error('Invalid database system. Must be: mysql ; Not: '.env('DB_SYSTEM'));
-            $error = true;
-        }
-
-        if (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION)) {
-            $this->error('Version of MariaDB/MySQL used is lower than required version: '.NN_MINIMUM_MARIA_VERSION.PHP_EOL.' Please update your install of Mariadb/MySQL');
+        if (env('DB_CONNECTION') === 'mysql' && (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION))) {
+            $this->error('Version of MariaDB/MySQL/ used is lower than required version: '.NN_MINIMUM_MARIA_VERSION.PHP_EOL.' Please update your install of Mariadb/MySQL');
             $error = true;
         }
 
@@ -98,17 +92,15 @@ class InstallNntmux extends Command
                     });
                 }
 
-                if ($this->updatePatch()) {
-                    $paths = $this->updatePaths();
-                    if ($paths !== false) {
-                        $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
-                        $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
-                        $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
-                        if ($sql1 === null || $sql2 === null || $sql3 === null) {
-                            $error = true;
-                        } else {
-                            $this->info('Settings table updated successfully');
-                        }
+                $paths = $this->updatePaths();
+                if ($paths !== false) {
+                    $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $paths['nzb_path']]);
+                    $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $paths['unrar_path']]);
+                    $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $paths['covers_path']]);
+                    if ($sql1 === null || $sql2 === null || $sql3 === null) {
+                        $error = true;
+                    } else {
+                        $this->info('Settings table updated successfully');
                     }
                 }
 
@@ -134,30 +126,6 @@ class InstallNntmux extends Command
                 exit;
             }
         }
-    }
-
-    /**
-     * @return bool
-     * @throws \Cz\Git\GitException
-     */
-    private function updatePatch(): bool
-    {
-        $patch = (new Versions())->getSQLPatchFromFile();
-        $updateSettings = false;
-        if ($patch > 0) {
-            $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
-        }
-
-        // If it all worked, continue the install process.
-        if ($updateSettings !== false) {
-            $this->info('Database updated successfully');
-
-            return true;
-        }
-
-        $this->error('Could not update sqlpatch to '.$patch.' for your database.');
-
-        return false;
     }
 
     /**

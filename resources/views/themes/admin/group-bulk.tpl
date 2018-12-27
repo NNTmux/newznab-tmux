@@ -1,4 +1,4 @@
-<div class="well well-sm">
+<div class="card card-body">
 	<h1>{$title}</h1>
 
 	{if $groupmsglist}
@@ -50,7 +50,7 @@
 				<tr>
 					<td></td>
 					<td>
-						<input class="btn btn-default" type="submit" value="Add Groups"/>
+						<input class="btn btn-success" type="submit" value="Add Groups"/>
 					</td>
 				</tr>
 
