@@ -424,7 +424,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
             escapeString('%.exe'),
@@ -454,7 +454,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
             escapeString('%install.bin%'),
             $this->crapTime
@@ -479,7 +479,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
             escapeString('%password.url%'),
             $this->crapTime
@@ -609,7 +609,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
 			AND rf.name LIKE %s %s',
             escapeString('%.nzb%'),
@@ -677,7 +677,7 @@ class ReleaseRemover
         $this->query = sprintf(
             "SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
 			%s",
             $this->crapTime
@@ -790,7 +790,8 @@ class ReleaseRemover
                     $blType,
                     $opTypeName,
                     $ftUsing
-                    ), true
+                    ),
+                    true
                 );
 
                 if ($opTypeName === 'Subject') {
@@ -845,7 +846,7 @@ class ReleaseRemover
         if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
                 $regexSQL = sprintf(
-                    'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
+                    'JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
                     escapeString($regex->regex)
                 );
 
@@ -891,7 +892,8 @@ class ReleaseRemover
                     $this->method,
                     $blType,
                     $ftUsing
-                    ), true
+                    ),
+                    true
                 );
 
                 $this->query = sprintf(
@@ -1003,6 +1005,7 @@ class ReleaseRemover
      * Delete releases from the database.
      *
      * @return true
+     * @throws \Exception
      */
     protected function deleteReleases(): bool
     {
@@ -1234,7 +1237,8 @@ class ReleaseRemover
         $this->colorCli->primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
-            'If you are satisfied, type yes and press enter. Anything else will exit.', true
+            'If you are satisfied, type yes and press enter. Anything else will exit.',
+            true
         );
 
         // Check the users response.
@@ -1340,11 +1344,13 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, 'chinese');
             $regexMatch =
                 str_replace(
-                    ['-', '(', ')', '.', '?', 'nl  subed|bed|s'], [
+                    ['-', '(', ')', '.', '?', 'nl  subed|bed|s'],
+                    [
                     '',
                     '',
                     '',
-                    ' ', '', 'nlsubs|nlsubbed|nlsubed', ], substr(
+                    ' ', '', 'nlsubs|nlsubbed|nlsubed', ],
+                    substr(
                         $dbRegex,
                         $forBegin,
                         strrpos($dbRegex, ')') - $forBegin
@@ -1355,14 +1361,18 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, '4u');
             $regexMatch =
                 str_replace(
-                    ['4u.nl', 'nov[ a]+rip'], ['"4u" "nl"', 'nova'], substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
+                    ['4u.nl', 'nov[ a]+rip'],
+                    ['"4u" "nl"', 'nova'],
+                    substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
                 );
         } elseif (substr($dbRegex, 8, 5) === 'bd|dl') {
             // Find first bd|dl instance position in Regex, then find last closing parenthesis as this is reversed.
             $forBegin = strpos($dbRegex, 'bd|dl');
             $regexMatch =
                 str_replace(
-                    ['bd|dl)mux', '\\', ']', '['], ['bdmux|dlmux', '', '', ''], substr(
+                    ['bd|dl)mux', '\\', ']', '['],
+                    ['bdmux|dlmux', '', '', ''],
+                    substr(
                         $dbRegex,
                         $forBegin,
                         strrpos($dbRegex, ')') - $forBegin
