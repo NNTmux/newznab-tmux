@@ -6,7 +6,6 @@ use Blacklight\ColorCLI;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendAccountExpiredEmail;
@@ -405,10 +404,10 @@ class User extends Authenticatable
      * @param string $role
      * @param bool   $apiRequests
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false): array
+    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
@@ -431,7 +430,7 @@ class User extends Authenticatable
         }
         $order = self::getBrowseOrder($orderBy);
 
-        return DB::select(
+        return self::fromQuery(
             sprintf(
                 $query,
                 ! empty($userName) ? 'AND users.username '.'LIKE '.escapeString('%'.$userName.'%') : '',
