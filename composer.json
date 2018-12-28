@@ -132,7 +132,7 @@
     "spatie/laravel-fractal": "^5.3",
     "spatie/laravel-permission": "^2.12",
     "vlucas/phpdotenv": "^2.4",
-    "voku/simple_html_dom": "^4.1",
+    "voku/simple_html_dom": "4.1.7",
     "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
