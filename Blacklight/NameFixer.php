@@ -2514,8 +2514,8 @@ class NameFixer
                     $this->_fileName = preg_replace('/\.\d+$/', '', $this->_fileName);
                 }
             }
-            if (preg_match('/^[a-zA-Z]{0,4}\./', $this->_fileName)) {
-                $this->_fileName = preg_replace('/^[a-zA-Z]{0,4}\./', '', $this->_fileName);
+            if (preg_match('/^[a-zA-Z]{0,7}\./', $this->_fileName)) {
+                $this->_fileName = preg_replace('/^[a-zA-Z]{0,7}\./', '', $this->_fileName);
             }
         }
 
