@@ -2493,22 +2493,30 @@ class NameFixer
      */
     private function cleanFileNames()
     {
-        $this->_fileName = preg_replace('/\.4k$/', '.2160p', $this->_fileName);
-        if (preg_match('/\.fullhd$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.fullhd$/i', '.1080p', $this->_fileName);
+        if (preg_match('/(\.[a-zA-Z]{2})?(\.4k|\.fullhd|\.hd|\.int|\.\d+)?$/i', $this->_fileName, $match)) {
+            if (preg_match('/\.[a-zA-Z]{2}/i', $match[1])) {
+                $this->_fileName = preg_replace('/\.[a-zA-Z]{2}\./i', '.', $this->_fileName);
+            }
+            if (preg_match('/\.4k$/', $match[2])) {
+                $this->_fileName = preg_replace('/\.4k$/', '.2160p', $this->_fileName);
+            }
+            if (preg_match('/\.fullhd$/i', $match[2])) {
+                $this->_fileName = preg_replace('/\.fullhd$/i', '.1080p', $this->_fileName);
+            }
+            if (preg_match('/\.hd$/i', $match[2])) {
+                $this->_fileName = preg_replace('/\.hd$/i', '.720p', $this->_fileName);
+            }
+            if (preg_match('/\.int$/i', $match[2])) {
+                $this->_fileName = preg_replace('/\.int$/i', '.INTERNAL', $this->_fileName);
+            }
+            if (preg_match('/\.\d+/', $match[2])) {
+                $this->_fileName = preg_replace('/\.\d+$/', '', $this->_fileName);
+            }
+            if (preg_match('/^[a-zA-Z]{0,4}\./', $match[0])) {
+                $this->_fileName = preg_replace('/^[a-zA-Z]{0,4}\./', '', $this->_fileName);
+            }
         }
-        if (preg_match('/\.hd$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.hd$/i', '.720p', $this->_fileName);
-        }
-        if (preg_match('/\.int$/i', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.int$/i', '.INTERNAL', $this->_fileName);
-        }
-        if (preg_match('/\.\d+$/', $this->_fileName)) {
-            $this->_fileName = preg_replace('/\.\d+$/', '', $this->_fileName);
-        }
-        if (preg_match('/^[a-zA-Z]{0,4}\./', $this->_fileName)) {
-            $this->_fileName = preg_replace('/^[a-zA-Z]{0,4}\./', '', $this->_fileName);
-        }
+
 
         return $this->_fileName;
     }
