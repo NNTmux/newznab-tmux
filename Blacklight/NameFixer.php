@@ -2519,7 +2519,6 @@ class NameFixer
             }
         }
 
-
         return $this->_fileName;
     }
 }
