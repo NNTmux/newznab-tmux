@@ -13,7 +13,7 @@ return [
     | Supported: "bcrypt", "argon", "argon2id"
     |
     */
-    'driver' => 'argon',
+    'driver' => env('PASSWORD_HASH', 'argon'),
     /*
     |--------------------------------------------------------------------------
     | Bcrypt Options
