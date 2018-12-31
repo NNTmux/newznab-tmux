@@ -1,3 +1,5 @@
+2018-12-31 DariusIII
+	* Chg: Update doctrine/dbal to version 2.9.2
 2018-12-30 DariusIII
 	* Chg: Add back php-cs-fixer
 2018-12-28 DariusIII
