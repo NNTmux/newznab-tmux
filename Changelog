@@ -1,4 +1,5 @@
 2018-12-31 DariusIII
+	* Chg: Do not fetch mgrposters if allAsMgr is enabled
 	* Chg: Update doctrine/dbal to version 2.9.2
 2018-12-30 DariusIII
 	* Chg: Add back php-cs-fixer

@@ -582,7 +582,7 @@ class Binaries
 
         if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
             $mgrActive = true;
-            $this->mgrPosters = ! empty($this->mgrPosters) ? array_flip(array_pluck($this->mgrPosters, 'poster')) : '';
+            $this->mgrPosters = ! empty($this->mgrPosters) && $this->allAsMgr === false ? array_flip(array_pluck($this->mgrPosters, 'poster')) : '';
         } else {
             $mgrActive = false;
         }
