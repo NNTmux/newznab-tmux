@@ -204,7 +204,11 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
         } else {
-
+            try {
+                processReleases($releases, '');
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
             // Run functions that run on releases table after all others completed.
             $groupCount = rtrim($options[2], '_');
             if (! is_numeric($groupCount)) {
