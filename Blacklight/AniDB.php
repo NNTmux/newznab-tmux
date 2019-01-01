@@ -6,6 +6,11 @@ use App\Models\Category;
 use App\Models\AnidbTitle;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class AniDB
+ *
+ * @package Blacklight
+ */
 class AniDB
 {
     /**

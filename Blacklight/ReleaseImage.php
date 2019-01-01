@@ -12,7 +12,10 @@ use Intervention\Image\Exception\NotWritableException;
 /**
  * Resize/save/delete images to disk.
  *
+ *
  * Class ReleaseImage
+ *
+ * @package Blacklight
  */
 class ReleaseImage
 {

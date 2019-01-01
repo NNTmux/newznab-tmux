@@ -7,7 +7,10 @@ use App\Extensions\util\Git;
 /**
  * Tmux output functions for printing monitor data.
  *
+ *
  * Class TmuxOutput
+ *
+ * @package Blacklight
  */
 class TmuxOutput extends Tmux
 {

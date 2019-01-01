@@ -7,11 +7,12 @@ use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
 
 /**
- * Class Binaries.
+ * Class Binaries
+ *
+ * @package Blacklight
  */
 class Binaries
 {
@@ -740,7 +741,6 @@ class Binaries
      *
      *
      * @param array $headers
-     * @param bool $multiGroup
      *
      * @throws \Exception
      * @throws \Throwable
@@ -770,16 +770,13 @@ class Binaries
                     $fileCount[1] = $fileCount[3] = 0;
                 }
 
-                $ckName = '';
-                $ckId = '';
-
                 $collMatch = $this->_collectionsCleaning->collectionsCleaner(
                     $this->header['matches'][1],
-                    $ckName
+                    ''
                 );
 
-                // Used to group articles together when forming the release.  MGR requires this to be group irrespective
-                $this->header['CollectionKey'] = $collMatch['name'].$ckId.$fileCount[3];
+                // Used to group articles together when forming the release.
+                $this->header['CollectionKey'] = $collMatch['name'].$fileCount[3];
 
                 // If this header's collection key isn't in memory, attempt to insert the collection
                 if (! isset($collectionIDs[$this->header['CollectionKey']])) {
@@ -826,7 +823,7 @@ class Binaries
                     $collectionID = $collectionIDs[$this->header['CollectionKey']];
                 }
 
-                // MGR or Standard, Binary Hash should be unique to the group
+                // Binary Hash should be unique to the group
                 $hash = md5($this->header['matches'][1].$this->header['From'].$this->groupMySQL['id']);
 
                 $binaryID = false;

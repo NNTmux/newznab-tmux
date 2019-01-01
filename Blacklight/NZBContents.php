@@ -10,7 +10,10 @@ use Blacklight\processing\PostProcess;
 /**
  * Gets information contained within the NZB.
  *
+ *
  * Class NZBContents
+ *
+ * @package Blacklight
  */
 class NZBContents
 {

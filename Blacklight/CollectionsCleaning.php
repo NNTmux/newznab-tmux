@@ -5,7 +5,10 @@ namespace Blacklight;
 /**
  * Cleans names for collections/imports/namefixer.
  *
+ *
  * Class CollectionsCleaning
+ *
+ * @package Blacklight
  */
 class CollectionsCleaning
 {
@@ -77,34 +80,27 @@ class CollectionsCleaning
     protected $_regexes;
 
     /**
-     * @param array $options Class instances.
+     * CollectionsCleaning constructor.
+     *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
         // Extensions.
         $this->e0 = self::REGEX_FILE_EXTENSIONS;
         $this->e1 = self::REGEX_FILE_EXTENSIONS.self::REGEX_END;
         $this->e2 = self::REGEX_FILE_EXTENSIONS.self::REGEX_SUBJECT_SIZE.self::REGEX_END;
 
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
         $this->_regexes = new Regexes(['Table_Name' => 'collection_regexes']);
     }
 
     /**
-     * Cleans a usenet subject returning a string that can be used to "merge" files together, a pretty subject, a categoryID and the name status.
-     *
-     * @param string $subject   Subject to parse.
-     * @param string $groupName Group to work in.
-     *
-     * @return array The ID of the Regex Matched and the cleaned collection name
+     * @param $subject
+     * @param $groupName
+     * @return array
      * @throws \Exception
      */
-    public function collectionsCleaner($subject, $groupName): ?array
+    public function collectionsCleaner($subject, $groupName): array
     {
         $this->subject = $subject;
         $this->groupName = $groupName;
@@ -118,23 +114,16 @@ class CollectionsCleaning
             ];
         }
 
-        switch ($groupName) {
-            /*
-            case 'alt.binaries.this.is.an.example':
-                return $this->_example_method_name();
-            */
-            case null:
-            default:
-                return $this->generic();
-        }
+        return $this->generic();
     }
 
     /**
      * Cleans usenet subject before inserting, used for collectionhash. If no regexes matched on collectionsCleaner.
      *
-     * @return array|null
+     *
+     * @return array
      */
-    protected function generic(): ?array
+    protected function generic(): array
     {
         // For non music groups.
         if (! preg_match('/\.(flac|lossless|mp3|music|sounds)/', $this->groupName)) {

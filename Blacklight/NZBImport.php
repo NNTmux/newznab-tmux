@@ -9,8 +9,9 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 /**
- * Import NZB files into the database.
- * Class NZBImport.
+ * Class NZBImport
+ *
+ * @package Blacklight
  */
 class NZBImport
 {

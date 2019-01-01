@@ -7,7 +7,9 @@ use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class Tmux.
+ * Class Tmux
+ *
+ * @package Blacklight
  */
 class Tmux
 {

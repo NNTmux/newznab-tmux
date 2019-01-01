@@ -10,6 +10,11 @@ use App\Models\CollectionRegex;
 use App\Models\ReleaseNamingRegex;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class Regexes
+ *
+ * @package Blacklight
+ */
 class Regexes
 {
     /**

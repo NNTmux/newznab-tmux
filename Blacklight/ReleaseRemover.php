@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * Handles removing of various unwanted releases.
  *
+ *
  * Class ReleaseRemover
+ *
+ * @package Blacklight
  */
 class ReleaseRemover
 {

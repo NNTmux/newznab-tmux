@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\File;
 /**
  * Class for reading and writing NZB files on the hard disk,
  * building folder paths to store the NZB files.
+ *
+ *
+ * Class NZB
+ *
+ * @package Blacklight
  */
 class NZB
 {

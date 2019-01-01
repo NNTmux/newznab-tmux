@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * Tmux pane shell exec functions for pane respawning.
  *
+ *
  * Class TmuxRun
+ *
+ * @package Blacklight
  */
 class TmuxRun extends Tmux
 {

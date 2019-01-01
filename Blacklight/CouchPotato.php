@@ -24,7 +24,9 @@ namespace Blacklight;
 use GuzzleHttp\Client;
 
 /**
- * Class CouchPotato.
+ * Class CouchPotato
+ *
+ * @package Blacklight
  */
 class CouchPotato
 {

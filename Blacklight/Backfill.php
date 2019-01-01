@@ -6,6 +6,11 @@ use App\Models\Group;
 use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class Backfill
+ *
+ * @package Blacklight
+ */
 class Backfill
 {
     /**

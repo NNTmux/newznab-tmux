@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\ClientException;
 
+/**
+ * Class Games
+ *
+ * @package Blacklight
+ */
 class Games
 {
     protected const GAME_MATCH_PERCENTAGE = 85;

@@ -9,6 +9,11 @@ use App\Extensions\util\PhpYenc;
  * Class for connecting to the usenet, retrieving articles and article headers,
  * decoding yEnc articles, decompressing article headers.
  * Extends PEAR's Net_NNTP_Client class, overrides some functions.
+ *
+ *
+ * Class NNTP
+ *
+ * @package Blacklight
  */
 class NNTP extends \Net_NNTP_Client
 {

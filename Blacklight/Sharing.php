@@ -5,7 +5,9 @@ namespace Blacklight;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class Sharing.
+ * Class Sharing
+ *
+ * @package Blacklight
  */
 class Sharing
 {

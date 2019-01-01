@@ -1,4 +1,5 @@
 2019-01-01 DariusIII
+	* Chg: Update all the \Blacklight namespace classes with class PHPDOC block
 	* Chg: Update friendsofphp/php-cs-fixer to version 2.13.2
 	* Fix: Fix NZB creation
 	* Fix: Fix typo in ProcessReleases class

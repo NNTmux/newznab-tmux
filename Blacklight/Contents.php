@@ -5,6 +5,11 @@ namespace Blacklight;
 use App\Models\User;
 use App\Models\Content;
 
+/**
+ * Class Contents
+ *
+ * @package Blacklight
+ */
 class Contents
 {
     public const TYPEUSEFUL = 1;

@@ -9,7 +9,10 @@ use App\Models\Settings;
 /**
  * Categorizing of releases by name/group.
  *
+ *
  * Class Categorize
+ *
+ * @package Blacklight
  */
 class Categorize
 {

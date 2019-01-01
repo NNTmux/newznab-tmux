@@ -3,7 +3,9 @@
 namespace Blacklight;
 
 /**
- * Class ConsoleTools.
+ * Class ConsoleTools
+ *
+ * @package Blacklight
  */
 class ConsoleTools
 {

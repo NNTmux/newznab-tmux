@@ -10,6 +10,11 @@ use App\Models\ReleaseExtraFull;
 use Illuminate\Support\Facades\DB;
 use Mhor\MediaInfo\Container\MediaInfoContainer;
 
+/**
+ * Class ReleaseExtra
+ *
+ * @package Blacklight
+ */
 class ReleaseExtra
 {
     /**

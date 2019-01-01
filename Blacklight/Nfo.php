@@ -14,7 +14,8 @@ use Blacklight\processing\PostProcess;
 
 /**
  * Class Nfo
- * Class for handling fetching/storing of NFO files.
+ *
+ * @package Blacklight
  */
 class Nfo
 {

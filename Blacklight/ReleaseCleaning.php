@@ -7,6 +7,11 @@ use App\Models\Predb;
 /**
  * Cleans names for releases/imports/namefixer.
  * Names of group functions should match between CollectionsCleaning and this file.
+ *
+ *
+ * Class ReleaseCleaning
+ *
+ * @package Blacklight
  */
 class ReleaseCleaning
 {

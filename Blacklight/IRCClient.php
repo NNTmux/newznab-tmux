@@ -7,7 +7,10 @@ use Blacklight\utility\Utility;
 /**
  * Basic IRC client for fetching IRCScraper.
  *
+ *
  * Class IRCClient
+ *
+ * @package Blacklight
  */
 class IRCClient
 {

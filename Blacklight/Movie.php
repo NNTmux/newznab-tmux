@@ -25,7 +25,9 @@ use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
- * Class Movie.
+ * Class Movie
+ *
+ * @package Blacklight
  */
 class Movie
 {

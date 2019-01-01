@@ -22,7 +22,9 @@ use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
- * Class Music.
+ * Class Music
+ *
+ * @package Blacklight
  */
 class Music
 {
