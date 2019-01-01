@@ -8,9 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class IRCScraper
- *
- * @package Blacklight
+ * Class IRCScraper.
  */
 class IRCScraper extends IRCClient
 {

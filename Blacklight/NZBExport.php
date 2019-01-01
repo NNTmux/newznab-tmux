@@ -7,9 +7,7 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 /**
- * Class NZBExport
- *
- * @package Blacklight
+ * Class NZBExport.
  */
 class NZBExport
 {

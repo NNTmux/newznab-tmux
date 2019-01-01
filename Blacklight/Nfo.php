@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
 
 /**
- * Class Nfo
- *
- * @package Blacklight
+ * Class Nfo.
  */
 class Nfo
 {

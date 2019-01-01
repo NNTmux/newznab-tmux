@@ -6,9 +6,7 @@ use GuzzleHttp\Client;
 use App\Models\Settings;
 
 /**
- * Class SABnzbd
- *
- * @package Blacklight
+ * Class SABnzbd.
  */
 class SABnzbd
 {

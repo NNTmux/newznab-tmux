@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Class Genres
- *
- * @package Blacklight
+ * Class Genres.
  */
 class Genres
 {

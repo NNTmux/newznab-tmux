@@ -11,9 +11,7 @@ use App\Models\ReleaseNamingRegex;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class Regexes
- *
- * @package Blacklight
+ * Class Regexes.
  */
 class Regexes
 {

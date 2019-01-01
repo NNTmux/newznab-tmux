@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\ClientException;
 
 /**
- * Class Games
- *
- * @package Blacklight
+ * Class Games.
  */
 class Games
 {

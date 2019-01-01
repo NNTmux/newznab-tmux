@@ -7,9 +7,7 @@ use App\Models\SteamApp;
 use b3rs3rk\steamfront\Main;
 
 /**
- * Class Steam
- *
- * @package Blacklight
+ * Class Steam.
  */
 class Steam
 {

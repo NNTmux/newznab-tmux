@@ -12,8 +12,6 @@ use Blacklight\processing\PostProcess;
  *
  *
  * Class NZBContents
- *
- * @package Blacklight
  */
 class NZBContents
 {

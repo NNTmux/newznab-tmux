@@ -7,8 +7,6 @@ namespace Blacklight;
  *
  *
  * Class CollectionsCleaning
- *
- * @package Blacklight
  */
 class CollectionsCleaning
 {

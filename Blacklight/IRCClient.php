@@ -9,8 +9,6 @@ use Blacklight\utility\Utility;
  *
  *
  * Class IRCClient
- *
- * @package Blacklight
  */
 class IRCClient
 {

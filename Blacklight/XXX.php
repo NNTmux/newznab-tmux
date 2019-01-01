@@ -16,9 +16,7 @@ use Blacklight\processing\adult\Popporn;
 use Blacklight\processing\adult\Hotmovies;
 
 /**
- * Class XXX
- *
- * @package Blacklight
+ * Class XXX.
  */
 class XXX
 {

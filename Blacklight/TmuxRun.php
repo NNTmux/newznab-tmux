@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\DB;
  *
  *
  * Class TmuxRun
- *
- * @package Blacklight
  */
 class TmuxRun extends Tmux
 {

@@ -6,9 +6,7 @@ use App\Models\User;
 use App\Models\Content;
 
 /**
- * Class Contents
- *
- * @package Blacklight
+ * Class Contents.
  */
 class Contents
 {

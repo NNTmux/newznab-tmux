@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 
 /**
- * Class Binaries
- *
- * @package Blacklight
+ * Class Binaries.
  */
 class Binaries
 {

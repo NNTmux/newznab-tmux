@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 /**
- * Class SphinxSearch
- *
- * @package Blacklight
+ * Class SphinxSearch.
  */
 class SphinxSearch
 {
