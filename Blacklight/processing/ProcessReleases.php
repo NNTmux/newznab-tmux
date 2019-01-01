@@ -705,7 +705,6 @@ class ProcessReleases
     public function createNZBs($groupID): int
     {
         $startTime = now();
-        $this->formFromNamesQuery();
 
         if ($this->echoCLI) {
             $this->colorCli->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
@@ -720,9 +719,8 @@ class ProcessReleases
 				FROM releases r
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE %s nzbstatus = 0 %s",
-                (! empty($groupID) ? ' r.groups_id = '.$groupID.' AND ' : ' '),
-                $this->fromNamesQuery
+				WHERE %s nzbstatus = 0",
+                ! empty($groupID) ? ' r.groups_id = '.$groupID.' AND ' : ' '
             )
         );
 

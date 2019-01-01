@@ -278,12 +278,6 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('ajax', 'AjaxController@ajaxAction');
     Route::get('tmux-edit', 'TmuxController@edit');
     Route::post('tmux-edit', 'TmuxController@edit');
-    Route::get('posters-list', 'MgrPosterController@index');
-    Route::post('posters-list', 'MgrPosterController@index');
-    Route::get('posters-edit/{id?}', 'MgrPosterController@edit');
-    Route::post('posters-edit{id?}', 'MgrPosterController@edit');
-    Route::get('poster-delete/{id}', 'MgrPosterController@destroy');
-    Route::post('poster-delete/{id}', 'MgrPosterController@destroy');
     Route::get('release-list', 'ReleasesController@index');
     Route::post('release-list', 'ReleasesController@index');
     Route::get('release-delete/{id}', 'ReleasesController@destroy');

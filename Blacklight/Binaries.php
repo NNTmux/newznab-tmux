@@ -6,7 +6,6 @@ use App\Models\Group;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
-use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
@@ -1566,26 +1565,6 @@ class Binaries
         }
 
         return $ignore;
-    }
-
-    /**
-     * Returns all multigroup poster entries from the database.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
-     */
-    protected function getMultiGroupPosters()
-    {
-        $poster = Cache::get('mgrposter');
-        if ($poster !== null) {
-            return $poster;
-        }
-
-        $poster = MultigroupPoster::query()->get(['poster']);
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
-        Cache::put('mgrposter', $poster, $expiresAt);
-
-        return $poster;
     }
 
     /**
