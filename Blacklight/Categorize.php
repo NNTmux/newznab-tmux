@@ -11,8 +11,6 @@ use App\Models\Settings;
  *
  *
  * Class Categorize
- *
- * @package Blacklight
  */
 class Categorize
 {

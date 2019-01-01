@@ -21,9 +21,7 @@ use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 /**
- * Class Console
- *
- * @package Blacklight
+ * Class Console.
  */
 class Console
 {

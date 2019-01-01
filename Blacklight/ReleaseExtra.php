@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Mhor\MediaInfo\Container\MediaInfoContainer;
 
 /**
- * Class ReleaseExtra
- *
- * @package Blacklight
+ * Class ReleaseExtra.
  */
 class ReleaseExtra
 {

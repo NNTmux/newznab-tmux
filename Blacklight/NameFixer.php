@@ -10,9 +10,7 @@ use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
 
 /**
- * Class NameFixer
- *
- * @package Blacklight
+ * Class NameFixer.
  */
 class NameFixer
 {

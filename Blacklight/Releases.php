@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Class Releases
- *
- * @package Blacklight
+ * Class Releases.
  */
 class Releases
 {

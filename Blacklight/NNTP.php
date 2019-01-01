@@ -12,8 +12,6 @@ use App\Extensions\util\PhpYenc;
  *
  *
  * Class NNTP
- *
- * @package Blacklight
  */
 class NNTP extends \Net_NNTP_Client
 {

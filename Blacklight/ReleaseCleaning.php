@@ -10,8 +10,6 @@ use App\Models\Predb;
  *
  *
  * Class ReleaseCleaning
- *
- * @package Blacklight
  */
 class ReleaseCleaning
 {

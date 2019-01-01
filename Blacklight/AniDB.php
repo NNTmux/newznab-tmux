@@ -7,9 +7,7 @@ use App\Models\AnidbTitle;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class AniDB
- *
- * @package Blacklight
+ * Class AniDB.
  */
 class AniDB
 {

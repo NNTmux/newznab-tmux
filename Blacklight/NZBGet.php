@@ -12,8 +12,6 @@ use Blacklight\utility\Utility;
  *
  *
  * Class NZBGet
- *
- * @package Blacklight
  */
 class NZBGet
 {

@@ -14,8 +14,6 @@ use Intervention\Image\Exception\NotWritableException;
  *
  *
  * Class ReleaseImage
- *
- * @package Blacklight
  */
 class ReleaseImage
 {

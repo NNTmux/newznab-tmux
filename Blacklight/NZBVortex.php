@@ -6,9 +6,7 @@ use Page;
 use App\Models\User;
 
 /**
- * Class NZBVortex
- *
- * @package Blacklight
+ * Class NZBVortex.
  */
 final class NZBVortex
 {

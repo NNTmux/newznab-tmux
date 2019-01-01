@@ -9,8 +9,6 @@ use App\Extensions\util\Git;
  *
  *
  * Class TmuxOutput
- *
- * @package Blacklight
  */
 class TmuxOutput extends Tmux
 {

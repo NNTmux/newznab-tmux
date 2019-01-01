@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\File;
  *
  *
  * Class NZB
- *
- * @package Blacklight
  */
 class NZB
 {

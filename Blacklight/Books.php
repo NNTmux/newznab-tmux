@@ -20,9 +20,7 @@ use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
- * Class Books
- *
- * @package Blacklight
+ * Class Books.
  */
 class Books
 {
