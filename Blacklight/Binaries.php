@@ -10,7 +10,6 @@ use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
-use Blacklight\processing\ProcessReleasesMultiGroup;
 
 /**
  * Class Binaries.
@@ -134,16 +133,6 @@ class Binaries
     protected $startLoop;
 
     /**
-     * @var bool Is this retrieved header a multigroup one?
-     */
-    protected $multiGroup;
-
-    /**
-     * @var bool
-     */
-    protected $allAsMgr;
-
-    /**
      * @var int How long it took in seconds to download headers
      */
     protected $timeHeaders;
@@ -157,11 +146,6 @@ class Binaries
      * @var \DateTime
      */
     protected $startPR;
-
-    /**
-     * @var array The CBP/MGR tables names
-     */
-    protected $tableNames;
 
     /**
      * @var \DateTime
@@ -219,11 +203,6 @@ class Binaries
     protected $headersNotInserted;
 
     /**
-     * @var \Blacklight\Binaries[]|\Illuminate\Database\Eloquent\Collection
-     */
-    protected $mgrPosters;
-
-    /**
      * Constructor.
      *
      * @param array $options Class instances / echo to CLI?
@@ -259,8 +238,6 @@ class Binaries
         $this->_newGroupDaysToScan = Settings::settingValue('..newgroupdaystoscan') !== '' ? (int) Settings::settingValue('..newgroupdaystoscan') : 3;
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
-        $this->allAsMgr = (int) Settings::settingValue('..allasmgr') === 1;
-        $this->mgrPosters = $this->getMultiGroupPosters();
 
         $this->blackList = $this->whiteList = [];
     }
@@ -362,11 +339,6 @@ class Binaries
                     $this->colorCli->primary('Part repair enabled. Checking for missing parts.');
                 }
                 $this->partRepair($groupMySQL);
-
-                if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
-                    $tableNames = ProcessReleasesMultiGroup::tableNames();
-                    $this->partRepair($groupMySQL, $tableNames);
-                }
             } elseif ($this->_echoCLI) {
                 $this->colorCli->primary('Part repair disabled by user.');
             }
@@ -577,17 +549,7 @@ class Binaries
 
         $this->notYEnc = $this->headersBlackListed = 0;
 
-        // Check if MySQL tables exist, create if they do not, get their names at the same time.
-        $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
-
-        if ($this->allAsMgr === true || ! empty($this->mgrPosters)) {
-            $mgrActive = true;
-            $this->mgrPosters = ! empty($this->mgrPosters) && $this->allAsMgr === false ? array_flip(array_pluck($this->mgrPosters, 'poster')) : '';
-        } else {
-            $mgrActive = false;
-        }
-
-        $returnArray = $stdHeaders = $mgrHeaders = [];
+        $returnArray = $stdHeaders = [];
 
         $partRepair = ($type === 'partrepair');
         $this->addToPartRepair = ($type === 'update' && $this->_partRepair);
@@ -607,8 +569,7 @@ class Binaries
             if ($partRepair === true) {
                 DB::update(
                     sprintf(
-                        'UPDATE %s SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
-                        $this->tableNames['prname'],
+                        'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
                         $this->groupMySQL['id'],
                         ((int) $this->first === (int) $this->last ? '= '.$this->first : 'IN ('.implode(',', range($this->first, $this->last)).')')
                     )
@@ -710,11 +671,7 @@ class Binaries
                 $header['Bytes'] = (isset($this->header[':bytes']) ? $header[':bytes'] : 0);
             }
 
-            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $this->mgrPosters))) {
-                $mgrHeaders[] = $header;
-            } else {
-                $stdHeaders[] = $header;
-            }
+            $stdHeaders[] = $header;
         }
 
         unset($headers); // Reclaim memory now that headers are split.
@@ -727,17 +684,8 @@ class Binaries
             $this->outputHeaderInitial();
         }
 
-        // MGR headers goes first
-        if (! empty($mgrHeaders)) {
-            $this->tableNames = ProcessReleasesMultiGroup::tableNames();
-            $this->storeHeaders($mgrHeaders, true);
-        }
-        unset($mgrHeaders);
-
-        // Standard headers go second so we can switch tableNames back and do part repair to standard group tables
         if (! empty($stdHeaders)) {
-            $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
-            $this->storeHeaders($stdHeaders, false);
+            $this->storeHeaders($stdHeaders);
         }
         unset($stdHeaders);
 
@@ -748,14 +696,14 @@ class Binaries
         $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate);
 
         if ($partRepair && \count($headersRepaired) > 0) {
-            $this->removeRepairedParts($headersRepaired, $this->tableNames['prname'], $this->groupMySQL['id']);
+            $this->removeRepairedParts($headersRepaired, 'missed_parts', $this->groupMySQL['id']);
         }
         unset($headersRepaired);
 
         if ($this->addToPartRepair) {
             $notInsertedCount = \count($this->headersNotInserted);
             if ($notInsertedCount > 0) {
-                $this->addMissingParts($this->headersNotInserted, $this->tableNames['prname'], $this->groupMySQL['id']);
+                $this->addMissingParts($this->headersNotInserted, 'missed_parts', $this->groupMySQL['id']);
 
                 $this->log(
                     $notInsertedCount.' articles failed to insert!',
@@ -771,7 +719,7 @@ class Binaries
             }
             $notReceivedCount = \count($rangeNotReceived);
             if ($notReceivedCount > 0) {
-                $this->addMissingParts($rangeNotReceived, $this->tableNames['prname'], $this->groupMySQL['id']);
+                $this->addMissingParts($rangeNotReceived, 'missed_parts', $this->groupMySQL['id']);
 
                 if ($this->_echoCLI) {
                     $this->colorCli->alternate(
@@ -798,15 +746,13 @@ class Binaries
      * @throws \Exception
      * @throws \Throwable
      */
-    protected function storeHeaders(array $headers = [], $multiGroup = false): void
+    protected function storeHeaders(array $headers = []): void
     {
-        $this->multiGroup = $multiGroup;
         $binariesUpdate = $collectionIDs = $articles = [];
 
         DB::beginTransaction();
 
-        $partsQuery = $partsCheck =
-            "INSERT IGNORE INTO {$this->tableNames['pname']} (binaries_id, number, messageid, partnumber, size) VALUES ";
+        $partsQuery = $partsCheck = 'INSERT IGNORE INTO parts (binaries_id, number, messageid, partnumber, size) VALUES ';
 
         // Loop articles, figure out files/parts.
         foreach ($headers as $this->header) {
@@ -825,13 +771,8 @@ class Binaries
                     $fileCount[1] = $fileCount[3] = 0;
                 }
 
-                if ($this->multiGroup) {
-                    $ckName = '';
-                    $ckId = '';
-                } else {
-                    $ckName = $this->groupMySQL['name'];
-                    $ckId = $this->groupMySQL['id'];
-                }
+                $ckName = '';
+                $ckId = '';
 
                 $collMatch = $this->_collectionsCleaning->collectionsCleaner(
                     $this->header['matches'][1],
@@ -853,7 +794,7 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
-                    $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255))) : '');
+                    $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255)));
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
@@ -863,10 +804,10 @@ class Binaries
 
                     try {
                         DB::insert(sprintf("
-							INSERT INTO %s (subject, fromname, date, xref, groups_id,
+							INSERT INTO collections (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", $this->tableNames['cname'], escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
@@ -893,9 +834,9 @@ class Binaries
 
                 try {
                     DB::insert(sprintf("
-						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
+						INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
-						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $this->tableNames['bname'], $hash, escapeString(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
@@ -930,14 +871,14 @@ class Binaries
                 $this->header['matches'][2].','.$this->header['Bytes'].'),';
         }
 
-        //unset($headers); // Reclaim memory.
+        unset($headers); // Reclaim memory.
 
         // Start of inserting into SQL.
         $this->startUpdate = now();
 
         // End of processing headers.
         $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning);
-        $binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $this->tableNames['bname']);
+        $binariesQuery = $binariesCheck = 'INSERT INTO binaries (id, partsize, currentparts) VALUES ';
         foreach ($binariesUpdate as $binaryID => $binary) {
             $binariesQuery .= '('.$binaryID.','.$binary['Size'].','.$binary['Parts'].'),';
         }
@@ -1062,31 +1003,22 @@ class Binaries
     /**
      * Attempt to get missing article headers.
      *
-     * @param array|string $tables
      * @param array        $groupArr The info for this group from mysql.
      *
      * @return void
      * @throws \Exception
      * @throws \Throwable
      */
-    public function partRepair($groupArr, $tables = ''): void
+    public function partRepair($groupArr): void
     {
-        $tableNames = $tables;
-
-        if ($tableNames === '') {
-            $tableNames = (new Group())->getCBPTableNames($groupArr['id']);
-        }
         // Get all parts in partrepair table.
         $missingParts = [];
         try {
             $missingParts = DB::select(sprintf('
-				SELECT * FROM %s
+				SELECT * FROM missed_parts
 				WHERE groups_id = %d AND attempts < %d
-				ORDER BY numberid ASC LIMIT %d', $tableNames['prname'], $groupArr['id'], $this->_partRepairMaxTries, $this->_partRepairLimit));
+				ORDER BY numberid ASC LIMIT %d', $groupArr['id'], $this->_partRepairMaxTries, $this->_partRepairLimit));
         } catch (\PDOException $e) {
-            if (preg_match('/SQLSTATE\[42S02\]: Base table or view not found/i', $e->getMessage())) {
-                DB::statement("CREATE TABLE {$tableNames['prname']} LIKE missed_parts");
-            }
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                 $this->colorCli->notice('Deadlock occurred');
                 DB::rollBack();
@@ -1147,10 +1079,9 @@ class Binaries
                 sprintf(
                     '
 					SELECT COUNT(id) AS num
-					FROM %s
+					FROM missed_parts
 					WHERE groups_id = %d
 					AND numberid <= %d',
-                    $tableNames['prname'],
                     $groupArr['id'],
                     $missingParts[$missingCount - 1]->numberid
                 )
@@ -1166,11 +1097,10 @@ class Binaries
                 DB::update(
                     sprintf(
                         '
-						UPDATE %s
+						UPDATE missed_parts
 						SET attempts = attempts + 1
 						WHERE groups_id = %d
 						AND numberid <= %d',
-                        $tableNames['prname'],
                         $groupArr['id'],
                         $missingParts[$missingCount - 1]->numberid
                     )
@@ -1187,11 +1117,10 @@ class Binaries
         }
 
         // Remove articles that we cant fetch after x attempts.
-        DB::transaction(function () use ($groupArr, $tableNames) {
+        DB::transaction(function () use ($groupArr) {
             DB::delete(
                 sprintf(
-                    'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
-                    $tableNames['prname'],
+                    'DELETE FROM missed_parts WHERE attempts >= %d AND groups_id = %d',
                     $this->_partRepairMaxTries,
                     $groupArr['id']
                 )
@@ -1210,43 +1139,31 @@ class Binaries
      */
     public function postdate($post, array $groupData): int
     {
-        // Set table names
-        $groupID = Group::getIDByName($groupData['group']);
-        $group = [];
-        if ($groupID !== '') {
-            $group = (new Group())->getCBPTableNames($groupID);
-        }
-
         $currentPost = $post;
 
         $attempts = $date = 0;
         do {
             // Try to get the article date locally first.
-            if ($groupID !== '') {
-                // Try to get locally.
-                $local = DB::select(
+            // Try to get locally.
+            $local = DB::select(
                     sprintf(
                         '
 						SELECT c.date AS date
-						FROM %s c
-						INNER JOIN %s b ON(c.id=b.collections_id)
-						INNER JOIN %s p ON(b.id=p.binaries_id)
+						FROM collections c
+						INNER JOIN binaries b ON(c.id=b.collections_id)
+						INNER JOIN parts p ON(b.id=p.binaries_id)
 						WHERE p.number = %s',
-                        $group['cname'],
-                        $group['bname'],
-                        $group['pname'],
                         $currentPost
                     )
                 );
-                if (! empty($local) && \count($local) > 0) {
-                    $date = $local[0]->date;
-                    break;
-                }
+            if (! empty($local) && \count($local) > 0) {
+                $date = $local[0]->date;
+                break;
             }
 
             // If we could not find it locally, try usenet.
             $header = $this->_nntp->getXOVER($currentPost);
-            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
+            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
                 $date = $header[0]['Date'];
                 break;
             }

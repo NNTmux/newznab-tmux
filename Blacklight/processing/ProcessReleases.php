@@ -18,7 +18,6 @@ use Blacklight\ConsoleTools;
 use Blacklight\ReleaseImage;
 use App\Models\ReleasesGroups;
 use Blacklight\ReleaseCleaning;
-use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\DB;
 
 class ProcessReleases
@@ -89,19 +88,6 @@ class ProcessReleases
      * @var \Blacklight\ReleaseImage
      */
     public $releaseImage;
-
-    /**
-     * List of table names to be using for method calls.
-     *
-     *
-     * @var array
-     */
-    protected $tables = [];
-
-    /**
-     * @var string
-     */
-    protected $fromNamesQuery;
 
     /**
      * Time (hours) to wait before delete a stuck/broken collection.
@@ -297,7 +283,6 @@ class ProcessReleases
     public function processIncompleteCollections($groupID): void
     {
         $startTime = now();
-        $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
             $this->colorCli->header('Process Releases -> Attempting to find complete collections.');
@@ -318,9 +303,8 @@ class ProcessReleases
                 sprintf(
                     '
 					SELECT COUNT(c.id) AS complete
-					FROM %s c
+					FROM collections c
 					WHERE c.filecheck = %d %s',
-                    $this->tables['cname'],
                     self::COLLFC_COMPPART,
                     $where
                 )
@@ -344,7 +328,6 @@ class ProcessReleases
     public function processCollectionSizes($groupID): void
     {
         $startTime = now();
-        $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
             $this->colorCli->header('Process Releases -> Calculating collection sizes (in bytes).');
@@ -353,18 +336,16 @@ class ProcessReleases
         $checked = DB::update(
             sprintf(
                 '
-				UPDATE %s c
+				UPDATE collections c
 				SET c.filesize =
 				(
 					SELECT COALESCE(SUM(b.partsize), 0)
-					FROM %s b
+					FROM binaries b
 					WHERE b.collections_id = c.id
 				),
 				c.filecheck = %d
 				WHERE c.filecheck = %d
 				AND c.filesize = 0 %s',
-                $this->tables['cname'],
-                $this->tables['bname'],
                 self::COLLFC_SIZED,
                 self::COLLFC_COMPPART,
                 (! empty($groupID) ? ' AND c.groups_id = '.$groupID : ' ')
@@ -389,7 +370,6 @@ class ProcessReleases
     public function deleteUnwantedCollections($groupID): void
     {
         $startTime = now();
-        $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
             $this->colorCli->header(
@@ -422,10 +402,9 @@ class ProcessReleases
                     sprintf(
                         '
 						SELECT SQL_NO_CACHE id
-						FROM %s c
+						FROM collections c
 						WHERE c.filecheck = %d
 						AND c.filesize > 0',
-                        $this->tables['cname'],
                         self::COLLFC_SIZED
                     )
                 ) !== null
@@ -434,12 +413,11 @@ class ProcessReleases
                     DB::delete(
                         sprintf(
                             '
-						DELETE c FROM %s c
+						DELETE c FROM collections c
 						WHERE c.filecheck = %d
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
 						AND c.filesize < GREATEST(%d, %d)',
-                            $this->tables['cname'],
                             self::COLLFC_SIZED,
                             $groupMinSizeSetting,
                             $minSizeSetting,
@@ -458,10 +436,9 @@ class ProcessReleases
                         DB::delete(
                             sprintf(
                                 '
-							DELETE c FROM %s c
+							DELETE c FROM collections c
 							WHERE c.filecheck = %d
 							AND c.filesize > %d',
-                                $this->tables['cname'],
                                 self::COLLFC_SIZED,
                                 $maxSizeSetting
                             )
@@ -478,11 +455,10 @@ class ProcessReleases
                         DB::delete(
                             sprintf(
                                 '
-						DELETE c FROM %s c
+						DELETE c FROM collections c
 						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
-                                $this->tables['cname'],
                                 self::COLLFC_SIZED,
                                 $groupMinFilesSetting,
                                 $minFilesSetting,
@@ -513,25 +489,6 @@ class ProcessReleases
         }
     }
 
-    /**
-     * @param $groupID
-     * @throws \Exception
-     */
-    protected function initiateTableNames($groupID): void
-    {
-        $this->tables = (new Group())->getCBPTableNames($groupID);
-    }
-
-    /**
-     * Form fromNamesQuery for creating NZBs.
-     *
-     * @void
-     */
-    protected function formFromNamesQuery(): void
-    {
-        $posters = MultigroupPoster::commaSeparatedList();
-        $this->fromNamesQuery = sprintf("AND r.fromname NOT IN('%s')", $posters);
-    }
 
     /**
      * @param int|string $groupID (optional)
@@ -542,7 +499,6 @@ class ProcessReleases
     public function createReleases($groupID): array
     {
         $startTime = now();
-        $this->initiateTableNames($groupID);
 
         $categorize = new Categorize();
         $returnCount = $duplicate = 0;
@@ -555,12 +511,11 @@ class ProcessReleases
             sprintf(
                 '
 				SELECT SQL_NO_CACHE c.*, g.name AS gname
-				FROM %s c
+				FROM collections c
 				INNER JOIN groups g ON c.groups_id = g.id
 				WHERE %s c.filecheck = %d
 				AND c.filesize > 0
 				LIMIT %d',
-                $this->tables['cname'],
                 (! empty($groupID) ? ' c.groups_id = '.$groupID.' AND ' : ' '),
                 self::COLLFC_SIZED,
                 $this->releaseCreationLimit
@@ -640,10 +595,9 @@ class ProcessReleases
                     DB::update(
                             sprintf(
                                 '
-								UPDATE %s
+								UPDATE collections
 								SET filecheck = %d, releases_id = %d
 								WHERE id = %d',
-                                $this->tables['cname'],
                                 self::COLLFC_INSERTED,
                                 $releaseID,
                                 $collection->id
@@ -712,9 +666,8 @@ class ProcessReleases
                         sprintf(
                             '
 							DELETE c
-							FROM %s c
+							FROM collections c
 							WHERE c.collectionhash = %s',
-                            $this->tables['cname'],
                             escapeString($collection->collectionhash)
                         )
                     );
@@ -872,7 +825,6 @@ class ProcessReleases
     public function deleteCollections($groupID): void
     {
         $startTime = now();
-        $this->initiateTableNames($groupID);
 
         $deletedCount = 0;
 
@@ -892,9 +844,8 @@ class ProcessReleases
                 sprintf(
                     '
 				DELETE c
-				FROM %s c
+				FROM collections c
 				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
-                    $this->tables['cname'],
                     Settings::settingValue('..partretentionhours')
                 )
             );
@@ -930,17 +881,12 @@ class ProcessReleases
             $deleted = 0;
             $deleteQuery = DB::transaction(function () {
                 DB::delete(
-                    sprintf(
-                        '
+                    '
 					DELETE c, b, p
-					FROM %s c
-					LEFT JOIN %s b ON c.id = b.collections_id
-					LEFT JOIN %s p ON b.id = p.binaries_id
-					WHERE (b.id IS NULL OR p.binaries_id IS NULL)',
-                        $this->tables['cname'],
-                        $this->tables['bname'],
-                        $this->tables['pname']
-                    )
+					FROM collections c
+					LEFT JOIN binaries b ON c.id = b.collections_id
+					LEFT JOIN parts p ON b.id = p.binaries_id
+					WHERE (b.id IS NULL OR p.binaries_id IS NULL)'
                 );
             }, 3);
 
@@ -970,15 +916,12 @@ class ProcessReleases
             $deleteQuery = DB::transaction(function () {
                 DB::delete(
                     sprintf(
-                        'DELETE b, p FROM %s b
-					LEFT JOIN %s p ON b.id = p.binaries_id
-					LEFT JOIN %s c ON b.collections_id = c.id
+                        'DELETE b, p FROM binaries b
+					LEFT JOIN parts p ON b.id = p.binaries_id
+					LEFT JOIN collections c ON b.collections_id = c.id
 					WHERE (p.binaries_id IS NULL OR c.id IS NULL)
 					AND b.id < %d',
-                        $this->tables['bname'],
-                        $this->tables['pname'],
-                        $this->tables['cname'],
-                        $this->maxQueryFormulator($this->tables['bname'], 20000)
+                        $this->maxQueryFormulator('binaries', 20000)
                     )
                 );
             }, 3);
@@ -1010,13 +953,11 @@ class ProcessReleases
                     sprintf(
                         '
 					DELETE p
-					FROM %s p
-					LEFT JOIN %s b ON p.binaries_id = b.id
+					FROM parts p
+					LEFT JOIN binaries b ON p.binaries_id = b.id
 					WHERE b.id IS NULL
 					AND p.binaries_id < %d',
-                        $this->tables['pname'],
-                        $this->tables['bname'],
-                        $this->maxQueryFormulator($this->tables['bname'], 20000)
+                        $this->maxQueryFormulator('binaries', 20000)
                     )
                 );
             }, 3);
@@ -1049,14 +990,11 @@ class ProcessReleases
         $deleted = 0;
         // Collections that were missing on NZB creation.
         $collections = DB::select(
-            sprintf(
                 '
 				SELECT SQL_NO_CACHE c.id
-				FROM %s c
+				FROM collections c
 				INNER JOIN releases r ON r.id = c.releases_id
-				WHERE r.nzbstatus = 1',
-                $this->tables['cname']
-            )
+				WHERE r.nzbstatus = 1'
         );
 
         foreach ($collections as $collection) {
@@ -1066,9 +1004,8 @@ class ProcessReleases
                     sprintf(
                         '
 						DELETE c
-						FROM %s c
+						FROM collections c
 						WHERE c.id = %d',
-                        $this->tables['cname'],
                         $collection->id
                     )
                 );
@@ -1462,21 +1399,18 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s c
+				UPDATE collections c
 				INNER JOIN
 				(
 					SELECT c.id
-					FROM %s c
-					INNER JOIN %s b ON b.collections_id = c.id
+					FROM collections c
+					INNER JOIN binaries b ON b.collections_id = c.id
 					WHERE c.totalfiles > 0
 					AND c.filecheck = %d %s
 					GROUP BY b.collections_id, c.totalfiles, c.id
 					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
 				) r ON c.id = r.id
 				SET filecheck = %d',
-                $this->tables['cname'],
-                $this->tables['cname'],
-                $this->tables['bname'],
                 self::COLLFC_DEFAULT,
                 $where,
                 self::COLLFC_COMPCOLL
@@ -1501,21 +1435,18 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s c
+				UPDATE collections c
 				INNER JOIN
 				(
 					SELECT c.id
-					FROM %s c
-					INNER JOIN %s b ON b.collections_id = c.id
+					FROM collections c
+					INNER JOIN binaries b ON b.collections_id = c.id
 					WHERE b.filenumber = 0
 					AND c.totalfiles > 0
 					AND c.filecheck = %d %s
 					GROUP BY c.id
 				) r ON c.id = r.id
 				SET c.filecheck = %d',
-                $this->tables['cname'],
-                $this->tables['cname'],
-                $this->tables['bname'],
                 self::COLLFC_COMPCOLL,
                 $where,
                 self::COLLFC_ZEROPART
@@ -1524,10 +1455,9 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s c
+				UPDATE collections c
 				SET filecheck = %d
 				WHERE filecheck = %d %s',
-                $this->tables['cname'],
                 self::COLLFC_TEMPCOMP,
                 self::COLLFC_COMPCOLL,
                 $where
@@ -1548,21 +1478,18 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s b
+				UPDATE binaries b
 				INNER JOIN
 				(
 					SELECT b.id
-					FROM %s b
-					INNER JOIN %s c ON c.id = b.collections_id
+					FROM binaries b
+					INNER JOIN collections c ON c.id = b.collections_id
 					WHERE c.filecheck = %d
 					AND b.partcheck = %d %s
 					AND b.currentparts = b.totalparts
 					GROUP BY b.id, b.totalparts
 				) r ON b.id = r.id
 				SET b.partcheck = %d',
-                $this->tables['bname'],
-                $this->tables['bname'],
-                $this->tables['cname'],
                 self::COLLFC_TEMPCOMP,
                 self::FILE_INCOMPLETE,
                 $where,
@@ -1572,21 +1499,18 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s b
+				UPDATE binaries b
 				INNER JOIN
 				(
 					SELECT b.id
-					FROM %s b
-					INNER JOIN %s c ON c.id = b.collections_id
+					FROM binaries b
+					INNER JOIN collections c ON c.id = b.collections_id
 					WHERE c.filecheck = %d
 					AND b.partcheck = %d %s
 					AND b.currentparts >= (b.totalparts + 1)
 					GROUP BY b.id, b.totalparts
 				) r ON b.id = r.id
 				SET b.partcheck = %d',
-                $this->tables['bname'],
-                $this->tables['bname'],
-                $this->tables['cname'],
                 self::COLLFC_ZEROPART,
                 self::FILE_INCOMPLETE,
                 $where,
@@ -1609,15 +1533,12 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s c INNER JOIN
-					(SELECT c.id FROM %s c
-					INNER JOIN %s b ON c.id = b.collections_id
+				UPDATE collections c INNER JOIN
+					(SELECT c.id FROM collections c
+					INNER JOIN binaries b ON c.id = b.collections_id
 					WHERE b.partcheck = 1 AND c.filecheck IN (%d, %d) %s
 					GROUP BY b.collections_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
 				r ON c.id = r.id SET filecheck = %d',
-                $this->tables['cname'],
-                $this->tables['cname'],
-                $this->tables['bname'],
                 self::COLLFC_TEMPCOMP,
                 self::COLLFC_ZEROPART,
                 $where,
@@ -1639,10 +1560,9 @@ class ProcessReleases
         DB::update(
             sprintf(
                 '
-				UPDATE %s c
+				UPDATE collections c
 				SET filecheck = %d
 				WHERE filecheck IN (%d, %d) %s',
-                $this->tables['cname'],
                 self::COLLFC_COMPCOLL,
                 self::COLLFC_TEMPCOMP,
                 self::COLLFC_ZEROPART,
@@ -1664,12 +1584,10 @@ class ProcessReleases
         DB::update(
             sprintf(
                 "
-				UPDATE %s c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM %s b WHERE b.collections_id = c.id)
+				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binariess b WHERE b.collections_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
 				AND c.filecheck IN (%d, %d, 10) %s",
-                $this->tables['cname'],
                 self::COLLFC_COMPPART,
-                $this->tables['bname'],
                 $this->collectionDelayTime,
                 self::COLLFC_DEFAULT,
                 self::COLLFC_COMPCOLL,
@@ -1695,12 +1613,11 @@ class ProcessReleases
             DB::delete(
                 sprintf(
                     '
-                DELETE c FROM %s c
+                DELETE c FROM collections c
                 WHERE
                     c.added <
                     DATE_SUB(%s, INTERVAL %d HOUR)
                 %s',
-                    $this->tables['cname'],
                     escapeString($lastRun),
                     $this->collectionTimeout,
                     $where

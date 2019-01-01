@@ -1,3 +1,5 @@
+2019-01-01 DariusIII
+	* Chg: Revert Binaries to pre-tpg and mgr state, with single tables for binaries, collections, parts and missed_parts
 2018-12-31 DariusIII
 	* Chg: Do not fetch mgrposters if allAsMgr is enabled
 	* Chg: Update doctrine/dbal to version 2.9.2

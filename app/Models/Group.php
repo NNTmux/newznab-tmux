@@ -348,7 +348,7 @@ class Group extends Model
 
         foreach (self::$cbpm as $tablePrefix) {
             DB::statement(
-                "DROP TABLE IF EXISTS {$tablePrefix}_{$id}"
+                "DROP TABLE IF EXISTS {$tablePrefix}"
             );
         }
 
@@ -375,16 +375,6 @@ class Group extends Model
     {
         foreach (self::$cbpm as $tablePrefix) {
             DB::statement("TRUNCATE TABLE {$tablePrefix}");
-        }
-
-        $groups = self::query()->select(['id'])->get();
-
-        if ($groups instanceof \Traversable) {
-            foreach ($groups as $group) {
-                foreach (self::$cbpm as $tablePrefix) {
-                    DB::statement("DROP TABLE IF EXISTS {$tablePrefix}_{$group['id']}");
-                }
-            }
         }
 
         // Reset the group stats.
@@ -424,12 +414,11 @@ class Group extends Model
 
         $res->get();
 
-        if ($res instanceof \Traversable) {
-            $releases = new Releases(['Groups' => self::class]);
-            $nzb = new NZB();
-            $releaseImage = new ReleaseImage();
-            foreach ($res as $row) {
-                $releases->deleteSingle(
+        $releases = new Releases(['Groups' => self::class]);
+        $nzb = new NZB();
+        $releaseImage = new ReleaseImage();
+        foreach ($res as $row) {
+            $releases->deleteSingle(
                     [
                         'g' => $row['guid'],
                         'i' => $row['id'],
@@ -437,7 +426,6 @@ class Group extends Model
                     $nzb,
                     $releaseImage
                 );
-            }
         }
     }
 
@@ -514,68 +502,6 @@ class Group extends Model
         );
 
         return "Group {$id} has been ".(($status === 0) ? 'deactivated' : 'activated').'.';
-    }
-
-    /**
-     * Get the names of the collections/binaries/parts/part repair tables.
-     * If TPG is on, try to create new tables for the groups_id, if we fail, log the error and exit.
-     *
-     * @param int $groupID ID of the group.
-     *
-     * @return array The table names.
-     * @throws \Exception
-     */
-    public function getCBPTableNames($groupID): array
-    {
-        $groupKey = $groupID;
-
-        // Check if buffered and return. Prevents re-querying MySQL when TPG is on.
-        if (isset(self::$cbppTableNames[$groupKey])) {
-            return self::$cbppTableNames[$groupKey];
-        }
-
-        if ($this->allasmgr === false && config('nntmux.echocli') && self::createNewTPGTables($groupID) === false) {
-            exit('There is a problem creating new TPG tables for this group ID: '.$groupID.PHP_EOL);
-        }
-
-        if ($this->allasmgr === false) {
-            $tables = [
-                'cname' => 'collections_'.$groupID,
-                'bname' => 'binaries_'.$groupID,
-                'pname' => 'parts_'.$groupID,
-                'prname' => 'missed_parts_'.$groupID,
-            ];
-        } else {
-            $tables = [
-                'cname' => 'multigroup_collections',
-                'bname' => 'multigroup_binaries',
-                'pname' => 'multigroup_parts',
-                'prname' => 'multigroup_missed_parts',
-            ];
-        }
-
-        // Buffer.
-        self::$cbppTableNames[$groupKey] = $tables;
-
-        return $tables;
-    }
-
-    /**
-     * Check if the tables exist for the groups_id, make new tables for table per group.
-     *
-     * @param int $groupID
-     *
-     * @return bool
-     */
-    public static function createNewTPGTables($groupID): bool
-    {
-        foreach (self::$cbpm as $tablePrefix) {
-            DB::statement(
-                    "CREATE TABLE IF NOT EXISTS {$tablePrefix}_{$groupID} LIKE {$tablePrefix}"
-                );
-        }
-
-        return true;
     }
 
     /**

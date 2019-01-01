@@ -160,14 +160,6 @@
                 <span class="submenu-icon ml-auto"></span>
             </div>
         </a>
-        <div id='submenu8' class="collapse sidebar-submenu">
-            <a href="{$smarty.const.WWW_TOP}/admin/posters-edit" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">Add MultiGroup poster</span>
-            </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/posters-list" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">View MultiGroup Posters List</span>
-            </a>
-        </div>
         <a href="#submenu9" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-download fa-fw mr-3"></span>
