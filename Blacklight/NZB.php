@@ -114,7 +114,6 @@ class NZB
 
     /**
      * Initiate class vars when writing NZBs.
-     *
      */
     public function initiateForWrite()
     {
