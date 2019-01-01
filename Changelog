@@ -1,4 +1,5 @@
 2019-01-01 DariusIII
+	* Fix: Fix NZB creation
 	* Fix: Fix typo in ProcessReleases class
 	* Fix: Fix couple of leftover lines pointing to non-existing functions
 	* Fix: Remove ProcessReleasesMultiGroup from switch.php

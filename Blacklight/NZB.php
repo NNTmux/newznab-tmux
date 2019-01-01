@@ -115,15 +115,9 @@ class NZB
     /**
      * Initiate class vars when writing NZBs.
      *
-     * @param int $groupID
      */
-    public function initiateForWrite($groupID)
+    public function initiateForWrite()
     {
-        $this->groupID = $groupID;
-
-        if ($this->groupID === '') {
-            exit("{$this->groupID} is missing\n");
-        }
         $this->setQueries();
     }
 

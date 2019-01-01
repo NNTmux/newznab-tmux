@@ -728,7 +728,7 @@ class ProcessReleases
         if (\count($releases) > 0) {
             $total = \count($releases);
             // Init vars for writing the NZB's.
-            $this->nzb->initiateForWrite($groupID);
+            $this->nzb->initiateForWrite();
             foreach ($releases as $release) {
                 if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
                     $nzbCount++;
