@@ -1581,7 +1581,7 @@ class ProcessReleases
         DB::update(
             sprintf(
                 "
-				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binariess b WHERE b.collections_id = c.id)
+				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
 				AND c.filecheck IN (%d, %d, 10) %s",
                 self::COLLFC_COMPPART,

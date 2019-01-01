@@ -1,4 +1,5 @@
 2019-01-01 DariusIII
+	* Fix: Fix typo in ProcessReleases class
 	* Fix: Fix couple of leftover lines pointing to non-existing functions
 	* Fix: Remove ProcessReleasesMultiGroup from switch.php
 	* Chg: Revert Binaries to pre-tpg and mgr state, with single tables for binaries, collections, parts and missed_parts
