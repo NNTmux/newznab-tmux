@@ -489,7 +489,6 @@ class ProcessReleases
         }
     }
 
-
     /**
      * @param int|string $groupID (optional)
      *
