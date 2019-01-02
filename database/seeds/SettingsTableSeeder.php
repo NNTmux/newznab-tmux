@@ -11,8 +11,6 @@ class SettingsTableSeeder extends Seeder
      */
     public function run()
     {
-
-
         \DB::table('settings')->delete();
 
         \DB::table('settings')->insert([

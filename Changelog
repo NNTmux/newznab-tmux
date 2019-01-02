@@ -1,3 +1,5 @@
+2049-01-02 DariusIII
+	* Chg: Update RoleAndPermissionsSeeder
 2019-01-01 DariusIII
 	* Chg: Update all the \Blacklight namespace classes with class PHPDOC block
 	* Chg: Update friendsofphp/php-cs-fixer to version 2.13.2
