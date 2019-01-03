@@ -144,17 +144,17 @@
 							</div>
 							<a href="{{route('logout')}}" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white"
 							   onclick="event.preventDefault(); document.getElementById('frm-logout').submit();">
-								<span class="fa fa-unlock"></span>
+								<span class="fa fa-unlock mr-3"></span>
 								<span>Sign Out</span>
 							</a>
 						{else}
 							<a href="{$smarty.const.WWW_TOP}/login" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
-								<span class="fa fa-lock"></span>
+								<span class="fa fa-lock mr-3"></span>
 								<span>Sign In</span>
 							</a>
 						{/if}
 						<a href="{$smarty.const.WWW_TOP}/contact-us" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
-							<span class="fa fa-envelope-open-text"></span>
+							<span class="fa fa-envelope-open-text mr-3"></span>
 							<span>Contact</span>
 						</a>
 					</ul>
