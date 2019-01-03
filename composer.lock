@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4a7eda4ce5d76ba3f09b6ab64447fbba",
+    "content-hash": "4bad95371be253844488f9ea0c7e8ab1",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -7309,16 +7309,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.1.7",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59"
+                "reference": "1dceb493f22929505ad32da6158012a82c44a4f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/935663ebc6917f4db45c7e613b5e8cb84cabac59",
-                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/1dceb493f22929505ad32da6158012a82c44a4f5",
+                "reference": "1dceb493f22929505ad32da6158012a82c44a4f5",
                 "shasum": ""
             },
             "require": {
@@ -7329,7 +7329,7 @@
                 "symfony/css-selector": "~3.0|~4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.0"
+                "phpunit/phpunit": "~6.0 || ~7.0"
             },
             "suggest": {
                 "voku/portable-utf8": "~4.0"
@@ -7364,7 +7364,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2018-10-17T19:23:47+00:00"
+            "time": "2018-12-30T21:10:11+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",

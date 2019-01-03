@@ -1,4 +1,5 @@
 2019-01-03 DariusIII
+	* Chg: Update voku/simple_html_dom to version 4.2.0
 	* Chg: Update package.json, update laravel-mix to version 4.0.13
 	* Chg: Remove unused settings from settings seeder/fixtures and migrations from database/migrations folder. Remove everything related to menus as we do not use them
 	* Chg: Use group name for collectionsCleaner in Binaries class
