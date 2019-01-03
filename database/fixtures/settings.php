@@ -9,14 +9,6 @@ return [
         'hint' => 'When going through PAR2 files, add them to the RAR file content list of the NZB.',
         'setting' => 'addpar2',
     ],
-    1 => [
-        'section' => '',
-        'subsection' => '',
-        'name' => 'allasmgr',
-        'value' => '1',
-        'hint' => 'Treat all releases as MGR',
-        'setting' => 'allasmgr',
-    ],
     2 => [
         'section' => '',
         'subsection' => '',
@@ -752,14 +744,6 @@ return [
         'value' => '',
         'hint' => '',
         'setting' => 'siteseed',
-    ],
-    94 => [
-        'section' => '',
-        'subsection' => '',
-        'name' => 'sqlpatch',
-        'value' => '343',
-        'hint' => '',
-        'setting' => 'sqlpatch',
     ],
     95 => [
         'section' => '',
