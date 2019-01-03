@@ -1,4 +1,5 @@
 2019-01-03 DariusIII
+	* CHg: Update resend_user_verification script
 	* Chg: Update vlucas/phpdotenv to version 2.5.2
 	* Chg: Update Binaries class, add unique index to binaries table
 2019-01-02 DariusIII
