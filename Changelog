@@ -1,4 +1,6 @@
-2049-01-02 DariusIII
+2019-01-03 DariusIII
+	* Chg: Update Binaries class, add unique index to binaries table
+2019-01-02 DariusIII
 	* Chg: Update RoleAndPermissionsSeeder
 2019-01-01 DariusIII
 	* Chg: Update all the \Blacklight namespace classes with class PHPDOC block

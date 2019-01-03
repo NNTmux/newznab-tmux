@@ -694,14 +694,14 @@ class Binaries
         $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate);
 
         if ($partRepair && \count($headersRepaired) > 0) {
-            $this->removeRepairedParts($headersRepaired, 'missed_parts', $this->groupMySQL['id']);
+            $this->removeRepairedParts($headersRepaired, $this->groupMySQL['id']);
         }
         unset($headersRepaired);
 
         if ($this->addToPartRepair) {
             $notInsertedCount = \count($this->headersNotInserted);
             if ($notInsertedCount > 0) {
-                $this->addMissingParts($this->headersNotInserted, 'missed_parts', $this->groupMySQL['id']);
+                $this->addMissingParts($this->headersNotInserted, $this->groupMySQL['id']);
 
                 $this->log(
                     $notInsertedCount.' articles failed to insert!',
@@ -717,7 +717,7 @@ class Binaries
             }
             $notReceivedCount = \count($rangeNotReceived);
             if ($notReceivedCount > 0) {
-                $this->addMissingParts($rangeNotReceived, 'missed_parts', $this->groupMySQL['id']);
+                $this->addMissingParts($rangeNotReceived, $this->groupMySQL['id']);
 
                 if ($this->_echoCLI) {
                     $this->colorCli->alternate(
@@ -1291,15 +1291,15 @@ class Binaries
     /**
      * Add article numbers from missing headers to DB.
      *
-     * @param array  $numbers   The article numbers of the missing headers.
-     * @param string $tableName Name of the partrepair table to insert into.
-     * @param int    $groupID   The ID of this groups.
+     * @param array $numbers The article numbers of the missing headers.
+     * @param int $groupID The ID of this groups.
      *
-     * @return bool
+     *
+     * @return string
      */
-    private function addMissingParts($numbers, $tableName, $groupID): bool
+    private function addMissingParts($numbers, $groupID): string
     {
-        $insertStr = 'INSERT INTO '.$tableName.' (numberid, groups_id) VALUES ';
+        $insertStr = 'INSERT INTO missed_parts (numberid, groups_id) VALUES ';
         foreach ($numbers as $number) {
             $insertStr .= '('.$number.','.$groupID.'),';
         }
@@ -1313,15 +1313,14 @@ class Binaries
      * Clean up part repair table.
      *
      * @param array  $numbers   The article numbers.
-     * @param string $tableName Name of the part repair table to work on.
      * @param int    $groupID   The ID of the group.
      *
      * @return void
      * @throws \Throwable
      */
-    private function removeRepairedParts(array $numbers, $tableName, $groupID): void
+    private function removeRepairedParts(array $numbers, $groupID): void
     {
-        $sql = 'DELETE FROM '.$tableName.' WHERE numberid in (';
+        $sql = 'DELETE FROM missed_parts WHERE numberid in (';
         foreach ($numbers as $number) {
             $sql .= $number.',';
         }
