@@ -1,3 +1,5 @@
+2019-01-04 DariusIII
+	* Fix: Fix AEBN class error when fetching data
 2019-01-03 DariusIII
 	* Chg: Adjust menu text alignment in left sidebar
 	* Chg: Update voku/simple_html_dom to version 4.2.0
