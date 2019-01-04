@@ -77,7 +77,7 @@ class CollectionRegexesController extends BasePageController
                     break;
                 }
 
-                if ($request->input('id') === '') {
+                if (empty($request->input('id'))) {
                     $regexes->addRegex($request->all());
                 } else {
                     $regexes->updateRegex($request->all());
