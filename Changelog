@@ -1,4 +1,5 @@
 2019-01-04 DariusIII
+	* Fix: Fix bad checks in all regex related admin controllers
 	* Fix: Fix adding new collection regexes
 	* Fix: Fix AEBN class error when fetching data
 2019-01-03 DariusIII

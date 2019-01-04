@@ -58,17 +58,17 @@ class CollectionRegexesController extends BasePageController
 
         switch ($request->input('action') ?? 'view') {
             case 'submit':
-                if ($request->input('group_regex') === '') {
+                if (empty($request->input('group_regex'))) {
                     $error = 'Group regex must not be empty!';
                     break;
                 }
 
-                if ($request->input('regex') === '') {
+                if (empty($request->input('regex'))) {
                     $error = 'Regex cannot be empty';
                     break;
                 }
 
-                if ($request->input('description') === '') {
+                if (empty($request->input('description'))) {
                     $request->merge(['description' => '']);
                 }
 
@@ -77,7 +77,7 @@ class CollectionRegexesController extends BasePageController
                     break;
                 }
 
-                if (empty($request->input('id'))) {
+                if (! $request->has('id')) {
                     $regexes->addRegex($request->all());
                 } else {
                     $regexes->updateRegex($request->all());
