@@ -14,7 +14,7 @@ class UpdateBinariesTable extends Migration
     public function up()
     {
         Schema::table('binaries', function (Blueprint $table) {
-            $table->index(['collections_id', 'filenumber'])->unique('ux_collection_id_filenumber');
+            $table->unique(['collections_id', 'filenumber'], 'ux_collection_id_filenumber');
         });
     }
 
