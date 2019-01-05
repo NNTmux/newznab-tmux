@@ -114,7 +114,7 @@ class Hotmovies extends AdultMovies
     {
         $studio = false;
         $director = false;
-        if ($ret = $this->_html->findOne('div.page_video_info')) {
+        if ($ret = $this->_html->find('div.page_video_info')) {
             foreach ($ret->find('text') as $e) {
                 $e = trim($e->plaintext);
                 $rArray = [',', '...', '&nbsp:'];
@@ -127,18 +127,14 @@ class Hotmovies extends AdultMovies
                     $e = null;
                 }
                 if ($studio === true) {
-                    if (stripos($e, 'Custodian of Records') === false) {
-                        if (stripos($e, 'Description') === false) {
-                            if ($director === true && ! empty($e)) {
-                                $this->_res['director'] = $e;
-                                $e = null;
-                                $director = false;
-                            }
-                            if (! empty($e)) {
-                                $this->_res['productinfo'][] = $e;
-                            }
-                        } else {
-                            break;
+                    if ((stripos($e, 'Custodian of Records') === false) && stripos($e, 'Description') === false) {
+                        if ($director === true && ! empty($e)) {
+                            $this->_res['director'] = $e;
+                            $e = null;
+                            $director = false;
+                        }
+                        if (! empty($e)) {
+                            $this->_res['productinfo'][] = $e;
                         }
                     } else {
                         break;
@@ -146,7 +142,7 @@ class Hotmovies extends AdultMovies
                 }
             }
         }
-        if (\is_array($this->_res['productinfo'])) {
+        if (isset($this->_res['productinfo']) && \is_array($this->_res['productinfo'])) {
             $this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
         }
 

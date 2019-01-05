@@ -1,4 +1,5 @@
 2019-01-05 DariusIII
+	* Fix: Fix fetching XXX data from Hotmovies
 	* Chg: Update dariusiii/rarinfo to version 2.7.1.2
 	* Chg: Update dariusiii/rarinfo to version 2.7.1.1
 	* Chg: Update binaries table unique index migration
