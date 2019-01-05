@@ -769,8 +769,7 @@ class Binaries
                 }
 
                 $collMatch = $this->_collectionsCleaning->collectionsCleaner(
-                    $this->header['matches'][1],
-                    $this->groupMySQL['name']
+                    $this->header['matches'][1]
                 );
 
                 // Used to group articles together when forming the release.

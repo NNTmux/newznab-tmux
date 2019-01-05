@@ -93,12 +93,12 @@ class CollectionsCleaning
     }
 
     /**
-     * @param $subject
-     * @param $groupName
+     * @param string $subject
+     * @param string $groupName
      * @return array
      * @throws \Exception
      */
-    public function collectionsCleaner($subject, $groupName): array
+    public function collectionsCleaner($subject, $groupName = ''): array
     {
         $this->subject = $subject;
         $this->groupName = $groupName;
