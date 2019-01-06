@@ -151,14 +151,14 @@ foreach ($data as $dir => $files) {
                 $predb->executeTruncate();
 
                 // Import file into predb_imports
-                dd($predb->executeLoadData(
+                $predb->executeLoadData(
                     [
                         'fields' => '\\t\\t',
                         'lines'  => '\\r\\n',
                         'local'  => $local,
                         'path'   => $dumpFile,
                     ]
-                ));
+                );
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {

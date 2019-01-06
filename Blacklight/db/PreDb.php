@@ -161,7 +161,7 @@ SQL_EXPORT;
             $this->prepareSQLLoadData($options);
         }
 
-        return $this->ps['LoadData']->execute($options['path']);
+        return $this->ps['LoadData']->execute([':path' => $options['path']]);
     }
 
     /**

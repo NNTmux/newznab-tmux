@@ -1,4 +1,5 @@
 2019-01-06 DariusIII
+	* Chg: Remove debug code from predb_import_daily_batch.php
 	* Chg: Update used libraries to their latest versions
 2019-01-05 DariusIII
 	* Fix: Fix fetching XXX data from Hotmovies
