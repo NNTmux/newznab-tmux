@@ -1,4 +1,5 @@
 2019-01-07 DariusIII
+	* Chg: Revert Binaries to original behaviour
 	* Chg: Try to prevent insertion of duplicated Xref data
 	* Chg: More File facade usage for files manipulation
 	* Chg: Remove MenuTableSeeder as the model and table do not exist anymore
