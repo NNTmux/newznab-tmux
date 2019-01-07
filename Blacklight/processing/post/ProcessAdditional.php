@@ -1250,7 +1250,7 @@ class ProcessAdditional
 
                     // Check if the file exists.
                     if (File::isFile($file[0])) {
-                        $rarData = @file_get_contents($file[0]);
+                        $rarData = @File::get($file[0]);
                         if ($rarData !== false) {
                             $this->_processCompressedData($rarData);
                             $foundCompressedFile = true;
@@ -2174,7 +2174,7 @@ class ProcessAdditional
      */
     protected function _processNfoFile($fileLocation): void
     {
-        $data = @file_get_contents($fileLocation);
+        $data = @File::get($fileLocation);
         if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) === true && $this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp) === true) {
             $this->_releaseHasNoNFO = false;
         }

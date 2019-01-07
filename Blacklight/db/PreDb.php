@@ -228,7 +228,7 @@ SQL_EXPORT;
         if (! $options['read'] || ! File::isFile($options['path'])) {
             File::put($options['path'], base64_encode(serialize($settings)));
         } else {
-            $settings = unserialize(base64_decode(file_get_contents($options['path'])));
+            $settings = unserialize(base64_decode(File::get($options['path'])));
         }
 
         return $settings;
