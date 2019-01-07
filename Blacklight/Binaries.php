@@ -788,7 +788,7 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
-                    $collHashXref = Collection::query()->where('collectionhash', $this->header['CollectionKey'])->select(['xref'])->first();
+                    $collHashXref = Collection::query()->where('collectionhash', sha1($this->header['CollectionKey']))->select(['xref'])->first();
                     $xrefs = [];
                     if ($collHashXref !== null) {
                         $collXrefs = explode(' ', $collHashXref->value('xref'));
@@ -803,6 +803,8 @@ class Binaries
                     preg_match('/(alt\.binaries\.\w+)/', $this->header['Xref'], $match2);
 
                     $xref = ! empty($xrefs) && ! \in_array($match2[0], $xrefs, false) ? sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255))) : '';
+
+                    dump($xref);
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
