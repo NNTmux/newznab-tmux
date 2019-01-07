@@ -11,6 +11,7 @@ use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class Nfo.
@@ -141,7 +142,7 @@ class Nfo
             )) {
             // File/GetId3 work with files, so save to disk.
             $tmpPath = $this->tmpPath.$guid.'.nfo';
-            file_put_contents($tmpPath, $possibleNFO);
+            File::put($tmpPath, $possibleNFO);
 
             // Linux boxes have 'file' (so should Macs), Windows *can* have it too: see GNUWIN.txt in docs.
             $result = Utility::fileInfo($tmpPath);
@@ -149,7 +150,7 @@ class Nfo
 
                 // Check if it's text.
                 if (preg_match('/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/', $result)) {
-                    @unlink($tmpPath);
+                    @File::delete($tmpPath);
 
                     return true;
 
@@ -157,7 +158,7 @@ class Nfo
                 }
 
                 if (preg_match('/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/', $result) || preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO)) {
-                    @unlink($tmpPath);
+                    @File::delete($tmpPath);
 
                     return false;
                 }
@@ -165,7 +166,7 @@ class Nfo
 
             // If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
             $check = (new \getID3())->analyze($tmpPath);
-            @unlink($tmpPath);
+            @File::delete($tmpPath);
             if (isset($check['error'])) {
 
                 // Check if it's a par2.

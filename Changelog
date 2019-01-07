@@ -1,4 +1,5 @@
 2019-01-07 DariusIII
+	* Chg: Use File facade for files manipulation
 	* Chg: Update opis/closure to version 3.1.3
 2019-01-06 DariusIII
 	* Chg: Remove debug code from predb_import_daily_batch.php

@@ -1080,13 +1080,13 @@ class ProcessAdditional
 
                 if ($this->_extractUsingRarInfo === false && $this->_unrarPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.rar';
-                    file_put_contents($fileName, $compressedData);
+                    File::put($fileName, $compressedData);
                     runCmd(
                         $this->_killString.$this->_unrarPath.
                         '" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.
                         $fileName.'" "'.$this->tmpPath.'unrar/"'
                     );
-                    unlink($fileName);
+                    File::delete($fileName);
                 }
                 break;
             case ArchiveInfo::TYPE_ZIP:
@@ -1096,12 +1096,12 @@ class ProcessAdditional
 
                 if ($this->_extractUsingRarInfo === false && $this->_7zipPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
-                    file_put_contents($fileName, $compressedData);
+                    File::put($fileName, $compressedData);
                     runCmd(
                         $this->_killString.$this->_7zipPath.'" x "'.
                         $fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"'
                     );
-                    unlink($fileName);
+                    File::delete($fileName);
                 }
                 break;
             default:
@@ -1791,14 +1791,14 @@ class ProcessAdditional
                 if (File::isFile($this->tmpPath.$audioFileName)) {
 
                     // Try to move the temp audio file.
-                    $renamed = rename($this->tmpPath.$audioFileName, $this->_audioSavePath.$audioFileName);
+                    $renamed = File::move($this->tmpPath.$audioFileName, $this->_audioSavePath.$audioFileName);
 
                     if (! $renamed) {
                         // Try to copy it if it fails.
-                        $copied = copy($this->tmpPath.$audioFileName, $this->_audioSavePath.$audioFileName);
+                        $copied = File::copy($this->tmpPath.$audioFileName, $this->_audioSavePath.$audioFileName);
 
                         // Delete the old file.
-                        unlink($this->tmpPath.$audioFileName);
+                        File::delete($this->tmpPath.$audioFileName);
 
                         // If it didn't copy continue.
                         if (! $copied) {
@@ -2023,11 +2023,11 @@ class ProcessAdditional
                 $newFile = ($this->_releaseImage->vidSavePath.$this->_release->guid.'.ogv');
 
                 // Try to move the file to the new path.
-                $renamed = @rename($fileName, $newFile);
+                $renamed = @File::move($fileName, $newFile);
 
                 // If we couldn't rename it, try to copy it.
                 if (! $renamed) {
-                    $copied = @copy($fileName, $newFile);
+                    $copied = @File::copy($fileName, $newFile);
 
                     // Delete the old file.
                     File::delete($fileName);
