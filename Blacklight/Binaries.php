@@ -803,7 +803,6 @@ class Binaries
 
                     $xref = ! empty($xrefs) && ! \in_array($match2[0], $xrefs, false) ? sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255))) : '';
 
-                    dump($xref);
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
