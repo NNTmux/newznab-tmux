@@ -1,4 +1,5 @@
 2019-01-07 DariusIII
+	* Chg: Try to prevent insertion of duplicated Xref data
 	* Chg: More File facade usage for files manipulation
 	* Chg: Remove MenuTableSeeder as the model and table do not exist anymore
 	* Chg: Update PreDb class and predb_import_daily_batch script

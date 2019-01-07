@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Models\Collection;
 use App\Models\Group;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
@@ -787,7 +788,21 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
-                    $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255)));
+                    $collHashXref = Collection::query()->where('collectionhash', $this->header['CollectionKey'])->select(['xref'])->first();
+                    $xrefs = [];
+                    if ($collHashXref !== null) {
+                        $collXrefs = explode(' ', $collHashXref->value('xref'));
+                        foreach ($collXrefs as $collXref) {
+                            if (preg_match('/(^alt\.binaries\.\w+)/', $collXref, $match)) {
+                                $xrefs[] = $match[0];
+                            }
+                        }
+
+                    }
+
+                    preg_match('/(alt\.binaries\.\w+)/', $this->header['Xref'], $match2);
+
+                    $xref = ! empty($xrefs) && ! \in_array($match2[0], $xrefs, false) ? sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255))) : '';
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
