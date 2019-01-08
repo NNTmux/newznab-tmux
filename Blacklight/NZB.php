@@ -215,6 +215,11 @@ class NZB
                     foreach ($matches as $group) {
                         $XMLWriter->writeElement('group', $group);
                     }
+                } elseif (preg_match_all('#(\S+)#', $collection->xref, $matches)) {
+                    $matches = array_values(array_unique($matches[1]));
+                    foreach ($matches as $group) {
+                        $XMLWriter->writeElement('group', $group);
+                    }
                 } else {
                     return false;
                 }

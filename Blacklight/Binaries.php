@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Models\Collection;
 use App\Models\Group;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
@@ -787,7 +788,38 @@ class Binaries
                     // Get the current unixtime from PHP.
                     $now = now()->timestamp;
 
-                    $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString(substr($this->header['Xref'], 2, 255)));
+                    $xrefsData = Collection::whereCollectionhash(sha1($this->header['CollectionKey']))->value('xref');
+
+                    $tempHeaderXrefs = [];
+                    //dump($this->header['Xref']);
+                    $headerXrefs = explode(' ', $this->header['Xref']);
+                    foreach ($headerXrefs as $headerXref) {
+                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.\w+)/', $headerXref, $match)) {
+                            $tempHeaderXrefs[] = $match[0];
+                        }
+                    }
+
+                    $tempXrefsData = [];
+
+                    if ($xrefsData !== null) {
+                        $xrefsDataArray = explode(' ', $xrefsData);
+                        foreach ($xrefsDataArray as $xrefData) {
+                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.\w+)/', $xrefData, $match1)) {
+                                $tempXrefsData[] = $match1[0];
+                            }
+                        }
+                    }
+
+                    $finalXrefArray = [];
+                    foreach ($tempHeaderXrefs as $tempHeaderXref) {
+                        if (! in_array($tempHeaderXref, $tempXrefsData, false)) {
+                            $finalXrefArray[] = $tempHeaderXref;
+                        }
+                    }
+
+                    $finaXref = implode(' ', $finalXrefArray);
+
+                    $xref = sprintf('xref = CONCAT(xref, "\\n"%s ),', escapeString($finaXref));
 
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
@@ -801,7 +833,7 @@ class Binaries
 							INSERT INTO collections (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
-							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(substr($this->header['Xref'], 0, 255)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(implode(' ', $tempHeaderXrefs)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
