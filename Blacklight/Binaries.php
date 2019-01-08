@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\Collection;
 use App\Models\Group;
 use App\Models\Settings;
+use App\Models\Collection;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
