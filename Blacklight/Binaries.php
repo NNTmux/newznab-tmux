@@ -791,10 +791,9 @@ class Binaries
                     $xrefsData = Collection::whereCollectionhash(sha1($this->header['CollectionKey']))->value('xref');
 
                     $tempHeaderXrefs = [];
-                    //dump($this->header['Xref']);
                     $headerXrefs = explode(' ', $this->header['Xref']);
                     foreach ($headerXrefs as $headerXref) {
-                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.\w+)/', $headerXref, $match)) {
+                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $match)) {
                             $tempHeaderXrefs[] = $match[0];
                         }
                     }
@@ -804,7 +803,7 @@ class Binaries
                     if ($xrefsData !== null) {
                         $xrefsDataArray = explode(' ', $xrefsData);
                         foreach ($xrefsDataArray as $xrefData) {
-                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.\w+)/', $xrefData, $match1)) {
+                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $xrefData, $match1)) {
                                 $tempXrefsData[] = $match1[0];
                             }
                         }

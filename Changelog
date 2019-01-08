@@ -1,4 +1,5 @@
 2019-01-08 DariusIII
+	* Chg: Update xref matching regex
 	* Chg: Alter Binaries class xref updates and adjust nzb creation accordingly
 2019-01-07 DariusIII
 	* Chg: Revert Binaries to original behaviour
