@@ -829,10 +829,10 @@ class User extends Authenticatable
                         case 'view audio':
                             $ret[] = 3000;
                             continue 2;
-                        case 'view tv':
+                        case 'view pc':
                             $ret[] = 4000;
                             continue 2;
-                        case 'view pc':
+                        case 'view tv':
                             $ret[] = 5000;
                             continue 2;
                         case 'view adult':

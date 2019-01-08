@@ -71,6 +71,14 @@ class ClearanceMiddleware
             }
         }
 
+        if ($request->is(['TV', 'browse/TV', 'browse/TV/*'])) {
+            if (! $user->hasDirectPermission('view tv') || ! $user->hasPermissionTo('view tv')) {
+                abort(401);
+            } else {
+                return $next($request);
+            }
+        }
+
         return $next($request);
     }
 }
