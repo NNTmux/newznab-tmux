@@ -791,9 +791,8 @@ class Binaries
                     $xrefsData = Collection::whereCollectionhash(sha1($this->header['CollectionKey']))->value('xref');
 
                     $tempHeaderXrefs = [];
-                    $headerXrefs = explode(' ', $this->header['Xref']);
-                    foreach ($headerXrefs as $headerXref) {
-                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $match)) {
+                    foreach (explode(' ', $this->header['Xref']) as $headerXref) {
+                        if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $headerXref, $match) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $headerXref, $match)) {
                             $tempHeaderXrefs[] = $match[0];
                         }
                     }
@@ -801,9 +800,8 @@ class Binaries
                     $tempXrefsData = [];
 
                     if ($xrefsData !== null) {
-                        $xrefsDataArray = explode(' ', $xrefsData);
-                        foreach ($xrefsDataArray as $xrefData) {
-                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $xrefData, $match1)) {
+                        foreach (explode(' ', $xrefsData) as $xrefData) {
+                            if (preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)(\:\d+)/', $xrefData, $match1) || preg_match('/(^[a-zA-Z]{2,3}\.(bin(aries|arios|aer))\.[a-zA-Z0-9]?.+)/', $xrefData, $match1)) {
                                 $tempXrefsData[] = $match1[0];
                             }
                         }
