@@ -153,13 +153,6 @@
                 <span class="menu-collapsed">View Book List</span>
             </a>
         </div>
-        <a href="#submenu8" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
-            <div class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-object-group fa-fw mr-3"></span>
-                <span class="menu-collapsed">Multi Group</span>
-                <span class="submenu-icon ml-auto"></span>
-            </div>
-        </a>
         <a href="#submenu9" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
             <div class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-download fa-fw mr-3"></span>
