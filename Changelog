@@ -1,3 +1,5 @@
+2019-01-09 DariusIII
+	* Chg: Update base laravel classess and middleware
 2019-01-08 DariusIII
 	* Chg: Update laravel/framework to version 5.7.20
 	* Fix: Fix switched categories for TV and PC for users excluded categories views
