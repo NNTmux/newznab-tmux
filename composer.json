@@ -116,7 +116,7 @@
     "messerli90/igdb": "^1.0",
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
-    "nesbot/carbon": "2.6.1 as 1.35.0",
+    "nesbot/carbon": "2.10.0 as 1.35.0",
     "ntimyeboah/laravel-database-trigger": "^1.0",
     "php-ffmpeg/php-ffmpeg": "^0.13.0",
     "php-http/guzzle6-adapter": "^1.1",
