@@ -92,15 +92,13 @@ class UpdateNNTmux extends Command
     {
         if (App::isDownForMaintenance() === false) {
             $this->call('down');
+
             return true;
         }
 
         return false;
     }
 
-    /**
-     *
-     */
     private function appUp()
     {
         $this->call('up');
@@ -113,14 +111,13 @@ class UpdateNNTmux extends Command
     {
         if ((new Tmux())->isRunning() === true) {
             $this->call('tmux-ui:stop', ['type' => 'true']);
+
             return true;
         }
+
         return false;
     }
 
-    /**
-     *
-     */
     private function startTmux()
     {
         $this->call('tmux-ui:start');
