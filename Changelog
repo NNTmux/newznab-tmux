@@ -1,4 +1,5 @@
 2019-01-09 DariusIII
+	* Chg: Update nntmux:all command to stop tmux on start and start it after the process is complete at the end
 	* Chg: Update nesbot/carbon to version 2.10.0
 	* Chg: Update base laravel classess and middleware
 2019-01-08 DariusIII

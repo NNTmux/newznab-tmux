@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Ytake\LaravelSmarty\Smarty;
 use Illuminate\Support\Facades\App;
@@ -42,18 +43,22 @@ class UpdateNNTmux extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
     public function handle()
     {
+        $maintenance = App::isDownForMaintenance();
+
+        if (! $maintenance) {
+            $this->call('down');
+        }
+        $wasRunning = false;
+
+        if ((new Tmux())->isRunning() === true) {
+            $wasRunning = true;
+            $this->call('tmux-ui:stop', ['type' => 'true']);
+        }
+
         try {
-            $maintenance = App::isDownForMaintenance();
-
-            if (! $maintenance) {
-                $this->call('down');
-            }
-
             $output = $this->call('nntmux:git');
             if ($output === 'Already up-to-date.') {
                 $this->info($output);
@@ -67,28 +72,30 @@ class UpdateNNTmux extends Command
                 $fail = $this->call('nntmux:db');
                 if ($fail) {
                     $this->error('Db updating failed!!');
-
-                    return 1;
                 }
-            }
-
-            $smarty = new Smarty();
-            $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
-            $cleared = $smarty->clearCompiledTemplate();
-            if ($cleared) {
-                $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
-            } else {
-                $this->output->writeln(
-                    '<comment>You should clear your Smarty compiled template cache at: '.
-                    config('ytake-laravel-smarty.compile_path').'</comment>'
-                );
-            }
-
-            if (! $maintenance) {
-                $this->call('up');
             }
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+        }
+
+        $smarty = new Smarty();
+        $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
+        $cleared = $smarty->clearCompiledTemplate();
+        if ($cleared) {
+            $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
+        } else {
+            $this->output->writeln(
+                '<comment>You should clear your Smarty compiled template cache at: '.
+                config('ytake-laravel-smarty.compile_path').'</comment>'
+            );
+        }
+
+        if (! $maintenance) {
+            $this->call('up');
+        }
+
+        if ($wasRunning === true) {
+            $this->call('tmux-ui:start');
         }
     }
 }
