@@ -46,17 +46,8 @@ class UpdateNNTmux extends Command
      */
     public function handle()
     {
-        $maintenance = App::isDownForMaintenance();
-
-        if (! $maintenance) {
-            $this->call('down');
-        }
-        $wasRunning = false;
-
-        if ((new Tmux())->isRunning() === true) {
-            $wasRunning = true;
-            $this->call('tmux-ui:stop', ['type' => 'true']);
-        }
+        $maintenance = $this->appDown();
+        $running = $this->stopTmux();
 
         try {
             $output = $this->call('nntmux:git');
@@ -66,8 +57,6 @@ class UpdateNNTmux extends Command
                 $status = $this->call('nntmux:composer');
                 if ($status) {
                     $this->error('Composer failed to update!!');
-
-                    return false;
                 }
                 $fail = $this->call('nntmux:db');
                 if ($fail) {
@@ -78,9 +67,7 @@ class UpdateNNTmux extends Command
             $this->error($e->getMessage());
         }
 
-        $smarty = new Smarty();
-        $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
-        $cleared = $smarty->clearCompiledTemplate();
+        $cleared = (new Smarty())->setCompileDir(config('ytake-laravel-smarty.compile_path'))->clearCompiledTemplate();
         if ($cleared) {
             $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
         } else {
@@ -90,12 +77,52 @@ class UpdateNNTmux extends Command
             );
         }
 
-        if (! $maintenance) {
-            $this->call('up');
+        if ($maintenance === true) {
+            $this->appUp();
+        }
+        if ($running === true) {
+            $this->startTmux();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function appDown()
+    {
+        if (App::isDownForMaintenance() === false) {
+            $this->call('down');
+            return true;
         }
 
-        if ($wasRunning === true) {
-            $this->call('tmux-ui:start');
+        return false;
+    }
+
+    /**
+     *
+     */
+    private function appUp()
+    {
+        $this->call('up');
+    }
+
+    /**
+     * @return bool
+     */
+    private function stopTmux()
+    {
+        if ((new Tmux())->isRunning() === true) {
+            $this->call('tmux-ui:stop', ['type' => 'true']);
+            return true;
         }
+        return false;
+    }
+
+    /**
+     *
+     */
+    private function startTmux()
+    {
+        $this->call('tmux-ui:start');
     }
 }
