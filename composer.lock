@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7586a356b3eea085352d94696143b21e",
+    "content-hash": "6eee2da870446d40fb69d6f5f49cc436",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -11769,6 +11769,7 @@
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",
+        "ext-sodium": "*",
         "ext-spl": "*",
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
