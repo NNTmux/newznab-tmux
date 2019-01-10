@@ -1,3 +1,5 @@
+2019-01-10 DariusIII
+	* Chg: Log Binaries class errors into storage/logs/laravel.log
 2019-01-09 DariusIII
 	* Chg: Remove missed Multi Group menu item from admin side menu
 	* Chg: Update UpdateNNTmux.php

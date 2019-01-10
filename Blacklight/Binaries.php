@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Binaries.
@@ -709,6 +710,8 @@ class Binaries
                     __FUNCTION__,
                     'warning'
                 );
+
+                Log::warning($notInsertedCount.' articles failed to insert!');
             }
             unset($this->headersNotInserted);
 
@@ -834,6 +837,7 @@ class Binaries
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
+                        Log::error($e->getMessage());
                         DB::rollBack();
                     }
 
@@ -863,6 +867,7 @@ class Binaries
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
+                    Log::error($e->getMessage());
                     DB::rollBack();
                 }
 
@@ -1600,10 +1605,13 @@ class Binaries
         try {
             return DB::insert($query);
         } catch (QueryException $e) {
+            Log::error($e->getMessage());
             $this->colorCli->debug('Query error occurred.');
         } catch (\PDOException $e) {
+            Log::error($e->getMessage());
             $this->colorCli->debug('Query error occurred.');
         } catch (\Throwable $e) {
+            Log::error($e->getMessage());
             $this->colorCli->debug('Query error occurred.');
         }
 
