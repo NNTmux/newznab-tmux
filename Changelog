@@ -1,4 +1,5 @@
 2019-01-10 DariusIII
+	* Chg: Add sodium extension as requirement to composer.json
 	* Fix: Fix search error when tags are not set
 	* Chg: Add getRawHTMLThroughCF function to helpers.php
 	* Chg: Log Binaries class errors into storage/logs/laravel.log

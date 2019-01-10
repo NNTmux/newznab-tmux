@@ -76,6 +76,7 @@
     "ext-session": "*",
     "ext-simplexml": "*",
     "ext-sockets": "*",
+    "ext-sodium": "*",
     "ext-spl": "*",
     "ext-xmlwriter": "*",
     "ext-zlib": "*",
