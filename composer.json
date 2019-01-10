@@ -131,6 +131,7 @@
     "spatie/laravel-directory-cleanup": "^1.2",
     "spatie/laravel-fractal": "^5.3",
     "spatie/laravel-permission": "^2.12",
+    "tunaabutbul/cloudflare-middleware": "^1.2",
     "vlucas/phpdotenv": "^2.4",
     "voku/simple_html_dom": "^4.2",
     "wandersonwhcr/illuminate-romans": "^1.0",

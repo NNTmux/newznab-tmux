@@ -4,10 +4,13 @@ use Colors\Color;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 use GuzzleHttp\Exception\RequestException;
+use Tuna\CloudflareMiddleware;
 
 if (! function_exists('getRawHtml')) {
 
@@ -20,16 +23,44 @@ if (! function_exists('getRawHtml')) {
     function getRawHtml($url, $cookie = false)
     {
         $cookiejar = new CookieJar();
-        $client = new Client();
+        $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         if ($cookie !== false) {
             $cookieJar = $cookiejar->setCookie(SetCookie::fromString($cookie));
-            $client = new Client(['cookies' => $cookieJar]);
+            $client = new Client(['cookies' => $cookieJar, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
         } catch (RequestException $e) {
+            Log::error($e->getMessage());
             $response = false;
         } catch (\RuntimeException $e) {
+            Log::error($e->getMessage());
+            $response = false;
+        }
+
+        return $response;
+    }
+}
+
+if (! function_exists('getRawHtmlThroughCF')) {
+
+    /**
+     * @param $url
+     *
+     * @return bool|string
+     */
+    function getRawHtmlThroughCF($url)
+    {
+        $client = new Client(['cookies' => new FileCookieJar('cookies.txt'), 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
+        $client->getConfig('handler')->push(CloudflareMiddleware::create());
+
+        try {
+            $response = $client->get($url)->getBody()->getContents();
+        } catch (RequestException $e) {
+            Log::error($e->getMessage());
+            $response = false;
+        } catch (\RuntimeException $e) {
+            Log::error($e->getMessage());
             $response = false;
         }
 
