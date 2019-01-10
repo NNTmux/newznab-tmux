@@ -1,4 +1,5 @@
 2019-01-10 DariusIII
+	* Chg: Update .travis.yml
 	* Chg: Add sodium extension as requirement to composer.json
 	* Fix: Fix search error when tags are not set
 	* Chg: Add getRawHTMLThroughCF function to helpers.php
