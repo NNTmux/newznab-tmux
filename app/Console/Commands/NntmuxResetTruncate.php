@@ -43,26 +43,11 @@ class NntmuxResetTruncate extends Command
         $this->info('Reseting all groups completed.');
         DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
-        $arr = ['parts', 'missed_parts', 'binaries', 'collections', 'multigroup_parts', 'multigroup_missed_parts', 'multigroup_binaries', 'multigroup_collections'];
-
-        foreach ($arr as &$value) {
+        foreach (['parts', 'missed_parts', 'binaries', 'collections'] as &$value) {
             DB::statement("TRUNCATE TABLE $value");
             $this->info("Truncating $value completed.");
         }
         unset($value);
-
-        foreach (DB::select('SHOW table status') as $row) {
-            $tbl = $row->Name;
-            if (preg_match('/collections_\d+/', $tbl) || preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/missed_parts_\d+/', $tbl) || preg_match('/\d+_collections/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_missed_parts_\d+/', $tbl)) {
-                if ($this->argument('type') === 'true') {
-                    DB::statement("DROP TABLE $tbl");
-                    $this->info("Dropping $tbl completed.");
-                } else {
-                    DB::statement("TRUNCATE TABLE $tbl");
-                    $this->info("Truncating $tbl completed.");
-                }
-            }
-        }
 
         $delcount = Release::query()->where('nzbstatus', '=', 0)->delete();
         $this->info($delcount.' releases had no nzb, deleted.');

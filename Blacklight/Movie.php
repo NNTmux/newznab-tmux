@@ -768,7 +768,7 @@ class Movie
                         $ret['title'] = $art['name'];
                     }
                     if ($this->echooutput && Utility::isCLI()) {
-                        $this->colorCli->alternateOver('Fanart Found ').$this->colorCli->headerOver($ret['title']);
+                        $this->colorCli->alternateOver('Fanart Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                     }
 
                     return $ret;
@@ -882,7 +882,7 @@ class Movie
                 $ret['backdrop'] = '';
             }
             if ($this->echooutput && Utility::isCLI()) {
-                $this->colorCli->primaryOver('TMDb Found ').$this->colorCli->headerOver($ret['title']);
+                $this->colorCli->primaryOver('TMDb Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
             }
 
             return $ret;
@@ -917,7 +917,7 @@ class Movie
                     ];
 
                     if ($this->echooutput && Utility::isCLI()) {
-                        $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($result->orig_title());
+                        $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($result->orig_title()).PHP_EOL;
                     }
 
                     return $ret;
@@ -962,7 +962,7 @@ class Movie
                             return false;
                         }
                         if ($this->echooutput && Utility::isCLI()) {
-                            $this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']);
+                            $this->colorCli->alternateOver('Trakt Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
 
                         return $ret;
@@ -1013,7 +1013,7 @@ class Movie
                         ];
 
                         if ($this->echooutput && Utility::isCLI()) {
-                            $this->colorCli->alternateOver('OMDbAPI Found ').$this->colorCli->headerOver($ret['title']);
+                            $this->colorCli->alternateOver('OMDbAPI Found ').$this->colorCli->headerOver($ret['title']).PHP_EOL;
                         }
 
                         return $ret;

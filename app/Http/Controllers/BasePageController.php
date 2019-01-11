@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
-use App\Models\Menu;
 use App\Models\User;
 use Blacklight\SABnzbd;
 use App\Models\Category;
@@ -281,7 +280,6 @@ class BasePageController extends Controller
         }
 
         $content = new Contents();
-        $this->smarty->assign('menulist', Menu::getMenu($role, url('/')));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
         if ($this->userdata !== null) {

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command
@@ -105,7 +106,7 @@ class InstallNntmux extends Command
                 }
 
                 if (! $error && $this->addAdminUser()) {
-                    @file_put_contents(base_path().'/_install/install.lock', 'application install locked on '.now());
+                    File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
                     $process = new Process('php artisan key:generate --force');
                     $process->setTimeout(600);

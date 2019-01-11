@@ -634,18 +634,6 @@
 				</tr>
 				<tr>
 
-				<tr>
-					<td style="width:180px;"><label for="allasmgr">Treat all releases as MGR:</label></td>
-					<td>
-						{html_radios id="allasmgr" name='allasmgr' values=$yesno_ids output=$yesno_names selected=$site->allasmgr separator='<br />'}
-						<div class="hint">This will make all releases to be treated as multigroup releases and go into
-							one table for collection/binaries/parts/missed_parts processing.<br>
-							This setting will most likely cause higher load on server
-						</div>
-					</td>
-				</tr>
-				<tr>
-
 			</table>
 		</fieldset>
 

@@ -2,6 +2,9 @@
 
 namespace Blacklight;
 
+/**
+ * Class ReleaseSearch.
+ */
 class ReleaseSearch
 {
     /**

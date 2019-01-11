@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Handles removing of various unwanted releases.
  *
+ *
  * Class ReleaseRemover
  */
 class ReleaseRemover
@@ -144,6 +145,7 @@ class ReleaseRemover
      *                         content is what to change the column content to
      *
      * @return string|bool
+     * @throws \Exception
      */
     public function removeByCriteria($arguments)
     {
@@ -201,13 +203,14 @@ class ReleaseRemover
     /**
      * Delete crap releases.
      *
-     * @param bool       $delete                 Delete the release or just show the result?
-     * @param int|string $time                   Time in hours (to select old releases) or 'full' for no time limit.
-     * @param string     $type                   Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
+     * @param bool $delete Delete the release or just show the result?
+     * @param int|string $time Time in hours (to select old releases) or 'full' for no time limit.
+     * @param string $type Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
      *                                           passwordurl, sample, scr, short, size, ''] ('' runs against all types)
-     * @param string|int     $blacklistID
+     * @param string|int $blacklistID
      *
      * @return string|bool
+     * @throws \Exception
      */
     public function removeCrap($delete, $time, $type = '', $blacklistID = '')
     {
@@ -331,6 +334,7 @@ class ReleaseRemover
      * Remove releases with 15 or more letters or numbers, nothing else.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeGibberish()
     {
@@ -359,6 +363,7 @@ class ReleaseRemover
      * Remove releases with 25 or more letters/numbers, probably hashed.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeHashed()
     {
@@ -388,6 +393,7 @@ class ReleaseRemover
      * Remove releases with 5 or less letters/numbers.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeShort()
     {
@@ -416,6 +422,7 @@ class ReleaseRemover
      * Remove releases with an exe file not in other misc or pc apps/games.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeExecutable()
     {
@@ -424,7 +431,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s
 			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
             escapeString('%.exe'),
@@ -446,6 +453,7 @@ class ReleaseRemover
      * Remove releases with an install.bin file.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeInstallBin()
     {
@@ -454,7 +462,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
             escapeString('%install.bin%'),
             $this->crapTime
@@ -471,6 +479,7 @@ class ReleaseRemover
      * Remove releases with an password.url file.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removePasswordURL()
     {
@@ -479,7 +488,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name LIKE %s %s',
             escapeString('%password.url%'),
             $this->crapTime
@@ -496,6 +505,7 @@ class ReleaseRemover
      * Remove releases with password in the search name.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removePassworded()
     {
@@ -544,6 +554,7 @@ class ReleaseRemover
      * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeSize()
     {
@@ -579,6 +590,7 @@ class ReleaseRemover
      * Remove releases bigger than 200MB with just a single file.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeHuge()
     {
@@ -602,6 +614,7 @@ class ReleaseRemover
      * Remove releases that are just a single nzb file.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeSingleNZB()
     {
@@ -609,7 +622,7 @@ class ReleaseRemover
         $this->query = sprintf(
             'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.totalpart = 1
 			AND rf.name LIKE %s %s',
             escapeString('%.nzb%'),
@@ -627,6 +640,7 @@ class ReleaseRemover
      * Remove releases with more than 1 part, less than 40MB, sample in name. TV/Movie sections.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeSample()
     {
@@ -669,6 +683,7 @@ class ReleaseRemover
      * Remove releases with a scr file in the filename/subject.
      *
      * @return bool|string
+     * @throws \Exception
      */
     protected function removeSCR()
     {
@@ -677,7 +692,7 @@ class ReleaseRemover
         $this->query = sprintf(
             "SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			JOIN release_files rf ON r.id = rf.releases_id
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
 			%s",
             $this->crapTime
@@ -694,6 +709,7 @@ class ReleaseRemover
      * Remove releases using the site blacklist regexes.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function removeBlacklist(): bool
     {
@@ -790,7 +806,8 @@ class ReleaseRemover
                     $blType,
                     $opTypeName,
                     $ftUsing
-                    ), true
+                    ),
+                    true
                 );
 
                 if ($opTypeName === 'Subject') {
@@ -825,6 +842,7 @@ class ReleaseRemover
      * Remove releases using the site blacklist regexes against file names.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function removeBlacklistFiles(): bool
     {
@@ -845,7 +863,7 @@ class ReleaseRemover
         if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
                 $regexSQL = sprintf(
-                    'STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
+                    'JOIN release_files rf ON r.id = rf.releases_id WHERE rf.name REGEXP %s',
                     escapeString($regex->regex)
                 );
 
@@ -891,7 +909,8 @@ class ReleaseRemover
                     $this->method,
                     $blType,
                     $ftUsing
-                    ), true
+                    ),
+                    true
                 );
 
                 $this->query = sprintf(
@@ -918,6 +937,7 @@ class ReleaseRemover
      * Thanks to dizant from nZEDb forums for the sql query.
      *
      * @return string|bool
+     * @throws \Exception
      */
     protected function removeWMV()
     {
@@ -942,6 +962,7 @@ class ReleaseRemover
      * Thanks to dizant from nZEDb forums for parts of the sql query.
      *
      * @return string|bool
+     * @throws \Exception
      */
     protected function removeCodecPoster()
     {
@@ -1003,6 +1024,7 @@ class ReleaseRemover
      * Delete releases from the database.
      *
      * @return true
+     * @throws \Exception
      */
     protected function deleteReleases(): bool
     {
@@ -1234,7 +1256,8 @@ class ReleaseRemover
         $this->colorCli->primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
-            'If you are satisfied, type yes and press enter. Anything else will exit.', true
+            'If you are satisfied, type yes and press enter. Anything else will exit.',
+            true
         );
 
         // Check the users response.
@@ -1340,11 +1363,13 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, 'chinese');
             $regexMatch =
                 str_replace(
-                    ['-', '(', ')', '.', '?', 'nl  subed|bed|s'], [
+                    ['-', '(', ')', '.', '?', 'nl  subed|bed|s'],
+                    [
                     '',
                     '',
                     '',
-                    ' ', '', 'nlsubs|nlsubbed|nlsubed', ], substr(
+                    ' ', '', 'nlsubs|nlsubbed|nlsubed', ],
+                    substr(
                         $dbRegex,
                         $forBegin,
                         strrpos($dbRegex, ')') - $forBegin
@@ -1355,14 +1380,18 @@ class ReleaseRemover
             $forBegin = strpos($dbRegex, '4u');
             $regexMatch =
                 str_replace(
-                    ['4u.nl', 'nov[ a]+rip'], ['"4u" "nl"', 'nova'], substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
+                    ['4u.nl', 'nov[ a]+rip'],
+                    ['"4u" "nl"', 'nova'],
+                    substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
                 );
         } elseif (substr($dbRegex, 8, 5) === 'bd|dl') {
             // Find first bd|dl instance position in Regex, then find last closing parenthesis as this is reversed.
             $forBegin = strpos($dbRegex, 'bd|dl');
             $regexMatch =
                 str_replace(
-                    ['bd|dl)mux', '\\', ']', '['], ['bdmux|dlmux', '', '', ''], substr(
+                    ['bd|dl)mux', '\\', ']', '['],
+                    ['bdmux|dlmux', '', '', ''],
+                    substr(
                         $dbRegex,
                         $forBegin,
                         strrpos($dbRegex, ')') - $forBegin

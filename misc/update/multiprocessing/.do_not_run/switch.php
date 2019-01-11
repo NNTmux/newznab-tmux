@@ -1,7 +1,7 @@
 <?php
 
-if (!isset($argv[1])) {
-	exit('This script is not intended to be run manually.' . PHP_EOL);
+if (! isset($argv[1])) {
+    exit('This script is not intended to be run manually.' . PHP_EOL);
 }
 
 require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
@@ -15,7 +15,6 @@ use Blacklight\Backfill;
 use Blacklight\Binaries;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\processing\ProcessReleasesMultiGroup;
 use Illuminate\Support\Facades\DB;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
@@ -24,13 +23,13 @@ $options = explode('  ', $argv[1]);
 
 switch ($options[1]) {
 
-	// Runs backFill interval or all.
-	// $options[2] => (string)group name, Name of group to work on.
-	// $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
-	case 'backfill':
-		if (in_array((int)$options[3], [1, 2], false)) {
-			$value = Settings::settingValue('site.tmux.backfill_qty');
-			if ($value !== false) {
+    // Runs backFill interval or all.
+    // $options[2] => (string)group name, Name of group to work on.
+    // $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
+    case 'backfill':
+        if (in_array((int)$options[3], [1, 2], false)) {
+            $value = Settings::settingValue('site.tmux.backfill_qty');
+            if ($value !== false) {
                 try {
                     $nntp = nntp();
                 } catch (Exception $e) {
@@ -42,15 +41,15 @@ switch ($options[1]) {
                     echo $e->getMessage();
                 }
             }
-		}
-		break;
+        }
+        break;
 
-	/*  BackFill up to x number of articles for all groups.
-	 *
-	 * $options[2] => (string) Group name.
-	 * $options[3] => (int)    Quantity of articles to download.
-	 */
-	case 'backfill_all_quantity':
+    /*  BackFill up to x number of articles for all groups.
+     *
+     * $options[2] => (string) Group name.
+     * $options[3] => (int)    Quantity of articles to download.
+     */
+    case 'backfill_all_quantity':
         try {
             $nntp = nntp();
         } catch (Exception $e) {
@@ -63,9 +62,9 @@ switch ($options[1]) {
         }
         break;
 
-	// BackFill a single group, 10000 parts.
-	// $options[2] => (string)group name, Name of group to work on.
-	case 'backfill_all_quick':
+    // BackFill a single group, 10000 parts.
+    // $options[2] => (string)group name, Name of group to work on.
+    case 'backfill_all_quick':
         try {
             $nntp = nntp();
         } catch (Exception $e) {
@@ -78,15 +77,15 @@ switch ($options[1]) {
         }
         break;
 
-	/* Get a range of article headers for a group.
-	 *
-	 * $options[2] => (string) backfill/binaries
-	 * $options[3] => (string) Group name.
-	 * $options[4] => (int)    First article number in range.
-	 * $options[5] => (int)    Last article number in range.
-	 * $options[6] => (int)    Number of threads.
-	 */
-	case 'get_range':
+    /* Get a range of article headers for a group.
+     *
+     * $options[2] => (string) backfill/binaries
+     * $options[3] => (string) Group name.
+     * $options[4] => (int)    First article number in range.
+     * $options[5] => (int)    Last article number in range.
+     * $options[6] => (int)    Number of threads.
+     */
+    case 'get_range':
         try {
             $nntp = nntp();
         } catch (Exception $e) {
@@ -111,58 +110,58 @@ switch ($options[1]) {
             echo $e->getMessage();
         }
         if (empty($return)) {
-			exit();
-		}
-		$columns = [];
-		switch ($options[2]) {
-			case 'binaries':
-				if ($return['lastArticleNumber'] <= $groupMySQL['last_record']){
-					exit();
-				}
-				$unixTime = is_numeric($return['lastArticleDate']) ? $return['lastArticleDate'] : strtotime($return['lastArticleDate']);
-				$columns[1] = sprintf(
-					'last_record_postdate = FROM_UNIXTIME(%s)',
-					$unixTime
-				);
-				$columns[2] = sprintf('last_record = %s', $return['lastArticleNumber']);
-				$query = sprintf(
-					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND last_record < %s',
-					$columns[1],
-					$columns[2],
-					$groupMySQL['id'],
-					$return['lastArticleNumber']
-				);
-				break;
-			case 'backfill':
-				if ($return['firstArticleNumber'] >= $groupMySQL['first_record']){
-					exit();
-				}
-				$unixTime = is_numeric($return['firstArticleDate']) ? $return['firstArticleDate'] : strtotime($return['firstArticleDate']);
-				$columns[1] = sprintf(
-					'first_record_postdate = FROM_UNIXTIME(%s)',
-					$unixTime
-				);
-				$columns[2] = sprintf('first_record = %s', $return['firstArticleNumber']);
-				$query = sprintf(
-					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND first_record > %s',
-					$columns[1],
-					$columns[2],
-					$groupMySQL['id'],
-					$return['firstArticleNumber']
-				);
-				break;
-			default:
-				exit();
-		}
-		DB::update($query);
-		break;
+            exit();
+        }
+        $columns = [];
+        switch ($options[2]) {
+            case 'binaries':
+                if ($return['lastArticleNumber'] <= $groupMySQL['last_record']) {
+                    exit();
+                }
+                $unixTime = is_numeric($return['lastArticleDate']) ? $return['lastArticleDate'] : strtotime($return['lastArticleDate']);
+                $columns[1] = sprintf(
+                    'last_record_postdate = FROM_UNIXTIME(%s)',
+                    $unixTime
+                );
+                $columns[2] = sprintf('last_record = %s', $return['lastArticleNumber']);
+                $query = sprintf(
+                    'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND last_record < %s',
+                    $columns[1],
+                    $columns[2],
+                    $groupMySQL['id'],
+                    $return['lastArticleNumber']
+                );
+                break;
+            case 'backfill':
+                if ($return['firstArticleNumber'] >= $groupMySQL['first_record']) {
+                    exit();
+                }
+                $unixTime = is_numeric($return['firstArticleDate']) ? $return['firstArticleDate'] : strtotime($return['firstArticleDate']);
+                $columns[1] = sprintf(
+                    'first_record_postdate = FROM_UNIXTIME(%s)',
+                    $unixTime
+                );
+                $columns[2] = sprintf('first_record = %s', $return['firstArticleNumber']);
+                $query = sprintf(
+                    'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND first_record > %s',
+                    $columns[1],
+                    $columns[2],
+                    $groupMySQL['id'],
+                    $return['firstArticleNumber']
+                );
+                break;
+            default:
+                exit();
+        }
+        DB::update($query);
+        break;
 
-	/* Do part repair for a group.
-	 *
-	 * $options[2] => (string) Group name.
-	 */
-	case 'part_repair':
-		$groupMySQL = Group::getByName($options[2])->toArray();
+    /* Do part repair for a group.
+     *
+     * $options[2] => (string) Group name.
+     */
+    case 'part_repair':
+        $groupMySQL = Group::getByName($options[2])->toArray();
         try {
             $nntp = nntp();
         } catch (Exception $e) {
@@ -188,42 +187,33 @@ switch ($options[1]) {
         }
         break;
 
-	// Process releases.
-	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
-	case 'releases':
+    // Process releases.
+    // $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
+    case 'releases':
         try {
             $releases = new ProcessReleases();
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-        try {
-            $mgrreleases = new ProcessReleasesMultiGroup();
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
 
         //Runs function that are per group
-		if (is_numeric($options[2])) {
-
+        if (is_numeric($options[2])) {
             try {
                 processReleases($releases, $options[2]);
             } catch (Exception $e) {
                 echo $e->getMessage();
             }
         } else {
-
-			// Run MGR once after all other release updates for standard groups
             try {
-                processReleases(new ProcessReleasesMultiGroup(), '');
+                processReleases($releases, '');
             } catch (Exception $e) {
                 echo $e->getMessage();
             }
-
             // Run functions that run on releases table after all others completed.
-			$groupCount = rtrim($options[2], '_');
-			if (!is_numeric($groupCount)) {
-				$groupCount = 1;
-			}
+            $groupCount = rtrim($options[2], '_');
+            if (! is_numeric($groupCount)) {
+                $groupCount = 1;
+            }
             try {
                 $releases->deletedReleasesByGroup();
             } catch (Exception $e) {
@@ -235,20 +225,20 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
             //$releases->processRequestIDs('', (5000 * $groupCount), true);
-			//$releases->processRequestIDs('', (1000 * $groupCount), false);
+            //$releases->processRequestIDs('', (1000 * $groupCount), false);
             try {
                 $releases->categorizeReleases(2);
             } catch (Exception $e) {
                 echo $e->getMessage();
             }
         }
-		break;
+        break;
 
-	/* Update a single group's article headers.
-	 *
-	 * $options[2] => (string) Group name.
-	 */
-	case 'update_group_headers':
+    /* Update a single group's article headers.
+     *
+     * $options[2] => (string) Group name.
+     */
+    case 'update_group_headers':
         try {
             $nntp = nntp();
         } catch (Exception $e) {
@@ -263,18 +253,18 @@ switch ($options[1]) {
         break;
 
 
-	// Do a single group (update_binaries/backFill/update_releases/postprocess).
-	// $options[2] => (int)groupid, group to work on
-	case 'update_per_group':
-		if (is_numeric($options[2])) {
-			// Get the group info from MySQL.
-			$groupMySQL = Group::find($options[2])->toArray();
+    // Do a single group (update_binaries/backFill/update_releases/postprocess).
+    // $options[2] => (int)groupid, group to work on
+    case 'update_per_group':
+        if (is_numeric($options[2])) {
+            // Get the group info from MySQL.
+            $groupMySQL = Group::find($options[2])->toArray();
 
-			if ($groupMySQL === null) {
-				exit('ERROR: Group not found with id ' . $options[2] . PHP_EOL);
-			}
+            if ($groupMySQL === null) {
+                exit('ERROR: Group not found with id ' . $options[2] . PHP_EOL);
+            }
 
-			// Connect to NNTP.
+            // Connect to NNTP.
             try {
                 $nntp = nntp();
             } catch (Exception $e) {
@@ -306,11 +296,6 @@ switch ($options[1]) {
             } catch (Exception $e) {
                 echo $e->getMessage();
             }
-            try {
-                processReleases(new ProcessReleasesMultiGroup(), $options[2]);
-            } catch (Exception $e) {
-                echo $e->getMessage();
-            }
 
             // Post process the releases.
             try {
@@ -324,15 +309,15 @@ switch ($options[1]) {
                 echo $e->getMessage();
             }
         }
-		break;
+        break;
 
-	// Post process additional and NFO.
-	// $options[2] => (char)Letter or number a-f 0-9, first character of release guid.
-	case 'pp_additional':
-	case 'pp_nfo':
-		if (charCheck($options[2])) {
+    // Post process additional and NFO.
+    // $options[2] => (char)Letter or number a-f 0-9, first character of release guid.
+    case 'pp_additional':
+    case 'pp_nfo':
+        if (charCheck($options[2])) {
 
-			// Create the connection here and pass, this is for post processing, so check for alternate.
+            // Create the connection here and pass, this is for post processing, so check for alternate.
             try {
                 $nntp = nntp(true);
             } catch (Exception $e) {
@@ -352,61 +337,61 @@ switch ($options[1]) {
                     echo $e->getMessage();
                 }
             }
-		}
-		break;
+        }
+        break;
 
-	/* Post process movies.
-	 *
-	 * $options[2] (char) Single character, first letter of release guid.
-	 * $options[3] (int)  Process all releases or renamed releases only.
-	 */
-	case 'pp_movie':
-		if (charCheck($options[2])) {
+    /* Post process movies.
+     *
+     * $options[2] (char) Single character, first letter of release guid.
+     * $options[3] (int)  Process all releases or renamed releases only.
+     */
+    case 'pp_movie':
+        if (charCheck($options[2])) {
             try {
                 (new PostProcess())->processMovies('', $options[2], $options[3] ?? '');
             } catch (Exception $e) {
                 echo $e->getMessage();
             }
         }
-		break;
+        break;
 
-	/* Post process TV.
-	 *
-	 * $options[2] (char) Single character, first letter of release guid.
-	 * $options[3] (int)  Process all releases or renamed releases only.
-	 */
-	case 'pp_tv':
-		if (charCheck($options[2])) {
+    /* Post process TV.
+     *
+     * $options[2] (char) Single character, first letter of release guid.
+     * $options[3] (int)  Process all releases or renamed releases only.
+     */
+    case 'pp_tv':
+        if (charCheck($options[2])) {
             try {
                 (new PostProcess())->processTv('', $options[2], $options[3] ?? '');
             } catch (Exception $e) {
                 echo $e->getMessage();
             }
         }
-		break;
+        break;
 }
 
 /**
  * Create / process releases for a groupID.
  *
- * @param ProcessReleases|ProcessReleasesMultiGroup $releases
+ * @param ProcessReleases $releases
  * @param int $groupID
  * @throws \Throwable
  */
 function processReleases($releases, $groupID)
 {
-	$releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
-	$releases->processIncompleteCollections($groupID);
-	$releases->processCollectionSizes($groupID);
-	$releases->deleteUnwantedCollections($groupID);
+    $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
+    $releases->processIncompleteCollections($groupID);
+    $releases->processCollectionSizes($groupID);
+    $releases->deleteUnwantedCollections($groupID);
 
-	do {
-		$releasesCount = $releases->createReleases($groupID);
-		$nzbFilesAdded = $releases->createNZBs($groupID);
+    do {
+        $releasesCount = $releases->createReleases($groupID);
+        $nzbFilesAdded = $releases->createNZBs($groupID);
 
-		// This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
-	} while ($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
-	$releases->deleteCollections($groupID);
+        // This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
+    } while ($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
+    $releases->deleteCollections($groupID);
 }
 
 /**
@@ -418,10 +403,10 @@ function processReleases($releases, $groupID)
  */
 function charCheck($char)
 {
-	if (in_array($char, ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'], false)) {
-		return true;
-	}
-	return false;
+    if (in_array($char, ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'], false)) {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -434,10 +419,10 @@ function charCheck($char)
  */
 function &nntp($alternate = false)
 {
-	$nntp = new NNTP();
-	if (($alternate && (int)Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-		exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
-	}
+    $nntp = new NNTP();
+    if (($alternate && (int)Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+        exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
+    }
 
-	return $nntp;
+    return $nntp;
 }

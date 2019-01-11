@@ -8,9 +8,10 @@ use GuzzleHttp\Psr7\Request;
 use Blacklight\utility\Utility;
 
 /**
- * Class NZBGet.
- *
  * Transfers data between an NZBGet server and a nntmux website.
+ *
+ *
+ * Class NZBGet
  */
 class NZBGet
 {

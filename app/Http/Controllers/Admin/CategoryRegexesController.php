@@ -70,12 +70,12 @@ class CategoryRegexesController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                if ($request->input('group_regex') === '') {
+                if (empty($request->input('group_regex'))) {
                     $this->smarty->assign('error', 'Group regex must not be empty!');
                     break;
                 }
 
-                if ($request->input('regex') === '') {
+                if (empty($request->input('regex'))) {
                     $this->smarty->assign('error', 'Regex cannot be empty');
                     break;
                 }
@@ -85,7 +85,7 @@ class CategoryRegexesController extends BasePageController
                     break;
                 }
 
-                if ($request->input('id') === '') {
+                if (empty($request->input('id'))) {
                     $regexes->addRegex($request->all());
                 } else {
                     $regexes->updateRegex($request->all());

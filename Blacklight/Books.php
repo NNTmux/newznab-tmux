@@ -19,6 +19,9 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
+/**
+ * Class Books.
+ */
 class Books
 {
     /**

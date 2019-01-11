@@ -90,7 +90,7 @@ class SearchController extends BasePageController
                 'basic',
                 $categoryID,
                 0,
-                $tags
+                $tags ?? []
             );
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());

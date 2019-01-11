@@ -4,6 +4,9 @@ namespace Blacklight;
 
 use League\CLImate\CLImate;
 
+/**
+ * Class ColorCLI.
+ */
 class ColorCLI
 {
     /**

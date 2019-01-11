@@ -6,6 +6,9 @@ use App\Models\Settings;
 use App\Models\SteamApp;
 use b3rs3rk\steamfront\Main;
 
+/**
+ * Class Steam.
+ */
 class Steam
 {
     private const STEAM_MATCH_PERCENTAGE = 90;

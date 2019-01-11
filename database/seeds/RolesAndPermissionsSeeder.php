@@ -14,7 +14,7 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run()
     {
         // Reset cached roles and permissions
-        app()['cache']->forget('spatie.permission.cache');
+        app('cache')->forget('spatie.permission.cache');
 
         // create permissions
         Permission::create(['name' => 'preview']);
@@ -32,7 +32,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // create roles and assign created permissions
 
-        $role = Role::create(
+        $roleUser = Role::create(
             [
                 'name' => 'User',
                 'apirequests' => 10,
@@ -44,9 +44,11 @@ class RolesAndPermissionsSeeder extends Seeder
                 'rate_limit' => 60,
             ]
         );
-        $role->givePermissionTo(['preview', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books']);
 
-        $role = Role::create(
+        $roleUser->save();
+        $roleUser->givePermissionTo(['preview', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books']);
+
+        $roleAdmin = Role::create(
             [
                 'name' => 'Admin',
                 'apirequests' => 1000,
@@ -58,9 +60,11 @@ class RolesAndPermissionsSeeder extends Seeder
                 'rate_limit' => 60,
             ]
         );
-        $role->givePermissionTo(Permission::all());
 
-        Role::create(
+        $roleAdmin->save();
+        $roleAdmin->givePermissionTo(Permission::all());
+
+        $roleDisabled = Role::create(
             [
                 'name' => 'Disabled',
                 'apirequests' => 0,
@@ -73,7 +77,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
 
-        $role = Role::create(
+        $roleDisabled->save();
+
+        $roleMod = Role::create(
             [
                 'name' => 'Moderator',
                 'apirequests' => 1000,
@@ -85,9 +91,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'rate_limit' => 60,
             ]
         );
-        $role->givePermissionTo(Permission::all());
+        $roleMod->save();
+        $roleMod->givePermissionTo(Permission::all());
 
-        $role = Role::create(
+        $roleFriend = Role::create(
             [
                 'name' => 'Friend',
                 'apirequests' => 100,
@@ -99,6 +106,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'rate_limit' => 60,
             ]
         );
-        $role->givePermissionTo(['preview', 'hideads', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books', 'view other']);
+        $roleFriend->save();
+        $roleFriend->givePermissionTo(['preview', 'hideads', 'view console', 'view movies', 'view audio', 'view pc', 'view tv', 'view adult', 'view books', 'view other']);
     }
 }

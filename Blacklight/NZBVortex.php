@@ -5,10 +5,13 @@ namespace Blacklight;
 use Page;
 use App\Models\User;
 
+/**
+ * Class NZBVortex.
+ */
 final class NZBVortex
 {
-    protected $nonce = null;
-    protected $session = null;
+    private $nonce = null;
+    private $session = null;
 
     public function __construct()
     {

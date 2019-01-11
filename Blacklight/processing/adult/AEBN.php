@@ -168,9 +168,9 @@ class AEBN extends AdultMovies
         if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
             foreach ($ret->find('div') as $div) {
                 foreach ($div->find('span') as $span) {
-                    $span->plaintext = rawurldecode($span->plaintext);
-                    $span->plaintext = preg_replace('/&nbsp;/', '', $span->plaintext);
-                    $this->_res['productinfo'][] = trim($span->plaintext);
+                    $text = rawurldecode($span->plaintext);
+                    $text = preg_replace('/&nbsp;/', '', $text);
+                    $this->_res['productinfo'][] = trim($text);
                 }
             }
             if (false !== $key = array_search('Running Time:', $this->_res['productinfo'], false)) {

@@ -40,8 +40,14 @@ class UserController extends BasePageController
         ];
 
         $rslt = User::getRange(
-            $offset, config('nntmux.items_per_page'), $orderBy, $variables['username'],
-            $variables['email'], $variables['host'], $variables['role'], true
+            $offset,
+            config('nntmux.items_per_page'),
+            $orderBy,
+            $variables['username'],
+            $variables['email'],
+            $variables['host'],
+            $variables['role'],
+            true
         );
 
         $results = $this->paginate($rslt ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());

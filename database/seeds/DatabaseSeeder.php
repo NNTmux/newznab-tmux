@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ContentTableSeeder::class);
         $this->call(GenresTableSeeder::class);
         $this->call(GroupsTableSeeder::class);
-        $this->call(MenuTableSeeder::class);
         $this->call(ReleaseNamingRegexesTableSeeder::class);
         $this->call(SettingsTableSeeder::class);
         $this->call(RolesAndPermissionsSeeder::class);

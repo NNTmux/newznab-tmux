@@ -42,6 +42,7 @@ class ReleaseNamingRegexesController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -54,17 +55,17 @@ class ReleaseNamingRegexesController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                if ($request->input('group_regex') === '') {
+                if (empty($request->input('group_regex'))) {
                     $this->smarty->assign('error', 'Group regex must not be empty!');
                     break;
                 }
 
-                if ($request->input('regex') === '') {
+                if (empty($request->input('regex'))) {
                     $this->smarty->assign('error', 'Regex cannot be empty');
                     break;
                 }
 
-                if ($request->input('description') === '') {
+                if (empty($request->input('description'))) {
                     $request->merge(['description' => '']);
                 }
 
@@ -73,13 +74,13 @@ class ReleaseNamingRegexesController extends BasePageController
                     break;
                 }
 
-                if ($request->input('id') === '') {
-                    $regex = $regexes->addRegex($request->all());
+                if (empty($request->input('id'))) {
+                    $regexes->addRegex($request->all());
                 } else {
-                    $regex = $regexes->updateRegex($request->all());
+                    $regexes->updateRegex($request->all());
                 }
 
-                redirect('admin/release_naming_regexes-list');
+                return redirect('admin/release_naming_regexes-list');
                 break;
 
             case 'view':

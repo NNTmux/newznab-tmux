@@ -10,6 +10,9 @@ use App\Models\CollectionRegex;
 use App\Models\ReleaseNamingRegex;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class Regexes.
+ */
 class Regexes
 {
     /**
@@ -187,18 +190,13 @@ class Regexes
             return [];
         }
 
-        $tableNames = (new Group())->getCBPTableNames($groupID);
-
         $rows = DB::select(
-            sprintf(
                 'SELECT
 					b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
 					c.fromname, c.collectionhash
-				FROM %s b
-				INNER JOIN %s c ON c.id = b.collections_id',
-                $tableNames['bname'],
-                $tableNames['cname']
-            )
+				FROM binaries b
+				INNER JOIN collections c ON c.id = b.collections_id'
+
         );
 
         $data = [];

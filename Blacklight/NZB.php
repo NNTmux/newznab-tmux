@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\File;
 /**
  * Class for reading and writing NZB files on the hard disk,
  * building folder paths to store the NZB files.
+ *
+ *
+ * Class NZB
  */
 class NZB
 {
@@ -114,22 +117,9 @@ class NZB
 
     /**
      * Initiate class vars when writing NZBs.
-     *
-     * @param int $groupID
      */
-    public function initiateForWrite($groupID)
+    public function initiateForWrite()
     {
-        $this->groupID = $groupID;
-
-        if ($this->groupID === '') {
-            exit("{$this->groupID} is missing\n");
-        }
-        // Set table names
-        $this->_tableNames = [
-            'cName' => 'collections_'.$this->groupID,
-            'bName' => 'binaries_'.$this->groupID,
-            'pName' => 'parts_'.$this->groupID,
-        ];
         $this->setQueries();
     }
 
@@ -138,22 +128,22 @@ class NZB
      */
     protected function setQueries(): void
     {
-        $this->_collectionsQuery = "
+        $this->_collectionsQuery = '
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
 				g.name AS groupname
-			FROM {$this->_tableNames['cName']} c
+			FROM collections c
 			INNER JOIN groups g ON c.groups_id = g.id
-			WHERE c.releases_id = ";
-        $this->_binariesQuery = "
+			WHERE c.releases_id = ';
+        $this->_binariesQuery = '
 			SELECT b.id, b.name, b.totalparts
-			FROM {$this->_tableNames['bName']} b
+			FROM binaries b
 			WHERE b.collections_id = %d
-			ORDER BY b.name ASC";
-        $this->_partsQuery = "
+			ORDER BY b.name ASC';
+        $this->_partsQuery = '
 			SELECT DISTINCT(p.messageid), p.size, p.partnumber
-			FROM {$this->_tableNames['pName']} p
+			FROM parts p
 			WHERE p.binaries_id = %d
-			ORDER BY p.partnumber ASC";
+			ORDER BY p.partnumber ASC';
     }
 
     /**
@@ -225,6 +215,11 @@ class NZB
                     foreach ($matches as $group) {
                         $XMLWriter->writeElement('group', $group);
                     }
+                } elseif (preg_match_all('#(\S+)#', $collection->xref, $matches)) {
+                    $matches = array_values(array_unique($matches[1]));
+                    foreach ($matches as $group) {
+                        $XMLWriter->writeElement('group', $group);
+                    }
                 } else {
                     return false;
                 }
@@ -278,10 +273,7 @@ class NZB
             DB::delete(
             sprintf(
                 '
-				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collections_id) STRAIGHT_JOIN %s p ON(b.id=p.binaries_id) WHERE c.releases_id = %d',
-                $this->_tableNames['cName'],
-                $this->_tableNames['bName'],
-                $this->_tableNames['pName'],
+				DELETE c, b, p FROM collections c JOIN binaries b ON(c.id=b.collections_id) STRAIGHT_JOIN parts p ON(b.id=p.binaries_id) WHERE c.releases_id = %d',
                 $relID
             )
         );

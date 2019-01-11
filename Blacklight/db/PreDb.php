@@ -161,7 +161,7 @@ SQL_EXPORT;
             $this->prepareSQLLoadData($options);
         }
 
-        return $this->ps['LoadData']->execute($options['path']);
+        return $this->ps['LoadData']->execute([':path' => $options['path']]);
     }
 
     /**
@@ -226,9 +226,9 @@ SQL_EXPORT;
         $options += $defaults;
 
         if (! $options['read'] || ! File::isFile($options['path'])) {
-            file_put_contents($options['path'], base64_encode(serialize($settings)));
+            File::put($options['path'], base64_encode(serialize($settings)));
         } else {
-            $settings = unserialize(base64_decode(file_get_contents($options['path'])));
+            $settings = unserialize(base64_decode(File::get($options['path'])));
         }
 
         return $settings;

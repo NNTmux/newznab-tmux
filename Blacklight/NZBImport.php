@@ -9,7 +9,6 @@ use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 /**
- * Import NZB files into the database.
  * Class NZBImport.
  */
 class NZBImport
@@ -149,7 +148,7 @@ class NZBImport
                 if (strtolower(substr($nzbFile, -7)) === '.nzb.gz') {
                     $nzbString = Utility::unzipGzipFile($nzbFile);
                 } else {
-                    $nzbString = file_get_contents($nzbFile);
+                    $nzbString = File::get($nzbFile);
                 }
 
                 if ($nzbString === false) {

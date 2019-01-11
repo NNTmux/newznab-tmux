@@ -7,6 +7,9 @@ use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Class Genres.
+ */
 class Genres
 {
     public const CONSOLE_TYPE = Category::GAME_ROOT;

@@ -11,8 +11,6 @@ class SettingsTableSeeder extends Seeder
      */
     public function run()
     {
-
-
         \DB::table('settings')->delete();
 
         \DB::table('settings')->insert([
@@ -23,14 +21,6 @@ class SettingsTableSeeder extends Seeder
                 'value' => '0',
                 'hint' => 'When going through PAR2 files, add them to the RAR file content list of the NZB.',
                 'setting' => 'addpar2',
-            ],
-            1 => [
-                'section' => '',
-                'subsection' => '',
-                'name' => 'allasmgr',
-                'value' => '1',
-                'hint' => 'Treat all releases as MGR',
-                'setting' => 'allasmgr',
             ],
             2 => [
                 'section' => '',
@@ -516,7 +506,7 @@ class SettingsTableSeeder extends Seeder
                 'section' => '',
                 'subsection' => '',
                 'name' => 'nzbpath',
-                'value' => '/home/darius/PhpstormProjects/newznab-tmux/resources/nzb/',
+                'value' => '/var/www/NNTmux/resources/nzb/',
                 'hint' => 'The directory where nzb files will be stored.',
                 'setting' => 'nzbpath',
             ],
@@ -768,14 +758,6 @@ class SettingsTableSeeder extends Seeder
                 'hint' => '',
                 'setting' => 'siteseed',
             ],
-            94 => [
-                'section' => '',
-                'subsection' => '',
-                'name' => 'sqlpatch',
-                'value' => '343',
-                'hint' => '',
-                'setting' => 'sqlpatch',
-            ],
             95 => [
                 'section' => '',
                 'subsection' => '',
@@ -796,7 +778,7 @@ class SettingsTableSeeder extends Seeder
                 'section' => '',
                 'subsection' => '',
                 'name' => 'tmpunrarpath',
-                'value' => '/home/darius/PhpstormProjects/newznab-tmux/resources/tmp/unrar/',
+                'value' => '/var/www/NNTmux/resources/tmp/unrar/',
                 'hint' => 'The path to where unrar puts files. WARNING: This directory will have its contents deleted.<br/>Use forward slashes in windows c:/temp/path/stuff/will/be/unpacked/to',
                 'setting' => 'tmpunrarpath',
             ],
@@ -1157,7 +1139,7 @@ Default: %Y-%m-%d %T',
                 'section' => 'site',
                 'subsection' => 'main',
                 'name' => 'coverspath',
-                'value' => '/home/darius/PhpstormProjects/newznab-tmux/resources/covers/',
+                'value' => '/var/www/NNTmux/resources/covers/',
                 'hint' => 'The absolute path to the place covers will be stored.',
                 'setting' => 'coverspath',
             ],
@@ -1197,7 +1179,7 @@ Default: %Y-%m-%d %T',
                 'section' => 'site',
                 'subsection' => 'main',
                 'name' => 'logfile',
-                'value' => '/var/www/nntmux/resources/logs/failed-login.log',
+                'value' => '/var/www/NNTmux/resources/logs/failed-login.log',
                 'hint' => 'Location of log file (MUST be set if logging to file is set).',
                 'setting' => 'logfile',
             ],
@@ -1517,7 +1499,7 @@ Default: %Y-%m-%d %T',
                 'section' => 'site',
                 'subsection' => 'tmux',
                 'name' => 'monitor_delay',
-                'value' => '300',
+                'value' => '30',
                 'hint' => '',
                 'setting' => 'monitor_delay',
             ],

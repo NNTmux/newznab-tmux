@@ -1,3 +1,83 @@
+2019-01-10 DariusIII
+	* Chg: Update fideloper/proxy to version 4.1.0
+	* Chg: Update .travis.yml
+	* Chg: Add sodium extension as requirement to composer.json
+	* Fix: Fix search error when tags are not set
+	* Chg: Add getRawHTMLThroughCF function to helpers.php
+	* Chg: Log Binaries class errors into storage/logs/laravel.log
+2019-01-09 DariusIII
+	* Chg: Remove missed Multi Group menu item from admin side menu
+	* Chg: Update UpdateNNTmux.php
+	* Chg: Make monitor_delay value 30 seconds in place of old 300 (5 minutes)
+	* Chg: Update nntmux:all command to stop tmux on start and start it after the process is complete at the end
+	* Chg: Update nesbot/carbon to version 2.10.0
+	* Chg: Update base laravel classess and middleware
+2019-01-08 DariusIII
+	* Chg: Update laravel/framework to version 5.7.20
+	* Fix: Fix switched categories for TV and PC for users excluded categories views
+	* Chg: Update phpstan/phpstan to version 0.10.8
+	* Chg: Update xref matching regex
+	* Chg: Alter Binaries class xref updates and adjust nzb creation accordingly
+2019-01-07 DariusIII
+	* Chg: Revert Binaries to original behaviour
+	* Chg: Try to prevent insertion of duplicated Xref data
+	* Chg: More File facade usage for files manipulation
+	* Chg: Remove MenuTableSeeder as the model and table do not exist anymore
+	* Chg: Update PreDb class and predb_import_daily_batch script
+	* Chg: Use File facade for files manipulation
+	* Chg: Update opis/closure to version 3.1.3
+2019-01-06 DariusIII
+	* Chg: Remove debug code from predb_import_daily_batch.php
+	* Chg: Update used libraries to their latest versions
+2019-01-05 DariusIII
+	* Fix: Fix fetching XXX data from Hotmovies
+	* Chg: Update dariusiii/rarinfo to version 2.7.1.2
+	* Chg: Update dariusiii/rarinfo to version 2.7.1.1
+	* Chg: Update binaries table unique index migration
+	* Chg: Update collection hash creation
+2019-01-04 DariusIII
+	* Chg: Update maxmind-db/reader to version 1.4.1
+	* Chg: Update friendsofphp/php-cs-fixer to version 2.14.0 and dariusiii/rarinfo to version 2.7.1
+	* Chg: Update reset truncate command
+	* Chg: Update dariusiii/rarinfo to version 2.7.0.1
+	* Chg: Update dariusiii/rarinfo to version 2.7.0
+	* Fix: Fix bad checks in all regex related admin controllers
+	* Fix: Fix adding new collection regexes
+	* Fix: Fix AEBN class error when fetching data
+2019-01-03 DariusIII
+	* Chg: Adjust menu text alignment in left sidebar
+	* Chg: Update voku/simple_html_dom to version 4.2.0
+	* Chg: Update package.json, update laravel-mix to version 4.0.13
+	* Chg: Remove unused settings from settings seeder/fixtures and migrations from database/migrations folder. Remove everything related to menus as we do not use them
+	* Chg: Use group name for collectionsCleaner in Binaries class
+	* Chg: Update resend_user_verification script
+	* Chg: Update vlucas/phpdotenv to version 2.5.2
+	* Chg: Update Binaries class, add unique index to binaries table
+2019-01-02 DariusIII
+	* Chg: Update RoleAndPermissionsSeeder
+2019-01-01 DariusIII
+	* Chg: Update all the \Blacklight namespace classes with class PHPDOC block
+	* Chg: Update friendsofphp/php-cs-fixer to version 2.13.2
+	* Fix: Fix NZB creation
+	* Fix: Fix typo in ProcessReleases class
+	* Fix: Fix couple of leftover lines pointing to non-existing functions
+	* Fix: Remove ProcessReleasesMultiGroup from switch.php
+	* Chg: Revert Binaries to pre-tpg and mgr state, with single tables for binaries, collections, parts and missed_parts
+2018-12-31 DariusIII
+	* Chg: Do not fetch mgrposters if allAsMgr is enabled
+	* Chg: Update doctrine/dbal to version 2.9.2
+2018-12-30 DariusIII
+	* Chg: Add back php-cs-fixer
+2018-12-28 DariusIII
+	* Chg: Add option for users to change password hashing algorithm in their .env file
+	* Chg: Add new line to end of messages for found movie names from sources used
+	* Chg: Update voku/simple_html_dom to version 4.1.10
+	* Chg: Update voku/simple_html_dom to version 4.1.8
+	* Chg: Update cleanFileNames function regexes
+2018-12-27 DariusIII
+	* Chg: Use plain join in place of straight join in ReleaseRemover class
+	* Chg: Use lowercase letters for charest declaration on basepage.tpl
+	* Chg: Update User model and Admin\UserController
 2018-12-26 DariusIII
 	* Chg: Update imdbphp/imdbphp to version 6.1.3 and nikic/php-parser to version 4.1.1
 	* Chg: Update NameFixer for predb title match

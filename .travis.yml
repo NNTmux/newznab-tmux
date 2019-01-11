@@ -29,6 +29,10 @@ addons:
       - curl
 
 before_install:
+    - sudo add-apt-repository ppa:ondrej/php -y
+    - sudo apt-get -qq update
+    - sudo apt-get install -y libsodium-dev
+    - pecl install libsodium
     - composer validate
 
 install:

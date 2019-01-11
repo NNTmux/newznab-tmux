@@ -9,6 +9,7 @@ use App\Models\Settings;
 /**
  * Categorizing of releases by name/group.
  *
+ *
  * Class Categorize
  */
 class Categorize

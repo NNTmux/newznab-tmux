@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Tmux pane shell exec functions for pane respawning.
  *
+ *
  * Class TmuxRun
  */
 class TmuxRun extends Tmux
@@ -148,7 +149,7 @@ class TmuxRun extends Tmux
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 100 show $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 3000 show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -157,7 +158,7 @@ class TmuxRun extends Tmux
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 100 show $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/match_prefiles.php 300 show $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -188,8 +189,7 @@ class TmuxRun extends Tmux
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 13 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 15 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 17 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 19 true other yes show $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/fixrelnames.php predbft $log; date +\"{$this->_dateFormat}\"; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 19 true other yes show  $log; date +\"{$this->_dateFormat}\"; \
 						{$runVar['commands']['_sleep']} {$runVar['settings']['fix_timer']}' 2>&1 1> /dev/null"
                 );
             } else {
