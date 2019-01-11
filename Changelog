@@ -1,4 +1,5 @@
 2019-01-11 DariusIII
+	* Chg: Update install command and reduce code used
 	* Chg: Simplify UpdateNNTmuxDB.php handle function, use native artisan commands without Symfony Process component
 	* Chg: Update czproject/git-php to version 2.15.0
 2019-01-10 DariusIII

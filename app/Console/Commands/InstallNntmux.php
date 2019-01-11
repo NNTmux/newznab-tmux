@@ -71,26 +71,10 @@ class InstallNntmux extends Command
                     }
                 }
                 $this->info('Migrating tables and seeding them with initial data');
-                if (env('APP_ENV') !== 'production') {
-                    $process = new Process('php artisan migrate:fresh --seed');
-                    $process->setTimeout(600);
-                    $process->run(function ($type, $buffer) {
-                        if (Process::ERR === $type) {
-                            echo 'ERR > '.$buffer;
-                        } else {
-                            echo $buffer;
-                        }
-                    });
+                if (config('app.env') !== 'production') {
+                    $this->call('migrate:fresh', ['--seed' => true]);
                 } else {
-                    $process = new Process('php artisan migrate:fresh --force --seed');
-                    $process->setTimeout(600);
-                    $process->run(function ($type, $buffer) {
-                        if (Process::ERR === $type) {
-                            echo 'ERR > '.$buffer;
-                        } else {
-                            echo $buffer;
-                        }
-                    });
+                    $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
                 }
 
                 $paths = $this->updatePaths();
@@ -108,15 +92,7 @@ class InstallNntmux extends Command
                 if (! $error && $this->addAdminUser()) {
                     File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
-                    $process = new Process('php artisan key:generate --force');
-                    $process->setTimeout(600);
-                    $process->run(function ($type, $buffer) {
-                        if (Process::ERR === $type) {
-                            echo 'ERR > '.$buffer;
-                        } else {
-                            echo $buffer;
-                        }
-                    });
+                    $this->call('key:generate', ['--force' => true]);
                     $this->info('NNTmux installation completed successfully');
                     exit();
                 }
@@ -141,7 +117,7 @@ class InstallNntmux extends Command
         $tmp_path = base_path().'/resources/tmp/';
         $unrar_path = $tmp_path.'unrar/';
 
-        $nzbPathCheck = is_writable($nzb_path);
+        $nzbPathCheck = File::isWritable($nzb_path);
         if ($nzbPathCheck === false) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
 
@@ -150,7 +126,7 @@ class InstallNntmux extends Command
 
         if (! file_exists($unrar_path)) {
             $this->info('Creating missing '.$unrar_path.' folder');
-            if (! @mkdir($unrar_path) && ! is_dir($unrar_path)) {
+            if (! @File::makeDirectory($unrar_path) && ! File::isDirectory($unrar_path)) {
                 throw new \RuntimeException('Unable to create '.$unrar_path.' folder');
             }
             $this->info('Folder '.$unrar_path.' successfully created');
@@ -162,7 +138,7 @@ class InstallNntmux extends Command
             return false;
         }
 
-        $coversPathCheck = is_writable($covers_path);
+        $coversPathCheck = File::isWritable($covers_path);
         if ($coversPathCheck === false) {
             $this->warn($covers_path.' is not writable. Please fix folder permissions');
 
@@ -181,15 +157,15 @@ class InstallNntmux extends Command
      */
     private function addAdminUser(): bool
     {
-        if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
+        if (config('nntmux.admin_username') === '' || config('nntmux.admin_password') === '' || config('nntmux.admin_email') === '') {
             $this->error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!');
             exit();
         }
 
         $this->info('Adding admin user to database');
         try {
-            User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
-            User::where('username', env('ADMIN_USER'))->update(['verified' => 1]);
+            User::add(config('nntmux.admin_username'), config('nntmux.admin_password'), config('nntmux.admin_email'), 2, '', '', '', '');
+            User::where('username', config('nntmux.admin_username'))->update(['verified' => 1]);
         } catch (\Throwable $e) {
             echo $e->getMessage();
             $this->error('Unable to add admin user!');

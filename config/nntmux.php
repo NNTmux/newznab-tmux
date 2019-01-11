@@ -14,4 +14,7 @@ return [
     'cache_expiry_short' => env('CACHE_EXPIRY_SHORT', 5),
     'cache_expiry_medium' =>env('CACHE_EXPIRY_MEDIUM', 10),
     'cache_expiry_long' => env('CACHE_EXPIRY_LONG', 15),
+    'admin_username' => env('ADMIN_USER', 'admin'),
+    'admin_password' => env('ADMIN_PASS', 'admin'),
+    'admin_email' => env('ADMIN_EMAIL', 'admin@example.com')
 ];
