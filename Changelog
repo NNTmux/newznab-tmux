@@ -1,3 +1,5 @@
+2019-01-11 DariusIII
+	* Chg: Update czproject/git-php to version 2.15.0
 2019-01-10 DariusIII
 	* Chg: Update fideloper/proxy to version 4.1.0
 	* Chg: Update .travis.yml
