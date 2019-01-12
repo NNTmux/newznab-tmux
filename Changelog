@@ -1,4 +1,5 @@
 2019-01-13 DariusIII
+	* Chg: Update predb filename and title check to use only predb_rt index
 	* Chg: Add attributes to predb_rt index
 2019-01-12 DariusIII
 	* Chg: Update nntmux:git command to also pull tags (addresses issue #842)
