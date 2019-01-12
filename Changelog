@@ -1,4 +1,5 @@
 2019-01-12 DariusIII
+	* Chg: Update Vue to version 2.5.22
 	* Chg: Update Blacklight/processing/adult/Popporn class
 2019-01-11 DariusIII
 	* Chg: Use config key in place of env in firewall config file

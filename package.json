@@ -16,7 +16,7 @@
         "laravel-mix": "^4.0.13",
         "lodash": "^4.17.11",
         "popper.js": "^1.14.6",
-        "vue": "^2.5.21"
+        "vue": "^2.5.22"
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.6",
