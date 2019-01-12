@@ -14,7 +14,7 @@ class TmuxUIStop extends Command
      *
      * @var string
      */
-    protected $signature = 'tmux-ui:stop {type}';
+    protected $signature = 'tmux-ui:stop {--kill}';
 
     /**
      * The console command description.
@@ -28,20 +28,16 @@ class TmuxUIStop extends Command
      */
     public function handle()
     {
-        if ($this->argument('type') !== null) {
-            (new Tmux())->stopIfRunning();
-
-            if ($this->argument('type') === 'true') {
-                $sessionName = Settings::settingValue('site.tmux.tmux_session');
-                $tmuxSession = new Process('tmux kill-session -t '.$sessionName);
-                $this->info('Killing active tmux session: '.$sessionName);
-                $tmuxSession->run();
-                if ($tmuxSession->isSuccessful()) {
-                    $this->info('Tmux session killed successfully');
-                }
+        $tmux = new Tmux();
+        $tmux->stopIfRunning();
+        if ($tmux->isRunning() && $this->option('kill') === true) {
+            $sessionName = Settings::settingValue('site.tmux.tmux_session');
+            $tmuxSession = new Process('tmux kill-session -t '.$sessionName);
+            $this->info('Killing active tmux session: '.$sessionName);
+            $tmuxSession->run();
+            if ($tmuxSession->isSuccessful()) {
+                $this->info('Tmux session killed successfully');
             }
-        } else {
-            $this->error($this->description);
         }
     }
 }
