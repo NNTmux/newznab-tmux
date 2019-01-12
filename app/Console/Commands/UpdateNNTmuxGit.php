@@ -48,7 +48,9 @@ class UpdateNNTmuxGit extends Command
             $wasRunning = true;
             $this->call('tmux-ui:stop', ['--kill' => true]);
         }
-
+        $this->info('Getting changes from Github');
+        $this->git->gitPull();
+        $this->info('Getting latest tag');
         $this->git->gitPull()->getTags();
 
         if ($wasRunning === true) {
