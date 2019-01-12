@@ -1,3 +1,5 @@
+2019-01-12 DariusIII
+	* Chg: Update Blacklight/processing/adult/Popporn class
 2019-01-11 DariusIII
 	* Chg: Use config key in place of env in firewall config file
 	* Chg: Update install command and reduce code used
