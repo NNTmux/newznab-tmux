@@ -1,4 +1,5 @@
 2019-01-12 DariusIII
+	* Chg: Add short version of --kill option (--k)
 	* Chg: Update tmux-ui:stop command to use --kill option if tmux session needs to be killed
 	* Fix: Fix config/nntmux.php db_name value (Fixes issue #841)
 	* Chg: Update Vue to version 2.5.22

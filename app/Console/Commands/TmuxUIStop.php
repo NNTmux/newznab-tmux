@@ -14,7 +14,7 @@ class TmuxUIStop extends Command
      *
      * @var string
      */
-    protected $signature = 'tmux-ui:stop {--kill}';
+    protected $signature = 'tmux-ui:stop {--k|kill : kill the session}';
 
     /**
      * The console command description.
