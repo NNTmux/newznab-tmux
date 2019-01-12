@@ -30,7 +30,7 @@ class TmuxUIStop extends Command
     {
         $tmux = new Tmux();
         $tmux->stopIfRunning();
-        if ($tmux->isRunning() && $this->option('kill') === true) {
+        if ($this->option('kill') === true) {
             $sessionName = Settings::settingValue('site.tmux.tmux_session');
             $tmuxSession = new Process('tmux kill-session -t '.$sessionName);
             $this->info('Killing active tmux session: '.$sessionName);
