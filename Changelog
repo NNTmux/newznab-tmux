@@ -1,3 +1,5 @@
+2019-01-13 DariusIII
+	* Chg: Add attributes to predb_rt index
 2019-01-12 DariusIII
 	* Chg: Update nntmux:git command to also pull tags (addresses issue #842)
 	* Chg: Add short version of --kill option (--k)
