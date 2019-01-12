@@ -1,4 +1,5 @@
 2019-01-12 DariusIII
+	* Fix: Fix config/nntmux.php db_name value (Fixes issue #841)
 	* Chg: Update Vue to version 2.5.22
 	* Chg: Update Blacklight/processing/adult/Popporn class
 2019-01-11 DariusIII
