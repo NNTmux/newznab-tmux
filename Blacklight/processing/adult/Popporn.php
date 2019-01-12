@@ -20,12 +20,12 @@ class Popporn extends AdultMovies
 
     /**
      * Override if 18 years+ or older
-     * Define Popporn url
+     * Define PopPorn url
      * Needed Search Queries Constant.
      */
-    const IF18 = 'http://www.popporn.com/popporn/4';
-    const POPURL = 'http://www.popporn.com';
-    const TRAILINGSEARCH = '/results/index.cfm?v=4&g=0&searchtext=';
+    protected const IF18 = 'https://www.popporn.com/popporn/4';
+    protected const POPURL = 'https://www.popporn.com';
+    protected const TRAILINGSEARCH = '/search&q=';
 
     /**
      * Sets the directurl for the return results array.

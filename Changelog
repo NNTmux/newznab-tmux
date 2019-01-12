@@ -1,3 +1,12 @@
+2019-01-12 DariusIII
+	* Fix: Fix config/nntmux.php db_name value (Fixes issue #841)
+	* Chg: Update Vue to version 2.5.22
+	* Chg: Update Blacklight/processing/adult/Popporn class
+2019-01-11 DariusIII
+	* Chg: Use config key in place of env in firewall config file
+	* Chg: Update install command and reduce code used
+	* Chg: Simplify UpdateNNTmuxDB.php handle function, use native artisan commands without Symfony Process component
+	* Chg: Update czproject/git-php to version 2.15.0
 2019-01-10 DariusIII
 	* Chg: Update fideloper/proxy to version 4.1.0
 	* Chg: Update .travis.yml

@@ -275,7 +275,7 @@ return [
             'model' => PragmaRX\Firewall\Vendor\Laravel\Models\User::class,
 
             'emails' => [
-                env('ADMIN_EMAIL'),
+                config('nntmux.admin_email'),
             ],
         ],
 
