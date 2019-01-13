@@ -90,6 +90,7 @@ function populate_rt($table, $max)
                                 'id' => $row->id,
                                 'title' => $row->title,
                                 'filename' => $row->filename,
+                                'source' => $row->source,
                             ]);
                         break;
                 }
