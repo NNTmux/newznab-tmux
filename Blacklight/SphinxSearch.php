@@ -165,6 +165,7 @@ class SphinxSearch
     {
         if (empty($indexes)) {
             $this->cli->error('You need to provide index name to truncate');
+
             return false;
         }
         foreach ($indexes as $index) {
