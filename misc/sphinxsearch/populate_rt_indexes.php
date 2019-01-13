@@ -47,7 +47,7 @@ function populate_rt($table, $max)
 
         if ($table === 'predb_rt') {
             DB::statement('SET SESSION group_concat_max_len=16384;');
-            $query = 'SELECT id, title, filename
+            $query = 'SELECT id, title, filename, source
 				FROM predb
 				WHERE id > %d
 				GROUP BY id
