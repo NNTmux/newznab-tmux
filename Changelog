@@ -1,4 +1,5 @@
 2019-01-13 DariusIII
+	* Chg: Remove settings that are either not working or set in .env file from site-edit
 	* Chg: Add source to predb_rt index
 	* Chg: Update truncateRTIndex and optimizrRTIndex functions
 	* Chg: Improve sphinx indexes population with data
