@@ -168,8 +168,12 @@ class SphinxSearch
             return false;
         }
         foreach ($indexes as $index) {
-            $this->helper->truncateRtIndex($index);
-            $this->cli->info('Truncating index '.$index.' finished.');
+            if (\in_array($index, $this->config['indexes'], true)) {
+                $this->helper->truncateRtIndex($index);
+                $this->cli->info('Truncating index '.$index.' finished.');
+            } else {
+                $this->cli->error('Unsupported index: '.$index);
+            }
         }
 
         return true;
@@ -180,10 +184,10 @@ class SphinxSearch
      */
     public function optimizeRTIndex(): void
     {
-        $this->helper->flushRtIndex($this->config['indexes']['releases']);
-        $this->helper->optimizeIndex($this->config['indexes']['releases']);
-        $this->helper->flushRtIndex($this->config['indexes']['predb']);
-        $this->helper->optimizeIndex($this->config['indexes']['predb']);
+        foreach ($this->config['indexes'] as $index) {
+            $this->helper->flushRtIndex($index);
+            $this->helper->optimizeIndex($index);
+        }
     }
 
     /**
