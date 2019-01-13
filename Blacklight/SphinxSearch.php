@@ -79,7 +79,7 @@ class SphinxSearch
             $this->sphinxQL
                 ->replace()
                 ->into($this->config['indexes']['predb'])
-                ->set(['id' => $parameters['id'], 'title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
+                ->set(['id' => $parameters['id'], 'title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']])
                 ->execute();
         }
     }
@@ -146,7 +146,7 @@ class SphinxSearch
     {
         $new = Predb::query()
             ->where('title', $title)
-            ->select(['id', 'title', 'filename'])
+            ->select(['id', 'title', 'filename', 'source'])
             ->groupBy('id')
             ->first();
 

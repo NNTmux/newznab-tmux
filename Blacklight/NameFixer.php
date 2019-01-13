@@ -1273,14 +1273,14 @@ class NameFixer
                     foreach ($results as $result) {
                         if (! empty($result)) {
                             $preMatch = Predb::whereId($result['id'])->first();
-                            $preFtMatch = $this->preMatch($preMatch->filename);
+                            $preFtMatch = $this->preMatch($result['filename']);
                             if ($preFtMatch[0] === true) {
-                                $this->_fileName = $preMatch->filename;
+                                $this->_fileName = $result['filename'];
                                 $release->filename = $this->_fileName;
-                                if ($preMatch->title !== $release->searchname) {
-                                    $this->updateRelease($release, $preMatch->title, 'file matched source: '.$preMatch->source, $echo, 'PreDB file match, ', $nameStatus, $show, $preMatch->id);
+                                if ($result['title'] !== $release->searchname) {
+                                    $this->updateRelease($release, $result['title'], 'file matched source: '.$preMatch->source, $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
                                 } else {
-                                    $this->_updateSingleColumn('predb_id', $preMatch->id, $release->releases_id);
+                                    $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
                                 }
                                 $matching++;
                                 break;
