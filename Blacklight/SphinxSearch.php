@@ -35,6 +35,11 @@ class SphinxSearch
     protected $helper;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    private $cli;
+
+    /**
      * Establish connection to SphinxQL.
      *
      * @throws \Exception
@@ -46,6 +51,7 @@ class SphinxSearch
         $this->connection->setParams(['host' => $this->config['host'], 'port' => $this->config['port']]);
         $this->sphinxQL = new SphinxQL($this->connection);
         $this->helper = new Helper($this->connection);
+        $this->cli = new ColorCLI();
     }
 
     /**
@@ -151,11 +157,22 @@ class SphinxSearch
 
     /**
      * Truncate the RT index.
+     *
+     * @param array $indexes
+     * @return bool
      */
-    public function truncateRTIndex(): void
+    public function truncateRTIndex($indexes = []): bool
     {
-        $this->helper->truncateRtIndex($this->config['indexes']['releases']);
-        $this->helper->truncateRtIndex($this->config['indexes']['predb']);
+        if (empty($indexes)) {
+            $this->cli->error('You need to provide index name to truncate');
+            return false;
+        }
+        foreach ($indexes as $index) {
+            $this->helper->truncateRtIndex($index);
+            $this->cli->info('Truncating index '.$index.' finished.');
+        }
+
+        return true;
     }
 
     /**
