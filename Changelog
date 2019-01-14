@@ -1,4 +1,5 @@
 2019-01-14 DariusIII
+	* Chg: Update Binaries class, remove commit from DB::insert queries
 	* Chg: Add error images
 2019-01-13 DariusIII
 	* Chg: Remove settings that are either not working or set in .env file from site-edit
