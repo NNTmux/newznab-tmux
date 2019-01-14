@@ -1,4 +1,5 @@
 2019-01-14 DariusIII
+	* Fix: Revert removal of commit from Binaries class
 	* Chg: Update describe function, remove null definition from $options
 	* Chg: Update Git related functions
 	* Chg: Update Binaries class, remove commit from DB::insert queries

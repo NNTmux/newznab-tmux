@@ -835,6 +835,7 @@ class Binaries
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'", escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)), escapeString(utf8_encode($this->header['From'])), $unixtime, escapeString(implode(' ', $tempHeaderXrefs)), $this->groupMySQL['id'], $fileCount[3], sha1($this->header['CollectionKey']), $collMatch['id'], $xref, sodium_bin2hex($random)));
                         $collectionID = $this->_pdo->lastInsertId();
+                        DB::commit();
                     } catch (\Throwable $e) {
                         Log::error($e->getMessage());
                         DB::rollBack();
@@ -864,6 +865,7 @@ class Binaries
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d", $hash, escapeString(utf8_encode($this->header['matches'][1])), $collectionID, $this->header['matches'][3], $fileCount[1], $this->header['Bytes'], $this->header['Bytes']));
                     $binaryID = $this->_pdo->lastInsertId();
+                    DB::commit();
                 } catch (\Throwable $e) {
                     Log::error($e->getMessage());
                     DB::rollBack();
@@ -914,6 +916,7 @@ class Binaries
         // Check if we got any binaries. If we did, try to insert them.
         if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->runQuery($binariesQuery)) {
             if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->runQuery(rtrim($partsQuery, ','))) {
+                DB::commit();
             } else {
                 if ($this->addToPartRepair) {
                     $this->headersNotInserted += $this->headersReceived;
