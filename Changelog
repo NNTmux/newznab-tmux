@@ -1,4 +1,5 @@
 2019-01-14 DariusIII
+	* Chg: Update czproject/git-php to version 3.16.0, opus/closure and phpstan to latest versions
 	* Fix: Revert removal of commit from Binaries class
 	* Chg: Update describe function, remove null definition from $options
 	* Chg: Update Git related functions
