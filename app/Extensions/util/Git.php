@@ -75,20 +75,14 @@ class Git
     }
 
     /**
-     * Run describe command.
+     * @param null $options
      *
-     * @param string $options
-     *
-     * @return string
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @return string[]
+     * @throws \Cz\Git\GitException
      */
     public function describe($options = null)
     {
-        $command = new Process('git describe '.$options);
-        $command->run();
-
-        return $command->getOutput();
+        return $this->repo->execute(['describe', $options]);
     }
 
     /**
@@ -202,7 +196,8 @@ class Git
 
     /**
      * @param array $options
-     * @return \Cz\Git\GitRepository
+     *
+     * @return string[]
      * @throws \Cz\Git\GitException
      */
     public function gitPull(array $options = [])
@@ -213,7 +208,7 @@ class Git
         ];
         $options += $default;
 
-        return $this->repo->pull($options['remote'].' '.$options['branch']);
+        return $this->repo->execute(['pull', $options['remote'], $options['branch'], '--tags']);
     }
 
     /**
@@ -228,7 +223,7 @@ class Git
      */
     public function gitRun($command)
     {
-        return $this->repo->execute($command);
+        return $this->repo->execute([$command]);
     }
 
     /**
@@ -249,20 +244,17 @@ class Git
     }
 
     /**
-     * Fetch the most recently added tag.
-     *
-     * Be aware this might cause problems if tags are added out of order?
-     *
      * @param bool $cached
      *
      * @return string
+     * @throws \Cz\Git\GitException
      */
     public function tagLatest($cached = true)
     {
         if (empty($this->gitTagLatest) || $cached === false) {
-            $this->gitTagLatest = trim($this->describe('--tags --abbrev=0 HEAD'));
+            $this->gitTagLatest = $this->describe('--tags', '--abbrev=0 HEAD');
         }
 
-        return $this->gitTagLatest;
+        return $this->gitTagLatest[0];
     }
 }
