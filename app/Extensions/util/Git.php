@@ -75,12 +75,12 @@ class Git
     }
 
     /**
-     * @param null $options
+     * @param $options
      *
      * @return string[]
      * @throws \Cz\Git\GitException
      */
-    public function describe($options = null)
+    public function describe($options)
     {
         return $this->repo->execute(['describe', $options]);
     }

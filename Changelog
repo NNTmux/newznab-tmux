@@ -1,4 +1,5 @@
 2019-01-14 DariusIII
+	* Chg: Update describe function, remove null definition from $options
 	* Chg: Update Git related functions
 	* Chg: Update Binaries class, remove commit from DB::insert queries
 	* Chg: Add error images
