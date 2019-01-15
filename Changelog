@@ -1,4 +1,5 @@
 2019-01-15 DariusIII
+	* Chg: Update laravel/framework to version 5.7.21
 	* Chg: Update package.json
 	* Chg: Check sphinx for existing pre data before we insert new
 	* Chg: Update phpunit/phpunit to version 7.5.2
