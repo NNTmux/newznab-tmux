@@ -1,4 +1,5 @@
 2019-01-15 DariusIII
+	* Chg: Update directories that need to be cleaned up after PPA (add unzip folder)
 	* Fix: Fix insertion of data into predb_rt index from IRCScraper
 2019-01-14 DariusIII
 	* Chg: Update opis/closure (3.1.4 => 3.1.5)
