@@ -1,3 +1,5 @@
+2019-01-15 DariusIII
+	* Fix: Fix insertion of data into predb_rt index from IRCScraper
 2019-01-14 DariusIII
 	* Chg: Update opis/closure (3.1.4 => 3.1.5)
 	* Chg: Update dariusiii/rarinfo to version 2.7.2

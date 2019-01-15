@@ -139,19 +139,13 @@ class SphinxSearch
     /**
      * Update Sphinx Predb index for given predb_id.
      *
-     * @param int $title
+     * @param array $parameters
      * @throws \Exception
      */
-    public function updatePreDb($title): void
+    public function updatePreDb($parameters): void
     {
-        $new = Predb::query()
-            ->where('title', $title)
-            ->select(['id', 'title', 'filename', 'source'])
-            ->groupBy('id')
-            ->first();
-
-        if ($new !== null) {
-            $this->insertPredb($new);
+        if (! empty($parameters)) {
+            $this->insertPredb($parameters);
         }
     }
 

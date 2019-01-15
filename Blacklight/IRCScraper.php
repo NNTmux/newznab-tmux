@@ -323,6 +323,7 @@ class IRCScraper extends IRCClient
             'id' => DB::connection()->getPdo()->lastInsertId(),
             'title' => $this->_curPre['title'],
             'filename' => $this->_curPre['filename'],
+            'source' => $this->_curPre['source'],
         ];
 
         (new SphinxSearch())->insertPredb($parameters);
@@ -333,7 +334,8 @@ class IRCScraper extends IRCClient
     /**
      * Updates PRE data in the DB.
      *
-     * @throws \RuntimeException
+     *
+     * @throws \Exception
      */
     protected function _updatePre()
     {
@@ -371,6 +373,7 @@ class IRCScraper extends IRCClient
             'id' => DB::connection()->getPdo()->lastInsertId(),
             'title' => $this->_curPre['title'],
             'filename' => $this->_curPre['filename'],
+            'source' => $this->_curPre['source'],
         ];
 
         (new SphinxSearch())->updatePreDb($parameters);
