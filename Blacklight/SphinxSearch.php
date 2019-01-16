@@ -35,6 +35,11 @@ class SphinxSearch
     protected $helper;
 
     /**
+     * @var \Blacklight\ColorCLI
+     */
+    private $cli;
+
+    /**
      * Establish connection to SphinxQL.
      *
      * @throws \Exception
@@ -46,6 +51,7 @@ class SphinxSearch
         $this->connection->setParams(['host' => $this->config['host'], 'port' => $this->config['port']]);
         $this->sphinxQL = new SphinxQL($this->connection);
         $this->helper = new Helper($this->connection);
+        $this->cli = new ColorCLI();
     }
 
     /**
@@ -73,7 +79,7 @@ class SphinxSearch
             $this->sphinxQL
                 ->replace()
                 ->into($this->config['indexes']['predb'])
-                ->set(['id' => $parameters['id'], 'title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
+                ->set(['id' => $parameters['id'], 'title' => $parameters['title'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename'], 'source' => $parameters['source']])
                 ->execute();
         }
     }
@@ -133,29 +139,39 @@ class SphinxSearch
     /**
      * Update Sphinx Predb index for given predb_id.
      *
-     * @param int $title
+     * @param array $parameters
      * @throws \Exception
      */
-    public function updatePreDb($title): void
+    public function updatePreDb($parameters): void
     {
-        $new = Predb::query()
-            ->where('title', $title)
-            ->select(['id', 'title', 'filename'])
-            ->groupBy('id')
-            ->first();
-
-        if ($new !== null) {
-            $this->insertPredb($new);
+        if (! empty($parameters)) {
+            $this->insertPredb($parameters);
         }
     }
 
     /**
      * Truncate the RT index.
+     *
+     * @param array $indexes
+     * @return bool
      */
-    public function truncateRTIndex(): void
+    public function truncateRTIndex($indexes = []): bool
     {
-        $this->helper->truncateRtIndex($this->config['indexes']['releases']);
-        $this->helper->truncateRtIndex($this->config['indexes']['predb']);
+        if (empty($indexes)) {
+            $this->cli->error('You need to provide index name to truncate');
+
+            return false;
+        }
+        foreach ($indexes as $index) {
+            if (\in_array($index, $this->config['indexes'], true)) {
+                $this->helper->truncateRtIndex($index);
+                $this->cli->info('Truncating index '.$index.' finished.');
+            } else {
+                $this->cli->error('Unsupported index: '.$index);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -163,10 +179,10 @@ class SphinxSearch
      */
     public function optimizeRTIndex(): void
     {
-        $this->helper->flushRtIndex($this->config['indexes']['releases']);
-        $this->helper->optimizeIndex($this->config['indexes']['releases']);
-        $this->helper->flushRtIndex($this->config['indexes']['predb']);
-        $this->helper->optimizeIndex($this->config['indexes']['predb']);
+        foreach ($this->config['indexes'] as $index) {
+            $this->helper->flushRtIndex($index);
+            $this->helper->optimizeIndex($index);
+        }
     }
 
     /**

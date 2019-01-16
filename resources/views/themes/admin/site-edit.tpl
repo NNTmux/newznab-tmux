@@ -209,23 +209,6 @@
 			<legend>3<sup>rd</sup> Party API Keys</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
-					<td style="width:160px;"><label for="tmdbkey">TMDB Key</label>:</td>
-					<td>
-						<input id="tmdbkey" class="long" name="tmdbkey" type="text" value="{$site->tmdbkey}"/>
-						<div class="hint">The api key used for access to tmdb</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:160px;"><label for="rottentomatokey">Rotten Tomatoes Key</label>:</td>
-					<td>
-						<input id="rottentomatokey" class="long" name="rottentomatokey" type="text"
-							   value="{$site->rottentomatokey}"/>
-						<div class="hint">The api key used for access to rotten tomatoes</div>
-					</td>
-				</tr>
-
-				<tr>
 					<td><label for="amazonpubkey">Amazon Public Key</label>:</td>
 					<td>
 						<input id="amazonpubkey" class="long" name="amazonpubkey" type="text"
@@ -320,18 +303,6 @@
 							grabbing.
 							<br/>Use forward slashes in windows <span
 									style="font-family:courier;">c:/path/to/unrar.exe</span></div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="tmpunrarpath">Temp Unrar File Path</label>:</td>
-					<td>
-						<input id="tmpunrarpath" class="long" name="tmpunrarpath" type="text"
-							   value="{$site->tmpunrarpath}"/>
-						<div class="hint">The path to where unrar puts files. WARNING: This directory will have its
-							contents deleted.
-							<br/>Use forward slashes in windows <span style="font-family:courier;">c:/temp/path/stuff/will/be/unpacked/to</span>
-						</div>
 					</td>
 				</tr>
 

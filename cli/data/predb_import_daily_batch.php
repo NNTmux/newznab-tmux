@@ -18,10 +18,6 @@
  * @author    niel
  * @copyright 2015 nZEDb
  */
-
-/* TODO better tune the queries for performance, including pre-fetching groups_id and other data for
-    faster inclusion in the main query.
-*/
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\ColorCLI;
@@ -140,7 +136,7 @@ foreach ($data as $dir => $files) {
 
                 // Make sure it's readable by all.
                 chmod($dumpFile, 0777);
-                $local = strtolower($argv[2]) === 'local';
+                $local = strtolower($argv[2]) === 'local' ? '' : 'remote';
                 $verbose = $argv[3] === true;
 
                 if ($verbose) {
@@ -148,32 +144,41 @@ foreach ($data as $dir => $files) {
                 }
 
                 // Truncate to clear any old data
-                $predb->executeTruncate();
+                DB::statement('TRUNCATE TABLE predb_imports');
 
                 // Import file into predb_imports
-                $predb->executeLoadData(
-                    [
-                        'fields' => '\\t\\t',
-                        'lines'  => '\\r\\n',
-                        'local'  => $local,
-                        'path'   => $dumpFile,
-                    ]
-                );
+                DB::unprepared("LOAD DATA {$local} INFILE '{$dumpFile}' IGNORE INTO TABLE predb_imports FIELDS TERMINATED BY '\\t\\t' LINES TERMINATED BY '\\r\\n' (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname)");
+                DB::commit();
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
                     $colorCli->info('Deleting any records where title <=8 from Temporary Table');
                 }
-                $predb->executeDeleteShort();
+                DB::delete('DELETE FROM predb_imports WHERE LENGTH(title) <= 8');
 
                 // Add any groups that do not currently exist
-                $predb->executeAddGroups();
+                DB::insert("INSERT IGNORE INTO groups (name, description)
+	                        SELECT groupname, 'Added by predb import script'
+	                        FROM predb_imports AS pi LEFT JOIN groups AS g ON pi.groupname = g.name
+	                        WHERE pi.groupname IS NOT NULL AND g.name IS NULL
+	                        GROUP BY groupname");
 
                 // Fill the groups_id
-                $predb->executeUpdateGroupID();
+                DB::update('UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL');
 
                 $colorCli->info('Inserting records from temporary table into predb table');
-                $inserted = $predb->executeInsert();
+                $inserted = DB::insert("INSERT INTO predb (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groups_id)
+                        SELECT pi.title, pi.nfo, pi.size, pi.files, pi.filename, pi.nuked, pi.nukereason, pi.category, pi.predate, pi.source, pi.requestid, groups_id
+                        FROM predb_imports AS pi
+                        ON DUPLICATE KEY UPDATE predb.nfo = IF(predb.nfo IS NULL, pi.nfo, predb.nfo),
+	                    predb.size = IF(predb.size IS NULL, pi.size, predb.size),
+	                    predb.files = IF(predb.files IS NULL, pi.files, predb.files),
+	                    predb.filename = IF(predb.filename = '', pi.filename, predb.filename),
+	                    predb.nuked = IF(pi.nuked > 0, pi.nuked, predb.nuked),
+	                    predb.nukereason = IF(pi.nuked > 0, pi.nukereason, predb.nukereason),
+	                    predb.category = IF(predb.category IS NULL, pi.category, predb.category),
+	                    predb.requestid = IF(predb.requestid = 0, pi.requestid, predb.requestid),
+	                    predb.groups_id = IF(predb.groups_id = 0, pi.groups_id, predb.groups_id)");
 
                 // Delete the dump.
                 unlink($dumpFile);
@@ -182,7 +187,7 @@ foreach ($data as $dir => $files) {
                     settings_array($match[2] + 1, $progress),
                     ['read' => false]
                 );
-                if ($inserted === true) {
+                if ($inserted > 0) {
                     echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n", $match[2], date('Y-m-d', $match[2]), --$total);
                 }
             } else {

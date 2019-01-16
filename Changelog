@@ -1,4 +1,35 @@
+2019-01-16 DariusIII
+	* Fix: Fix predb_import_daily_batch.php
+	* Chg: Update config/irc_settings.php
+2019-01-15 DariusIII
+	* Chg: Update laravel/framework to version 5.7.21
+	* Chg: Update package.json
+	* Chg: Check sphinx for existing pre data before we insert new
+	* Chg: Update phpunit/phpunit to version 7.5.2
+	* Chg: Update directories that need to be cleaned up after PPA (add unzip folder)
+	* Fix: Fix insertion of data into predb_rt index from IRCScraper
+2019-01-14 DariusIII
+	* Chg: Update opis/closure (3.1.4 => 3.1.5)
+	* Chg: Update dariusiii/rarinfo to version 2.7.2
+	* Chg: Update czproject/git-php to version 3.16.0, opus/closure and phpstan to latest versions
+	* Fix: Revert removal of commit from Binaries class
+	* Chg: Update describe function, remove null definition from $options
+	* Chg: Update Git related functions
+	* Chg: Update Binaries class, remove commit from DB::insert queries
+	* Chg: Add error images
+2019-01-13 DariusIII
+	* Chg: Remove settings that are either not working or set in .env file from site-edit
+	* Chg: Add source to predb_rt index
+	* Chg: Update truncateRTIndex and optimizrRTIndex functions
+	* Chg: Improve sphinx indexes population with data
+	* Chg: Update Categorize class a.b.e group matching
+	* Chg: Update nikic/php-parser to version 4.2.0
+	* Chg: Update predb filename and title check to use only predb_rt index
+	* Chg: Add attributes to predb_rt index
 2019-01-12 DariusIII
+	* Chg: Update nntmux:git command to also pull tags (addresses issue #842)
+	* Chg: Add short version of --kill option (--k)
+	* Chg: Update tmux-ui:stop command to use --kill option if tmux session needs to be killed
 	* Fix: Fix config/nntmux.php db_name value (Fixes issue #841)
 	* Chg: Update Vue to version 2.5.22
 	* Chg: Update Blacklight/processing/adult/Popporn class

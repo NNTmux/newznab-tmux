@@ -1272,15 +1272,14 @@ class NameFixer
                 if (! empty($results)) {
                     foreach ($results as $result) {
                         if (! empty($result)) {
-                            $preMatch = Predb::whereId($result['id'])->first();
-                            $preFtMatch = $this->preMatch($preMatch->filename);
+                            $preFtMatch = $this->preMatch($result['filename']);
                             if ($preFtMatch[0] === true) {
-                                $this->_fileName = $preMatch->filename;
+                                $this->_fileName = $result['filename'];
                                 $release->filename = $this->_fileName;
-                                if ($preMatch->title !== $release->searchname) {
-                                    $this->updateRelease($release, $preMatch->title, 'file matched source: '.$preMatch->source, $echo, 'PreDB file match, ', $nameStatus, $show, $preMatch->id);
+                                if ($result['title'] !== $release->searchname) {
+                                    $this->updateRelease($release, $result['title'], 'file matched source: '.$result['source'], $echo, 'PreDB file match, ', $nameStatus, $show, $result['id']);
                                 } else {
-                                    $this->_updateSingleColumn('predb_id', $preMatch->id, $release->releases_id);
+                                    $this->_updateSingleColumn('predb_id', $result['id'], $release->releases_id);
                                 }
                                 $matching++;
                                 break;
@@ -2446,8 +2445,7 @@ class NameFixer
         if (! empty($this->_fileName)) {
             foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
                 if (! empty($match)) {
-                    $preTitle = Predb::whereId($match['id'])->first();
-                    $this->updateRelease($release, $preTitle->title, 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $preTitle->id);
+                    $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
 
                     return true;
                 }
@@ -2474,8 +2472,7 @@ class NameFixer
         if (! empty($this->_fileName)) {
             foreach ($this->sphinx->searchIndexes($this->_fileName, 'title', 'predb_rt') as $match) {
                 if (! empty($match)) {
-                    $preTitle = Predb::whereId($match['id'])->first();
-                    $this->updateRelease($release, $preTitle->title, 'PreDb: Title match', $echo, $type, $nameStatus, $show, $preTitle->id);
+                    $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
 
                     return true;
                 }

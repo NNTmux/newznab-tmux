@@ -345,11 +345,18 @@ class Categorize
                     }
                     break;
                 case preg_match('/alt\.binaries\..*(erotica|ijsklontje|xxx)/', $group):
-                    if ($this->isXxx()) {
-                        break;
+                    switch (true) {
+                        case $this->isXxx():
+                        case $this->isMovie():
+                        case $this->isTV():
+                        case $this->isPC():
+                        case $this->isPCGame():
+                            break;
+                        default:
+                            $this->tmpCat = Category::XXX_OTHER;
+                            $this->tmpTag[] = Category::TAG_XXX_OTHER;
+                            break;
                     }
-                    $this->tmpCat = Category::XXX_OTHER;
-                    $this->tmpTag[] = Category::TAG_XXX_OTHER;
                     break;
                 case $group === 'alt.binaries.cd.image.sega-saturn':
                 case $group === 'alt.binaries.gamecube':

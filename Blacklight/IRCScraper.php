@@ -60,6 +60,11 @@ class IRCScraper extends IRCClient
     protected $_titleIgnoreRegex;
 
     /**
+     * @var \Blacklight\SphinxSearch
+     */
+    protected $sphinxsearch;
+
+    /**
      * Construct.
      *
      * @param bool $silent Run this in silent mode (no text output).
@@ -128,6 +133,8 @@ class IRCScraper extends IRCClient
         if (config('irc_settings.scrape_irc_title_ignore') !== '') {
             $this->_titleIgnoreRegex = config('irc_settings.scrape_irc_title_ignore');
         }
+
+        $this->sphinxsearch = new SphinxSearch();
 
         $this->_groupList = [];
         $this->_silent = $silent;
@@ -277,11 +284,13 @@ class IRCScraper extends IRCClient
     /**
      * Insert new PRE into the DB.
      *
-     * @throws \RuntimeException
+     *
+     * @throws \Exception
      */
     protected function _insertNewPre()
     {
-        if (empty($this->_curPre['title'])) {
+        $sphinxData = $this->sphinxsearch->searchIndexes($this->_curPre['title'], ['title'], 'predb_rt');
+        if (! empty($sphinxData) || empty($this->_curPre['title'])) {
             return;
         }
 
@@ -323,9 +332,10 @@ class IRCScraper extends IRCClient
             'id' => DB::connection()->getPdo()->lastInsertId(),
             'title' => $this->_curPre['title'],
             'filename' => $this->_curPre['filename'],
+            'source' => $this->_curPre['source'],
         ];
 
-        (new SphinxSearch())->insertPredb($parameters);
+        $this->sphinxsearch->insertPredb($parameters);
 
         $this->_doEcho(true);
     }
@@ -333,7 +343,8 @@ class IRCScraper extends IRCClient
     /**
      * Updates PRE data in the DB.
      *
-     * @throws \RuntimeException
+     *
+     * @throws \Exception
      */
     protected function _updatePre()
     {
@@ -371,9 +382,10 @@ class IRCScraper extends IRCClient
             'id' => DB::connection()->getPdo()->lastInsertId(),
             'title' => $this->_curPre['title'],
             'filename' => $this->_curPre['filename'],
+            'source' => $this->_curPre['source'],
         ];
 
-        (new SphinxSearch())->updatePreDb($parameters);
+        $this->sphinxsearch->updatePreDb($parameters);
 
         $this->_doEcho(false);
     }

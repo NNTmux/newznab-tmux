@@ -1,7 +1,5 @@
 <?php
 
-$username = env('SCRAPE_IRC_USERNAME', '');
-
 return [
     /***********************************************************************************************************************
      * You can use this to set the NICKNAME=>REALNAME and USERNAME below.
@@ -9,7 +7,7 @@ return [
      * @note THIS MUST NOT BE EMPTY=>THIS MUST ALSO BE UNIQUE OR YOU WILL NOT BE ABLE TO CONNECT TO IRC.
      * @note pick a normal name otherwise you will be banned from the pre channel !!!!
      **********************************************************************************************************************/
-    'username' => $username,
+    'username' => env('SCRAPE_IRC_USERNAME', ''),
 
 /***********************************************************************************************************************
  * The IRC server to connect to.
@@ -32,18 +30,18 @@ return [
 /***********************************************************************************************************************
  * This is the nick name visible in IRC channels.
  **********************************************************************************************************************/
-'scrape_irc_nickname'=> $username,
+'scrape_irc_nickname'=> env('SCRAPE_IRC_USERNAME', ''),
 
 /***********************************************************************************************************************
  * This is a name that is visible to others when they type /whois nickname.
  **********************************************************************************************************************/
-'scrape_irc_realname'=> $username,
+'scrape_irc_realname'=> env('SCRAPE_IRC_USERNAME', ''),
 
 /***********************************************************************************************************************
  * This is used as part of your "ident" when connecting to IRC.
  * @note This is also the username for ZNC.
  **********************************************************************************************************************/
-'scrape_irc_username' => $username,
+'scrape_irc_username' => env('SCRAPE_IRC_USERNAME', ''),
 
 /***********************************************************************************************************************
  * This is not required by synirc=>but if you use ZNC=>this is required.

@@ -46,10 +46,11 @@ class UpdateNNTmuxGit extends Command
 
         if ((new Tmux())->isRunning() === true) {
             $wasRunning = true;
-            $this->call('tmux-ui:stop', ['type' => 'true']);
+            $this->call('tmux-ui:stop', ['--kill' => true]);
         }
-
-        $this->git->gitPull();
+        $this->info('Getting changes from Github');
+        $result = $this->git->gitPull();
+        $this->info($result[2]);
 
         if ($wasRunning === true) {
             $this->call('tmux-ui:start');
