@@ -18,7 +18,6 @@
  * @author    niel
  * @copyright 2015 nZEDb
  */
-
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\ColorCLI;
