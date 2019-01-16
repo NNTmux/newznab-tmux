@@ -1,4 +1,5 @@
 2019-01-16 DariusIII
+	* Chg: Update spatie/laravel-fractal to version 5.4.3
 	* Fix: Fix predb_import_daily_batch.php
 	* Chg: Update config/irc_settings.php
 2019-01-15 DariusIII

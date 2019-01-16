@@ -5461,16 +5461,16 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "5.4.2",
+            "version": "5.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "2931881cac3155ceb798f2fd1e55bd152576682b"
+                "reference": "514663b6b331a6c62ab6321cdf68d790a706e082"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/2931881cac3155ceb798f2fd1e55bd152576682b",
-                "reference": "2931881cac3155ceb798f2fd1e55bd152576682b",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/514663b6b331a6c62ab6321cdf68d790a706e082",
+                "reference": "514663b6b331a6c62ab6321cdf68d790a706e082",
                 "shasum": ""
             },
             "require": {
@@ -5481,7 +5481,8 @@
             },
             "require-dev": {
                 "orchestra/testbench": "~3.5.0|~3.6.0|~3.7.0",
-                "phpunit/phpunit": "^6.2|^7.0"
+                "phpunit/phpunit": "^6.2|^7.0",
+                "scrutinizer/ocular": "^1.5"
             },
             "type": "library",
             "extra": {
@@ -5525,7 +5526,7 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2018-09-28T16:17:34+00:00"
+            "time": "2019-01-16T12:38:34+00:00"
         },
         {
             "name": "spatie/laravel-permission",
