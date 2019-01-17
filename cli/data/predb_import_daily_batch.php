@@ -147,7 +147,7 @@ foreach ($data as $dir => $files) {
                 DB::statement('TRUNCATE TABLE predb_imports');
 
                 // Import file into predb_imports
-                DB::unprepared("LOAD DATA {$local} INFILE '{$dumpFile}' IGNORE INTO TABLE predb_imports FIELDS TERMINATED BY '\\t\\t' LINES TERMINATED BY '\\r\\n' (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname)");
+                DB::unprepared("LOAD DATA {$local} INFILE '{$dumpFile}' IGNORE INTO TABLE predb_imports FIELDS TERMINATED BY '\\t\\t' OPTIONALLY ENCLOSED BY \"'\" LINES TERMINATED BY '\\r\\n' (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname)");
                 DB::commit();
 
                 // Remove any titles where length <=8

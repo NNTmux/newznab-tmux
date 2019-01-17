@@ -1,4 +1,5 @@
 2019-01-17 DariusIII
+	* Fix: Fix predb_import_daily_batch script, it was inserting quotes and making data bad
 	* Chg: Switch from SphinxSearch to Manticore in sphinx.conf
 	* Chg: Use only complete threaded update for binaries
 	* Chg: Add source column to predb_se table creation
