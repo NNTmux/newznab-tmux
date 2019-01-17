@@ -57,8 +57,8 @@ class TmuxController extends BasePageController
         $this->smarty->assign('fix_crap_check_names', ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec']);
         $this->smarty->assign('sequential_ids', [0, 1]);
         $this->smarty->assign('sequential_names', ['Disabled', 'Enabled']);
-        $this->smarty->assign('binaries_ids', [0, 1, 2]);
-        $this->smarty->assign('binaries_names', ['Disabled', 'Simple Threaded Update', 'Complete Threaded Update']);
+        $this->smarty->assign('binaries_ids', [0, 1]);
+        $this->smarty->assign('binaries_names', ['Disabled', 'Enabled']);
         $this->smarty->assign('lookup_reqids_ids', [0, 1, 2]);
         $this->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded']);
         $this->smarty->assign('predb_ids', [0, 1]);

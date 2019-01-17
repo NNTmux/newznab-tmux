@@ -614,7 +614,6 @@ class TmuxRun extends Tmux
                     $binaries = 'echo "\nbinaries has been disabled/terminated by Binaries"';
                     break;
                 case 1:
-                case 2:
                     $binaries = sprintf(
                         '%s %s;',
                         $runVar['scripts']['binaries'],

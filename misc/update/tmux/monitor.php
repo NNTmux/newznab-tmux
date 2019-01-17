@@ -89,9 +89,6 @@ while ($runVar['counts']['iterations'] > 0) {
 
     switch ((int) $runVar['settings']['binaries_run']) {
         case 1:
-            $runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/binaries.php 0";
-            break;
-        case 2:
             $runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php binaries";
             break;
         default:

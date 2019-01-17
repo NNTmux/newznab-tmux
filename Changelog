@@ -1,4 +1,5 @@
 2019-01-17 DariusIII
+	* Chg: Use only complete threaded update for binaries
 	* Chg: Add source column to predb_se table creation
 	* Chg: Update resetdb command sphinx index truncation
 2019-01-16 DariusIII
