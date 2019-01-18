@@ -874,7 +874,6 @@ class Releases
             $searchResult = array_pluck($this->sphinxSearch->searchIndexes($name, ['searchname'], 'releases_rt'), 'id');
         }
 
-
         $whereSql = sprintf(
             'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
