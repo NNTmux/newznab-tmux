@@ -5398,16 +5398,16 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "cb27ea0094ba7ba52679713cbca38c24f070f006"
+                "reference": "ef3c21c3ca0e1980c96d8203f3d9462306efbc26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/cb27ea0094ba7ba52679713cbca38c24f070f006",
-                "reference": "cb27ea0094ba7ba52679713cbca38c24f070f006",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/ef3c21c3ca0e1980c96d8203f3d9462306efbc26",
+                "reference": "ef3c21c3ca0e1980c96d8203f3d9462306efbc26",
                 "shasum": ""
             },
             "require": {
@@ -5457,7 +5457,7 @@
                 "laravel-directory-cleanup",
                 "spatie"
             ],
-            "time": "2018-11-30T13:17:12+00:00"
+            "time": "2019-01-18T16:32:41+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
