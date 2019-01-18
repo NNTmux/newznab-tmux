@@ -27,23 +27,22 @@ class FixturesDown extends Command
      *
      * @var string
      */
-    protected $signature = 'fixtures:down {type}';
+    protected $signature = 'fixtures:down {--t|table=* : Table to truncate, no argument truncates them all}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Truncate(empty) all tables or just select ones.
+    protected $description = 'Truncate(empty) all, multiple or just one table.
     Tables that are supported are :
-    all <= Populates all the tables listed below
+    no option argument <= Truncates all the tables listed below
     binaryblacklist
     categories
     category_regexes
     collection_regexes
     content
     groups
-    menu
     release_naming_regexes
     settings
     tmux';
@@ -64,11 +63,16 @@ class FixturesDown extends Command
     public function handle()
     {
         if ($this->confirm('This command will truncate(empty) your tables. Should we continue?')) {
-            $this->info('Truncating '.$this->argument('type').' table(s)');
-            if ($this->argument('type') === 'all') {
+            if (empty($this->option('table'))) {
+                $this->info('Truncating all tables');
                 FixturesFacade::down();
-            } elseif (\in_array($this->argument('type'), self::$allowedTables, false)) {
-                FixturesFacade::down($this->argument('type'));
+            } else {
+                foreach ($this->option('table') as $option) {
+                    if (\in_array($option, self::$allowedTables, false)) {
+                        $this->info('Truncating '.$option.' table');
+                        FixturesFacade::down($option);
+                    }
+                }
             }
         } else {
             $this->info('Command execution stopped');
