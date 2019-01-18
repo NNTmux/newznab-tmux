@@ -136,8 +136,8 @@ foreach ($data as $dir => $files) {
 
                 // Make sure it's readable by all.
                 chmod($dumpFile, 0777);
-                $local = strtolower($argv[2]) === 'local' ? '' : 'remote';
-                $verbose = $argv[3] === true;
+                $local = strtolower($argv[2]) === 'local' ? 'LOCAL' : '';
+                $verbose = $argv[3] === 'true';
 
                 if ($verbose) {
                     $colorCli->info('Clearing import table');
