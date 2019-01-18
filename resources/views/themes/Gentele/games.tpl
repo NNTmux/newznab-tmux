@@ -82,21 +82,21 @@
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
 													{if $result->classused == "GiantBomb"}<a
-														class="badge badge-default"
+														class="badge badge-info"
 														target="_blank"
 														href="{$site->dereferrer_link}{$result->url}"
 														name="giantbomb{$result->gamesinfo_id}"
 														title="View GiantBomb page">
 															GiantBomb</a>{/if}
 													{if $result->classused == "Steam"}<a
-														class="badge badge-default"
+														class="badge badge-info"
 														target="_blank"
 														href="{$site->dereferrer_link}{$result->url|escape:"htmlall"}"
 														name="steam{$result->gamesinfo_id}"
 														title="View Steam page">
 															Steam</a>{/if}
                                                     {if $result->classused == "IGDB"}<a
-                                                        class="badge badge-default"
+                                                        class="badge badge-info"
                                                         target="_blank"
                                                         href="{$site->dereferrer_link}{$result->url}"
                                                         name="igdb{$result->gamesinfo_id}"
@@ -104,10 +104,10 @@
                                                             IGDB</a>{/if}
 													{if $result->nfoid > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
-														title="View NFO" class="modal_nfo badge badge-default"
+														title="View NFO" class="modal_nfo badge badge-info"
 														rel="nfo">
 															NFO</a>{/if}
-													<a class="badge badge-default"
+													<a class="badge badge-info"
 													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
 													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result->failed)}
@@ -132,8 +132,8 @@
 																		   value="{$result->guid}"
 																		   id="chksingle"/>
 																</label>
-																<span class="badge badge-default">{$result->size|filesize}</span>
-																<span class="badge badge-default">Posted {$result->postdate|timeago}
+																<span class="badge badge-info">{$result->size|filesize}</span>
+																<span class="badge badge-info">Posted {$result->postdate|timeago}
 																	ago</span>
 																{if isset($isadmin)}<a
 																	class="badge badge-warning"
