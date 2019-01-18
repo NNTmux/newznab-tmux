@@ -24,11 +24,6 @@ class Releases
     public const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
-     * @var \Blacklight\ReleaseSearch
-     */
-    public $releaseSearch;
-
-    /**
      * @var \Blacklight\SphinxSearch
      */
     public $sphinxSearch;
@@ -51,7 +46,6 @@ class Releases
         $options += $defaults;
 
         $this->sphinxSearch = new SphinxSearch();
-        $this->releaseSearch = new ReleaseSearch();
     }
 
     /**
