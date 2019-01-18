@@ -68,7 +68,7 @@ class FixturesUp extends Command
         } else {
             foreach ($this->option('table') as $option) {
                 if (\in_array($option, self::$allowedTables, false)) {
-                    $this->info('Populating ' .$option.' table');
+                    $this->info('Populating '.$option.' table');
                     FixturesFacade::up($option);
                 }
             }
