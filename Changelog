@@ -1,4 +1,5 @@
 2019-01-18 DariusIII
+	* Chg: Update Releases class all the searches to query manticore search directly and use results in queries
 	* Chg: Update spatie/laravel-directory-cleanup to version 1.2.3
 	* Fix: Fix insert_hashes trigger migration (Fixes issue #846)
 	* Chg: Update fixtures:up and :down commands to accept optional parameters
