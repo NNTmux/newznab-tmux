@@ -1,4 +1,5 @@
 2019-01-18 DariusIII
+	* Fix: Fix insert_hashes trigger migration (Fixes issue #846)
 	* Chg: Update fixtures:up and :down commands to accept optional parameters
 	* Chg: Use badge-info for badges on games page
 2019-01-17 DariusIII
