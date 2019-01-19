@@ -1,3 +1,5 @@
+2019-01-19 DariusIII
+	* Fix: Return empty array in search functions if manticore search found no matches
 2019-01-18 DariusIII
 	* Chg: Update Releases class all the searches to query manticore search directly and use results in queries
 	* Chg: Update spatie/laravel-directory-cleanup to version 1.2.3

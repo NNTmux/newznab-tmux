@@ -702,7 +702,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql): [];
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -782,7 +782,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql): [];
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -925,7 +925,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql): [];
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -1064,7 +1064,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql): [];
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -1137,7 +1137,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql): [];
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1217,7 +1217,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql): [];
         if (! empty($releases) && \count($releases) > 0) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
