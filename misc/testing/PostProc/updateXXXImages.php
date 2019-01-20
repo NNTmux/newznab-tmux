@@ -16,7 +16,6 @@ if ($argc === 1 || $argv[1] !== 'true') {
 
 $path2covers = NN_COVERS.'xxx'.DS;
 
-
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
     if (is_file($filePath->getPathname()) && preg_match('/-cover\.jpg$/', $filePath->getPathname())) {
