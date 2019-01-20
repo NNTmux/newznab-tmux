@@ -42,7 +42,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = XxxInfo::query()->where('id', $match1[1])->select(['id'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath.' not found in db.');
+                    $colorCli->info($filePath->getPathname().' not found in db.');
                 }
             }
         }
