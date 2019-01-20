@@ -24,7 +24,6 @@ if ($row !== null) {
 }
 $path2covers = NN_COVERS.'movies'.DS;
 
-
 $itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
     if (is_file($filePath->getPathname()) && preg_match('/-cover\.jpg$/', $filePath->getPathname())) {

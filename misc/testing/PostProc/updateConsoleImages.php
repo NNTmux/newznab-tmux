@@ -51,6 +51,6 @@ $qry = ConsoleInfo::query()->where('cover', '=', 1)->value('id');
             $colorCli->info($path2covers.$rows['id'].'.jpg does not exist.');
             $deleted++;
         }
-}
+    }
 $colorCli->header($covers.' covers set.');
 $colorCli->header($deleted.' consoles unset.');
