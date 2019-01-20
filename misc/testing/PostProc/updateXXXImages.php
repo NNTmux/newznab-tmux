@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\XxxInfo;
 use Blacklight\ColorCLI;
+use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
 $colorCli = new ColorCLI();
@@ -15,11 +16,11 @@ if ($argc === 1 || $argv[1] !== 'true') {
 
 $path2covers = NN_COVERS.'xxx'.DS;
 
-$dirItr = new RecursiveDirectoryIterator($path2covers);
-$itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);
+
+$itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
-    if (is_file($filePath) && preg_match('/-cover\.jpg/', $filePath)) {
-        preg_match('/(\d+)-cover\.jpg/', basename($filePath), $match);
+    if (is_file($filePath->getPathname()) && preg_match('/-cover\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)-cover\.jpg$/', $filePath->getPathname(), $match);
         if (isset($match[1])) {
             $run = XxxInfo::query()->where('cover', '=', 0)->where('id', $match[1])->update(['cover' => 1]);
             if ($run >= 1) {
@@ -27,13 +28,13 @@ foreach ($itr as $filePath) {
             } else {
                 $run = XxxInfo::query()->where('id', $match[1])->select(['id'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath.' not found in db.');
+                    $colorCli->info($filePath->getPathname().' not found in db.');
                 }
             }
         }
     }
-    if (is_file($filePath) && preg_match('/-backdrop\.jpg/', $filePath)) {
-        preg_match('/(\d+)-backdrop\.jpg/', basename($filePath), $match1);
+    if (is_file($filePath->getPathname()) && preg_match('/-backdrop\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)-backdrop\.jpg$/', $filePath->getPathname(), $match1);
         if (isset($match1[1])) {
             $run = XxxInfo::query()->where(['backdrop' => 0, 'id' => $match1[1]])->update(['backdrop' => 1]);
             if ($run >= 1) {
@@ -56,7 +57,7 @@ $qry = XxxInfo::query()->where('cover', '=', 1)->select(['id'])->get();
             $deleted++;
         }
     }
-$qry = XxxInfo::query()->where('backdrop', '=', 1)->select(['id'])->get();
+$qry1 = XxxInfo::query()->where('backdrop', '=', 1)->select(['id'])->get();
     foreach ($qry1 as $rows) {
         if (! is_file($path2covers.$rows['id'].'-backdrop.jpg')) {
             XxxInfo::query()->where(['backdrop' => 1, 'id' => $rows['id']])->update(['backdrop' => 0]);

@@ -1,3 +1,5 @@
+2019-01-20 DariusIII
+	* Fix: Fix misc/tesing/PostProc/updateXXXImages.php script error (fixes issue #852)
 2019-01-19 DariusIII
 	* Fix: Return empty array in search functions if manticore search found no matches
 2019-01-18 DariusIII
