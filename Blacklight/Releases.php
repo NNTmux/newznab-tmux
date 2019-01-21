@@ -635,7 +635,7 @@ class Releases
 
 
 
-        $results = $this->sphinxSearch->searchIndexes('releases_rt', '', '', $searchFields);
+        $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
         $searchResult = array_pluck($results, 'id');
 

@@ -2470,7 +2470,7 @@ class NameFixer
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, 'title') as $match) {
+            foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
                 if (! empty($match)) {
                     $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
 

@@ -1,4 +1,5 @@
 2019-01-21 DariusIII
+	* Fix: Fix issues reported by scrutinizer (strings where arrays are expected and vice versa)
 	* Chg: Update search, update matching
 2019-01-20 DariusIII
 	* Chg: Update rest of the cover checking files
