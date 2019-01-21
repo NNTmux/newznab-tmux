@@ -633,8 +633,6 @@ class Releases
             $searchFields['filename'] = $fileName;
         }
 
-
-
         $results = $this->sphinxSearch->searchIndexes('releases_rt', '', '', $searchFields);
 
         $searchResult = array_pluck($results, 'id');
