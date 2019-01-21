@@ -195,7 +195,7 @@ class SphinxSearch
      */
     public function searchIndexes(string $rt_index, $searchString = '', $column = [], array $searchArray = []): array
     {
-        $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 100000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 100000);
+        $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'sph04')->option('sort_method', 'pq')->limit(0, 10000)->orderBy('id', 'desc');
         if (! empty($searchArray)) {
             foreach ($searchArray as $key => $value) {
                 $query->match($key, $value);
