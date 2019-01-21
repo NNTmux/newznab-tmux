@@ -173,16 +173,17 @@ class Predb extends Model
     }
 
     /**
-     * @param string $search
+     * @param array $search
+     *
      * @return mixed
      * @throws \Exception
      */
-    public static function getAll($search = '')
+    public static function getAll($search = [])
     {
         $sql = self::query()->remember(config('nntmux.cache_expiry_medium'))->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
-        if ($search !== '') {
+        if (! empty($search)) {
             $sphinx = new SphinxSearch();
-            $ids = array_pluck($sphinx->searchIndexes($search, 'title', 'predb_rt'), 'id');
+            $ids = array_pluck($sphinx->searchIndexes('predb_rt', $search, 'title'), 'id');
             $sql->whereIn('predb.id', $ids);
         }
 

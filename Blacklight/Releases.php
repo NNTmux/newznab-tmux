@@ -619,21 +619,23 @@ class Releases
             $orderBy = $this->getBrowseOrder($orderBy);
         }
 
-        $query = $this->sphinxSearch->sphinxQL->select()->from('releases_rt')->option('max_matches', 10000);
+        $searchFields = [];
         if ($searchName !== -1) {
-            $query->match('searchname', $searchName);
+            $searchFields['searchname'] = $searchName;
         }
         if ($usenetName !== -1) {
-            $query->match('name', $usenetName);
+            $searchFields['name'] = $usenetName;
         }
         if ($posterName !== -1) {
-            $query->match('fromname', $posterName);
+            $searchFields['fromname'] = $posterName;
         }
         if ($fileName !== -1) {
-            $query->match('filename', $fileName);
+            $searchFields['filename'] = $fileName;
         }
 
-        $results = $query->execute()->fetchAllAssoc() ?? [];
+
+
+        $results = $this->sphinxSearch->searchIndexes('releases_rt', '', '', $searchFields);
 
         $searchResult = array_pluck($results, 'id');
 
@@ -731,7 +733,7 @@ class Releases
     public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
     {
         if ($searchName !== -1) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes($searchName, ['searchname'], 'releases_rt'), 'id');
+            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
         }
 
         $catQuery = Category::getCategorySearch($cat);
@@ -871,7 +873,7 @@ class Releases
         }
 
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes($name, ['searchname'], 'releases_rt'), 'id');
+            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
@@ -1016,7 +1018,7 @@ class Releases
         }
 
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes($name, ['searchname'], 'releases_rt'), 'id');
+            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
@@ -1093,7 +1095,7 @@ class Releases
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes($name, ['searchname'], 'releases_rt'), 'id');
+            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
@@ -1167,7 +1169,7 @@ class Releases
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes($name, ['searchname'], 'releases_rt'), 'id');
+            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(

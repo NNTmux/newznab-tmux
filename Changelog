@@ -1,3 +1,5 @@
+2019-01-21 DariusIII
+	* Chg: Update search, update matching
 2019-01-20 DariusIII
 	* Chg: Update rest of the cover checking files
 	* Fix: Fix misc/tesing/PostProc/updateXXXImages.php script error (fixes issue #852)

@@ -187,12 +187,22 @@ class SphinxSearch
 
     /**
      * @param string $searchString (what are we looking for?)
-     * @param string|array $column (one or multiple columns from the columns that exist in indexes)
-     * @param string $rt_index (releases_rt or predb_rt)
+     * @param array $column       (one or multiple columns from the columns that exist in indexes)
+     * @param string       $rt_index     (releases_rt or predb_rt)
+     * @param array        $searchArray
+     *
      * @return array
      */
-    public function searchIndexes(string $searchString, $column, string $rt_index): array
+    public function searchIndexes(string $rt_index, $searchString = '', $column = [], array $searchArray = []): array
     {
-        return $this->sphinxQL->select()->from($rt_index)->match($column, $searchString)->option('max_matches', 10000)->execute()->fetchAllAssoc() ?? [];
+        $query = $this->sphinxQL->select()->from($rt_index)->option('max_matches', 10000)->option('ranker', 'matchany')->limit(0, 10000)->orderBy('weight()', 'desc');
+        if (! empty($searchArray)) {
+            foreach ($searchArray as $key => $value) {
+                $query->match($key, $value);
+            }
+            return $query->execute()->fetchAllAssoc() ?? [];
+        }
+
+        return $query->match($column, $searchString)->execute()->fetchAllAssoc() ?? [];
     }
 }
