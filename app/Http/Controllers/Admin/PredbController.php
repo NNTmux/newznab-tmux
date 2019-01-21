@@ -19,7 +19,7 @@ class PredbController extends BasePageController
 
         if ($request->has('presearch')) {
             $lastSearch = $request->input('presearch');
-            $parr = Predb::getAll(array_wrap($request->input('presearch')));
+            $parr = Predb::getAll($request->input('presearch'));
         } else {
             $lastSearch = '';
             $parr = Predb::getAll();
