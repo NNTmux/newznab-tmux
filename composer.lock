@@ -510,16 +510,16 @@
         },
         {
             "name": "czproject/git-php",
-            "version": "v3.16.0",
+            "version": "v3.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/czproject/git-php.git",
-                "reference": "1df0ce1344517cd1355ac35182f99096219c644f"
+                "reference": "7e1461628f0f3c31c968e03faca0aded177006ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/czproject/git-php/zipball/1df0ce1344517cd1355ac35182f99096219c644f",
-                "reference": "1df0ce1344517cd1355ac35182f99096219c644f",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/7e1461628f0f3c31c968e03faca0aded177006ea",
+                "reference": "7e1461628f0f3c31c968e03faca0aded177006ea",
                 "shasum": ""
             },
             "require": {
@@ -548,7 +548,7 @@
             "keywords": [
                 "git"
             ],
-            "time": "2019-01-14T12:09:07+00:00"
+            "time": "2019-01-21T07:55:29+00:00"
         },
         {
             "name": "dariusiii/php-itunes-api",
