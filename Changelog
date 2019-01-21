@@ -1,4 +1,5 @@
 2019-01-21 DariusIII
+	* Fix: Fix XML_Response atom:link url reported for api v1
 	* Chg: Slightly optimize searchIndexes query
 	* Fix: Fix error on search with argument 16 not being an array but null
 	* Chg: Update czproject/git-php (v3.16.0 => v3.16.1)
