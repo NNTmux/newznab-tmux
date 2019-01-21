@@ -200,6 +200,7 @@ class SphinxSearch
             foreach ($searchArray as $key => $value) {
                 $query->match($key, $value);
             }
+
             return $query->execute()->fetchAllAssoc() ?? [];
         }
 
