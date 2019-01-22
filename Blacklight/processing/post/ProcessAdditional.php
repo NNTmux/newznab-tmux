@@ -20,7 +20,6 @@ use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
 use FFMpeg\Format\Video\Ogg;
-use Illuminate\Support\Facades\Log;
 use Mhor\MediaInfo\MediaInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
@@ -29,6 +28,7 @@ use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use FFMpeg\Filters\Video\ResizeFilter;
 
