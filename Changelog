@@ -1,4 +1,5 @@
 2019-01-22 DariusIII
+	* Fix: Fix one more occurence of wrong data sent to search function
 	* Chg: Log errors in PostProcessAdditional class
 2019-01-21 DariusIII
 	* Chg: Further improve results returned by search

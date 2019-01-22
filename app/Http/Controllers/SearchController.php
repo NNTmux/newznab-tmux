@@ -152,7 +152,7 @@ class SearchController extends BasePageController
                 config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
-                $this->userdata['categoryexclusions'],
+                $this->userdata['categoryexclusions'] ?? [],
                 'advanced',
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
