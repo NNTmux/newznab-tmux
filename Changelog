@@ -1,4 +1,7 @@
 2019-01-22 DariusIII
+	* Chg: Updated phpstan/phpstan (0.10.8 => 0.11.1)
+	* Chg: Updated laravel/framework (v5.7.21 => v5.7.22)
+	* Chg: Updated nunomaduro/larastan (v0.3.13 => v0.3.14)
 	* Fix: Fix total count of console releases that made console covers page to show only 1 page
 	* Chg: Update config/logging.php
 	* Fix: Fix one more occurence of wrong data sent to search function
