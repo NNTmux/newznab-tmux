@@ -1,3 +1,5 @@
+2019-01-22 DariusIII
+	* Chg: Log errors in PostProcessAdditional class
 2019-01-21 DariusIII
 	* Chg: Further improve results returned by search
 	* Chg: Improve Manticore Search results, return more relevant ones and more current

@@ -20,6 +20,7 @@ use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
 use FFMpeg\Format\Video\Ogg;
+use Illuminate\Support\Facades\Log;
 use Mhor\MediaInfo\MediaInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
@@ -1647,6 +1648,7 @@ class ProcessAdditional
 
             return $files;
         } catch (\Throwable $e) {
+            Log::error($e->getTraceAsString());
             $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
 
             return false;
@@ -1783,6 +1785,7 @@ class ProcessAdditional
                         $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
                         $audioSample->save($format, $this->tmpPath.$audioFileName);
                     } catch (\InvalidArgumentException $e) {
+                        Log::error($e->getTraceAsString());
                         //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                     }
                 }
@@ -1899,10 +1902,13 @@ class ProcessAdditional
                 try {
                     $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
                 } catch (\RuntimeException $runtimeException) {
-                    //We show no error at all, we failed to save the frame and move on
+                    Log::error($runtimeException->getTraceAsString());
+                    //We show no error we just log it, we failed to save the frame and move on
                 } catch (\InvalidArgumentException $e) {
+                    Log::error($e->getTraceAsString());
                     //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 } catch (\Throwable $e) {
+                    Log::error($e->getTraceAsString());
                     //Again we do nothing, we just want to catch the error
                 }
             }
@@ -1994,6 +2000,7 @@ class ProcessAdditional
                             $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                             $videoSample->save($format, $fileName);
                         } catch (\InvalidArgumentException $e) {
+                            Log::error($e->getTraceAsString());
                             //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                         }
                     }
@@ -2011,6 +2018,7 @@ class ProcessAdditional
                         $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                         $videoSample->save($format, $fileName);
                     } catch (\InvalidArgumentException $e) {
+                        Log::error($e->getTraceAsString());
                         //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                     }
                 }
