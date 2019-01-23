@@ -3,8 +3,8 @@
 namespace Blacklight;
 
 use App\Models\Settings;
-use App\Extensions\util\PhpYenc;
 use Blacklight\utility\Utility;
+use App\Extensions\util\PhpYenc;
 
 /*
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -1299,7 +1299,7 @@ class NNTP extends \Net_NNTP_Client
     }
 
     /**
-     * Connect to a NNTP server
+     * Connect to a NNTP server.
      *
      * @param string $host                   (optional) The address of the NNTP-server to connect to, defaults to 'localhost'.
      * @param mixed  $encryption             (optional) Use TLS/SSL on the connection?
@@ -1343,11 +1343,12 @@ class NNTP extends \Net_NNTP_Client
             default:
                 $message = '$encryption parameter must be either tcp, tls, ssl.';
                 trigger_error($message, E_USER_ERROR);
+
                 return $this->throwError($message);
         }
         // Attempt to connect to usenet.
         $socket = stream_socket_client(
-            $transport . '://' . $host . ':' . $port,
+            $transport.'://'.$host.':'.$port,
             $errorNumber,
             $errorString,
             $timeout,
@@ -1359,10 +1360,11 @@ class NNTP extends \Net_NNTP_Client
             if (preg_match('/tls|ssl/', $transport)) {
                 $message .= ' Try disabling SSL/TLS, and/or try a different port.';
             }
-            $message .= ' [ERROR ' . $errorNumber . ': ' . $errorString . ']';
+            $message .= ' [ERROR '.$errorNumber.': '.$errorString.']';
             if ($this->_logger) {
                 $this->_logger->notice($message);
             }
+
             return $this->throwError($message);
         }
         // Store the socket resource as property.
@@ -1404,6 +1406,6 @@ class NNTP extends \Net_NNTP_Client
      */
     public function _isConnected($feof = true): bool
     {
-        return (is_resource($this->_socket) && ($feof ? ! feof($this->_socket) : true));
+        return is_resource($this->_socket) && ($feof ? ! feof($this->_socket) : true);
     }
 }
