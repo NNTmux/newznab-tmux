@@ -1130,12 +1130,9 @@ class NameFixer
 				SELECT r.id AS releases_id, r.name, r.searchname,
 				r.fromname, r.groups_id, r.categories_id
 				FROM releases r
-				%1$s
-				AND (r.name LIKE %2$s OR r.searchname LIKE %2$s)
-				AND r.predb_id = 0
-				LIMIT 21',
-                $join,
-                escapeString('%'.$pre['title'].'%')
+				WHERE r.id IN (%s)
+				AND r.predb_id = 0',
+                $join
             )
         );
 
@@ -1170,12 +1167,10 @@ class NameFixer
         $join = '';
 
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
-            $titlematch = SphinxSearch::escapeString($preTitle);
-            $join .= sprintf(
-                        'INNER JOIN releases_se rse ON rse.id = r.id
-						WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',
-                        $titlematch
-                    );
+            $titlematch = $this->sphinx->searchIndexes('releases_rt', $preTitle, ['name', 'searchname', 'filename']);
+            if (! empty($titlematch)) {
+                $join = implode(',', array_pluck($titlematch, 'id'));
+            }
         }
 
         return $join;
