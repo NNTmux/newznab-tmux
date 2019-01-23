@@ -20,8 +20,6 @@ class QueueController extends BasePageController
     {
         $this->setPrefs();
 
-        $this->smarty->assign();
-
         $queueType = $error = '';
         $queue = null;
         switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {

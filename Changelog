@@ -1,3 +1,5 @@
+2019-01-23 DariusIII
+	* Fix: Fix variable assignment error in QueueController
 2019-01-22 DariusIII
 	* Chg: Updated phpstan/phpstan (0.10.8 => 0.11.1)
 	* Chg: Updated laravel/framework (v5.7.21 => v5.7.22)
