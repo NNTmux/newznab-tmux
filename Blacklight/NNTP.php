@@ -5,7 +5,7 @@ namespace Blacklight;
 use App\Models\Settings;
 use App\Extensions\util\PhpYenc;
 
-/**
+/*
  * Class for connecting to the usenet, retrieving articles and article headers,
  * decoding yEnc articles, decompressing article headers.
  * Extends PEAR's Net_NNTP_Client class, overrides some functions.
@@ -14,21 +14,21 @@ use App\Extensions\util\PhpYenc;
  * Class NNTP
  */
 
-/**
+/*
 * 'Service discontinued' (RFC977)
 *
 * @access     public
 */
 define('NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_FORCED', 400);
 
-/**
+/*
  * 'Groups and descriptions unavailable'
  *
  * @access     public
  */
 define('NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_UNAVAILABLE', 481);
 
-/**
+/*
  * 'Can not initiate TLS negotiation' (RFC4642)
  *
  * @access     public
@@ -1216,7 +1216,6 @@ class NNTP extends \Net_NNTP_Client
      * @param int $response NET_NNTP Response code
      *
      * @return object PEAR error
-     * @access protected
      */
     protected function _handleErrorResponse($response)
     {
@@ -1286,6 +1285,7 @@ class NNTP extends \Net_NNTP_Client
                 return $this->throwError('Can not initiate TLS negotiation', $response, $this->_currentStatusResponse());
             default:
                 $text = $this->_currentStatusResponse();
+
                 return $this->throwError("Unexpected response: '$text'", $response, $text);
         }
     }
