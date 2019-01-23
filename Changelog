@@ -1,3 +1,5 @@
+2019-01-24 DariusIII
+	* Chg: Update NNTP class
 2019-01-23 DariusIII
 	* Chg: Return search results for tv, movies, anime searches from api properly
 	* Chg: Use pear/net_nntp from github and adjust our NNTP class
