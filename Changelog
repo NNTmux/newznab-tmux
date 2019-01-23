@@ -1,4 +1,5 @@
 2019-01-23 DariusIII
+	* Chg: Use pear/net_nntp from github and adjust our NNTP class
 	* Chg: Update NameFixer matchPredbFT function
 	* Fix: Fix variable assignment error in QueueController
 2019-01-22 DariusIII

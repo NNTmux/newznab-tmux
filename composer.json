@@ -14,8 +14,6 @@
       "App\\": "app/"
     },
     "classmap": [
-      "libs/PEAR/Net_NNTP/NNTP/",
-      "libs/",
       "database/factories",
       "database/seeds"
     ]
@@ -54,6 +52,12 @@
   "non-feature-branches": [
     "latest-.*"
   ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pear/Net_NNTP"
+        }
+    ],
   "require": {
     "php": ">=7.2.0",
     "ext-bcmath": "*",
@@ -119,6 +123,7 @@
     "monolog/monolog": "^1.22",
     "nesbot/carbon": "2.10.0 as 1.35.0",
     "ntimyeboah/laravel-database-trigger": "^1.0",
+    "pear/net_nntp": "^1.5",
     "php-ffmpeg/php-ffmpeg": "^0.13.0",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
