@@ -44,7 +44,7 @@ install:
 
 before_script:
      # Create mysql database and user.
-     - echo "USE mysql;\nUPDATE user SET password=PASSWORD('test') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+     - echo "USE mysql;\nUPDATE user SET password='test' WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
      - mysql_upgrade -u root -ptest
      - mysql -u root -e "SET GLOBAL innodb_file_per_table = 1;"
      - mysql -u root -e "SET GLOBAL innodb_file_format = BARRACUDA;"
