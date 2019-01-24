@@ -1,4 +1,5 @@
 2019-01-24 DariusIII
+	* Chg: Update nunomaduro/larastan (v0.3.14 => v0.3.15)
 	* Chg: Update NNTP class
 2019-01-23 DariusIII
 	* Chg: Return search results for tv, movies, anime searches from api properly
