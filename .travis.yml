@@ -33,7 +33,6 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y libsodium-dev
     - pecl install libsodium
-    - sudo mysql_upgrade -u root -pnew_password
     - composer validate
 
 install:
@@ -45,6 +44,8 @@ install:
 
 before_script:
      # Create mysql database and user.
+     - echo "USE mysql;\nUPDATE user SET password=PASSWORD('test') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+     - mysql_upgrade -u root -ptest
      - mysql -u root -e "SET GLOBAL innodb_file_per_table = 1;"
      - mysql -u root -e "SET GLOBAL innodb_file_format = BARRACUDA;"
      - mysql -u root -e "SET GLOBAL innodb_large_prefix = 1;"
