@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: darius
- * Date: 24.1.19.
- * Time: 11.41
- */
-
 namespace Tests\Feature;
 
 use App\Models\Settings;
