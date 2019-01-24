@@ -1,4 +1,5 @@
 2019-01-24 DariusIII
+	* Chg: Update toTree function
 	* Chg: Add SettingsTest
 	* Chg: Simplify settingValue function in app/Models/Settings model
 	* Chg: Update nunomaduro/larastan (v0.3.14 => v0.3.15)

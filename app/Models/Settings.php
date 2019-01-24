@@ -142,14 +142,14 @@ class Settings extends Model
      */
     public static function toTree($excludeUnsectioned = true): array
     {
-        $results = self::query()->get()->all();
+        $results = self::all();
 
         $tree = [];
-        if (\is_array($results)) {
+        if (! empty($results)) {
             foreach ($results as $result) {
-                if (! $excludeUnsectioned || ! empty($result['section'])) {
-                    $tree[$result['section']][$result['subsection']][$result['name']] =
-                        ['value' => $result['value'], 'hint' => $result['hint']];
+                if (! $excludeUnsectioned || ! empty($result->section)) {
+                    $tree[$result->section][$result->subsection][$result->name] =
+                        ['value' => $result->value, 'hint' => $result->hint];
                 }
             }
         } else {
