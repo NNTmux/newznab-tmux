@@ -33,7 +33,7 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y libsodium-dev
     - pecl install libsodium
-    - sudo mysql_upgrade -u TEST -p TEST
+    - sudo mysql_upgrade -u TEST -pTEST
     - composer validate
 
 install:
