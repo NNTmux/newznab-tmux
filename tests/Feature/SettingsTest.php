@@ -6,11 +6,12 @@
  * Time: 11.41
  */
 
-namespace app\Models;
+namespace Tests\Feature;
 
 use App\Models\Settings;
+use Tests\TestCase;
 
-class SettingsTest extends \PHPUnit_Framework_TestCase
+class SettingsTest extends TestCase
 {
     public function testSettingValue()
     {
