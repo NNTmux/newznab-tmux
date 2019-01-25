@@ -44,7 +44,6 @@ class GameController extends BasePageController
         $gen = new Genres(['Settings' => null]);
         $meta_title = $title = 'Game Edit';
 
-
         // Set the current action.
         $action = $request->input('action') ?? 'view';
 
