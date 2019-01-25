@@ -85,12 +85,12 @@ class UserSerie extends Model
     /**
      * Delete a tv show from the user's "my shows".
      *
-     * @param int $userId    ID of user.
-     * @param int $videoId ID of tv show.
+     * @param $users_id
+     * @param $videos_id
      */
-    public static function delShow($userId, $videoId): void
+    public static function delShow($users_id, $videos_id): void
     {
-        self::query()->where(['users_id' => $userId, 'videos_id' => $videoId])->delete();
+        self::query()->where(compact('users_id', 'videos_id'))->delete();
     }
 
     /**
@@ -134,12 +134,12 @@ class UserSerie extends Model
     /**
      * Update a TV show category ID for a user's "my show" TV show.
      *
-     * @param int   $userId    ID of the user.
-     * @param int $videoId ID of the TV show.
-     * @param array $catID  List of category ID's.
+     * @param       $users_id
+     * @param       $videos_id
+     * @param array $catID List of category ID's.
      */
-    public static function updateShow($userId, $videoId, array $catID = []): void
+    public static function updateShow($users_id, $videos_id, array $catID = []): void
     {
-        self::query()->where(['users_id' => $userId, 'videos_id' => $videoId])->update(['categories' =>  ! empty($catID) ? implode('|', $catID) : 'NULL']);
+        self::query()->where(compact('users_id', 'videos_id'))->update(['categories' =>  ! empty($catID) ? implode('|', $catID) : 'NULL']);
     }
 }
