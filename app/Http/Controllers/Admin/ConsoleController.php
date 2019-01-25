@@ -17,7 +17,7 @@ class ConsoleController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Console List';
+        $meta_title = $title = 'Console List';
 
         $consoleList = Utility::getRange('consoleinfo');
 
@@ -25,13 +25,7 @@ class ConsoleController extends BasePageController
 
         $content = $this->smarty->fetch('console-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -47,6 +41,7 @@ class ConsoleController extends BasePageController
         $this->setAdminPrefs();
         $console = new Console(['Settings' => null]);
         $gen = new Genres();
+        $meta_title = $title = 'Console Edit';
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -81,7 +76,6 @@ class ConsoleController extends BasePageController
                     break;
                 case 'view':
                 default:
-                    $title = 'Console Edit';
                     $this->smarty->assign('console', $con);
                     $this->smarty->assign('genres', $gen->getGenres(Genres::CONSOLE_TYPE));
                     break;
@@ -90,13 +84,7 @@ class ConsoleController extends BasePageController
 
         $content = $this->smarty->fetch('console-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

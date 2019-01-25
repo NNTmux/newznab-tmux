@@ -14,19 +14,13 @@ class CommentsController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Comments List';
+        $meta_title = $title = 'Comments List';
 
         $commentsList = ReleaseComment::getCommentsRange();
         $this->smarty->assign('commentslist', $commentsList);
 
         $content = $this->smarty->fetch('comments-list.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 

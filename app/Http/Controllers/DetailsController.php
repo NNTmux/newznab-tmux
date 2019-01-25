@@ -163,14 +163,7 @@ class DetailsController extends BasePageController
             $meta_description = 'View NZB for'.$data['searchname'];
 
             $content = $this->smarty->fetch('viewnzb.tpl');
-            $this->smarty->assign(
-                [
-                    'content' => $content,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]
-            );
+            $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
             $this->pagerender();
         }
     }

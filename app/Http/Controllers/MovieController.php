@@ -45,13 +45,7 @@ class MovieController extends BasePageController
             }
         }
 
-        $this->smarty->assign([
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
+        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -171,12 +165,7 @@ class MovieController extends BasePageController
             $content = $this->smarty->fetch('movies.tpl');
         }
 
-        $this->smarty->assign([
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -216,13 +205,7 @@ class MovieController extends BasePageController
             if ($modal) {
                 echo $content;
             } else {
-                $this->smarty->assign([
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]);
+                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
                 $this->pagerender();
             }
         }

@@ -256,14 +256,14 @@ class BasePageController extends Controller
 
         $sab = new SABnzbd($this);
         $this->smarty->assign('sabintegrated', $sab->integratedBool);
-        if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
+        if ($sab->integratedBool && $sab->url !== '' && $sab->apikey !== '') {
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
-        if ($this->userdata->hasRole('Admin') === true) {
+        if ($this->userdata->hasRole('Admin')) {
             $this->smarty->assign('isadmin', 'true');
         }
 
-        if ($this->userdata->hasRole('Moderator') === true) {
+        if ($this->userdata->hasRole('Moderator')) {
             $this->smarty->assign('ismod', 'true');
         }
 

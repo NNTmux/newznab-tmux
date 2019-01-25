@@ -221,15 +221,7 @@ class RegisterController extends Controller
         $meta_description = 'Register';
 
         $content = app('smarty.view')->fetch($theme.'/register.tpl');
-        app('smarty.view')->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-                'nocaptcha' => $nocaptcha,
-            ]
-        );
+        app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description', 'nocaptcha'));
         app('smarty.view')->display($theme.'/basepage.tpl');
     }
 }

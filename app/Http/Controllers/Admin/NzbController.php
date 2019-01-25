@@ -63,15 +63,9 @@ class NzbController extends BasePageController
             }
         }
 
-        $title = 'Import Nzbs';
+        $meta_title = $title = 'Import Nzbs';
         $content = $this->smarty->fetch('nzb-import.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 
@@ -134,7 +128,7 @@ class NzbController extends BasePageController
             );
         }
 
-        $title = 'Export Nzbs';
+        $meta_title = $title = 'Export Nzbs';
         $this->smarty->assign(
             [
                 'gziplist'  => [1 => 'True', 0 => 'False'],
@@ -142,13 +136,7 @@ class NzbController extends BasePageController
             ]
         );
         $content = $this->smarty->fetch('nzb-export.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

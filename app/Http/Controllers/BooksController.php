@@ -101,14 +101,7 @@ class BooksController extends BasePageController
         $meta_keywords = 'browse,nzb,books,description,details';
         $meta_description = 'Browse for Books';
         $content = $this->smarty->fetch('books.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
 
         $this->pagerender();
     }

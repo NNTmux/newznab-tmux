@@ -65,7 +65,7 @@ class LoginController extends Controller
                 $user = User::getByEmail($request->input('username'));
             }
 
-            if ($user !== null && ((config('firewall.enabled') === true && \Firewall::isBlacklisted($user->host) === false) || config('firewall.enabled') === false)) {
+            if ($user !== null && ((config('firewall.enabled') === true && ! \Firewall::isBlacklisted($user->host)) || config('firewall.enabled') === false)) {
                 if (config('captcha.enabled') === true && (! empty(config('captcha.secret')) && ! empty(config('captcha.sitekey')))) {
                     $this->validate($request, [
                         'g-recaptcha-response' => ['required', 'captcha'],
@@ -74,7 +74,7 @@ class LoginController extends Controller
 
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
-                if ($user->isVerified() === false || $user->isPendingVerification()) {
+                if (! $user->isVerified() || $user->isPendingVerification()) {
                     return $this->showLoginForm('You have not verified your email address!');
                 }
 
@@ -112,14 +112,7 @@ class LoginController extends Controller
         $meta_keywords = 'Login';
         $meta_description = 'Login';
         $content = app('smarty.view')->fetch($theme.'/login.tpl');
-        app('smarty.view')->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        app('smarty.view')->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         app('smarty.view')->display($theme.'/basepage.tpl');
     }
 

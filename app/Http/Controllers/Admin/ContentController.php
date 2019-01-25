@@ -15,21 +15,14 @@ class ContentController extends BasePageController
     public function index()
     {
         $this->setAdminPrefs();
-        $contents = new Contents();
-        $contentList = $contents->getAll();
+        $contentList = (new Contents())->getAll();
         $this->smarty->assign('contentlist', $contentList);
 
-        $title = 'Content List';
+        $meta_title = $title = 'Content List';
 
         $content = $this->smarty->fetch('content-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -85,7 +78,7 @@ class ContentController extends BasePageController
             case 'view':
             default:
                 if ($request->has('id')) {
-                    $title = 'Content Edit';
+                    $meta_title = $title = 'Content Edit';
                     $id = $request->input('id');
 
                     $content = $contents->getByID($id, User::ROLE_ADMIN);
@@ -99,23 +92,17 @@ class ContentController extends BasePageController
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
 
-        $contenttypelist = ['1' => 'Useful Link', '2' => 'Article', '3' => 'Homepage'];
+        $contenttypelist = [1 => 'Useful Link', 2 => 'Article', 3 => 'Homepage'];
         $this->smarty->assign('contenttypelist', $contenttypelist);
 
         $this->smarty->assign('content', $content);
 
-        $rolelist = ['0' => 'Everyone', '1' => 'Logged in Users', '2' => 'Admins'];
+        $rolelist = [1 => 'Everyone', 2 => 'Logged in Users', 3 => 'Admins'];
         $this->smarty->assign('rolelist', $rolelist);
 
         $content = $this->smarty->fetch('content-add.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

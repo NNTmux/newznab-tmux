@@ -156,13 +156,7 @@ class MyShowsController extends BasePageController
                 $this->smarty->assign('shows', $results);
 
                 $content = $this->smarty->fetch('myshows.tpl');
-                $this->smarty->assign([
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]);
+                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
                 $this->pagerender();
                 break;
         }

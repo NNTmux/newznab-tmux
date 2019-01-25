@@ -82,12 +82,7 @@ class GamesController extends BasePageController
 
         $content = $this->smarty->fetch('games.tpl');
         $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
+            compact('content', 'meta_title', 'meta_keywords', 'meta_description')
         );
         $this->pagerender();
     }

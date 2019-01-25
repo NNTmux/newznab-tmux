@@ -64,16 +64,7 @@ class ContactUsController extends BasePageController
         $meta_description = 'Contact us at '.Settings::settingValue('site.main.title').' and submit your feedback';
         $content = $this->smarty->fetch('contact.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-                'msg' => $msg,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description', 'msg'));
 
         $this->pagerender();
     }

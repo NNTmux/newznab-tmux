@@ -18,7 +18,7 @@ class SharingController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Sharing Settings';
+        $meta_title = $title = 'Sharing Settings';
 
         $allSites = SharingSite::query()->orderByDesc('id')->paginate(config('nntmux.items_per_cover_page'));
         if ($allSites->total() === 0) {
@@ -49,14 +49,7 @@ class SharingController extends BasePageController
                 $max_download = $ourSite['max_download'];
             }
             Sharing::query()
-                ->update(
-                    [
-                        'site_name' => $site_name,
-                        'max_push' => $max_push,
-                        'max_pull' => $max_pull,
-                        'max_download' => $max_download,
-                    ]
-                );
+                ->update(compact('site_name', 'max_push', 'max_pull', 'max_download'));
 
             $ourSite = $ourSite = Sharing::query()->first();
         }
@@ -65,13 +58,7 @@ class SharingController extends BasePageController
 
         $content = $this->smarty->fetch('sharing.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

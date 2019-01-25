@@ -35,15 +35,7 @@ class PredbController extends BasePageController
         $meta_description = 'View PreDb info';
 
         $content = $this->smarty->fetch('predb.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
 
         $this->adminrender();
     }

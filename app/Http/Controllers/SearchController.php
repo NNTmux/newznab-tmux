@@ -197,14 +197,7 @@ You can combine some of these rules, but not all.<br />';
         );
 
         $content = $this->smarty->fetch('search.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 }

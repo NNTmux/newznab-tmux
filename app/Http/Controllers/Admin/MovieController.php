@@ -18,20 +18,14 @@ class MovieController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Movie List';
+        $meta_title = $title = 'Movie List';
 
         $movieList = Utility::getRange('movieinfo');
         $this->smarty->assign('movielist', $movieList);
 
         $content = $this->smarty->fetch('movie-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -50,14 +44,14 @@ class MovieController extends BasePageController
         $this->setAdminPrefs();
         $movie = new Movie(['Settings' => null]);
 
-        $title = 'Movie Add';
+        $meta_title = $title = 'Movie Add';
 
         $id = str_pad($request->input('id'), 7, '0', STR_PAD_LEFT);
 
         if ($request->has('id') && \strlen($id) === 7) {
             $movCheck = $movie->getMovieInfo($id);
             $movieInfo = $movie->updateMovieInfo($id);
-            if ($movieInfo === true && ($movCheck === null || ($request->has('update') === true && (int) $request->input('update') === 1))) {
+            if ($movieInfo && ($movCheck === null || ($request->has('update') && (int) $request->input('update') === 1))) {
                 $forUpdate = Release::query()->where('imdbid', $id)->get(['id']);
                 if ($forUpdate !== null) {
                     $movieInfoId = MovieInfo::query()->where('imdbid', $id)->first(['id']);
@@ -76,13 +70,7 @@ class MovieController extends BasePageController
 
         $content = $this->smarty->fetch('movie-add.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -98,7 +86,7 @@ class MovieController extends BasePageController
         $this->setAdminPrefs();
 
         $movie = new Movie();
-        $title = 'Add Movie';
+        $meta_title = $title = 'Add Movie';
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -159,7 +147,7 @@ class MovieController extends BasePageController
                     break;
                 case 'view':
                 default:
-                    $title = 'Movie Edit';
+                    $meta_title = $title = 'Movie Edit';
                     $this->smarty->assign('movie', $mov);
                     break;
             }
@@ -167,13 +155,7 @@ class MovieController extends BasePageController
 
         $content = $this->smarty->fetch('movie-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

@@ -110,14 +110,7 @@ class ConsoleController extends BasePageController
         $meta_description = 'Browse for Console Games';
         $content = $this->smarty->fetch('console.tpl');
 
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
 
         $this->pagerender();
     }

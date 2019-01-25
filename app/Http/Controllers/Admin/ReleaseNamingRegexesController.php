@@ -19,7 +19,7 @@ class ReleaseNamingRegexesController extends BasePageController
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
 
-        $title = 'Release Naming Regex List';
+        $meta_title = $title = 'Release Naming Regex List';
 
         $group = '';
         if ($request->has('group') && ! empty($request->input('group'))) {
@@ -29,13 +29,7 @@ class ReleaseNamingRegexesController extends BasePageController
         $this->smarty->assign('regex', $regex);
 
         $content = $this->smarty->fetch('release_naming_regexes-list.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 
@@ -86,11 +80,11 @@ class ReleaseNamingRegexesController extends BasePageController
             case 'view':
             default:
                 if ($request->has('id')) {
-                    $title = 'Release Naming Regex Edit';
+                    $meta_title = $title = 'Release Naming Regex Edit';
                     $id = $request->input('id');
                     $regex = $regexes->getRegexByID($id);
                 } else {
-                    $title = 'Release Naming Regex Add';
+                    $meta_title = $title = 'Release Naming Regex Add';
                     $regex = ['status' => 1];
                 }
                 break;
@@ -102,13 +96,7 @@ class ReleaseNamingRegexesController extends BasePageController
 
         $content = $this->smarty->fetch('release_naming_regexes-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -121,7 +109,7 @@ class ReleaseNamingRegexesController extends BasePageController
     public function testRegex(Request $request)
     {
         $this->setAdminPrefs();
-        $title = 'Release Naming Regex Test';
+        $meta_title = $title = 'Release Naming Regex Test';
 
         $group = trim($request->has('group') && ! empty($request->input('group')) ? $request->input('group') : '');
         $regex = trim($request->has('regex') && ! empty($request->input('regex')) ? $request->input('regex') : '');
@@ -134,13 +122,7 @@ class ReleaseNamingRegexesController extends BasePageController
         }
 
         $content = $this->smarty->fetch('release_naming_regexes-test.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

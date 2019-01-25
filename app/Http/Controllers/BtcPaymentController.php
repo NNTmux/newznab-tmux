@@ -55,14 +55,7 @@ class BtcPaymentController extends BasePageController
 
         $content = $this->smarty->fetch('btc_payment.tpl');
 
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'title' => $title,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'title', 'meta_description'));
         $this->pagerender();
     }
 

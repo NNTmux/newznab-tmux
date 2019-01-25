@@ -23,13 +23,13 @@ class TmuxController extends BasePageController
         switch ($action) {
             case 'submit':
                 Settings::settingsUpdate($request->all());
-                $title = 'Tmux Settings Edit';
+                $meta_title = $title = 'Tmux Settings Edit';
                 $this->smarty->assign('site', $this->settings);
                 break;
 
             case 'view':
             default:
-                $title = 'Tmux Settings Edit';
+                $meta_title = $title = 'Tmux Settings Edit';
                 $this->smarty->assign('site', $this->settings);
                 break;
         }
@@ -66,13 +66,7 @@ class TmuxController extends BasePageController
 
         $content = $this->smarty->fetch('tmux-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

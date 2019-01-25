@@ -17,7 +17,7 @@ class BookController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Book List';
+        $meta_title = $title = 'Book List';
 
         $bookList = BookInfo::query()->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
 
@@ -25,13 +25,7 @@ class BookController extends BasePageController
 
         $content = $this->smarty->fetch('book-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -46,6 +40,8 @@ class BookController extends BasePageController
     {
         $this->setAdminPrefs();
         $book = new Books();
+
+        $meta_title = $title = 'Book Edit';
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -78,7 +74,6 @@ class BookController extends BasePageController
                     break;
                 case 'view':
                 default:
-                    $title = 'Book Edit';
                     $this->smarty->assign('book', $b);
                     break;
             }
@@ -86,13 +81,7 @@ class BookController extends BasePageController
 
         $content = $this->smarty->fetch('book-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

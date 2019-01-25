@@ -78,7 +78,7 @@ class ApiController extends BasePageController
                 }
             }
 
-            if ($res->hasRole('Disabled') === true) {
+            if ($res->hasRole('Disabled')) {
                 Utility::showApiError(101);
             }
 
@@ -249,7 +249,7 @@ class ApiController extends BasePageController
                $api->verifyEmptyParameter('g');
                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $relData = Release::checkGuidForApi($request->input('id'));
-               if ($relData !== false) {
+               if ($relData) {
                    return redirect(WWW_TOP.'/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
                }
 
