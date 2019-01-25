@@ -145,10 +145,8 @@ class Video extends Model
      */
     public static function getSeriesList($uid, $letter = '', $showname = ''): array
     {
-        if ($letter !== '') {
-            if ($letter === '0-9') {
-                $letter = '[0-9]';
-            }
+        if (($letter !== '') && $letter === '0-9') {
+            $letter = '[0-9]';
         }
 
         $qry = self::query()
