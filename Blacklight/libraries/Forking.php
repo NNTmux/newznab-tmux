@@ -300,10 +300,8 @@ class Forking extends \fork_daemon
 
             $this->addwork($this->work);
             $this->process_work(true);
-        } else {
-            if (config('nntmux.echocli') === true) {
-                $this->colorCli->header('No work to do!');
-            }
+        } elseif (config('nntmux.echocli') === true) {
+            $this->colorCli->header('No work to do!');
         }
     }
 
@@ -603,7 +601,7 @@ class Forking extends \fork_daemon
             $threads = 1;
         }
 
-        $leftguids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+        $leftGuids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
         // Prevent PreDB FT from always running
         if ($this->workTypeOptions[0] === 'predbft') {
@@ -619,18 +617,18 @@ class Forking extends \fork_daemon
                 )
             );
             if ($preCount[0]->num > 0) {
-                $leftguids = \array_slice($leftguids, 0, (int) ceil($preCount[0]->num / $maxperrun));
+                $leftGuids = \array_slice($leftGuids, 0, (int) ceil($preCount[0]->num / $maxperrun));
             } else {
-                $leftguids = [];
+                $leftGuids = [];
             }
         }
 
         $count = 0;
         $queue = [];
-        foreach ($leftguids as $leftguid) {
+        foreach ($leftGuids as $leftGuid) {
             $count++;
             if ($maxperrun > 0) {
-                $queue[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftguid, $maxperrun, $count);
+                $queue[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftGuid, $maxperrun, $count);
             }
         }
         $this->work = $queue;
@@ -665,15 +663,13 @@ class Forking extends \fork_daemon
 
         $groups = DB::select('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
-        if ($groups instanceof \Traversable) {
-            foreach ($groups as $group) {
-                try {
-                    if (DB::select(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group->id)) !== false) {
-                        $this->work[] = ['id' => $group->id];
-                    }
-                } catch (\PDOException $e) {
-                    $e->getMessage();
+        foreach ($groups as $group) {
+            try {
+                if (DB::select(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group->id)) !== false) {
+                    $this->work[] = ['id' => $group->id];
                 }
+            } catch (\PDOException $e) {
+                Log::debug($e->getMessage());
             }
         }
 
@@ -759,7 +755,7 @@ class Forking extends \fork_daemon
     private function postProcessAddMainMethod()
     {
         $maxProcesses = 1;
-        if ($this->checkProcessAdditional() === true) {
+        if ($this->checkProcessAdditional()) {
             $this->processAdditional = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
@@ -812,11 +808,12 @@ class Forking extends \fork_daemon
     private function postProcessNfoMainMethod(): int
     {
         $maxProcesses = 1;
-        if ($this->checkProcessNfo() === true) {
+        if ($this->checkProcessNfo()) {
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
-                sprintf('
+                sprintf(
+                    '
 					SELECT leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
@@ -858,7 +855,7 @@ class Forking extends \fork_daemon
     private function postProcessMovMainMethod(): int
     {
         $maxProcesses = 1;
-        if ($this->checkProcessMovies() === true) {
+        if ($this->checkProcessMovies()) {
             $this->processMovies = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
@@ -913,7 +910,7 @@ class Forking extends \fork_daemon
     private function postProcessTvMainMethod()
     {
         $maxProcesses = 1;
-        if ($this->checkProcessTV() === true) {
+        if ($this->checkProcessTV()) {
             $this->processTV = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
@@ -1093,7 +1090,8 @@ class Forking extends \fork_daemon
             $this->colorCli->header(
                     'Process ID #'.$pid.' has completed.'.PHP_EOL.
                     'There are '.($this->forked_children_count - 1).' process(es) still active with '.
-                    (--$this->_workCount).' job(s) left in the queue.', true
+                    (--$this->_workCount).' job(s) left in the queue.',
+                true
                 );
         }
     }

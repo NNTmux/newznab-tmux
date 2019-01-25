@@ -1,4 +1,5 @@
 2019-01-25 DariusIII
+	* Chg: Small update to Forking class
 	* Chg: Small change in Video model
 	* Chg: Update Console class
 	* Chg: Small optimizations in code, use compact where applicable
