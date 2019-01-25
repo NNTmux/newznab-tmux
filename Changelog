@@ -1,4 +1,5 @@
 2019-01-25 DariusIII
+	* Chg: Update Console class
 	* Chg: Small optimizations in code, use compact where applicable
 	* Chg: Add config/nntmux_nntp.php and use the config in NNTP class
 	* Chg: Updated czproject/git-php (v3.16.1 => v3.16.2)

@@ -337,28 +337,16 @@ class Console
      * @param $releasedate
      * @param $esrb
      * @param $cover
-     * @param $genreID
+     * @param $genres_id
      * @param string $review
      */
-    public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genreID, $review = 'review'): void
+    public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genres_id, $review = 'review'): void
     {
+        $releasedate = $releasedate !== '' ? $releasedate : 'null';
+        $review = $review === 'review' ? $review : substr($review, 0, 3000);
         ConsoleInfo::query()
             ->where('id', $id)
-            ->update(
-                [
-                    'title' => $title,
-                    'asin' => $asin,
-                    'url' => $url,
-                    'salesrank' => $salesrank,
-                    'platform' => $platform,
-                    'publisher' => $publisher,
-                    'releasedate' => $releasedate !== '' ? $releasedate : 'null',
-                    'esrb' => $esrb,
-                    'cover' => $cover,
-                    'genres_id' => $genreID,
-                    'review' => $review === 'review' ? $review : substr($review, 0, 3000),
-                ]
-            );
+            ->update(compact('title', 'asin', 'url', 'salesrank', 'platform', 'publisher', 'releasedate', 'esrb', 'cover', 'genres_id', 'review'));
     }
 
     /**
@@ -383,7 +371,7 @@ class Console
                 $con['substr'] = $gameInfo['title'];
             }
 
-            if ($this->_matchConToGameInfo($gameInfo, $con) === true) {
+            if ($this->_matchConToGameInfo($gameInfo, $con)) {
                 $con += $this->_setConAfterMatch($amaz);
                 $con += $this->_matchGenre($amaz);
 
