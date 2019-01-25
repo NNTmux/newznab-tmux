@@ -9,8 +9,8 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\Log;
+use Blacklight\processing\PostProcess;
 
 /**
  * Class Forking.
