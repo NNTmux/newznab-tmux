@@ -146,7 +146,7 @@ class NNTP extends \Net_NNTP_Client
      */
     public function doConnect($compression = true, $alternate = false)
     {
-        if ($this->_isConnected() && (($alternate && $this->_currentServer === env('NNTP_SERVER_A')) || (! $alternate && $this->_currentServer === env('NNTP_SERVER')))) {
+        if ($this->_isConnected() && (($alternate && $this->_currentServer === config('nntmux_nntp.alternate_server')) || (! $alternate && $this->_currentServer === config('nntmux_nntp.server')))) {
             return true;
         }
 
@@ -156,19 +156,19 @@ class NNTP extends \Net_NNTP_Client
 
         // Set variables to connect based on if we are using the alternate provider or not.
         if (! $alternate) {
-            $sslEnabled = env('NNTP_SSLENABLED') ? true : false;
-            $this->_currentServer = env('NNTP_SERVER');
-            $this->_currentPort = env('NNTP_PORT');
-            $userName = env('NNTP_USERNAME');
-            $password = env('NNTP_PASSWORD');
-            $socketTimeout = ! empty(env('NNTP_SOCKET_TIMEOUT')) ? env('NNTP_SOCKET_TIMEOUT') : $this->_socketTimeout;
+            $sslEnabled = config('nntmux_nntp.ssl') ? true : false;
+            $this->_currentServer = config('nntmux_nntp.server');
+            $this->_currentPort = config('nntmux_nntp.port');
+            $userName = config('nntmux_nntp.username');
+            $password = config('nntmux_nntp.password');
+            $socketTimeout = ! empty(config('nntmux_nntp.socket_timeout')) ? config('nntmux_nntp.socket_timeout') : $this->_socketTimeout;
         } else {
-            $sslEnabled = env('NNTP_SSLENABLED_A') ? true : false;
-            $this->_currentServer = env('NNTP_SERVER_A');
-            $this->_currentPort = env('NNTP_PORT_A');
-            $userName = env('NNTP_USERNAME_A');
-            $password = env('NNTP_PASSWORD_A');
-            $socketTimeout = ! empty(env('NNTP_SOCKET_TIMEOUT_A')) ? env('NNTP_SOCKET_TIMEOUT_A') : $this->_socketTimeout;
+            $sslEnabled = config('nntmux_nntp.alternate_server_ssl') ? true : false;
+            $this->_currentServer = config('nntmux_nntp.alternate_server');
+            $this->_currentPort = config('nntmux_nntp.alternate_server_port');
+            $userName = config('nntmux_nntp.alternate_server_username');
+            $password = config('nntmux_nntp.alternate_server_password');
+            $socketTimeout = ! empty(config('nntmux_nntp.alternate_server_socket_timeout')) ? config('nntmux_nntp.alternate_server_socket_timeout') : $this->_socketTimeout;
         }
 
         $enc = ($sslEnabled ? ' (ssl)' : ' (non-ssl)');
@@ -561,7 +561,7 @@ class NNTP extends \Net_NNTP_Client
                 } elseif ($alternate) {
                     if (! $aConnected) {
                         // Check if the current connected server is the alternate or not.
-                        $aConnected = $this->_currentServer === env('NNTP_SERVER') ? $nntp->doConnect(true, true) : $nntp->doConnect();
+                        $aConnected = $this->_currentServer === config('nntmux_nntp.server') ? $nntp->doConnect(true, true) : $nntp->doConnect();
                     }
                     // If we connected successfully to usenet try to download the article body.
                     if ($aConnected === true) {
@@ -1191,13 +1191,13 @@ class NNTP extends \Net_NNTP_Client
             $retVal = true;
         } else {
             switch ($this->_currentServer) {
-                case env('NNTP_SERVER'):
+                case config('nntmux_nntp.server'):
                     if (\is_resource($this->_socket)) {
                         $this->doQuit(true);
                     }
                     $retVal = $this->doConnect();
                     break;
-                case env('NNTP_SERVER_A'):
+                case config('nntmux_nntp.alternate_server'):
                     if (\is_resource($this->_socket)) {
                         $this->doQuit(true);
                     }

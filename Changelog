@@ -1,4 +1,5 @@
 2019-01-25 DariusIII
+	* Chg: Add config/nntmux_nntp.php and use the config in NNTP class
 	* Chg: Updated czproject/git-php (v3.16.1 => v3.16.2)
 2019-01-24 DariusIII
 	* Fix: Use inline string for settingValue in TmuxRun class
