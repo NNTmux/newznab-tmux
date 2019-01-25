@@ -1,4 +1,5 @@
 2019-01-25 DariusIII
+	* Chg: Update Category class
 	* Fix: Fix Log class usage in Forking class
 	* Chg: Small update to Forking class
 	* Chg: Small change in Video model

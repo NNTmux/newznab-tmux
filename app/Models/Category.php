@@ -442,12 +442,13 @@ class Category extends Model
      * Return the parent and category name from the supplied categoryID.
      *
      *
-     * @param $ID
+     * @param $categoryId
+     *
      * @return string
      */
-    public static function getNameByID($ID): string
+    public static function getNameByID($categoryId): string
     {
-        $cat = self::query()->where('id', $ID)->first();
+        $cat = self::query()->where('id', $categoryId)->first();
 
         return $cat !== null ? $cat->parent->title.' -> '.$cat->title : '';
     }
