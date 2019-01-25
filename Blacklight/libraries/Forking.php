@@ -10,6 +10,7 @@ use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Blacklight\processing\PostProcess;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Forking.
