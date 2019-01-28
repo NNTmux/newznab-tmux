@@ -173,7 +173,7 @@ class Settings extends Model
             [
                 'section' => $match[1] ?? '',
                 'subsection' => $match[2] ?? '',
-                'name' => $match[3],
+                'name' => $match[3] ?? '',
             ]
         )->value('value');
 
