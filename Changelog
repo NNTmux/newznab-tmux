@@ -1,4 +1,5 @@
 2019-01-28 DariusIII
+	* Chg: Update nesbot/carbon (2.10.0 => 2.10.1)
 	* Fix: Fix safe backfill
 	* Chg: Make settingValue function silent for undefined index
 	* Fix: Fix check for not empty collections table in Forking class
