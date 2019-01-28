@@ -385,7 +385,7 @@ class Forking extends \fork_daemon
         $backfill_qty = (int) Settings::settingValue('site.tmux.backfill_qty');
         $backfill_order = (int) Settings::settingValue('site.tmux.backfill_order');
         $backfill_days = (int) Settings::settingValue('site.tmux.backfill_days');
-        $maxmssgs = (int) Settings::settingValue('maxmssgs');
+        $maxmssgs = (int) Settings::settingValue('..maxmssgs');
         $threads = (int) Settings::settingValue('..backfillthreads');
 
         $orderby = 'ORDER BY a.last_record ASC';
@@ -414,7 +414,7 @@ class Forking extends \fork_daemon
         $backfilldays = '';
         if ($backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = now()->subDays((int) $days)->format('Y-m-d');
+            $backfilldays = now()->subDays(Carbon::createFromDate($days));
         } elseif ($backfill_days === 2) {
             $backfilldays = now()->subDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate'))->diffInDays())->format('Y-m-d');
         }

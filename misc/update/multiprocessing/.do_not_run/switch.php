@@ -16,6 +16,7 @@ use Blacklight\Binaries;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -28,16 +29,18 @@ switch ($options[1]) {
     // $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
     case 'backfill':
         if (in_array((int)$options[3], [1, 2], false)) {
-            $value = Settings::settingValue('site.tmux.backfill_qty');
-            if ($value !== false) {
+            $value = (int) Settings::settingValue('site.tmux.backfill_qty');
+            if ($value !== null) {
                 try {
                     $nntp = nntp();
                 } catch (Exception $e) {
+                    Log::error($e->getTraceAsString());
                     echo $e->getMessage();
                 }
                 try {
                     (new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
                 } catch (Exception $e) {
+                    Log::error($e->getTraceAsString());
                     echo $e->getMessage();
                 }
             }
@@ -53,11 +56,13 @@ switch ($options[1]) {
         try {
             $nntp = nntp();
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             (new Backfill())->backfillAllGroups($options[2], $options[3]);
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         break;
@@ -68,11 +73,13 @@ switch ($options[1]) {
         try {
             $nntp = nntp();
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             (new Backfill())->backfillAllGroups($options[2], 10000, 'normal');
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         break;
@@ -97,16 +104,19 @@ switch ($options[1]) {
                 return;
             }
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill'));
         } catch (Exception $e) {
+            Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         if (empty($return)) {
