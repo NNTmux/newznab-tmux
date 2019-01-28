@@ -1,3 +1,5 @@
+2019-01-28 DariusIII
+	* Chg: Update settingValue function in Settings model
 2019-01-25 DariusIII
 	* Chg: Update Category class
 	* Fix: Fix Log class usage in Forking class

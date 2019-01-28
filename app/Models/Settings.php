@@ -162,18 +162,18 @@ class Settings extends Model
     }
 
     /**
-     * @param $setting
+     * @param string|array $setting
      *
-     * @return null|string
+     * @return string|null
      */
     public static function settingValue($setting): ?string
     {
-        $setting = explode('.', $setting);
+        $settingArray = preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $match);
         $result = self::query()->where(
             [
-                'section' => $setting[0] ?? '',
-                'subsection' => $setting[1] ?? '',
-                'name' => $setting[2],
+                'section' => $match[1] ?? '',
+                'subsection' => $match[2] ?? '',
+                'name' => $match[3],
             ]
         )->value('value');
 
