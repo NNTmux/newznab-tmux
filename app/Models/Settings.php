@@ -162,13 +162,13 @@ class Settings extends Model
     }
 
     /**
-     * @param string|array $setting
+     * @param $setting
      *
-     * @return string|null
+     * @return mixed
      */
-    public static function settingValue($setting): ?string
+    public static function settingValue($setting)
     {
-        $settingArray = preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $match);
+        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $match);
         $result = self::query()->where(
             [
                 'section' => $match[1] ?? '',
@@ -177,13 +177,7 @@ class Settings extends Model
             ]
         )->value('value');
 
-        if ($result !== null) {
-            $value = $result;
-        } else {
-            $value = null;
-        }
-
-        return $value;
+        return $result;
     }
 
     /**

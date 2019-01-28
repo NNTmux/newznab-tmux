@@ -1,4 +1,5 @@
 2019-01-28 DariusIII
+	* Chg: Simplify settingValue function
 	* Chg: Update settingValue function in Settings model
 2019-01-25 DariusIII
 	* Chg: Update Category class
