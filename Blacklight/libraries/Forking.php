@@ -662,7 +662,7 @@ class Forking extends \fork_daemon
 
         foreach ($groups as $group) {
             try {
-                if (DB::select(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group->id)) !== false) {
+                if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
                     $this->work[] = ['id' => $group->id];
                 }
             } catch (\PDOException $e) {
