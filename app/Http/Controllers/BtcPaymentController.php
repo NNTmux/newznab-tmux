@@ -79,7 +79,7 @@ class BtcPaymentController extends BasePageController
             // If order was paid in full (2) or overpaid (4)
             if ((int) $order['status'] === 2 || (int) $order['status'] === 4) {
                 User::updateUserRole($callback_data['user_id'], $newRole);
-                User::updateUserRoleChangeDate($callback_data['user_id'], now()->addYears($addYear));
+                User::updateUserRoleChangeDate($callback_data['user_id'], null, $addYear);
             }
         }
     }

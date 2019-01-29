@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
@@ -368,13 +369,19 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $uid
+     * @param int $uid
      * @param $date
-     * @return int
+     * @param int $addYear
      */
-    public static function updateUserRoleChangeDate($uid, $date): int
+    public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0)
     {
-        return self::whereId($uid)->update(['rolechangedate' => $date]);
+        $currRoleExp = self::whereId($uid)->select(['rolechangedate'])->first();
+        if (! empty($date)) {
+            self::whereId($uid)->update(['rolechangedate' => $date]);
+        }
+        if (empty($date) && ! empty($addYear)) {
+            self::whereId($uid)->update(['rolechangedate' => Carbon::createFromDate($currRoleExp['rolechangedate'])->addYears($addYear)]);
+        }
     }
 
     /**
