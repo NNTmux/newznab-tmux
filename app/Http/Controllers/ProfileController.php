@@ -8,14 +8,14 @@ use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use App\Jobs\SendAccountDeletedEmail;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController

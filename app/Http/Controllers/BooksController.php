@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Blacklight\Books;
 use App\Models\Category;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 
 class BooksController extends BasePageController
 {

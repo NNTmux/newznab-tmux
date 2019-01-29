@@ -13,13 +13,13 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\Categorize;
+use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
 use Blacklight\ReleaseImage;
 use App\Models\ReleasesGroups;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class ProcessReleases
 {
