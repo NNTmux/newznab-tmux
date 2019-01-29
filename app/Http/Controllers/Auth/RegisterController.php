@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\Invitation;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
@@ -101,7 +102,7 @@ class RegisterController extends Controller
         }
 
         if ($validator->fails()) {
-            $error = implode('', array_collapse($validator->errors()->toArray()));
+            $error = implode('', Arr::collapse($validator->errors()->toArray()));
 
             return $this->showRegistrationForm($error);
         }

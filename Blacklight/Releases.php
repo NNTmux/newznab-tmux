@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Chumper\Zipper\Zipper;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
@@ -635,7 +636,7 @@ class Releases
 
         $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
-        $searchResult = array_pluck($results, 'id');
+        $searchResult = Arr::pluck($results, 'id');
 
         $catQuery = '';
         if ($type === 'basic') {
@@ -731,7 +732,7 @@ class Releases
     public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
     {
         if ($searchName !== -1) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
         }
 
         $catQuery = Category::getCategorySearch($cat);
@@ -871,7 +872,7 @@ class Releases
         }
 
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
@@ -1016,7 +1017,7 @@ class Releases
         }
 
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
@@ -1093,7 +1094,7 @@ class Releases
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(
@@ -1167,7 +1168,7 @@ class Releases
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
         if (! empty($name)) {
-            $searchResult = array_pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
         }
 
         $whereSql = sprintf(

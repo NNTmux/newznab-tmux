@@ -6,6 +6,7 @@ use Blacklight\Genres;
 use Blacklight\Console;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ConsoleController extends BasePageController
 {
@@ -35,7 +36,7 @@ class ConsoleController extends BasePageController
                 ];
         }
         $category = Category::GAME_ROOT;
-        if ($id && \in_array($id, array_pluck($ctmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($ctmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::GAME_ROOT)

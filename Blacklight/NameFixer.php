@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Models\Category;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
+use Illuminate\Support\Arr;
 
 /**
  * Class NameFixer.
@@ -1027,7 +1028,7 @@ class NameFixer
 
                         if ($status !== '') {
                             foreach ($status as $key => $stat) {
-                                $updateColumns = array_add($updateColumns, $key, $stat);
+                                $updateColumns = Arr::add($updateColumns, $key, $stat);
                             }
                         }
 
@@ -1169,7 +1170,7 @@ class NameFixer
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
             $titlematch = $this->sphinx->searchIndexes('releases_rt', $preTitle, ['name', 'searchname', 'filename']);
             if (! empty($titlematch)) {
-                $join = implode(',', array_pluck($titlematch, 'id'));
+                $join = implode(',', Arr::pluck($titlematch, 'id'));
             }
         }
 

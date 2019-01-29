@@ -1,4 +1,5 @@
 2019-01-29 DariusIII
+	* Chg: Replace usage of array_ helper with Arr class directly to prepare for Laravel 5.8 changes
 	* Chg: Replace usage of str_ helper with Str class directly to prepare for Laravel 5.8 changes
 	* Chg: Update vlucas/phpdotenv to version 2.6.1
 	* Chg: Update used libraries to their latest versions

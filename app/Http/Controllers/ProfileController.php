@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use App\Jobs\SendAccountDeletedEmail;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
@@ -159,7 +160,7 @@ class ProfileController extends BasePageController
                 ]);
 
                 if ($validator->fails()) {
-                    $errorStr = implode('', array_collapse($validator->errors()->toArray()));
+                    $errorStr = implode('', Arr::collapse($validator->errors()->toArray()));
                 } elseif (! empty($request->input('nzbgeturl')) && $nzbGet->verifyURL($request->input('nzbgeturl')) === false) {
                     $errorStr = 'The NZBGet URL you entered is invalid!';
                 } elseif ((! $request->has('saburl') && $request->has('sabapikey')) || ($request->has('saburl') && ! $request->has('sabapikey'))) {

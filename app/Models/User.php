@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
@@ -690,7 +691,7 @@ class User extends Authenticatable
         ]);
 
         if ($validator->fails()) {
-            (new ColorCLI())->error(implode('', array_collapse($validator->errors()->toArray())));
+            (new ColorCLI())->error(implode('', Arr::collapse($validator->errors()->toArray())));
         }
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.

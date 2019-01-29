@@ -6,6 +6,7 @@ use Blacklight\Music;
 use Blacklight\Genres;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class MusicController extends BasePageController
 {
@@ -32,7 +33,7 @@ class MusicController extends BasePageController
         }
 
         $category = Category::MUSIC_ROOT;
-        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::MUSIC_ROOT)

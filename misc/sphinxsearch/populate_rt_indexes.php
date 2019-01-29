@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Predb;
 use App\Models\Release;
 use Blacklight\SphinxSearch;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1])) {
@@ -26,7 +27,7 @@ function populate_rt($table, $max)
     $allowedIndexes = ['releases_rt', 'predb_rt'];
     if (\in_array($table, $allowedIndexes, true)) {
         $sphinx = new SphinxSearch();
-        $sphinx->truncateRTIndex(array_wrap($table));
+        $sphinx->truncateRTIndex(Arr::wrap($table));
         if ($table === 'releases_rt') {
             DB::statement('SET SESSION group_concat_max_len=16384;');
             $query = 'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename

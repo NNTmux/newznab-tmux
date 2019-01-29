@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Blacklight\Books;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class BooksController extends BasePageController
 {
@@ -31,7 +32,7 @@ class BooksController extends BasePageController
                 ];
         }
         $category = Category::BOOKS_ROOT;
-        if ($id && \in_array($id, array_pluck($btmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($btmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::BOOKS_ROOT)

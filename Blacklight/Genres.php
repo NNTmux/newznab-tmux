@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Genre;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -123,7 +124,7 @@ class Genres
         $sql = $this->getListQuery($type, $activeOnly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
 
-        return (array) array_first(DB::select($sql));
+        return (array) Arr::first(DB::select($sql));
     }
 
     /**

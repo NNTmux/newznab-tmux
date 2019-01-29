@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\Contents;
 use App\Models\Forumpost;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -86,7 +87,7 @@ class BasePageController extends Controller
         $this->settings = new Settings();
         $this->smarty = app('smarty.view');
 
-        foreach (array_get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
+        foreach (Arr::get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
             $this->smarty->addPluginsDir($plugins);
         }
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;

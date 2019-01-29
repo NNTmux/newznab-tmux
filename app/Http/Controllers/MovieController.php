@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Blacklight\Movie;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class MovieController extends BasePageController
 {
@@ -71,7 +72,7 @@ class MovieController extends BasePageController
         }
 
         $category = $request->has('imdb') ? -1 : Category::MOVIE_ROOT;
-        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where(['title'=> $id, 'parentid' => Category::MOVIE_ROOT])
                 ->first(['id']);

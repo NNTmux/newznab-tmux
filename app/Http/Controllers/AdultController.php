@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Blacklight\XXX;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AdultController extends BasePageController
 {
@@ -29,7 +30,7 @@ class AdultController extends BasePageController
                 ];
         }
         $category = Category::XXX_ROOT;
-        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::XXX_ROOT)

@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\CategoryRegex;
 use App\Models\CollectionRegex;
 use App\Models\ReleaseNamingRegex;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -109,7 +110,7 @@ class Regexes
      */
     public function getRegexByID($id): array
     {
-        return (array) array_first(DB::select(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 1', $this->tableName, $id)));
+        return (array) Arr::first(DB::select(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 1', $this->tableName, $id)));
     }
 
     /**

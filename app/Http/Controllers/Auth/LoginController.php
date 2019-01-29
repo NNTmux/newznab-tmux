@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -94,7 +95,7 @@ class LoginController extends Controller
             return $this->showLoginForm($error);
         }
 
-        $error = implode('', array_collapse($validator->errors()->toArray()));
+        $error = implode('', Arr::collapse($validator->errors()->toArray()));
 
         return $this->showLoginForm($error);
     }

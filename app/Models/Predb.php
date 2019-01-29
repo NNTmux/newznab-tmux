@@ -5,6 +5,7 @@ namespace App\Models;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Blacklight\SphinxSearch;
+use Illuminate\Support\Arr;
 use Laravel\Scout\Searchable;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
@@ -183,7 +184,7 @@ class Predb extends Model
         $sql = self::query()->remember(config('nntmux.cache_expiry_medium'))->leftJoin('releases', 'releases.predb_id', '=', 'predb.id')->orderByDesc('predb.predate');
         if (! empty($search)) {
             $sphinx = new SphinxSearch();
-            $ids = array_pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
+            $ids = Arr::pluck($sphinx->searchIndexes('predb_rt', $search, ['title']), 'id');
             $sql->whereIn('predb.id', $ids);
         }
 

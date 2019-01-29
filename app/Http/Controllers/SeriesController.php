@@ -6,6 +6,7 @@ use App\Models\Video;
 use Blacklight\Releases;
 use App\Models\UserSerie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class SeriesController extends BasePageController
 {
@@ -61,7 +62,7 @@ class SeriesController extends BasePageController
                     $series[$r->series][$r->episode][] = $r;
                 }
 
-                $this->smarty->assign('seasons', array_sort_recursive($series));
+                $this->smarty->assign('seasons', Arr::sortRecursive($series));
                 $this->smarty->assign('show', $show);
                 $this->smarty->assign('myshows', $myshows);
 

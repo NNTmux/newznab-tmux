@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\TmuxOutput;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
@@ -33,7 +34,7 @@ $db_name = config('nntmux.db_name');
 
 $tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
 
-$runVar['constants'] = (array) array_first(DB::select($tRun->getConstantSettings()));
+$runVar['constants'] = (array) Arr::first(DB::select($tRun->getConstantSettings()));
 
 //assign shell commands
 $runVar['commands']['_php'] = " nice -n{$tmux_niceness} php";
@@ -73,7 +74,7 @@ $psTableRowCount = $pdo->prepare($tblCount);
 while ($runVar['counts']['iterations'] > 0) {
     $timer01 = time();
     // These queries are very fast, run every loop -- tmux and site settings
-    $runVar['settings'] = (array) array_first(DB::select($tRun->getMonitorSettings()));
+    $runVar['settings'] = (array) Arr::first(DB::select($tRun->getMonitorSettings()));
     $runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
     $runVar['settings']['book_reqids'] = (! empty($runVar['settings']['book_reqids'])
@@ -131,8 +132,8 @@ while ($runVar['counts']['iterations'] > 0) {
             echo $e;
         }
 
-        $splitres = (array) array_first(DB::select($splitqry));
-        $runVar['timers']['newOld'] = (array) array_first(DB::select($newOldqry));
+        $splitres = (array) Arr::first(DB::select($splitqry));
+        $runVar['timers']['newOld'] = (array) Arr::first(DB::select($newOldqry));
 
         //assign split query results to main var
         if (is_array($splitres)) {
@@ -173,7 +174,7 @@ while ($runVar['counts']['iterations'] > 0) {
         } catch (Exception $e) {
             echo $e;
         }
-        $proc1res = (array) array_first(DB::select($proc1qry));
+        $proc1res = (array) Arr::first(DB::select($proc1qry));
         $runVar['timers']['query']['proc1_time'] = (time() - $timer04);
         $runVar['timers']['query']['proc11_time'] = (time() - $timer01);
 
@@ -183,7 +184,7 @@ while ($runVar['counts']['iterations'] > 0) {
         } catch (Exception $e) {
             echo $e;
         }
-        $proc2res = (array) array_first(DB::select($proc2qry));
+        $proc2res = (array) Arr::first(DB::select($proc2qry));
         $runVar['timers']['query']['proc2_time'] = (time() - $timer05);
         $runVar['timers']['query']['proc21_time'] = (time() - $timer01);
 

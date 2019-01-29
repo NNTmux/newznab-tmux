@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use Illuminate\Support\Arr;
 use Imdb\Title;
 use Imdb\Config;
 use aharen\OMDbAPI;
@@ -830,7 +831,7 @@ class Movie
             } else {
                 $ret['rating'] = '';
             }
-            $actors = array_pluck($tmdbLookup['credits']['cast'], 'name');
+            $actors = Arr::pluck($tmdbLookup['credits']['cast'], 'name');
             if (! empty($actors)) {
                 $ret['actors'] = $actors;
             } else {
@@ -907,7 +908,7 @@ class Movie
                     $ret = [
                         'title' => $result->orig_title(),
                         'tagline' => $result->tagline(),
-                        'plot' => array_get($result->plot_split(), '0.plot'),
+                        'plot' => Arr::get($result->plot_split(), '0.plot'),
                         'rating' => ! empty($result->rating()) ? $result->rating() : '',
                         'year' => $result->year(),
                         'cover' => $result->photo(),

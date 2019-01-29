@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\User;
 use App\Models\Content;
+use Illuminate\Support\Arr;
 
 /**
  * Class Contents.
@@ -143,7 +144,7 @@ class Contents
             return false;
         }
 
-        return array_first($row);
+        return Arr::first($row);
     }
 
     /**
