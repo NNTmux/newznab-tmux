@@ -14,6 +14,7 @@ use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
 use App\Jobs\SendAccountDeletedEmail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
 
 class ProfileController extends BasePageController
@@ -186,7 +187,7 @@ class ProfileController extends BasePageController
                         $request->input('nzbgeturl') ?? '',
                         $request->input('nzbgetusername') ?? '',
                         $request->input('nzbgetpassword') ?? '',
-                        $request->has('saburl') ? str_finish($request->input('saburl'), '/') : '',
+                        $request->has('saburl') ? Str::finish($request->input('saburl'), '/') : '',
                         $request->input('sabapikey') ?? '',
                         $request->input('sabpriority') ?? '',
                         $request->input('sabapikeytype') ?? '',

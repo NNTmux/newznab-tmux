@@ -19,6 +19,7 @@ use Blacklight\ReleaseImage;
 use App\Models\ReleasesGroups;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProcessReleases
 {
@@ -314,7 +315,7 @@ class ProcessReleases
 
             $this->colorCli->primary(
                     ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -357,7 +358,7 @@ class ProcessReleases
                 true
                 );
             $totalTime = now()->diffInSeconds($startTime);
-            $this->colorCli->primary($totalTime.str_plural(' second', $totalTime), true);
+            $this->colorCli->primary($totalTime.Str::plural(' second', $totalTime), true);
         }
     }
 
@@ -483,7 +484,7 @@ class ProcessReleases
                     $minSizeDeleted.' smaller than, '.
                     $maxSizeDeleted.' bigger than, '.
                     $minFilesDeleted.' with less files than site/group settings in: '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -685,7 +686,7 @@ class ProcessReleases
                     ' Releases added and '.
                     number_format($duplicate).
                     ' duplicate collections deleted in '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -744,8 +745,8 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
-                    $totalTime.str_plural(' second', $totalTime).PHP_EOL.
-                    'Total time: '.$totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
+                    'Total time: '.$totalTime.Str::plural(' second', $totalTime),
                 true
             );
         }
@@ -788,7 +789,7 @@ class ProcessReleases
         $totalTime = now()->diffInSeconds($startTime);
 
         if ($this->echoCLI) {
-            $this->colorCli->primary($totalTime.str_plural(' second', $totalTime));
+            $this->colorCli->primary($totalTime.Str::plural(' second', $totalTime));
         }
     }
 
@@ -860,7 +861,7 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                $totalTime.str_plural(' second', $totalTime),
+                $totalTime.Str::plural(' second', $totalTime),
                 true
             );
         }
@@ -898,7 +899,7 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' orphaned collections in '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                     true
                 );
             }
@@ -934,7 +935,7 @@ class ProcessReleases
 
             if ($this->echoCLI) {
                 $this->colorCli->primary(
-                    'Finished deleting '.$deleted.' binaries with no collections or parts in '.$totalTime.str_plural(' second', $totalTime),
+                    'Finished deleting '.$deleted.' binaries with no collections or parts in '.$totalTime.Str::plural(' second', $totalTime),
                     true
                 );
             }
@@ -971,7 +972,7 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary(
                     'Finished deleting '.$deleted.' parts with no binaries in '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                     true
                 );
             }
@@ -1016,11 +1017,11 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                     'Finished deleting '.$deleted.' collections missed after NZB creation in '.
-                    $colDelTime.str_plural(' second', $colDelTime).PHP_EOL.
+                    $colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.
                     'Removed '.
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -1117,7 +1118,7 @@ class ProcessReleases
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -1352,7 +1353,7 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
-                        $totalTime.str_plural(' second', $totalTime),
+                        $totalTime.Str::plural(' second', $totalTime),
                     true
                     );
             }

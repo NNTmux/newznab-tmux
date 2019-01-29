@@ -4,6 +4,7 @@ namespace Blacklight\libraries;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Str;
 
 /**
  * Class TraktAPI
@@ -189,7 +190,7 @@ class TraktAPI
             default:
                 $extended = 'min';
         }
-        $array = $this->getJsonArray(self::API_URL.'movies/'.str_slug($movie), $extended);
+        $array = $this->getJsonArray(self::API_URL.'movies/'.Str::slug($movie), $extended);
         if (! $array) {
             return false;
         }
@@ -247,7 +248,7 @@ class TraktAPI
     public function showSearch($show = '', $type = 'show')
     {
         $searchUrl = self::API_URL.'search?query='.
-                str_slug($show).
+                Str::slug($show).
                 '&type='.$type;
 
         return $this->getJsonArray($searchUrl, '');
@@ -269,7 +270,7 @@ class TraktAPI
         if (empty($show)) {
             return null;
         }
-        $showUrl = self::API_URL.'shows/'.str_slug($show);
+        $showUrl = self::API_URL.'shows/'.Str::slug($show);
 
         if ($type === 'full') {
             $extended = 'full';

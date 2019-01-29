@@ -19,6 +19,7 @@
  * @copyright 2014 nZEDb
  */
 use App\Models\Category;
+use Illuminate\Support\Str;
 
 /**
  * Returns the value of the specified Category constant.
@@ -155,7 +156,7 @@ function release_flag($text, $page)
     }
 
     if ($code !== '' && $page === 'browse') {
-        $www = str_finish(WWW_TOP, '/');
+        $www = Str::finish(WWW_TOP, '/');
 
         return
             '<img title="'.$language.'" alt="'.$language.'" src="'.$www.'assets/images/flags/'.$code.'.png"/>';

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command
@@ -146,9 +147,9 @@ class InstallNntmux extends Command
         }
 
         return [
-            'nzb_path' => str_finish($nzb_path, '/'),
-            'covers_path' => str_finish($covers_path, '/'),
-            'unrar_path' => str_finish($unrar_path, '/'),
+            'nzb_path' => Str::finish($nzb_path, '/'),
+            'covers_path' => Str::finish($covers_path, '/'),
+            'unrar_path' => Str::finish($unrar_path, '/'),
         ];
     }
 

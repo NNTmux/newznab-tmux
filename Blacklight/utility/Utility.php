@@ -6,6 +6,7 @@ use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 
 /**
  * Class Utility.
@@ -251,10 +252,10 @@ class Utility
         if (! \defined('NN_COVERS')) {
             switch (true) {
                 case $path[0] === '/' || $path[1] === ':' || $path[0] === '\\':
-                    \define('NN_COVERS', str_finish($path, '/'));
+                    \define('NN_COVERS', Str::finish($path, '/'));
                     break;
-                case \strlen($path) > 0 && $path[0] !== '/' && $path[1] !== ':' && $path[0] !== '\\':
-                    \define('NN_COVERS', realpath(NN_ROOT.str_finish($path, '/')));
+                case $path !== '' && $path[0] !== '/' && $path[1] !== ':' && $path[0] !== '\\':
+                    \define('NN_COVERS', realpath(NN_ROOT.Str::finish($path, '/')));
                     break;
                 case empty($path): // Default to resources location.
                 default:

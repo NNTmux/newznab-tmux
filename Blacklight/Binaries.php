@@ -10,6 +10,7 @@ use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 
 /**
  * Class Binaries.
@@ -278,7 +279,7 @@ class Binaries
             }
 
             $this->log(
-                'Updating completed in '.str_plural(' second', now()->diffInSeconds($allTime)),
+                'Updating completed in '.Str::plural(' second', now()->diffInSeconds($allTime)),
                 __FUNCTION__,
                 'primary'
             );
@@ -513,7 +514,7 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        str_plural(' second', now()->diffInSeconds($startGroup))
+                        Str::plural(' second', now()->diffInSeconds($startGroup))
                     );
             }
         } elseif ($this->_echoCLI) {
