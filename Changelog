@@ -1,4 +1,5 @@
 2019-01-29 DariusIII
+	* Chg: Update all-js.js and all-css.css with latest versions of popper and font-awesome
 	* Chg: Update laravel/framework (v5.7.22 => v5.7.23)
 	* Chg: Update composer/composer (1.8.0 => 1.8.2)
 	* Chg: Replace usage of array_ helper with Arr class directly to prepare for Laravel 5.8 changes
