@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendAccountExpiredEmail;
