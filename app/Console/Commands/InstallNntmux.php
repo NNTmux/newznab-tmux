@@ -4,9 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\Settings;
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command

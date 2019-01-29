@@ -6,8 +6,8 @@ use Blacklight\NNTP;
 use App\Models\Group;
 use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
-use Blacklight\ConsoleTools;
 use Illuminate\Support\Arr;
+use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
 $start = now();

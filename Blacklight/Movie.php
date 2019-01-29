@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Illuminate\Support\Arr;
 use Imdb\Title;
 use Imdb\Config;
 use aharen\OMDbAPI;
@@ -12,6 +11,7 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Tmdb\Laravel\Facades\Tmdb;
 use Blacklight\utility\Utility;

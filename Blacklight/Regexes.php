@@ -5,10 +5,10 @@ namespace Blacklight;
 use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use App\Models\CategoryRegex;
 use App\Models\CollectionRegex;
 use App\Models\ReleaseNamingRegex;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 /**

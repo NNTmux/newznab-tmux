@@ -6,9 +6,9 @@ use App\Models\Group;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
-use Illuminate\Support\Arr;
 
 /**
  * Class NameFixer.

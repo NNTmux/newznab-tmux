@@ -3,10 +3,10 @@
 namespace Blacklight\utility;
 
 use App\Models\Settings;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Str;
 
 /**
  * Class Utility.
