@@ -712,7 +712,7 @@ class Binaries
                     'warning'
                 );
 
-                if (config('app.debug' === true)) {
+                if (config('app.debug') === true) {
                     Log::warning($notInsertedCount.' articles failed to insert!');
                 }
             }
@@ -840,7 +840,7 @@ class Binaries
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
-                        if (config('app.debug' === true)) {
+                        if (config('app.debug') === true) {
                             Log::error($e->getMessage());
                         }
                         DB::rollBack();
@@ -872,7 +872,7 @@ class Binaries
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
-                    if (config('app.debug' === true)) {
+                    if (config('app.debug') === true) {
                         Log::error($e->getMessage());
                     }
                     DB::rollBack();
@@ -1612,17 +1612,17 @@ class Binaries
         try {
             return DB::insert($query);
         } catch (QueryException $e) {
-            if (config('app.debug' === true)) {
+            if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
             $this->colorCli->debug('Query error occurred.');
         } catch (\PDOException $e) {
-            if (config('app.debug' === true)) {
+            if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
             $this->colorCli->debug('Query error occurred.');
         } catch (\Throwable $e) {
-            if (config('app.debug' === true)) {
+            if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
             $this->colorCli->debug('Query error occurred.');
