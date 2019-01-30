@@ -1,4 +1,7 @@
 2019-01-30 DariusIII
+	* Chg: Update dariusiii/php-itunes-api (v1.0.6 => v1.0.7)
+	* Chg: Update nette/php-generator (v3.0.5 => v3.2.1)
+  	* Chg: Update nette/di (v2.4.14 => v2.4.15)
 	* Chg: Log errors only if debugging is enabled
 	* Chg: Use transaction when updating expired collections on tmux start
 	* Chg: Simplify expressions to reduce cognitive load in ProcessAdditional class
