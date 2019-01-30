@@ -1,3 +1,5 @@
+2019-01-30 DariusIII
+	* Chg: Update laravel/framework (v5.7.23 => v5.7.24)
 2019-01-29 DariusIII
 	* Chg: Use transactions where possible in ProcessReleases class
 	* Chg: Update all-js.js and all-css.css with latest versions of popper and font-awesome
