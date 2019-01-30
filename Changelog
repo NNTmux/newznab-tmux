@@ -1,4 +1,5 @@
 2019-01-30 DariusIII
+	* Chg: Simplify expressions to reduce cognitive load in ProcessAdditional class
 	* Chg: Update composer/composer (1.8.2 => 1.8.3)
 	* Chg: Update laravel/framework (v5.7.23 => v5.7.24)
 2019-01-29 DariusIII

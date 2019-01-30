@@ -699,12 +699,12 @@ class ProcessAdditional
             cli_set_process_title($this->_showCLIReleaseID.$this->_release->id);
 
             // Create folder to store temporary files.
-            if ($this->_createTempFolder() === false) {
+            if (! $this->_createTempFolder()) {
                 continue;
             }
 
             // Get NZB contents.
-            if ($this->_getNZBContents() === false) {
+            if (! $this->_getNZBContents()) {
                 continue;
             }
 
@@ -720,27 +720,23 @@ class ProcessAdditional
                 $bookFlood = true;
             }
 
-            if ($this->_processPasswords === true ||
-                $this->_processThumbnails === true ||
-                $this->_processMediaInfo === true ||
-                $this->_processAudioInfo === true ||
-                $this->_processVideo === true
+            if ($this->_processPasswords || $this->_processThumbnails || $this->_processMediaInfo || $this->_processAudioInfo || $this->_processVideo
             ) {
 
                 // Process usenet Message-ID downloads.
                 $this->_processMessageIDDownloads();
 
                 // Process compressed (RAR/ZIP) files inside the NZB.
-                if ($bookFlood === false && $this->_NZBHasCompressedFile) {
+                if (! $bookFlood && $this->_NZBHasCompressedFile) {
                     // Download the RARs/ZIPs, extract the files inside them and insert the file info into the DB.
                     $this->_processNZBCompressedFiles();
 
                     // Download rar/zip in reverse order, to get the last rar or zip file.
-                    if ($this->_fetchLastFiles === true) {
+                    if ($this->_fetchLastFiles) {
                         $this->_processNZBCompressedFiles(true);
                     }
 
-                    if ($this->_releaseHasPassword === false) {
+                    if (! $this->_releaseHasPassword) {
                         // Process the extracted files to get video/audio samples/etc.
                         $this->_processExtractedFiles();
                     }
@@ -877,7 +873,7 @@ class ProcessAdditional
             }
 
             // Check if it's a rar/zip.
-            if ($this->_NZBHasCompressedFile === false &&
+            if (! $this->_NZBHasCompressedFile &&
                 preg_match(
                     '/\.(part\d+|r\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                     $this->_currentNZBFile['title']
@@ -887,7 +883,7 @@ class ProcessAdditional
             }
 
             // Look for a video sample, make sure it's not an image.
-            if ($this->_processThumbnails === true && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g$/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processThumbnails && empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && ! preg_match('/\.jpe?g$/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
             ) {
                 // Get the amount of segments for this file.
                 $segCount = (\count($this->_currentNZBFile['segments']) - 1);
@@ -901,7 +897,7 @@ class ProcessAdditional
             }
 
             // Look for a JPG picture, make sure it's not a CD cover.
-            if ($this->_processJPGSample === true && empty($this->_JPGMessageIDs) && ! preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $this->_releaseGroupName) && preg_match('/\.jpe?g[. ")\]]/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processJPGSample && empty($this->_JPGMessageIDs) && ! preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $this->_releaseGroupName) && preg_match('/\.jpe?g[. ")\]]/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'])
             ) {
                 // Get the amount of segments for this file.
                 $segCount = (\count($this->_currentNZBFile['segments']) - 1);
@@ -915,13 +911,13 @@ class ProcessAdditional
             }
 
             // Look for a video file, make sure it's not a sample, for MediaInfo.
-            if ($this->_processMediaInfo === true && empty($this->_MediaInfoMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && preg_match('/'.$this->_videoFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'][0])
+            if ($this->_processMediaInfo && empty($this->_MediaInfoMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false && preg_match('/'.$this->_videoFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title']) && isset($this->_currentNZBFile['segments'][0])
             ) {
                 $this->_MediaInfoMessageIDs = (string) $this->_currentNZBFile['segments'][0];
             }
 
             // Look for a audio file.
-            if ($this->_processAudioInfo === true && empty($this->_AudioInfoMessageIDs) && preg_match('/'.$this->_audioFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title'], $type) && isset($this->_currentNZBFile['segments'])
+            if ($this->_processAudioInfo && empty($this->_AudioInfoMessageIDs) && preg_match('/'.$this->_audioFileRegex.'[. ")\]]/i', $this->_currentNZBFile['title'], $type) && isset($this->_currentNZBFile['segments'])
             ) {
                 // Get the extension.
                 $this->_AudioInfoExtension = $type[1];
@@ -971,7 +967,7 @@ class ProcessAdditional
                 break;
             }
 
-            if ($this->_releaseHasPassword === true) {
+            if ($this->_releaseHasPassword) {
                 $this->_echo('Skipping processing of rar '.$nzbFile['title'].' it has a password.', 'primaryOver');
                 break;
             }
@@ -1024,7 +1020,7 @@ class ProcessAdditional
                 // Process the compressed file.
                 $decompressed = $this->_processCompressedData($fetchedBinary);
 
-                if ($decompressed === true || $this->_releaseHasPassword === true) {
+                if ($decompressed || $this->_releaseHasPassword) {
                     break;
                 }
             } else {
@@ -1048,7 +1044,7 @@ class ProcessAdditional
     {
         $this->_compressedFilesChecked++;
         // Give the data to archive info so it can check if it's a rar.
-        if ($this->_archiveInfo->setData($compressedData, true) === false) {
+        if (! $this->_archiveInfo->setData($compressedData, true)) {
             $this->_debug('Data is probably not RAR or ZIP.');
 
             return false;
@@ -1079,7 +1075,7 @@ class ProcessAdditional
                     $this->_echo('r', 'primaryOver');
                 }
 
-                if ($this->_extractUsingRarInfo === false && $this->_unrarPath !== false) {
+                if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.rar';
                     File::put($fileName, $compressedData);
                     runCmd(
@@ -1095,7 +1091,7 @@ class ProcessAdditional
                     $this->_echo('z', 'primaryOver');
                 }
 
-                if ($this->_extractUsingRarInfo === false && $this->_7zipPath !== false) {
+                if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
                     runCmd(
@@ -1128,7 +1124,7 @@ class ProcessAdditional
 
         // Loop through the files.
         foreach ($files as $file) {
-            if ($this->_releaseHasPassword === true) {
+            if ($this->_releaseHasPassword) {
                 break;
             }
 
@@ -1157,7 +1153,7 @@ class ProcessAdditional
                     $fileName = '';
                 }
 
-                if ($this->_extractUsingRarInfo === true) {
+                if ($this->_extractUsingRarInfo) {
                     // Extract files from the rar.
                     if (isset($file['compressed']) && (int) $file['compressed'] === 0) {
                         File::put(
@@ -1262,7 +1258,7 @@ class ProcessAdditional
             }
 
             // If we found no compressed files, break out.
-            if ($foundCompressedFile === false) {
+            if (! $foundCompressedFile) {
                 break;
             }
 
@@ -1284,15 +1280,14 @@ class ProcessAdditional
             if (File::isFile($file)) {
 
                     // Process PAR2 files.
-                if ($this->_foundPAR2Info === false && preg_match('/\.par2$/', $file)) {
+                if (! $this->_foundPAR2Info && preg_match('/\.par2$/', $file)) {
                     $this->_siftPAR2Info($file);
                 } // Process NFO files.
-                elseif ($this->_releaseHasNoNFO === true && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
+                elseif ($this->_releaseHasNoNFO && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
                     $this->_processNfoFile($file);
                 } // Process audio files.
                 elseif (
-                        ($this->_foundAudioInfo === false ||
-                            $this->_foundAudioSample === false) &&
+                        (! $this->_foundAudioInfo || ! $this->_foundAudioSample) &&
                         preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
                     ) {
                     // Try to get audio sample/audio media info.
@@ -1300,11 +1295,11 @@ class ProcessAdditional
                     $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
                     File::delete($this->tmpPath.'audiofile.'.$fileType[2]);
                 } // Process JPG files.
-                elseif ($this->_foundJPGSample === false && preg_match('/\.jpe?g$/i', $file)) {
+                elseif (! $this->_foundJPGSample && preg_match('/\.jpe?g$/i', $file)) {
                     $this->_getJPGSample($file);
                     File::delete($file);
                 } // Video sample // video clip // video media info.
-                elseif (($this->_foundSample === false || $this->_foundVideo === false || $this->_foundMediaInfo === false) &&
+                elseif ((! $this->_foundSample || ! $this->_foundVideo || ! $this->_foundMediaInfo) &&
                         preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
                     ) {
                     $this->_processVideoFile($file);
@@ -1316,19 +1311,19 @@ class ProcessAdditional
                     if (! empty($output)) {
                         switch (true) {
 
-                                case $this->_foundJPGSample === false && preg_match('/^JPE?G/i', $output):
+                                case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
                                     $this->_getJPGSample($file);
                                     File::delete($file);
                                     break;
 
                                 case
-                                    ($this->_foundMediaInfo === false || $this->_foundSample === false || $this->_foundVideo === false)
+                                    (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo)
                                     && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
                                     $this->_processVideoFile($file);
                                     break;
 
                                 case
-                                    ($this->_foundAudioSample === false || $this->_foundAudioInfo === false) &&
+                                    (! $this->_foundAudioSample || ! $this->_foundAudioInfo) &&
                                     preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
                                     switch ($fileType[0]) {
                                         case 'FLAC':
@@ -1346,7 +1341,7 @@ class ProcessAdditional
                                     File::delete($this->tmpPath.'audiofile.'.$fileType);
                                     break;
 
-                                case $this->_foundPAR2Info === false && stripos($output, 'Parity') === 0:
+                                case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
                                     $this->_siftPAR2Info($file);
                                     break;
                             }
@@ -1379,7 +1374,7 @@ class ProcessAdditional
     protected function _processSampleMessageIDs(): void
     {
         // Download and process sample image.
-        if ($this->_foundSample === false || $this->_foundVideo === false) {
+        if (! $this->_foundSample || ! $this->_foundVideo) {
             if (! empty($this->_sampleMessageIDs)) {
 
                 // Download it from usenet.
@@ -1400,12 +1395,12 @@ class ProcessAdditional
                         File::put($fileLocation, $sampleBinary);
 
                         // Try to get a sample picture.
-                        if ($this->_foundSample === false) {
+                        if (! $this->_foundSample) {
                             $this->_foundSample = $this->_getSample($fileLocation);
                         }
 
                         // Try to get a sample video.
-                        if ($this->_foundVideo === false) {
+                        if (! $this->_foundVideo) {
                             $this->_foundVideo = $this->_getVideo($fileLocation);
                         }
                     }
@@ -1425,8 +1420,8 @@ class ProcessAdditional
     protected function _processMediaInfoMessageIDs(): void
     {
         // Download and process mediainfo. Also try to get a sample if we didn't get one yet.
-        if ($this->_foundMediaInfo === false || $this->_foundSample === false || $this->_foundVideo === false) {
-            if ($this->_foundMediaInfo === false && ! empty($this->_MediaInfoMessageIDs)) {
+        if (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo) {
+            if (! $this->_foundMediaInfo && ! empty($this->_MediaInfoMessageIDs)) {
 
                 // Try to download it from usenet.
                 $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
@@ -1447,17 +1442,17 @@ class ProcessAdditional
                         File::put($fileLocation, $mediaBinary);
 
                         // Try to get media info.
-                        if ($this->_foundMediaInfo === false) {
+                        if (! $this->_foundMediaInfo) {
                             $this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
                         }
 
                         // Try to get a sample picture.
-                        if ($this->_foundSample === false) {
+                        if (! $this->_foundSample) {
                             $this->_foundSample = $this->_getSample($fileLocation);
                         }
 
                         // Try to get a sample video.
-                        if ($this->_foundVideo === false) {
+                        if (! $this->_foundVideo) {
                             $this->_foundVideo = $this->_getVideo($fileLocation);
                         }
                     }
@@ -1477,7 +1472,7 @@ class ProcessAdditional
     protected function _processAudioInfoMessageIDs(): void
     {
         // Download audio file, use media info to try to get the artist / album.
-        if ($this->_foundAudioInfo === false || $this->_foundAudioSample === false) {
+        if (! $this->_foundAudioInfo || ! $this->_foundAudioSample) {
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
@@ -1512,7 +1507,7 @@ class ProcessAdditional
     protected function _processJPGMessageIDs(): void
     {
         // Download JPG file.
-        if ($this->_foundJPGSample === false && ! empty($this->_JPGMessageIDs)) {
+        if (! $this->_foundJPGSample && ! empty($this->_JPGMessageIDs)) {
 
             // Try to download it.
             $jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs, $this->_alternateNNTP);
@@ -1539,7 +1534,7 @@ class ProcessAdditional
                 ) === 1
                 );
 
-                if ($this->_foundJPGSample !== false) {
+                if ($this->_foundJPGSample) {
                     // Update the DB to say we got it.
                     Release::query()->where('id', $this->_release->id)->update(['jpgstatus' => 1]);
 
@@ -1587,12 +1582,12 @@ class ProcessAdditional
         $this->_passwordStatus = max($this->_passwordStatus);
 
         // Set the release to no password if password processing is off.
-        if ($this->_processPasswords === false) {
+        if (! $this->_processPasswords) {
             $this->_releaseHasPassword = false;
         }
 
         // If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus, if the rar/zip has no password.
-        if ($this->_releaseHasPassword === false && $this->_NZBHasCompressedFile && $releaseFilesCount === 0) {
+        if (! $this->_releaseHasPassword && $this->_NZBHasCompressedFile && $releaseFilesCount === 0) {
             $query = sprintf(
                 'UPDATE releases
 				SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
@@ -1609,7 +1604,7 @@ class ProcessAdditional
                 'UPDATE releases
 				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
 				WHERE id = %d',
-                ($this->_processPasswords === true ? $this->_passwordStatus : Releases::PASSWD_NONE),
+                ($this->_processPasswords ? $this->_passwordStatus : Releases::PASSWD_NONE),
                 $releaseFilesCount,
                 $iSQL,
                 $vSQL,
@@ -1667,12 +1662,12 @@ class ProcessAdditional
         $retVal = $audVal = false;
 
         // Check if audio sample fetching is on.
-        if ($this->_processAudioSample === false) {
+        if (! $this->_processAudioSample) {
             $audVal = true;
         }
 
         // Check if media info fetching is on.
-        if ($this->_processAudioInfo === false) {
+        if (! $this->_processAudioInfo) {
             $retVal = true;
         }
 
@@ -1696,7 +1691,7 @@ class ProcessAdditional
         if (File::isFile($fileLocation)) {
 
             // Check if media info is enabled.
-            if ($retVal === false) {
+            if (! $retVal) {
 
                 // Get the media info for the file.
                 $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
@@ -1772,7 +1767,7 @@ class ProcessAdditional
             }
 
             // Check if creating audio samples is enabled.
-            if ($audVal === false) {
+            if (! $audVal) {
 
                 // File name to store audio file.
                 $audioFileName = ($this->_release->guid.'.ogg');
@@ -1846,7 +1841,7 @@ class ProcessAdditional
         );
 
         // If it's successful, tell the DB.
-        if ($this->_foundJPGSample !== false) {
+        if ($this->_foundJPGSample) {
             Release::query()->where('id', $this->_release->id)->update(['jpgstatus' => 1]);
         }
     }
@@ -2007,7 +2002,7 @@ class ProcessAdditional
                 }
             }
 
-            if ($newMethod === false) {
+            if (! $newMethod) {
                 // If longer than 60 or we could not get the video length, run the old way.
                 if ($this->ffprobe->isValid($fileLocation)) {
                     try {
@@ -2144,7 +2139,7 @@ class ProcessAdditional
             }
 
             // If we found a name and added 10 files, stop.
-            if ($foundName === true && $filesAdded > 10) {
+            if ($foundName && $filesAdded > 10) {
                 break;
             }
 
@@ -2163,10 +2158,10 @@ class ProcessAdditional
             }
 
             // Try to get a new name.
-            if ($foundName === false) {
+            if (! $foundName) {
                 $this->_release->textstring = $file['name'];
                 $this->_release->releases_id = $this->_release->id;
-                if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? true : false), 'PAR2, ', 1, 1) === true) {
+                if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? true : false), 'PAR2, ', 1, 1)) {
                     $foundName = true;
                 }
             }
@@ -2183,7 +2178,7 @@ class ProcessAdditional
     protected function _processNfoFile($fileLocation): void
     {
         $data = @File::get($fileLocation);
-        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) === true && $this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp) === true) {
+        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp)) {
             $this->_releaseHasNoNFO = false;
         }
     }
@@ -2195,7 +2190,7 @@ class ProcessAdditional
     protected function _processVideoFile($fileLocation): void
     {
         // Try to get a sample with it.
-        if ($this->_foundSample === false) {
+        if (! $this->_foundSample) {
             $this->_foundSample = $this->_getSample($fileLocation);
         }
 
@@ -2203,12 +2198,12 @@ class ProcessAdditional
          * Don't get it here if _sampleMessageIDs is empty
          * or has 1 message-id (Saves downloading another part).
          */
-        if ($this->_foundVideo === false && \count($this->_sampleMessageIDs) < 2) {
+        if (! $this->_foundVideo && \count($this->_sampleMessageIDs) < 2) {
             $this->_foundVideo = $this->_getVideo($fileLocation);
         }
 
         // Try to get media info with it.
-        if ($this->_foundMediaInfo === false) {
+        if (! $this->_foundMediaInfo) {
             $this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
         }
     }
