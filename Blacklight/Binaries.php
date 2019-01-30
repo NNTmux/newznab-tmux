@@ -712,7 +712,9 @@ class Binaries
                     'warning'
                 );
 
-                Log::warning($notInsertedCount.' articles failed to insert!');
+                if (config('app.debug' === true)) {
+                    Log::warning($notInsertedCount.' articles failed to insert!');
+                }
             }
             unset($this->headersNotInserted);
 
@@ -838,7 +840,9 @@ class Binaries
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
-                        Log::error($e->getMessage());
+                        if (config('app.debug' === true)) {
+                            Log::error($e->getMessage());
+                        }
                         DB::rollBack();
                     }
 
@@ -868,7 +872,9 @@ class Binaries
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
-                    Log::error($e->getMessage());
+                    if (config('app.debug' === true)) {
+                        Log::error($e->getMessage());
+                    }
                     DB::rollBack();
                 }
 
@@ -1606,13 +1612,19 @@ class Binaries
         try {
             return DB::insert($query);
         } catch (QueryException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug' === true)) {
+                Log::error($e->getMessage());
+            }
             $this->colorCli->debug('Query error occurred.');
         } catch (\PDOException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug' === true)) {
+                Log::error($e->getMessage());
+            }
             $this->colorCli->debug('Query error occurred.');
         } catch (\Throwable $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug' === true)) {
+                Log::error($e->getMessage());
+            }
             $this->colorCli->debug('Query error occurred.');
         }
 
