@@ -1643,7 +1643,7 @@ class ProcessAdditional
 
             return $files;
         } catch (\Throwable $e) {
-            if (config('app.debug' === true)) {
+            if (config('app.debug') === true) {
                 Log::error($e->getTraceAsString());
             }
             $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
@@ -1782,7 +1782,7 @@ class ProcessAdditional
                         $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
                         $audioSample->save($format, $this->tmpPath.$audioFileName);
                     } catch (\InvalidArgumentException $e) {
-                        if (config('app.debug' === true)) {
+                        if (config('app.debug') === true) {
                             Log::error($e->getTraceAsString());
                         }
                         //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
@@ -1901,17 +1901,17 @@ class ProcessAdditional
                 try {
                     $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
                 } catch (\RuntimeException $runtimeException) {
-                    if (config('app.debug' === true)) {
+                    if (config('app.debug') === true) {
                         Log::error($runtimeException->getTraceAsString());
                     }
                     //We show no error we just log it, we failed to save the frame and move on
                 } catch (\InvalidArgumentException $e) {
-                    if (config('app.debug' === true)) {
+                    if (config('app.debug') === true) {
                         Log::error($e->getTraceAsString());
                     }
                     //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
                 } catch (\Throwable $e) {
-                    if (config('app.debug' === true)) {
+                    if (config('app.debug') === true) {
                         Log::error($e->getTraceAsString());
                     }
                     //Again we do nothing, we just want to catch the error
@@ -2005,7 +2005,7 @@ class ProcessAdditional
                             $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                             $videoSample->save($format, $fileName);
                         } catch (\InvalidArgumentException $e) {
-                            if (config('app.debug' === true)) {
+                            if (config('app.debug') === true) {
                                 Log::error($e->getTraceAsString());
                             }
                             //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
@@ -2025,7 +2025,7 @@ class ProcessAdditional
                         $videoSample->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                         $videoSample->save($format, $fileName);
                     } catch (\InvalidArgumentException $e) {
-                        if (config('app.debug' === true)) {
+                        if (config('app.debug') === true) {
                             Log::error($e->getTraceAsString());
                         }
                         //We do nothing, just prevent displaying errors because the file cannot be open(corrupted or incomplete file)
