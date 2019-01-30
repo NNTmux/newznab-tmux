@@ -1,4 +1,5 @@
 2019-01-30 DariusIII
+	* Chg: Use transaction when updating expired collections on tmux start
 	* Chg: Simplify expressions to reduce cognitive load in ProcessAdditional class
 	* Chg: Update composer/composer (1.8.2 => 1.8.3)
 	* Chg: Update laravel/framework (v5.7.23 => v5.7.24)

@@ -33,24 +33,18 @@ if ($session !== null) {
 //reset collections dateadded to now if dateadded > delay time check
 $colorCli->header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
 
-$sql = 'SHOW table status';
-$tables = DB::select($sql);
-
 $ran = 0;
-foreach ($tables as $row) {
-    $tbl = $row->Name;
 
-    if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
-        $run = DB::update(
-            'UPDATE '.$tbl.
-            ' SET dateadded = now() WHERE dateadded < now() - INTERVAL '.
-            $delaytimet.' HOUR'
-        );
-        if ($run > 0) {
-            $ran += $run;
-        }
+DB::transaction(function () use ($ran, $delaytimet) {
+    $run = DB::update(
+        'UPDATE collections SET dateadded = now() WHERE dateadded < now() - INTERVAL '.
+        $delaytimet.' HOUR'
+    );
+    if ($run > 0) {
+        $ran += $run;
     }
-}
+}, 5);
+
 $colorCli->primary(number_format($ran).' collections reset.');
 sleep(2);
 
