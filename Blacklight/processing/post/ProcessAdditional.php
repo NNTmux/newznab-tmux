@@ -1060,7 +1060,7 @@ class ProcessAdditional
         try {
             // Get a summary of the compressed file.
             $dataSummary = $this->_archiveInfo->getSummary(true);
-        } catch (\ExceptionWithThrowable $exception) {
+        } catch (\Exception $exception) {
             //Log the exception and continue to next item
             if (config('app.debug') === true) {
                 Log::warning($exception->getTraceAsString());
