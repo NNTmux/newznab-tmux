@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use App\Models\Release;
-use Blacklight\utility\Utility;
 use GuzzleHttp\Client;
+use App\Models\Release;
 use GuzzleHttp\Psr7\Request;
+use Blacklight\utility\Utility;
 
 /**
  * Transfers data between an NZBGet server and a nntmux website.

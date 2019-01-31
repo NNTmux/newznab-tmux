@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\ConsoleInfo;
 use Blacklight\ColorCLI;
+use App\Models\ConsoleInfo;
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;

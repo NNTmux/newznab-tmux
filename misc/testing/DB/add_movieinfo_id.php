@@ -3,8 +3,8 @@
  * This script will convert releases table imdbid column
  * from zerofilled int to varchar(15).
  */
-use App\Models\MovieInfo;
 use App\Models\Release;
+use App\Models\MovieInfo;
 use Illuminate\Support\Facades\DB;
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';

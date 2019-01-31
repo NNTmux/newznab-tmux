@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use Blacklight\Books;
-use Illuminate\Http\Request;
+use App\Models\Category;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 
 class BooksController extends BasePageController
 {

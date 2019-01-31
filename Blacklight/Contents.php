@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use App\Models\Content;
 use App\Models\User;
+use App\Models\Content;
 use Illuminate\Support\Arr;
 
 /**

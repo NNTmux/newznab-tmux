@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Backfill;
 use Blacklight\NNTP;
+use Blacklight\Backfill;
 
 // Create the connection here and pass
 $nntp = new NNTP();
