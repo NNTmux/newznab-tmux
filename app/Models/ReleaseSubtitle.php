@@ -38,9 +38,9 @@ class ReleaseSubtitle extends Model
      * @var array
      */
     protected $fillable = [
-		'id',
-		'releases_id',
-		'subsid',
-		'subslanguage',
-	];
+        'id',
+        'releases_id',
+        'subsid',
+        'subslanguage',
+    ];
 }

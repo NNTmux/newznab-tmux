@@ -12,13 +12,11 @@ class CategoryRegexesTableSeeder extends Seeder
      */
     public function run()
     {
-
-
         \DB::table('category_regexes')->delete();
 
-        \DB::table('category_regexes')->insert(array (
+        \DB::table('category_regexes')->insert([
             0 =>
-            array (
+            [
                 'id' => 1,
                 'group_regex' => '^alt\\.binaries\\.sony\\.psvita$',
                 'regex' => '/.*/ ',
@@ -26,9 +24,7 @@ class CategoryRegexesTableSeeder extends Seeder
                 'description' => '',
                 'ordinal' => 50,
                 'categories_id' => 1120,
-            ),
-        ));
-
-
+            ],
+        ]);
     }
 }

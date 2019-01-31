@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
-use App\Models\Release;
+use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\User;
+use App\Models\UserRequest;
+use App\Transformers\ApiTransformer;
+use App\Transformers\CategoryTransformer;
+use App\Transformers\DetailsTransformer;
+use App\Transformers\TagsTransformer;
 use Blacklight\http\API;
 use Blacklight\Releases;
-use App\Models\UserRequest;
-use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
-use App\Transformers\ApiTransformer;
-use App\Transformers\TagsTransformer;
-use App\Transformers\DetailsTransformer;
-use App\Transformers\CategoryTransformer;
-use App\Http\Controllers\BasePageController;
+use Illuminate\Http\Request;
 
 class ApiV2Controller extends BasePageController
 {

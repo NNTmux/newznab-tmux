@@ -185,7 +185,7 @@
       "@php artisan package:discover --ansi"
     ],
     "format": [
-      "vendor/bin/php-cs-fixer fix"
+      "vendor/bin/php-cs-fixer fix --config .php-cs"
     ]
   },
   "suggest": {

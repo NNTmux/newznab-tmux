@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
-use App\Models\User;
-use Blacklight\SABnzbd;
 use App\Models\Category;
-use App\Models\Settings;
-use Blacklight\Contents;
 use App\Models\Forumpost;
+use App\Models\Settings;
+use App\Models\User;
+use Blacklight\Contents;
+use Blacklight\SABnzbd;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class BasePageController extends Controller
 {

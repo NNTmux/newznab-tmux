@@ -2,8 +2,8 @@
 
 namespace App\Support\Database;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Cache;
 
 class Builder extends QueryBuilder
 {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendContactUsEmail;
 use App\Models\Settings;
 use Illuminate\Http\Request;
-use App\Jobs\SendContactUsEmail;
 
 class ContactUsController extends BasePageController
 {

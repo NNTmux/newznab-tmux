@@ -4,8 +4,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\Games;
 use Blacklight\ColorCLI;
+use Blacklight\Games;
 
 $pdo = DB::connection()->getPdo();
 $game = new Games(['Echo' => true]);

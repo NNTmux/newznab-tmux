@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Release;
+use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Models\Release;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BasePageController;
 
 class ReleasesController extends BasePageController
 {

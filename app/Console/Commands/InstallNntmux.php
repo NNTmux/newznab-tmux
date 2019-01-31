@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
 use App\Models\Settings;
-use Illuminate\Support\Str;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command
@@ -119,7 +119,7 @@ class InstallNntmux extends Command
         $unrar_path = $tmp_path.'unrar/';
 
         $nzbPathCheck = File::isWritable($nzb_path);
-        if ($nzbPathCheck === false) {
+        if (! $nzbPathCheck) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
 
             return false;
@@ -140,7 +140,7 @@ class InstallNntmux extends Command
         }
 
         $coversPathCheck = File::isWritable($covers_path);
-        if ($coversPathCheck === false) {
+        if (! $coversPathCheck) {
             $this->warn($covers_path.' is not writable. Please fix folder permissions');
 
             return false;

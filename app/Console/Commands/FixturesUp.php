@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Mayconbordin\L5Fixtures\Fixtures;
 use Mayconbordin\L5Fixtures\FixturesFacade;
 
 class FixturesUp extends Command

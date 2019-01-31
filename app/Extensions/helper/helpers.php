@@ -1,16 +1,16 @@
 <?php
 
-use Colors\Color;
 use Blacklight\XXX;
+use Colors\Color;
 use GuzzleHttp\Client;
-use Tuna\CloudflareMiddleware;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Cookie\FileCookieJar;
 use Symfony\Component\Process\Process;
-use GuzzleHttp\Exception\RequestException;
+use Tuna\CloudflareMiddleware;
 
 if (! function_exists('getRawHtml')) {
 

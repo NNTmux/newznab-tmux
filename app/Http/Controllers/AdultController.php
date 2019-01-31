@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\XXX;
 use App\Models\Category;
-use Illuminate\Support\Arr;
+use Blacklight\XXX;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AdultController extends BasePageController
 {

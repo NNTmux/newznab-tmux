@@ -238,7 +238,8 @@ class Sharing
 
             // Attempt to upload the comment to usenet.
             $success = $this->nntp->postArticle(
-                self::group, '(_nZEDb_)'.$this->siteSettings->site_name.'_'.$this->siteSettings->site_guid.' - [1/1] "'.$sid.'" yEnc (1/1)',
+                self::group,
+                '(_nZEDb_)'.$this->siteSettings->site_name.'_'.$this->siteSettings->site_guid.' - [1/1] "'.$sid.'" yEnc (1/1)',
                 json_encode(
                     [
                         'USER' => $this->siteSettings->hide_users ? 'ANON' : $row->username,

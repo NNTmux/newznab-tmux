@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Video;
-use App\Models\Release;
-use Illuminate\Http\Request;
-use Blacklight\processing\tv\TV;
 use App\Http\Controllers\BasePageController;
+use App\Models\Release;
+use App\Models\Video;
+use Illuminate\Http\Request;
 
 class ShowsController extends BasePageController
 {

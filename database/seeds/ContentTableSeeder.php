@@ -12,13 +12,11 @@ class ContentTableSeeder extends Seeder
      */
     public function run()
     {
-
-
         \DB::table('content')->delete();
 
-        \DB::table('content')->insert(array (
+        \DB::table('content')->insert([
             0 =>
-            array (
+            [
                 'id' => 1,
                 'title' => 'Welcome to NNTmux.',
                 'url' => 'NULL',
@@ -30,9 +28,9 @@ class ContentTableSeeder extends Seeder
                 'status' => 1,
                 'ordinal' => 0,
                 'role' => 0,
-            ),
+            ],
             1 =>
-            array (
+            [
                 'id' => 2,
                 'title' => 'example content',
                 'url' => '/great/seo/content/page/',
@@ -44,9 +42,9 @@ class ContentTableSeeder extends Seeder
                 'status' => 1,
                 'ordinal' => 1,
                 'role' => 0,
-            ),
+            ],
             2 =>
-            array (
+            [
                 'id' => 3,
                 'title' => 'another example',
                 'url' => '/another/great/seo/content/page/',
@@ -58,9 +56,7 @@ class ContentTableSeeder extends Seeder
                 'status' => 1,
                 'ordinal' => 0,
                 'role' => 0,
-            ),
-        ));
-
-
+            ],
+        ]);
     }
 }
