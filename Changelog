@@ -1,4 +1,5 @@
 2019-01-31 DariusIII
+	* Chg: Update .styleci config file
 	* Chg: Update and fix code with php-cs-fixer
 	* Chg: Update TinyMCE to version 4.9.3
 	* Chg: Update composer.json
