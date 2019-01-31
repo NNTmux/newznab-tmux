@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Yadakhov\InsertOnDuplicateKey;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\AnidbEpisode.

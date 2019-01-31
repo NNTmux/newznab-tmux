@@ -2,24 +2,24 @@
 
 namespace Blacklight\processing;
 
-use App\Models\Category;
+use Blacklight\NZB;
+use Blacklight\NNTP;
 use App\Models\Group;
 use App\Models\Predb;
-use App\Models\Release;
-use App\Models\ReleaseRegex;
-use App\Models\ReleasesGroups;
-use App\Models\Settings;
-use Blacklight\Categorize;
-use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 use Blacklight\Genres;
-use Blacklight\NNTP;
-use Blacklight\NZB;
-use Blacklight\ReleaseCleaning;
-use Blacklight\ReleaseImage;
+use App\Models\Release;
+use App\Models\Category;
+use App\Models\Settings;
+use Blacklight\ColorCLI;
 use Blacklight\Releases;
-use Illuminate\Support\Facades\DB;
+use Blacklight\Categorize;
 use Illuminate\Support\Str;
+use App\Models\ReleaseRegex;
+use Blacklight\ConsoleTools;
+use Blacklight\ReleaseImage;
+use App\Models\ReleasesGroups;
+use Blacklight\ReleaseCleaning;
+use Illuminate\Support\Facades\DB;
 
 class ProcessReleases
 {

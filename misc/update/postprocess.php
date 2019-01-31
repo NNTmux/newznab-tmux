@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use Blacklight\NNTP;
+use App\Models\Settings;
 use Blacklight\processing\PostProcess;
 
 /**
