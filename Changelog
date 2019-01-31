@@ -1,4 +1,5 @@
 2019-01-31 DariusIII
+	* Fix: Add missing STATUS_DISABLED to admin/CategoryController
 	* Chg: Add try-catch block to archiveinfo to catch errors
 2019-01-30 DariusIII
 	* Fix: Fix typo in config check
