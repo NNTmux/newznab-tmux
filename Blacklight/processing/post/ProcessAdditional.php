@@ -1057,8 +1057,16 @@ class ProcessAdditional
             return false;
         }
 
-        // Get a summary of the compressed file.
-        $dataSummary = $this->_archiveInfo->getSummary(true);
+        try {
+            // Get a summary of the compressed file.
+            $dataSummary = $this->_archiveInfo->getSummary(true);
+        } catch (\ExceptionWithThrowable $exception) {
+            //Log the exception and continue to next item
+            if (config('app.debug') === true) {
+                Log::warning($exception->getTraceAsString());
+            }
+            return false;
+        }
 
         // Check if the compressed file is encrypted.
         if (! empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && (int) $dataSummary['is_encrypted'] !== 0)) {
@@ -1070,40 +1078,33 @@ class ProcessAdditional
         }
 
         switch ($dataSummary['main_type']) {
-            case ArchiveInfo::TYPE_RAR:
-                if ($this->_echoCLI) {
-                    $this->_echo('r', 'primaryOver');
-                }
+                case ArchiveInfo::TYPE_RAR:
+                    if ($this->_echoCLI) {
+                        $this->_echo('r', 'primaryOver');
+                    }
 
-                if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
-                    $fileName = $this->tmpPath.uniqid('', true).'.rar';
-                    File::put($fileName, $compressedData);
-                    runCmd(
-                        $this->_killString.$this->_unrarPath.
-                        '" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.
-                        $fileName.'" "'.$this->tmpPath.'unrar/"'
-                    );
-                    File::delete($fileName);
-                }
-                break;
-            case ArchiveInfo::TYPE_ZIP:
-                if ($this->_echoCLI) {
-                    $this->_echo('z', 'primaryOver');
-                }
+                    if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
+                        $fileName = $this->tmpPath.uniqid('', true).'.rar';
+                        File::put($fileName, $compressedData);
+                        runCmd($this->_killString.$this->_unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$this->tmpPath.'unrar/"');
+                        File::delete($fileName);
+                    }
+                    break;
+                case ArchiveInfo::TYPE_ZIP:
+                    if ($this->_echoCLI) {
+                        $this->_echo('z', 'primaryOver');
+                    }
 
-                if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
-                    $fileName = $this->tmpPath.uniqid('', true).'.zip';
-                    File::put($fileName, $compressedData);
-                    runCmd(
-                        $this->_killString.$this->_7zipPath.'" x "'.
-                        $fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"'
-                    );
-                    File::delete($fileName);
-                }
-                break;
-            default:
-                return false;
-        }
+                    if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
+                        $fileName = $this->tmpPath.uniqid('', true).'.zip';
+                        File::put($fileName, $compressedData);
+                        runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
+                        File::delete($fileName);
+                    }
+                    break;
+                default:
+                    return false;
+            }
 
         return $this->_processCompressedFileList();
     }

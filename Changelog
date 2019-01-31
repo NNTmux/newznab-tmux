@@ -1,3 +1,5 @@
+2019-01-31 DariusIII
+	* Chg: Add try-catch block to archiveinfo to catch errors
 2019-01-30 DariusIII
 	* Fix: Fix typo in config check
 	* Chg: Update dariusiii/php-itunes-api (v1.0.6 => v1.0.7)
