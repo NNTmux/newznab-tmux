@@ -1065,6 +1065,7 @@ class ProcessAdditional
             if (config('app.debug') === true) {
                 Log::warning($exception->getTraceAsString());
             }
+
             return false;
         }
 
