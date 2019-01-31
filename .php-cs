@@ -4,7 +4,6 @@
  */
 $rules = [
     '@PSR2' => true,
-    // addtional rules
     'array_syntax' => ['syntax' => 'short'],
     'no_multiline_whitespace_before_semicolons' => true,
     'no_short_echo_tag' => true,
