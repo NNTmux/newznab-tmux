@@ -1,4 +1,5 @@
 2019-01-31 DariusIII
+	* Chg: Update TinyMCE to version 4.9.3
 	* Chg: Update composer.json
 	* Fix: Add missing STATUS_DISABLED to admin/CategoryController
 	* Chg: Add try-catch block to archiveinfo to catch errors
