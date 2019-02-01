@@ -663,7 +663,7 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -704,7 +704,7 @@ class Releases
             return $releases;
         }
         $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -784,7 +784,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -927,7 +927,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -1066,7 +1066,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -1139,7 +1139,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -1219,7 +1219,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
