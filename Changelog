@@ -1,4 +1,5 @@
 2019-02-01 DariusIII
+	* Fix: Fix count of rows for apiv2 searches
 	* Fix: Fix error on empty search results
 	* Fix: Add check for empty collections in Releases class
 	* Chg: Update search function return tag
