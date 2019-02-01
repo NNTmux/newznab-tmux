@@ -7,7 +7,8 @@
         "watch-poll": "npm run watch -- --watch-poll",
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "format": "prettier --write 'resources/**/*.{css,js,vue}'"
     },
     "devDependencies": {
         "axios": "^0.18",
@@ -16,6 +17,7 @@
         "laravel-mix": "^4.0.14",
         "lodash": "^4.17.11",
         "popper.js": "^1.14.7",
+        "prettier": "1.16.3",
         "vue": "^2.5.22"
     },
     "dependencies": {
