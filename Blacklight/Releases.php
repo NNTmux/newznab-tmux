@@ -585,15 +585,15 @@ class Releases
      * @param              $hasComments
      * @param              $daysNew
      * @param              $daysOld
-     * @param int          $offset
-     * @param int          $limit
+     * @param int $offset
+     * @param int $limit
      * @param string|array $orderBy
-     * @param int          $maxAge
-     * @param array        $excludedCats
-     * @param string       $type
-     * @param array        $cat
-     * @param int          $minSize
-     * @param array        $tags
+     * @param int $maxAge
+     * @param array $excludedCats
+     * @param string $type
+     * @param array $cat
+     * @param int $minSize
+     * @param array $tags
      *
      * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
@@ -704,8 +704,8 @@ class Releases
             return $releases;
         }
         $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
-        if ((\is_array($releases) && ! empty($releases)) || $releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+        if ((\is_array($releases) && ! empty($releases)) || (\is_object($releases) && $releases->isNotEmpty())) {
+            $releases->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
