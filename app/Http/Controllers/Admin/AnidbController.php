@@ -17,7 +17,7 @@ class AnidbController extends BasePageController
         $this->setAdminPrefs();
 
         $AniDB = new AniDB();
-        $title = 'AniDB List';
+        $title = $meta_title = 'AniDB List';
 
         $aname = '';
         if (request()->has('animetitle') && ! empty(request()->input('animetitle'))) {
@@ -33,13 +33,7 @@ class AnidbController extends BasePageController
 
         $content = $this->smarty->fetch('anidb-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -95,12 +89,7 @@ class AnidbController extends BasePageController
         $title = 'Edit AniDB Data';
         $content = $this->smarty->fetch('anidb-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'content'));
 
         $this->adminrender();
     }
@@ -126,12 +115,7 @@ class AnidbController extends BasePageController
 
         $title = 'Remove anidbID from Releases';
         $content = $this->smarty->fetch('anidb-remove.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'content'));
         $this->adminrender();
     }
 }

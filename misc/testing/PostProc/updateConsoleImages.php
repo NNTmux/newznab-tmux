@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\ColorCLI;
 use App\Models\ConsoleInfo;
+use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
 $colorCli = new ColorCLI();
@@ -15,11 +16,10 @@ if ($argc === 1 || $argv[1] !== 'true') {
 
 $path2covers = NN_COVERS.'console'.DS;
 
-$dirItr = new \RecursiveDirectoryIterator($path2covers);
-$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
+$itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
-    if (is_file($filePath) && preg_match('/\d+\.jpg$/', $filePath)) {
-        preg_match('/(\d+)\.jpg$/', basename($filePath), $match);
+    if (is_file($filePath->getPathname()) && preg_match('/\d+\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)\.jpg$/', $filePath->getPathname(), $match);
         if (isset($match[1])) {
             $run = ConsoleInfo::query()->where(
                 [
@@ -40,7 +40,6 @@ foreach ($itr as $filePath) {
 }
 
 $qry = ConsoleInfo::query()->where('cover', '=', 1)->value('id');
-if ($qry instanceof \Traversable) {
     foreach ($qry as $rows) {
         if (! is_file($path2covers.$rows['id'].'.jpg')) {
             ConsoleInfo::query()->where(
@@ -53,6 +52,5 @@ if ($qry instanceof \Traversable) {
             $deleted++;
         }
     }
-}
 $colorCli->header($covers.' covers set.');
 $colorCli->header($deleted.' consoles unset.');

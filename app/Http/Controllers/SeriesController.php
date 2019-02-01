@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use Blacklight\Releases;
 use App\Models\UserSerie;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 
 class SeriesController extends BasePageController
@@ -61,7 +62,7 @@ class SeriesController extends BasePageController
                     $series[$r->series][$r->episode][] = $r;
                 }
 
-                $this->smarty->assign('seasons', array_sort_recursive($series));
+                $this->smarty->assign('seasons', Arr::sortRecursive($series));
                 $this->smarty->assign('show', $show);
                 $this->smarty->assign('myshows', $myshows);
 
@@ -139,13 +140,7 @@ class SeriesController extends BasePageController
 
             $content = $this->smarty->fetch('viewserieslist.tpl');
 
-            $this->smarty->assign([
-                'title' => $title,
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
+            $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
             $this->pagerender();
         }
     }

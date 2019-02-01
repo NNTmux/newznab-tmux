@@ -6,6 +6,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use App\Models\MovieInfo;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
 $colorCli = new ColorCLI();
@@ -23,11 +24,10 @@ if ($row !== null) {
 }
 $path2covers = NN_COVERS.'movies'.DS;
 
-$dirItr = new \RecursiveDirectoryIterator($path2covers);
-$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
+$itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
-    if (is_file($filePath) && preg_match('/-cover\.jpg/', $filePath)) {
-        preg_match('/(\d+)-cover\.jpg/', basename($filePath), $match);
+    if (is_file($filePath->getPathname()) && preg_match('/-cover\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)-cover\.jpg$/', $filePath->getPathname(), $match);
         if (isset($match[1])) {
             $run = MovieInfo::query()->where('cover', '=', 0)->where('imdbid', $match[1])->update(['cover' => 1]);
             if ($run >= 1) {
@@ -40,8 +40,8 @@ foreach ($itr as $filePath) {
             }
         }
     }
-    if (is_file($filePath) && preg_match('/-backdrop\.jpg/', $filePath)) {
-        preg_match('/(\d+)-backdrop\.jpg/', basename($filePath), $match1);
+    if (is_file($filePath) && preg_match('/-backdrop\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)-backdrop\.jpg$/', $filePath->getPathname(), $match1);
         if (isset($match1[1])) {
             $run = MovieInfo::query()->where(['backdrop' => 0, 'imdbid' => $match1[1]])->update(['backdrop' => 1]);
             if ($run >= 1) {
@@ -49,7 +49,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = MovieInfo::query()->where('imdbid', $match1[1])->select(['imdbid'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath.' not found in db.');
+                    $colorCli->info($filePath->getPathname().' not found in db.');
                 }
             }
         }

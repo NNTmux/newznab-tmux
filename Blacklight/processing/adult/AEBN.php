@@ -44,15 +44,15 @@ class AEBN extends AdultMovies
      * @var array
      */
     protected $_res = [
-		'backcover'   => [],
-		'boxcover'    => [],
-		'cast'        => [],
-		'director'    => [],
-		'genres'      => [],
-		'productinfo' => [],
-		'synopsis'    => [],
-		'trailers'    => ['url' => []],
-	];
+        'backcover'   => [],
+        'boxcover'    => [],
+        'cast'        => [],
+        'director'    => [],
+        'genres'      => [],
+        'productinfo' => [],
+        'synopsis'    => [],
+        'trailers'    => ['url' => []],
+    ];
 
     /**
      * Sets title in getAll method.

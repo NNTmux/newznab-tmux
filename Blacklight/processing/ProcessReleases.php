@@ -13,6 +13,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\Categorize;
+use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
 use Blacklight\ReleaseImage;
@@ -123,7 +124,6 @@ class ProcessReleases
 
         $this->echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
-        $this->pdo = DB::connection()->getPdo();
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
@@ -267,7 +267,7 @@ class ProcessReleases
                 }
             }
         }
-        if ($this->echoCLI !== false && $categorized > 0) {
+        if ($this->echoCLI && $categorized > 0) {
             echo PHP_EOL;
         }
 
@@ -314,7 +314,7 @@ class ProcessReleases
 
             $this->colorCli->primary(
                     ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -333,9 +333,10 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Calculating collection sizes (in bytes).');
         }
         // Get the total size in bytes of the collection for collections where filecheck = 2.
-        $checked = DB::update(
-            sprintf(
-                '
+        DB::transaction(function () use ($groupID, $startTime) {
+            $checked = DB::update(
+                sprintf(
+                    '
 				UPDATE collections c
 				SET c.filesize =
 				(
@@ -346,19 +347,20 @@ class ProcessReleases
 				c.filecheck = %d
 				WHERE c.filecheck = %d
 				AND c.filesize = 0 %s',
-                self::COLLFC_SIZED,
-                self::COLLFC_COMPPART,
-                (! empty($groupID) ? ' AND c.groups_id = '.$groupID : ' ')
-            )
-        );
-        if ($checked > 0 && $this->echoCLI) {
-            $this->colorCli->primary(
+                    self::COLLFC_SIZED,
+                    self::COLLFC_COMPPART,
+                    (! empty($groupID) ? ' AND c.groups_id = '.$groupID : ' ')
+                )
+            );
+            if ($checked > 0 && $this->echoCLI) {
+                $this->colorCli->primary(
                     $checked.' collections set to filecheck = 3(size calculated)',
-                true
+                    true
                 );
-            $totalTime = now()->diffInSeconds($startTime);
-            $this->colorCli->primary($totalTime.str_plural(' second', $totalTime), true);
-        }
+                $totalTime = now()->diffInSeconds($startTime);
+                $this->colorCli->primary($totalTime.Str::plural(' second', $totalTime), true);
+            }
+        }, 10);
     }
 
     /**
@@ -372,9 +374,7 @@ class ProcessReleases
         $startTime = now();
 
         if ($this->echoCLI) {
-            $this->colorCli->header(
-                    'Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.'
-                );
+            $this->colorCli->header('Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.');
         }
 
         $groupID === '' ? $groupIDs = Group::getActiveIDs() : $groupIDs = [['id' => $groupID]];
@@ -398,94 +398,63 @@ class ProcessReleases
                 }
             }
 
-            if (DB::selectOne(
-                    sprintf(
-                        '
+            if (DB::selectOne(sprintf('
 						SELECT SQL_NO_CACHE id
 						FROM collections c
 						WHERE c.filecheck = %d
-						AND c.filesize > 0',
-                        self::COLLFC_SIZED
-                    )
-                ) !== null
-            ) {
-                $deleteQuery = DB::transaction(function () use ($minSizeSetting, $groupMinSizeSetting) {
-                    DB::delete(
-                        sprintf(
-                            '
+						AND c.filesize > 0', self::COLLFC_SIZED)) !== null) {
+                DB::transaction(function () use (
+                    $groupMinSizeSetting,
+                    $minSizeSetting,
+                    $minSizeDeleted,
+                    $maxSizeSetting,
+                    $maxSizeDeleted,
+                    $minFilesSetting,
+                    $groupMinFilesSetting,
+                    $minFilesDeleted,
+                    $startTime
+                ) {
+                    $deleteQuery = DB::delete(sprintf('
 						DELETE c FROM collections c
 						WHERE c.filecheck = %d
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
-						AND c.filesize < GREATEST(%d, %d)',
-                            self::COLLFC_SIZED,
-                            $groupMinSizeSetting,
-                            $minSizeSetting,
-                            $groupMinSizeSetting,
-                            $minSizeSetting
-                        )
-                    );
-                }, 3);
-
-                if ($deleteQuery > 0) {
-                    $minSizeDeleted += $deleteQuery;
-                }
-
-                if ($maxSizeSetting > 0) {
-                    $deleteQuery = DB::transaction(function () use ($maxSizeSetting) {
-                        DB::delete(
-                            sprintf(
-                                '
-							DELETE c FROM collections c
-							WHERE c.filecheck = %d
-							AND c.filesize > %d',
-                                self::COLLFC_SIZED,
-                                $maxSizeSetting
-                            )
-                        );
-                    }, 3);
+						AND c.filesize < GREATEST(%d, %d)', self::COLLFC_SIZED, $groupMinSizeSetting, $minSizeSetting, $groupMinSizeSetting, $minSizeSetting));
 
                     if ($deleteQuery > 0) {
-                        $maxSizeDeleted += $deleteQuery;
+                        $minSizeDeleted += $deleteQuery;
                     }
-                }
 
-                if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
-                    $deleteQuery = DB::transaction(function () use ($minFilesSetting, $groupMinFilesSetting) {
-                        DB::delete(
-                            sprintf(
-                                '
+                    if ($maxSizeSetting > 0) {
+                        $deleteQuery = DB::delete(sprintf('
+							DELETE c FROM collections c
+							WHERE c.filecheck = %d
+							AND c.filesize > %d', self::COLLFC_SIZED, $maxSizeSetting));
+
+                        if ($deleteQuery > 0) {
+                            $maxSizeDeleted += $deleteQuery;
+                        }
+                    }
+
+                    if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
+                        $deleteQuery = DB::delete(sprintf('
 						DELETE c FROM collections c
 						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
-						AND c.totalfiles < GREATEST(%d, %d)',
-                                self::COLLFC_SIZED,
-                                $groupMinFilesSetting,
-                                $minFilesSetting,
-                                $groupMinFilesSetting,
-                                $minFilesSetting
-                            )
-                        );
-                    }, 3);
+						AND c.totalfiles < GREATEST(%d, %d)', self::COLLFC_SIZED, $groupMinFilesSetting, $minFilesSetting, $groupMinFilesSetting, $minFilesSetting));
 
-                    if ($deleteQuery > 0) {
-                        $minFilesDeleted += $deleteQuery;
+                        if ($deleteQuery > 0) {
+                            $minFilesDeleted += $deleteQuery;
+                        }
                     }
-                }
+
+                    $totalTime = now()->diffInSeconds($startTime);
+
+                    if ($this->echoCLI) {
+                        $this->colorCli->primary('Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.$minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.' with less files than site/group settings in: '.$totalTime.Str::plural(' second', $totalTime), true);
+                    }
+                }, 10);
             }
-        }
-
-        $totalTime = now()->diffInSeconds($startTime);
-
-        if ($this->echoCLI) {
-            $this->colorCli->primary(
-                    'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.
-                    $minSizeDeleted.' smaller than, '.
-                    $maxSizeDeleted.' bigger than, '.
-                    $minFilesDeleted.' with less files than site/group settings in: '.
-                    $totalTime.str_plural(' second', $totalTime),
-                true
-                );
         }
     }
 
@@ -591,7 +560,8 @@ class ProcessReleases
 
                 if ($releaseID !== null) {
                     // Update collections table to say we inserted the release.
-                    DB::update(
+                    DB::transaction(function () use ($collection, $releaseID) {
+                        DB::update(
                             sprintf(
                                 '
 								UPDATE collections
@@ -602,6 +572,7 @@ class ProcessReleases
                                 $collection->id
                             )
                         );
+                    }, 10);
 
                     // Add the id of regex that matched the collection and release name to release_regexes table
                     ReleaseRegex::insertIgnore([
@@ -685,7 +656,7 @@ class ProcessReleases
                     ' Releases added and '.
                     number_format($duplicate).
                     ' duplicate collections deleted in '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -730,7 +701,7 @@ class ProcessReleases
             // Init vars for writing the NZB's.
             $this->nzb->initiateForWrite();
             foreach ($releases as $release) {
-                if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title) === true) {
+                if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title)) {
                     $nzbCount++;
                     if ($this->echoCLI) {
                         echo "Creating NZBs and deleting Collections: $nzbCount/$total.\r";
@@ -744,8 +715,8 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
-                    $totalTime.str_plural(' second', $totalTime).PHP_EOL.
-                    'Total time: '.$totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
+                    'Total time: '.$totalTime.Str::plural(' second', $totalTime),
                 true
             );
         }
@@ -788,7 +759,7 @@ class ProcessReleases
         $totalTime = now()->diffInSeconds($startTime);
 
         if ($this->echoCLI) {
-            $this->colorCli->primary($totalTime.str_plural(' second', $totalTime));
+            $this->colorCli->primary($totalTime.Str::plural(' second', $totalTime));
         }
     }
 
@@ -835,9 +806,9 @@ class ProcessReleases
                 ), true);
         }
 
-        $deleted = 0;
-        $deleteQuery = DB::transaction(function () {
-            DB::delete(
+        DB::transaction(function () use ($deletedCount, $startTime) {
+            $deleted = 0;
+            $deleteQuery = DB::delete(
                 sprintf(
                     '
 				DELETE c
@@ -846,157 +817,150 @@ class ProcessReleases
                     Settings::settingValue('..partretentionhours')
                 )
             );
-        }, 3);
+            if ($deleteQuery > 0) {
+                $deleted = $deleteQuery;
+                $deletedCount += $deleted;
+            }
+            $firstQuery = $fourthQuery = now();
 
-        if ($deleteQuery > 0) {
-            $deleted = $deleteQuery;
-            $deletedCount += $deleted;
-        }
+            $totalTime = $firstQuery->diffInSeconds($startTime);
 
-        $firstQuery = $fourthQuery = now();
-
-        $totalTime = $firstQuery->diffInSeconds($startTime);
-
-        if ($this->echoCLI) {
-            $this->colorCli->primary(
-                'Finished deleting '.$deleted.' old collections/binaries/parts in '.
-                $totalTime.str_plural(' second', $totalTime),
-                true
-            );
-        }
-
-        // Cleanup orphaned collections, binaries and parts
-        // this really shouldn't happen, but just incase - so we only run 1/200 of the time
-        if (random_int(0, 200) <= 1) {
-            // CBP collection orphaned with no binaries or parts.
             if ($this->echoCLI) {
-                echo
-                    $this->colorCli->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
-                    $this->colorCli->primary('Deleting orphaned collections.');
+                $this->colorCli->primary(
+                    'Finished deleting '.$deleted.' old collections/binaries/parts in '.
+                    $totalTime.Str::plural(' second', $totalTime),
+                    true
+                );
             }
 
-            $deleted = 0;
-            $deleteQuery = DB::transaction(function () {
-                DB::delete(
-                    '
+            // Cleanup orphaned collections, binaries and parts
+            // this really shouldn't happen, but just incase - so we only run 1/200 of the time
+            if (random_int(0, 200) <= 1) {
+                // CBP collection orphaned with no binaries or parts.
+                if ($this->echoCLI) {
+                    echo
+                        $this->colorCli->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
+                        $this->colorCli->primary('Deleting orphaned collections.');
+                }
+
+                $deleted = 0;
+                $deleteQuery =
+                    DB::delete(
+                        '
 					DELETE c, b, p
 					FROM collections c
 					LEFT JOIN binaries b ON c.id = b.collections_id
 					LEFT JOIN parts p ON b.id = p.binaries_id
 					WHERE (b.id IS NULL OR p.binaries_id IS NULL)'
-                );
-            }, 3);
+                    );
 
-            if ($deleteQuery > 0) {
-                $deleted = $deleteQuery;
-                $deletedCount += $deleted;
-            }
+                if ($deleteQuery > 0) {
+                    $deleted = $deleteQuery;
+                    $deletedCount += $deleted;
+                }
 
-            $secondQuery = now();
-            $totalTime = $secondQuery->diffInSeconds($firstQuery);
+                $secondQuery = now();
+                $totalTime = $secondQuery->diffInSeconds($firstQuery);
 
-            if ($this->echoCLI) {
-                $this->colorCli->primary(
-                    'Finished deleting '.$deleted.' orphaned collections in '.
-                    $totalTime.str_plural(' second', $totalTime),
-                    true
-                );
-            }
+                if ($this->echoCLI) {
+                    $this->colorCli->primary(
+                        'Finished deleting '.$deleted.' orphaned collections in '.
+                        $totalTime.Str::plural(' second', $totalTime),
+                        true
+                    );
+                }
 
-            // orphaned binaries - binaries with no parts or binaries with no collection
-            // Don't delete currently inserting binaries by checking the max id.
-            if ($this->echoCLI) {
-                $this->colorCli->primary('Deleting orphaned binaries/parts with no collection.', true);
-            }
+                // orphaned binaries - binaries with no parts or binaries with no collection
+                // Don't delete currently inserting binaries by checking the max id.
+                if ($this->echoCLI) {
+                    $this->colorCli->primary('Deleting orphaned binaries/parts with no collection.', true);
+                }
 
-            $deleted = 0;
-            $deleteQuery = DB::transaction(function () {
-                DB::delete(
-                    sprintf(
-                        'DELETE b, p FROM binaries b
+                $deleted = 0;
+                $deleteQuery =
+                    DB::delete(
+                        sprintf(
+                            'DELETE b, p FROM binaries b
 					LEFT JOIN parts p ON b.id = p.binaries_id
 					LEFT JOIN collections c ON b.collections_id = c.id
 					WHERE (p.binaries_id IS NULL OR c.id IS NULL)
 					AND b.id < %d',
-                        $this->maxQueryFormulator('binaries', 20000)
-                    )
-                );
-            }, 3);
+                            $this->maxQueryFormulator('binaries', 20000)
+                        )
+                    );
 
-            if ($deleteQuery > 0) {
-                $deleted = $deleteQuery;
-                $deletedCount += $deleted;
-            }
+                if ($deleteQuery > 0) {
+                    $deleted = $deleteQuery;
+                    $deletedCount += $deleted;
+                }
 
-            $thirdQuery = now();
+                $thirdQuery = now();
 
-            $totalTime = $thirdQuery->diffInSeconds($secondQuery);
+                $totalTime = $thirdQuery->diffInSeconds($secondQuery);
 
-            if ($this->echoCLI) {
-                $this->colorCli->primary(
-                    'Finished deleting '.$deleted.' binaries with no collections or parts in '.$totalTime.str_plural(' second', $totalTime),
-                    true
-                );
-            }
+                if ($this->echoCLI) {
+                    $this->colorCli->primary(
+                        'Finished deleting '.$deleted.' binaries with no collections or parts in '.$totalTime.Str::plural(' second', $totalTime),
+                        true
+                    );
+                }
 
-            // orphaned parts - parts with no binary
-            // Don't delete currently inserting parts by checking the max id.
-            if ($this->echoCLI) {
-                $this->colorCli->primary('Deleting orphaned parts with no binaries.', true);
-            }
-            $deleted = 0;
-            $deleteQuery = DB::transaction(function () {
-                DB::delete(
-                    sprintf(
-                        '
+                // orphaned parts - parts with no binary
+                // Don't delete currently inserting parts by checking the max id.
+                if ($this->echoCLI) {
+                    $this->colorCli->primary('Deleting orphaned parts with no binaries.', true);
+                }
+                $deleted = 0;
+                $deleteQuery =
+                    DB::delete(
+                        sprintf(
+                            '
 					DELETE p
 					FROM parts p
 					LEFT JOIN binaries b ON p.binaries_id = b.id
 					WHERE b.id IS NULL
 					AND p.binaries_id < %d',
-                        $this->maxQueryFormulator('binaries', 20000)
-                    )
-                );
-            }, 3);
+                            $this->maxQueryFormulator('binaries', 20000)
+                        )
+                    );
 
-            if ($deleteQuery > 0) {
-                $deleted = $deleteQuery;
-                $deletedCount += $deleted;
-            }
+                if ($deleteQuery > 0) {
+                    $deleted = $deleteQuery;
+                    $deletedCount += $deleted;
+                }
 
-            $fourthQuery = now();
+                $fourthQuery = now();
 
-            $totalTime = $fourthQuery->diffInSeconds($thirdQuery);
+                $totalTime = $fourthQuery->diffInSeconds($thirdQuery);
+
+                if ($this->echoCLI) {
+                    $this->colorCli->primary(
+                        'Finished deleting '.$deleted.' parts with no binaries in '.
+                        $totalTime.Str::plural(' second', $totalTime),
+                        true
+                    );
+                }
+            } // done cleaning up Binaries/Parts orphans
 
             if ($this->echoCLI) {
                 $this->colorCli->primary(
-                    'Finished deleting '.$deleted.' parts with no binaries in '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    'Deleting collections that were missed after NZB creation.',
                     true
                 );
             }
-        } // done cleaning up Binaries/Parts orphans
 
-        if ($this->echoCLI) {
-            $this->colorCli->primary(
-                'Deleting collections that were missed after NZB creation.',
-                true
-            );
-        }
-
-        $deleted = 0;
-        // Collections that were missing on NZB creation.
-        $collections = DB::select(
+            $deleted = 0;
+            // Collections that were missing on NZB creation.
+            $collections = DB::select(
                 '
 				SELECT SQL_NO_CACHE c.id
 				FROM collections c
 				INNER JOIN releases r ON r.id = c.releases_id
 				WHERE r.nzbstatus = 1'
-        );
+            );
 
-        foreach ($collections as $collection) {
-            $deleted++;
-            DB::transaction(function () use ($collection) {
+            foreach ($collections as $collection) {
+                $deleted++;
                 DB::delete(
                     sprintf(
                         '
@@ -1006,24 +970,24 @@ class ProcessReleases
                         $collection->id
                     )
                 );
-            }, 3);
-        }
-        $deletedCount += $deleted;
+            }
+            $deletedCount += $deleted;
 
-        $colDelTime = now()->diffInSeconds($fourthQuery);
-        $totalTime = $fourthQuery->diffInSeconds($startTime);
+            $colDelTime = now()->diffInSeconds($fourthQuery);
+            $totalTime = $fourthQuery->diffInSeconds($startTime);
 
-        if ($this->echoCLI) {
-            $this->colorCli->primary(
+            if ($this->echoCLI) {
+                $this->colorCli->primary(
                     'Finished deleting '.$deleted.' collections missed after NZB creation in '.
-                    $colDelTime.str_plural(' second', $colDelTime).PHP_EOL.
+                    $colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.
                     'Removed '.
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
-                    $totalTime.str_plural(' second', $totalTime),
-                true
+                    $totalTime.Str::plural(' second', $totalTime),
+                    true
                 );
-        }
+            }
+        }, 10);
     }
 
     /**
@@ -1117,7 +1081,7 @@ class ProcessReleases
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
-                    $totalTime.str_plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
         }
@@ -1352,7 +1316,7 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
-                        $totalTime.str_plural(' second', $totalTime),
+                        $totalTime.Str::plural(' second', $totalTime),
                     true
                     );
             }
@@ -1390,12 +1354,14 @@ class ProcessReleases
      * @param string $where
      *
      * @void
+     * @throws \Throwable
      */
     private function collectionFileCheckStage1(&$where): void
     {
-        DB::update(
-            sprintf(
-                '
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    '
 				UPDATE collections c
 				INNER JOIN
 				(
@@ -1408,11 +1374,12 @@ class ProcessReleases
 					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
 				) r ON c.id = r.id
 				SET filecheck = %d',
-                self::COLLFC_DEFAULT,
-                $where,
-                self::COLLFC_COMPCOLL
-            )
-        );
+                    self::COLLFC_DEFAULT,
+                    $where,
+                    self::COLLFC_COMPCOLL
+                )
+            );
+        }, 10);
     }
 
     /**
@@ -1426,12 +1393,14 @@ class ProcessReleases
      * @param string $where
      *
      * @void
+     * @throws \Throwable
      */
     private function collectionFileCheckStage2(&$where): void
     {
-        DB::update(
-            sprintf(
-                '
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    '
 				UPDATE collections c
 				INNER JOIN
 				(
@@ -1444,22 +1413,26 @@ class ProcessReleases
 					GROUP BY c.id
 				) r ON c.id = r.id
 				SET c.filecheck = %d',
-                self::COLLFC_COMPCOLL,
-                $where,
-                self::COLLFC_ZEROPART
-            )
-        );
-        DB::update(
-            sprintf(
-                '
+                    self::COLLFC_COMPCOLL,
+                    $where,
+                    self::COLLFC_ZEROPART
+                )
+            );
+        }, 10);
+
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    '
 				UPDATE collections c
 				SET filecheck = %d
 				WHERE filecheck = %d %s',
-                self::COLLFC_TEMPCOMP,
-                self::COLLFC_COMPCOLL,
-                $where
-            )
-        );
+                    self::COLLFC_TEMPCOMP,
+                    self::COLLFC_COMPCOLL,
+                    $where
+                )
+            );
+        }, 10);
     }
 
     /**
@@ -1469,10 +1442,12 @@ class ProcessReleases
      * @param string $where
      *
      * @void
+     * @throws \Throwable
      */
     private function collectionFileCheckStage3($where): void
     {
-        DB::update(
+        DB::transaction(function () use ($where) {
+            DB::update(
             sprintf(
                 '
 				UPDATE binaries b
@@ -1493,9 +1468,12 @@ class ProcessReleases
                 self::FILE_COMPLETE
             )
         );
-        DB::update(
-            sprintf(
-                '
+        }, 10);
+
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    '
 				UPDATE binaries b
 				INNER JOIN
 				(
@@ -1508,12 +1486,13 @@ class ProcessReleases
 					GROUP BY b.id, b.totalparts
 				) r ON b.id = r.id
 				SET b.partcheck = %d',
-                self::COLLFC_ZEROPART,
-                self::FILE_INCOMPLETE,
-                $where,
-                self::FILE_COMPLETE
-            )
-        );
+                    self::COLLFC_ZEROPART,
+                    self::FILE_INCOMPLETE,
+                    $where,
+                    self::FILE_COMPLETE
+                )
+            );
+        }, 10);
     }
 
     /**
@@ -1524,24 +1503,27 @@ class ProcessReleases
      * @param string $where
      *
      * @void
+     * @throws \Throwable
      */
     private function collectionFileCheckStage4(&$where): void
     {
-        DB::update(
-            sprintf(
-                '
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    '
 				UPDATE collections c INNER JOIN
 					(SELECT c.id FROM collections c
 					INNER JOIN binaries b ON c.id = b.collections_id
 					WHERE b.partcheck = 1 AND c.filecheck IN (%d, %d) %s
 					GROUP BY b.collections_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
 				r ON c.id = r.id SET filecheck = %d',
-                self::COLLFC_TEMPCOMP,
-                self::COLLFC_ZEROPART,
-                $where,
-                self::COLLFC_COMPPART
-            )
-        );
+                    self::COLLFC_TEMPCOMP,
+                    self::COLLFC_ZEROPART,
+                    $where,
+                    self::COLLFC_COMPPART
+                )
+            );
+        }, 10);
     }
 
     /**
@@ -1551,21 +1533,24 @@ class ProcessReleases
      * @param string $where
      *
      * @void
+     * @throws \Throwable
      */
     private function collectionFileCheckStage5(&$where): void
     {
-        DB::update(
-            sprintf(
-                '
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    '
 				UPDATE collections c
 				SET filecheck = %d
 				WHERE filecheck IN (%d, %d) %s',
-                self::COLLFC_COMPCOLL,
-                self::COLLFC_TEMPCOMP,
-                self::COLLFC_ZEROPART,
-                $where
-            )
-        );
+                    self::COLLFC_COMPCOLL,
+                    self::COLLFC_TEMPCOMP,
+                    self::COLLFC_ZEROPART,
+                    $where
+                )
+            );
+        }, 10);
     }
 
     /**
@@ -1575,22 +1560,25 @@ class ProcessReleases
      * @param string $where
      *
      * @void
+     * @throws \Throwable
      */
     private function collectionFileCheckStage6(&$where): void
     {
-        DB::update(
-            sprintf(
-                "
+        DB::transaction(function () use ($where) {
+            DB::update(
+                sprintf(
+                    "
 				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
 				AND c.filecheck IN (%d, %d, 10) %s",
-                self::COLLFC_COMPPART,
-                $this->collectionDelayTime,
-                self::COLLFC_DEFAULT,
-                self::COLLFC_COMPCOLL,
-                $where
-            )
-        );
+                    self::COLLFC_COMPPART,
+                    $this->collectionDelayTime,
+                    self::COLLFC_DEFAULT,
+                    self::COLLFC_COMPCOLL,
+                    $where
+                )
+            );
+        }, 10);
     }
 
     /**
@@ -1606,8 +1594,8 @@ class ProcessReleases
     {
         $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 
-        $obj = DB::transaction(function () use ($where, $lastRun) {
-            DB::delete(
+        DB::transaction(function () use ($where, $lastRun) {
+            $obj = DB::delete(
                 sprintf(
                     '
                 DELETE c FROM collections c
@@ -1620,10 +1608,9 @@ class ProcessReleases
                     $where
                 )
             );
+            if ($this->echoCLI && $obj > 0) {
+                $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.', true);
+            }
         }, 3);
-
-        if ($this->echoCLI && $obj > 0) {
-            $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.', true);
-        }
     }
 }

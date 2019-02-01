@@ -1,4 +1,103 @@
+2019-02-01 DariusIII
+	* Chg: Update search function return tag
+	* Chg: Optimize RSS and search queries to load only needed columns from releases table
+	* Chg: Add prettier for css/js/vue files code style fixes
+	* Chg: Update sebastian/environment (4.0.2 => 4.1.0)
+	* Chg: Update phpunit/phpunit (7.5.2 => 7.5.3)
+2019-01-31 DariusIII
+	* Chg: Update .styleci config file
+	* Chg: Update and fix code with php-cs-fixer
+	* Chg: Update TinyMCE to version 4.9.3
+	* Chg: Update composer.json
+	* Fix: Add missing STATUS_DISABLED to admin/CategoryController
+	* Chg: Add try-catch block to archiveinfo to catch errors
+2019-01-30 DariusIII
+	* Fix: Fix typo in config check
+	* Chg: Update dariusiii/php-itunes-api (v1.0.6 => v1.0.7)
+	* Chg: Update nette/php-generator (v3.0.5 => v3.2.1)
+  	* Chg: Update nette/di (v2.4.14 => v2.4.15)
+	* Chg: Log errors only if debugging is enabled
+	* Chg: Use transaction when updating expired collections on tmux start
+	* Chg: Simplify expressions to reduce cognitive load in ProcessAdditional class
+	* Chg: Update composer/composer (1.8.2 => 1.8.3)
+	* Chg: Update laravel/framework (v5.7.23 => v5.7.24)
+2019-01-29 DariusIII
+	* Chg: Use transactions where possible in ProcessReleases class
+	* Chg: Update all-js.js and all-css.css with latest versions of popper and font-awesome
+	* Chg: Update laravel/framework (v5.7.22 => v5.7.23)
+	* Chg: Update composer/composer (1.8.0 => 1.8.2)
+	* Chg: Replace usage of array_ helper with Arr class directly to prepare for Laravel 5.8 changes
+	* Chg: Replace usage of str_ helper with Str class directly to prepare for Laravel 5.8 changes
+	* Chg: Update vlucas/phpdotenv to version 2.6.1
+	* Chg: Update used libraries to their latest versions
+	* Chg: Update BTC support to take into account current role expiration date
+2019-01-28 DariusIII
+	* Chg: Update nesbot/carbon (2.10.0 => 2.10.1)
+	* Fix: Fix safe backfill
+	* Chg: Make settingValue function silent for undefined index
+	* Fix: Fix check for not empty collections table in Forking class
+	* Chg: Update composer/ca-bundle (1.1.3 => 1.1.4)
+	* Fix: Fix wrong date calculation in safeBackfill function
+	* Chg: Update Forking class, cast values from database into int where needed
+	* Chg: Simplify settingValue function
+	* Chg: Update settingValue function in Settings model
+2019-01-25 DariusIII
+	* Chg: Update Category class
+	* Fix: Fix Log class usage in Forking class
+	* Chg: Small update to Forking class
+	* Chg: Small change in Video model
+	* Chg: Update Console class
+	* Chg: Small optimizations in code, use compact where applicable
+	* Chg: Add config/nntmux_nntp.php and use the config in NNTP class
+	* Chg: Updated czproject/git-php (v3.16.1 => v3.16.2)
+2019-01-24 DariusIII
+	* Fix: Use inline string for settingValue in TmuxRun class
+	* Chg: Update toTree function
+	* Chg: Add SettingsTest
+	* Chg: Simplify settingValue function in app/Models/Settings model
+	* Chg: Update nunomaduro/larastan (v0.3.14 => v0.3.15)
+	* Chg: Update NNTP class
+2019-01-23 DariusIII
+	* Chg: Return search results for tv, movies, anime searches from api properly
+	* Chg: Use pear/net_nntp from github and adjust our NNTP class
+	* Chg: Update NameFixer matchPredbFT function
+	* Fix: Fix variable assignment error in QueueController
+2019-01-22 DariusIII
+	* Chg: Updated phpstan/phpstan (0.10.8 => 0.11.1)
+	* Chg: Updated laravel/framework (v5.7.21 => v5.7.22)
+	* Chg: Updated nunomaduro/larastan (v0.3.13 => v0.3.14)
+	* Fix: Fix total count of console releases that made console covers page to show only 1 page
+	* Chg: Update config/logging.php
+	* Fix: Fix one more occurence of wrong data sent to search function
+	* Chg: Log errors in PostProcessAdditional class
+2019-01-21 DariusIII
+	* Chg: Further improve results returned by search
+	* Chg: Improve Manticore Search results, return more relevant ones and more current
+	* Fix: Fix XML_Response atom:link url reported for api v1
+	* Chg: Slightly optimize searchIndexes query
+	* Fix: Fix error on search with argument 16 not being an array but null
+	* Chg: Update czproject/git-php (v3.16.0 => v3.16.1)
+	* Fix: Fix issues reported by scrutinizer (strings where arrays are expected and vice versa)
+	* Chg: Update search, update matching
+2019-01-20 DariusIII
+	* Chg: Update rest of the cover checking files
+	* Fix: Fix misc/tesing/PostProc/updateXXXImages.php script error (fixes issue #852)
+2019-01-19 DariusIII
+	* Fix: Return empty array in search functions if manticore search found no matches
+2019-01-18 DariusIII
+	* Chg: Update Releases class all the searches to query manticore search directly and use results in queries
+	* Chg: Update spatie/laravel-directory-cleanup to version 1.2.3
+	* Fix: Fix insert_hashes trigger migration (Fixes issue #846)
+	* Chg: Update fixtures:up and :down commands to accept optional parameters
+	* Chg: Use badge-info for badges on games page
+2019-01-17 DariusIII
+	* Fix: Fix predb_import_daily_batch script, it was inserting quotes and making data bad
+	* Chg: Switch from SphinxSearch to Manticore in sphinx.conf
+	* Chg: Use only complete threaded update for binaries
+	* Chg: Add source column to predb_se table creation
+	* Chg: Update resetdb command sphinx index truncation
 2019-01-16 DariusIII
+	* Chg: Update spatie/laravel-fractal to version 5.4.3
 	* Fix: Fix predb_import_daily_batch.php
 	* Chg: Update config/irc_settings.php
 2019-01-15 DariusIII

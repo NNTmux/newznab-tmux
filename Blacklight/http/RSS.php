@@ -69,7 +69,7 @@ class RSS extends Capabilities
         }
         $sql =
             sprintf(
-                "SELECT r.*,
+                "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
 					m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors,
 					g.name AS group_name,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
@@ -86,10 +86,10 @@ class RSS extends Capabilities
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
 				LEFT JOIN groups g ON g.id = r.groups_id
-				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
 				LEFT OUTER JOIN genres mug ON mug.id = mu.genres_id
 				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfo_id
+				LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 				LEFT OUTER JOIN genres cog ON cog.id = co.genres_id %s
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				LEFT OUTER JOIN bookinfo bo ON bo.id = r.bookinfo_id
@@ -133,7 +133,7 @@ class RSS extends Capabilities
     {
         $sql = sprintf(
             "
-				SELECT r.*, v.id, v.title, g.name AS group_name,
+				SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
 					COALESCE(cp.id,0) AS parentid
@@ -197,7 +197,7 @@ class RSS extends Capabilities
     {
         $sql = sprintf(
             "
-				SELECT r.*, mi.title AS releasetitle, g.name AS group_name,
+				SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
 					COALESCE(cp.id,0) AS parentid

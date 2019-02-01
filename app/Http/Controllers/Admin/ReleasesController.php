@@ -17,20 +17,14 @@ class ReleasesController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Release List';
+        $meta_title = $title = 'Release List';
 
         $releaseList = Release::getReleasesRange();
         $this->smarty->assign('releaselist', $releaseList);
 
         $content = $this->smarty->fetch('release-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -44,6 +38,7 @@ class ReleasesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
+        $meta_title = $title = 'Release Edit';
 
         // Set the current action.
         $action = ($request->input('action') ?? 'view');
@@ -76,7 +71,6 @@ class ReleasesController extends BasePageController
 
             case 'view':
             default:
-                $title = 'Release Edit';
                 $id = $request->input('id');
                 $release = Release::getByGuid($id);
                 $this->smarty->assign('release', $release);
@@ -89,13 +83,7 @@ class ReleasesController extends BasePageController
 
         $content = $this->smarty->fetch('release-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

@@ -7,7 +7,6 @@ use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendPasswordResetEmail;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 
 class ResetPasswordController extends Controller

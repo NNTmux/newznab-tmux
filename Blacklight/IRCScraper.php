@@ -289,7 +289,7 @@ class IRCScraper extends IRCClient
      */
     protected function _insertNewPre()
     {
-        $sphinxData = $this->sphinxsearch->searchIndexes($this->_curPre['title'], ['title'], 'predb_rt');
+        $sphinxData = $this->sphinxsearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
         if (! empty($sphinxData) || empty($this->_curPre['title'])) {
             return;
         }

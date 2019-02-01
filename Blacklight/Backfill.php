@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Group;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -93,7 +94,7 @@ class Backfill
         $this->colorCli = new ColorCLI();
 
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
-        $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2008-08-14';
+        $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2012-08-14';
         $this->_safePartRepair = (int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill';
         $this->_disableBackfillGroup = (int) Settings::settingValue('..disablebackfillgroup') === 1;
     }
@@ -334,9 +335,9 @@ class Backfill
     public function safeBackfill($articles = ''): void
     {
         $groupname = Group::query()
-            ->whereBetween('first_record_postdate', [$this->_safeBackFillDate, now()])
+            ->whereBetween('first_record_postdate', [Carbon::createFromDate($this->_safeBackFillDate), now()])
             ->where('backfill', '=', 1)
-            ->select('name')
+            ->select(['name'])
             ->orderBy('name')
             ->first();
 

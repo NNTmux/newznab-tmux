@@ -1,8 +1,8 @@
 <?php
 
-namespace Blacklight;
+namespace Tests\Feature;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class BooksTest extends TestCase
 {

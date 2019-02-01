@@ -23,6 +23,8 @@ class SiteController extends BasePageController
     {
         $this->setAdminPrefs();
 
+        $meta_title = $title = 'Site Edit';
+
         // set the current action
         $action = $request->input('action') ?? 'view';
 
@@ -66,8 +68,6 @@ class SiteController extends BasePageController
                 break;
             case 'view':
             default:
-
-                $title = 'Site Edit';
                 $site = $this->settings;
                 $this->smarty->assign('site', $site);
                 $this->smarty->assign('settings', Settings::toTree());
@@ -176,13 +176,7 @@ class SiteController extends BasePageController
 
         $content = $this->smarty->fetch('site-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -194,7 +188,7 @@ class SiteController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Site Stats';
+        $meta_title = $title = 'Site Stats';
 
         $topgrabs = User::getTopGrabbers();
         $this->smarty->assign('topgrabs', $topgrabs);
@@ -218,13 +212,7 @@ class SiteController extends BasePageController
 
         $content = $this->smarty->fetch('site-stats.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

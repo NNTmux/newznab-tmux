@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Video;
 use App\Models\Release;
 use Illuminate\Http\Request;
-use Blacklight\processing\tv\TV;
 use App\Http\Controllers\BasePageController;
 
 class ShowsController extends BasePageController
@@ -18,7 +17,7 @@ class ShowsController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'TV Shows List';
+        $meta_title = $title = 'TV Shows List';
 
         $tvshowname = ($request->has('showname') && ! empty($request->input('showname')) ? $request->input('showname') : '');
 
@@ -30,13 +29,7 @@ class ShowsController extends BasePageController
         );
 
         $content = $this->smarty->fetch('show-list.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 
@@ -69,15 +62,9 @@ class ShowsController extends BasePageController
 
         $this->smarty->assign('show', $show);
 
-        $title = 'Edit TV Show Data';
+        $meta_title = $title = 'Edit TV Show Data';
         $content = $this->smarty->fetch('show-edit.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 
@@ -99,15 +86,9 @@ class ShowsController extends BasePageController
 
         $this->smarty->assign('success', $success);
 
-        $title = 'Remove Video and Episode IDs from Releases';
+        $meta_title = $title = 'Remove Video and Episode IDs from Releases';
         $content = $this->smarty->fetch('show-remove.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

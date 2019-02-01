@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
@@ -19,8 +18,6 @@ class QueueController extends BasePageController
     public function index(Request $request)
     {
         $this->setPrefs();
-
-        $this->smarty->assign();
 
         $queueType = $error = '';
         $queue = null;
@@ -97,13 +94,7 @@ class QueueController extends BasePageController
         $meta_keywords = 'view,'.strtolower($queueType).',queue';
         $meta_description = 'View'.$queueType.' Queue';
         $content = $this->smarty->fetch('viewqueue.tpl');
-        $this->smarty->assign([
-            'title' => $title,
-            'content' => $content,
-            'meta_title' => $meta_title,
-            'meta_keywords' => $meta_keywords,
-            'meta_description' => $meta_description,
-        ]);
+        $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -331,12 +322,7 @@ class QueueController extends BasePageController
 
         $content = $this->smarty->fetch('nzbvortex.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'content'));
 
         $this->pagerender();
     }

@@ -45,14 +45,7 @@ class BrowseController extends BasePageController
         $meta_description = 'Browse for Nzbs';
 
         $content = $this->smarty->fetch('browse.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -141,15 +134,7 @@ class BrowseController extends BasePageController
         $meta_description = 'Browse for Nzbs';
 
         $content = $this->smarty->fetch('browse.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'covgroup' => $covgroup,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'covgroup', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -187,14 +172,7 @@ class BrowseController extends BasePageController
             $meta_description = 'Browse Groups';
             $content = $this->smarty->fetch('browse.tpl');
 
-            $this->smarty->assign(
-                [
-                    'content' => $content,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]
-            );
+            $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
 
             $this->pagerender();
         }
@@ -233,14 +211,7 @@ class BrowseController extends BasePageController
             $meta_description = 'Browse Groups';
             $content = $this->smarty->fetch('browse.tpl');
 
-            $this->smarty->assign(
-                [
-                    'content' => $content,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]
-            );
+            $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
 
             $this->pagerender();
         }

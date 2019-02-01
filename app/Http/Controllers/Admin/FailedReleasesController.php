@@ -14,20 +14,14 @@ class FailedReleasesController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Failed Releases List';
+        $meta_title = $title = 'Failed Releases List';
 
         $frellist = Release::getFailedRange();
         $this->smarty->assign('releaselist', $frellist);
 
         $content = $this->smarty->fetch('failrel-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

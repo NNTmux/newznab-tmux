@@ -46,8 +46,9 @@ CREATE TABLE predb_se
 	id          BIGINT UNSIGNED NOT NULL,
 	weight      INTEGER NOT NULL,
 	query       VARCHAR(1024) NOT NULL,
-	title        VARCHAR(255) NOT NULL DEFAULT '',
-	filename  VARCHAR(1000) NULL,
+	title       VARCHAR(255) NOT NULL DEFAULT '',
+	source      VARCHAR(255) NOT NULL,
+	filename    VARCHAR(1000) NULL,
 	INDEX(query)
 ) ENGINE=SPHINX CONNECTION="%spredb_rt"
 DDLSQL;

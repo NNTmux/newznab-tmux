@@ -2,6 +2,7 @@
 
 use Bhuvidya\Countries\CountriesSeeder;
 use Illuminate\Database\Seeder;
+
 class DatabaseSeeder extends Seeder
 {
     /**

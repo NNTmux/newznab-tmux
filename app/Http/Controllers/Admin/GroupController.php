@@ -26,16 +26,10 @@ class GroupController extends BasePageController
             ]
         );
 
-        $title = 'Group List';
+        $meta_title = $title = 'Group List';
         $content = $this->smarty->fetch('group-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -64,16 +58,10 @@ class GroupController extends BasePageController
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
 
-        $title = 'Bulk Add Newsgroups';
+        $meta_title = $title = 'Bulk Add Newsgroups';
         $content = $this->smarty->fetch('group-bulk.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -122,13 +110,13 @@ class GroupController extends BasePageController
 
             case 'view':
             default:
-                $title = 'Group Edit';
+                $meta_title = $title = 'Group Edit';
                 if ($request->has('id')) {
-                    $title = 'Newsgroup Edit';
+                    $meta_title = $title = 'Newsgroup Edit';
                     $id = $request->input('id');
                     $group = Group::getGroupByID($id);
                 } else {
-                    $this->title = 'Newsgroup Add';
+                    $meta_title = $title = 'Newsgroup Add';
                 }
                 break;
         }
@@ -140,13 +128,7 @@ class GroupController extends BasePageController
 
         $content = $this->smarty->fetch('group-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -172,17 +154,11 @@ class GroupController extends BasePageController
 
         $this->smarty->assign('grouplist', $grouplist);
 
-        $title = 'Group List';
+        $meta_title = $title = 'Group List';
 
         $content = $this->smarty->fetch('group-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -208,17 +184,11 @@ class GroupController extends BasePageController
 
         $this->smarty->assign('grouplist', $grouplist);
 
-        $title = 'Group List';
+        $meta_title = $title = 'Group List';
 
         $content = $this->smarty->fetch('group-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

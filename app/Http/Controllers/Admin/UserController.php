@@ -20,7 +20,7 @@ class UserController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'User List';
+        $meta_title = $title = 'User List';
 
         $roles = [];
         foreach (Role::all()->toArray() as $userRole) {
@@ -72,13 +72,7 @@ class UserController extends BasePageController
         }
 
         $content = $this->smarty->fetch('user-list.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -102,7 +96,7 @@ class UserController extends BasePageController
             'rate_limit' => 60,
         ];
 
-        $title = 'View User';
+        $meta_title = $title = 'View User';
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -156,10 +150,8 @@ class UserController extends BasePageController
                     }
                     if ($request->input('role') !== null) {
                         $roleName = Role::query()->where('id', $request->input('role'))->value('name');
-                        if ($roleName === 'Disabled') {
-                            if (env('FIREWALL_ENABLED') === true && \Firewall::isBlacklisted($editedUser->host) === false) {
-                                \Firewall::blacklist($editedUser->host);
-                            }
+                        if (($roleName === 'Disabled') && config('firewall.enabled') === true && ! \Firewall::isBlacklisted($editedUser->host)) {
+                            \Firewall::blacklist($editedUser->host);
                         }
                         $editedUser->refresh();
                         SendAccountChangedEmail::dispatch($editedUser);
@@ -221,13 +213,7 @@ class UserController extends BasePageController
 
         $content = $this->smarty->fetch('user-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

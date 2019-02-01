@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Blacklight\ColorCLI;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendAccountExpiredEmail;
@@ -368,13 +370,19 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $uid
+     * @param int $uid
      * @param $date
-     * @return int
+     * @param int $addYear
      */
-    public static function updateUserRoleChangeDate($uid, $date): int
+    public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0)
     {
-        return self::whereId($uid)->update(['rolechangedate' => $date]);
+        $currRoleExp = self::whereId($uid)->select(['rolechangedate'])->first();
+        if (! empty($date)) {
+            self::whereId($uid)->update(['rolechangedate' => $date]);
+        }
+        if (empty($date) && ! empty($addYear)) {
+            self::whereId($uid)->update(['rolechangedate' => Carbon::createFromDate($currRoleExp['rolechangedate'])->addYears($addYear)]);
+        }
     }
 
     /**
@@ -683,7 +691,7 @@ class User extends Authenticatable
         ]);
 
         if ($validator->fails()) {
-            (new ColorCLI())->error(implode('', array_collapse($validator->errors()->toArray())));
+            (new ColorCLI())->error(implode('', Arr::collapse($validator->errors()->toArray())));
         }
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.

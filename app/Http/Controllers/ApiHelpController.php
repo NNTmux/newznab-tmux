@@ -23,15 +23,7 @@ class ApiHelpController extends BasePageController
         $meta_description = 'View description of the site Nzb Api.';
 
         $content = $this->smarty->fetch('apidesc.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -47,15 +39,7 @@ class ApiHelpController extends BasePageController
         $meta_description = 'View description of the site Nzb version 2 Api.';
 
         $content = $this->smarty->fetch('apiv2desc.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 }

@@ -123,15 +123,15 @@ class ADM extends AdultMovies
         foreach ($this->_html->find('ul.list-unstyled li') as $li) {
             $category = explode(':', $li->plaintext);
             switch (trim($category[0])) {
-				case 'Director':
-					$this->_res['director'] = trim($category[1]);
-					break;
-				case 'Format':
-				case 'Studio':
-				case 'Released':
-				case 'SKU':
-					$this->_res['productinfo'][trim($category[0])] = trim($category[1]);
-			}
+                case 'Director':
+                    $this->_res['director'] = trim($category[1]);
+                    break;
+                case 'Format':
+                case 'Studio':
+                case 'Released':
+                case 'SKU':
+                    $this->_res['productinfo'][trim($category[0])] = trim($category[1]);
+            }
         }
 
         return $this->_res;

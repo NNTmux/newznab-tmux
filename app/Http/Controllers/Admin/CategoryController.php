@@ -14,7 +14,7 @@ class CategoryController extends BasePageController
     public function index()
     {
         $this->setAdminPrefs();
-        $title = 'Category List';
+        $meta_title = $title = 'Category List';
 
         $categorylist = Category::getFlat();
 
@@ -22,13 +22,7 @@ class CategoryController extends BasePageController
 
         $content = $this->smarty->fetch('category-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 
@@ -69,8 +63,8 @@ class CategoryController extends BasePageController
                 break;
         }
 
-        $this->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);
-        $this->smarty->assign('status_names', ['Yes', 'No']);
+        $this->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE, Category::STATUS_DISABLED]);
+        $this->smarty->assign('status_names', ['Yes', 'No', 'Disabled']);
 
         $content = $this->smarty->fetch('category-edit.tpl');
 

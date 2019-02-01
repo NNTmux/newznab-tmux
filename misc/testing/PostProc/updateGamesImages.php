@@ -7,6 +7,7 @@ use Blacklight\ColorCLI;
 use App\Models\GamesInfo;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
 $colorCli = new ColorCLI();
@@ -26,11 +27,10 @@ if ($row !== null) {
 }
 $path2covers = NN_COVERS.'games'.DS;
 
-$dirItr = new \RecursiveDirectoryIterator($path2covers);
-$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
+$itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
-    if (is_file($filePath) && preg_match('/\d+\.jpg/', $filePath)) {
-        preg_match('/(\d+)\.jpg/', basename($filePath), $match);
+    if (is_file($filePath->getPathname()) && preg_match('/\d+\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)\.jpg$/', basename($filePath->getPathname()), $match);
         if (isset($match[1])) {
             $run = GamesInfo::query()->where('cover', '=', 0)->where('id', $match[1])->update(['cover' => 1]);
             if ($run !== false) {
@@ -39,7 +39,7 @@ foreach ($itr as $filePath) {
                 } else {
                     $run = GamesInfo::query()->where('id', $match[1])->select(['id'])->get();
                     if ($run !== null && $run === 0) {
-                        $colorCli->info($filePath.' not found in db.');
+                        $colorCli->info($filePath->getPathname().' not found in db.');
                     }
                 }
             }
@@ -48,7 +48,6 @@ foreach ($itr as $filePath) {
 }
 
 $qry = GamesInfo::query()->where('cover', '=', 1)->select(['id'])->get();
-if ($qry instanceof \Traversable) {
     foreach ($qry as $rows) {
         if (! is_file($path2covers.$rows['id'].'.jpg')) {
             GamesInfo::query()->where(['cover' => 1, 'id' => $rows['id']])->update(['cover' => 0]);
@@ -56,6 +55,5 @@ if ($qry instanceof \Traversable) {
             $deleted++;
         }
     }
-}
 $colorCli->header($covers.' covers set.');
 $colorCli->header($deleted.' games unset.');

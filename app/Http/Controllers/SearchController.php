@@ -86,7 +86,7 @@ class SearchController extends BasePageController
                 config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
-                $this->userdata['categoryexclusions'],
+                $this->userdata['categoryexclusions'] ?? [],
                 'basic',
                 $categoryID,
                 0,
@@ -152,7 +152,7 @@ class SearchController extends BasePageController
                 config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
-                $this->userdata['categoryexclusions'],
+                $this->userdata['categoryexclusions'] ?? [],
                 'advanced',
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
@@ -197,14 +197,7 @@ You can combine some of these rules, but not all.<br />';
         );
 
         $content = $this->smarty->fetch('search.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 }

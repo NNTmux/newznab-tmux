@@ -142,14 +142,14 @@ class Settings extends Model
      */
     public static function toTree($excludeUnsectioned = true): array
     {
-        $results = self::query()->get()->all();
+        $results = self::all();
 
         $tree = [];
-        if (\is_array($results)) {
+        if (! empty($results)) {
             foreach ($results as $result) {
-                if (! $excludeUnsectioned || ! empty($result['section'])) {
-                    $tree[$result['section']][$result['subsection']][$result['name']] =
-                        ['value' => $result['value'], 'hint' => $result['hint']];
+                if (! $excludeUnsectioned || ! empty($result->section)) {
+                    $tree[$result->section][$result->subsection][$result->name] =
+                        ['value' => $result->value, 'hint' => $result->hint];
                 }
             }
         } else {
@@ -162,75 +162,20 @@ class Settings extends Model
     }
 
     /**
-     * Checks the supplied parameter is either a string or an array with single element. If
-     * either the value is passed to Settings::dottedToArray() for conversion. Otherwise the
-     * value is returned unchanged.
-     *
-     *
      * @param $setting
      *
-     * @return array|false
+     * @return mixed
      */
-    public static function settingToArray($setting)
+    public static function settingValue($setting)
     {
-        if (! \is_array($setting)) {
-            $setting = self::dottedToArray($setting);
-        } elseif (\count($setting) === 1) {
-            $setting = self::dottedToArray($setting[0]);
-        }
-
-        return $setting;
-    }
-
-    /**
-     * @param $setting
-     *
-     * @return null|string
-     */
-    public static function settingValue($setting): ?string
-    {
-        $setting = self::settingToArray($setting);
-        $result = self::query()->where([
-                                                'section' => $setting['section'] ?? '',
-                                                'subsection' => $setting['subsection'] ?? '',
-                                                'name' => $setting['name'],
-                                            ])->value('value');
-
-        if ($result !== null) {
-            $value = $result;
-        } else {
-            $value = null;
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param $setting
-     *
-     * @return array|false
-     */
-    protected static function dottedToArray($setting)
-    {
-        $result = [];
-        if (\is_string($setting)) {
-            $array = explode('.', $setting);
-            $count = \count($array);
-            if ($count > 3) {
-                return false;
-            }
-
-            while (3 - $count > 0) {
-                array_unshift($array, '');
-                $count++;
-            }
-            list(
-                $result['section'],
-                $result['subsection'],
-                $result['name']) = $array;
-        } else {
-            return false;
-        }
+        preg_match('/(\w+)?\.(\w+)?\.(\w+)/i', $setting, $match);
+        $result = self::query()->where(
+            [
+                'section' => $match[1] ?? '',
+                'subsection' => $match[2] ?? '',
+                'name' => $match[3] ?? '',
+            ]
+        )->value('value');
 
         return $result;
     }

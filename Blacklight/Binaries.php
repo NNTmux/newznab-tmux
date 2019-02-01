@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Models\Group;
 use App\Models\Settings;
 use App\Models\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
@@ -278,7 +279,7 @@ class Binaries
             }
 
             $this->log(
-                'Updating completed in '.str_plural(' second', now()->diffInSeconds($allTime)),
+                'Updating completed in '.Str::plural(' second', now()->diffInSeconds($allTime)),
                 __FUNCTION__,
                 'primary'
             );
@@ -513,7 +514,7 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                         PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        str_plural(' second', now()->diffInSeconds($startGroup))
+                        Str::plural(' second', now()->diffInSeconds($startGroup))
                     );
             }
         } elseif ($this->_echoCLI) {
@@ -711,7 +712,9 @@ class Binaries
                     'warning'
                 );
 
-                Log::warning($notInsertedCount.' articles failed to insert!');
+                if (config('app.debug') === true) {
+                    Log::warning($notInsertedCount.' articles failed to insert!');
+                }
             }
             unset($this->headersNotInserted);
 
@@ -837,7 +840,9 @@ class Binaries
                         $collectionID = $this->_pdo->lastInsertId();
                         DB::commit();
                     } catch (\Throwable $e) {
-                        Log::error($e->getMessage());
+                        if (config('app.debug') === true) {
+                            Log::error($e->getMessage());
+                        }
                         DB::rollBack();
                     }
 
@@ -867,7 +872,9 @@ class Binaries
                     $binaryID = $this->_pdo->lastInsertId();
                     DB::commit();
                 } catch (\Throwable $e) {
-                    Log::error($e->getMessage());
+                    if (config('app.debug') === true) {
+                        Log::error($e->getMessage());
+                    }
                     DB::rollBack();
                 }
 
@@ -1605,13 +1612,19 @@ class Binaries
         try {
             return DB::insert($query);
         } catch (QueryException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $this->colorCli->debug('Query error occurred.');
         } catch (\PDOException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $this->colorCli->debug('Query error occurred.');
         } catch (\Throwable $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $this->colorCli->debug('Query error occurred.');
         }
 

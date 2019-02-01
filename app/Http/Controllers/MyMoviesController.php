@@ -167,13 +167,7 @@ class MyMoviesController extends BasePageController
                 $this->smarty->assign('movies', true);
 
                 $content = $this->smarty->fetch('browse.tpl');
-                $this->smarty->assign([
-                        'content' => $content,
-                        'title' => $title,
-                        'meta_title' => $meta_title,
-                        'meta_keywords' => $meta_keywords,
-                        'meta_description' => $meta_description,
-                    ]);
+                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
                 $this->pagerender();
                 break;
             default:
@@ -210,13 +204,7 @@ class MyMoviesController extends BasePageController
                 $this->smarty->assign('movies', $results);
 
                 $content = $this->smarty->fetch('mymovies.tpl');
-                $this->smarty->assign([
-                        'content' => $content,
-                        'title' => $title,
-                        'meta_title' => $meta_title,
-                        'meta_keywords' => $meta_keywords,
-                        'meta_description' => $meta_description,
-                    ]);
+                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
                 $this->pagerender();
                 break;
         }

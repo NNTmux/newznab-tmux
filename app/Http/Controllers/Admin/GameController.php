@@ -18,7 +18,7 @@ class GameController extends BasePageController
         $this->setAdminPrefs();
         $game = new Games(['Settings' => null]);
 
-        $title = 'Game List';
+        $meta_title = $title = 'Game List';
 
         $gamelist = $game->getRange();
 
@@ -26,13 +26,7 @@ class GameController extends BasePageController
 
         $content = $this->smarty->fetch('game-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -48,6 +42,7 @@ class GameController extends BasePageController
         $this->setAdminPrefs();
         $games = new Games(['Settings' => null]);
         $gen = new Genres(['Settings' => null]);
+        $meta_title = $title = 'Game Edit';
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';
@@ -83,7 +78,6 @@ class GameController extends BasePageController
 
                 case 'view':
                 default:
-                    $title = 'Game Edit';
                     $this->smarty->assign('game', $game);
                     $this->smarty->assign('genres', $gen->getGenres(Genres::GAME_TYPE));
                     break;
@@ -91,13 +85,7 @@ class GameController extends BasePageController
         }
 
         $content = $this->smarty->fetch('game-edit.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

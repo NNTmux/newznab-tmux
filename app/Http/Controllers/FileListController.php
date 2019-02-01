@@ -46,13 +46,7 @@ class FileListController extends BasePageController
             $content = $this->smarty->fetch('viewfilelist.tpl');
 
             $this->smarty->assign(
-                    [
-                        'title' => $title,
-                        'content' => $content,
-                        'meta_title' => $meta_title,
-                        'meta_keywords' => $meta_keywords,
-                        'meta_description' => $meta_description,
-                    ]
+                compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description')
                 );
             $this->pagerender();
         }

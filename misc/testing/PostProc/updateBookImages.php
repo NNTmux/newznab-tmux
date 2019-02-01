@@ -2,6 +2,7 @@
 
 use App\Models\BookInfo;
 use Blacklight\ColorCLI;
+use Illuminate\Support\Facades\File;
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
@@ -15,11 +16,10 @@ if ($argc === 1 || $argv[1] !== 'true') {
 
 $path2covers = NN_COVERS.'book'.DS;
 
-$dirItr = new \RecursiveDirectoryIterator($path2covers);
-$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
+$itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
-    if (is_file($filePath) && preg_match('/\d+\.jpg$/', $filePath)) {
-        preg_match('/(\d+)\.jpg$/', basename($filePath), $match);
+    if (is_file($filePath->getPathname()) && preg_match('/\d+\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)\.jpg$/', $filePath->getPathname(), $match);
         if (isset($match[1])) {
             $run = BookInfo::query()->where('cover', '=', 0)->where('id', $match[1])->update(['cover' => 1]);
             if ($run >= 1) {

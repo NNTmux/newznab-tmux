@@ -6,6 +6,7 @@ use Blacklight\NNTP;
 use App\Models\Group;
 use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
+use Illuminate\Support\Arr;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
@@ -32,7 +33,7 @@ $colorCli->header('Inserting new values into short_groups table.');
 DB::statement('TRUNCATE TABLE short_groups');
 
 // Put into an array all active groups
-$result = array_pluck(Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
+$result = Arr::pluck(Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
 
 foreach ($data as $newgroup) {
     if (\in_array($newgroup['group'], $result, false)) {

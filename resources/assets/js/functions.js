@@ -1,17 +1,20 @@
 // event bindings
-jQuery(function ($) {
-
-    $('.cartadd').click(function (e) {
+jQuery(function($) {
+    $('.cartadd').click(function(e) {
         if ($(this).hasClass('icon_cart_clicked')) return false;
-        var guid = $(".guid").attr('id').substring(4);
+        var guid = $('.guid')
+            .attr('id')
+            .substring(4);
         //alert(guid);
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
         });
-        $.post(SERVERROOT + "/cart/add?id=" + guid, function (resp) {
-            $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
+        $.post(SERVERROOT + '/cart/add?id=' + guid, function(resp) {
+            $(e.target)
+                .addClass('icon_cart_clicked')
+                .attr('title', 'Added to Cart');
             PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Release added to your Download Basket!',
@@ -20,27 +23,29 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
-
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-
-    $('.sabsend').click(function (e) {
+    $('.sabsend').click(function(e) {
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
-        var guid = $(".guid").attr('id').substring(4);
-        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
+        var guid = $('.guid')
+            .attr('id')
+            .substring(4);
+        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
 
-        $.post(nzburl, function (resp) {
-            $(e.target).addClass('icon_sab_clicked').attr('title', 'Added to Queue');
+        $.post(nzburl, function(resp) {
+            $(e.target)
+                .addClass('icon_sab_clicked')
+                .attr('title', 'Added to Queue');
             PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Release added to your download queue!',
@@ -49,26 +54,30 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-    $('.getsend').click(function (e) {
+    $('.getsend').click(function(e) {
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
-        var guid = $(".guid").attr('id').substring(4);
-        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
+        var guid = $('.guid')
+            .attr('id')
+            .substring(4);
+        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
 
-        $.post(nzburl, function (resp) {
-            $(e.target).addClass('icon_nzbget_clicked').attr('title', 'Added to Queue');
-            PNotify.defaults.icons = "fontawesome5";
+        $.post(nzburl, function(resp) {
+            $(e.target)
+                .addClass('icon_nzbget_clicked')
+                .attr('title', 'Added to Queue');
+            PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -76,25 +85,29 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-    $('.sendtocouch').click(function (e) {
+    $('.sendtocouch').click(function(e) {
         if ($(this).hasClass('icon_cp_clicked')) return false;
-        var id = $(this).attr('id').substring(4);
-        var cpurl = SERVERROOT + "sendtocouch/" + id;
+        var id = $(this)
+            .attr('id')
+            .substring(4);
+        var cpurl = SERVERROOT + 'sendtocouch/' + id;
 
-        $.post(cpurl, function (resp) {
-            $(e.target).addClass('icon_cp_clicked').attr('title', 'Added to CouchPotato');
-            PNotify.defaults.icons = "fontawesome5";
+        $.post(cpurl, function(resp) {
+            $(e.target)
+                .addClass('icon_cp_clicked')
+                .attr('title', 'Added to CouchPotato');
+            PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Movie added to CoucPotato wanted list!',
                 type: 'success',
@@ -102,48 +115,52 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-    $('.vortexsend').click(function (event) {
+    $('.vortexsend').click(function(event) {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
-        var guid = $(".guid").attr('id').substring(4);
+        var guid = $('.guid')
+            .attr('id')
+            .substring(4);
 
         if (guid && guid.length > 0) {
-            $.ajax
-            ({
+            $.ajax({
                 url: SERVERROOT + 'nzbvortex?addQueue=' + guid + '&isAjax',
-                cache: false
-            }).done(function (html) {
-                var message = 'Added ' + guid + ' to queue.';
-                $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
-                PNotify.defaults.icons = "fontawesome5";
-                PNotify.success({
-
-                    title: 'Release added to your download queue!',
-                    type: 'success',
-                    icon: 'fa fa-info fa-3x',
-                    Animate: {
-                        animate: true,
-                        in_class: 'bounceInLeft',
-                        out_class: 'bounceOutRight'
-                    },
-                    desktop: {
-                        desktop: true,
-                        fallback: true
-                    }
+                cache: false,
+            })
+                .done(function(html) {
+                    var message = 'Added ' + guid + ' to queue.';
+                    $(event.target)
+                        .addClass('icon_nzbvortex_clicked')
+                        .attr('title', message);
+                    PNotify.defaults.icons = 'fontawesome5';
+                    PNotify.success({
+                        title: 'Release added to your download queue!',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
+                        Animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight',
+                        },
+                        desktop: {
+                            desktop: true,
+                            fallback: true,
+                        },
+                    });
+                })
+                .fail(function(response) {
+                    alert(response.responseText);
                 });
-            }).fail(function (response) {
-                alert(response.responseText);
-            });
         }
         return false;
     });
@@ -157,43 +174,63 @@ jQuery(function ($) {
     vortexStates[5] = 'Skipped';
 
     // browse.tpl, search.tpl -- show icons on hover
-    var orig_opac = $('table.data tr').children('td.icons').children('div.icon').css('opacity');
+    var orig_opac = $('table.data tr')
+        .children('td.icons')
+        .children('div.icon')
+        .css('opacity');
     $('table.data tr').hover(
-        function () {
-            $(this).children('td.icons').children('div.icon').css('opacity', 1);
+        function() {
+            $(this)
+                .children('td.icons')
+                .children('div.icon')
+                .css('opacity', 1);
         },
-        function () {
-            $(this).children('td.icons').children('div.icon').css('opacity', orig_opac);
+        function() {
+            $(this)
+                .children('td.icons')
+                .children('div.icon')
+                .css('opacity', orig_opac);
         }
     );
 
-    $(".forumpostsubmit").click(function (e) {
-        if ($.trim($("#addMessage").val()) == "" || $.trim($("#addSubject").val()) == "") {
-            alert("Please enter a subject and message.");
+    $('.forumpostsubmit').click(function(e) {
+        if ($.trim($('#addMessage').val()) == '' || $.trim($('#addSubject').val()) == '') {
+            alert('Please enter a subject and message.');
             return false;
         }
     });
 
-    $(".forumreplysubmit").click(function (e) {
-        if ($.trim($("#addMessage").val()) == "") {
-            alert("Please enter a message.");
+    $('.forumreplysubmit').click(function(e) {
+        if ($.trim($('#addMessage').val()) == '') {
+            alert('Please enter a message.');
             return false;
         }
     });
 
-    $(".check").click(function (e) {
+    $('.check').click(function(e) {
         if (!$(e.target).is('input'))
-            $(this).children(".nzb_check").attr('checked', !$(this).children(".nzb_check").attr('checked'));
+            $(this)
+                .children('.nzb_check')
+                .attr(
+                    'checked',
+                    !$(this)
+                        .children('.nzb_check')
+                        .attr('checked')
+                );
     });
 
-    $(".descmore").click(function (e) {
-        $(this).prev(".descinitial").hide();
-        $(this).next(".descfull").show();
+    $('.descmore').click(function(e) {
+        $(this)
+            .prev('.descinitial')
+            .hide();
+        $(this)
+            .next('.descfull')
+            .show();
         $(this).hide();
         return false;
     });
 
-    $('.nzb_check_all').change(function () {
+    $('.nzb_check_all').change(function() {
         if ($(this).attr('checked')) {
             $('table.data tr td input:checkbox').attr('checked', $(this).attr('checked'));
         } else {
@@ -201,9 +238,9 @@ jQuery(function ($) {
         }
     });
 
-    $('.nzb_check_all_season').change(function () {
+    $('.nzb_check_all_season').change(function() {
         var season = $(this).attr('name');
-        $('table.data tr td input:checkbox').each(function (i, row) {
+        $('table.data tr td input:checkbox').each(function(i, row) {
             if ($(row).attr('name') == season) {
                 $(row).attr('checked', !$(row).attr('checked'));
             }
@@ -211,19 +248,23 @@ jQuery(function ($) {
     });
 
     // browse.tpl, search.tpl
-    $('.icon_cart').click(function (e) {
+    $('.icon_cart').click(function(e) {
         if ($(this).hasClass('icon_cart_clicked')) return false;
-        var guid = $(this).attr('id').substring(4);
+        var guid = $(this)
+            .attr('id')
+            .substring(4);
         //alert(guid);
         //alert(SERVERROOT + "/cart/add?id=" + guid);
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
         });
-        $.post(SERVERROOT + "/cart/add?id=" + guid, function (resp) {
-            $(e.target).addClass('icon_cart_clicked').attr('title', ' Release added to Cart');
-            PNotify.defaults.icons = "fontawesome5";
+        $.post(SERVERROOT + '/cart/add?id=' + guid, function(resp) {
+            $(e.target)
+                .addClass('icon_cart_clicked')
+                .attr('title', ' Release added to Cart');
+            PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Release added to your download basket!',
                 type: 'success',
@@ -231,145 +272,157 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-    $('.icon_nzbvortex').click(function (event) {
+    $('.icon_nzbvortex').click(function(event) {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
-        var guid = $(this).parent().parent().attr('id').substring(4);
+        var guid = $(this)
+            .parent()
+            .parent()
+            .attr('id')
+            .substring(4);
 
         if (guid && guid.length > 0) {
-            $.ajax
-            ({
+            $.ajax({
                 url: SERVERROOT + '/nzbvortex?addQueue=' + guid + '&isAjax',
-                cache: false
-            }).done(function (html) {
-                var message = 'Added ' + guid + ' to queue.';
-                $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
-                PNotify.defaults.icons = "fontawesome5";
-                PNotify.success({
-                    title: 'ADDED TO NZBVORTEX!',
-                    type: 'success',
-                    icon: 'fa fa-info fa-3x',
-                    Animate: {
-                        animate: true,
-                        in_class: 'bounceInLeft',
-                        out_class: 'bounceOutRight'
-                    },
-                    desktop: {
-                        desktop: true,
-                        fallback: true
-                    }
+                cache: false,
+            })
+                .done(function(html) {
+                    var message = 'Added ' + guid + ' to queue.';
+                    $(event.target)
+                        .addClass('icon_nzbvortex_clicked')
+                        .attr('title', message);
+                    PNotify.defaults.icons = 'fontawesome5';
+                    PNotify.success({
+                        title: 'ADDED TO NZBVORTEX!',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
+                        Animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight',
+                        },
+                        desktop: {
+                            desktop: true,
+                            fallback: true,
+                        },
+                    });
+                })
+                .fail(function(response) {
+                    alert(response.responseText);
                 });
-            }).fail(function (response) {
-                alert(response.responseText);
-            });
         }
 
         return false;
     });
 
-    $(document).on('click', 'a.vortex-resume', function (event) {
+    $(document).on('click', 'a.vortex-resume', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?resume=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?resume=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-pause', function (event) {
+    $(document).on('click', 'a.vortex-pause', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?pause=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?pause=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-moveup', function (event) {
+    $(document).on('click', 'a.vortex-moveup', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?moveup=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?moveup=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-movedown', function (event) {
+    $(document).on('click', 'a.vortex-movedown', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?movedown=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?movedown=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-movetop', function (event) {
+    $(document).on('click', 'a.vortex-movetop', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?movetop=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?movetop=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-movebottom', function (event) {
+    $(document).on('click', 'a.vortex-movebottom', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?movebottom=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?movebottom=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-trash', function (event) {
+    $(document).on('click', 'a.vortex-trash', function(event) {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
-        $.get(SERVERROOT + "nzbvortex?delete=" + $(this).attr('href') + '&isAjax');
+        $.get(SERVERROOT + 'nzbvortex?delete=' + $(this).attr('href') + '&isAjax');
         $(this).removeAttr('href');
         return false;
     });
 
-    $(document).on('click', 'a.vortex-filelist', function (event) {
+    $(document).on('click', 'a.vortex-filelist', function(event) {
         event.preventDefault();
         var id = $(this).attr('href');
         $('#vortex-overlay-' + id).show();
 
         $.colorbox({});
 
-        $.ajax
-        ({
+        $.ajax({
             url: SERVERROOT + '/nzbvortex?filelist=' + id + '&isAjax',
-            cache: false
-        }).done(function (response) {
-            $('#cboxLoadingGraphic').hide();
-            var json = $.parseJSON(response);
-            console.log(json);
-            $.each(json.files, function (k, v) {
-
-                $('#cboxContent').append('<strong>' + v.fileName + '</strong> (' + vortexStates[v.state] + ')<br />');
+            cache: false,
+        })
+            .done(function(response) {
+                $('#cboxLoadingGraphic').hide();
+                var json = $.parseJSON(response);
+                console.log(json);
+                $.each(json.files, function(k, v) {
+                    $('#cboxContent').append(
+                        '<strong>' + v.fileName + '</strong> (' + vortexStates[v.state] + ')<br />'
+                    );
+                });
+            })
+            .fail(function(response) {
+                alert('Unable to retrieve filelist: ' + response.responseText);
             });
-
-        }).fail(function (response) {
-            alert('Unable to retrieve filelist: ' + response.responseText);
-        });
 
         $(this).removeAttr('href');
         return false;
     });
 
-    $('.icon_sab').click(function (e) {
+    $('.icon_sab').click(function(e) {
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
-        var guid = $(this).attr('id').substring(4);
-        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
+        var guid = $(this)
+            .attr('id')
+            .substring(4);
+        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
 
-        $.post(nzburl, function (resp) {
-            $(e.target).addClass('icon_sab_clicked').attr('title', 'Release added to Queue');
-            PNotify.defaults.icons = "fontawesome5";
+        $.post(nzburl, function(resp) {
+            $(e.target)
+                .addClass('icon_sab_clicked')
+                .attr('title', 'Release added to Queue');
+            PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -377,26 +430,30 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-    $('.icon_nzbget').click(function (e) {
+    $('.icon_nzbget').click(function(e) {
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
-        var guid = $(this).attr('id').substring(4);
-        var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
+        var guid = $(this)
+            .attr('id')
+            .substring(4);
+        var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
 
-        $.post(nzburl, function (resp) {
-            $(e.target).addClass('icon_nzbget_clicked').attr('title', 'Added to Queue');
-            PNotify.defaults.icons = "fontawesome5";
+        $.post(nzburl, function(resp) {
+            $(e.target)
+                .addClass('icon_nzbget_clicked')
+                .attr('title', 'Added to Queue');
+            PNotify.defaults.icons = 'fontawesome5';
             PNotify.success({
                 title: 'Release added to your download queue!',
                 type: 'success',
@@ -404,132 +461,245 @@ jQuery(function ($) {
                 Animate: {
                     animate: true,
                     in_class: 'bounceInLeft',
-                    out_class: 'bounceOutRight'
+                    out_class: 'bounceOutRight',
                 },
                 desktop: {
                     desktop: true,
-                    fallback: true
-                }
+                    fallback: true,
+                },
             });
         });
         return false;
     });
 
-
-    $("table.data a.modal_nfo").colorbox({	 // NFO modal
-        href: function () {
+    $('table.data a.modal_nfo').colorbox({
+        // NFO modal
+        href: function() {
             return $(this).attr('href') + '&modal';
         },
-        title: function () {
-            return $(this).parent().parent().children('a.title').text();
+        title: function() {
+            return $(this)
+                .parent()
+                .parent()
+                .children('a.title')
+                .text();
         },
-        innerWidth: "800px", innerHeight: "90%", initialWidth: "800px", initialHeight: "90%", speed: 0, opacity: 0.7
+        innerWidth: '800px',
+        innerHeight: '90%',
+        initialWidth: '800px',
+        initialHeight: '90%',
+        speed: 0,
+        opacity: 0.7,
     });
     // Screenshot modal
-    $("table.data a.modal_prev").colorbox({scrolling: false, maxWidth: "800px", maxHeight: "450px"});
-
-    $("table.data a.modal_imdb").colorbox({	 // IMDB modal
-        href: function () {
-            return SERVERROOT + "movie/" + $(this).attr('name').substring(4) + '&modal';
-        },
-        title: function () {
-            return $(this).parent().parent().children('a.title').text();
-        },
-        innerWidth: "800px", innerHeight: "450px", initialWidth: "800px", initialHeight: "450px", speed: 0, opacity: 0.7
-    }).click(function () {
-        $('#colorbox').removeClass().addClass('cboxMovie');
+    $('table.data a.modal_prev').colorbox({
+        scrolling: false,
+        maxWidth: '800px',
+        maxHeight: '450px',
     });
 
-    $("a.modal_imdbtrailer").colorbox({	 // IMDB trailer modal
-        href: function () {
-            return SERVERROOT + "movietrailer/" + $(this).attr('name').substring(4) + '&modal';
-        },
-        title: function () {
-            return $(this).parent().parent().children('a.title').text();
-        },
-        innerWidth: "800px", innerHeight: "450px", initialWidth: "800px", initialHeight: "450px", speed: 0, opacity: 0.7
-    }).click(function () {
-        $('#colorbox').removeClass().addClass('cboxMovie');
-    });
+    $('table.data a.modal_imdb')
+        .colorbox({
+            // IMDB modal
+            href: function() {
+                return (
+                    SERVERROOT +
+                    'movie/' +
+                    $(this)
+                        .attr('name')
+                        .substring(4) +
+                    '&modal'
+                );
+            },
+            title: function() {
+                return $(this)
+                    .parent()
+                    .parent()
+                    .children('a.title')
+                    .text();
+            },
+            innerWidth: '800px',
+            innerHeight: '450px',
+            initialWidth: '800px',
+            initialHeight: '450px',
+            speed: 0,
+            opacity: 0.7,
+        })
+        .click(function() {
+            $('#colorbox')
+                .removeClass()
+                .addClass('cboxMovie');
+        });
 
+    $('a.modal_imdbtrailer')
+        .colorbox({
+            // IMDB trailer modal
+            href: function() {
+                return (
+                    SERVERROOT +
+                    'movietrailer/' +
+                    $(this)
+                        .attr('name')
+                        .substring(4) +
+                    '&modal'
+                );
+            },
+            title: function() {
+                return $(this)
+                    .parent()
+                    .parent()
+                    .children('a.title')
+                    .text();
+            },
+            innerWidth: '800px',
+            innerHeight: '450px',
+            initialWidth: '800px',
+            initialHeight: '450px',
+            speed: 0,
+            opacity: 0.7,
+        })
+        .click(function() {
+            $('#colorbox')
+                .removeClass()
+                .addClass('cboxMovie');
+        });
 
-    $("table.data a.modal_music").colorbox({	 // Music modal
-        href: function () {
-            return SERVERROOT + "musicmodal/" + $(this).attr('name').substring(4) + '&modal';
-        },
-        title: function () {
-            return $(this).parent().parent().children('a.title').text();
-        },
-        innerWidth: "800px", innerHeight: "450px", initialWidth: "800px", initialHeight: "450px", speed: 0, opacity: 0.7
-    }).click(function () {
-        $('#colorbox').removeClass().addClass('cboxMusic');
-    });
-    $("table.data a.modal_console").colorbox({	 // Console modal
-        href: function () {
-            return SERVERROOT + "consolemodal/" + $(this).attr('name').substring(4) + '&modal';
-        },
-        title: function () {
-            return $(this).parent().parent().children('a.title').text();
-        },
-        innerWidth: "800px", innerHeight: "450px", initialWidth: "800px", initialHeight: "450px", speed: 0, opacity: 0.7
-    }).click(function () {
-        $('#colorbox').removeClass().addClass('cboxConsole');
-    });
-    $("table.data a.modal_book").colorbox({	 // Book modal
-        href: function () {
-            return SERVERROOT + "bookmodal/" + $(this).attr('name').substring(4) + '&modal';
-        },
-        title: function () {
-            return $(this).parent().parent().children('a.title').text();
-        },
-        innerWidth: "800px", innerHeight: "450px", initialWidth: "800px", initialHeight: "450px", speed: 0, opacity: 0.7
-    }).click(function () {
-        $('#colorbox').removeClass().addClass('cboxBook');
-    });
+    $('table.data a.modal_music')
+        .colorbox({
+            // Music modal
+            href: function() {
+                return (
+                    SERVERROOT +
+                    'musicmodal/' +
+                    $(this)
+                        .attr('name')
+                        .substring(4) +
+                    '&modal'
+                );
+            },
+            title: function() {
+                return $(this)
+                    .parent()
+                    .parent()
+                    .children('a.title')
+                    .text();
+            },
+            innerWidth: '800px',
+            innerHeight: '450px',
+            initialWidth: '800px',
+            initialHeight: '450px',
+            speed: 0,
+            opacity: 0.7,
+        })
+        .click(function() {
+            $('#colorbox')
+                .removeClass()
+                .addClass('cboxMusic');
+        });
+    $('table.data a.modal_console')
+        .colorbox({
+            // Console modal
+            href: function() {
+                return (
+                    SERVERROOT +
+                    'consolemodal/' +
+                    $(this)
+                        .attr('name')
+                        .substring(4) +
+                    '&modal'
+                );
+            },
+            title: function() {
+                return $(this)
+                    .parent()
+                    .parent()
+                    .children('a.title')
+                    .text();
+            },
+            innerWidth: '800px',
+            innerHeight: '450px',
+            initialWidth: '800px',
+            initialHeight: '450px',
+            speed: 0,
+            opacity: 0.7,
+        })
+        .click(function() {
+            $('#colorbox')
+                .removeClass()
+                .addClass('cboxConsole');
+        });
+    $('table.data a.modal_book')
+        .colorbox({
+            // Book modal
+            href: function() {
+                return (
+                    SERVERROOT +
+                    'bookmodal/' +
+                    $(this)
+                        .attr('name')
+                        .substring(4) +
+                    '&modal'
+                );
+            },
+            title: function() {
+                return $(this)
+                    .parent()
+                    .parent()
+                    .children('a.title')
+                    .text();
+            },
+            innerWidth: '800px',
+            innerHeight: '450px',
+            initialWidth: '800px',
+            initialHeight: '450px',
+            speed: 0,
+            opacity: 0.7,
+        })
+        .click(function() {
+            $('#colorbox')
+                .removeClass()
+                .addClass('cboxBook');
+        });
 
-
-    $('#nzb_multi_operations_form').submit(function () {
+    $('#nzb_multi_operations_form').submit(function() {
         return false;
     });
 
-
-    $('button.nzb_multi_operations_download').on('click', (function () {
-        var ids = "";
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != "on")
-                ids += $(row).val() + ',';
+    $('button.nzb_multi_operations_download').on('click', function() {
+        var ids = '';
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            if ($(row).val() != 'on') ids += $(row).val() + ',';
         });
         ids = ids.substring(0, ids.length - 1);
-        if (ids)
-            window.location = SERVERROOT + "/getnzb?zip=1&id=" + ids;
-    }));
+        if (ids) window.location = SERVERROOT + '/getnzb?zip=1&id=' + ids;
+    });
 
-    $('input.nzb_multi_operations_download_cart').on('click', (function () {
-        var ids = "";
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != "on")
-                ids += $(row).val() + ',';
+    $('input.nzb_multi_operations_download_cart').on('click', function() {
+        var ids = '';
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            if ($(row).val() != 'on') ids += $(row).val() + ',';
         });
         ids = ids.substring(0, ids.length - 1);
-        if (ids)
-            window.location = SERVERROOT + "/getnzb?zip=1&id=" + ids;
-    }));
+        if (ids) window.location = SERVERROOT + '/getnzb?zip=1&id=' + ids;
+    });
 
-
-    $('button.nzb_multi_operations_cart').on('click', (function () {
+    $('button.nzb_multi_operations_cart').on('click', function() {
         var guids = new Array();
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
         });
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             var guid = $(row).val();
-            var $cartIcon = $(row).parent().children('div.icons').children('.icon_cart');
+            var $cartIcon = $(row)
+                .parent()
+                .children('div.icons')
+                .children('.icon_cart');
             if (guid && !$cartIcon.hasClass('icon_cart_clicked')) {
                 $cartIcon.addClass('icon_cart_clicked').attr('title', 'Added to Cart');
                 guids.push(guid);
-                PNotify.defaults.icons = "fontawesome5";
+                PNotify.defaults.icons = 'fontawesome5';
                 PNotify.success({
                     title: 'Release added to your Download Basket!',
                     type: 'success',
@@ -537,31 +707,35 @@ jQuery(function ($) {
                     Animate: {
                         animate: true,
                         in_class: 'bounceInLeft',
-                        out_class: 'bounceOutRight'
+                        out_class: 'bounceOutRight',
                     },
                     desktop: {
                         desktop: true,
-                        fallback: true
-                    }
+                        fallback: true,
+                    },
                 });
             }
             $(this).attr('checked', false);
         });
         var guidstring = guids.toString();
         //alert (guidstring); // This is just for testing shit
-        $.post(SERVERROOT + "/cart/add?id=" + guidstring);
-    }));
-    $('button.nzb_multi_operations_sab').on('click', (function () {
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            var $sabIcon = $(row).parent().parent().children('td.icons').children('.icon_sab');
+        $.post(SERVERROOT + '/cart/add?id=' + guidstring);
+    });
+    $('button.nzb_multi_operations_sab').on('click', function() {
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            var $sabIcon = $(row)
+                .parent()
+                .parent()
+                .children('td.icons')
+                .children('.icon_sab');
             var guid = $(row).val();
             //alert(guid);
             if (guid && !$sabIcon.hasClass('icon_sab_clicked')) {
-                var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
+                var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
                 // alert(nzburl);
-                $.post(nzburl, function (resp) {
+                $.post(nzburl, function(resp) {
                     $sabIcon.addClass('icon_sab_clicked').attr('title', 'Added to Queue');
-                    PNotify.defaults.icons = "fontawesome5";
+                    PNotify.defaults.icons = 'fontawesome5';
                     PNotify.success({
                         title: 'Release added to your download queue!',
                         type: 'success',
@@ -569,27 +743,31 @@ jQuery(function ($) {
                         Animate: {
                             animate: true,
                             in_class: 'bounceInLeft',
-                            out_class: 'bounceOutRight'
+                            out_class: 'bounceOutRight',
                         },
                         desktop: {
                             desktop: true,
-                            fallback: true
-                        }
+                            fallback: true,
+                        },
                     });
                 });
             }
             $(this).attr('checked', false);
         });
-    }));
-    $('input.nzb_multi_operations_nzbget').on('click', (function () {
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            var $nzbgetIcon = $(row).parent().parent().children('td.icons').children('.icon_nzbget');
+    });
+    $('input.nzb_multi_operations_nzbget').on('click', function() {
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            var $nzbgetIcon = $(row)
+                .parent()
+                .parent()
+                .children('td.icons')
+                .children('.icon_nzbget');
             var guid = $(row).val();
             if (guid && !$nzbgetIcon.hasClass('icon_nzbget_clicked')) {
-                var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
-                $.post(nzburl, function (resp) {
+                var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+                $.post(nzburl, function(resp) {
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title', 'Added to Queue');
-                    PNotify.defaults.icons = "fontawesome5";
+                    PNotify.defaults.icons = 'fontawesome5';
                     PNotify.success({
                         title: 'Release added to your download queue!',
                         type: 'success',
@@ -597,48 +775,52 @@ jQuery(function ($) {
                         Animate: {
                             animate: true,
                             in_class: 'bounceInLeft',
-                            out_class: 'bounceOutRight'
+                            out_class: 'bounceOutRight',
                         },
                         desktop: {
                             desktop: true,
-                            fallback: true
-                        }
+                            fallback: true,
+                        },
                     });
                 });
             }
             $(this).attr('checked', false);
         });
-    }));
+    });
 
     //front end admin functions
-    $('input.nzb_multi_operations_edit').click(function () {
-        var ids = "";
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != "on")
-                ids += '&id[]=' + $(row).val();
+    $('input.nzb_multi_operations_edit').click(function() {
+        var ids = '';
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            if ($(row).val() != 'on') ids += '&id[]=' + $(row).val();
         });
         if (ids)
             $('input.nzb_multi_operations_edit').colorbox({
-                href: function () {
-                    return SERVERROOT + "ajax_release-admin?action=edit" + ids + "&from=" + encodeURIComponent(window.location);
+                href: function() {
+                    return (
+                        SERVERROOT +
+                        'ajax_release-admin?action=edit' +
+                        ids +
+                        '&from=' +
+                        encodeURIComponent(window.location)
+                    );
                 },
                 title: 'Edit Release',
-                innerWidth: "400px",
-                innerHeight: "250px",
-                initialWidth: "400px",
-                initialHeight: "250px",
+                innerWidth: '400px',
+                innerHeight: '250px',
+                initialWidth: '400px',
+                initialHeight: '250px',
                 speed: 0,
-                opacity: 0.7
+                opacity: 0.7,
             });
     });
-    $('input.nzb_multi_operations_delete').click(function () {
-        var ids = "";
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != "on")
-                ids += '&id[]=' + $(row).val();
+    $('input.nzb_multi_operations_delete').click(function() {
+        var ids = '';
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            if ($(row).val() != 'on') ids += '&id[]=' + $(row).val();
         });
         if (ids) {
-            PNotify.defaults.icons = "fontawesome5";
+            PNotify.defaults.icons = 'fontawesome5';
             const notice = PNotify.alert({
                 title: 'Confirmation Needed',
                 text: 'Are you sure you want to delete the selected releases?',
@@ -646,340 +828,389 @@ jQuery(function ($) {
                 hide: false,
                 modules: {
                     Confirm: {
-                        confirm: true
-                    }
+                        confirm: true,
+                    },
                 },
                 Buttons: {
                     closer: false,
-                    sticker: false
+                    sticker: false,
                 },
                 History: {
-                    history: false
-                }
+                    history: false,
+                },
             });
-            notice.on('pnotify.confirm', function () {
-                $.post(SERVERROOT + "ajax_release-admin?action=dodelete" + ids, function (resp) {
+            notice.on('pnotify.confirm', function() {
+                $.post(SERVERROOT + 'ajax_release-admin?action=dodelete' + ids, function(resp) {
                     location.reload(true);
                 });
             });
-            notice.on('pnotify.cancel', function () {
+            notice.on('pnotify.cancel', function() {
                 alert('Cancelled');
             });
         }
     });
-    $('input.nzb_multi_operations_rebuild').click(function () {
-        var ids = "";
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != "on")
-                ids += '&id[]=' + $(row).val();
+    $('input.nzb_multi_operations_rebuild').click(function() {
+        var ids = '';
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            if ($(row).val() != 'on') ids += '&id[]=' + $(row).val();
         });
         if (ids)
             if (confirm('Are you sure you want to rebuild the selected releases?')) {
-                $.post(SERVERROOT + "ajax_release-admin?action=dorebuild" + ids, function (resp) {
+                $.post(SERVERROOT + 'ajax_release-admin?action=dorebuild' + ids, function(resp) {
                     location.reload(true);
                 });
             }
     });
     //cart functions
-    $('input.nzb_multi_operations_cartdelete').click(function () {
+    $('input.nzb_multi_operations_cartdelete').click(function() {
         var ids = new Array();
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
-            if ($(row).val() != "on")
-                ids.push($(row).val());
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
+            if ($(row).val() != 'on') ids.push($(row).val());
         });
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
         });
 
         //alert(SERVERROOT + "/cart/delete/" + ids);
         if (ids) {
-            PNotify.defaults.icons = "fontawesome5";
+            PNotify.defaults.icons = 'fontawesome5';
             const notice = PNotify.alert({
                 title: 'Confirmation Needed',
                 text: 'Are you sure you want to delete the selected releases from your cart?',
                 hide: false,
                 modules: {
                     Confirm: {
-                        confirm: true
-                    }
+                        confirm: true,
+                    },
                 },
                 Buttons: {
                     closer: false,
-                    sticker: false
+                    sticker: false,
                 },
                 History: {
-                    history: false
-                }
+                    history: false,
+                },
             });
-            notice.on('pnotify.confirm', function () {
-                $.post(SERVERROOT + "/cart/delete/" + ids)
+            notice.on('pnotify.confirm', function() {
+                $.post(SERVERROOT + '/cart/delete/' + ids);
             });
-            notice.on('pnotify.cancel', function () {
+            notice.on('pnotify.cancel', function() {
                 alert('Cancelled');
             });
         }
     });
-    $('input.nzb_multi_operations_cartsab').click(function () {
+    $('input.nzb_multi_operations_cartsab').click(function() {
         var ids = new Array();
-        $("table.data INPUT[type='checkbox']:checked").each(function (i, row) {
+        $("table.data INPUT[type='checkbox']:checked").each(function(i, row) {
             var guid = $(row).val();
-            var nzburl = SERVERROOT + "/sendtoqueue/" + guid;
-            $.post(nzburl, function () {
-                PNotify.defaults.icons = "fontawesome5";
+            var nzburl = SERVERROOT + '/sendtoqueue/' + guid;
+            $.post(nzburl, function() {
+                PNotify.defaults.icons = 'fontawesome5';
                 PNotify.success({
-
                     title: 'Releases sent to queue!',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
                     Animate: {
                         animate: true,
                         in_class: 'bounceInLeft',
-                        out_class: 'bounceOutRight'
+                        out_class: 'bounceOutRight',
                     },
                     desktop: {
                         desktop: true,
-                        fallback: true
-                    }
+                        fallback: true,
+                    },
                 });
             });
         });
     });
 
-
     // headermenu.tpl
     $('#headsearch')
-        .focus(function () {
-            if (this.value == 'Search...') this.value = ''; else this.select();
+        .focus(function() {
+            if (this.value == 'Search...') this.value = '';
+            else this.select();
         })
-        .blur(function () {
+        .blur(function() {
             if (this.value == '') this.value = 'Search...';
         });
-    $('#headsearch_form').submit(function () {
+    $('#headsearch_form').submit(function() {
         $('#headsearch_go').trigger('click');
         return false;
     });
-    $('#headsearch_go').click(function () {
+    $('#headsearch_go').click(function() {
         if ($('#headsearch').val() && $('#headsearch').val() != 'Search...') {
-
             var sText = $('#headsearch').val();
-            var sCat = ($("#headcat").val() != -1 ? "&t=" + $("#headcat").val() : "");
-            document.location = WWW_TOP + "/search?id=" + sText + sCat;
+            var sCat = $('#headcat').val() != -1 ? '&t=' + $('#headcat').val() : '';
+            document.location = WWW_TOP + '/search?id=' + sText + sCat;
         }
     });
 
     // search.tpl
-    $('#search_search_button').click(function () {
+    $('#search_search_button').click(function() {
         if ($('#search').val())
-            document.location = WWW_TOP + "/search?id=" + $('#search').val() + ($("#search_cat").val() != -1 ? "&t=" + $("#search_cat").val() : "");
+            document.location =
+                WWW_TOP +
+                '/search?id=' +
+                $('#search').val() +
+                ($('#search_cat').val() != -1 ? '&t=' + $('#search_cat').val() : '');
         return false;
     });
 
-    $('#search')
-        .focus(function () {
-            this.select();
-        })
+    $('#search').focus(function() {
+        this.select();
+    });
 
     // searchraw.tpl
-    $('#searchraw_search_button').click(function () {
-        if ($('#search').val())
-            document.location = WWW_TOP + "/searchraw/" + $('#search').val();
+    $('#searchraw_search_button').click(function() {
+        if ($('#search').val()) document.location = WWW_TOP + '/searchraw/' + $('#search').val();
         return false;
     });
-    $('#searchraw_download_selected').click(function () {
-        if ($('#dl input:checked').length)
-            $('#dl').trigger('submit');
+    $('#searchraw_download_selected').click(function() {
+        if ($('#dl input:checked').length) $('#dl').trigger('submit');
         return false;
     });
 
     // login.tpl, register.tpl, search.tpl, searchraw.tpl
-    if ($('#username').length)
-        $('#username').focus();
-    if ($('#search').length)
-        $('#search').focus();
+    if ($('#username').length) $('#username').focus();
+    if ($('#search').length) $('#search').focus();
 
     // viewfilelist.tpl
-    $('#viewfilelist_download_selected').click(function () {
-        if ($('#fileform input:checked').length)
-            $('#fileform').trigger('submit');
+    $('#viewfilelist_download_selected').click(function() {
+        if ($('#fileform input:checked').length) $('#fileform').trigger('submit');
         return false;
     });
 
     // misc
-    $('.confirm_action').click(function () {
+    $('.confirm_action').click(function() {
         return confirm('Are you sure?');
     });
 
     // play audio preview
-    $('.audioprev').click(function () {
-        var a = document.getElementById($(this).next('audio').attr('ID'));
+    $('.audioprev').click(function() {
+        var a = document.getElementById(
+            $(this)
+                .next('audio')
+                .attr('ID')
+        );
         if (a != null) {
-            if ($(this).text() == "Listen") {
+            if ($(this).text() == 'Listen') {
                 a.play();
-                $(this).text("Stop");
-            }
-            else {
+                $(this).text('Stop');
+            } else {
                 a.pause();
                 a.currentTime = 0;
-                $(this).text("Listen");
+                $(this).text('Listen');
             }
         }
 
-        a.addEventListener('ended', function () {
-            $(this).prev().text("Listen");
+        a.addEventListener('ended', function() {
+            $(this)
+                .prev()
+                .text('Listen');
         });
 
         return false;
     });
 
     // mmenu
-    $('.mmenu').click(function () {
-        document.location = $(this).children('a').attr('href');
+    $('.mmenu').click(function() {
+        document.location = $(this)
+            .children('a')
+            .attr('href');
         return false;
     });
 
     // mmenu_new
-    $('.mmenu_new').click(function () {
-        window.open($(this).children('a').attr('href'));
+    $('.mmenu_new').click(function() {
+        window.open(
+            $(this)
+                .children('a')
+                .attr('href')
+        );
         return false;
     });
 
     // searchraw.tpl, viewfilelist.tpl -- checkbox operations
     // selections
     var last1, last2;
-    $(".checkbox_operations .select_all").click(function () {
-        $("table.data INPUT[type='checkbox']").attr('checked', true).trigger('change');
+    $('.checkbox_operations .select_all').click(function() {
+        $("table.data INPUT[type='checkbox']")
+            .attr('checked', true)
+            .trigger('change');
         return false;
     });
-    $(".checkbox_operations .select_none").click(function () {
-        $("table.data INPUT[type='checkbox']").attr('checked', false).trigger('change');
+    $('.checkbox_operations .select_none').click(function() {
+        $("table.data INPUT[type='checkbox']")
+            .attr('checked', false)
+            .trigger('change');
         return false;
     });
-    $(".checkbox_operations .select_invert").click(function () {
-        $("table.data INPUT[type='checkbox']").each(function () {
-            $(this).attr('checked', !$(this).attr('checked')).trigger('change');
+    $('.checkbox_operations .select_invert').click(function() {
+        $("table.data INPUT[type='checkbox']").each(function() {
+            $(this)
+                .attr('checked', !$(this).attr('checked'))
+                .trigger('change');
         });
         return false;
     });
-    $(".checkbox_operations .select_range").click(function () {
+    $('.checkbox_operations .select_range').click(function() {
         if (last1 && last2 && last1 < last2)
-            $("table.data INPUT[type='checkbox']").slice(last1, last2).attr('checked', true).trigger('change');
+            $("table.data INPUT[type='checkbox']")
+                .slice(last1, last2)
+                .attr('checked', true)
+                .trigger('change');
         else if (last1 && last2)
-            $("table.data INPUT[type='checkbox']").slice(last2, last1).attr('checked', true).trigger('change');
+            $("table.data INPUT[type='checkbox']")
+                .slice(last2, last1)
+                .attr('checked', true)
+                .trigger('change');
         return false;
     });
-    $('table.data td.check INPUT[type="checkbox"]').click(function (e) {
+    $('table.data td.check INPUT[type="checkbox"]').click(function(e) {
         // range event interaction -- see further above
-        var rowNum = $(e.target).parent().parent()[0].rowIndex;
+        var rowNum = $(e.target)
+            .parent()
+            .parent()[0].rowIndex;
         if (last1) last2 = last1;
         last1 = rowNum;
 
         // perform range selection
         if (e.shiftKey && last1 && last2) {
             if (last1 < last2)
-                $("table.data INPUT[type='checkbox']").slice(last1, last2).attr('checked', true).trigger('change');
+                $("table.data INPUT[type='checkbox']")
+                    .slice(last1, last2)
+                    .attr('checked', true)
+                    .trigger('change');
             else
-                $("table.data INPUT[type='checkbox']").slice(last2, last1).attr('checked', true).trigger('change');
+                $("table.data INPUT[type='checkbox']")
+                    .slice(last2, last1)
+                    .attr('checked', true)
+                    .trigger('change');
         }
     });
-    $('table.data a.data_filename').click(function (e) { // click filenames to select
+    $('table.data a.data_filename').click(function(e) {
+        // click filenames to select
         // range event interaction -- see further above
-        var rowNum = $(e.target).parent().parent()[0].rowIndex;
+        var rowNum = $(e.target)
+            .parent()
+            .parent()[0].rowIndex;
         if (last1) last2 = last1;
         last1 = rowNum;
 
-        var $checkbox = $('table.data tr:nth-child(' + (rowNum + 1) + ') td.selection INPUT[type="checkbox"]');
+        var $checkbox = $(
+            'table.data tr:nth-child(' + (rowNum + 1) + ') td.selection INPUT[type="checkbox"]'
+        );
         $checkbox.attr('checked', !$checkbox.attr('checked'));
 
         return false;
     });
 
     // show/hide previews
-    $('#showmoviepreviews').click(function () {
-        $('#moviepreviews').next('form').toggle('fast');
-        $('#moviepreviews').toggle('fast', function () {
-            $('#showmoviepreviews').text(($('#moviepreviews').is(":visible") ? "Hide" : "Show") + " previews");
+    $('#showmoviepreviews').click(function() {
+        $('#moviepreviews')
+            .next('form')
+            .toggle('fast');
+        $('#moviepreviews').toggle('fast', function() {
+            $('#showmoviepreviews').text(
+                ($('#moviepreviews').is(':visible') ? 'Hide' : 'Show') + ' previews'
+            );
         });
         return false;
     });
 
     // show/hide invite form
-    $('#lnkSendInvite').click(function () {
+    $('#lnkSendInvite').click(function() {
         $('#divInvite').slideToggle('fast');
     });
 
     // send an invite
-    $('#frmSendInvite').submit(function () {
-        var inputEmailto = $("#txtInvite").val();
+    $('#frmSendInvite').submit(function() {
+        var inputEmailto = $('#txtInvite').val();
         if (isValidEmailAddress(inputEmailto)) {
-
             // no caching of results
             $.ajax({
                 url: WWW_TOP + '/ajax_profile?action=1&rand=' + $.now(),
-                data: {emailto: inputEmailto},
-                dataType: "html",
-                success: function (data) {
-                    $("#txtInvite").val("");
+                data: { emailto: inputEmailto },
+                dataType: 'html',
+                success: function(data) {
+                    $('#txtInvite').val('');
                     $('#divInvite').slideToggle('fast');
-                    $("#divInviteSuccess").text(data).show();
-                    $("#divInviteError").hide();
+                    $('#divInviteSuccess')
+                        .text(data)
+                        .show();
+                    $('#divInviteError').hide();
                 },
-                error: function (xhr, err, e) {
-                    alert("Error in ajax_profile: " + err);
-                }
+                error: function(xhr, err, e) {
+                    alert('Error in ajax_profile: ' + err);
+                },
             });
-        }
-        else {
-            $("#divInviteSuccess").hide();
-            $("#divInviteError").text("Invalid email").show();
+        } else {
+            $('#divInviteSuccess').hide();
+            $('#divInviteError')
+                .text('Invalid email')
+                .show();
         }
         return false;
     });
 
     // movie.tpl
-    $('.mlmore').click(function () {	// show more movies
-        $(this).parent().parent().hide();
-        $(this).parent().parent().parent().children(".mlextra").show();
+    $('.mlmore').click(function() {
+        // show more movies
+        $(this)
+            .parent()
+            .parent()
+            .hide();
+        $(this)
+            .parent()
+            .parent()
+            .parent()
+            .children('.mlextra')
+            .show();
         return false;
     });
 
     // lookup tmdb for a movie
-    $('#frmMyMovieLookup').submit(function () {
-        var movSearchText = $("#txtsearch").val();
+    $('#frmMyMovieLookup').submit(function() {
+        var movSearchText = $('#txtsearch').val();
         // no caching of results
         $.ajax({
             url: WWW_TOP + '/ajax_mymovies?rand=' + $.now(),
-            data: {id: movSearchText},
-            dataType: "html",
-            success: function (data) {
-                $("#divMovResults").html(data);
+            data: { id: movSearchText },
+            dataType: 'html',
+            success: function(data) {
+                $('#divMovResults').html(data);
             },
-            error: function (xhr, err, e) {
-                alert("Error in ajax_mymovies: " + err);
-            }
+            error: function(xhr, err, e) {
+                alert('Error in ajax_mymovies: ' + err);
+            },
         });
 
         return false;
     });
 
     // season selector in TV
-    $('a[id^="seas_"]').click(function () {
-        seas = $(this).attr("ID").replace("seas_", "");
+    $('a[id^="seas_"]').click(function() {
+        seas = $(this)
+            .attr('ID')
+            .replace('seas_', '');
 
         $('table[class^="tb_"]').hide();
         $('.tb_' + seas).show();
 
-        $("li", $(this).closest("ul")).removeClass("active");
-        $(this).closest("li").addClass("active");
+        $('li', $(this).closest('ul')).removeClass('active');
+        $(this)
+            .closest('li')
+            .addClass('active');
 
         return false;
     });
 });
 
-
-$.extend({ // http://plugins.jquery.com/project/URLEncode
-    URLEncode: function (c) {
+$.extend({
+    // http://plugins.jquery.com/project/URLEncode
+    URLEncode: function(c) {
         var o = '';
         var x = 0;
         c = c.toString();
@@ -990,7 +1221,8 @@ $.extend({ // http://plugins.jquery.com/project/URLEncode
                 o += m[1];
                 x += m[1].length;
             } else {
-                if (c[x] == ' ') o += '+'; else {
+                if (c[x] == ' ') o += '+';
+                else {
                     var d = c.charCodeAt(x);
                     var h = d.toString(16);
                     o += '%' + (h.length < 2 ? '0' : '') + h.toUpperCase();
@@ -1000,7 +1232,7 @@ $.extend({ // http://plugins.jquery.com/project/URLEncode
         }
         return o;
     },
-    URLDecode: function (s) {
+    URLDecode: function(s) {
         var o = s;
         var binVal, t;
         var r = /(%[^%]{2})/;
@@ -1010,26 +1242,28 @@ $.extend({ // http://plugins.jquery.com/project/URLEncode
             o = o.replace(m[1], t);
         }
         return o;
-    }
+    },
 });
 
-
 function isValidEmailAddress(emailAddress) {
-    var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+    var pattern = new RegExp(
+        /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
+    );
     return pattern.test(emailAddress);
 }
 
 function mymovie_del(imdbID, btn) {
     $.ajax({
         url: WWW_TOP + '/ajax_mymovies?rand=' + $.now(),
-        data: {del: imdbID},
-        dataType: "html",
-        success: function (data) {
+        data: { del: imdbID },
+        dataType: 'html',
+        success: function(data) {
             $(btn).hide();
-            $(btn).prev("a").show();
+            $(btn)
+                .prev('a')
+                .show();
         },
-        error: function (xhr, err, e) {
-        }
+        error: function(xhr, err, e) {},
     });
 
     return false;
@@ -1037,16 +1271,16 @@ function mymovie_del(imdbID, btn) {
 
 function mymovie_add(imdbID, btn) {
     $(btn).hide();
-    $(btn).next("a").show();
+    $(btn)
+        .next('a')
+        .show();
 
     $.ajax({
         url: WWW_TOP + '/ajax_mymovies?rand=' + $.now(),
-        data: {add: imdbID},
-        dataType: "html",
-        success: function (data) {
-        },
-        error: function (xhr, err, e) {
-        }
+        data: { add: imdbID },
+        dataType: 'html',
+        success: function(data) {},
+        error: function(xhr, err, e) {},
     });
 
     return false;
@@ -1054,52 +1288,55 @@ function mymovie_add(imdbID, btn) {
 
 //reset users api counts
 function resetapireq(uid, type) {
-    $.post(SERVERROOT + "ajax_resetusergrabs-admin?id=" + uid + "&action=" + type, function (resp) {
-    });
+    $.post(SERVERROOT + 'ajax_resetusergrabs-admin?id=' + uid + '&action=' + type, function(
+        resp
+    ) {});
 }
 
 function getNzbGetQueue() {
     $.ajax({
-        url: "queuedata?type=nzbget&id=" + $.now(),
+        url: 'queuedata?type=nzbget&id=' + $.now(),
         cache: false,
-        success: function (html) {
-            $(".nzbget_queue").html(html);
-            setTimeout("getNzbGetQueue()", 2500);
+        success: function(html) {
+            $('.nzbget_queue').html(html);
+            setTimeout('getNzbGetQueue()', 2500);
         },
-        error: function () {
-            $(".nzbget_queue").html("Could not contact your queue. <a href=\"javascript:location.reload(true)\">Refresh</a>");
+        error: function() {
+            $('.nzbget_queue').html(
+                'Could not contact your queue. <a href="javascript:location.reload(true)">Refresh</a>'
+            );
         },
-        timeout: 5000
+        timeout: 5000,
     });
 }
 
 function getHistory() {
     $.ajax({
-        url: "queuedata?type=history&id=" + $.now(),
+        url: 'queuedata?type=history&id=' + $.now(),
         cache: false,
-        success: function (html) {
-            $(".sab_history").html(html);
-            setTimeout("getHistory()", 10000);
+        success: function(html) {
+            $('.sab_history').html(html);
+            setTimeout('getHistory()', 10000);
         },
-        error: function () {
+        error: function() {
             //$(".sab_history").html("Could not contact your queue. <a href=\"javascript:location.reload(true)\">Refresh</a>");
         },
-        timeout: 5000
+        timeout: 5000,
     });
 }
 
 /** ******  iswitch  *********************** **/
 
-$(function () {
+$(function() {
     var checkAll = $('input.flat-all');
     var checkboxes = $('input.flat');
 
     $('input').iCheck({
         checkboxClass: 'icheckbox_flat-green',
-        radioClass: 'iradio_flat-green'
+        radioClass: 'iradio_flat-green',
     });
 
-    checkAll.on('ifChecked ifUnchecked', function (event) {
+    checkAll.on('ifChecked ifUnchecked', function(event) {
         if (event.type === 'ifChecked') {
             checkboxes.iCheck('check');
         } else {
@@ -1107,7 +1344,7 @@ $(function () {
         }
     });
 
-    checkboxes.on('ifChanged', function (event) {
+    checkboxes.on('ifChanged', function(event) {
         if (checkboxes.filter(':checked').length === checkboxes.length) {
             checkAll.prop('checked', 'checked');
         } else {
@@ -1121,19 +1358,20 @@ $(function () {
 /** ****** tinyMCE ************************* **/
 tinyMCE.init({
     selector: 'textarea#addMessage',
-    theme: "modern",
+    theme: 'modern',
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
         'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
-        'save table contextmenu directionality emoticons template paste textcolor code'
+        'save table contextmenu directionality emoticons template paste textcolor code',
     ],
-    theme_advanced_toolbar_location: "top",
-    theme_advanced_toolbar_align: "left",
-    toolbar: 'insertfile undo redo | styleselect | fontselect |sizeselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons | code',
-    fontsize_formats: "8pt 9pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 24pt 36pt",
-    mode: "exact",
+    theme_advanced_toolbar_location: 'top',
+    theme_advanced_toolbar_align: 'left',
+    toolbar:
+        'insertfile undo redo | styleselect | fontselect |sizeselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons | code',
+    fontsize_formats: '8pt 9pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 24pt 36pt',
+    mode: 'exact',
     relative_urls: false,
     remove_script_host: false,
-    convert_urls: true
+    convert_urls: true,
 });
 /** ****** /tinyMCE ************************* **/

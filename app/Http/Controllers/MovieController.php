@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Blacklight\Movie;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 
 class MovieController extends BasePageController
@@ -45,13 +46,7 @@ class MovieController extends BasePageController
             }
         }
 
-        $this->smarty->assign([
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
+        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -77,7 +72,7 @@ class MovieController extends BasePageController
         }
 
         $category = $request->has('imdb') ? -1 : Category::MOVIE_ROOT;
-        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where(['title'=> $id, 'parentid' => Category::MOVIE_ROOT])
                 ->first(['id']);
@@ -171,12 +166,7 @@ class MovieController extends BasePageController
             $content = $this->smarty->fetch('movies.tpl');
         }
 
-        $this->smarty->assign([
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]);
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 
@@ -216,13 +206,7 @@ class MovieController extends BasePageController
             if ($modal) {
                 echo $content;
             } else {
-                $this->smarty->assign([
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]);
+                $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
                 $this->pagerender();
             }
         }

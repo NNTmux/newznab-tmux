@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Mayconbordin\L5Fixtures\Fixtures;
 use Mayconbordin\L5Fixtures\FixturesFacade;
 
 class FixturesUp extends Command
@@ -18,7 +17,6 @@ class FixturesUp extends Command
       'collection_regexes',
       'content',
       'groups',
-      'menu',
       'release_naming_regexes',
       'settings',
       'tmux',
@@ -28,7 +26,7 @@ class FixturesUp extends Command
      *
      * @var string
      */
-    protected $signature = 'fixtures:up {type}';
+    protected $signature = 'fixtures:up {--t|table=* : Populate all, multiple or single table}';
 
     /**
      * The console command description.
@@ -37,14 +35,13 @@ class FixturesUp extends Command
      */
     protected $description = 'Apply database fixtures to all tables or just to select ones.
     Tables that are supported are :
-    all <= Populates all the tables listed below
+    no argument <= Populates all the tables listed below
     binaryblacklist
     categories
     category_regexes
     collection_regexes
     content
     groups
-    menu
     release_naming_regexes
     settings
     tmux';
@@ -64,12 +61,16 @@ class FixturesUp extends Command
      */
     public function handle()
     {
-        $this->info('Populating '.$this->argument('type').' table(s)');
-
-        if ($this->argument('type') === 'all') {
+        if (empty($this->option('table'))) {
+            $this->info('Populating all tables');
             FixturesFacade::up();
-        } elseif (\in_array($this->argument('type'), self::$allowedTables, false)) {
-            FixturesFacade::up($this->argument('type'));
+        } else {
+            foreach ($this->option('table') as $option) {
+                if (\in_array($option, self::$allowedTables, false)) {
+                    $this->info('Populating '.$option.' table');
+                    FixturesFacade::up($option);
+                }
+            }
         }
     }
 }

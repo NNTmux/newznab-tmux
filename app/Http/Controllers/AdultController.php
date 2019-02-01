@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Blacklight\XXX;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 
 class AdultController extends BasePageController
@@ -29,7 +30,7 @@ class AdultController extends BasePageController
                 ];
         }
         $category = Category::XXX_ROOT;
-        if ($id && \in_array($id, array_pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::XXX_ROOT)
@@ -107,12 +108,7 @@ class AdultController extends BasePageController
         } else {
             $content = $this->smarty->fetch('xxx.tpl');
         }
-        $this->smarty->assign([
-            'content' => $content,
-            'meta_title' => $meta_title,
-            'meta_keywords' => $meta_keywords,
-            'meta_description' => $meta_description,
-        ]);
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 }

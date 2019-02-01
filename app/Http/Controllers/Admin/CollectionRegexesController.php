@@ -19,26 +19,15 @@ class CollectionRegexesController extends BasePageController
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']);
 
-        $title = 'Collections Regex List';
+        $meta_title = $title = 'Collections Regex List';
 
         $group = ($request->has('group') && ! empty($request->input('group')) ? $request->input('group') : '');
         $regex = $regexes->getRegex($group);
-        $this->smarty->assign(
-            [
-                'group'             => $group,
-                'regex'             => $regex,
-            ]
-        );
+        $this->smarty->assign(compact('group', 'regex'));
 
         $content = $this->smarty->fetch('collection_regexes-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -89,10 +78,10 @@ class CollectionRegexesController extends BasePageController
             case 'view':
             default:
                 if ($request->has('id')) {
-                    $title = 'Collections Regex Edit';
+                    $meta_title = $title = 'Collections Regex Edit';
                     $regex = $regexes->getRegexByID($request->input('id'));
                 } else {
-                    $title = 'Collections Regex Add';
+                    $meta_title = $title = 'Collections Regex Add';
                     $regex += ['status' => 1];
                 }
                 break;
@@ -105,13 +94,7 @@ class CollectionRegexesController extends BasePageController
 
         $content = $this->smarty->fetch('collection_regexes-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -124,7 +107,7 @@ class CollectionRegexesController extends BasePageController
     public function testRegex(Request $request)
     {
         $this->setAdminPrefs();
-        $title = 'Collections Regex Test';
+        $meta_title = $title = 'Collections Regex Test';
 
         $group = trim($request->has('group') && ! empty($request->input('group')) ? $request->input('group') : '');
         $regex = trim($request->has('regex') && ! empty($request->input('regex')) ? $request->input('regex') : '');
@@ -137,13 +120,7 @@ class CollectionRegexesController extends BasePageController
 
         $content = $this->smarty->fetch('collection_regexes-test.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

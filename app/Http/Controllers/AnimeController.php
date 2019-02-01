@@ -77,15 +77,7 @@ class AnimeController extends BasePageController
                 $this->smarty->assign('nodata', '');
             }
             $content = $this->smarty->fetch('viewanime.tpl');
-            $this->smarty->assign(
-                [
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]
-            );
+            $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
             $this->pagerender();
         }
     }
@@ -131,15 +123,7 @@ class AnimeController extends BasePageController
         $this->smarty->assign('animetitle', $animeTitle);
         $content = $this->smarty->fetch('viewanimelist.tpl');
 
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description'));
         $this->pagerender();
     }
 }

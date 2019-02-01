@@ -15,7 +15,7 @@ class RoleController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'User Role List';
+        $meta_title = $title = 'User Role List';
 
         //get the user roles
         $userroles = Role::all();
@@ -24,11 +24,7 @@ class RoleController extends BasePageController
 
         $content = $this->smarty->fetch('role-list.tpl');
 
-        $this->smarty->assign([
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]);
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -44,7 +40,7 @@ class RoleController extends BasePageController
 
         switch ($request->input('action') ?? 'view') {
             case 'submit':
-                $title = 'Add User Role';
+                $meta_title = $title = 'Add User Role';
                     $role = Role::create([
                         'name' => $request->input('name'),
                         'apirequests' => $request->input('apirequests'),
@@ -101,7 +97,7 @@ class RoleController extends BasePageController
                 break;
             case 'view':
             default:
-            $title = 'Add User Role';
+            $meta_title = $title = 'Add User Role';
             $role = [
             ];
 
@@ -113,14 +109,7 @@ class RoleController extends BasePageController
 
         $content = $this->smarty->fetch('role-add.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-                'role' => $role,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content', 'role'));
 
         $this->adminrender();
     }
@@ -134,7 +123,7 @@ class RoleController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'User Roles';
+        $meta_title = $title = 'User Roles';
 
         // Get the user roles.
         $userRoles = Role::all();
@@ -145,7 +134,7 @@ class RoleController extends BasePageController
 
         switch ($request->input('action') ?? 'view') {
             case 'submit':
-                    $title = 'Update User Role';
+                    $meta_title = $title = 'Update User Role';
                     $role = Role::find($request->input('id'));
                     $role->update([
                         'name' => $request->input('name'),
@@ -231,7 +220,7 @@ class RoleController extends BasePageController
             case 'view':
             default:
                 if ($request->has('id')) {
-                    $title = 'User Roles Edit';
+                    $meta_title = $title = 'User Roles Edit';
                     $role = Role::findById($request->input('id'));
                     $this->smarty->assign('role', $role);
                 }
@@ -243,13 +232,7 @@ class RoleController extends BasePageController
 
         $content = $this->smarty->fetch('role-edit.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }

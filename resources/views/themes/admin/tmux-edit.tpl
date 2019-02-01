@@ -214,9 +214,7 @@
 					<td>
 						{html_options style="width:180px;" class="siteeditstyle" id="binaries" name='binaries' values=$binaries_ids output=$binaries_names selected=$site->binaries}
 						<div class="hint">Choose to run update_binaries. Update binaries gets from your last_record to
-							now.<br/>Simple
-							Threaded Update runs 1 group per thread.<br/>Complete Threaded Update splits all work across
-							multiple threads.
+							now.
 						</div>
 					</td>
 				</tr>
@@ -720,21 +718,6 @@
 						<div class="hint">Set this to write each panes output to a per pane per day log file. This adds
 							GMT date
 							to the filename.
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td style="width:180px;"><label for="powerline">Powerline Status Bar:</label></td>
-					<td>
-						{html_radios id="powerline" name='powerline' values=$yesno_ids output=$yesno_names selected=$site->powerline separator='<br />'}
-						<div class="hint">Choose to use the Powerline tmux status bar. To make this pretty, you need to
-							install
-							a patched font. This can be found on <a href="https://github.com/jonnyboy/powerline-fonts">my
-								fork</a> or <a href="https://github.com/Lokaltog/powerline-fonts">the original
-								git</a><br \>You
-							will need to copy the default theme located at powerline/powerline/themes/default.sh to
-							powerline/powerline/themes/tmux.sh and edit that file for what is displayed, colors, etc.
 						</div>
 					</td>
 				</tr>

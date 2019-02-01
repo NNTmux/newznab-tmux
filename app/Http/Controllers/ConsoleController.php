@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Blacklight\Genres;
 use Blacklight\Console;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 
 class ConsoleController extends BasePageController
@@ -35,7 +36,7 @@ class ConsoleController extends BasePageController
                 ];
         }
         $category = Category::GAME_ROOT;
-        if ($id && \in_array($id, array_pluck($ctmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($ctmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::GAME_ROOT)
@@ -110,14 +111,7 @@ class ConsoleController extends BasePageController
         $meta_description = 'Browse for Console Games';
         $content = $this->smarty->fetch('console.tpl');
 
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
 
         $this->pagerender();
     }

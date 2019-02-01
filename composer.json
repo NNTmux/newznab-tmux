@@ -14,8 +14,6 @@
       "App\\": "app/"
     },
     "classmap": [
-      "libs/PEAR/Net_NNTP/NNTP/",
-      "libs/",
       "database/factories",
       "database/seeds"
     ]
@@ -54,6 +52,12 @@
   "non-feature-branches": [
     "latest-.*"
   ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pear/Net_NNTP"
+        }
+    ],
   "require": {
     "php": ">=7.2.0",
     "ext-bcmath": "*",
@@ -117,8 +121,9 @@
     "messerli90/igdb": "^1.0",
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
-    "nesbot/carbon": "2.10.0 as 1.35.0",
+    "nesbot/carbon": "2.10.1 as 1.35.0",
     "ntimyeboah/laravel-database-trigger": "^1.0",
+    "pear/net_nntp": "^1.5",
     "php-ffmpeg/php-ffmpeg": "^0.13.0",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
@@ -147,7 +152,7 @@
     "barryvdh/laravel-ide-helper": "^2.4",
     "beyondcode/laravel-dump-server": "^1.0",
     "filp/whoops": "~2.0",
-    "friendsofphp/php-cs-fixer": "^2.13",
+    "friendsofphp/php-cs-fixer": "^2.14",
     "fzaninotto/faker": "~1.4",
     "mockery/mockery": "^1.0",
     "moontoast/math": "^1.1",
@@ -178,6 +183,9 @@
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi"
+    ],
+    "format": [
+      "vendor/bin/php-cs-fixer fix --config .php-cs"
     ]
   },
   "suggest": {

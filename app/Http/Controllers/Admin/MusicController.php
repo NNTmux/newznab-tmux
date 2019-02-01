@@ -17,20 +17,14 @@ class MusicController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $title = 'Music List';
+        $meta_title = $title = 'Music List';
 
         $musicList = Utility::getRange('musicinfo');
 
         $this->smarty->assign('musiclist', $musicList);
 
         $content = $this->smarty->fetch('music-list.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 
@@ -45,6 +39,8 @@ class MusicController extends BasePageController
         $this->setAdminPrefs();
         $music = new Music();
         $gen = new Genres();
+
+        $meta_title = $title = 'Music Edit';
 
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -80,7 +76,6 @@ class MusicController extends BasePageController
                     break;
                 case 'view':
                 default:
-                    $title = 'Music Edit';
                     $this->smarty->assign('music', $mus);
                     $this->smarty->assign('genres', $gen->getGenres(Genres::MUSIC_TYPE));
                     break;
@@ -88,13 +83,7 @@ class MusicController extends BasePageController
         }
 
         $content = $this->smarty->fetch('music-edit.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

@@ -16,7 +16,7 @@ class AjaxController extends BasePageController
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function ajaxAction(Request $request)
     {

@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
 
@@ -1027,7 +1028,7 @@ class NameFixer
 
                         if ($status !== '') {
                             foreach ($status as $key => $stat) {
-                                $updateColumns = array_add($updateColumns, $key, $stat);
+                                $updateColumns = Arr::add($updateColumns, $key, $stat);
                             }
                         }
 
@@ -1130,12 +1131,9 @@ class NameFixer
 				SELECT r.id AS releases_id, r.name, r.searchname,
 				r.fromname, r.groups_id, r.categories_id
 				FROM releases r
-				%1$s
-				AND (r.name LIKE %2$s OR r.searchname LIKE %2$s)
-				AND r.predb_id = 0
-				LIMIT 21',
-                $join,
-                escapeString('%'.$pre['title'].'%')
+				WHERE r.id IN (%s)
+				AND r.predb_id = 0',
+                $join
             )
         );
 
@@ -1170,12 +1168,10 @@ class NameFixer
         $join = '';
 
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
-            $titlematch = SphinxSearch::escapeString($preTitle);
-            $join .= sprintf(
-                        'INNER JOIN releases_se rse ON rse.id = r.id
-						WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',
-                        $titlematch
-                    );
+            $titlematch = $this->sphinx->searchIndexes('releases_rt', $preTitle, ['name', 'searchname', 'filename']);
+            if (! empty($titlematch)) {
+                $join = implode(',', Arr::pluck($titlematch, 'id'));
+            }
         }
 
         return $join;
@@ -1268,7 +1264,7 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = $this->preMatch($this->_fileName);
             if ($preMatch[0] === true) {
-                $results = $this->sphinx->searchIndexes($preMatch[1], ['filename', 'title'], 'predb_rt');
+                $results = $this->sphinx->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']);
                 if (! empty($results)) {
                     foreach ($results as $result) {
                         if (! empty($result)) {
@@ -2443,7 +2439,7 @@ class NameFixer
         $this->_cleanMatchFiles();
 
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes($this->_fileName, ['filename', 'title'], 'predb_rt') as $match) {
+            foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['filename', 'title']) as $match) {
                 if (! empty($match)) {
                     $this->updateRelease($release, $match['title'], 'PreDb: Filename match', $echo, $type, $nameStatus, $show, $match['id']);
 
@@ -2470,7 +2466,7 @@ class NameFixer
         $this->_cleanMatchFiles();
         $this->cleanFileNames();
         if (! empty($this->_fileName)) {
-            foreach ($this->sphinx->searchIndexes($this->_fileName, 'title', 'predb_rt') as $match) {
+            foreach ($this->sphinx->searchIndexes('predb_rt', $this->_fileName, ['title']) as $match) {
                 if (! empty($match)) {
                     $this->updateRelease($release, $match['title'], 'PreDb: Title match', $echo, $type, $nameStatus, $show, $match['id']);
 

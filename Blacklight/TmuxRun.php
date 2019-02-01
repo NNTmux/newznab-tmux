@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use App\Models\Settings;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,13 +24,7 @@ class TmuxRun extends Tmux
     public function __construct()
     {
         parent::__construct();
-        $dateFormat = Settings::settingValue(
-            [
-                'section'    => 'shell',
-                'subsection' => 'date',
-                'name'       => 'format',
-            ]
-        );
+        $dateFormat = Settings::settingValue('shell.date.format');
         $this->_dateFormat = $dateFormat ?? '%Y-%m-%d %T';
     }
 
@@ -614,7 +609,6 @@ class TmuxRun extends Tmux
                     $binaries = 'echo "\nbinaries has been disabled/terminated by Binaries"';
                     break;
                 case 1:
-                case 2:
                     $binaries = sprintf(
                         '%s %s;',
                         $runVar['scripts']['binaries'],
@@ -777,7 +771,7 @@ class TmuxRun extends Tmux
      */
     protected function _runSharing($pane, &$runVar): void
     {
-        $sharing = (array) array_first(DB::select('SELECT enabled, posting, fetching FROM sharing'));
+        $sharing = (array) Arr::first(DB::select('SELECT enabled, posting, fetching FROM sharing'));
 
         if (! empty($sharing) && (int) $sharing['enabled'] === 1 && (int) $runVar['settings']['run_sharing'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1) && shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
             shell_exec(

@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\ColorCLI;
 use App\Models\MusicInfo;
+use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
 $colorCli = new ColorCLI();
@@ -15,11 +16,10 @@ if ($argc === 1 || $argv[1] !== 'true') {
 
 $path2covers = NN_COVERS.'music'.DS;
 
-$dirItr = new \RecursiveDirectoryIterator($path2covers);
-$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
+$itr = File::allFiles($path2covers);
 foreach ($itr as $filePath) {
-    if (is_file($filePath) && preg_match('/\d+\.jpg/', $filePath)) {
-        preg_match('/(\d+)\.jpg/', basename($filePath), $match);
+    if (is_file($filePath->getPathname()) && preg_match('/\d+\.jpg$/', $filePath->getPathname())) {
+        preg_match('/(\d+)\.jpg$/', $filePath->getPathname(), $match);
         if (isset($match[1])) {
             $run = MusicInfo::query()->where('cover', '=', 0)->where('id', $match[1])->update(['cover' => 1]);
             if ($run >= 1) {
@@ -27,7 +27,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = MusicInfo::query()->where('id', $match[1])->select(['id'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath.' not found in db.');
+                    $colorCli->info($filePath->getPathname().' not found in db.');
                 }
             }
         }

@@ -19,7 +19,7 @@ class CategoryRegexesController extends BasePageController
         $this->setAdminPrefs();
         $regexes = new Regexes(['Settings' =>null, 'Table_Name' => 'category_regexes']);
 
-        $title = 'Category Regex List';
+        $meta_title = $title = 'Category Regex List';
 
         $group = $request->has('group') && ! empty($request->input('group')) ? $request->input('group') : '';
         $regex = $regexes->getRegex($group);
@@ -33,13 +33,7 @@ class CategoryRegexesController extends BasePageController
 
         $content = $this->smarty->fetch('category_regexes-list.tpl');
 
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
 
         $this->adminrender();
     }
@@ -97,11 +91,11 @@ class CategoryRegexesController extends BasePageController
             case 'view':
             default:
                 if ($request->has('id')) {
-                    $title = 'Category Regex Edit';
+                    $meta_title = $title = 'Category Regex Edit';
                     $id = $request->input('id');
                     $regex = $regexes->getRegexByID($id);
                 } else {
-                    $title = 'Category Regex Add';
+                    $meta_title = $title = 'Category Regex Add';
                 }
                 $this->smarty->assign('regex', $regex);
                 break;
@@ -128,13 +122,7 @@ class CategoryRegexesController extends BasePageController
         $this->smarty->assign('category_ids', $categories['category_ids']);
 
         $content = $this->smarty->fetch('category_regexes-edit.tpl');
-        $this->smarty->assign(
-            [
-                'title' => $title,
-                'meta_title' => $title,
-                'content' => $content,
-            ]
-        );
+        $this->smarty->assign(compact('title', 'meta_title', 'content'));
         $this->adminrender();
     }
 }

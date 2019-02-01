@@ -50,13 +50,7 @@ class NfoController extends BasePageController
                 if ($modal) {
                     echo $content;
                 } else {
-                    $this->smarty->assign([
-                            'title' => $title,
-                            'content' => $content,
-                            'meta_title' => $meta_title,
-                            'meta_keywords' => $meta_keywords,
-                            'meta_description' => $meta_description,
-                        ]);
+                    $this->smarty->assign(compact('title', 'content', 'meta_title', 'meta_keywords', 'meta_description'));
                     $this->pagerender();
                 }
             } else {

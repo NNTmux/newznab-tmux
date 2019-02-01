@@ -29,7 +29,7 @@ class RssController extends BasePageController
             $title = 'Rss Info';
             $meta_title = 'Rss Nzb Info';
             $meta_keywords = 'view,nzb,description,details,rss,atom';
-            $meta_description = 'View information about Newznab Tmux RSS Feeds.';
+            $meta_description = 'View information about NNTmux RSS Feeds.';
 
             $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
             $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
@@ -86,7 +86,7 @@ class RssController extends BasePageController
                 $rssToken = $res['api_token'];
                 $maxRequests = $res->role->apirequests;
 
-                if ($res->hasRole('Disabled') === true) {
+                if ($res->hasRole('Disabled')) {
                     Utility::showApiError(101);
                 }
             }

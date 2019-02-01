@@ -7,6 +7,7 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use Chumper\Zipper\Zipper;
+use Illuminate\Support\Arr;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -22,11 +23,6 @@ class Releases
     public const PASSWD_POTENTIAL = 1; // Might have a password.
     public const BAD_FILE = 2; // Possibly broken RAR/ZIP.
     public const PASSWD_RAR = 10; // Definitely passworded.
-
-    /**
-     * @var \Blacklight\ReleaseSearch
-     */
-    public $releaseSearch;
 
     /**
      * @var \Blacklight\SphinxSearch
@@ -51,7 +47,6 @@ class Releases
         $options += $defaults;
 
         $this->sphinxSearch = new SphinxSearch();
-        $this->releaseSearch = new ReleaseSearch();
     }
 
     /**
@@ -600,7 +595,7 @@ class Releases
      * @param int          $minSize
      * @param array        $tags
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
@@ -624,19 +619,25 @@ class Releases
         } else {
             $orderBy = $this->getBrowseOrder($orderBy);
         }
-        $searchOptions = [];
+
+        $searchFields = [];
         if ($searchName !== -1) {
-            $searchOptions['searchname'] = $searchName;
+            $searchFields['searchname'] = $searchName;
         }
         if ($usenetName !== -1) {
-            $searchOptions['name'] = $usenetName;
+            $searchFields['name'] = $usenetName;
         }
         if ($posterName !== -1) {
-            $searchOptions['fromname'] = $posterName;
+            $searchFields['fromname'] = $posterName;
         }
         if ($fileName !== -1) {
-            $searchOptions['filename'] = $fileName;
+            $searchFields['filename'] = $fileName;
         }
+
+        $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
+
+        $searchResult = Arr::pluck($results, 'id');
+
         $catQuery = '';
         if ($type === 'basic') {
             $catQuery = Category::getCategorySearch($cat);
@@ -644,26 +645,25 @@ class Releases
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
-            '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s %s',
-            $this->releaseSearch->getFullTextJoinString(),
+            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
-            (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(string) (104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
-            (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(string) (104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
+            (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
+            (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
             ((int) $hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
             ((int) $hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
             $catQuery,
             ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
             ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            (\count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -703,8 +703,8 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -731,16 +731,14 @@ class Releases
      */
     public function apiSearch($searchName, $groupName, $offset = 0, $limit = 1000, $maxAge = -1, array $excludedCats = [], array $cat = [-1], $minSize = 0, array $tags = [])
     {
-        $searchOptions = [];
         if ($searchName !== -1) {
-            $searchOptions['searchname'] = $searchName;
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $searchName, ['searchname']), 'id');
         }
 
         $catQuery = Category::getCategorySearch($cat);
 
         $whereSql = sprintf(
-            '%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s',
-            $this->releaseSearch->getFullTextJoinString(),
+            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
@@ -748,7 +746,7 @@ class Releases
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             $catQuery,
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            (\count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
@@ -786,7 +784,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -872,17 +870,20 @@ class Releases
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
             }
         }
+
+        if (! empty($name)) {
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+        }
+
         $whereSql = sprintf(
-            '%s
-			WHERE r.nzbstatus = %d
+            'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
@@ -926,7 +927,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -953,6 +954,7 @@ class Releases
      * @param int $maxAge
      * @param int $minSize
      * @param array $excludedCategories
+     * @param array $tags
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
     public function apiTvSearch(array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
@@ -1013,17 +1015,20 @@ class Releases
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airdate));
             }
         }
+
+        if (! empty($name)) {
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+        }
+
         $whereSql = sprintf(
-            '%s
-			WHERE r.nzbstatus = %d
+            'WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
             $this->showPasswords(),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
@@ -1061,7 +1066,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -1088,16 +1093,18 @@ class Releases
      */
     public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, array $excludedCategories = [])
     {
+        if (! empty($name)) {
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+        }
+
         $whereSql = sprintf(
-            '%s
-			WHERE r.passwordstatus %s
+            'WHERE r.passwordstatus %s
 			AND r.nzbstatus = %d
 			%s %s %s %s %s',
-            ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             $this->showPasswords(),
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
-            ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
@@ -1132,7 +1139,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -1155,20 +1162,23 @@ class Releases
      * @param int $maxAge
      * @param int $minSize
      * @param array $excludedCategories
+     * @param array $tags
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
     public function moviesSearch($imDbId = -1, $tmDbId = -1, $traktId = -1, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0, array $excludedCategories = [], array $tags = [])
     {
+        if (! empty($name)) {
+            $searchResult = Arr::pluck($this->sphinxSearch->searchIndexes('releases_rt', $name, ['searchname']), 'id');
+        }
+
         $whereSql = sprintf(
-            '%s
-            WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
+            'WHERE r.categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER.'
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s %s %s %s',
-            $name !== '' ? $this->releaseSearch->getFullTextJoinString() : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
-            $name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : '',
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
@@ -1209,7 +1219,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases) && \count($releases) > 0) {
+        if (! empty($releases)) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));

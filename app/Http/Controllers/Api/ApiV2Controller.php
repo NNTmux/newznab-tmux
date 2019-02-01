@@ -232,7 +232,7 @@ class ApiV2Controller extends BasePageController
     {
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
-        if ($relData !== false) {
+        if ($relData) {
             return redirect('/getnzb?r='.$request->input('api_token').'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 

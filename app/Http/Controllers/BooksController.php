@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Blacklight\Books;
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 
 class BooksController extends BasePageController
@@ -31,7 +32,7 @@ class BooksController extends BasePageController
                 ];
         }
         $category = Category::BOOKS_ROOT;
-        if ($id && \in_array($id, array_pluck($btmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($btmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('parentid', '=', Category::BOOKS_ROOT)
@@ -101,14 +102,7 @@ class BooksController extends BasePageController
         $meta_keywords = 'browse,nzb,books,description,details';
         $meta_description = 'Browse for Books';
         $content = $this->smarty->fetch('books.tpl');
-        $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
-        );
+        $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));
 
         $this->pagerender();
     }
