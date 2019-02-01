@@ -704,7 +704,7 @@ class Releases
             return $releases;
         }
         $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
-        if (! empty($releases)) {
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -784,7 +784,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases)) {
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -927,7 +927,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases)) {
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -986,8 +986,8 @@ class Releases
             );
             $show = Release::fromQuery($showQry);
 
-            if (! empty($show)) {
-                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && \strlen($show[0]->episodes) > 0) {
+            if ($show->isNotEmpty()) {
+                if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes != '') {
                     $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
                 } elseif ((int) $show[0]->video > 0) {
                     $showSql = 'AND r.videos_id = '.$show[0]->video;
@@ -1066,7 +1066,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases)) {
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -1139,7 +1139,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases)) {
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -1219,7 +1219,7 @@ class Releases
             return $releases;
         }
         $releases = Release::fromQuery($sql);
-        if (! empty($releases)) {
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
