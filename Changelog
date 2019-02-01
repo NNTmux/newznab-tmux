@@ -1,3 +1,6 @@
+2019-02-01 DariusIII
+	* Chg:  Update sebastian/environment (4.0.2 => 4.1.0)
+	* Chg:  Update phpunit/phpunit (7.5.2 => 7.5.3)
 2019-01-31 DariusIII
 	* Chg: Update .styleci config file
 	* Chg: Update and fix code with php-cs-fixer
