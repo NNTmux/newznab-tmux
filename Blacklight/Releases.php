@@ -595,7 +595,7 @@ class Releases
      * @param int          $minSize
      * @param array        $tags
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
