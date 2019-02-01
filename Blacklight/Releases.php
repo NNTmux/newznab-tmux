@@ -783,7 +783,13 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
+        if ($searchName !== -1 && ! empty($searchResult)) {
+            $releases = Release::fromQuery($sql);
+        } elseif ($searchName !== -1 && empty($searchResult)) {
+            $releases = [];
+        } else {
+            $releases = Release::fromQuery($sql);
+        }
         if ((\is_array($releases) && ! empty($releases)) || (\is_object($releases) && $releases->isNotEmpty())) {
             $releases->_totalrows = $this->getPagerCount($baseSql);
         }
