@@ -704,7 +704,7 @@ class Releases
             return $releases;
         }
         $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
-        if ($releases->isNotEmpty()) {
+        if (! empty($releases) || $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
