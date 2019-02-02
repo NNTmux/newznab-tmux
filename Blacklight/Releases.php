@@ -585,15 +585,15 @@ class Releases
      * @param              $hasComments
      * @param              $daysNew
      * @param              $daysOld
-     * @param int          $offset
-     * @param int          $limit
+     * @param int $offset
+     * @param int $limit
      * @param string|array $orderBy
-     * @param int          $maxAge
-     * @param array        $excludedCats
-     * @param string       $type
-     * @param array        $cat
-     * @param int          $minSize
-     * @param array        $tags
+     * @param int $maxAge
+     * @param array $excludedCats
+     * @param string $type
+     * @param array $cat
+     * @param int $minSize
+     * @param array $tags
      *
      * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
@@ -703,8 +703,8 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ! empty($searchResult) ? Release::fromQuery($sql) : [];
-        if ((\is_array($releases) && ! empty($releases)) || $releases->isNotEmpty()) {
+        $releases = ! empty($searchResult) ? Release::fromQuery($sql) : collect();
+        if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -783,7 +783,13 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        if ($searchName !== -1 && ! empty($searchResult)) {
+            $releases = Release::fromQuery($sql);
+        } elseif ($searchName !== -1 && empty($searchResult)) {
+            $releases = collect();
+        } else {
+            $releases = Release::fromQuery($sql);
+        }
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
