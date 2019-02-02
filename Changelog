@@ -1,4 +1,5 @@
 2019-02-02 DariusIII
+	* Chg: Update package.json
 	* Chg: Update font-awesome to version 5.7.1
 	* Fix: Properly fix site searches and api related searches
 2019-02-01 DariusIII
