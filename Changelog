@@ -1,3 +1,5 @@
+2019-02-02 DariusIII
+	* Fix: Properly fix site searches and api related searches
 2019-02-01 DariusIII
 	* Fix: Fix count of rows for apiv2 searches
 	* Fix: Fix error on empty search results

@@ -93,7 +93,7 @@ class SearchController extends BasePageController
                 $tags ?? []
             );
 
-            $results = $this->paginate($rslt ?? [], $rslt->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->smarty->assign(
                 [
@@ -157,7 +157,7 @@ class SearchController extends BasePageController
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
 
-            $results = $this->paginate($rslt ?? [], $rslt->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+            $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->smarty->assign(
                 [

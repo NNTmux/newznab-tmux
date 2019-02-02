@@ -343,7 +343,7 @@ class XML_Response
     {
         $this->xml->startElement($this->namespace.':response');
         $this->xml->writeAttribute('offset', $this->offset);
-        $this->xml->writeAttribute('total', $this->releases->_totalrows ?? 0);
+        $this->xml->writeAttribute('total', $this->releases[0]->_totalrows ?? 0);
         $this->xml->endElement();
     }
 

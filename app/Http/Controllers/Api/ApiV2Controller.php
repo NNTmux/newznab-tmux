@@ -91,7 +91,7 @@ class ApiV2Controller extends BasePageController
         );
 
         $response = [
-            'Total' => $relData->_totalrows ?? 0,
+            'Total' => $relData[0]->_totalrows ?? 0,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
@@ -147,7 +147,7 @@ class ApiV2Controller extends BasePageController
         }
 
         $response = [
-            'Total' => $relData->_totalrows ?? 0,
+            'Total' => $relData[0]->_totalrows ?? 0,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
@@ -216,7 +216,7 @@ class ApiV2Controller extends BasePageController
         );
 
         $response = [
-            'Total' => $relData->_totalrows ?? 0,
+            'Total' => $relData[0]->_totalrows ?? 0,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
