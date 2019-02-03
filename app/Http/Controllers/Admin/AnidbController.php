@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use Blacklight\AniDB;
 use App\Models\Release;
-use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
 
 class AnidbController extends BasePageController
