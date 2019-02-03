@@ -2,12 +2,12 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\NNTP;
 use App\Models\Group;
-use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
-use Illuminate\Support\Arr;
+use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
+use Blacklight\NNTP;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 $start = now();

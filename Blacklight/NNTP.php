@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
+use App\Extensions\util\PhpYenc;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use App\Extensions\util\PhpYenc;
 
 /*
  * Class for connecting to the usenet, retrieving articles and article headers,

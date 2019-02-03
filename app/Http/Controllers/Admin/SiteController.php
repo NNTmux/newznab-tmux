@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Release;
-use Blacklight\SABnzbd;
-use App\Models\Category;
-use App\Models\Settings;
-use Illuminate\Http\Request;
-use Blacklight\utility\Utility;
-use Spatie\Permission\Models\Role;
 use App\Http\Controllers\BasePageController;
+use App\Models\Category;
+use App\Models\Release;
+use App\Models\Settings;
+use App\Models\User;
+use Blacklight\SABnzbd;
+use Blacklight\utility\Utility;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class SiteController extends BasePageController
 {

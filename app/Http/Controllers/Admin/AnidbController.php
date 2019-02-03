@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Blacklight\AniDB;
-use App\Models\Release;
-use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
+use App\Models\Release;
+use Blacklight\AniDB;
+use Illuminate\Http\Request;
 
 class AnidbController extends BasePageController
 {
@@ -25,8 +25,6 @@ class AnidbController extends BasePageController
         }
 
         $this->smarty->assign('animetitle', $aname);
-
-        $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
 
         $anidblist = $AniDB->getAnimeRange($aname);
         $this->smarty->assign('anidblist', $anidblist);

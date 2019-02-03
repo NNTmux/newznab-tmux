@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
+use Yadakhov\InsertOnDuplicateKey;
 
 /**
  * App\Models\TvEpisode.

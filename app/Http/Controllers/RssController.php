@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Category;
-use Blacklight\http\RSS;
+use App\Models\User;
 use App\Models\UserRequest;
-use Illuminate\Http\Request;
+use Blacklight\http\RSS;
 use Blacklight\utility\Utility;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class RssController extends BasePageController

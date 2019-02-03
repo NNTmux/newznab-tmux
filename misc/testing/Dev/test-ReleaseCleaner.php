@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\SphinxSearch;
 use Blacklight\ReleaseCleaning;
+use Blacklight\SphinxSearch;
 use Illuminate\Support\Facades\DB;
 
 $message =

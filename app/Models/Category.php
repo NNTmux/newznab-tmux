@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
+use Watson\Rememberable\Rememberable;
 
 /**
  * App\Models\Category.
