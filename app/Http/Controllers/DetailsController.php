@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DnzbFailure;
-use App\Models\Predb;
-use App\Models\Release;
-use App\Models\ReleaseComment;
-use App\Models\ReleaseFile;
-use App\Models\ReleaseNfo;
-use App\Models\ReleaseRegex;
-use App\Models\Settings;
+use Blacklight\XXX;
 use App\Models\User;
-use App\Models\UserDownload;
+use App\Models\Predb;
 use App\Models\Video;
 use Blacklight\AniDB;
 use Blacklight\Books;
-use Blacklight\Console;
 use Blacklight\Games;
 use Blacklight\Movie;
 use Blacklight\Music;
-use Blacklight\ReleaseExtra;
+use App\Models\Release;
+use Blacklight\Console;
+use App\Models\Settings;
 use Blacklight\Releases;
-use Blacklight\XXX;
+use App\Models\ReleaseNfo;
+use App\Models\DnzbFailure;
+use App\Models\ReleaseFile;
+use App\Models\ReleaseRegex;
+use App\Models\UserDownload;
+use Blacklight\ReleaseExtra;
+use App\Models\ReleaseComment;
 use Illuminate\Support\Facades\Auth;
 
 class DetailsController extends BasePageController

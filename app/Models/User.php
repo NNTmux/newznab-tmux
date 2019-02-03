@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
-use App\Jobs\SendAccountExpiredEmail;
-use App\Jobs\SendInviteEmail;
 use Blacklight\ColorCLI;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\Request;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use App\Jobs\SendAccountExpiredEmail;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Jrean\UserVerification\Traits\UserVerification;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User.

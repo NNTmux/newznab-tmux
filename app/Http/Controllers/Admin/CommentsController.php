@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
 use App\Models\ReleaseComment;
+use App\Http\Controllers\BasePageController;
 
 class CommentsController extends BasePageController
 {

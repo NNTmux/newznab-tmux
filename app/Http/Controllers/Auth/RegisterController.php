@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\Invitation;
-use App\Models\Settings;
 use App\Models\User;
-use Blacklight\utility\Utility;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Http\Request;
+use App\Models\Settings;
+use App\Models\Invitation;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Blacklight\utility\Utility;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Jrean\UserVerification\Facades\UserVerification;
+use Illuminate\Foundation\Auth\RegistersUsers;
 use Jrean\UserVerification\Traits\VerifiesUsers;
-use Spatie\Permission\Models\Role;
+use Jrean\UserVerification\Facades\UserVerification;
 
 class RegisterController extends Controller
 {

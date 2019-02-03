@@ -2,15 +2,15 @@
 
 namespace Blacklight\libraries;
 
+use Blacklight\Nfo;
+use Blacklight\NZB;
+use Blacklight\NNTP;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\Nfo;
-use Blacklight\NNTP;
-use Blacklight\NZB;
-use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Blacklight\processing\PostProcess;
 
 /**
  * Class Forking.

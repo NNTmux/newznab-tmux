@@ -2,28 +2,28 @@
 
 namespace Blacklight;
 
+use Imdb\Title;
+use Imdb\Config;
 use aharen\OMDbAPI;
-use App\Models\Category;
-use App\Models\MovieInfo;
-use App\Models\Release;
-use App\Models\Settings;
-use Blacklight\libraries\FanartTV;
-use Blacklight\processing\tv\TraktTv;
-use Blacklight\utility\Utility;
-use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\iTunes;
+use Imdb\TitleSearch;
 use GuzzleHttp\Client;
+use App\Models\Release;
+use App\Models\Category;
+use App\Models\Settings;
+use App\Models\MovieInfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
+use Tmdb\Laravel\Facades\Tmdb;
+use Blacklight\utility\Utility;
+use DariusIII\ItunesApi\iTunes;
+use Blacklight\libraries\FanartTV;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Imdb\Config;
-use Imdb\Title;
-use Imdb\TitleSearch;
 use Tmdb\Exception\TmdbApiException;
-use Tmdb\Laravel\Facades\Tmdb;
+use Blacklight\processing\tv\TraktTv;
+use Illuminate\Support\Facades\Cache;
+use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
+use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
 /**
  * Class Movie.

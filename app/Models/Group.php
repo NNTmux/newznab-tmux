@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Blacklight\ColorCLI;
-use Blacklight\NNTP;
 use Blacklight\NZB;
-use Blacklight\ReleaseImage;
+use Blacklight\NNTP;
+use Blacklight\ColorCLI;
 use Blacklight\Releases;
-use Illuminate\Database\Eloquent\Model;
+use Blacklight\ReleaseImage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\Group.

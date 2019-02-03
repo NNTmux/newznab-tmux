@@ -3,9 +3,9 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use ApaiIO\ApaiIO;
-use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\Operations\Search;
 use App\Models\Settings;
+use ApaiIO\Operations\Search;
+use ApaiIO\Configuration\GenericConfiguration;
 
 $pubkey = Settings::settingValue('APIs..amazonpubkey');
 $privkey = Settings::settingValue('APIs..amazonprivkey');
