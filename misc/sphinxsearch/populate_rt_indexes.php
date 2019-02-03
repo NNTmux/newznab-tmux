@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Predb;
 use App\Models\Release;
-use Blacklight\SphinxSearch;
 use Illuminate\Support\Arr;
+use Blacklight\SphinxSearch;
 use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1])) {

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\BasePageController;
-use App\Models\Release;
 use App\Models\Video;
+use App\Models\Release;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BasePageController;
 
 class ShowsController extends BasePageController
 {

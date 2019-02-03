@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Blacklight\libraries\Geary;
 use Illuminate\Http\Request;
+use Blacklight\libraries\Geary;
 use Spatie\Permission\Models\Role;
 
 class BtcPaymentController extends BasePageController

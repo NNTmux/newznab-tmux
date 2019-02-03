@@ -2,35 +2,35 @@
 
 namespace Blacklight\processing\post;
 
-use App\Models\Category;
+use FFMpeg\FFMpeg;
+use Blacklight\Nfo;
+use Blacklight\NZB;
+use FFMpeg\FFProbe;
+use Blacklight\NNTP;
 use App\Models\Group;
 use App\Models\Release;
-use App\Models\ReleaseFile;
+use App\Models\Category;
 use App\Models\Settings;
-use Blacklight\Categorize;
 use Blacklight\ColorCLI;
+use Blacklight\Releases;
 use Blacklight\NameFixer;
-use Blacklight\Nfo;
-use Blacklight\NNTP;
-use Blacklight\NZB;
+use Blacklight\Categorize;
+use App\Models\ReleaseFile;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
-use Blacklight\Releases;
 use Blacklight\SphinxSearch;
-use Blacklight\utility\Utility;
-use dariusiii\rarinfo\ArchiveInfo;
-use dariusiii\rarinfo\Par2Info;
-use FFMpeg\Coordinate\Dimension;
-use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\FFMpeg;
-use FFMpeg\FFProbe;
-use FFMpeg\Filters\Video\ResizeFilter;
-use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Format\Video\Ogg;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use Mhor\MediaInfo\MediaInfo;
+use Blacklight\utility\Utility;
+use dariusiii\rarinfo\Par2Info;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\Format\Audio\Vorbis;
+use FFMpeg\Coordinate\Dimension;
+use dariusiii\rarinfo\ArchiveInfo;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
+use FFMpeg\Filters\Video\ResizeFilter;
 
 class ProcessAdditional
 {
