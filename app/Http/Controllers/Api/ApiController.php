@@ -119,13 +119,16 @@ class ApiController extends BasePageController
                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $categoryID = $api->categoryID();
                $limit = $api->limit();
+               $searchArr = [
+                   'searchname' => $request->input('q') ?? -1,
+                   'name' => -1,
+                   'fromname' => -1,
+                   'filename' => -1,
+               ];
 
                if ($request->has('q')) {
                    $relData = $releases->search(
-                       $request->input('q'),
-                       -1,
-                       -1,
-                       -1,
+                       $searchArr,
                        $groupName,
                        -1,
                        -1,

@@ -2,16 +2,16 @@
 
 namespace Blacklight;
 
+use App\Models\Category;
 use App\Models\Group;
 use App\Models\Release;
-use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\utility\Utility;
 use Chumper\Zipper\Zipper;
 use Illuminate\Support\Arr;
-use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Releases.
@@ -574,28 +574,25 @@ class Releases
      * Function for searching on the site (by subject, searchname or advanced).
      *
      *
-     * @param              $searchName
-     * @param              $usenetName
-     * @param              $posterName
-     * @param              $fileName
+     * @param  array       $searchArr
      * @param              $groupName
      * @param              $sizeFrom
      * @param              $sizeTo
      * @param              $daysNew
      * @param              $daysOld
-     * @param int $offset
-     * @param int $limit
+     * @param int          $offset
+     * @param int          $limit
      * @param string|array $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
-     * @param string $type
-     * @param array $cat
-     * @param int $minSize
-     * @param array $tags
+     * @param int          $maxAge
+     * @param array        $excludedCats
+     * @param string       $type
+     * @param array        $cat
+     * @param int          $minSize
+     * @param array        $tags
      *
      * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
+    public function search($searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
         $sizeRange = [
             1 => 1,
@@ -618,19 +615,9 @@ class Releases
             $orderBy = $this->getBrowseOrder($orderBy);
         }
 
-        $searchFields = [];
-        if ($searchName !== -1) {
-            $searchFields['searchname'] = $searchName;
-        }
-        if ($usenetName !== -1) {
-            $searchFields['name'] = $usenetName;
-        }
-        if ($posterName !== -1) {
-            $searchFields['fromname'] = $posterName;
-        }
-        if ($fileName !== -1) {
-            $searchFields['filename'] = $fileName;
-        }
+        $searchFields = Arr::where($searchArr, function ($value) {
+            return $value !== -1;
+        });
 
         $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 

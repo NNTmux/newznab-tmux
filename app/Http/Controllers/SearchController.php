@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Group;
 use App\Models\Category;
+use App\Models\Group;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
@@ -42,15 +42,15 @@ class SearchController extends BasePageController
         );
 
         if ($searchType === 'basic' && ! $request->has('searchadvr') && ($request->has('id') || $request->has('subject'))) {
-            $searchString = '';
+            $searchString = [];
             switch (true) {
                 case $request->has('subject'):
-                    $searchString = (string) $request->input('subject');
-                    $this->smarty->assign('subject', $searchString);
+                    $searchString['searchname'] = (string) $request->input('subject');
+                    $this->smarty->assign('subject', $searchString['searchname']);
                     break;
                 case $request->has('id'):
-                    $searchString = (string) $request->input('id');
-                    $this->smarty->assign('search', $searchString);
+                    $searchString['searchname'] = (string) $request->input('id');
+                    $this->smarty->assign('search', $searchString['searchname']);
                     break;
             }
 
@@ -61,7 +61,7 @@ class SearchController extends BasePageController
             foreach ($releases->getBrowseOrdering() as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search?id='.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType
+                    WWW_TOP.'/search?id='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType
                 );
             }
 
@@ -72,9 +72,6 @@ class SearchController extends BasePageController
 
             $rslt = $releases->search(
                 $searchString,
-                -1,
-                -1,
-                -1,
                 -1,
                 -1,
                 -1,
@@ -102,10 +99,18 @@ class SearchController extends BasePageController
         }
 
         $searchVars = [
-            'searchadvr' => '', 'searchadvsubject' => '', 'searchadvposter' => '',
-            'searchadvfilename' => '', 'searchadvdaysnew' => '', 'searchadvdaysold' => '',
-            'searchadvgroups' => '', 'searchadvcat' => '', 'searchadvsizefrom' => '',
-            'searchadvsizeto' => '', 'searchadvhasnfo' => '', 'searchadvhascomments' => '',
+            'searchadvr' => '',
+            'searchadvsubject' => '',
+            'searchadvposter' => '',
+            'searchadvfilename' => '',
+            'searchadvdaysnew' => '',
+            'searchadvdaysold' => '',
+            'searchadvgroups' => '',
+            'searchadvcat' => '',
+            'searchadvsizefrom' => '',
+            'searchadvsizeto' => '',
+            'searchadvhasnfo' => '',
+            'searchadvhascomments' => '',
         ];
 
         foreach ($searchVars as $searchVarKey => $searchVar) {
@@ -134,11 +139,15 @@ class SearchController extends BasePageController
                 );
             }
 
+            $searchArr = [
+                'searchname' => $searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr'],
+                'name' => $searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject'],
+                'fromname' => $searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter'],
+                'filename' => $searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename'],
+            ];
+
             $rslt = $releases->search(
-                ($searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr']),
-                ($searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject']),
-                ($searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter']),
-                ($searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename']),
+                $searchArr,
                 $searchVars['searchadvgroups'],
                 $searchVars['searchadvsizefrom'],
                 $searchVars['searchadvsizeto'],

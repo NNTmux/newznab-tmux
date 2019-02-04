@@ -50,37 +50,37 @@
 							<tr>
 								<th><label for="searchadvr">Release Name:</label></th>
 								<td><input class="searchadv" id="searchadvr" name="searchadvr"
-										   value="{$searchadvr|escape:'html'}"
+										   value="{$searchadvr|escape:'htmlall'}"
 										   type="text"></td>
 							</tr>
 							<tr>
 								<th><label for="searchadvsubject">Usenet Name:</label></th>
 								<td><input class="searchadv" id="searchadvsubject" name="searchadvsubject"
-										   value="{$searchadvsubject|escape:'html'}" type="text"></td>
+										   value="{$searchadvsubject|escape:'htmlall'}" type="text"></td>
 							</tr>
 							<tr>
 								<th><label for="searchadvposter">Poster:</label></th>
 								<td><input class="searchadv" id="searchadvposter" name="searchadvposter"
-										   value="{$searchadvposter|escape:'html'}" type="text"></td>
+										   value="{$searchadvposter|escape:'htmlall'}" type="text"></td>
 							</tr>
 							<tr>
 								<th><label for="searchadvfilename">Filename:</label></th>
 								<td><input class="searchadv" id="searchadvfilename" name="searchadvfilename"
-										   value="{$searchadvfilename|escape:'html'}" type="text"/></td>
+										   value="{$searchadvfilename|escape:'htmlall'}" type="text"/></td>
 							</tr>
 							<tr>
 							<tr>
 								<th><label for="searchadvdaysnew">Min age(days):</label></th>
 								<td>
 									<input class="searchdaysinput" id="searchadvdaysnew" name="searchadvdaysnew"
-										   value="{$searchadvdaysnew|escape:'html'}" type="text">
+										   value="{$searchadvdaysnew|escape:'htmlall'}" type="text">
 								</td>
 							</tr>
 							<tr>
 								<th><label for="searchadvdaysold">Max age(days):</label></th>
 								<td>
 									<input class="searchdaysinput" id="searchadvdaysold" name="searchadvdaysold"
-										   value="{$searchadvdaysold|escape:'html'}" type="text">
+										   value="{$searchadvdaysold|escape:'htmlall'}" type="text">
 								</td>
 							</tr>
 							<tr>
