@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Group;
+use App\Models\Category;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
