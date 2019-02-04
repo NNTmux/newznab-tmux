@@ -24,7 +24,7 @@
 	</div>
 	<br>
 	<div class="well well-sm">
-		<div style="text-align: center">{$search_description}
+		<div style="text-align: center">
 			<div>
 				<br>
 				{{Form::open(['url' => 'search', 'method' => 'get'])}}

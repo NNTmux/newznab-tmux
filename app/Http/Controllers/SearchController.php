@@ -166,22 +166,6 @@ class SearchController extends BasePageController
             );
         }
 
-        $search_description =
-            'Sphinx Search Rules:<br />
-The search is case insensitive.<br />
-All words must be separated by spaces.
-Do not seperate words using . or _ or -, sphinx will match a space against those automatically.<br />
-Putting | between words makes any of those words optional.<br />
-Putting << between words makes the word on the left have to be before the word on the right.<br />
-Putting - or ! in front of a word makes that word excluded. Do not add a space between the - or ! and the word.<br />
-Quoting all the words using " will look for an exact match.<br />
-Putting ^ at the start will limit searches to releases that start with that word.<br />
-Putting $ at the end will limit searches to releases that end with that word.<br />
-Putting a * after a word will do a partial word search. ie: fish* will match fishing.<br />
-If your search is only words seperated by spaces, all those words will be mandatory, the order of the words is not important.<br />
-You can enclose words using paranthesis. ie: (^game*|^dex*)s03*(x264<&lt;nogrp$)<br />
-You can combine some of these rules, but not all.<br />';
-
         $this->smarty->assign(
             [
                 'sizelist' => [
@@ -192,7 +176,6 @@ You can combine some of these rules, but not all.<br />';
                 'sadvanced' => $searchType !== 'basic',
                 'grouplist' => Group::getGroupsForSelect(),
                 'catlist' => Category::getForSelect(),
-                'search_description' => $search_description,
             ]
         );
 
