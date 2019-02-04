@@ -2,16 +2,16 @@
 
 namespace Blacklight;
 
+use App\Models\Category;
 use App\Models\Group;
 use App\Models\Release;
-use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\utility\Utility;
 use Chumper\Zipper\Zipper;
 use Illuminate\Support\Arr;
-use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Releases.
@@ -1245,7 +1245,7 @@ class Releases
             $catRow = Category::find($currRow['categories_id']);
             $parentCat = $catRow['parentid'];
 
-            $results = $this->search(getSimilarName($name), -1, -1, -1, -1, '', '', 0, 0, -1, -1, 0, '', '', -1, $excludedCats, [$parentCat]);
+            $results = $this->search(getSimilarName($name), -1, -1, -1, -1, '', '', -1, -1, 0, '', '', -1, $excludedCats, [$parentCat]);
             if (! $results) {
                 return $results;
             }
