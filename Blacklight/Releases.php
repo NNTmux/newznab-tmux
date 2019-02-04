@@ -1232,7 +1232,7 @@ class Releases
             $catRow = Category::find($currRow['categories_id']);
             $parentCat = $catRow['parentid'];
 
-            $results = $this->search(getSimilarName($name), -1, -1, -1, -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
+            $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
             if (! $results) {
                 return $results;
             }
