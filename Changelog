@@ -1,4 +1,5 @@
 2019-02-04 DariusIII
+	* Chg: Remove nfo and comments options from search function (searching for releases that are commented or have nfo)
 	* Chg: Remove SphinxSearch rules description as those do not apply anymore (not using raw queries but SphinxQL query builder)
 	* Chg: Update spatie/laravel-permission (2.30.0 => 2.31.0)
 	* Chg: Update sebastian/diff (3.0.1 => 3.0.2)

@@ -581,8 +581,6 @@ class Releases
      * @param              $groupName
      * @param              $sizeFrom
      * @param              $sizeTo
-     * @param              $hasNfo
-     * @param              $hasComments
      * @param              $daysNew
      * @param              $daysOld
      * @param int $offset
@@ -597,7 +595,7 @@ class Releases
      *
      * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
+    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
         $sizeRange = [
             1 => 1,
@@ -645,7 +643,7 @@ class Releases
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s %s',
+            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
@@ -653,8 +651,6 @@ class Releases
             ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
             (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
-            ((int) $hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
-            ((int) $hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
             $catQuery,
             ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
             ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),

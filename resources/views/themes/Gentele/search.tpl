@@ -99,16 +99,9 @@
 								</td>
 							</tr>
 							<tr>
-								<th><label for="searchadvhasnfo">NFO/Comments:</label></th>
 								<td>
-									<input type="hidden" name="searchadvhasnfo" value="0">
-									<input type="checkbox" name="searchadvhasnfo" value="1">
-									<input type="hidden" name="searchadvhascomments" value="0">
-									<input type="checkbox" name="searchadvhascomments" value="1">
-									<div style="float:right;"><input type="hidden" name="search_type" value="adv"
-																	 id="search_type">
-										<input id="search_adv_button" class="btn btn-success" type="submit"
-											   value="Search">
+									<div style="float:right;"><input type="hidden" name="search_type" value="adv" id="search_type">
+										<input id="search_adv_button" class="btn btn-success" type="submit" value="Search">
 									</div>
 								</td>
 							</tr>
