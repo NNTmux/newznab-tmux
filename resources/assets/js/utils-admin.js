@@ -718,7 +718,7 @@ function enableFixCrapCustom() {
 /** ****** tinyMCE ***************************/
 tinyMCE.init({
     selector: 'textarea#body',
-    theme: 'modern',
+    theme: 'silver',
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
         'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
@@ -737,7 +737,7 @@ tinyMCE.init({
 
 tinyMCE.init({
     selector: 'textarea#metadescription',
-    theme: 'modern',
+    theme: 'silver',
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
         'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
@@ -756,7 +756,7 @@ tinyMCE.init({
 
 tinyMCE.init({
     selector: 'textarea#metakeywords',
-    theme: 'modern',
+    theme: 'silver',
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
         'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',

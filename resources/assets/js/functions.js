@@ -1358,7 +1358,7 @@ $(function() {
 /** ****** tinyMCE ************************* **/
 tinyMCE.init({
     selector: 'textarea#addMessage',
-    theme: 'Silver',
+    theme: 'silver',
     plugins: [
         'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
         'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
