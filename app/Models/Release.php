@@ -542,8 +542,8 @@ class Release extends Model
      * Retrieve alternate release with same or similar searchname.
      *
      *
-     * @param $guid
-     * @param $userid
+     * @param string $guid
+     * @param int $userid
      * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public static function getAlternate($guid, $userid)
@@ -555,13 +555,16 @@ class Release extends Model
         }
         DnzbFailure::insertIgnore(['release_id' => $rel['id'], 'users_id' => $userid, 'failed' => 1]);
 
+        preg_match('/(^\w+[-_. ].+?\.(\d+p)).+/i', $rel['searchname'], $similar);
+
         $alternate = self::query()
             ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
-            ->where('searchname', 'like', $rel['searchname'])
+            ->where('releases.searchname', 'like', $rel['searchname'])
+            ->orWhere('releases.searchname', 'like', $similar[1].'%')
             ->where('df.release_id', '=', null)
-            ->where('categories_id', $rel['categories_id'])
-            ->where('id', $rel['id'])
-            ->orderBy('postdate', 'desc')
+            ->where('releases.categories_id', $rel['categories_id'])
+            ->where('id', '<>', $rel['id'])
+            ->orderBy('releases.postdate', 'desc')
             ->first(['guid']);
 
         return $alternate;
