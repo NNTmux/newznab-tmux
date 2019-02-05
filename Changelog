@@ -1,4 +1,6 @@
 2019-02-05 DariusIII
+	* Chg: Update laravel/framework (v5.7.24 => v5.7.25)
+	* Chg: Update barryvdh/laravel-debugbar (v3.2.1 => v3.2.2)
 	* Chg: Improve getAlternate function
 	* Fix: Change TinyMCE theme to Silver (modern has been removed from TinyMCE 5)
 	* Chg: Update TinyMCE to version 5.0.0
