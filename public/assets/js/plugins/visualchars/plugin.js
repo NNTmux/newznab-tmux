@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) Tiny Technologies, Inc. All rights reserved.
+ * Licensed under the LGPL or a commercial license.
+ * For LGPL see License.txt in the project root for license information.
+ * For commercial licenses see https://www.tiny.cloud/
+ *
+ * Version: 5.0.0-1 (2019-02-04)
+ */
 (function () {
 var visualchars = (function () {
     'use strict';
@@ -427,35 +435,40 @@ var visualchars = (function () {
     };
     var Bindings = { setup: setup$1 };
 
-    var toggleActiveState = function (editor) {
-      return function (e) {
-        var ctrl = e.control;
-        editor.on('VisualChars', function (e) {
-          ctrl.active(e.state);
-        });
+    var toggleActiveState = function (editor, enabledStated) {
+      return function (api) {
+        api.setActive(enabledStated.get());
+        var editorEventCallback = function (e) {
+          return api.setActive(e.state);
+        };
+        editor.on('VisualChars', editorEventCallback);
+        return function () {
+          return editor.off('VisualChars', editorEventCallback);
+        };
       };
     };
-    var register$1 = function (editor) {
-      editor.addButton('visualchars', {
-        active: false,
-        title: 'Show invisible characters',
-        cmd: 'mceVisualChars',
-        onPostRender: toggleActiveState(editor)
+    var register$1 = function (editor, toggleState) {
+      editor.ui.registry.addToggleButton('visualchars', {
+        tooltip: 'Show invisible characters',
+        icon: 'paragraph',
+        onAction: function () {
+          return editor.execCommand('mceVisualChars');
+        },
+        onSetup: toggleActiveState(editor, toggleState)
       });
-      editor.addMenuItem('visualchars', {
+      editor.ui.registry.addToggleMenuItem('visualchars', {
         text: 'Show invisible characters',
-        cmd: 'mceVisualChars',
-        onPostRender: toggleActiveState(editor),
-        selectable: true,
-        context: 'view',
-        prependToContext: true
+        onAction: function () {
+          return editor.execCommand('mceVisualChars');
+        },
+        onSetup: toggleActiveState(editor, toggleState)
       });
     };
 
     global.add('visualchars', function (editor) {
       var toggleState = Cell(false);
       Commands.register(editor, toggleState);
-      register$1(editor);
+      register$1(editor, toggleState);
       Keyboard.setup(editor, toggleState);
       Bindings.setup(editor, toggleState);
       return Api.get(toggleState);
