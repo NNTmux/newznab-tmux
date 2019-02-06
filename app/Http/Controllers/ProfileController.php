@@ -305,7 +305,7 @@ class ProfileController extends BasePageController
 
         $this->smarty->assign('sabsetting_ids', [1, 2]);
         $this->smarty->assign('sabsetting_names', ['Site', 'Cookie']);
-        $this->smarty->assign('sabsetting_selected', ($sab->checkCookie() === true ? 2 : 1));
+        $this->smarty->assign('sabsetting_selected', ($sab->checkCookie() ? 2 : 1));
 
         switch ($sab->integrated) {
             case SABnzbd::INTEGRATION_TYPE_USER:
@@ -352,10 +352,10 @@ class ProfileController extends BasePageController
         $this->setPrefs();
         $userId = $request->input('id');
 
-        if ($userId !== null && (int) $userId === $this->userdata->id && $this->userdata->hasRole('Admin') === false) {
+        if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {
             $user = User::find($userId);
             SendAccountDeletedEmail::dispatch($user);
-            User::deleteUser($user->id);
+            $user->delete();
 
             return redirect('login');
         }

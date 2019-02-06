@@ -1,4 +1,5 @@
 2019-02-06 DariusIII
+	* Chg: Update ProfileController
 	* Chg: Fix errors in email sending Jobs
 	* Chg: Update Mail and Jobs to use user directly
 	* Chg: Update User model
