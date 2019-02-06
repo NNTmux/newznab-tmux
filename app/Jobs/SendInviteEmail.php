@@ -3,12 +3,13 @@
 namespace App\Jobs;
 
 use App\Mail\SendInvite;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendInviteEmail implements ShouldQueue
 {
@@ -21,16 +22,21 @@ class SendInviteEmail implements ShouldQueue
     private $url;
 
     /**
-     * Create a new job instance.
+     * @var \App\Models\User
+     */
+    private $user;
+
+    /**
+     * SendInviteEmail constructor.
      *
      * @param $email
-     * @param $userId
+     * @param $user
      * @param $url
      */
-    public function __construct($email, $userId, $url)
+    public function __construct($email, $user, $url)
     {
         $this->email = $email;
-        $this->userId = $userId;
+        $this->user = $user;
         $this->url = $url;
     }
 
@@ -41,6 +47,6 @@ class SendInviteEmail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->email)->send(new SendInvite($this->userId, $this->url));
+        Mail::to($this->email)->send(new SendInvite($this->user, $this->url));
     }
 }

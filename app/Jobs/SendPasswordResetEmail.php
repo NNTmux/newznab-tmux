@@ -36,7 +36,7 @@ class SendPasswordResetEmail implements ShouldQueue
      * @param \App\Models\User $user
      * @param string $newPass
      */
-    public function __construct(User $user, $newPass)
+    public function __construct($user, $newPass)
     {
         $this->email = $user->email;
         $this->userId = $user->id;

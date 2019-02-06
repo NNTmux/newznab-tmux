@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use App\Models\Invitation;
 use Illuminate\Http\Request;
@@ -227,7 +228,11 @@ class UserController extends BasePageController
     public function destroy(Request $request)
     {
         if ($request->has('id')) {
-            User::deleteUser($request->input('id'));
+            $user = User::find($request->input('id'));
+
+            SendAccountDeletedEmail::dispatch($user);
+
+            $user->delete();
 
             return redirect('admin/user-list');
         }

@@ -17,11 +17,11 @@ class AccountExpired extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param $userId
+     * @param $user
      */
-    public function __construct($userId)
+    public function __construct($user)
     {
-        $this->user = User::find($userId);
+        $this->user = $user;
     }
 
     /**

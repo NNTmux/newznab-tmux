@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -12,19 +12,25 @@ class SendInvite extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * @var \App\Models\User
+     */
     public $user;
 
+    /**
+     * @var string
+     */
     public $invite;
 
     /**
-     * Create a new message instance.
+     * SendInvite constructor.
      *
-     * @param $userId
-     * @param $invite
+     * @param \App\Models\User $user
+     * @param                  $invite
      */
-    public function __construct($userId, $invite)
+    public function __construct($user, $invite)
     {
-        $this->user = User::find($userId);
+        $this->user = $user;
         $this->invite = $invite;
     }
 

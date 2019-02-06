@@ -2,32 +2,32 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use App\Mail\AccountExpired;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendAccountExpiredEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $email;
-
-    private $userId;
+    /**
+     * @var \App\Models\User
+     */
+    private $user;
 
     /**
      * Create a new job instance.
      *
      * @param \App\Models\User $user
      */
-    public function __construct(User $user)
+    public function __construct($user)
     {
-        $this->email = $user->email;
-        $this->userId = $user->id;
+        $this->user = $user;
     }
 
     /**
@@ -37,6 +37,6 @@ class SendAccountExpiredEmail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->email)->send(new AccountExpired($this->userId));
+        Mail::to($this->user->email)->send(new AccountExpired($this->user));
     }
 }

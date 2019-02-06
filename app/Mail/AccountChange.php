@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -12,16 +12,19 @@ class AccountChange extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * @var \App\Models\User
+     */
     public $user;
 
     /**
-     * Create a new message instance.
+     * AccountChange constructor.
      *
-     * @param $userId
+     * @param \App\Models\User $user
      */
-    public function __construct($userId)
+    public function __construct($user)
     {
-        $this->user = User::find($userId);
+        $this->user = $user;
     }
 
     /**

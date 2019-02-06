@@ -25,7 +25,7 @@ class SendPasswordForgottenEmail implements ShouldQueue
      * @param \App\Models\User $user
      * @param $resetLink
      */
-    public function __construct(User $user, $resetLink)
+    public function __construct($user, $resetLink)
     {
         $this->email = $user->email;
         $this->resetLink = $resetLink;
