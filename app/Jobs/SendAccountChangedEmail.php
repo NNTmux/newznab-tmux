@@ -16,16 +16,6 @@ class SendAccountChangedEmail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var string
-     */
-    private $email;
-
-    /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var \App\Models\User
      */
     private $user;
@@ -38,7 +28,6 @@ class SendAccountChangedEmail implements ShouldQueue
     public function __construct($user)
     {
         $this->user = $user;
-        $this->email = $user->email;
     }
 
     /**
@@ -48,6 +37,6 @@ class SendAccountChangedEmail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->email)->send(new AccountChange($this->user));
+        Mail::to($this->user->email)->send(new AccountChange($this->user));
     }
 }
