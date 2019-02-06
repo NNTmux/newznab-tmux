@@ -1,3 +1,5 @@
+2019-02-06 DariusIII
+	* Chg: Update User model
 2019-02-05 DariusIII
 	* Chg: Update laravel/framework (v5.7.24 => v5.7.25)
 	* Chg: Update barryvdh/laravel-debugbar (v3.2.1 => v3.2.2)
