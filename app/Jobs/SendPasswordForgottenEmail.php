@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use App\Mail\ForgottenPassword;
 use Illuminate\Support\Facades\Mail;
