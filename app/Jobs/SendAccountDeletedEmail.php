@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use App\Models\Settings;
 use App\Mail\AccountDeleted;
 use Illuminate\Bus\Queueable;
