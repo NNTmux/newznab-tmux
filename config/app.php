@@ -166,6 +166,7 @@ return [
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         Orangehill\Iseed\IseedServiceProvider::class,
         Messerli90\IGDB\IGDBServiceProvider::class,
+        App\Providers\UserServiceProvider::class,
 
     ],
 

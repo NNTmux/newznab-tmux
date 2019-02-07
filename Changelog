@@ -1,4 +1,5 @@
 2019-02-07 DariusIII
+	* Chg: Add UserServiceObserver and move account verification to it
 	* Chg: Update package.json with new version of Vue (2.6.2)
 2019-02-06 DariusIII
 	* Chg: Updated pear/console_getopt (v1.4.1 => v1.4.2)
