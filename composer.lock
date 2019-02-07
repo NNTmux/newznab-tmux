@@ -2084,16 +2084,16 @@
         },
         {
             "name": "james-heinrich/getid3",
-            "version": "v1.9.16",
+            "version": "v1.9.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JamesHeinrich/getID3.git",
-                "reference": "7aec0d4f5fc156612f71e415d07996aee6ab8d82"
+                "reference": "d2e45f2c4f75cc7443e158757ad2d678e318685d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/7aec0d4f5fc156612f71e415d07996aee6ab8d82",
-                "reference": "7aec0d4f5fc156612f71e415d07996aee6ab8d82",
+                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/d2e45f2c4f75cc7443e158757ad2d678e318685d",
+                "reference": "d2e45f2c4f75cc7443e158757ad2d678e318685d",
                 "shasum": ""
             },
             "require": {
@@ -2143,7 +2143,7 @@
                 "php",
                 "tags"
             ],
-            "time": "2018-10-17T17:19:36+00:00"
+            "time": "2019-02-07T17:30:03+00:00"
         },
         {
             "name": "jenssegers/model",
@@ -3734,16 +3734,16 @@
         },
         {
             "name": "nexmo/client",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Nexmo/nexmo-php.git",
-                "reference": "3dc03ca1dab726a23b757110897740e54304fc65"
+                "reference": "2f79f67f24225ea627ee14578e98c96276cdd4c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Nexmo/nexmo-php/zipball/3dc03ca1dab726a23b757110897740e54304fc65",
-                "reference": "3dc03ca1dab726a23b757110897740e54304fc65",
+                "url": "https://api.github.com/repos/Nexmo/nexmo-php/zipball/2f79f67f24225ea627ee14578e98c96276cdd4c5",
+                "reference": "2f79f67f24225ea627ee14578e98c96276cdd4c5",
                 "shasum": ""
             },
             "require": {
@@ -3778,7 +3778,7 @@
                 }
             ],
             "description": "PHP Client for using Nexmo's API.",
-            "time": "2019-01-02T09:06:47+00:00"
+            "time": "2019-02-07T11:14:34+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -4155,16 +4155,16 @@
         },
         {
             "name": "pear/pear",
-            "version": "v1.10.7",
+            "version": "v1.10.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core.git",
-                "reference": "334c2323ac35849c44534e2ba5b85c3ca5146ab0"
+                "reference": "f287dd85d11d7336489d7d742c6452922f39340f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core/zipball/334c2323ac35849c44534e2ba5b85c3ca5146ab0",
-                "reference": "334c2323ac35849c44534e2ba5b85c3ca5146ab0",
+                "url": "https://api.github.com/repos/pear/pear-core/zipball/f287dd85d11d7336489d7d742c6452922f39340f",
+                "reference": "f287dd85d11d7336489d7d742c6452922f39340f",
                 "shasum": ""
             },
             "require": {
@@ -4246,7 +4246,7 @@
                 }
             ],
             "description": "This is the definitive source of PEAR's core files.",
-            "time": "2018-12-05T19:51:15+00:00"
+            "time": "2019-02-07T18:59:54+00:00"
         },
         {
             "name": "pear/structures_graph",
@@ -5542,16 +5542,16 @@
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
-            "version": "v0.4.1",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtheunissen/guzzle-log-middleware.git",
-                "reference": "202f474456e5b4a62c09a91054b3942cab48ad74"
+                "reference": "6a15b7f71c6fc3f8456abeed530b2f12846f075f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtheunissen/guzzle-log-middleware/zipball/202f474456e5b4a62c09a91054b3942cab48ad74",
-                "reference": "202f474456e5b4a62c09a91054b3942cab48ad74",
+                "url": "https://api.github.com/repos/rtheunissen/guzzle-log-middleware/zipball/6a15b7f71c6fc3f8456abeed530b2f12846f075f",
+                "reference": "6a15b7f71c6fc3f8456abeed530b2f12846f075f",
                 "shasum": ""
             },
             "require": {
@@ -5590,7 +5590,7 @@
                 "middleware",
                 "psr7"
             ],
-            "time": "2017-11-06T19:17:52+00:00"
+            "time": "2019-02-07T18:58:23+00:00"
         },
         {
             "name": "seld/cli-prompt",
@@ -11035,16 +11035,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.3",
+            "version": "7.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "2cb759721e53bc05f56487f628c6b9fbb6c18746"
+                "reference": "2896657da5fb237bc316bdfc18c2650efeee0dc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2cb759721e53bc05f56487f628c6b9fbb6c18746",
-                "reference": "2cb759721e53bc05f56487f628c6b9fbb6c18746",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2896657da5fb237bc316bdfc18c2650efeee0dc0",
+                "reference": "2896657da5fb237bc316bdfc18c2650efeee0dc0",
                 "shasum": ""
             },
             "require": {
@@ -11115,7 +11115,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-01T05:24:07+00:00"
+            "time": "2019-02-07T14:15:04+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
