@@ -44,12 +44,12 @@ class FanartTV
      *
      * @return array|false
      */
-    public function getMovieFanart($id)
+    public function getMovieFanArt($id)
     {
         if ($this->apiKey !== '') {
-            $fanart = $this->_getUrl('movies/'.$id);
-            if (! empty($fanart)) {
-                return $fanart;
+            $fanArt = $this->_getUrl('movies/'.$id);
+            if (! empty($fanArt) && $fanArt['status'] !== 'error') {
+                return $fanArt;
             }
 
             return false;
@@ -67,9 +67,9 @@ class FanartTV
     public function getTVFanart($id)
     {
         if ($this->apiKey !== '') {
-            $fanart = $this->_getUrl('tv/'.$id);
-            if (! empty($fanart)) {
-                return $fanart;
+            $fanArt = $this->_getUrl('tv/'.$id);
+            if (! empty($fanArt) && $fanArt['status'] !== 'error') {
+                return $fanArt;
             }
 
             return false;

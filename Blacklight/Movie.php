@@ -744,7 +744,7 @@ class Movie
     protected function fetchFanartTVProperties($imdbId)
     {
         if ($this->fanartapikey !== null) {
-            $art = $this->fanart->getMovieFanart('tt'.$imdbId);
+            $art = $this->fanart->getMovieFanArt('tt'.$imdbId);
 
             if (! empty($art)) {
                 if (isset($art['status']) && $art['status'] === 'error') {
