@@ -7,7 +7,6 @@ use App\Models\Invitation;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Jobs\SendAccountChangedEmail;
-use App\Jobs\SendAccountDeletedEmail;
 use App\Http\Controllers\BasePageController;
 
 class UserController extends BasePageController
