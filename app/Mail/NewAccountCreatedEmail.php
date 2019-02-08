@@ -3,11 +3,9 @@
 namespace App\Mail;
 
 use App\Models\Settings;
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class NewAccountCreatedEmail extends Mailable
 {
