@@ -1,3 +1,5 @@
+2019-02-08 DariusIII
+	* Chg: Comment out missed dict definition in sphinx.conf (resolves issue #878)
 2019-02-07 DariusIII
 	* Chg: Update used libraries
 	* Chg: Update Blacklight\processing\post\AniDB class
