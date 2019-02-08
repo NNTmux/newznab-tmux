@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendNewRegisteredAccountMail;
+use App\Jobs\SendWelcomeEmail;
 use App\Models\User;
 use Jrean\UserVerification\Facades\UserVerification;
 
@@ -17,6 +19,8 @@ class UserServiceObserver
      */
     public function created(User $user)
     {
+        SendNewRegisteredAccountMail::dispatch($user);
+        SendWelcomeEmail::dispatch($user);
         UserVerification::generate($user);
 
         UserVerification::send($user, 'User email verification required');
