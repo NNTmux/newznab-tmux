@@ -230,8 +230,6 @@ class UserController extends BasePageController
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
 
-            SendAccountDeletedEmail::dispatch($user);
-
             $user->delete();
 
             return redirect('admin/user-list');

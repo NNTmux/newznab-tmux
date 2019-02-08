@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use App\Jobs\SendWelcomeEmail;
 use App\Jobs\SendNewRegisteredAccountMail;
@@ -24,5 +25,13 @@ class UserServiceObserver
         UserVerification::generate($user);
 
         UserVerification::send($user, 'User email verification required');
+    }
+
+    /**
+     * @param \App\Models\User $user
+     */
+    public function deleting(User $user)
+    {
+        SendAccountDeletedEmail::dispatch($user);
     }
 }

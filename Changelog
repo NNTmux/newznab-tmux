@@ -1,4 +1,5 @@
 2019-02-08 DariusIII
+	* Chg: Move account deletion emails sending to user observer
 	* Chg: Add email notifications for new registered user on site, send welcome email to new users
 	* Chg: Comment out missed dict definition in sphinx.conf (resolves issue #878)
 2019-02-07 DariusIII
