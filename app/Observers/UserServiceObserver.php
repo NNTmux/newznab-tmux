@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
-use App\Jobs\SendAccountDeletedEmail;
 use App\Models\User;
 use App\Jobs\SendWelcomeEmail;
+use App\Jobs\SendAccountDeletedEmail;
 use App\Jobs\SendNewRegisteredAccountMail;
 use Jrean\UserVerification\Facades\UserVerification;
 
