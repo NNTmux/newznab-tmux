@@ -872,7 +872,7 @@ class Releases
             $this->showPasswords(),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            ((! empty($name) && ! empty($searchResult))? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            ((! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
@@ -916,7 +916,7 @@ class Releases
             return $releases;
         }
         ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = Release::fromQuery($sql) : [];
-        if (!empty($releases) && $releases->isNotEmpty()) {
+        if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
