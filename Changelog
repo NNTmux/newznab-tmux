@@ -1,4 +1,6 @@
 2019-02-12 DariusIII
+	* Chg: Update laravel/framework (v5.7.25 => v5.7.26)
+	* Chg: Update phpstan/phpstan (0.11.1 => 0.11.2)
 	* Fix: Fix reset_postprocessing script to reset only requested categories and not all releases because of wrong query setup
 	* Chg: Update Bootstrap to version 4.3.0
 2019-02-11 DariusIII
