@@ -38,7 +38,7 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
     $total = \count($qry);
     foreach ($qry as $releases) {
         DB::update(
-                sprintf(
+            sprintf(
                     '
 						UPDATE releases
 						SET consoleinfo_id = NULL, gamesinfo_id = 0, imdbid = NULL, musicinfo_id = NULL,
@@ -58,7 +58,7 @@ if (isset($argv[1]) && ($argv[1] === 'consoles' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Console postprocessing');
-        $where = ' WHERE consoleinfo_id IS NOT NULL';
+        $where = ' WHERE consoleinfo_id IS NOT NULL AND categories_id BETWEEN '.Category::GAME_ROOT.' AND '.Category::GAME_OTHER;
     } else {
         $colorCli->header('Resetting all failed Console postprocessing');
         $where = ' WHERE consoleinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::GAME_ROOT.' AND '.Category::GAME_OTHER;
@@ -84,7 +84,7 @@ if (isset($argv[1]) && ($argv[1] === 'games' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Games postprocessing');
-        $where = ' WHERE gamesinfo_id != 0';
+        $where = ' WHERE gamesinfo_id != 0 AND categories_id = 4050';
     } else {
         $colorCli->header('Resetting all failed Games postprocessing');
         $where = ' WHERE gamesinfo_id IN (-2, 0) AND categories_id = 4050';
@@ -111,7 +111,7 @@ if (isset($argv[1]) && ($argv[1] === 'movies' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Movie postprocessing');
-        $where = ' WHERE imdbid IS NOT NULL';
+        $where = ' WHERE imdbid IS NOT NULL AND categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER;
     } else {
         $colorCli->header('Resetting all failed Movie postprocessing');
         $where = ' WHERE imdbid IN (-2, 0) AND categories_id BETWEEN '.Category::MOVIE_ROOT.' AND '.Category::MOVIE_OTHER;
@@ -137,7 +137,7 @@ if (isset($argv[1]) && ($argv[1] === 'music' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Music postprocessing');
-        $where = ' WHERE musicinfo_id IS NOT NULL';
+        $where = ' WHERE musicinfo_id IS NOT NULL AND categories_id BETWEEN '.Category::MUSIC_ROOT.' AND '.Category::MUSIC_OTHER;
     } else {
         $colorCli->header('Resetting all failed Music postprocessing');
         $where = ' WHERE musicinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::MUSIC_ROOT.' AND '.Category::MUSIC_OTHER;
@@ -156,13 +156,13 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Additional postprocessing');
-        $where = ' WHERE (haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0 OR videostatus != 0 OR audiostatus != 0';
+        $where = ' (WHERE (haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0 OR videostatus != 0 OR audiostatus != 0)';
     } else {
         $colorCli->header('Resetting all failed Additional postprocessing');
-        $where = ' WHERE haspreview < -1 OR haspreview = 0 OR passwordstatus < -1 OR passwordstatus = 0 OR jpgstatus < 0 OR videostatus < 0 OR audiostatus < 0';
+        $where = ' WHERE ((haspreview < -1 OR haspreview = 0) OR (passwordstatus < -1 OR passwordstatus = 0) OR jpgstatus < 0 OR videostatus < 0 OR audiostatus < 0)';
     }
 
-    $where .= ' AND categories_id < 1000';
+    $where .= ' AND categories_id IN (10, 20)';
 
     $colorCli->primary('SELECT id FROM releases'.$where);
     $qry = DB::select('SELECT id FROM releases'.$where);
@@ -214,7 +214,7 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Anime postprocessing');
-        $where = ' WHERE categories_id = 5070';
+        $where = ' WHERE categories_id = '.Category::TV_ANIME;
     } else {
         $colorCli->header('Resetting all failed Anime postprocessing');
         $where = ' WHERE anidbid BETWEEN -2 AND -1 AND categories_id = '.Category::TV_ANIME;
@@ -240,7 +240,7 @@ if (isset($argv[1]) && ($argv[1] === 'books' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Book postprocessing');
-        $where = ' WHERE bookinfo_id IS NOT NULL';
+        $where = ' WHERE bookinfo_id IS NOT NULL AND categories_id BETWEEN '.Category::BOOKS_ROOT.' AND '.Category::BOOKS_UNKNOWN;
     } else {
         $colorCli->header('Resetting all failed Book postprocessing');
         $where = ' WHERE bookinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::BOOKS_ROOT.' AND '.Category::BOOKS_UNKNOWN;
@@ -262,7 +262,7 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all XXX postprocessing');
-        $where = ' WHERE xxxinfo_id != 0';
+        $where = ' WHERE xxxinfo_id != 0 AND categories_id BETWEEN '.Category::XXX_ROOT.' AND '.Category::XXX_X264;
     } else {
         $colorCli->header('Resetting all failed XXX postprocessing');
         $where = ' WHERE xxxinfo_id IN (-2, 0) AND categories_id BETWEEN '.Category::XXX_ROOT.' AND '.Category::XXX_X264;
@@ -274,8 +274,8 @@ if (isset($argv[1]) && ($argv[1] === 'xxx' || $argv[1] === 'all')) {
     foreach ($qry as $releases) {
         DB::update('UPDATE releases SET xxxinfo_id = 0 WHERE id = '.$releases->id);
         $consoletools->overWritePrimary('Resetting XXX Releases:  '.$consoletools->percentString(
-                ++$concount,
-                    $total
+            ++$concount,
+            $total
             ));
     }
     $colorCli->header(PHP_EOL.number_format($concount).' xxxinfo_IDs reset.');
@@ -305,7 +305,7 @@ if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
 
 if ($ran === false) {
     $colorCli->error(
-            '\nThis script will reset postprocessing per category. It can also truncate the associated tables.'
+        '\nThis script will reset postprocessing per category. It can also truncate the associated tables.'
             .'\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the '
             .'second argument false.\n'
             .'To reset even those previously post processed, use the second argument true.'.PHP_EOL
