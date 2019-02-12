@@ -156,13 +156,13 @@ if (isset($argv[1]) && ($argv[1] === 'misc' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Additional postprocessing');
-        $where = ' (WHERE (haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0 OR videostatus != 0 OR audiostatus != 0)';
+        $where = ' WHERE ((haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0 OR videostatus != 0 OR audiostatus != 0)';
     } else {
         $colorCli->header('Resetting all failed Additional postprocessing');
         $where = ' WHERE ((haspreview < -1 OR haspreview = 0) OR (passwordstatus < -1 OR passwordstatus = 0) OR jpgstatus < 0 OR videostatus < 0 OR audiostatus < 0)';
     }
 
-    $where .= ' AND categories_id IN (10, 20)';
+    $where .= ' AND categories_id IN ('.Category::OTHER_MISC.','.Category::OTHER_HASHED.')';
 
     $colorCli->primary('SELECT id FROM releases'.$where);
     $qry = DB::select('SELECT id FROM releases'.$where);
