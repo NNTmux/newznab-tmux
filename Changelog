@@ -1,3 +1,5 @@
+2019-02-12 DariusIII
+	* Chg: Update Bootstrap to version 4.3.0
 2019-02-11 DariusIII
 	* Chg: Update composer/composer (1.8.3 => 1.8.4)
 	* Fix: Fix search returned values when search has no actual results (returning 125k unrelated releases)
