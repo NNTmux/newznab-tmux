@@ -303,7 +303,7 @@ class NZB
 
         $nzbPath = $this->siteNzbPath.$nzbPath;
 
-        if ($createIfNotExist === true && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) {
+        if ($createIfNotExist && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
         }
 

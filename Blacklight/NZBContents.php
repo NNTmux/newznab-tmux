@@ -81,7 +81,7 @@ class NZBContents
         $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput]));
         $this->nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo());
         $this->pp = (
-        $options['PostProcess'] instanceof PostProcess
+            $options['PostProcess'] instanceof PostProcess
             ? $options['PostProcess']
             : new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo])
         );
@@ -216,10 +216,6 @@ class NZBContents
         // Fetch the NZB location using the GUID.
         $nzbPath = $this->nzb->NZBPath($guid);
         if ($nzbPath === false) {
-            if ($this->echooutput) {
-                echo PHP_EOL.$guid.' appears to be missing the nzb file, skipping.'.PHP_EOL;
-            }
-
             return false;
         }
         $nzbContents = Utility::unzipGzipFile($nzbPath);
