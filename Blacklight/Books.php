@@ -12,14 +12,14 @@ use ApaiIO\Operations\Search;
 use DariusIII\ItunesApi\iTunes;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Exception\ServerException;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class Books.
