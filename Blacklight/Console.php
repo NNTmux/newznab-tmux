@@ -13,6 +13,7 @@ use ApaiIO\Operations\Search;
 use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\Log;
 use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;

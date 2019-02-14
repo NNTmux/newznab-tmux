@@ -19,6 +19,7 @@ use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Books.
