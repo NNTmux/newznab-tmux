@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a43c70acd5f31a6d16c63775f287dd7",
+    "content-hash": "6c5ba3ec5323dce038a08537894d4553",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1332,60 +1332,6 @@
                 "event-emitter"
             ],
             "time": "2017-07-17T17:39:19+00:00"
-        },
-        {
-            "name": "exeu/apai-io",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Exeu/apai-io.git",
-                "reference": "ba5bb754f59f744e927a3bdf4b339fa2a0afb44f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Exeu/apai-io/zipball/ba5bb754f59f744e927a3bdf4b339fa2a0afb44f",
-                "reference": "ba5bb754f59f744e927a3bdf4b339fa2a0afb44f",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "~6.0",
-                "php": ">=5.6.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ApaiIO\\": "src/ApaiIO"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Eichhorn",
-                    "email": "exeu65@googlemail.com",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Dejan Spasic",
-                    "email": "dejan.spasic@bitweise.biz",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Amazon Product Advertising PHP Library",
-            "homepage": "https://github.com/Exeu/apai-io",
-            "keywords": [
-                "ECS",
-                "Product Advertising",
-                "amazon",
-                "products",
-                "rest"
-            ],
-            "time": "2018-02-12T10:44:56+00:00"
         },
         {
             "name": "fideloper/proxy",

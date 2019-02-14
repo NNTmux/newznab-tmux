@@ -2,22 +2,13 @@
 
 namespace Blacklight;
 
-use ApaiIO\ApaiIO;
-use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Settings;
-use ApaiIO\Operations\Search;
 use DariusIII\ItunesApi\iTunes;
-use ApaiIO\Configuration\Country;
-use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
-use GuzzleHttp\Exception\ServerException;
-use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
 
@@ -329,119 +320,6 @@ class Books
     }
 
     /**
-     * @param $title
-     *
-     * @return false|mixed,
-     */
-    public function fetchAmazonBookProperties($title)
-    {
-        $conf = new GenericConfiguration();
-        $client = new Client();
-        $request = new GuzzleRequest($client);
-
-        $book = [];
-
-        try {
-            $conf
-                ->setCountry(Country::INTERNATIONAL)
-                ->setAccessKey($this->pubkey)
-                ->setSecretKey($this->privkey)
-                ->setAssociateTag($this->asstag)
-                ->setRequest($request)
-                ->setResponseTransformer(new XmlToSimpleXmlObject());
-        } catch (\Throwable $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-        } catch (ServerException $e) {
-            if (config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-        }
-
-        $search = new Search();
-        $search->setCategory('Books');
-        $search->setKeywords($title);
-        $search->setResponseGroup(['Large']);
-
-        $response = (new ApaiIO($conf))->runOperation($search);
-        if ($response === false) {
-            throw new \RuntimeException('Could not connect to Amazon');
-        }
-
-        if (isset($response->Items->Item->ItemAttributes->Title)) {
-            $this->colorCli->info('Found matching title: '.$response->Items->Item->ItemAttributes->Title);
-
-            $book['title'] = (string) $response->Items->Item->ItemAttributes->Title;
-            $book['author'] = (string) $response->Items->Item->ItemAttributes->Author;
-            $book['asin'] = (string) $response->Items->Item->ASIN;
-            $book['isbn'] = (string) $response->Items->Item->ItemAttributes->ISBN;
-            if ($book['isbn'] === '') {
-                $book['isbn'] = 'null';
-            }
-
-            $book['ean'] = (string) $response->Items->Item->ItemAttributes->EAN;
-            if ($book['ean'] === '') {
-                $book['ean'] = 'null';
-            }
-
-            $book['url'] = (string) $response->Items->Item->DetailPageURL;
-            $book['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $book['url']);
-
-            $book['salesrank'] = (string) $response->Items->Item->SalesRank;
-            if ($book['salesrank'] === '') {
-                $book['salesrank'] = 'null';
-            }
-
-            $book['publisher'] = (string) $response->Items->Item->ItemAttributes->Publisher;
-            if ($book['publisher'] === '') {
-                $book['publisher'] = 'null';
-            }
-
-            $book['publishdate'] = date('Y-m-d', strtotime((string) $response->Items->Item->ItemAttributes->PublicationDate));
-            if ($book['publishdate'] === '') {
-                $book['publishdate'] = 'null';
-            }
-
-            $book['pages'] = (string) $response->Items->Item->ItemAttributes->NumberOfPages;
-            if ($book['pages'] === '') {
-                $book['pages'] = 'null';
-            }
-
-            if (isset($response->Items->Item->EditorialReviews->EditorialReview->Content)) {
-                $book['overview'] = strip_tags((string) $response->Items->Item->EditorialReviews->EditorialReview->Content);
-                if ($book['overview'] === '') {
-                    $book['overview'] = 'null';
-                }
-            } else {
-                $book['overview'] = 'null';
-            }
-
-            if (isset($response->Items->Item->BrowseNodes->BrowseNode->Name)) {
-                $book['genre'] = (string) $response->Items->Item->BrowseNodes->BrowseNode->Name;
-                if ($book['genre'] === '') {
-                    $book['genre'] = 'null';
-                }
-            } else {
-                $book['genre'] = 'null';
-            }
-
-            $book['coverurl'] = (string) $response->Items->Item->LargeImage->URL;
-            if ($book['coverurl'] !== '') {
-                $book['cover'] = 1;
-            } else {
-                $book['cover'] = 0;
-            }
-
-            return $book;
-        }
-
-        $this->colorCli->notice('Could not find a match on Amazon!');
-
-        return false;
-    }
-
-    /**
      * Process book releases, 1 category at a time.
      *
      * @throws \Exception
@@ -611,10 +489,6 @@ class Books
 
         $book = false;
         if ($bookInfo !== '') {
-            /*$this->colorCli->info('Fetching data from Amazon for '.$bookInfo);
-
-            $book = $this->fetchAmazonBookProperties($bookInfo);*/
-
             if (! $book) {
                 $this->colorCli->info('Fetching data from iTunes for '.$bookInfo);
                 $book = $this->fetchItunesBookProperties($bookInfo);

@@ -1,4 +1,5 @@
 2019-02-14 DariusIII
+	* Chg: Remove Amazon as data source completely
 	* Fix: Fix coverurl error on Books
 	* Chg: Disable fetching amazon properties as a start of removal from NNTmux
 	* Chg: Show debug messages in PPA only if app env is set to debug
