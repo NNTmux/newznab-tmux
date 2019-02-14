@@ -710,23 +710,28 @@ class Books
             $book = false;
         }
 
-        if ($book !== false) {
+        if ($book) {
             $this->colorCli->info('Found matching title: '.$iTunesBook->getName());
             $book = [
-                    'title' => $iTunesBook->getName(),
-                    'author' => $iTunesBook->getAuthor(),
-                    'asin' => $iTunesBook->getItunesId(),
-                    'isbn' => 'null',
-                    'ean' => 'null',
-                    'url' => $iTunesBook->getStoreUrl(),
-                    'salesrank' => '',
-                    'publisher' => '',
-                    'pages' => '',
-                    'coverurl' => str_replace('100x100', '800x800', $iTunesBook->getCover()),
-                    'genre' => implode(', ', $iTunesBook->getGenre()),
-                    'overview' => strip_tags($iTunesBook->getDescription()),
-                    'publishdate' => $iTunesBook->getReleaseDate()->format('Y-m-d'),
-                ];
+                'title' => $iTunesBook->getName(),
+                'author' => $iTunesBook->getAuthor(),
+                'asin' => $iTunesBook->getItunesId(),
+                'isbn' => 'null',
+                'ean' => 'null',
+                'url' => $iTunesBook->getStoreUrl(),
+                'salesrank' => '',
+                'publisher' => '',
+                'pages' => '',
+                'coverurl' => ! empty($iTunesBook->getCover()) ? str_replace('100x100', '800x800', $iTunesBook->getCover()) : '',
+                'genre' => implode(', ', $iTunesBook->getGenre()),
+                'overview' => strip_tags($iTunesBook->getDescription()),
+                'publishdate' => $iTunesBook->getReleaseDate()->format('Y-m-d'),
+            ];
+            if (! empty($book['coverurl'])) {
+                $book['cover'] = 1;
+            } else {
+                $book['cover'] = 0;
+            }
         } else {
             $this->colorCli->notice('Could not find a match on iTunes!');
         }
