@@ -12,6 +12,7 @@ use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
 use DariusIII\ItunesApi\iTunes;
 use ApaiIO\Request\GuzzleRequest;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;

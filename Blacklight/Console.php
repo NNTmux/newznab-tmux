@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Carbon;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
