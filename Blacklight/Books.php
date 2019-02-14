@@ -611,16 +611,16 @@ class Books
 
         $book = false;
         if ($bookInfo !== '') {
-            $this->colorCli->info('Fetching data from Amazon for '.$bookInfo);
+            /*$this->colorCli->info('Fetching data from Amazon for '.$bookInfo);
 
-            $book = $this->fetchAmazonBookProperties($bookInfo);
-        }
+            $book = $this->fetchAmazonBookProperties($bookInfo);*/
 
-        if ($book === false) {
-            $this->colorCli->info('Fetching data from iTunes for '.$bookInfo);
-            $book = $this->fetchItunesBookProperties($bookInfo);
-        } elseif ($amazdata !== null) {
-            $book = $amazdata;
+            if (! $book) {
+                $this->colorCli->info('Fetching data from iTunes for '.$bookInfo);
+                $book = $this->fetchItunesBookProperties($bookInfo);
+            } elseif ($amazdata !== null) {
+                $book = $amazdata;
+            }
         }
 
         if (empty($book)) {

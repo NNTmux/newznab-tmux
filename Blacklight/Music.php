@@ -364,13 +364,8 @@ class Music
         if ($amazdata !== null) {
             $mus = $amazdata;
         } elseif ($title !== '') {
-            $mus = $this->fetchAmazonProperties($title);
-        }
-
-        if ($mus === false) {
+            //$mus = $this->fetchAmazonProperties($title);
             $mus = $this->fetchItunesMusicProperties($title);
-        } else {
-            $mus = false;
         }
 
         if ($mus === false) {

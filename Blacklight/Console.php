@@ -360,7 +360,7 @@ class Console
     {
         $consoleId = self::CONS_NTFND;
 
-        $amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
+        /*$amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
 
         if ($amaz) {
             $gameInfo['platform'] = $this->_replacePlatform($gameInfo['platform']);
@@ -398,20 +398,20 @@ class Console
                         $this->colorCli->primary($con['consolegenre']);
                 }
             }
-        } else {
-            $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
-            if ($igdb !== false) {
-                if ($igdb['coverurl'] !== '') {
-                    $igdb['cover'] = 1;
-                } else {
-                    $igdb['cover'] = 0;
-                }
+        } */
 
-                $consoleId = $this->_updateConsoleTable($igdb);
+        $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
+        if ($igdb !== false) {
+            if ($igdb['coverurl'] !== '') {
+                $igdb['cover'] = 1;
+            } else {
+                $igdb['cover'] = 0;
+            }
 
-                if ($this->echooutput && $consoleId !== -2) {
-                    $this->colorCli->header('Added/updated game: ').$this->colorCli->alternateOver('   Title:    ').$this->colorCli->primary($igdb['title']).$this->colorCli->alternateOver('   Platform: ').$this->colorCli->primary($igdb['platform']).$this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary($igdb['consolegenre']);
-                }
+            $consoleId = $this->_updateConsoleTable($igdb);
+
+            if ($this->echooutput && $consoleId !== -2) {
+                $this->colorCli->header('Added/updated game: ').$this->colorCli->alternateOver('   Title:    ').$this->colorCli->primary($igdb['title']).$this->colorCli->alternateOver('   Platform: ').$this->colorCli->primary($igdb['platform']).$this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary($igdb['consolegenre']);
             }
         }
 
