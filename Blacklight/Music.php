@@ -13,6 +13,7 @@ use ApaiIO\Operations\Search;
 use DariusIII\ItunesApi\iTunes;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
@@ -20,7 +21,6 @@ use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
 use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
 use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class Music.
