@@ -722,7 +722,7 @@ class Books
                     'salesrank' => '',
                     'publisher' => '',
                     'pages' => '',
-                    'cover' => str_replace('100x100', '800x800', $iTunesBook->getCover()),
+                    'coverurl' => str_replace('100x100', '800x800', $iTunesBook->getCover()),
                     'genre' => implode(', ', $iTunesBook->getGenre()),
                     'overview' => strip_tags($iTunesBook->getDescription()),
                     'publishdate' => $iTunesBook->getReleaseDate()->format('Y-m-d'),
