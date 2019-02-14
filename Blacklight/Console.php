@@ -761,12 +761,10 @@ class Console
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
-            continue;
-        } catch (ServerException) {
+        } catch (ServerException $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
-            continue;
         }
 
         $search = new Search();
