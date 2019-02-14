@@ -348,7 +348,9 @@ class Books
                 ->setRequest($request)
                 ->setResponseTransformer(new XmlToSimpleXmlObject());
         } catch (\Throwable $e) {
-            echo $e->getMessage();
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
         }
 
         $search = new Search();

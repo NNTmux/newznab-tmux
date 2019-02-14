@@ -20,6 +20,7 @@ use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
 use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
 use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
 use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Music.
@@ -475,7 +476,9 @@ class Music
                 ->setRequest($request)
                 ->setResponseTransformer(new XmlToSimpleXmlObject());
         } catch (\Throwable $e) {
-            echo $e->getMessage();
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
         }
 
         $apaiIo = new ApaiIO($conf);

@@ -1,3 +1,5 @@
+2019-02-14 DariusIII
+	* Chg: Show debug messages in PPA only if app env is set to debug
 2019-02-13 DariusIII
 	* Chg: Update spatie/laravel-permission (2.31.0 => 2.32.0)
 	* Chg: Remove messages about missing nzb, too annoying and not helpfull at all

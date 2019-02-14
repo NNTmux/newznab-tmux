@@ -1045,14 +1045,18 @@ class ProcessAdditional
         $this->_compressedFilesChecked++;
         // Give the data to archive info so it can check if it's a rar.
         if (! $this->_archiveInfo->setData($compressedData, true)) {
-            $this->_debug('Data is probably not RAR or ZIP.');
+            if (config('app.debug') === true) {
+                $this->_debug('Data is probably not RAR or ZIP.');
+            }
 
             return false;
         }
 
         // Check if there's an error.
         if ($this->_archiveInfo->error !== '') {
-            $this->_debug('ArchiveInfo Error: '.$this->_archiveInfo->error);
+            if (config('app.debug') === true) {
+                $this->_debug('ArchiveInfo Error: '.$this->_archiveInfo->error);
+            }
 
             return false;
         }
@@ -1071,7 +1075,9 @@ class ProcessAdditional
 
         // Check if the compressed file is encrypted.
         if (! empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && (int) $dataSummary['is_encrypted'] !== 0)) {
-            $this->_debug('ArchiveInfo: Compressed file has a password.');
+            if (config('app.debug') === true) {
+                $this->_debug('ArchiveInfo: Compressed file has a password.');
+            }
             $this->_releaseHasPassword = true;
             $this->_passwordStatus[] = Releases::PASSWD_RAR;
 
@@ -1132,7 +1138,9 @@ class ProcessAdditional
 
             if (isset($file['name'])) {
                 if (isset($file['error'])) {
-                    $this->_debug("Error: {$file['error']} (in: {$file['source']})");
+                    if (config('app.debug') === true) {
+                        $this->_debug("Error: {$file['error']} (in: {$file['source']})");
+                    }
                     continue;
                 }
 
@@ -1208,7 +1216,9 @@ class ProcessAdditional
                     if (preg_match('/alt\.binaries\.movies($|\.divx$)/', $this->_releaseGroupName) &&
                         preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])
                     ) {
-                        $this->_debug('Codec spam found, setting release to potentially passworded.');
+                        if (config('app.debug') === true) {
+                            $this->_debug('Codec spam found, setting release to potentially passworded.');
+                        }
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     } //Run a PreDB filename check on insert to try and match the release
@@ -1647,8 +1657,8 @@ class ProcessAdditional
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getTraceAsString());
+                $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
             }
-            $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
 
             return false;
         }
