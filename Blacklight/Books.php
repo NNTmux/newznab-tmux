@@ -12,6 +12,7 @@ use ApaiIO\Operations\Search;
 use DariusIII\ItunesApi\iTunes;
 use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -351,6 +352,12 @@ class Books
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
+            continue;
+        } catch (ServerException) {
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
+            continue;
         }
 
         $search = new Search();

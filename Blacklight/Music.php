@@ -479,6 +479,12 @@ class Music
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
+            continue;
+        } catch (ServerException) {
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
+            continue;
         }
 
         $apaiIo = new ApaiIO($conf);
