@@ -317,6 +317,7 @@ class Group extends Model
                     'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
                 ]);
         }
+
         return $checkOld->id;
     }
 
