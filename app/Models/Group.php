@@ -297,11 +297,11 @@ class Group extends Model
     /**
      * Add a new group.
      *
-     * @param array $group
      *
-     * @return bool
+     * @param $group
+     * @return int|mixed
      */
-    public static function addGroup($group): bool
+    public static function addGroup($group)
     {
         $checkOld = Group::query()->where('name', trim($group['name']))->first();
         if (empty($checkOld)) {
@@ -421,12 +421,12 @@ class Group extends Model
         $releaseImage = new ReleaseImage();
         foreach ($res as $row) {
             $releases->deleteSingle(
-                    [
+                [
                         'g' => $row['guid'],
                         'i' => $row['id'],
                     ],
-                    $nzb,
-                    $releaseImage
+                $nzb,
+                $releaseImage
                 );
         }
     }
