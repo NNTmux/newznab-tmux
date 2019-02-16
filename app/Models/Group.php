@@ -303,19 +303,21 @@ class Group extends Model
      */
     public static function addGroup($group): bool
     {
-        return self::query()->insertGetId(
-            [
-                'name' => trim($group['name']),
-                'description' => isset($group['description']) ? trim($group['description']) : '',
-                'backfill_target' => $group['backfill_target'] ?? 1,
-                'first_record' => $group['first_record'] ?? 0,
-                'last_record' => $group['last_record'] ?? 0,
-                'active' => $group['active'] ?? 0,
-                'backfill' => $group['backfill'] ?? 0,
-                'minsizetoformrelease' => $group['minsizetoformrelease'] ?? null,
-                'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
-            ]
-        );
+        $checkOld = Group::query()->where('name', trim($group['name']))->first();
+        if (empty($checkOld)) {
+            return self::query()->insertGetId([
+                    'name' => trim($group['name']),
+                    'description' => isset($group['description']) ? trim($group['description']) : '',
+                    'backfill_target' => $group['backfill_target'] ?? 1,
+                    'first_record' => $group['first_record'] ?? 0,
+                    'last_record' => $group['last_record'] ?? 0,
+                    'active' => $group['active'] ?? 0,
+                    'backfill' => $group['backfill'] ?? 0,
+                    'minsizetoformrelease' => $group['minsizetoformrelease'] ?? null,
+                    'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
+                ]);
+        }
+        return $checkOld->id;
     }
 
     /**

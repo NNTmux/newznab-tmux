@@ -1,4 +1,5 @@
 2019-05-16 DariusIII
+	* Fix: Fix error when adding already existing group. Fixes issue #892
 	* Fix: Fix bulk adding of groups when groups exist. Fixes issue #891
 2019-02-15 DariusIII
 	* Chg: Update phpunit/phpunit to latest version
