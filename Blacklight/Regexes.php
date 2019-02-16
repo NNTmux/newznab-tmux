@@ -192,7 +192,7 @@ class Regexes
         }
 
         $rows = DB::select(
-                'SELECT
+            'SELECT
 					b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
 					c.fromname, c.collectionhash
 				FROM binaries b

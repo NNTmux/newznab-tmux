@@ -197,13 +197,13 @@ class Group extends Model
      *
      * @param string $name The group name.
      *
-     * @return string|int Empty string on failure, groups_id on success.
+     * @return false|int false on failure, groups_id on success.
      */
     public static function getIDByName($name)
     {
         $res = self::query()->where('name', $name)->first(['id']);
 
-        return $res === null ? '' : $res->id;
+        return $res === null ? false : $res->id;
     }
 
     /**
@@ -462,7 +462,7 @@ class Group extends Model
             foreach ($groups as $group) {
                 if (preg_match($regFilter, $group['group']) > 0) {
                     $res = self::getIDByName($group['group']);
-                    if ($res === '') {
+                    if ($res === false) {
                         self::addGroup(
                             [
                                 'name'        => $group['group'],
@@ -477,7 +477,7 @@ class Group extends Model
             }
 
             if (\count($ret) === 0) {
-                $ret = 'No groups found with your regex, try again!';
+                $ret[] = ['group' => '', 'msg' => 'No groups found with your regex or groups already exist in database, try again!'];
             }
         }
 

@@ -313,7 +313,7 @@ class ProcessReleases
             $totalTime = now()->diffInSeconds($startTime);
 
             $this->colorCli->primary(
-                    ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
+                ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
                     $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
@@ -497,7 +497,7 @@ class ProcessReleases
         foreach ($collections as $collection) {
             $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
             $fromName = utf8_encode(
-                    trim($collection->fromname, "'")
+                trim($collection->fromname, "'")
                 );
 
             // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
@@ -509,9 +509,9 @@ class ProcessReleases
 
             if ($dupeCheck === null) {
                 $cleanedName = $this->releaseCleaning->releaseCleaner(
-                        $collection->subject,
-                        $collection->fromname,
-                        $collection->gname
+                    $collection->subject,
+                    $collection->fromname,
+                    $collection->gname
                     );
 
                 if (\is_array($cleanedName)) {
@@ -536,7 +536,7 @@ class ProcessReleases
                 $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
 
                 $releaseID = Release::insertRelease(
-                        [
+                    [
                             'name' => $cleanRelName,
                             'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
                             'totalpart' => $collection->totalfiles,
@@ -590,7 +590,7 @@ class ProcessReleases
                                 $xrefGrpID = Group::getIDByName($grpTmp);
                                 if ($xrefGrpID === '') {
                                     $xrefGrpID = Group::addGroup(
-                                            [
+                                        [
                                                 'name'                  => $grpTmp,
                                                 'description'           => 'Added by Release processing',
                                                 'backfill_target'       => 1,
@@ -605,7 +605,7 @@ class ProcessReleases
                                 }
 
                                 $relGroupsChk = ReleasesGroups::query()->where(
-                                        [
+                                    [
                                             ['releases_id', '=', $releaseID],
                                             ['groups_id', '=', $xrefGrpID],
                                         ]
@@ -613,7 +613,7 @@ class ProcessReleases
 
                                 if ($relGroupsChk === null) {
                                     ReleasesGroups::query()->insert(
-                                            [
+                                        [
                                                 'releases_id' => $releaseID,
                                                 'groups_id'   => $xrefGrpID,
                                             ]
@@ -651,7 +651,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    PHP_EOL.
+                PHP_EOL.
                     number_format($returnCount).
                     ' Releases added and '.
                     number_format($duplicate).
@@ -714,7 +714,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    number_format($nzbCount).' NZBs created/Collections deleted in '.
+                number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
                     'Total time: '.$totalTime.Str::plural(' second', $totalTime),
                 true
@@ -778,7 +778,7 @@ class ProcessReleases
             (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
         } elseif ($this->echoCLI) {
             $this->colorCli->info(
-                    'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
+                'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
                     'If you are using tmux or screen they might have their own scripts running Post-processing.'
                 );
         }
@@ -1053,7 +1053,7 @@ class ProcessReleases
             }
             if ($minFilesSetting > 0) {
                 $releases = Release::fromQuery(
-                     sprintf(
+                    sprintf(
                          '
 				SELECT SQL_NO_CACHE r.id, r.guid
 				FROM releases r
@@ -1077,7 +1077,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
+                'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
@@ -1199,7 +1199,7 @@ class ProcessReleases
         foreach ($categories as $category) {
             if ((int) $category->minsize > 0) {
                 $releases = Release::fromQuery(
-                        sprintf(
+                    sprintf(
                             '
 							SELECT id, guid
 							FROM releases
@@ -1282,7 +1282,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    'Removed releases: '.
+                'Removed releases: '.
                     number_format($retentionDeleted).
                     ' past retention, '.
                     number_format($passwordDeleted).
@@ -1315,7 +1315,7 @@ class ProcessReleases
             if ($totalDeleted > 0) {
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary(
-                        'Removed '.number_format($totalDeleted).' releases in '.
+                    'Removed '.number_format($totalDeleted).' releases in '.
                         $totalTime.Str::plural(' second', $totalTime),
                     true
                     );
@@ -1448,7 +1448,7 @@ class ProcessReleases
     {
         DB::transaction(function () use ($where) {
             DB::update(
-            sprintf(
+                sprintf(
                 '
 				UPDATE binaries b
 				INNER JOIN
