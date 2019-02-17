@@ -3,13 +3,12 @@
 	<div class="error">{$error}</div>
 {/if}
 <div class="card card-body">
-	<form action="binaryblacklist-edit?action=submit" method="POST">
-		{{csrf_field()}}
+	{{Form::open(['url'=> "admin/binaryblacklist-edit?action=submit"])}}
 		<table class="input">
 			<tr>
 				<td>Group:</td>
 				<td>
-					<input type="hidden" name="id" value="{$regex.id}"/>
+					<input type="hidden" name="id" value="{if (isset({$regex.id}))} {$regex.id} {else}''{/if}"/>
 					<input type="text" id="groupname" name="groupname" value="{$regex.groupname|escape:html}"/>
 					<div class="hint">The full name of a valid newsgroup. (Wildcard in the format 'alt.binaries.*')
 					</div>
@@ -59,5 +58,5 @@
 				</td>
 			</tr>
 		</table>
-	</form>
+	{{Form::close()}}
 </div>

@@ -110,7 +110,7 @@
             <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-list" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Blacklist</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Blacklist</span>
             </a>
         </div>
