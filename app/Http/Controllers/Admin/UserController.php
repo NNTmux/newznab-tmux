@@ -64,9 +64,6 @@ class UserController extends BasePageController
             ]
         );
 
-        User::updateExpiredRoles();
-        User::deleteUnVerified();
-
         foreach ($ordering as $orderType) {
             $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType);
         }

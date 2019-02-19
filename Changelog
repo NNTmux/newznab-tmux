@@ -1,4 +1,5 @@
 2019-02-19 DariusIII
+	* Chg: Move role expiration and verification checks into separate script and schedule them in Kernel.php
 	* CHg: Update archive handling regexes
 	* Chg: Update friendsofphp/php-cs-fixer (v2.14.1 => v2.14.2)
 	* Chg: Update phpunit/phpunit (7.5.5 => 7.5.6)
