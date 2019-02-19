@@ -120,7 +120,7 @@
     "messerli90/igdb": "^1.0",
     "mhor/php-mediainfo": "^4.1",
     "monolog/monolog": "^1.22",
-    "nesbot/carbon": "2.10.1 as 1.35.0",
+    "nesbot/carbon": "2.12.0 as 1.35.0",
     "ntimyeboah/laravel-database-trigger": "^1.0",
     "pear/net_nntp": "^1.5",
     "php-ffmpeg/php-ffmpeg": "^0.13.0",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c5ba3ec5323dce038a08537894d4553",
+    "content-hash": "724017412e0a32e5bec0ccc0a8f7b676",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -3581,22 +3581,22 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.10.1",
+            "version": "2.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "39a8ebfffc2a75de9d2ade3f0e12c7e11669f7ce"
+                "reference": "35dc8834ae9ad79b77c22d1e276fd838ca8c503d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/39a8ebfffc2a75de9d2ade3f0e12c7e11669f7ce",
-                "reference": "39a8ebfffc2a75de9d2ade3f0e12c7e11669f7ce",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/35dc8834ae9ad79b77c22d1e276fd838ca8c503d",
+                "reference": "35dc8834ae9ad79b77c22d1e276fd838ca8c503d",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": "^7.1.8",
-                "symfony/translation": "^4.0"
+                "symfony/translation": "^3.4 || ^4.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.14 || ^3.0",
@@ -3636,7 +3636,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-01-14T09:25:45+00:00"
+            "time": "2019-02-06T21:23:55+00:00"
         },
         {
             "name": "neutron/temporary-filesystem",
@@ -12029,7 +12029,7 @@
         {
             "alias": "1.35.0",
             "alias_normalized": "1.35.0.0",
-            "version": "2.10.1.0",
+            "version": "2.12.0.0",
             "package": "nesbot/carbon"
         }
     ],
