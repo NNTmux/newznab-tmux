@@ -1,3 +1,7 @@
+2019-02-19 DariusIII
+	* Chg: Update friendsofphp/php-cs-fixer (v2.14.1 => v2.14.2)
+	* Chg: Update phpunit/phpunit (7.5.5 => 7.5.6)
+	* Chg: Update nikic/php-parser (v4.2.0 => v4.2.1)
 2019-02-17 DariusIII
 	* Fix: Fix addition of new blacklist regexes (Fixes issue #894)
 2019-02-16 DariusIII
