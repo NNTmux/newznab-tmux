@@ -4,7 +4,6 @@ namespace Blacklight\processing;
 
 use Blacklight\NZB;
 use Blacklight\NNTP;
-use App\Models\UsenetGroup;
 use App\Models\Predb;
 use Blacklight\Genres;
 use App\Models\Release;
@@ -13,6 +12,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\Categorize;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\UsenetGroup;
 use App\Models\Release;
+use App\Models\UsenetGroup;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 

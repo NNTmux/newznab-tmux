@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\UsenetGroup;
 use App\Models\Sharing;
 use Blacklight\Regexes;
 use Blacklight\Binaries;
 use App\Models\SharingSite;
+use App\Models\UsenetGroup;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use App\Http\Controllers\BasePageController;

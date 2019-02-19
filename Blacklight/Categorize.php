@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 
 /**
  * Categorizing of releases by name/group.

@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ReleaseNfo;
+use App\Models\UsenetGroup;
 use dariusiii\rarinfo\SfvInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
