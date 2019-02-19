@@ -243,7 +243,7 @@ class Backfill
 
         if ($this->_echoCLI) {
             $this->colorCli->primary(
-                    'Group '.
+                'Group '.
                     $groupName.
                     "'s oldest article is ".
                     number_format($data['first']).
@@ -318,7 +318,7 @@ class Backfill
 
         if ($this->_echoCLI) {
             $this->colorCli->primary(
-                    PHP_EOL.
+                PHP_EOL.
                     'Group '.
                     $groupName.
                     ' processed in '.
