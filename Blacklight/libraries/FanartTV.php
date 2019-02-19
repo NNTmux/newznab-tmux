@@ -48,7 +48,7 @@ class FanartTV
     {
         if ($this->apiKey !== '') {
             $fanArt = $this->_getUrl('movies/'.$id);
-            if (! empty($fanArt) && $fanArt['status'] !== 'error') {
+            if ($fanArt !== false) {
                 return $fanArt;
             }
 
@@ -68,7 +68,7 @@ class FanartTV
     {
         if ($this->apiKey !== '') {
             $fanArt = $this->_getUrl('tv/'.$id);
-            if (! empty($fanArt) && $fanArt['status'] !== 'error') {
+            if ($fanArt !== false) {
                 return $fanArt;
             }
 
