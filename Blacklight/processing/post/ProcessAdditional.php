@@ -875,7 +875,7 @@ class ProcessAdditional
             // Check if it's a rar/zip.
             if (! $this->_NZBHasCompressedFile &&
                 preg_match(
-                    '/\.(part\d+|r\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+                    '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                     $this->_currentNZBFile['title']
                 )
             ) {
@@ -974,7 +974,7 @@ class ProcessAdditional
 
             // Probably not a rar/zip.
             if (! preg_match(
-                '/\.(part\d+|r\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+                '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                 $nzbFile['title']
             )
             ) {
@@ -1193,7 +1193,7 @@ class ProcessAdditional
     {
         // Don't add rar/zip files to the DB.
         if (! isset($file['error']) && isset($file['source']) &&
-            ! preg_match($this->_supportFileRegex.'|part\d+|r\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
+            ! preg_match($this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
         ) {
 
             // Cache the amount of files we find in the RAR or ZIP, return this to say we did find RAR or ZIP content.
@@ -2249,10 +2249,10 @@ class ProcessAdditional
         $a = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $a['title']);
         $b = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $b['title']);
 
-        if (preg_match('/\.(part\d+|r\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
+        if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
             $af = true;
         }
-        if (preg_match('/\.(part\d+|r\d+)(\s*\.rar)*($|[ ")\]-])/i', $b)) {
+        if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $b)) {
             $bf = true;
         }
 
