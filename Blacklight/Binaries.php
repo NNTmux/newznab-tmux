@@ -278,8 +278,9 @@ class Binaries
                 $counter++;
             }
 
+            $endTime = now()->diffInSeconds($allTime);
             $this->log(
-                'Updating completed in '.Str::plural(' second', now()->diffInSeconds($allTime)),
+                'Updating completed in '.$endTime.Str::plural(' second', $endTime),
                 __FUNCTION__,
                 'primary'
             );
@@ -410,11 +411,11 @@ class Binaries
         if ($total > 0) {
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
-                        (
-                        (int) $groupMySQL['last_record'] === 0
+                    (
+                            (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
                             (
-                            $this->_newGroupScanByDays
+                                $this->_newGroupScanByDays
                                 ? $this->_newGroupDaysToScan.' days'
                                 : number_format($this->_newGroupMessagesToScan).' messages'
                             ).' worth.'
@@ -444,7 +445,7 @@ class Binaries
 
                 if ($this->_echoCLI) {
                     $this->colorCli->header(
-                            PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
+                        PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
                             ' to '.number_format($last).') from '.$groupMySQL['name'].' - ('.
                             number_format($groupLast - $last).' articles in queue).'
                         );
@@ -512,14 +513,15 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
+                $endGroup = now()->diffInSeconds($startGroup);
                 $this->colorCli->primary(
-                        PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        Str::plural(' second', now()->diffInSeconds($startGroup))
+                    PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
+                        $endGroup.Str::plural(' second', $endGroup)
                     );
             }
         } elseif ($this->_echoCLI) {
             $this->colorCli->primary(
-                    'No new articles for '.$groupMySQL['name'].' (first '.number_format($first).
+                'No new articles for '.$groupMySQL['name'].' (first '.number_format($first).
                     ', last '.number_format($last).', grouplast '.number_format($groupMySQL['last_record']).
                     ', total '.number_format($total).")\n".'Server oldest: '.number_format($groupNNTP['first']).
                     ' Server newest: '.number_format($groupNNTP['last']).' Local newest: '.number_format($groupMySQL['last_record'])
@@ -728,7 +730,7 @@ class Binaries
 
                 if ($this->_echoCLI) {
                     $this->colorCli->alternate(
-                            'Server did not return '.$notReceivedCount.
+                        'Server did not return '.$notReceivedCount.
                             ' articles from '.$this->groupMySQL['name'].'.'
                         );
                 }
@@ -988,7 +990,7 @@ class Binaries
     protected function outputHeaderInitial(): void
     {
         $this->colorCli->primary(
-                'Received '.\count($this->headersReceived).
+            'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
             );
@@ -1064,7 +1066,7 @@ class Binaries
         if ($missingCount > 0) {
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
-                        'Attempting to repair '.
+                    'Attempting to repair '.
                         number_format($missingCount).
                         ' parts.'
                     );
@@ -1144,7 +1146,7 @@ class Binaries
 
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
-                        PHP_EOL.
+                    PHP_EOL.
                         number_format($partsRepaired).
                         ' parts repaired.'
                     );
@@ -1181,7 +1183,7 @@ class Binaries
             // Try to get the article date locally first.
             // Try to get locally.
             $local = DB::select(
-                    sprintf(
+                sprintf(
                         '
 						SELECT c.date AS date
 						FROM collections c
@@ -1263,7 +1265,7 @@ class Binaries
 
         if ($this->_echoCLI) {
             $this->colorCli->primary(
-                    'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
+                'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
                 );
         }
 
@@ -1321,7 +1323,7 @@ class Binaries
         $wantedArticle = (int) $wantedArticle;
         if ($this->_echoCLI) {
             $this->colorCli->primary(
-                    PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
+                PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
                 );
         }
