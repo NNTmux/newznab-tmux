@@ -6,7 +6,7 @@ if (! isset($argv[1])) {
 
 require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Settings;
 use Blacklight\processing\PostProcess;
 use Blacklight\processing\ProcessReleases;
@@ -98,7 +98,7 @@ switch ($options[1]) {
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-        $groupMySQL = Group::getByName($options[3])->toArray();
+        $groupMySQL = UsenetGroup::getByName($options[3])->toArray();
         try {
             if ($nntp->isError($nntp->selectGroup($groupMySQL['name'])) && $nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
                 return;
@@ -135,7 +135,7 @@ switch ($options[1]) {
                 );
                 $columns[2] = sprintf('last_record = %s', $return['lastArticleNumber']);
                 $query = sprintf(
-                    'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND last_record < %s',
+                    'UPDATE usenet_groups SET %s, %s, last_updated = NOW() WHERE id = %d AND last_record < %s',
                     $columns[1],
                     $columns[2],
                     $groupMySQL['id'],
@@ -153,7 +153,7 @@ switch ($options[1]) {
                 );
                 $columns[2] = sprintf('first_record = %s', $return['firstArticleNumber']);
                 $query = sprintf(
-                    'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND first_record > %s',
+                    'UPDATE usenet_groups SET %s, %s, last_updated = NOW() WHERE id = %d AND first_record > %s',
                     $columns[1],
                     $columns[2],
                     $groupMySQL['id'],
@@ -171,7 +171,7 @@ switch ($options[1]) {
      * $options[2] => (string) Group name.
      */
     case 'part_repair':
-        $groupMySQL = Group::getByName($options[2])->toArray();
+        $groupMySQL = UsenetGroup::getByName($options[2])->toArray();
         try {
             $nntp = nntp();
         } catch (Exception $e) {
@@ -254,7 +254,7 @@ switch ($options[1]) {
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-        $groupMySQL = Group::getByName($options[2])->toArray();
+        $groupMySQL = UsenetGroup::getByName($options[2])->toArray();
         try {
             (new Binaries(['NNTP' => $nntp]))->updateGroup($groupMySQL);
         } catch (Exception $e) {
@@ -268,7 +268,7 @@ switch ($options[1]) {
     case 'update_per_group':
         if (is_numeric($options[2])) {
             // Get the group info from MySQL.
-            $groupMySQL = Group::find($options[2])->toArray();
+            $groupMySQL = UsenetGroup::find($options[2])->toArray();
 
             if ($groupMySQL === null) {
                 exit('ERROR: Group not found with id ' . $options[2] . PHP_EOL);

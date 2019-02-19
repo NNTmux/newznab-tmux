@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -108,9 +108,9 @@ class Backfill
     public function backfillAllGroups($groupName = '', $articles = '', $type = ''): void
     {
         if ($groupName !== '') {
-            $grp[] = Group::getByName($groupName);
+            $grp[] = UsenetGroup::getByName($groupName);
         } else {
-            $grp = Group::getActiveBackfill($type);
+            $grp = UsenetGroup::getActiveBackfill($type);
         }
 
         $groupCount = \count($grp);
@@ -231,7 +231,7 @@ class Backfill
                 ', skipping it, consider disabling backfill on it.');
 
             if ($this->_disableBackfillGroup) {
-                Group::updateGroupStatus($groupArr['id'], 'backfill', 0);
+                UsenetGroup::updateGroupStatus($groupArr['id'], 'backfill', 0);
             }
 
             if ($this->_echoCLI) {
@@ -296,7 +296,7 @@ class Backfill
             DB::update(
                 sprintf(
                     '
-					UPDATE groups
+					UPDATE usenet_groups
 					SET first_record_postdate = FROM_UNIXTIME(%s), first_record = %s, last_updated = NOW()
 					WHERE id = %d',
                     $newdate,
@@ -334,7 +334,7 @@ class Backfill
      */
     public function safeBackfill($articles = ''): void
     {
-        $groupname = Group::query()
+        $groupname = UsenetGroup::query()
             ->whereBetween('first_record_postdate', [Carbon::createFromDate($this->_safeBackFillDate), now()])
             ->where('backfill', '=', 1)
             ->select(['name'])

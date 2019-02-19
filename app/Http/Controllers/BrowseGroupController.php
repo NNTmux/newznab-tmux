@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 
 class BrowseGroupController extends BasePageController
 {
@@ -12,7 +12,7 @@ class BrowseGroupController extends BasePageController
     public function show()
     {
         $this->setPrefs();
-        $groupList = Group::getGroupsRange('', true);
+        $groupList = UsenetGroup::getGroupsRange('', true);
         $this->smarty->assign('results', $groupList);
 
         $meta_title = 'Browse Groups';

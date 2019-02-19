@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Settings;
 use App\Models\Collection;
 use Illuminate\Support\Str;
@@ -254,7 +254,7 @@ class Binaries
      */
     public function updateAllGroups($maxHeaders = 100000): void
     {
-        $groups = Group::getActive();
+        $groups = UsenetGroup::getActive();
 
         $groupCount = \count($groups);
         if ($groupCount > 0) {
@@ -322,7 +322,7 @@ class Binaries
             $groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
 
             if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
-                Group::disableIfNotExist($groupMySQL['id']);
+                UsenetGroup::disableIfNotExist($groupMySQL['id']);
             }
             if ($this->_nntp->isError($groupNNTP)) {
                 return;
@@ -348,7 +348,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
+            UsenetGroup::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
         }
 
         // Get first article we want aka the oldest.
@@ -466,7 +466,7 @@ class Binaries
                             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
                         }
 
-                        Group::query()
+                        UsenetGroup::query()
                             ->where('id', $groupMySQL['id'])
                             ->update(
                                 [
@@ -483,7 +483,7 @@ class Binaries
                         $scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
                     }
 
-                    Group::query()
+                    UsenetGroup::query()
                         ->where('id', $groupMySQL['id'])
                         ->update(
                             [
@@ -494,7 +494,7 @@ class Binaries
                         );
                 } else {
                     // If we didn't fetch headers, update the record still.
-                    Group::query()
+                    UsenetGroup::query()
                         ->where('id', $groupMySQL['id'])
                         ->update(
                             [
@@ -1480,7 +1480,7 @@ class Binaries
 					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
 					bb.last_activity as last_activity
 				FROM binaryblacklist bb
-				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
+				LEFT OUTER JOIN usenet_groups g ON g.name %s bb.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
                 ($groupRegex ? 'REGEXP' : '='),

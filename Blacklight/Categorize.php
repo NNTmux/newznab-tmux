@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Category;
 use App\Models\Settings;
 
@@ -123,7 +123,7 @@ class Categorize
     private function groupName(): string
     {
         if (! isset($this->ugroups[$this->groupid])) {
-            $group = Group::query()->where('id', $this->groupid)->first(['name']);
+            $group = UsenetGroup::query()->where('id', $this->groupid)->first(['name']);
             $this->ugroups[$this->groupid] = ($group === null ? false : $group['name']);
         }
 

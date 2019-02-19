@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ReleaseNfo;
@@ -330,7 +330,7 @@ class Nfo
             $movie = new Movie(['Echo' => $this->echo]);
 
             foreach ($res as $arr) {
-                $fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], Group::getNameByID($arr['groups_id']));
+                $fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], UsenetGroup::getNameByID($arr['groups_id']));
                 if ($fetchedBinary !== false) {
                     // Insert nfo into database.
 

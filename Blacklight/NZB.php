@@ -132,7 +132,7 @@ class NZB
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
 				g.name AS groupname
 			FROM collections c
-			INNER JOIN groups g ON c.groups_id = g.id
+			INNER JOIN usenet_groups g ON c.groups_id = g.id
 			WHERE c.releases_id = ';
         $this->_binariesQuery = '
 			SELECT b.id, b.name, b.totalparts

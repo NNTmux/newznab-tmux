@@ -16,7 +16,7 @@ class FixturesUp extends Command
       'category_regexes',
       'collection_regexes',
       'content',
-      'groups',
+      'usenet_groups',
       'release_naming_regexes',
       'settings',
       'tmux',
@@ -41,7 +41,7 @@ class FixturesUp extends Command
     category_regexes
     collection_regexes
     content
-    groups
+    usenet_groups
     release_naming_regexes
     settings
     tmux';

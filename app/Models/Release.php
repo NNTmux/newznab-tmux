@@ -63,19 +63,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $proc_hash16k Has the release been hash16k
  * processed
  * @property mixed|null $nzb_guid
- * @property-read \App\Models\Category $category
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[] $comment
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[] $download
- * @property-read \App\Models\TvEpisode $episode
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[] $failed
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseFile[] $file
- * @property-read \App\Models\Group $group
- * @property-read \App\Models\ReleaseNfo $nfo
- * @property-read \App\Models\Predb $predb
+ * @property-read \App\Models\Category                                                    $category
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseComment[]   $comment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserDownload[]     $download
+ * @property-read \App\Models\TvEpisode                                                   $episode
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DnzbFailure[]      $failed
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseFile[]      $file
+ * @property-read \App\Models\UsenetGroup                                                 $group
+ * @property-read \App\Models\ReleaseNfo                                                  $nfo
+ * @property-read \App\Models\Predb                                                       $predb
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleaseExtraFull[] $releaseExtra
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleasesGroups[] $releaseGroup
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[] $userRelease
- * @property-read \App\Models\Video $video
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ReleasesGroups[]   $releaseGroup
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UsersRelease[]     $userRelease
+ * @property-read \App\Models\Video                                                       $video
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAdddate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAnidbid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Release whereAudiostatus($value)
@@ -151,7 +151,7 @@ class Release extends Model
      */
     public function group()
     {
-        return $this->belongsTo(Group::class, 'groups_id');
+        return $this->belongsTo(UsenetGroup::class, 'groups_id');
     }
 
     /**
@@ -421,7 +421,7 @@ class Release extends Model
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
     }
 
@@ -497,14 +497,14 @@ class Release extends Model
                     DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names"),
                 ]
             )
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->leftJoin('videos as v', 'v.id', '=', 'releases.videos_id')
             ->leftJoin('tv_info as tvi', 'tvi.videos_id', '=', 'releases.videos_id')
             ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'releases.tv_episodes_id')
             ->leftJoin('releases_groups as rg', 'rg.releases_id', '=', 'releases.id')
-            ->leftJoin('groups as g2', 'rg.groups_id', '=', 'g2.id');
+            ->leftJoin('usenet_groups as g2', 'rg.groups_id', '=', 'g2.id');
 
         if (\is_array($guid)) {
             $tempGuids = [];

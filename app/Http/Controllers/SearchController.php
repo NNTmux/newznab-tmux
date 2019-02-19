@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Category;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
@@ -179,7 +179,7 @@ class SearchController extends BasePageController
                 ],
                 'results' => $results,
                 'sadvanced' => $searchType !== 'basic',
-                'grouplist' => Group::getGroupsForSelect(),
+                'grouplist' => UsenetGroup::getGroupsForSelect(),
                 'catlist' => Category::getForSelect(),
             ]
         );

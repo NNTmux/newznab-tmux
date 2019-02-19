@@ -21,7 +21,7 @@
 
 namespace Blacklight\http;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Category;
 use App\Models\AudioData;
 use Blacklight\utility\Utility;
@@ -121,7 +121,7 @@ class API extends Capabilities
     {
         $groupName = -1;
         if (request()->has('group')) {
-            $group = Group::isValidGroup(request()->input('group'));
+            $group = UsenetGroup::isValidGroup(request()->input('group'));
             if ($group !== false) {
                 $groupName = $group;
             }

@@ -3,7 +3,7 @@
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
 use Illuminate\Support\Arr;
@@ -33,7 +33,7 @@ $colorCli->header('Inserting new values into short_groups table.');
 DB::statement('TRUNCATE TABLE short_groups');
 
 // Put into an array all active groups
-$result = Arr::pluck(Group::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
+$result = Arr::pluck(UsenetGroup::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->get(['name']), 'name');
 
 foreach ($data as $newgroup) {
     if (\in_array($newgroup['group'], $result, false)) {

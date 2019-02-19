@@ -765,7 +765,7 @@ class ReleaseRemover
                 $groupID = '';
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = DB::select(
-                        'SELECT id FROM groups WHERE name REGEXP '.
+                        'SELECT id FROM usenet_groups WHERE name REGEXP '.
                         escapeString($regex->groupname)
                     );
 
@@ -875,7 +875,7 @@ class ReleaseRemover
                 $groupID = '';
                 if (strtolower($regex->groupname) !== 'alt.binaries.*') {
                     $groupIDs = DB::select(
-                        'SELECT id FROM groups WHERE name REGEXP '.
+                        'SELECT id FROM usenet_groups WHERE name REGEXP '.
                         escapeString($regex->groupname)
                     );
                     $groupIDCount = \count($groupIDs);
@@ -1138,7 +1138,7 @@ class ReleaseRemover
                 case 'groupname':
                     switch ($args[1]) {
                         case 'equals':
-                            $group = DB::select('SELECT id FROM groups WHERE name = '.escapeString($args[2]));
+                            $group = DB::select('SELECT id FROM usenet_groups WHERE name = '.escapeString($args[2]));
                             if (empty($group)) {
                                 $this->error = 'This group was not found in your database: '.$args[2].PHP_EOL;
                                 break;
@@ -1146,7 +1146,7 @@ class ReleaseRemover
 
                             return ' AND groups_id = '.$group[0]->id;
                         case 'like':
-                            $groups = DB::select('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
+                            $groups = DB::select('SELECT id FROM usenet_groups WHERE name '.$this->formatLike($args[2], 'name'));
                             if (\count($groups) === 0) {
                                 $this->error = 'No groups were found with this pattern in your database: '.$args[2].PHP_EOL;
                                 break;

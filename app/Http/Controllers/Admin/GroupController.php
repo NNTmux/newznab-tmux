@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BasePageController;
 
@@ -22,7 +22,7 @@ class GroupController extends BasePageController
         $this->smarty->assign(
             [
                 'groupname' => $groupName,
-                'grouplist' => Group::getGroupsRange($groupName),
+                'grouplist' => UsenetGroup::getGroupsRange($groupName),
             ]
         );
 
@@ -48,7 +48,7 @@ class GroupController extends BasePageController
 
         if ($action === 'submit') {
             if ($request->has('groupfilter') && ! empty($request->input('groupfilter'))) {
-                $msgs = Group::addBulk($request->input('groupfilter'), $request->input('active'), $request->input('backfill'));
+                $msgs = UsenetGroup::addBulk($request->input('groupfilter'), $request->input('active'), $request->input('backfill'));
             }
         } else {
             $msgs = '';
@@ -96,13 +96,13 @@ class GroupController extends BasePageController
             case 'submit':
                 if (empty($request->input('id'))) {
                     // Add a new group.
-                    $request->merge(['name' => Group::isValidGroup($request->input('name'))]);
+                    $request->merge(['name' => UsenetGroup::isValidGroup($request->input('name'))]);
                     if ($request->input('name') !== false) {
-                        Group::addGroup($request->all());
+                        UsenetGroup::addGroup($request->all());
                     }
                 } else {
                     // Update an existing group.
-                    Group::updateGroup($request->all());
+                    UsenetGroup::updateGroup($request->all());
                 }
 
                 return redirect('admin/group-list');
@@ -114,7 +114,7 @@ class GroupController extends BasePageController
                 if ($request->has('id')) {
                     $meta_title = $title = 'Newsgroup Edit';
                     $id = $request->input('id');
-                    $group = Group::getGroupByID($id);
+                    $group = UsenetGroup::getGroupByID($id);
                 } else {
                     $meta_title = $title = 'Newsgroup Add';
                 }
@@ -150,7 +150,7 @@ class GroupController extends BasePageController
 
         $this->smarty->assign('groupname', $groupname);
 
-        $grouplist = Group::getGroupsRange($gname, true);
+        $grouplist = UsenetGroup::getGroupsRange($gname, true);
 
         $this->smarty->assign('grouplist', $grouplist);
 
@@ -180,7 +180,7 @@ class GroupController extends BasePageController
 
         $this->smarty->assign('groupname', $groupname);
 
-        $grouplist = Group::getGroupsRange($gname, false);
+        $grouplist = UsenetGroup::getGroupsRange($gname, false);
 
         $this->smarty->assign('grouplist', $grouplist);
 

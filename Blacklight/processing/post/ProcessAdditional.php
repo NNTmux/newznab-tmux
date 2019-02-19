@@ -7,7 +7,7 @@ use Blacklight\Nfo;
 use Blacklight\NZB;
 use FFMpeg\FFProbe;
 use Blacklight\NNTP;
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
@@ -2309,7 +2309,7 @@ class ProcessAdditional
         $this->_passwordStatus = [Releases::PASSWD_NONE];
         $this->_releaseHasPassword = false;
 
-        $this->_releaseGroupName = Group::getNameByID($this->_release->groups_id);
+        $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);
 
         $this->_releaseHasNoNFO = false;
         // Make sure we don't already have an nfo.

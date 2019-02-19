@@ -119,7 +119,7 @@ class PreDb
 
         $sql = <<<SQL_EXPORT
 SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name
-	FROM {$this->tableMain} p LEFT OUTER JOIN groups g ON p.groups_id = g.id {$limit}
+	FROM {$this->tableMain} p LEFT OUTER JOIN usenet_groups g ON p.groups_id = g.id {$limit}
 	INTO OUTFILE '{$options['path']}'
 	FIELDS TERMINATED BY '{$options['fields']}' {$enclosedby}
 	LINES TERMINATED BY '{$options['lines']}';
@@ -268,9 +268,9 @@ SQL_EXPORT;
     protected function prepareSQLAddGroups(): void
     {
         $sql = <<<'SQL_ADD_GROUPS'
-INSERT IGNORE INTO groups (name, description)
+INSERT IGNORE INTO usenet_groups (name, description)
 	SELECT groupname, 'Added by predb import script'
-	FROM predb_imports AS pi LEFT JOIN groups AS g ON pi.groupname = g.name
+	FROM predb_imports AS pi LEFT JOIN usenet_groups AS g ON pi.groupname = g.name
 	WHERE pi.groupname IS NOT NULL AND g.name IS NULL
 	GROUP BY groupname;
 SQL_ADD_GROUPS;
@@ -341,7 +341,7 @@ SQL_LOAD_DATA;
 
     protected function prepareSQLUpdateGroupIDs(): void
     {
-        $sql = 'UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL';
+        $sql = 'UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM usenet_groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL';
         $this->prepareSQLStatement($sql, 'UpdateGroupID');
     }
 }

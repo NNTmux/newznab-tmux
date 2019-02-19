@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
@@ -83,7 +83,7 @@ class Releases
 			(
 				SELECT r.*, g.name AS group_name
 				FROM releases r
-				LEFT JOIN groups g ON g.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				%s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
@@ -150,7 +150,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s
 				%s %s %s %s ',
-            ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
+            ($groupName !== -1 ? 'LEFT JOIN usenet_groups g ON g.id = r.groups_id' : ''),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
@@ -269,7 +269,7 @@ class Releases
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id');
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'r.groups_id');
 
         if ($groupID !== '') {
             $query->where('r.groups_id', $groupID);
@@ -330,7 +330,7 @@ class Releases
     {
         $groups = Release::query()
             ->selectRaw('DISTINCT g.id, g.name')
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
         $temp_array = [];
 
@@ -393,13 +393,13 @@ class Releases
                 "SELECT r.*,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
-					groups.name AS group_name,
+					usenet_groups.name AS group_name,
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					df.failed AS failed
 				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				LEFT JOIN groups ON groups.id = r.groups_id
+				LEFT JOIN usenet_groups ON usenet_groups.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				LEFT JOIN categories c ON c.id = r.categories_id
@@ -635,7 +635,7 @@ class Releases
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
             (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
             $catQuery,
@@ -661,7 +661,7 @@ class Releases
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
@@ -726,7 +726,7 @@ class Releases
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             $catQuery,
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
@@ -744,7 +744,7 @@ class Releases
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			%s %s",
@@ -895,7 +895,7 @@ class Releases
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
@@ -1036,7 +1036,7 @@ class Releases
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
@@ -1108,7 +1108,7 @@ class Releases
 			FROM releases r
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
 			%s",
@@ -1185,7 +1185,7 @@ class Releases
 				rn.releases_id AS nfoid
 			FROM releases r
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id

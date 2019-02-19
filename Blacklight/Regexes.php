@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Category;
 use Illuminate\Support\Arr;
@@ -185,7 +185,7 @@ class Regexes
      */
     public function testCollectionRegex($groupName, $regex, $limit): array
     {
-        $groupID = Group::getIDByName($groupName);
+        $groupID = UsenetGroup::getIDByName($groupName);
 
         if (! $groupID) {
             return [];
@@ -251,7 +251,7 @@ class Regexes
      */
     public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
     {
-        $groupID = Group::getIDByName($groupName);
+        $groupID = UsenetGroup::getIDByName($groupName);
 
         if (! $groupID) {
             return [];

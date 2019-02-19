@@ -5,7 +5,7 @@ namespace Blacklight\processing;
 use Blacklight\Nfo;
 use Blacklight\XXX;
 use Blacklight\NNTP;
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use Blacklight\Books;
 use Blacklight\Games;
 use Blacklight\Movie;
@@ -312,7 +312,7 @@ class PostProcess
         }
 
         // Get the PAR2 file.
-        $par2 = $nntp->getMessages(Group::getNameByID($groupID), $messageID, $this->alternateNNTP);
+        $par2 = $nntp->getMessages(UsenetGroup::getNameByID($groupID), $messageID, $this->alternateNNTP);
         if ($nntp->isError($par2)) {
             return false;
         }

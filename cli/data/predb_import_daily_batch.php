@@ -157,14 +157,14 @@ foreach ($data as $dir => $files) {
                 DB::delete('DELETE FROM predb_imports WHERE LENGTH(title) <= 8');
 
                 // Add any groups that do not currently exist
-                DB::insert("INSERT IGNORE INTO groups (name, description)
+                DB::insert("INSERT IGNORE INTO usenet_groups (name, description)
 	                        SELECT groupname, 'Added by predb import script'
-	                        FROM predb_imports AS pi LEFT JOIN groups AS g ON pi.groupname = g.name
+	                        FROM predb_imports AS pi LEFT JOIN usenet_groups AS g ON pi.groupname = g.name
 	                        WHERE pi.groupname IS NOT NULL AND g.name IS NULL
 	                        GROUP BY groupname");
 
                 // Fill the groups_id
-                DB::update('UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL');
+                DB::update('UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM usenet_groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL');
 
                 $colorCli->info('Inserting records from temporary table into predb table');
                 $inserted = DB::insert("INSERT INTO predb (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groups_id)

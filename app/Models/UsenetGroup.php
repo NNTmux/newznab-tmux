@@ -27,22 +27,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $backfill
  * @property string|null $description
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfill($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfillTarget($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecord($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecordPostdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecord($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecordPostdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastUpdated($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinfilestoformrelease($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinsizetoformrelease($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfill($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfillTarget($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereFirstRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereFirstRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereLastRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereLastRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereLastUpdated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinfilestoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinsizetoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereName($value)
  * @mixin \Eloquent
  */
-class Group extends Model
+class UsenetGroup extends Model
 {
     /**
      * @var bool
@@ -303,7 +303,7 @@ class Group extends Model
      */
     public static function addGroup($group)
     {
-        $checkOld = Group::query()->where('name', trim($group['name']))->first();
+        $checkOld = UsenetGroup::query()->where('name', trim($group['name']))->first();
         if (empty($checkOld)) {
             return self::query()->insertGetId([
                     'name' => trim($group['name']),
@@ -455,7 +455,7 @@ class Group extends Model
             $nntp->doQuit();
 
             if ($nntp->isError($groups)) {
-                return 'Problem fetching groups from usenet.';
+                return 'Problem fetching usenet_groups from usenet.';
             }
 
             $regFilter = '/'.$groupList.'/i';

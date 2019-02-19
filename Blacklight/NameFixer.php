@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
@@ -934,7 +934,7 @@ class NameFixer
                 $newName = preg_replace(['/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'], '', $newName[0]);
 
                 if ($this->echooutput && $show) {
-                    $groupName = Group::getNameByID($release->groups_id);
+                    $groupName = UsenetGroup::getNameByID($release->groups_id);
                     $oldCatName = Category::getNameByID($release->categories_id);
                     $newCatName = Category::getNameByID($determinedCategory['categories_id']);
 

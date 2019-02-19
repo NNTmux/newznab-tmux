@@ -288,7 +288,7 @@ class Games
 				gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id,
 				rn.releases_id AS nfoid
 				FROM releases r
-				LEFT OUTER JOIN groups g ON g.id = r.groups_id
+				LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id

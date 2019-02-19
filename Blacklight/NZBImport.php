@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
@@ -280,9 +280,9 @@ class NZBImport
                             $groupName = $group;
                         }
                     } else {
-                        $group = Group::isValidGroup($group);
+                        $group = UsenetGroup::isValidGroup($group);
                         if ($group !== false) {
-                            $groupID = Group::addGroup([
+                            $groupID = UsenetGroup::addGroup([
                                 'name' => $group,
                                 'description' => 'Added by NZBimport script.',
                                 'backfill_target' => 1,
@@ -440,7 +440,7 @@ class NZBImport
     protected function getAllGroups(): bool
     {
         $this->allGroups = [];
-        $groups = Group::query()->get(['id', 'name']);
+        $groups = UsenetGroup::query()->get(['id', 'name']);
 
         if ($groups instanceof \Traversable) {
             foreach ($groups as $group) {

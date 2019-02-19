@@ -354,7 +354,7 @@ class Forking extends \fork_daemon
         // The option for backFill is for doing up to x articles. Else it's done by date.
         $this->work = DB::select(
             sprintf(
-                'SELECT name %s FROM groups WHERE backfill = 1',
+                'SELECT name %s FROM usenet_groups WHERE backfill = 1',
                 ($this->workTypeOptions[0] === false ? '' : (', '.$this->workTypeOptions[0].' AS max'))
             )
         );
@@ -425,7 +425,7 @@ class Forking extends \fork_daemon
 				g.first_record AS our_first,
 				MAX(a.first_record) AS their_first,
 				MAX(a.last_record) AS their_last
-				FROM groups g
+				FROM usenet_groups g
 				INNER JOIN short_groups a ON g.name = a.name
 				WHERE g.first_record IS NOT NULL
 				AND g.first_record_postdate IS NOT NULL
@@ -487,7 +487,7 @@ class Forking extends \fork_daemon
         $this->register_child_run([0 => $this, 1 => 'binariesChildWorker']);
         $this->work = DB::select(
             sprintf(
-                'SELECT name, %d AS max FROM groups WHERE active = 1',
+                'SELECT name, %d AS max FROM usenet_groups WHERE active = 1',
                 $this->workTypeOptions[0]
             )
         );
@@ -524,7 +524,7 @@ class Forking extends \fork_daemon
             '
 			SELECT g.name AS groupname, g.last_record AS our_last,
 				a.last_record AS their_last
-			FROM groups g
+			FROM usenet_groups g
 			INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name
 			ORDER BY a.last_record DESC'
         );
@@ -658,7 +658,7 @@ class Forking extends \fork_daemon
     {
         $this->register_child_run([0 => $this, 1 => 'releasesChildWorker']);
 
-        $groups = DB::select('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
+        $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
         foreach ($groups as $group) {
             try {
@@ -994,7 +994,7 @@ class Forking extends \fork_daemon
     private function updatePerGroupMainMethod()
     {
         $this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
-        $this->work = DB::select('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
         return (int) Settings::settingValue('..releasethreads');
     }
