@@ -3,9 +3,9 @@
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
-use App\Models\UsenetGroup;
 use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
 use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;

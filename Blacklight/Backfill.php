@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 

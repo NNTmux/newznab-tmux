@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 

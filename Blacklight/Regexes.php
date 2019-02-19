@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Release;
 use App\Models\Category;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
 use App\Models\CategoryRegex;
 use App\Models\CollectionRegex;

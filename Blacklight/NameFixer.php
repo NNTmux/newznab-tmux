@@ -2,10 +2,10 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;

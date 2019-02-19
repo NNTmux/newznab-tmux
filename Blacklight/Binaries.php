@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\UsenetGroup;
 use App\Models\Settings;
 use App\Models\Collection;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
