@@ -102,7 +102,7 @@ foreach ($data as $dir => $files) {
                 }
 
                 // Download the dump.
-                $dump = Utility::getUrl(['url' => $file['download_url']]);
+                $dump = getRawHtml($file['download_url']);
                 echo "Downloading: {$file['download_url']}\n";
 
                 if (! $dump) {
@@ -148,7 +148,6 @@ foreach ($data as $dir => $files) {
 
                 // Import file into predb_imports
                 DB::unprepared("LOAD DATA {$local} INFILE '{$dumpFile}' IGNORE INTO TABLE predb_imports FIELDS TERMINATED BY '\\t\\t' OPTIONALLY ENCLOSED BY \"'\" LINES TERMINATED BY '\\r\\n' (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname)");
-                DB::commit();
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
@@ -167,7 +166,7 @@ foreach ($data as $dir => $files) {
                 DB::update('UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM usenet_groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL');
 
                 $colorCli->info('Inserting records from temporary table into predb table');
-                $inserted = DB::insert("INSERT INTO predb (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groups_id)
+                $inserted = DB::insert("INSERT INTO predb (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groups_id)
                         SELECT pi.title, pi.nfo, pi.size, pi.files, pi.filename, pi.nuked, pi.nukereason, pi.category, pi.predate, pi.source, pi.requestid, groups_id
                         FROM predb_imports AS pi
                         ON DUPLICATE KEY UPDATE predb.nfo = IF(predb.nfo IS NULL, pi.nfo, predb.nfo),
@@ -214,15 +213,7 @@ function settings_array($last = null, $settings = null)
 
 function getDirListing($url)
 {
-    $result = Utility::getUrl(
-        [
-            'url'            => $url,
-            'requestheaders' => [
-                'Content-Type: application/json',
-                'User-Agent: nZEDb',
-            ],
-        ]
-    );
+    $result = getRawHtml($url);
 
     if ($result === false) {
         exit('Error connecting to GitHub, try again later?'.PHP_EOL);

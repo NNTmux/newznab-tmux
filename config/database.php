@@ -51,6 +51,9 @@ return [
             'collation'   => 'utf8_unicode_ci',
             'strict'      => false,
             'engine'      => 'InnoDB ROW_FORMAT=DYNAMIC',
+            'options' => [
+                \PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+                ],
         ],
 
         'pgsql' => [

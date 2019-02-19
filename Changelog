@@ -1,4 +1,6 @@
 2019-02-19 DariusIII
+	* Chg: Use getRawHtml in place of Utility::getUrl in predb_import_daily_batch script
+	* Chg: Update config/database mysql connection settings
 	* Fix: Fix FanArt error when fetching covers
 	* Fix: Fix missing number on group processing time message
 	* Chg: Update nesbot/carbon (2.10.1 => 2.12.0)
