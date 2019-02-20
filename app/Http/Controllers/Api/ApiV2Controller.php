@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\UserAccessedApi;
 use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
@@ -11,6 +10,7 @@ use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
+use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
 use App\Transformers\ApiTransformer;
 use App\Transformers\TagsTransformer;
