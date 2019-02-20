@@ -84,9 +84,9 @@
                 <td><a title="View profile" href="{$smarty.const.WWW_TOP}/profile?id={$user->id}">{$user->email}</a>
                 </td>
                 <td>{$user->host}</td>
-                <td title="{$user->created_at}">{$user->created_at|date_format}</td>
-                <td title="{$user->lastlogin}">{$user->lastlogin|date_format}</td>
-                <td title="{$user->apiaccess}">{$user->apiaccess|date_format}</td>
+                <td title="{$user->created_at}">{$user->created_at}</td>
+                <td title="{$user->lastlogin}">{$user->lastlogin}</td>
+                <td title="{$user->apiaccess}">{$user->apiaccess}</td>
                 <td>{$user->apirequests}</td>
                 <td class="mid">{$user->grabs}</td>
                 <td class="mid">{$user->invites}</td>
