@@ -1,3 +1,5 @@
+2019-02-20 DariusIII
+	* Chg: Update nette/neon (v2.4.3 => v3.0.0)
 2019-02-19 DariusIII
 	* Chg: Use getRawHtml in place of Utility::getUrl in predb_import_daily_batch script
 	* Chg: Update config/database mysql connection settings
