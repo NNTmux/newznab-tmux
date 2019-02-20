@@ -319,13 +319,13 @@ class Binaries
 
         // Select the group on the NNTP server, gets the latest info on it.
         $groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
-        if ($this->_nntp->isError($groupNNTP)) {
+        if ($this->_nntp::isError($groupNNTP)) {
             $groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
 
             if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
                 UsenetGroup::disableIfNotExist($groupMySQL['id']);
             }
-            if ($this->_nntp->isError($groupNNTP)) {
+            if ($this->_nntp::isError($groupNNTP)) {
                 return;
             }
         }
@@ -412,7 +412,7 @@ class Binaries
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
                     (
-                            (int) $groupMySQL['last_record'] === 0
+                        (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
                             (
                                 $this->_newGroupScanByDays
@@ -430,7 +430,7 @@ class Binaries
 
             $done = false;
             // Get all the parts (in portions of $this->messageBuffer to not use too much memory).
-            while ($done === false) {
+            while (! $done) {
 
                 // Increment last until we reach $groupLast (group newest article).
                 if ($total > $this->messageBuffer) {
@@ -558,7 +558,7 @@ class Binaries
         $this->addToPartRepair = ($type === 'update' && $this->_partRepair);
 
         // Download the headers.
-        if ($partRepair === true) {
+        if ($partRepair) {
             // This is slower but possibly is better with missing headers.
             $headers = $this->_nntp->getOverview($this->first.'-'.$this->last, true, false);
         } else {
@@ -566,10 +566,10 @@ class Binaries
         }
 
         // If there was an error, try to reconnect.
-        if ($this->_nntp->isError($headers)) {
+        if ($this->_nntp::isError($headers)) {
 
             // Increment if part repair and return false.
-            if ($partRepair === true) {
+            if ($partRepair) {
                 DB::update(
                     sprintf(
                         'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
@@ -593,7 +593,7 @@ class Binaries
             $this->_nntp->enableCompression();
 
             // Check if the non-compression headers have an error.
-            if ($this->_nntp->isError($headers)) {
+            if ($this->_nntp::isError($headers)) {
                 $message = ((int) $headers->code === 0 ? 'Unknown error' : $headers->message);
                 $this->log(
                     "Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}",
@@ -635,7 +635,7 @@ class Binaries
             }
 
             // If set we are running in partRepair mode.
-            if ($partRepair === true && $missingParts !== null) {
+            if ($partRepair && $missingParts !== null) {
                 if (! \in_array($header['Number'], $missingParts, false)) {
                     // If article isn't one that is missing skip it.
                     continue;
@@ -683,7 +683,7 @@ class Binaries
             $this->updateBlacklistUsage();
         }
 
-        if ($this->_echoCLI && $partRepair === false) {
+        if ($this->_echoCLI && ! $partRepair) {
             $this->outputHeaderInitial();
         }
 
@@ -1184,13 +1184,13 @@ class Binaries
             // Try to get locally.
             $local = DB::select(
                 sprintf(
-                        '
+                    '
 						SELECT c.date AS date
 						FROM collections c
 						INNER JOIN binaries b ON(c.id=b.collections_id)
 						INNER JOIN parts p ON(b.id=p.binaries_id)
 						WHERE p.number = %s',
-                        $currentPost
+                    $currentPost
                     )
                 );
             if (! empty($local) && \count($local) > 0) {
@@ -1200,7 +1200,7 @@ class Binaries
 
             // If we could not find it locally, try usenet.
             $header = $this->_nntp->getXOVER($currentPost);
-            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
+            if (! $this->_nntp::isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
                 $date = $header[0]['Date'];
                 break;
             }
@@ -1593,12 +1593,8 @@ class Binaries
     protected function _ignoreFileCount($groupName, $subject): bool
     {
         $ignore = false;
-        switch ($groupName) {
-            case 'alt.binaries.erotica':
-                if (preg_match('/^\[\d+\]-\[FULL\]-\[#a\.b\.erotica@EFNet\]-\[ \d{2,3}_/', $subject)) {
-                    $ignore = true;
-                }
-                break;
+        if (($groupName === 'alt.binaries.erotica') && preg_match('/^\[\d+\]-\[FULL\]-\[#a\.b\.erotica@EFNet\]-\[ \d{2,3}_/', $subject)) {
+            $ignore = true;
         }
 
         return $ignore;
