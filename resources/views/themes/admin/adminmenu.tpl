@@ -240,5 +240,17 @@
                 <span class="menu-collapsed">View Pre Database</span>
             </a>
         </div>
+        <a href="#submenu15" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+            <div class="d-flex w-100 justify-content-start align-items-center">
+                <span class="fa fa-database fa-fw mr-3"></span>
+                <span class="menu-collapsed">Laravel Telescope</span>
+                <span class="submenu-icon ml-auto"></span>
+            </div>
+        </a>
+        <div id='submenu15' class="collapse sidebar-submenu">
+            <a href="{$smarty.const.WWW_TOP}/telescope" class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
+                <span class="menu-collapsed">View Telescope Monitoring tool</span>
+            </a>
+        </div>
     </ul>
 </div>
