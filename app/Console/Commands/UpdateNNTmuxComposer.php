@@ -65,6 +65,7 @@ class UpdateNNTmuxComposer extends Command
         }
         $this->output->writeln('<comment>Running composer install process...</comment>');
         $process = new Process($command);
+        $process->setTimeout(360);
         $process->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
                 echo $buffer;
