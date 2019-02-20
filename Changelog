@@ -1,4 +1,5 @@
 2019-02-20 DariusIII
+	* Chg: Add laravel/horizon to manage redis queues
 	* Chg: Add link to laravel telescope to admin area
 	* Chg: Add laravel/telescope to monitor indexer various data
 	* Chg: Update display of date for dates when user registered, logged in and accessed the api to show exact time not just date
