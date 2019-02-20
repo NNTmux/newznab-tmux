@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\UserAccessedApi;
 use App\Models\User;
 use App\Models\Release;
 use Blacklight\http\API;
@@ -89,7 +90,7 @@ class ApiController extends BasePageController
 
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
         if ($uid !== '') {
-            User::updateApiAccessed($uid);
+            event(new UserAccessedApi($res));
             $apiRequests = UserRequest::getApiRequests($uid);
             if ($apiRequests > $maxRequests) {
                 Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');

@@ -781,30 +781,6 @@ class User extends Authenticatable
     }
 
     /**
-     * When a user logs in, update the last time they logged in.
-     *
-     * @param int    $userID ID of the user.
-     * @param string $host
-     */
-    public static function updateSiteAccessed($userID, $host = ''): void
-    {
-        self::find($userID)->update(
-            [
-                'lastlogin' => now(),
-                'host' => $host,
-            ]
-        );
-    }
-
-    /**
-     * @param $uid
-     */
-    public static function updateApiAccessed($uid): void
-    {
-        self::find($uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
-    }
-
-    /**
      * Get the list of categories the user has excluded.
      *
      * @param int $userID ID of the user.

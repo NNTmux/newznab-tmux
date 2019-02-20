@@ -1,5 +1,6 @@
 2019-02-20 DariusIII
-	* Chg: DO some small code simplification
+	* Chg: Move certain user functions (api accessed and logged in) into specific events
+	* Chg: Do some small code simplification
 	* Chg: Add table to track failed jobs
 	* Fix: Add missing import of ColorCLI class. Fixes issue #897
 	* Chg: Update nette/neon (v2.4.3 => v3.0.0)

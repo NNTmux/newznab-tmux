@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 require_once NN_LIB.'utility/SmartyUtils.php';
 
+use App\Events\UserLoggedIn;
 use App\Models\User;
 use Blacklight\SABnzbd;
 use App\Models\Category;
@@ -243,7 +244,7 @@ class BasePageController extends Controller
 
         // Update last login every 15 mins.
         if ((strtotime($this->userdata['now']) - 900) > strtotime($this->userdata['lastlogin'])) {
-            User::updateSiteAccessed($this->userdata->id);
+            event(new UserLoggedIn($this->userdata));
         }
 
         $this->smarty->assign('userdata', $this->userdata);

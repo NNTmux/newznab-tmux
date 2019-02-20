@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\UserLoggedIn;
 use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Support\Arr;
@@ -80,7 +81,8 @@ class LoginController extends Controller
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                    User::updateSiteAccessed($user->id, (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '');
+                    $userIp = (int) Settings::settingValue('..storeuserips') === 1 ? $request->getClientIp() : '';
+                    event(new UserLoggedIn($user, $userIp));
 
                     Auth::logoutOtherDevices($request->input('password'));
 
