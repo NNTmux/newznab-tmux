@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Events\UserAccessedApi;
 use App\Events\UserLoggedIn;
-use App\Listeners\UpdateUserAccessedApi;
+use App\Events\UserAccessedApi;
 use App\Listeners\UpdateUserLoggedIn;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use App\Listeners\UpdateUserAccessedApi;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

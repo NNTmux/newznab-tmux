@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\UserAccessedApi;
 use App\Models\User;
 use App\Models\Release;
 use Blacklight\http\API;
@@ -10,6 +9,7 @@ use Blacklight\Releases;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
+use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\BasePageController;
 

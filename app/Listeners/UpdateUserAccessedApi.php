@@ -2,10 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\UserAccessedApi;
 use App\Models\User;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\UserAccessedApi;
 
 class UpdateUserAccessedApi
 {

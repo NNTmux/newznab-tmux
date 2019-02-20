@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Events\UserLoggedIn;
 use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Support\Arr;
+use App\Events\UserLoggedIn;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;

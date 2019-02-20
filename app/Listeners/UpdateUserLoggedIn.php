@@ -2,10 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\UserLoggedIn;
 use App\Models\User;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\UserLoggedIn;
 
 class UpdateUserLoggedIn
 {
