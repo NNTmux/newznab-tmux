@@ -1,4 +1,5 @@
 2019-02-20 DariusIII
+	* Chg: Add user API access tracking to ApiV2
 	* Chg: Increase timeout value for composer install command
 	* Chg: Move certain user functions (api accessed and logged in) into specific events
 	* Chg: Do some small code simplification
