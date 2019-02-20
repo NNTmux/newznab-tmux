@@ -25,6 +25,6 @@ class UpdateUserAccessedApi
      */
     public function handle(UserAccessedApi $event)
     {
-        User::find($event->user->id)->update(['apiaccess' => now()->format('Y-m-d h:m:s')]);
+        User::find($event->user->id)->update(['apiaccess' => now()]);
     }
 }
