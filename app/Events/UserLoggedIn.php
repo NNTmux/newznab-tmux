@@ -26,7 +26,7 @@ class UserLoggedIn
      * @param $user
      * @param $ip
      */
-    public function __construct($user, $ip)
+    public function __construct($user, $ip = '')
     {
         $this->user = $user;
         $this->ip = $ip;
