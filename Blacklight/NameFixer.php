@@ -7,7 +7,6 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
-use Blacklight\ColorCLI;
 use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
 
