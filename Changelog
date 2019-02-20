@@ -1,4 +1,5 @@
 2019-02-20 DariusIII
+	* Chg: Add table to track failed jobs
 	* Fix: Add missing import of ColorCLI class. Fixes issue #897
 	* Chg: Update nette/neon (v2.4.3 => v3.0.0)
 2019-02-19 DariusIII
