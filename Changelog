@@ -1,4 +1,5 @@
 2019-02-20 DariusIII
+	* Fix: Add missing import of ColorCLI class. Fixes issue #897
 	* Chg: Update nette/neon (v2.4.3 => v3.0.0)
 2019-02-19 DariusIII
 	* Chg: Use getRawHtml in place of Utility::getUrl in predb_import_daily_batch script
