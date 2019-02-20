@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('disposable:update')->weekly();
         $schedule->command('clean:directories')->hourly();
         $schedule->exec('php '.base_path().'/misc/testing/DB/checkUsers.php')->twiceDaily(1, 13);
+        $schedule->command('telescope:prune')->daily();
     }
 
     /**
