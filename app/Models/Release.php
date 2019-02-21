@@ -557,17 +557,13 @@ class Release extends Model
 
         preg_match('/(^\w+[-_. ].+?\.(\d+p)).+/i', $rel['searchname'], $similar);
 
-        $alternate = self::query()
-            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
-            ->where('releases.searchname', 'like', $rel['searchname'])
-            ->orWhere('releases.searchname', 'like', $similar[1].'%')
-            ->where('df.release_id', '=', null)
-            ->where('releases.categories_id', $rel['categories_id'])
-            ->where('id', '<>', $rel['id'])
-            ->orderBy('releases.postdate', 'desc')
-            ->first(['guid']);
+        if (!empty($similar)) {
+            $alternate = self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->where('releases.searchname', 'like', $rel['searchname'])->orWhere('releases.searchname', 'like', $similar[1].'%')->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderBy('releases.postdate', 'desc')->first(['guid']);
 
-        return $alternate;
+            return $alternate;
+        }
+
+        return false;
     }
 
     /**
