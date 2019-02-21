@@ -4,10 +4,10 @@ namespace App\Observers;
 
 use App\Models\User;
 use App\Jobs\SendWelcomeEmail;
+use Spatie\Permission\Models\Role;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Jobs\SendNewRegisteredAccountMail;
 use Jrean\UserVerification\Facades\UserVerification;
-use Spatie\Permission\Models\Role;
 
 class UserServiceObserver
 {
