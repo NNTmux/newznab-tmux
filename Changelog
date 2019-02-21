@@ -1,3 +1,5 @@
+2019-02-21 DariusIII
+	* Chg: Add laravel telescope migration
 2019-02-20 DariusIII
 	* Chg: Add laravel/horizon to manage redis queues
 	* Chg: Add link to laravel telescope to admin area
