@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var silver = (function () {
+var silver = (function (domGlobals) {
     'use strict';
 
     var noop = function () {
@@ -82,13 +82,13 @@ var silver = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -104,17 +104,17 @@ var silver = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -594,11 +594,11 @@ var silver = (function () {
       var constructors = [];
       var adt = {};
       each(cases, function (acase, count) {
-        var keys$$1 = keys(acase);
-        if (keys$$1.length !== 1) {
+        var keys$1 = keys(acase);
+        if (keys$1.length !== 1) {
           throw new Error('one and only one name per case');
         }
-        var key = keys$$1[0];
+        var key = keys$1[0];
         var value = acase[key];
         if (adt[key] !== undefined) {
           throw new Error('duplicate key detected:' + key);
@@ -1156,13 +1156,13 @@ var silver = (function () {
     var PlatformDetection = { detect: detect$2 };
 
     var detect$3 = cached(function () {
-      var userAgent = navigator.userAgent;
+      var userAgent = domGlobals.navigator.userAgent;
       return PlatformDetection.detect(userAgent);
     });
     var PlatformDetection$1 = { detect: detect$3 };
 
     var alloy = { tap: constant('alloy.tap') };
-    var focus$1 = constant('alloy.focus');
+    var focus = constant('alloy.focus');
     var postBlur = constant('alloy.blur.post');
     var postPaste = constant('alloy.paste.post');
     var receive = constant('alloy.receive');
@@ -1187,22 +1187,22 @@ var silver = (function () {
     var dehighlight = constant('alloy.dehighlight');
 
     var fromHtml = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
       if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        console.error('HTML does not have a single root node', html);
+        domGlobals.console.error('HTML does not have a single root node', html);
         throw new Error('HTML must have a single root node');
       }
       return fromDom(div.childNodes[0]);
     };
     var fromTag = function (tag, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createElement(tag);
       return fromDom(node);
     };
     var fromText = function (text, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createTextNode(text);
       return fromDom(node);
     };
@@ -1216,7 +1216,7 @@ var silver = (function () {
       var doc = docElm.dom();
       return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
     };
-    var Element$$1 = {
+    var Element = {
       fromHtml: fromHtml,
       fromTag: fromTag,
       fromText: fromText,
@@ -1280,13 +1280,13 @@ var silver = (function () {
       validateStrArr('optional', optional);
       checkDupes(everything);
       return function (obj) {
-        var keys$$1 = keys(obj);
+        var keys$1 = keys(obj);
         var allReqd = forall(required, function (req) {
-          return contains(keys$$1, req);
+          return contains(keys$1, req);
         });
         if (!allReqd)
-          reqMessage(required, keys$$1);
-        var unsupported = filter(keys$$1, function (key) {
+          reqMessage(required, keys$1);
+        var unsupported = filter(keys$1, function (key) {
           return !contains(everything, key);
         });
         if (unsupported.length > 0)
@@ -1339,23 +1339,23 @@ var silver = (function () {
     var documentPositionContainedBy = function (a, b) {
       return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
     };
-    var Node$1 = {
+    var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
     };
 
-    var ATTRIBUTE = Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = Node.CDATA_SECTION_NODE;
-    var COMMENT = Node.COMMENT_NODE;
-    var DOCUMENT = Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = Node.ELEMENT_NODE;
-    var TEXT = Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = Node.ENTITY_NODE;
-    var NOTATION = Node.NOTATION_NODE;
+    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
+    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
+    var COMMENT = domGlobals.Node.COMMENT_NODE;
+    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
+    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
+    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
+    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
+    var TEXT = domGlobals.Node.TEXT_NODE;
+    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
+    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
+    var ENTITY = domGlobals.Node.ENTITY_NODE;
+    var NOTATION = domGlobals.Node.NOTATION_NODE;
 
     var ELEMENT$1 = ELEMENT;
     var DOCUMENT$1 = DOCUMENT;
@@ -1379,12 +1379,12 @@ var silver = (function () {
       return dom.nodeType !== ELEMENT$1 && dom.nodeType !== DOCUMENT$1 || dom.childElementCount === 0;
     };
     var all = function (selector, scope) {
-      var base = scope === undefined ? document : scope.dom();
-      return bypassSelector(base) ? [] : map(base.querySelectorAll(selector), Element$$1.fromDom);
+      var base = scope === undefined ? domGlobals.document : scope.dom();
+      return bypassSelector(base) ? [] : map(base.querySelectorAll(selector), Element.fromDom);
     };
     var one = function (selector, scope) {
-      var base = scope === undefined ? document : scope.dom();
-      return bypassSelector(base) ? Option.none() : Option.from(base.querySelector(selector)).map(Element$$1.fromDom);
+      var base = scope === undefined ? domGlobals.document : scope.dom();
+      return bypassSelector(base) ? Option.none() : Option.from(base.querySelector(selector)).map(Element.fromDom);
     };
 
     var eq = function (e1, e2) {
@@ -1396,38 +1396,38 @@ var silver = (function () {
       return d1 === d2 ? false : d1.contains(d2);
     };
     var ieContains = function (e1, e2) {
-      return Node$1.documentPositionContainedBy(e1.dom(), e2.dom());
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
     var browser = PlatformDetection$1.detect().browser;
     var contains$2 = browser.isIE() ? ieContains : regularContains;
 
     var owner = function (element) {
-      return Element$$1.fromDom(element.dom().ownerDocument);
+      return Element.fromDom(element.dom().ownerDocument);
     };
     var defaultView = function (element) {
       var el = element.dom();
       var defView = el.ownerDocument.defaultView;
-      return Element$$1.fromDom(defView);
+      return Element.fromDom(defView);
     };
     var parent = function (element) {
       var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element$$1.fromDom);
+      return Option.from(dom.parentNode).map(Element.fromDom);
     };
     var offsetParent = function (element) {
       var dom = element.dom();
-      return Option.from(dom.offsetParent).map(Element$$1.fromDom);
+      return Option.from(dom.offsetParent).map(Element.fromDom);
     };
     var nextSibling = function (element) {
       var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element$$1.fromDom);
+      return Option.from(dom.nextSibling).map(Element.fromDom);
     };
     var children = function (element) {
       var dom = element.dom();
-      return map(dom.childNodes, Element$$1.fromDom);
+      return map(dom.childNodes, Element.fromDom);
     };
     var child = function (element, index) {
       var cs = element.dom().childNodes;
-      return Option.from(cs[index]).map(Element$$1.fromDom);
+      return Option.from(cs[index]).map(Element.fromDom);
     };
     var firstChild = function (element) {
       return child(element, 0);
@@ -1435,43 +1435,43 @@ var silver = (function () {
     var spot = Immutable('element', 'offset');
 
     var fromHtml$1 = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
-      return children(Element$$1.fromDom(div));
+      return children(Element.fromDom(div));
     };
 
     var before = function (marker, element) {
-      var parent$$1 = parent(marker);
-      parent$$1.each(function (v) {
+      var parent$1 = parent(marker);
+      parent$1.each(function (v) {
         v.dom().insertBefore(element.dom(), marker.dom());
       });
     };
     var after = function (marker, element) {
       var sibling = nextSibling(marker);
       sibling.fold(function () {
-        var parent$$1 = parent(marker);
-        parent$$1.each(function (v) {
+        var parent$1 = parent(marker);
+        parent$1.each(function (v) {
           append(v, element);
         });
       }, function (v) {
         before(v, element);
       });
     };
-    var prepend = function (parent$$1, element) {
-      var firstChild$$1 = firstChild(parent$$1);
-      firstChild$$1.fold(function () {
-        append(parent$$1, element);
+    var prepend = function (parent, element) {
+      var firstChild$1 = firstChild(parent);
+      firstChild$1.fold(function () {
+        append(parent, element);
       }, function (v) {
-        parent$$1.dom().insertBefore(element.dom(), v.dom());
+        parent.dom().insertBefore(element.dom(), v.dom());
       });
     };
-    var append = function (parent$$1, element) {
-      parent$$1.dom().appendChild(element.dom());
+    var append = function (parent, element) {
+      parent.dom().appendChild(element.dom());
     };
-    var appendAt = function (parent$$1, element, index) {
-      child(parent$$1, index).fold(function () {
-        append(parent$$1, element);
+    var appendAt = function (parent, element, index) {
+      child(parent, index).fold(function () {
+        append(parent, element);
       }, function (v) {
         before(v, element);
       });
@@ -1500,17 +1500,17 @@ var silver = (function () {
       return element.dom().innerHTML;
     };
     var set = function (element, content) {
-      var owner$$1 = owner(element);
-      var docDom = owner$$1.dom();
-      var fragment = Element$$1.fromDom(docDom.createDocumentFragment());
+      var owner$1 = owner(element);
+      var docDom = owner$1.dom();
+      var fragment = Element.fromDom(docDom.createDocumentFragment());
       var contentElements = fromHtml$1(content, docDom);
       append$1(fragment, contentElements);
       empty(element);
       append(element, fragment);
     };
     var getOuter = function (element) {
-      var container = Element$$1.fromTag('div');
-      var clone = Element$$1.fromDom(element.dom().cloneNode(true));
+      var container = Element.fromTag('div');
+      var clone = Element.fromDom(element.dom().cloneNode(true));
       append(container, clone);
       return get$1(container);
     };
@@ -1535,7 +1535,7 @@ var silver = (function () {
       if (isString(value) || isBoolean(value) || isNumber(value)) {
         dom.setAttribute(key, value + '');
       } else {
-        console.error('Invalid call to Attr.set. Key ', key, ':: Value ', value, ':: Element ', dom);
+        domGlobals.console.error('Invalid call to Attr.set. Key ', key, ':: Value ', value, ':: Element ', dom);
         throw new Error('Attribute value was not simple');
       }
     };
@@ -1560,11 +1560,11 @@ var silver = (function () {
       element.dom().removeAttribute(key);
     };
 
-    var clone$1 = function (original, isDeep) {
-      return Element$$1.fromDom(original.dom().cloneNode(isDeep));
+    var clone = function (original, isDeep) {
+      return Element.fromDom(original.dom().cloneNode(isDeep));
     };
     var shallow$1 = function (original) {
-      return clone$1(original, false);
+      return clone(original, false);
     };
 
     var getHtml = function (element) {
@@ -1589,34 +1589,34 @@ var silver = (function () {
       var sequence = [];
       var startTime = new Date().getTime();
       return {
-        logEventCut: function (name$$1, target, purpose) {
+        logEventCut: function (name, target, purpose) {
           sequence.push({
             outcome: 'cut',
             target: target,
             purpose: purpose
           });
         },
-        logEventStopped: function (name$$1, target, purpose) {
+        logEventStopped: function (name, target, purpose) {
           sequence.push({
             outcome: 'stopped',
             target: target,
             purpose: purpose
           });
         },
-        logNoParent: function (name$$1, target, purpose) {
+        logNoParent: function (name, target, purpose) {
           sequence.push({
             outcome: 'no-parent',
             target: target,
             purpose: purpose
           });
         },
-        logEventNoHandlers: function (name$$1, target) {
+        logEventNoHandlers: function (name, target) {
           sequence.push({
             outcome: 'no-handlers-left',
             target: target
           });
         },
-        logEventResponse: function (name$$1, target, purpose) {
+        logEventResponse: function (name, target, purpose) {
           sequence.push({
             outcome: 'response',
             purpose: purpose,
@@ -1633,7 +1633,7 @@ var silver = (function () {
             ], eventName)) {
             return;
           }
-          console.log(eventName, {
+          domGlobals.console.log(eventName, {
             event: eventName,
             time: finishTime - startTime,
             target: initialTarget.dom(),
@@ -1653,13 +1653,13 @@ var silver = (function () {
       };
     };
     var processEvent = function (eventName, initialTarget, f) {
-      var status$$1 = readOptFrom$1(eventConfig.get(), eventName).orThunk(function () {
+      var status = readOptFrom$1(eventConfig.get(), eventName).orThunk(function () {
         var patterns = keys(eventConfig.get());
         return findMap(patterns, function (p) {
           return eventName.indexOf(p) > -1 ? Option.some(eventConfig.get()[p]) : Option.none();
         });
       }).getOr(EventConfiguration.NORMAL);
-      switch (status$$1) {
+      switch (status) {
       case EventConfiguration.NORMAL:
         return f(noLogger());
       case EventConfiguration.LOGGING: {
@@ -1724,18 +1724,18 @@ var silver = (function () {
       return go(comp);
     };
     var getOrInitConnection = function () {
-      if (window[CHROME_INSPECTOR_GLOBAL] !== undefined) {
-        return window[CHROME_INSPECTOR_GLOBAL];
+      if (domGlobals.window[CHROME_INSPECTOR_GLOBAL] !== undefined) {
+        return domGlobals.window[CHROME_INSPECTOR_GLOBAL];
       } else {
-        var setEventStatus_1 = function (eventName, status$$1) {
+        var setEventStatus_1 = function (eventName, status) {
           var evs = eventConfig.get();
-          evs[eventName] = status$$1;
+          evs[eventName] = status;
           eventConfig.set(evs);
         };
-        window[CHROME_INSPECTOR_GLOBAL] = {
+        domGlobals.window[CHROME_INSPECTOR_GLOBAL] = {
           systems: {},
           lookup: function (uid) {
-            var systems = window[CHROME_INSPECTOR_GLOBAL].systems;
+            var systems = domGlobals.window[CHROME_INSPECTOR_GLOBAL].systems;
             var connections = keys(systems);
             return findMap(connections, function (conn) {
               var connGui = systems[conn];
@@ -1758,12 +1758,12 @@ var silver = (function () {
             }
           }
         };
-        return window[CHROME_INSPECTOR_GLOBAL];
+        return domGlobals.window[CHROME_INSPECTOR_GLOBAL];
       }
     };
-    var registerInspector = function (name$$1, gui) {
+    var registerInspector = function (name, gui) {
       var connection = getOrInitConnection();
-      connection.systems[name$$1] = gui;
+      connection.systems[name] = gui;
     };
     var noLogger = constant(ignoreEvent);
 
@@ -1915,8 +1915,8 @@ var silver = (function () {
       return compose(SimpleResult.serror, flatten)(errors);
     };
     var consolidateObj = function (objects, base) {
-      var partition$$1 = SimpleResult.partition(objects);
-      return partition$$1.errors.length > 0 ? mergeErrors$1(partition$$1.errors) : mergeValues$1(partition$$1.values, base);
+      var partition = SimpleResult.partition(objects);
+      return partition.errors.length > 0 ? mergeErrors$1(partition.errors) : mergeValues$1(partition.values, base);
     };
     var consolidateArr = function (objects) {
       var partitions = SimpleResult.partition(objects);
@@ -2106,13 +2106,13 @@ var silver = (function () {
       });
       return ResultCombine.consolidateObj(results, {});
     };
-    var value$2 = function (validator) {
+    var value$1 = function (validator) {
       var extract = function (path, strength, val) {
         return SimpleResult.bindError(validator(val, strength), function (err) {
           return custom(path, err);
         });
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'val';
       };
       var toDsl = function () {
@@ -2120,13 +2120,13 @@ var silver = (function () {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
     var getSetKeys = function (obj) {
-      var keys$$1 = keys(obj);
-      return filter(keys$$1, function (k) {
+      var keys$1 = keys(obj);
+      return filter(keys$1, function (k) {
         return hasKey$1(obj, k);
       });
     };
@@ -2138,8 +2138,8 @@ var silver = (function () {
         }, constant(acc));
       }, {});
       var extract = function (path, strength, o) {
-        var keys$$1 = isBoolean(o) ? [] : getSetKeys(o);
-        var extra = filter(keys$$1, function (k) {
+        var keys = isBoolean(o) ? [] : getSetKeys(o);
+        var extra = filter(keys, function (k) {
           return !hasKey$1(fieldNames, k);
         });
         return extra.length === 0 ? delegate.extract(path, strength, o) : unsupportedFields(path, extra);
@@ -2154,7 +2154,7 @@ var silver = (function () {
       var extract = function (path, strength, o) {
         return cExtract(path, o, fields, strength);
       };
-      var toString$$1 = function () {
+      var toString = function () {
         var fieldStrings = map(fields, function (field) {
           return field.fold(function (key, okey, presence, prop) {
             return key + ' -> ' + prop.toString();
@@ -2175,7 +2175,7 @@ var silver = (function () {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
@@ -2186,7 +2186,7 @@ var silver = (function () {
         });
         return ResultCombine.consolidateArr(results);
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'array(' + prop.toString() + ')';
       };
       var toDsl = function () {
@@ -2194,17 +2194,17 @@ var silver = (function () {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
     var setOf = function (validator, prop) {
-      var validateKeys = function (path, keys$$1) {
-        return arrOf(value$2(validator)).extract(path, identity, keys$$1);
+      var validateKeys = function (path, keys) {
+        return arrOf(value$1(validator)).extract(path, identity, keys);
       };
       var extract = function (path, strength, o) {
-        var keys$$1 = keys(o);
-        var validatedKeys = validateKeys(path, keys$$1);
+        var keys$1 = keys(o);
+        var validatedKeys = validateKeys(path, keys$1);
         return SimpleResult.bind(validatedKeys, function (validKeys) {
           var schema = map(validKeys, function (vk) {
             return adt$1.field(vk, vk, strict(), prop);
@@ -2212,7 +2212,7 @@ var silver = (function () {
           return objOf(schema).extract(path, strength, o);
         });
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'setOf(' + prop.toString() + ')';
       };
       var toDsl = function () {
@@ -2220,11 +2220,11 @@ var silver = (function () {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
-    var anyValue = constant(value$2(SimpleResult.svalue));
+    var anyValue = constant(value$1(SimpleResult.svalue));
     var arrOfObj = compose(arrOf, objOf);
     var state = adt$1.state;
     var field = adt$1.field;
@@ -2246,7 +2246,7 @@ var silver = (function () {
           return chooseFrom(path, strength, input, branches, chosen);
         });
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'chooseOn(' + key + '). Possible values: ' + keys(branches);
       };
       var toDsl = function () {
@@ -2254,12 +2254,12 @@ var silver = (function () {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
 
-    var _anyValue = value$2(SimpleResult.svalue);
+    var _anyValue = value$1(SimpleResult.svalue);
     var arrOfObj$1 = function (objFields) {
       return arrOfObj(objFields);
     };
@@ -2267,7 +2267,7 @@ var silver = (function () {
       return arrOf(_anyValue);
     };
     var valueOf = function (validator) {
-      return value$2(function (v) {
+      return value$1(function (v) {
         return validator(v).fold(SimpleResult.serror, SimpleResult.svalue);
       });
     };
@@ -2304,7 +2304,7 @@ var silver = (function () {
     };
     var anyValue$1 = constant(_anyValue);
     var typedValue = function (validator, expectedType) {
-      return value$2(function (a) {
+      return value$1(function (a) {
         var actualType = typeof a;
         return validator(a) ? SimpleResult.svalue(a) : SimpleResult.serror('Expected type: ' + expectedType + ' but got: ' + actualType);
       });
@@ -2338,7 +2338,7 @@ var silver = (function () {
       return strictOf(key, functionProcessor);
     };
     var forbid = function (key, message) {
-      return field(key, key, asOption(), value$2(function (v) {
+      return field(key, key, asOption(), value$1(function (v) {
         return SimpleResult.serror('The field: ' + key + ' is forbidden. ' + message);
       }));
     };
@@ -2492,14 +2492,14 @@ var silver = (function () {
       return dom !== undefined && dom !== null && dom.ownerDocument.body.contains(dom);
     };
     var body = cached(function () {
-      return getBody(Element$$1.fromDom(document));
+      return getBody(Element.fromDom(domGlobals.document));
     });
     var getBody = function (doc) {
       var b = doc.dom().body;
       if (b === null || b === undefined) {
         throw new Error('Body is not available yet');
       }
-      return Element$$1.fromDom(b);
+      return Element.fromDom(b);
     };
 
     var ancestor = function (scope, predicate, isRoot) {
@@ -2507,7 +2507,7 @@ var silver = (function () {
       var stop = isFunction(isRoot) ? isRoot : constant(false);
       while (element.parentNode) {
         element = element.parentNode;
-        var el = Element$$1.fromDom(element);
+        var el = Element.fromDom(element);
         if (predicate(el)) {
           return Option.some(el);
         } else if (stop(el)) {
@@ -2525,8 +2525,8 @@ var silver = (function () {
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
-          if (predicate(Element$$1.fromDom(node.childNodes[i]))) {
-            return Option.some(Element$$1.fromDom(node.childNodes[i]));
+          if (predicate(Element.fromDom(node.childNodes[i]))) {
+            return Option.some(Element.fromDom(node.childNodes[i]));
           }
           var res = descend(node.childNodes[i]);
           if (res.isSome()) {
@@ -2651,11 +2651,11 @@ var silver = (function () {
     var isRecursive = function (component, originator, target) {
       return eq(originator, component.element()) && !eq(originator, target);
     };
-    var events = derive([can(focus$1(), function (component, simulatedEvent) {
+    var events = derive([can(focus(), function (component, simulatedEvent) {
         var originator = simulatedEvent.event().originator();
         var target = simulatedEvent.event().target();
         if (isRecursive(component, originator, target)) {
-          console.warn(focus$1() + ' did not get interpreted by the desired target. ' + '\nOriginator: ' + element(originator) + '\nTarget: ' + element(target) + '\nCheck the ' + focus$1() + ' event handlers');
+          domGlobals.console.warn(focus() + ' did not get interpreted by the desired target. ' + '\nOriginator: ' + element(originator) + '\nTarget: ' + element(target) + '\nCheck the ' + focus() + ' event handlers');
           return false;
         } else {
           return true;
@@ -2686,8 +2686,8 @@ var silver = (function () {
       var id = isElement(elem) ? elem.dom()[idAttr$1] : null;
       return Option.from(id);
     };
-    var generate$2 = function (prefix$$1) {
-      return generate$1(prefix$$1);
+    var generate$2 = function (prefix) {
+      return generate$1(prefix);
     };
 
     var make = identity;
@@ -3155,7 +3155,7 @@ var silver = (function () {
 
     var internalSet = function (dom, property, value) {
       if (!isString(value)) {
-        console.error('Invalid call to CSS.set. Property ', property, ':: Value ', value, ':: Element ', dom);
+        domGlobals.console.error('Invalid call to CSS.set. Property ', property, ':: Value ', value, ':: Element ', dom);
         throw new Error('CSS value must be a string: ' + value);
       }
       if (isSupported(dom)) {
@@ -3187,9 +3187,9 @@ var silver = (function () {
         });
       });
     };
-    var get$5 = function (element, property) {
+    var get$4 = function (element, property) {
       var dom = element.dom();
-      var styles = window.getComputedStyle(dom);
+      var styles = domGlobals.window.getComputedStyle(dom);
       var r = styles.getPropertyValue(property);
       var v = r === '' && !inBody(element) ? getUnsafeProperty(dom, property) : r;
       return v === null ? undefined : v;
@@ -3205,7 +3205,7 @@ var silver = (function () {
       });
     };
     var isValidValue = function (tag, property, value) {
-      var element = Element$$1.fromTag(tag);
+      var element = Element.fromTag(tag);
       set$2(element, property, value);
       var style = getRaw(element, property);
       return style.isSome();
@@ -3221,7 +3221,7 @@ var silver = (function () {
       return e.dom().offsetWidth;
     };
 
-    var get$6 = function (element) {
+    var get$5 = function (element) {
       return element.dom().value;
     };
     var set$3 = function (element, value) {
@@ -3232,7 +3232,7 @@ var silver = (function () {
     };
 
     var renderToDom = function (definition) {
-      var subject = Element$$1.fromTag(definition.tag);
+      var subject = Element.fromTag(definition.tag);
       setAll(subject, definition.attributes);
       add$3(subject, definition.classes);
       setAll$1(subject, definition.styles);
@@ -3253,10 +3253,10 @@ var silver = (function () {
 
     var getBehaviours$1 = function (spec) {
       var behaviours = readOr$1('behaviours', {})(spec);
-      var keys$$1 = filter(keys(behaviours), function (k) {
+      var keys$1 = filter(keys(behaviours), function (k) {
         return behaviours[k] !== undefined;
       });
-      return map(keys$$1, function (k) {
+      return map(keys$1, function (k) {
         return behaviours[k].me;
       });
     };
@@ -3299,9 +3299,9 @@ var silver = (function () {
         systemApi.set(NoContextApi(getMe));
       };
       var syncComponents = function () {
-        var children$$1 = children(item);
-        var subs = bind(children$$1, function (child$$1) {
-          return systemApi.get().getByDom(child$$1).fold(function () {
+        var children$1 = children(item);
+        var subs = bind(children$1, function (child) {
+          return systemApi.get().getByDom(child).fold(function () {
             return [];
           }, function (c) {
             return [c];
@@ -3358,7 +3358,7 @@ var silver = (function () {
       return Result.value(build(completeSpec));
     };
     var text = function (textContent) {
-      var element = Element$$1.fromText(textContent);
+      var element = Element.fromText(textContent);
       return external({ element: element });
     };
     var external = function (spec) {
@@ -3411,16 +3411,16 @@ var silver = (function () {
       return closest(scope, predicate, isRoot).isSome();
     };
 
-    var ancestor$2 = function (scope, selector, isRoot) {
+    var ancestor$1 = function (scope, selector, isRoot) {
       return ancestor(scope, function (e) {
         return is(e, selector);
       }, isRoot);
     };
-    var descendant$2 = function (scope, selector) {
+    var descendant$1 = function (scope, selector) {
       return one(selector, scope);
     };
     var closest$3 = function (scope, selector, isRoot) {
-      return ClosestOrAncestor(is, ancestor$2, scope, selector, isRoot);
+      return ClosestOrAncestor(is, ancestor$1, scope, selector, isRoot);
     };
 
     var find$3 = function (queryElem) {
@@ -3434,7 +3434,7 @@ var silver = (function () {
       return dependent.bind(function (dep) {
         var id = get$2(dep, 'id');
         var doc = owner(dep);
-        return descendant$2(doc, '[aria-owns="' + id + '"]');
+        return descendant$1(doc, '[aria-owns="' + id + '"]');
       });
     };
     var manager = function () {
@@ -3511,10 +3511,10 @@ var silver = (function () {
     var onStrictKeyboardHandler = function (fieldName) {
       return onPresenceHandler('onKeyboardHandler', fieldName, strict());
     };
-    var output$1 = function (name, value) {
+    var output = function (name, value) {
       return state$1(name, constant(value));
     };
-    var snapshot$1 = function (name) {
+    var snapshot = function (name) {
       return state$1(name, identity);
     };
     var initSize = constant(_initSize);
@@ -3645,7 +3645,7 @@ var silver = (function () {
       var value = asRawOrDie('Creating behaviour: ' + data.name, modeSchema, data);
       return createModes(choose$1(value.branchKey, value.branches), value.name, value.active, value.apis, value.extra, value.state);
     };
-    var revoke$1 = constant(undefined);
+    var revoke = constant(undefined);
 
     var chooseChannels = function (channels, message) {
       return message.universal() ? channels : filter(channels, function (ch) {
@@ -3693,12 +3693,12 @@ var silver = (function () {
     });
 
     var attached = function (element, scope) {
-      var doc = scope || Element$$1.fromDom(document.documentElement);
+      var doc = scope || Element.fromDom(domGlobals.document.documentElement);
       return ancestor(element, curry(eq, doc)).isSome();
     };
     var windowOf = function (element) {
       var dom = element.dom();
-      if (dom === dom.window && element instanceof Window) {
+      if (dom === dom.window && element instanceof domGlobals.Window) {
         return element;
       }
       return isDocument(element) ? dom.defaultView || dom.parentWindow : null;
@@ -3726,7 +3726,7 @@ var silver = (function () {
     var absolute = function (element) {
       var doc = element.dom().ownerDocument;
       var body = doc.body;
-      var win = windowOf(Element$$1.fromDom(doc));
+      var win = windowOf(Element.fromDom(doc));
       var html = doc.documentElement;
       var scrollTop = firstDefinedOrZero(win.pageYOffset, html.scrollTop);
       var scrollLeft = firstDefinedOrZero(win.pageXOffset, html.scrollLeft);
@@ -3738,7 +3738,7 @@ var silver = (function () {
       var dom = element.dom();
       var doc = dom.ownerDocument;
       var body = doc.body;
-      var html = Element$$1.fromDom(doc.documentElement);
+      var html = Element.fromDom(doc.documentElement);
       if (body === dom) {
         return Position(body.offsetLeft, body.offsetTop);
       }
@@ -3749,8 +3749,8 @@ var silver = (function () {
     };
 
     var isSafari = PlatformDetection$1.detect().browser.isSafari();
-    var get$7 = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : document;
+    var get$6 = function (_DOC) {
+      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
       var x = doc.body.scrollLeft || doc.documentElement.scrollLeft;
       var y = doc.body.scrollTop || doc.documentElement.scrollTop;
       return Position(x, y);
@@ -3769,7 +3769,7 @@ var silver = (function () {
       var get = function (element) {
         var r = getOffset(element);
         if (r <= 0 || r === null) {
-          var css = get$5(element, name);
+          var css = get$4(element, name);
           return parseFloat(css) || 0;
         }
         return r;
@@ -3777,7 +3777,7 @@ var silver = (function () {
       var getOuter = get;
       var aggregate = function (element, properties) {
         return foldl(properties, function (acc, property) {
-          var val = get$5(element, property);
+          var val = get$4(element, property);
           var value = val === undefined ? 0 : parseInt(val, 10);
           return isNaN(value) ? acc : acc + value;
         }, 0);
@@ -3802,7 +3802,7 @@ var silver = (function () {
     var set$4 = function (element, h) {
       api.set(element, h);
     };
-    var get$8 = function (element) {
+    var get$7 = function (element) {
       return api.get(element);
     };
     var getOuter$1 = function (element) {
@@ -3813,13 +3813,13 @@ var silver = (function () {
       var dom = element.dom();
       return inBody(element) ? dom.getBoundingClientRect().height : dom.offsetHeight;
     });
-    var get$9 = function (element) {
+    var get$8 = function (element) {
       return api$1.get(element);
     };
     var getOuter$2 = function (element) {
       return api$1.getOuter(element);
     };
-    var setMax$1 = function (element, value) {
+    var setMax = function (element, value) {
       var inclusions = [
         'margin-top',
         'border-top-width',
@@ -3904,8 +3904,8 @@ var silver = (function () {
     };
 
     var view = function (doc) {
-      var element = doc.dom() === document ? Option.none() : Option.from(doc.dom().defaultView.frameElement);
-      return element.map(Element$$1.fromDom);
+      var element = doc.dom() === domGlobals.document ? Option.none() : Option.from(doc.dom().defaultView.frameElement);
+      return element.map(Element.fromDom);
     };
     var owner$1 = function (element) {
       return owner(element);
@@ -3917,12 +3917,12 @@ var silver = (function () {
     });
 
     var find$4 = function (element) {
-      var doc = Element$$1.fromDom(document);
-      var scroll$$1 = get$7(doc);
+      var doc = Element.fromDom(domGlobals.document);
+      var scroll = get$6(doc);
       var path = pathTo(element, Navigation);
-      return path.fold(curry(absolute, element), function (frames$$1) {
+      return path.fold(curry(absolute, element), function (frames) {
         var offset = viewport(element);
-        var r = foldr(frames$$1, function (b, a) {
+        var r = foldr(frames, function (b, a) {
           var loc = viewport(a);
           return {
             left: b.left + loc.left(),
@@ -3932,16 +3932,16 @@ var silver = (function () {
           left: 0,
           top: 0
         });
-        return Position(r.left + offset.left() + scroll$$1.left(), r.top + offset.top() + scroll$$1.top());
+        return Position(r.left + offset.left() + scroll.left(), r.top + offset.top() + scroll.top());
       });
     };
 
     var win = function () {
-      var width = window.innerWidth;
-      var height = window.innerHeight;
-      var doc = Element$$1.fromDom(document);
-      var scroll$$1 = get$7(doc);
-      return bounds(scroll$$1.left(), scroll$$1.top(), width, height);
+      var width = domGlobals.window.innerWidth;
+      var height = domGlobals.window.innerHeight;
+      var doc = Element.fromDom(domGlobals.document);
+      var scroll = get$6(doc);
+      return bounds(scroll.left(), scroll.top(), width, height);
     };
 
     var adt$3 = Adt.generate([
@@ -3963,11 +3963,11 @@ var silver = (function () {
         ]
       }
     ]);
-    var positionWithDirection = function (posName, decision$$1, x, y, width, height) {
-      var decisionX = decision$$1.x() - x;
-      var decisionY = decision$$1.y() - y;
-      var decisionWidth = decision$$1.width();
-      var decisionHeight = decision$$1.height();
+    var positionWithDirection = function (posName, decision, x, y, width, height) {
+      var decisionX = decision.x() - x;
+      var decisionY = decision.y() - y;
+      var decisionWidth = decision.width();
+      var decisionHeight = decision.height();
       var decisionRight = width - (decisionX + decisionWidth);
       var decisionBottom = height - (decisionY + decisionHeight);
       var left = Option.some(decisionX);
@@ -3975,7 +3975,7 @@ var silver = (function () {
       var right = Option.some(decisionRight);
       var bottom = Option.some(decisionBottom);
       var none = Option.none();
-      return cata(decision$$1.direction(), function () {
+      return cata(decision.direction(), function () {
         return css(posName, left, top, none, none);
       }, function () {
         return css(posName, none, top, right, none);
@@ -3993,19 +3993,19 @@ var silver = (function () {
         return css(posName, none, top, right, none);
       });
     };
-    var reposition = function (origin, decision$$1) {
+    var reposition = function (origin, decision) {
       return origin.fold(function () {
-        return css('absolute', Option.some(decision$$1.x()), Option.some(decision$$1.y()), Option.none(), Option.none());
+        return css('absolute', Option.some(decision.x()), Option.some(decision.y()), Option.none(), Option.none());
       }, function (x, y, width, height) {
-        return positionWithDirection('absolute', decision$$1, x, y, width, height);
+        return positionWithDirection('absolute', decision, x, y, width, height);
       }, function (x, y, width, height) {
-        return positionWithDirection('fixed', decision$$1, x, y, width, height);
+        return positionWithDirection('fixed', decision, x, y, width, height);
       });
     };
     var toBox = function (origin, element) {
       var rel = curry(find$4, element);
       var position = origin.fold(rel, rel, function () {
-        var scroll = get$7();
+        var scroll = get$6();
         return find$4(element).translate(-scroll.left(), -scroll.top());
       });
       var width = getOuter$1(element);
@@ -4022,7 +4022,7 @@ var silver = (function () {
     var cata$1 = function (subject, onNone, onRelative, onFixed) {
       return subject.fold(onNone, onRelative, onFixed);
     };
-    var relative$1 = adt$3.relative;
+    var relative = adt$3.relative;
     var fixed = adt$3.fixed;
 
     var anchor = Immutable('anchorBox', 'origin');
@@ -4145,7 +4145,7 @@ var silver = (function () {
     };
 
     var setMaxHeight = function (element, maxHeight) {
-      setMax$1(element, Math.floor(maxHeight));
+      setMax(element, Math.floor(maxHeight));
     };
     var anchored = constant(function (element, available) {
       setMaxHeight(element, available);
@@ -4354,7 +4354,7 @@ var silver = (function () {
       };
     };
     var getDirection = function (element) {
-      return get$5(element, 'direction') === 'rtl' ? 'rtl' : 'ltr';
+      return get$4(element, 'direction') === 'rtl' ? 'rtl' : 'ltr';
     };
 
     var schema$1 = function () {
@@ -4363,7 +4363,7 @@ var silver = (function () {
         strict$1('onRtl')
       ]);
     };
-    var get$a = function (elem, info, defaultLtr, defaultRtl) {
+    var get$9 = function (elem, info, defaultLtr, defaultRtl) {
       var ltr = info.layouts.map(function (ls) {
         return ls.onLtr(elem);
       }).getOr(defaultLtr);
@@ -4377,7 +4377,7 @@ var silver = (function () {
     var placement = function (component, anchorInfo, origin) {
       var hotspot = anchorInfo.hotspot;
       var anchorBox = toBox(origin, hotspot.element());
-      var layouts = get$a(component.element(), anchorInfo, all$2(), allRtl());
+      var layouts = get$9(component.element(), anchorInfo, all$2(), allRtl());
       return Option.some(nu$9({
         anchorBox: anchorBox,
         bubble: anchorInfo.bubble.getOr(fallback()),
@@ -4390,12 +4390,12 @@ var silver = (function () {
       strict$1('hotspot'),
       option('bubble'),
       schema$1(),
-      output$1('placement', placement)
+      output('placement', placement)
     ];
 
     var placement$1 = function (component, anchorInfo, origin) {
       var anchorBox = bounds(anchorInfo.x, anchorInfo.y, anchorInfo.width, anchorInfo.height);
-      var layouts = get$a(component.element(), anchorInfo, all$2(), allRtl());
+      var layouts = get$9(component.element(), anchorInfo, all$2(), allRtl());
       return Option.some(nu$9({
         anchorBox: anchorBox,
         bubble: anchorInfo.bubble,
@@ -4411,7 +4411,7 @@ var silver = (function () {
       defaulted$1('width', 0),
       defaulted$1('bubble', fallback()),
       schema$1(),
-      output$1('placement', placement$1)
+      output('placement', placement$1)
     ];
 
     var zeroWidth = function () {
@@ -4446,12 +4446,12 @@ var silver = (function () {
         ]
       }
     ]);
-    var range$1 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var range = Immutable('start', 'soffset', 'finish', 'foffset');
     var exactFromRange = function (simRange) {
       return type$1.exact(simRange.start(), simRange.soffset(), simRange.finish(), simRange.foffset());
     };
     var domRange = type$1.domRange;
-    var relative$2 = type$1.relative;
+    var relative$1 = type$1.relative;
     var exact = type$1.exact;
 
     var makeRange = function (start, soffset, finish, foffset) {
@@ -4461,7 +4461,7 @@ var silver = (function () {
       rng.setEnd(finish.dom(), foffset);
       return rng;
     };
-    var after$3 = function (start, soffset, finish, foffset) {
+    var after$1 = function (start, soffset, finish, foffset) {
       var r = makeRange(start, soffset, finish, foffset);
       var same = eq(start, finish) && soffset === foffset;
       return r.collapsed && !same;
@@ -4532,7 +4532,7 @@ var silver = (function () {
       }
     ]);
     var fromRange = function (win, type, range) {
-      return type(Element$$1.fromDom(range.startContainer), range.startOffset, Element$$1.fromDom(range.endContainer), range.endOffset);
+      return type(Element.fromDom(range.startContainer), range.startOffset, Element.fromDom(range.endContainer), range.endOffset);
     };
     var getRanges = function (win, selection) {
       return selection.match({
@@ -4571,7 +4571,7 @@ var silver = (function () {
           return rev.collapsed === false;
         });
         return reversed.map(function (rev) {
-          return adt$6.rtl(Element$$1.fromDom(rev.endContainer), rev.endOffset, Element$$1.fromDom(rev.startContainer), rev.startOffset);
+          return adt$6.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
         }).getOrThunk(function () {
           return fromRange(win, adt$6.ltr, rng);
         });
@@ -4658,7 +4658,7 @@ var silver = (function () {
     }
 
     var api$2 = NodeValue(isText, 'text');
-    var get$b = function (element) {
+    var get$a = function (element) {
       return api$2.get(element);
     };
     var getOption = function (element) {
@@ -4676,7 +4676,7 @@ var silver = (function () {
         var r = rangeForOffset(o);
         return r.getBoundingClientRect();
       };
-      var length = get$b(textnode).length;
+      var length = get$a(textnode).length;
       var offset = searchForPoint(rectForOffset, x, y, rect.right, length);
       return rangeForOffset(offset);
     };
@@ -4728,21 +4728,21 @@ var silver = (function () {
       return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
     };
 
-    var first$3 = function (element) {
+    var first = function (element) {
       return descendant(element, isCursorPosition);
     };
-    var last$2 = function (element) {
+    var last$1 = function (element) {
       return descendantRtl(element, isCursorPosition);
     };
     var descendantRtl = function (scope, predicate) {
       var descend = function (element) {
-        var children$$1 = children(element);
-        for (var i = children$$1.length - 1; i >= 0; i--) {
-          var child$$1 = children$$1[i];
-          if (predicate(child$$1)) {
-            return Option.some(child$$1);
+        var children$1 = children(element);
+        for (var i = children$1.length - 1; i >= 0; i--) {
+          var child = children$1[i];
+          if (predicate(child)) {
+            return Option.some(child);
           }
-          var res = descend(child$$1);
+          var res = descend(child);
           if (res.isSome()) {
             return res;
           }
@@ -4768,7 +4768,7 @@ var silver = (function () {
       cursorRange.selectNode(node.dom());
       var rect = cursorRange.getBoundingClientRect();
       var collapseDirection = getCollapseDirection(rect, x);
-      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$3 : last$2;
+      var f = collapseDirection === COLLAPSE_TO_LEFT ? first : last$1;
       return f(node).map(function (target) {
         return createCollapsedNode(doc, target, collapseDirection);
       });
@@ -4806,7 +4806,7 @@ var silver = (function () {
       return locate$1(doc, node, boundedX, boundedY);
     };
     var searchFromPoint = function (doc, x, y) {
-      return Element$$1.fromPoint(doc, x, y).bind(function (elem) {
+      return Element.fromPoint(doc, x, y).bind(function (elem) {
         var fallback = function () {
           return search(doc, elem, x);
         };
@@ -4815,7 +4815,7 @@ var silver = (function () {
     };
     var availableSearch = document.caretPositionFromPoint ? caretPositionFromPoint : document.caretRangeFromPoint ? caretRangeFromPoint : searchFromPoint;
 
-    var descendants$1 = function (scope, selector) {
+    var descendants = function (scope, selector) {
       return all(selector, scope);
     };
 
@@ -4823,15 +4823,15 @@ var silver = (function () {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range$1(Element$$1.fromDom(firstRng.startContainer), firstRng.startOffset, Element$$1.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(range(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
     };
     var doGetExact = function (selection) {
-      var anchorNode = Element$$1.fromDom(selection.anchorNode);
-      var focusNode = Element$$1.fromDom(selection.focusNode);
-      return after$3(anchorNode, selection.anchorOffset, focusNode, selection.focusOffset) ? Option.some(range$1(Element$$1.fromDom(selection.anchorNode), selection.anchorOffset, Element$$1.fromDom(selection.focusNode), selection.focusOffset)) : readRange(selection);
+      var anchor = Element.fromDom(selection.anchorNode);
+      var focus = Element.fromDom(selection.focusNode);
+      return after$1(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var getExact = function (win) {
       return Option.from(win.getSelection()).filter(function (sel) {
@@ -4845,14 +4845,14 @@ var silver = (function () {
 
     var point = Immutable('element', 'offset');
     var descendOnce = function (element, offset) {
-      var children$$1 = children(element);
-      if (children$$1.length === 0) {
+      var children$1 = children(element);
+      if (children$1.length === 0) {
         return point(element, offset);
-      } else if (offset < children$$1.length) {
-        return point(children$$1[offset], 0);
+      } else if (offset < children$1.length) {
+        return point(children$1[offset], 0);
       } else {
-        var last = children$$1[children$$1.length - 1];
-        var len = isText(last) ? get$b(last).length : children(last).length;
+        var last = children$1[children$1.length - 1];
+        var len = isText(last) ? get$a(last).length : children(last).length;
         return point(last, len);
       }
     };
@@ -4895,7 +4895,7 @@ var silver = (function () {
       return sum(points);
     };
     var screen = adt$7.screen;
-    var absolute$2 = adt$7.absolute;
+    var absolute$1 = adt$7.absolute;
 
     var getOffset = function (component, origin, anchorInfo) {
       var win = defaultView(anchorInfo.root).dom();
@@ -4904,13 +4904,13 @@ var silver = (function () {
         var compOwner = owner(component.element());
         return eq(frameOwner, compOwner);
       };
-      return Option.from(win.frameElement).map(Element$$1.fromDom).filter(hasSameOwner).map(absolute);
+      return Option.from(win.frameElement).map(Element.fromDom).filter(hasSameOwner).map(absolute);
     };
     var getRootPoint = function (component, origin, anchorInfo) {
       var doc = owner(component.element());
-      var outerScroll = get$7(doc);
+      var outerScroll = get$6(doc);
       var offset = getOffset(component, origin, anchorInfo).getOr(outerScroll);
-      return absolute$2(offset, outerScroll.left(), outerScroll.top());
+      return absolute$1(offset, outerScroll.left(), outerScroll.top());
     };
 
     var capRect = function (left, top, width, height) {
@@ -4927,10 +4927,10 @@ var silver = (function () {
       return Option.some(pointed(point, newWidth, newHeight));
     };
     var calcNewAnchor = function (optBox, rootPoint, anchorInfo, origin, elem) {
-      return optBox.map(function (box$$1) {
+      return optBox.map(function (box) {
         var points = [
           rootPoint,
-          box$$1.point()
+          box.point()
         ];
         var topLeft = cata$1(origin, function () {
           return sumAsAbsolute(points);
@@ -4939,7 +4939,7 @@ var silver = (function () {
         }, function () {
           return sumAsFixed(points);
         });
-        var anchorBox = rect(topLeft.left(), topLeft.top(), box$$1.width(), box$$1.height());
+        var anchorBox = rect(topLeft.left(), topLeft.top(), box.width(), box.height());
         var layoutsLtr = function () {
           return anchorInfo.showAbove ? [
             northeast$1,
@@ -4974,7 +4974,7 @@ var silver = (function () {
             north$1
           ];
         };
-        var layouts = get$a(elem, anchorInfo, layoutsLtr(), layoutsRtl());
+        var layouts = get$9(elem, anchorInfo, layoutsLtr(), layoutsRtl());
         return nu$9({
           anchorBox: anchorBox,
           bubble: anchorInfo.bubble.getOr(fallback()),
@@ -5002,7 +5002,7 @@ var silver = (function () {
       return getSelection().map(function (sel) {
         var modStart = descendOnce$1(sel.start(), sel.soffset());
         var modFinish = descendOnce$1(sel.finish(), sel.foffset());
-        return range$1(modStart.element(), modStart.offset(), modFinish.element(), modFinish.offset());
+        return range(modStart.element(), modStart.offset(), modFinish.element(), modFinish.offset());
       });
     };
     var placement$2 = function (component, anchorInfo, origin) {
@@ -5010,7 +5010,7 @@ var silver = (function () {
       var rootPoint = getRootPoint(component, origin, anchorInfo);
       var selectionBox = getAnchorSelection(win, anchorInfo).bind(function (sel) {
         var optRect = getFirstRect$1(win, exactFromRange(sel)).orThunk(function () {
-          var x = Element$$1.fromText(zeroWidth());
+          var x = Element.fromText(zeroWidth());
           before(sel.start(), x);
           return getFirstRect$1(win, exact(x, 0, x, 1)).map(function (rect) {
             remove(x);
@@ -5034,7 +5034,7 @@ var silver = (function () {
       schema$1(),
       defaulted$1('overrides', {}),
       defaulted$1('showAbove', false),
-      output$1('placement', placement$2)
+      output('placement', placement$2)
     ];
 
     var placement$3 = function (component, anchorInfo, origin) {
@@ -5053,7 +5053,7 @@ var silver = (function () {
       schema$1(),
       defaulted$1('overrides', {}),
       defaulted$1('showAbove', false),
-      output$1('placement', placement$3)
+      output('placement', placement$3)
     ];
 
     var eastX$1 = function (anchor) {
@@ -5080,7 +5080,7 @@ var silver = (function () {
     var northwest$2 = function (anchor, element, bubbles) {
       return nu$8(westX$1(anchor, element), northY$1(anchor, element), bubbles.northwest(), northwest(), 'link-layout-nw');
     };
-    var all$5 = function () {
+    var all$3 = function () {
       return [
         southeast$2,
         southwest$2,
@@ -5099,7 +5099,7 @@ var silver = (function () {
 
     var placement$4 = function (component, submenuInfo, origin) {
       var anchorBox = toBox(origin, submenuInfo.item.element());
-      var layouts = get$a(component.element(), submenuInfo, all$5(), allRtl$1());
+      var layouts = get$9(component.element(), submenuInfo, all$3(), allRtl$1());
       return Option.some(nu$9({
         anchorBox: anchorBox,
         bubble: fallback(),
@@ -5111,7 +5111,7 @@ var silver = (function () {
     var SubmenuAnchor = [
       strict$1('item'),
       schema$1(),
-      output$1('placement', placement$4)
+      output('placement', placement$4)
     ];
 
     var AnchorSchema = choose$1('anchor', {
@@ -5123,12 +5123,12 @@ var silver = (function () {
     });
 
     var getFixedOrigin = function () {
-      return fixed(0, 0, window.innerWidth, window.innerHeight);
+      return fixed(0, 0, domGlobals.window.innerWidth, domGlobals.window.innerHeight);
     };
     var getRelativeOrigin = function (component) {
       var position = absolute(component.element());
-      var bounds$$1 = component.element().dom().getBoundingClientRect();
-      return relative$1(position.left(), position.top(), bounds$$1.width, bounds$$1.height);
+      var bounds = component.element().dom().getBoundingClientRect();
+      return relative(position.left(), position.top(), bounds.width, bounds.height);
     };
     var place = function (component, origin, anchoring, getBounds, placee) {
       var anchor = box$1(anchoring.anchorBox, origin);
@@ -5187,24 +5187,24 @@ var silver = (function () {
 
     var fireDetaching = function (component) {
       emit(component, detachedFromDom());
-      var children$$1 = component.components();
-      each(children$$1, fireDetaching);
+      var children = component.components();
+      each(children, fireDetaching);
     };
     var fireAttaching = function (component) {
-      var children$$1 = component.components();
-      each(children$$1, fireAttaching);
+      var children = component.components();
+      each(children, fireAttaching);
       emit(component, attachedToDom());
     };
-    var attach = function (parent$$1, child$$1) {
-      attachWith(parent$$1, child$$1, append);
+    var attach = function (parent, child) {
+      attachWith(parent, child, append);
     };
-    var attachWith = function (parent$$1, child$$1, insertion) {
-      parent$$1.getSystem().addToWorld(child$$1);
-      insertion(parent$$1.element(), child$$1.element());
-      if (inBody(parent$$1.element())) {
-        fireAttaching(child$$1);
+    var attachWith = function (parent, child, insertion) {
+      parent.getSystem().addToWorld(child);
+      insertion(parent.element(), child.element());
+      if (inBody(parent.element())) {
+        fireAttaching(child);
       }
-      parent$$1.syncComponents();
+      parent.syncComponents();
     };
     var doDetach = function (component) {
       fireDetaching(component);
@@ -5212,11 +5212,11 @@ var silver = (function () {
       component.getSystem().removeFromWorld(component);
     };
     var detach = function (component) {
-      var parent$$1 = parent(component.element()).bind(function (p) {
+      var parent$1 = parent(component.element()).bind(function (p) {
         return component.getSystem().getByDom(p).fold(Option.none, Option.some);
       });
       doDetach(component);
-      parent$$1.each(function (p) {
+      parent$1.each(function (p) {
         p.syncComponents();
       });
     };
@@ -5234,15 +5234,15 @@ var silver = (function () {
     };
     var attachSystemInternal = function (element, guiSystem, inserter) {
       inserter(element, guiSystem.element());
-      var children$$1 = children(guiSystem.element());
-      each(children$$1, function (child$$1) {
-        guiSystem.getByDom(child$$1).each(fireAttaching);
+      var children$1 = children(guiSystem.element());
+      each(children$1, function (child) {
+        guiSystem.getByDom(child).each(fireAttaching);
       });
     };
     var detachSystem = function (guiSystem) {
-      var children$$1 = children(guiSystem.element());
-      each(children$$1, function (child$$1) {
-        guiSystem.getByDom(child$$1).each(fireDetaching);
+      var children$1 = children(guiSystem.element());
+      each(children$1, function (child) {
+        guiSystem.getByDom(child).each(fireDetaching);
       });
       remove(guiSystem.element());
     };
@@ -5428,7 +5428,7 @@ var silver = (function () {
         return forbid(f.name(), 'Cannot configure ' + f.name() + ' for ' + name);
       }).concat([state$1('dump', identity)]));
     };
-    var get$d = function (data) {
+    var get$b = function (data) {
       return data.dump;
     };
     var augment = function (data, original) {
@@ -5437,7 +5437,7 @@ var silver = (function () {
     var SketchBehaviours = {
       field: field$1,
       augment: augment,
-      get: get$d
+      get: get$b
     };
 
     var _placeholder = 'placeholder';
@@ -5484,9 +5484,9 @@ var silver = (function () {
         });
         return [__assign({}, value, { components: substituted })];
       }, function (req, valuesThunk) {
-        var values$$1 = valuesThunk(detail, compSpec.config, compSpec.validated);
+        var values = valuesThunk(detail, compSpec.config, compSpec.validated);
         var preprocessor = compSpec.validated.preprocess.getOr(identity);
-        return preprocessor(values$$1);
+        return preprocessor(values);
       });
     };
     var substituteAll = function (owner, detail, components, placeholders) {
@@ -5688,7 +5688,7 @@ var silver = (function () {
     var schemas = function (parts) {
       return bind(parts, function (part) {
         return part.fold(Option.none, Option.some, Option.none, Option.none).map(function (data) {
-          return strictObjOf(data.name, data.schema.concat([snapshot$1(original())]));
+          return strictObjOf(data.name, data.schema.concat([snapshot(original())]));
         }).toArray();
       });
     };
@@ -5773,7 +5773,7 @@ var silver = (function () {
         strict$1('uid'),
         defaulted$1('dom', {}),
         defaulted$1('components', []),
-        snapshot$1('originalSpec'),
+        snapshot('originalSpec'),
         defaulted$1('debug.sketcher', {})
       ]).concat(partUidsSchemas);
     };
@@ -5793,8 +5793,8 @@ var silver = (function () {
       var partUidsSchema = defaultUidsSchema(partTypes);
       var detail = asRawOrDie$1(owner, schema, specWithUid, partSchemas, [partUidsSchema]);
       var subs = substitutes(owner, detail, partTypes);
-      var components$$1 = components(owner, detail, subs.internals());
-      return factory(detail, components$$1, specWithUid, subs.externals());
+      var components$1 = components(owner, detail, subs.internals());
+      return factory(detail, components$1, specWithUid, subs.externals());
     };
     var supplyUid = function (spec) {
       return spec.hasOwnProperty('uid') ? spec : __assign({}, spec, { uid: generate$2('uid') });
@@ -5890,7 +5890,7 @@ var silver = (function () {
     };
 
     var dehighlightAllExcept = function (component, hConfig, hState, skip) {
-      var highlighted = descendants$1(component.element(), '.' + hConfig.highlightClass);
+      var highlighted = descendants(component.element(), '.' + hConfig.highlightClass);
       each(highlighted, function (h) {
         if (!exists(skip, function (skipComp) {
             return skipComp.element() === h;
@@ -5949,30 +5949,30 @@ var silver = (function () {
       return has$2(queryTarget.element(), hConfig.highlightClass);
     };
     var getHighlighted = function (component, hConfig, hState) {
-      return descendant$2(component.element(), '.' + hConfig.highlightClass).bind(function (e) {
+      return descendant$1(component.element(), '.' + hConfig.highlightClass).bind(function (e) {
         return component.getSystem().getByDom(e).toOption();
       });
     };
     var getByIndex = function (component, hConfig, hState, index) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
       return Option.from(items[index]).fold(function () {
         return Result.error('No element found with index ' + index);
       }, component.getSystem().getByDom);
     };
     var getFirst = function (component, hConfig, hState) {
-      return descendant$2(component.element(), '.' + hConfig.itemClass).bind(function (e) {
+      return descendant$1(component.element(), '.' + hConfig.itemClass).bind(function (e) {
         return component.getSystem().getByDom(e).toOption();
       });
     };
     var getLast = function (component, hConfig, hState) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
-      var last$$1 = items.length > 0 ? Option.some(items[items.length - 1]) : Option.none();
-      return last$$1.bind(function (c) {
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
+      var last = items.length > 0 ? Option.some(items[items.length - 1]) : Option.none();
+      return last.bind(function (c) {
         return component.getSystem().getByDom(c).toOption();
       });
     };
     var getDelta = function (component, hConfig, hState, delta) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
       var current = findIndex(items, function (item) {
         return has$2(item, hConfig.highlightClass);
       });
@@ -5988,7 +5988,7 @@ var silver = (function () {
       return getDelta(component, hConfig, hState, +1);
     };
     var getCandidates = function (component, hConfig, hState) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
       return cat(map(items, function (i) {
         return component.getSystem().getByDom(i).toOption();
       }));
@@ -6109,10 +6109,10 @@ var silver = (function () {
       });
     };
 
-    var focus$2 = function (element) {
+    var focus$1 = function (element) {
       element.dom().focus();
     };
-    var blur$$1 = function (element) {
+    var blur = function (element) {
       element.dom().blur();
     };
     var hasFocus = function (element) {
@@ -6120,8 +6120,8 @@ var silver = (function () {
       return element.dom() === doc.activeElement;
     };
     var active = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : document;
-      return Option.from(doc.activeElement).map(Element$$1.fromDom);
+      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+      return Option.from(doc.activeElement).map(Element.fromDom);
     };
     var search$1 = function (element) {
       return active(owner(element)).filter(function (e) {
@@ -6195,20 +6195,20 @@ var silver = (function () {
               'onApi'
             ], val) ? Result.value(val) : Result.error('Invalid value for focusInside');
           })),
-          output$1('handler', me),
-          output$1('state', stateInit),
-          output$1('sendFocusIn', optFocusIn)
+          output('handler', me),
+          output('state', stateInit),
+          output('sendFocusIn', optFocusIn)
         ]);
       };
       var processKey = function (component, simulatedEvent, getRules, keyingConfig, keyingState) {
         var rules = getRules(component, simulatedEvent, keyingConfig, keyingState);
-        return choose$2(rules, simulatedEvent.event()).bind(function (rule$$1) {
-          return rule$$1(component, simulatedEvent, keyingConfig, keyingState);
+        return choose$2(rules, simulatedEvent.event()).bind(function (rule) {
+          return rule(component, simulatedEvent, keyingConfig, keyingState);
         });
       };
       var toEvents = function (keyingConfig, keyingState) {
         var onFocusHandler = keyingConfig.focusInside !== FocusInsideModes.OnFocusMode ? Option.none() : optFocusIn(keyingConfig).map(function (focusIn) {
-          return run(focus$1(), function (component, simulatedEvent) {
+          return run(focus(), function (component, simulatedEvent) {
             focusIn(component, keyingConfig, keyingState);
             simulatedEvent.stop();
           });
@@ -6245,7 +6245,7 @@ var silver = (function () {
       return me;
     };
 
-    var create$3 = function (cyclicField) {
+    var create$2 = function (cyclicField) {
       var schema = [
         option('onEscape'),
         option('onEnter'),
@@ -6258,10 +6258,10 @@ var silver = (function () {
         var target = tabbingConfig.visibilitySelector.bind(function (sel) {
           return closest$3(element, sel);
         }).getOr(element);
-        return get$9(target) > 0;
+        return get$8(target) > 0;
       };
       var findInitial = function (component, tabbingConfig) {
-        var tabstops = descendants$1(component.element(), tabbingConfig.selector);
+        var tabstops = descendants(component.element(), tabbingConfig.selector);
         var visibles = filter(tabstops, function (elem) {
           return isVisible(tabbingConfig, elem);
         });
@@ -6291,7 +6291,7 @@ var silver = (function () {
         });
       };
       var go = function (component, simulatedEvent, tabbingConfig, cycle) {
-        var tabstops = descendants$1(component.element(), tabbingConfig.selector);
+        var tabstops = descendants(component.element(), tabbingConfig.selector);
         return findCurrent(component, tabbingConfig).bind(function (tabstop) {
           var optStopIndex = findIndex(tabstops, curry(eq, tabstop));
           return optStopIndex.bind(function (stopIndex) {
@@ -6335,9 +6335,9 @@ var silver = (function () {
       });
     };
 
-    var AcyclicType = create$3(state$1('cyclic', constant(false)));
+    var AcyclicType = create$2(state$1('cyclic', constant(false)));
 
-    var CyclicType = create$3(state$1('cyclic', constant(true)));
+    var CyclicType = create$2(state$1('cyclic', constant(true)));
 
     var doDefaultExecute = function (component, simulatedEvent, focused) {
       dispatch(component, focused, execute());
@@ -6475,16 +6475,16 @@ var silver = (function () {
     };
 
     var locateVisible = function (container, current, selector) {
-      var filter$$1 = isVisible;
-      return locateIn(container, current, selector, filter$$1);
+      var filter = isVisible;
+      return locateIn(container, current, selector, filter);
     };
-    var locateIn = function (container, current, selector, filter$$1) {
+    var locateIn = function (container, current, selector, filter$1) {
       var predicate = curry(eq, current);
-      var candidates = descendants$1(container, selector);
+      var candidates = descendants(container, selector);
       var visible = filter(candidates, isVisible);
       return locate$2(visible, predicate);
     };
-    var findIndex$2 = function (elements, target) {
+    var findIndex$1 = function (elements, target) {
       return findIndex(elements, function (elem) {
         return eq(target, elem);
       });
@@ -6542,7 +6542,7 @@ var silver = (function () {
       initSize()
     ];
     var focusIn = function (component, gridConfig, gridState) {
-      descendant$2(component.element(), gridConfig.selector).each(function (first) {
+      descendant$1(component.element(), gridConfig.selector).each(function (first) {
         gridConfig.focusManager.set(component, first);
       });
     };
@@ -6633,7 +6633,7 @@ var silver = (function () {
     };
     var focusIn$1 = function (component, flowConfig) {
       flowConfig.getInitial(component).orThunk(function () {
-        return descendant$2(component.element(), flowConfig.selector);
+        return descendant$1(component.element(), flowConfig.selector);
       }).each(function (first) {
         flowConfig.focusManager.set(component, first);
       });
@@ -6747,7 +6747,7 @@ var silver = (function () {
     var focusIn$2 = function (component, matrixConfig) {
       var focused = matrixConfig.previousSelector(component).orThunk(function () {
         var selectors = matrixConfig.selectors;
-        return descendant$2(component.element(), selectors.cell);
+        return descendant$1(component.element(), selectors.cell);
       });
       focused.each(function (cell) {
         matrixConfig.focusManager.set(component, cell);
@@ -6760,19 +6760,19 @@ var silver = (function () {
     };
     var toMatrix = function (rows, matrixConfig) {
       return map(rows, function (row) {
-        return descendants$1(row, matrixConfig.selectors.cell);
+        return descendants(row, matrixConfig.selectors.cell);
       });
     };
     var doMove$2 = function (ifCycle, ifMove) {
       return function (element, focused, matrixConfig) {
-        var move$$1 = matrixConfig.cycles ? ifCycle : ifMove;
+        var move = matrixConfig.cycles ? ifCycle : ifMove;
         return closest$3(focused, matrixConfig.selectors.row).bind(function (inRow) {
-          var cellsInRow = descendants$1(inRow, matrixConfig.selectors.cell);
-          return findIndex$2(cellsInRow, focused).bind(function (colIndex) {
-            var allRows = descendants$1(element, matrixConfig.selectors.row);
-            return findIndex$2(allRows, inRow).bind(function (rowIndex) {
+          var cellsInRow = descendants(inRow, matrixConfig.selectors.cell);
+          return findIndex$1(cellsInRow, focused).bind(function (colIndex) {
+            var allRows = descendants(element, matrixConfig.selectors.row);
+            return findIndex$1(allRows, inRow).bind(function (rowIndex) {
               var matrix = toMatrix(allRows, matrixConfig);
-              return move$$1(matrix, rowIndex, colIndex).map(function (next) {
+              return move(matrix, rowIndex, colIndex).map(function (next) {
                 return next.cell();
               });
             });
@@ -6807,7 +6807,7 @@ var silver = (function () {
       });
     };
     var focusIn$3 = function (component, menuConfig) {
-      descendant$2(component.element(), menuConfig.selector).each(function (first) {
+      descendant$1(component.element(), menuConfig.selector).each(function (first) {
         menuConfig.focusManager.set(component, first);
       });
     };
@@ -6930,7 +6930,7 @@ var silver = (function () {
         },
         setGridSize: function (component, keyConfig, keyState, numRows, numColumns) {
           if (!hasKey$1(keyState, 'setGridSize')) {
-            console.error('Layout does not support setGridSize');
+            domGlobals.console.error('Layout does not support setGridSize');
           } else {
             keyState.setGridSize(numRows, numColumns);
           }
@@ -6939,28 +6939,28 @@ var silver = (function () {
       state: KeyingState
     });
 
-    var preserve$2 = function (f, container) {
+    var preserve = function (f, container) {
       var ownerDoc = owner(container);
       var refocus = active(ownerDoc).bind(function (focused) {
-        var hasFocus$$1 = function (elem) {
+        var hasFocus = function (elem) {
           return eq(focused, elem);
         };
-        return hasFocus$$1(container) ? Option.some(container) : descendant(container, hasFocus$$1);
+        return hasFocus(container) ? Option.some(container) : descendant(container, hasFocus);
       });
       var result = f(container);
       refocus.each(function (oldFocus) {
         active(ownerDoc).filter(function (newFocus) {
           return eq(newFocus, oldFocus);
         }).fold(function () {
-          focus$2(oldFocus);
+          focus$1(oldFocus);
         }, noop);
       });
       return result;
     };
 
-    var set$7 = function (component, replaceConfig, replaceState, data) {
+    var set$5 = function (component, replaceConfig, replaceState, data) {
       detachChildren(component);
-      preserve$2(function () {
+      preserve(function () {
         var children = map(data, component.getSystem().build);
         each(children, function (l) {
           attach(component, l);
@@ -6974,7 +6974,7 @@ var silver = (function () {
     var append$2 = function (component, replaceConfig, replaceState, appendee) {
       insert(component, replaceConfig, append, appendee);
     };
-    var prepend$2 = function (component, replaceConfig, replaceState, prependee) {
+    var prepend$1 = function (component, replaceConfig, replaceState, prependee) {
       insert(component, replaceConfig, prepend, prependee);
     };
     var remove$7 = function (component, replaceConfig, replaceState, removee) {
@@ -7008,11 +7008,11 @@ var silver = (function () {
 
     var ReplaceApis = /*#__PURE__*/Object.freeze({
         append: append$2,
-        prepend: prepend$2,
+        prepend: prepend$1,
         remove: remove$7,
         replaceAt: replaceAt,
         replaceBy: replaceBy,
-        set: set$7,
+        set: set$5,
         contents: contents
     });
 
@@ -7171,7 +7171,7 @@ var silver = (function () {
       strict$1('getFallbackEntry'),
       strict$1('getDataKey'),
       strict$1('setValue'),
-      output$1('manager', {
+      output('manager', {
         setValue: setValue$1,
         getValue: getValue$1,
         onLoad: onLoad$1,
@@ -7196,7 +7196,7 @@ var silver = (function () {
       strict$1('getValue'),
       defaulted$1('setValue', noop),
       option('initialValue'),
-      output$1('manager', {
+      output('manager', {
         setValue: setValue$2,
         getValue: getValue$2,
         onLoad: onLoad$2,
@@ -7224,7 +7224,7 @@ var silver = (function () {
     };
     var MemoryStore = [
       option('initialValue'),
-      output$1('manager', {
+      output('manager', {
         setValue: setValue$3,
         getValue: getValue$3,
         onLoad: onLoad$3,
@@ -7257,15 +7257,15 @@ var silver = (function () {
       state: RepresentState
     });
 
-    var focus$3 = function (component, focusConfig) {
+    var focus$2 = function (component, focusConfig) {
       if (!focusConfig.ignore) {
-        focus$2(component.element());
+        focus$1(component.element());
         focusConfig.onFocus(component);
       }
     };
     var blur$1 = function (component, focusConfig) {
       if (!focusConfig.ignore) {
-        blur$$1(component.element());
+        blur(component.element());
       }
     };
     var isFocused = function (component) {
@@ -7273,7 +7273,7 @@ var silver = (function () {
     };
 
     var FocusApis = /*#__PURE__*/Object.freeze({
-        focus: focus$3,
+        focus: focus$2,
         blur: blur$1,
         isFocused: isFocused
     });
@@ -7283,8 +7283,8 @@ var silver = (function () {
       return nu$6(mod);
     };
     var events$4 = function (focusConfig) {
-      return derive([run(focus$1(), function (component, simulatedEvent) {
-          focus$3(component, focusConfig);
+      return derive([run(focus(), function (component, simulatedEvent) {
+          focus$2(component, focusConfig);
           simulatedEvent.stop();
         })].concat(focusConfig.stopMousedown ? [run(mousedown(), function (_, simulatedEvent) {
           simulatedEvent.event().prevent();
@@ -7322,10 +7322,10 @@ var silver = (function () {
         }
       });
     };
-    var toggle$3 = function (component, toggleConfig, toggleState) {
-      set$8(component, toggleConfig, toggleState, !toggleState.get());
+    var toggle = function (component, toggleConfig, toggleState) {
+      set$6(component, toggleConfig, toggleState, !toggleState.get());
     };
-    var on$1 = function (component, toggleConfig, toggleState) {
+    var on = function (component, toggleConfig, toggleState) {
       toggleState.set(true);
       updateClass(component, toggleConfig, toggleState);
       updateAriaState(component, toggleConfig, toggleState);
@@ -7335,31 +7335,31 @@ var silver = (function () {
       updateClass(component, toggleConfig, toggleState);
       updateAriaState(component, toggleConfig, toggleState);
     };
-    var set$8 = function (component, toggleConfig, toggleState, state) {
-      var action = state ? on$1 : off;
+    var set$6 = function (component, toggleConfig, toggleState, state) {
+      var action = state ? on : off;
       action(component, toggleConfig, toggleState);
     };
     var isOn = function (component, toggleConfig, toggleState) {
       return toggleState.get();
     };
     var onLoad$4 = function (component, toggleConfig, toggleState) {
-      set$8(component, toggleConfig, toggleState, toggleConfig.selected);
+      set$6(component, toggleConfig, toggleState, toggleConfig.selected);
     };
 
     var ToggleApis = /*#__PURE__*/Object.freeze({
         onLoad: onLoad$4,
-        toggle: toggle$3,
+        toggle: toggle,
         isOn: isOn,
-        on: on$1,
+        on: on,
         off: off,
-        set: set$8
+        set: set$6
     });
 
     var exhibit$2 = function (base, toggleConfig, toggleState) {
       return nu$6({});
     };
     var events$5 = function (toggleConfig, toggleState) {
-      var execute = executeEvent(toggleConfig, toggleState, toggle$3);
+      var execute = executeEvent(toggleConfig, toggleState, toggle);
       var load = loadEvent(toggleConfig, toggleState, onLoad$4);
       return derive(flatten([
         toggleConfig.toggleOnExecute ? [execute] : [],
@@ -7421,12 +7421,12 @@ var silver = (function () {
       defaultedOf('aria', { mode: 'none' }, choose$1('mode', {
         pressed: [
           defaulted$1('syncWithExpanded', false),
-          output$1('update', updatePressed)
+          output('update', updatePressed)
         ],
-        checked: [output$1('update', updateChecked)],
-        expanded: [output$1('update', updateExpanded)],
-        selected: [output$1('update', updateSelected)],
-        none: [output$1('update', noop)]
+        checked: [output('update', updateChecked)],
+        expanded: [output('update', updateExpanded)],
+        selected: [output('update', updateSelected)],
+        none: [output('update', noop)]
       }))
     ];
 
@@ -7452,7 +7452,7 @@ var silver = (function () {
       emitWith(item, focusEvent, { item: item });
     };
     var hover = constant(hoverEvent);
-    var focus$4 = constant(focusEvent);
+    var focus$3 = constant(focusEvent);
 
     var events$6 = function (name, eventHandlers) {
       var events = derive(eventHandlers);
@@ -7523,7 +7523,7 @@ var silver = (function () {
       ]),
       defaulted$1('ignoreFocus', false),
       defaulted$1('domModification', {}),
-      output$1('builder', builder),
+      output('builder', builder),
       defaulted$1('eventOrder', {})
     ];
 
@@ -7537,7 +7537,7 @@ var silver = (function () {
     var schema$a = [
       strict$1('dom'),
       strict$1('components'),
-      output$1('builder', builder$1)
+      output('builder', builder$1)
     ];
 
     var owner$2 = function () {
@@ -7563,7 +7563,7 @@ var silver = (function () {
 
     var builder$2 = function (detail) {
       var subs = substitutes(owner$2(), detail, parts());
-      var components$$1 = components(owner$2(), detail, subs.internals());
+      var components$1 = components(owner$2(), detail, subs.internals());
       var focusWidget = function (component) {
         return getPart(component, detail, 'widget').map(function (widget) {
           Keying.focusIn(widget);
@@ -7582,7 +7582,7 @@ var silver = (function () {
       };
       return {
         dom: detail.dom,
-        components: components$$1,
+        components: components$1,
         domModification: detail.domModification,
         events: derive([
           runOnExecute(function (component, simulatedEvent) {
@@ -7616,7 +7616,7 @@ var silver = (function () {
             mode: 'special',
             focusIn: detail.autofocus ? function (component) {
               focusWidget(component);
-            } : revoke$1(),
+            } : revoke(),
             onLeft: onHorizontalArrow,
             onRight: onHorizontalArrow,
             onEscape: function (component, simulatedEvent) {
@@ -7648,7 +7648,7 @@ var silver = (function () {
       ]),
       defaulted$1('domModification', {}),
       defaultUidsSchema(parts()),
-      output$1('builder', builder$2)
+      output('builder', builder$2)
     ];
 
     var itemSchema$1 = choose$1('type', {
@@ -7723,15 +7723,15 @@ var silver = (function () {
       }, choose$1('mode', {
         grid: [
           initSize(),
-          output$1('config', configureGrid)
+          output('config', configureGrid)
         ],
         matrix: [
-          output$1('config', configureMatrix),
+          output('config', configureMatrix),
           strict$1('rowSelector')
         ],
         menu: [
           defaulted$1('moveOnTab', true),
-          output$1('config', configureMenu)
+          output('config', configureMenu)
         ]
       })),
       itemMarkers(),
@@ -7740,7 +7740,7 @@ var silver = (function () {
       onHandler('onHighlight')
     ]);
 
-    var focus$5 = constant('alloy.menu-focus');
+    var focus$4 = constant('alloy.menu-focus');
 
     var make$1 = function (detail, components, spec, externals) {
       return {
@@ -7763,12 +7763,12 @@ var silver = (function () {
           Keying.config(detail.movement.config(detail, detail.movement))
         ]),
         events: derive([
-          run(focus$4(), function (menu, simulatedEvent) {
+          run(focus$3(), function (menu, simulatedEvent) {
             var event = simulatedEvent.event();
             menu.getSystem().getByDom(event.target()).each(function (item) {
               Highlighting.highlight(menu, item);
               simulatedEvent.stop();
-              emitWith(menu, focus$5(), {
+              emitWith(menu, focus$4(), {
                 menu: menu,
                 item: item
               });
@@ -7969,7 +7969,7 @@ var silver = (function () {
       var getSubmenuParents = function (container) {
         return submenuParentItems.get().getOrThunk(function () {
           var r = {};
-          var items = descendants$1(container.element(), '.' + detail.markers.item);
+          var items = descendants(container.element(), '.' + detail.markers.item);
           var parentItems = filter(items, function (i) {
             return get$2(i, 'aria-haspopup') === 'true';
           });
@@ -8093,7 +8093,7 @@ var silver = (function () {
         };
       };
       var events = derive([
-        run(focus$5(), function (sandbox, simulatedEvent) {
+        run(focus$4(), function (sandbox, simulatedEvent) {
           var menu = simulatedEvent.event().menu();
           Highlighting.highlight(sandbox, menu);
           var value = getItemValue(simulatedEvent.event().item());
@@ -8473,183 +8473,24 @@ var silver = (function () {
       };
     };
 
-    var getAll = function () {
-      return {
-        'accessibility-check': '<svg width="24" height="24"><path d="M12 2a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2c0-1.1.9-2 2-2zm8 7h-5v12c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-5c0-.6-.4-1-1-1a1 1 0 0 0-1 1v5c0 .6-.4 1-1 1a1 1 0 0 1-1-1V9H4a1 1 0 1 1 0-2h16c.6 0 1 .4 1 1s-.4 1-1 1z" fill-rule="nonzero"/></svg>',
-        'align-center': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm3 4h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 1 1 0-2zm0 8h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm-3-4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'align-justify': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2zm0 4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'align-left': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 4h8c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 8h8c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2zm0-4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'align-none': '<svg width="24" height="24"><path d="M14.2 5L13 7H5a1 1 0 1 1 0-2h9.2zm4 0h.8a1 1 0 0 1 0 2h-2l1.2-2zm-6.4 4l-1.2 2H5a1 1 0 0 1 0-2h6.8zm4 0H19a1 1 0 0 1 0 2h-4.4l1.2-2zm-6.4 4l-1.2 2H5a1 1 0 0 1 0-2h4.4zm4 0H19a1 1 0 0 1 0 2h-6.8l1.2-2zM7 17l-1.2 2H5a1 1 0 0 1 0-2h2zm4 0h8a1 1 0 0 1 0 2H9.8l1.2-2zm5.2-13.5l1.3.7-9.7 16.3-1.3-.7 9.7-16.3z" fill-rule="evenodd"/></svg>',
-        'align-right': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm6 4h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0 8h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm-6-4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'arrow-left': '<svg width="24" height="24"><path d="M5.6 13l12 6a1 1 0 0 0 1.4-1V6a1 1 0 0 0-1.4-.9l-12 6a1 1 0 0 0 0 1.8z" fill-rule="evenodd"/></svg>',
-        'arrow-right': '<svg width="24" height="24"><path d="M18.5 13l-12 6A1 1 0 0 1 5 18V6a1 1 0 0 1 1.4-.9l12 6a1 1 0 0 1 0 1.8z" fill-rule="evenodd"/></svg>',
-        'bold': '<svg width="24" height="24"><path d="M7.8 19c-.3 0-.5 0-.6-.2l-.2-.5V5.7c0-.2 0-.4.2-.5l.6-.2h5c1.5 0 2.7.3 3.5 1 .7.6 1.1 1.4 1.1 2.5a3 3 0 0 1-.6 1.9c-.4.6-1 1-1.6 1.2.4.1.9.3 1.3.6s.8.7 1 1.2c.4.4.5 1 .5 1.6 0 1.3-.4 2.3-1.3 3-.8.7-2.1 1-3.8 1H7.8zm5-8.3c.6 0 1.2-.1 1.6-.5.4-.3.6-.7.6-1.3 0-1.1-.8-1.7-2.3-1.7H9.3v3.5h3.4zm.5 6c.7 0 1.3-.1 1.7-.4.4-.4.6-.9.6-1.5s-.2-1-.7-1.4c-.4-.3-1-.4-2-.4H9.4v3.8h4z" fill-rule="evenodd"/></svg>',
-        'bookmark': '<svg width="24" height="24"><path d="M6 4v17l6-4 6 4V4c0-.6-.4-1-1-1H7a1 1 0 0 0-1 1z" fill-rule="nonzero"/></svg>',
-        'border-width': '<svg width="24" height="24"><path d="M5 14.8h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2zm-.5 3.7h15c.3 0 .5.2.5.5s-.2.5-.5.5h-15a.5.5 0 1 1 0-1zm.5-8.3h14c.6 0 1 .4 1 1v1c0 .5-.4 1-1 1H5a1 1 0 0 1-1-1v-1c0-.6.4-1 1-1zm0-5.7h14c.6 0 1 .4 1 1v2c0 .6-.4 1-1 1H5a1 1 0 0 1-1-1v-2c0-.6.4-1 1-1z" fill-rule="evenodd"/></svg>',
-        'brightness': '<svg width="24" height="24"><path d="M12 17c.3 0 .5.1.7.3.2.2.3.4.3.7v1c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3 1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7v-1c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3zm0-10a1 1 0 0 1-.7-.3A1 1 0 0 1 11 6V5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3.3 0 .5.1.7.3.2.2.3.4.3.7v1c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3zm7 4c.3 0 .5.1.7.3.2.2.3.4.3.7 0 .3-.1.5-.3.7a1 1 0 0 1-.7.3h-1a1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h1zM7 12c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3H5a1 1 0 0 1-.7-.3A1 1 0 0 1 4 12c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h1c.3 0 .5.1.7.3.2.2.3.4.3.7zm10 3.5l.7.8c.2.1.3.4.3.6 0 .3-.1.6-.3.8a1 1 0 0 1-.8.3 1 1 0 0 1-.6-.3l-.8-.7a1 1 0 0 1-.3-.8c0-.2.1-.5.3-.7a1 1 0 0 1 1.4 0zm-10-7l-.7-.8a1 1 0 0 1-.3-.6c0-.3.1-.6.3-.8.2-.2.5-.3.8-.3.2 0 .5.1.7.3l.7.7c.2.2.3.5.3.8 0 .2-.1.5-.3.7a1 1 0 0 1-.7.3 1 1 0 0 1-.8-.3zm10 0a1 1 0 0 1-.8.3 1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7c0-.3.1-.6.3-.8l.8-.7c.1-.2.4-.3.6-.3.3 0 .6.1.8.3.2.2.3.5.3.8 0 .2-.1.5-.3.7l-.7.7zm-10 7c.2-.2.5-.3.8-.3.2 0 .5.1.7.3a1 1 0 0 1 0 1.4l-.8.8a1 1 0 0 1-.6.3 1 1 0 0 1-.8-.3 1 1 0 0 1-.3-.8c0-.2.1-.5.3-.6l.7-.8zM12 8a4 4 0 0 1 3.7 2.4 4 4 0 0 1 0 3.2A4 4 0 0 1 12 16a4 4 0 0 1-3.7-2.4 4 4 0 0 1 0-3.2A4 4 0 0 1 12 8zm0 6.5c.7 0 1.3-.2 1.8-.7.5-.5.7-1.1.7-1.8s-.2-1.3-.7-1.8c-.5-.5-1.1-.7-1.8-.7s-1.3.2-1.8.7c-.5.5-.7 1.1-.7 1.8s.2 1.3.7 1.8c.5.5 1.1.7 1.8.7z" fill-rule="evenodd"/></svg>',
-        'browse': '<svg width="24" height="24"><path d="M19 4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4v-2h4V8H5v10h4v2H5a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h14zm-8 9.4l-2.3 2.3a1 1 0 1 1-1.4-1.4l4-4a1 1 0 0 1 1.4 0l4 4a1 1 0 0 1-1.4 1.4L13 13.4V20a1 1 0 0 1-2 0v-6.6z" fill-rule="nonzero"/></svg>',
-        'cancel': '<svg width="24" height="24"><path d="M12 4.6a7.4 7.4 0 1 1 0 14.8 7.4 7.4 0 0 1 0-14.8zM12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 8L14.8 8l1 1.1-2.7 2.8 2.7 2.7-1.1 1.1-2.7-2.7-2.7 2.7-1-1.1 2.6-2.7-2.7-2.7 1-1.1 2.8 2.7z" fill-rule="nonzero"/></svg>',
-        'change-case': '<svg width="24" height="24"><path d="M18.4 18.2v-.6c-.5.8-1.3 1.2-2.4 1.2-2.2 0-3.3-1.6-3.3-4.8 0-3.1 1-4.7 3.3-4.7 1.1 0 1.8.3 2.4 1.1v-.6c0-.5.4-.8.8-.8s.8.3.8.8v8.4c0 .5-.4.8-.8.8a.8.8 0 0 1-.8-.8zm-2-7.4c-1.3 0-1.8.9-1.8 3.2 0 2.4.5 3.3 1.7 3.3 1.3 0 1.8-.9 1.8-3.2 0-2.4-.5-3.3-1.7-3.3zM10 15.7H5.5l-.8 2.6a1 1 0 0 1-1 .7h-.2a.7.7 0 0 1-.7-1l4-12a1 1 0 1 1 2 0l4 12a.7.7 0 0 1-.8 1h-.2a1 1 0 0 1-1-.7l-.8-2.6zm-.3-1.5l-2-6.5-1.9 6.5h3.9z" fill-rule="evenodd"/></svg>',
-        'character-count': '<svg width="24" height="24"><path d="M4 11.5h16v1H4v-1zm4.8-6.8V10H7.7V5.8h-1v-1h2zM11 8.3V9h2v1h-3V7.7l2-1v-.9h-2v-1h3v2.4l-2 1zm6.3-3.4V10h-3.1V9h2.1V8h-2.1V6.8h2.1v-1h-2.1v-1h3.1zM5.8 16.4c0-.5.2-.8.5-1 .2-.2.6-.3 1.2-.3l.8.1c.2 0 .4.2.5.3l.4.4v2.8l.2.3H8.2v-.1-.2l-.6.3H7c-.4 0-.7 0-1-.2a1 1 0 0 1-.3-.9c0-.3 0-.6.3-.8.3-.2.7-.4 1.2-.4l.6-.2h.3v-.2l-.1-.2a.8.8 0 0 0-.5-.1 1 1 0 0 0-.4 0l-.3.4h-1zm2.3.8h-.2l-.2.1-.4.1a1 1 0 0 0-.4.2l-.2.2.1.3.5.1h.4l.4-.4v-.6zm2-3.4h1.2v1.7l.5-.3h.5c.5 0 .9.1 1.2.5.3.4.5.8.5 1.4 0 .6-.2 1.1-.5 1.5-.3.4-.7.6-1.3.6l-.6-.1-.4-.4v.4h-1.1v-5.4zm1.1 3.3c0 .3 0 .6.2.8a.7.7 0 0 0 1.2 0l.2-.8c0-.4 0-.6-.2-.8a.7.7 0 0 0-.6-.3l-.6.3-.2.8zm6.1-.5c0-.2 0-.3-.2-.4a.8.8 0 0 0-.5-.2c-.3 0-.5.1-.6.3l-.2.9c0 .3 0 .6.2.8.1.2.3.3.6.3.2 0 .4 0 .5-.2l.2-.4h1.1c0 .5-.3.8-.6 1.1a2 2 0 0 1-1.3.4c-.5 0-1-.2-1.3-.6a2 2 0 0 1-.5-1.4c0-.6.1-1.1.5-1.5.3-.4.8-.5 1.4-.5.5 0 1 0 1.2.3.4.3.5.7.5 1.2h-1v-.1z" fill-rule="evenodd"/></svg>',
-        'checklist': '<svg width="24" height="24"><path d="M11 17h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8a1 1 0 0 1 0 2h-8a1 1 0 0 1 0-2zM7.2 16c.2-.4.6-.5.9-.3.3.2.4.6.2 1L6 20c-.2.3-.7.4-1 0l-1.3-1.3a.7.7 0 0 1 0-1c.3-.2.7-.2 1 0l.7.9 1.7-2.8zm0-6c.2-.4.6-.5.9-.3.3.2.4.6.2 1L6 14c-.2.3-.7.4-1 0l-1.3-1.3a.7.7 0 0 1 0-1c.3-.2.7-.2 1 0l.7.9 1.7-2.8zm0-6c.2-.4.6-.5.9-.3.3.2.4.6.2 1L6 8c-.2.3-.7.4-1 0L3.8 6.9a.7.7 0 0 1 0-1c.3-.2.7-.2 1 0l.7.9 1.7-2.8z" fill-rule="evenodd"/></svg>',
-        'checkmark': '<svg width="24" height="24"><path d="M18.2 5.4a1 1 0 0 1 1.6 1.2l-8 12a1 1 0 0 1-1.5.1l-5-5a1 1 0 1 1 1.4-1.4l4.1 4.1 7.4-11z" fill-rule="nonzero"/></svg>',
-        'chevron-down': '<svg width="10" height="10"><path d="M8.7 2.2c.3-.3.8-.3 1 0 .4.4.4.9 0 1.2L5.7 7.8c-.3.3-.9.3-1.2 0L.2 3.4a.8.8 0 0 1 0-1.2c.3-.3.8-.3 1.1 0L5 6l3.7-3.8z" fill-rule="nonzero"/></svg>',
-        'chevron-left': '<svg width="10" height="10"><path d="M7.8 1.3L4 5l3.8 3.7c.3.3.3.8 0 1-.4.4-.9.4-1.2 0L2.2 5.7a.8.8 0 0 1 0-1.2L6.6.2C7 0 7.4 0 7.8.2c.3.3.3.8 0 1.1z" fill-rule="nonzero"/></svg>',
-        'chevron-right': '<svg width="10" height="10"><path d="M2.2 1.3a.8.8 0 0 1 0-1c.4-.4.9-.4 1.2 0l4.4 4.1c.3.4.3.9 0 1.2L3.4 9.8c-.3.3-.8.3-1.2 0a.8.8 0 0 1 0-1.1L6 5 2.2 1.3z" fill-rule="nonzero"/></svg>',
-        'chevron-up': '<svg width="10" height="10"><path d="M8.7 7.8L5 4 1.3 7.8c-.3.3-.8.3-1 0a.8.8 0 0 1 0-1.2l4.1-4.4c.3-.3.9-.3 1.2 0l4.2 4.4c.3.3.3.9 0 1.2-.3.3-.8.3-1.1 0z" fill-rule="nonzero"/></svg>',
-        'close': '<svg width="24" height="24"><path d="M17.3 8.2L13.4 12l3.9 3.8a1 1 0 0 1-1.5 1.5L12 13.4l-3.8 3.9a1 1 0 0 1-1.5-1.5l3.9-3.8-3.9-3.8a1 1 0 0 1 1.5-1.5l3.8 3.9 3.8-3.9a1 1 0 0 1 1.5 1.5z" fill-rule="evenodd"/></svg>',
-        'code-sample': '<svg width="24" height="26"><path d="M7.1 11a2.8 2.8 0 0 1-.8 2 2.8 2.8 0 0 1 .8 2v1.7c0 .3.1.6.4.8.2.3.5.4.8.4.3 0 .4.2.4.4v.8c0 .2-.1.4-.4.4-.7 0-1.4-.3-2-.8-.5-.6-.8-1.3-.8-2V15c0-.3-.1-.6-.4-.8-.2-.3-.5-.4-.8-.4a.4.4 0 0 1-.4-.4v-.8c0-.2.2-.4.4-.4.3 0 .6-.1.8-.4.3-.2.4-.5.4-.8V9.3c0-.7.3-1.4.8-2 .6-.5 1.3-.8 2-.8.3 0 .4.2.4.4v.8c0 .2-.1.4-.4.4-.3 0-.6.1-.8.4-.3.2-.4.5-.4.8V11zm9.8 0V9.3c0-.3-.1-.6-.4-.8-.2-.3-.5-.4-.8-.4a.4.4 0 0 1-.4-.4V7c0-.2.1-.4.4-.4.7 0 1.4.3 2 .8.5.6.8 1.3.8 2V11c0 .3.1.6.4.8.2.3.5.4.8.4.2 0 .4.2.4.4v.8c0 .2-.2.4-.4.4-.3 0-.6.1-.8.4-.3.2-.4.5-.4.8v1.7c0 .7-.3 1.4-.8 2-.6.5-1.3.8-2 .8a.4.4 0 0 1-.4-.4v-.8c0-.2.1-.4.4-.4.3 0 .6-.1.8-.4.3-.2.4-.5.4-.8V15a2.8 2.8 0 0 1 .8-2 2.8 2.8 0 0 1-.8-2zm-3.3-.4c0 .4-.1.8-.5 1.1-.3.3-.7.5-1.1.5-.4 0-.8-.2-1.1-.5-.4-.3-.5-.7-.5-1.1 0-.5.1-.9.5-1.2.3-.3.7-.4 1.1-.4.4 0 .8.1 1.1.4.4.3.5.7.5 1.2zM12 13c.4 0 .8.1 1.1.5.4.3.5.7.5 1.1 0 1-.1 1.6-.5 2a3 3 0 0 1-1.1 1c-.4.3-.8.4-1.1.4a.5.5 0 0 1-.5-.5V17a3 3 0 0 0 1-.2l.6-.6c-.6 0-1-.2-1.3-.5-.2-.3-.3-.7-.3-1 0-.5.1-1 .5-1.2.3-.4.7-.5 1.1-.5z" fill-rule="evenodd"/></svg>',
-        'color-levels': '<svg width="24" height="24"><path d="M17.5 11.4A9 9 0 0 1 18 14c0 .5 0 1-.2 1.4 0 .4-.3.9-.5 1.3a6.2 6.2 0 0 1-3.7 3 5.7 5.7 0 0 1-3.2 0A5.9 5.9 0 0 1 7.6 18a6.2 6.2 0 0 1-1.4-2.6 6.7 6.7 0 0 1 0-2.8c0-.4.1-.9.3-1.3a13.6 13.6 0 0 1 2.3-4A20 20 0 0 1 12 4a26.4 26.4 0 0 1 3.2 3.4 18.2 18.2 0 0 1 2.3 4zm-2 4.5c.4-.7.5-1.4.5-2a7.3 7.3 0 0 0-1-3.2c.2.6.2 1.2.2 1.9a4.5 4.5 0 0 1-1.3 3 5.3 5.3 0 0 1-2.3 1.5 4.9 4.9 0 0 1-2 .1 4.3 4.3 0 0 0 2.4.8 4 4 0 0 0 2-.6 4 4 0 0 0 1.5-1.5z" fill-rule="evenodd"/></svg>',
-        'color-picker': '<svg width="24" height="24"><path d="M12 3a9 9 0 0 0 0 18 1.5 1.5 0 0 0 1.1-2.5c-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" fill-rule="nonzero"/></svg>',
-        'color-swatch-remove-color': '<svg width="24" height="24"><path stroke="#000" stroke-width="2" d="M21 3L3 21" fill-rule="evenodd"/></svg>',
-        'color-swatch': '<svg width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="1" fill-rule="evenodd"/></svg>',
-        'comment': '<svg width="24" height="24"><path d="M9 19l3-2h7c.6 0 1-.4 1-1V6c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v10c0 .6.4 1 1 1h4v2zm-2 4v-4H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-6.4L7 23z" fill-rule="nonzero"/></svg>',
-        'contrast': '<svg width="24" height="24"><path d="M12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4zm-6 8a6 6 0 0 0 6 6V6a6 6 0 0 0-6 6z" fill-rule="evenodd"/></svg>',
-        'copy': '<svg width="24" height="24"><path d="M16 3H6a2 2 0 0 0-2 2v11h2V5h10V3zm1 4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9c0-1.2.9-2 2-2h7zm0 12V9h-7v10h7z" fill-rule="nonzero"/></svg>',
-        'crop': '<svg width="24" height="24"><path d="M17 8v7h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v2c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-2H7V9H5a1 1 0 1 1 0-2h2V5c0-.6.4-1 1-1s1 .4 1 1v2h7l3-3 1 1-3 3zM9 9v5l5-5H9zm1 6h5v-5l-5 5z" fill-rule="evenodd"/></svg>',
-        'cut': '<svg width="24" height="24"><path d="M18 15c.6.7 1 1.4 1 2.3 0 .8-.2 1.5-.7 2l-.8.5-1 .2c-.4 0-.8 0-1.2-.3a3.9 3.9 0 0 1-2.1-2.2c-.2-.5-.3-1-.2-1.5l-1-1-1 1c0 .5 0 1-.2 1.5-.1.5-.4 1-.9 1.4-.3.4-.7.6-1.2.8l-1.2.3c-.4 0-.7 0-1-.2-.3 0-.6-.3-.8-.5-.5-.5-.8-1.2-.7-2 0-.9.4-1.6 1-2.2A3.7 3.7 0 0 1 8.6 14H9l1-1-4-4-.5-1a3.3 3.3 0 0 1 0-2c0-.4.3-.7.5-1l6 6 6-6 .5 1a3.3 3.3 0 0 1 0 2c0 .4-.3.7-.5 1l-4 4 1 1h.5c.4 0 .8 0 1.2.3.5.2.9.4 1.2.8zm-8.5 2.2l.1-.4v-.3-.4a1 1 0 0 0-.2-.5 1 1 0 0 0-.4-.2 1.6 1.6 0 0 0-.8 0 2.6 2.6 0 0 0-.8.3 2.5 2.5 0 0 0-.9 1.1l-.1.4v.7l.2.5.5.2h.7a2.5 2.5 0 0 0 .8-.3 2.8 2.8 0 0 0 1-1zm2.5-2.8c.4 0 .7-.1 1-.4.3-.3.4-.6.4-1s-.1-.7-.4-1c-.3-.3-.6-.4-1-.4s-.7.1-1 .4c-.3.3-.4.6-.4 1s.1.7.4 1c.3.3.6.4 1 .4zm5.4 4l.2-.5v-.4-.3a2.6 2.6 0 0 0-.3-.8 2.4 2.4 0 0 0-.7-.7 2.5 2.5 0 0 0-.8-.3 1.5 1.5 0 0 0-.8 0 1 1 0 0 0-.4.2 1 1 0 0 0-.2.5 1.5 1.5 0 0 0 0 .7v.4l.3.4.3.4a2.8 2.8 0 0 0 .8.5l.4.1h.7l.5-.2z" fill-rule="evenodd"/></svg>',
-        'document-properties': '<svg width="24" height="24"><path d="M14.4 3H7a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h10a2 2 0 0 0 2-2V7.6L14.4 3zM17 19H7V5h6v4h4v10z" fill-rule="nonzero"/></svg>',
-        'drag': '<svg width="24" height="24"><path d="M13 5h2v2h-2V5zm0 4h2v2h-2V9zM9 9h2v2H9V9zm4 4h2v2h-2v-2zm-4 0h2v2H9v-2zm0 4h2v2H9v-2zm4 0h2v2h-2v-2zM9 5h2v2H9V5z" fill-rule="evenodd"/></svg>',
-        'duplicate': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M16 3v2H6v11H4V5c0-1.1.9-2 2-2h10zm3 8h-2V9h-7v10h9a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9c0-1.2.9-2 2-2h7a2 2 0 0 1 2 2v2z"/><path d="M17 14h1a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1h-1a1 1 0 0 1 0-2h1v-1a1 1 0 0 1 2 0v1z"/></g></svg>',
-        'edit-image': '<svg width="24" height="24"><path d="M18 16h2V7a2 2 0 0 0-2-2H7v2h11v9zM6 17h15a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1H6a2 2 0 0 1-2-2V7H3a1 1 0 1 1 0-2h1V4a1 1 0 1 1 2 0v13zm3-5.3l1.3 2 3-4.7 3.7 6H7l2-3.3z" fill-rule="nonzero"/></svg>',
-        'embed-page': '<svg width="24" height="24"><path d="M19 6V5H5v14h2A13 13 0 0 1 19 6zm0 1.4c-.8.8-1.6 2.4-2.2 4.6H19V7.4zm0 5.6h-2.4c-.4 1.8-.6 3.8-.6 6h3v-6zm-4 6c0-2.2.2-4.2.6-6H13c-.7 1.8-1.1 3.8-1.1 6h3zm-4 0c0-2.2.4-4.2 1-6H9.6A12 12 0 0 0 8 19h3zM4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm11.8 9c.4-1.9 1-3.4 1.8-4.5a9.2 9.2 0 0 0-4 4.5h2.2zm-3.4 0a12 12 0 0 1 2.8-4 12 12 0 0 0-5 4h2.2z" fill-rule="nonzero"/></svg>',
-        'embed': '<svg width="24" height="24"><path d="M4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm1 2v14h14V5H5zm4.8 2.6l5.6 4a.5.5 0 0 1 0 .8l-5.6 4A.5.5 0 0 1 9 16V8a.5.5 0 0 1 .8-.4z" fill-rule="nonzero"/></svg>',
-        'emoji': '<svg width="24" height="24"><path d="M9 11c.6 0 1-.4 1-1s-.4-1-1-1a1 1 0 0 0-1 1c0 .6.4 1 1 1zm6 0c.6 0 1-.4 1-1s-.4-1-1-1a1 1 0 0 0-1 1c0 .6.4 1 1 1zm-3 5.5c2.1 0 4-1.5 4.4-3.5H7.6c.5 2 2.3 3.5 4.4 3.5zM12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13z" fill-rule="nonzero"/></svg>',
-        'fill': '<svg width="24" height="26"><path d="M16.6 12l-9-9-1.4 1.4 2.4 2.4-5.2 5.1c-.5.6-.5 1.6 0 2.2L9 19.6a1.5 1.5 0 0 0 2.2 0l5.5-5.5c.5-.6.5-1.6 0-2.2zM5.2 13L10 8.2l4.8 4.8H5.2zM19 14.5s-2 2.2-2 3.5c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.3-2-3.5-2-3.5z" fill-rule="nonzero"/></svg>',
-        'flip-horizontally': '<svg width="24" height="24"><path d="M14 19h2v-2h-2v2zm4-8h2V9h-2v2zM4 7v10c0 1.1.9 2 2 2h3v-2H6V7h3V5H6a2 2 0 0 0-2 2zm14-2v2h2a2 2 0 0 0-2-2zm-7 16h2V3h-2v18zm7-6h2v-2h-2v2zm-4-8h2V5h-2v2zm4 12a2 2 0 0 0 2-2h-2v2z" fill-rule="nonzero"/></svg>',
-        'flip-vertically': '<svg width="24" height="24"><path d="M5 14v2h2v-2H5zm8 4v2h2v-2h-2zm4-14H7a2 2 0 0 0-2 2v3h2V6h10v3h2V6a2 2 0 0 0-2-2zm2 14h-2v2a2 2 0 0 0 2-2zM3 11v2h18v-2H3zm6 7v2h2v-2H9zm8-4v2h2v-2h-2zM5 18c0 1.1.9 2 2 2v-2H5z" fill-rule="nonzero"/></svg>',
-        'format-painter': '<svg width="24" height="24"><path d="M18 5V4c0-.5-.4-1-1-1H5a1 1 0 0 0-1 1v4c0 .6.5 1 1 1h12c.6 0 1-.4 1-1V7h1v4H9v9c0 .6.4 1 1 1h2c.6 0 1-.4 1-1v-7h8V5h-3z" fill-rule="nonzero"/></svg>',
-        'fullscreen': '<svg width="24" height="24"><path d="M15.3 10l-1.2-1.3 2.9-3h-2.3a.9.9 0 1 1 0-1.7H19c.5 0 .9.4.9.9v4.4a.9.9 0 1 1-1.8 0V7l-2.9 3zm0 4l3 3v-2.3a.9.9 0 1 1 1.7 0V19c0 .5-.4.9-.9.9h-4.4a.9.9 0 1 1 0-1.8H17l-3-2.9 1.3-1.2zM10 15.4l-2.9 3h2.3a.9.9 0 1 1 0 1.7H5a.9.9 0 0 1-.9-.9v-4.4a.9.9 0 1 1 1.8 0V17l2.9-3 1.2 1.3zM8.7 10L5.7 7v2.3a.9.9 0 0 1-1.7 0V5c0-.5.4-.9.9-.9h4.4a.9.9 0 0 1 0 1.8H7l3 2.9-1.3 1.2z" fill-rule="nonzero"/></svg>',
-        'gamma': '<svg width="24" height="24"><path d="M4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm1 2v14h14V5H5zm6.5 11.8V14L9.2 8.7a5.1 5.1 0 0 0-.4-.8l-.1-.2H8 8v-1l.3-.1.3-.1h.7a1 1 0 0 1 .6.5l.1.3a8.5 8.5 0 0 1 .3.6l1.9 4.6 2-5.2a1 1 0 0 1 1-.6.5.5 0 0 1 .5.6L13 14v2.8a.7.7 0 0 1-1.4 0z" fill-rule="nonzero"/></svg>',
-        'help': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M12 5.5a6.5 6.5 0 0 0-6 9 6.3 6.3 0 0 0 1.4 2l1 1a6.3 6.3 0 0 0 3.6 1 6.5 6.5 0 0 0 6-9 6.3 6.3 0 0 0-1.4-2l-1-1a6.3 6.3 0 0 0-3.6-1zM12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4z"/><path d="M9.6 9.7a.7.7 0 0 1-.7-.8c0-1.1 1.5-1.8 3.2-1.8 1.8 0 3.2.8 3.2 2.4 0 1.4-.4 2.1-1.5 2.8-.2 0-.3.1-.3.2a2 2 0 0 0-.8.8.8.8 0 0 1-1.4-.6c.3-.7.8-1 1.3-1.5l.4-.2c.7-.4.8-.6.8-1.5 0-.5-.6-.9-1.7-.9-.5 0-1 .1-1.4.3-.2 0-.3.1-.3.2v-.2c0 .4-.4.8-.8.8z" fill-rule="nonzero"/><circle cx="12" cy="16" r="1"/></g></svg>',
-        'highlight-bg-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path id="tox-icon-highlight-bg-color__color" d="M3 18h18v3H3z"/><path fill-rule="nonzero" d="M7.7 16.7H3l3.3-3.3-.7-.8L10.2 8l4 4.1-4 4.2c-.2.2-.6.2-.8 0l-.6-.7-1.1 1.1zm5-7.5L11 7.4l3-2.9a2 2 0 0 1 2.6 0L18 6c.7.7.7 2 0 2.7l-2.9 2.9-1.8-1.8-.5-.6"/></g></svg>',
-        'home': '<svg width="24" height="24"><path fill-rule="nonzero" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
-        'horizontal-rule': '<svg width="24" height="24"><path d="M4 11h16v2H4z" fill-rule="evenodd"/></svg>',
-        'image-options': '<svg width="24" height="24"><path d="M6 10a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2zm12 0a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2zm-6 0a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2z" fill-rule="nonzero"/></svg>',
-        'image': '<svg width="24" height="24"><path d="M5 15.7l3.3-3.2c.3-.3.7-.3 1 0L12 15l4.1-4c.3-.4.8-.4 1 0l2 1.9V5H5v10.7zM5 18V19h3l2.8-2.9-2-2L5 17.9zm14-3l-2.5-2.4-6.4 6.5H19v-4zM4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm6 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" fill-rule="nonzero"/></svg>',
-        'indent': '<svg width="24" height="24"><path d="M7 5h12c.6 0 1 .4 1 1s-.4 1-1 1H7a1 1 0 1 1 0-2zm5 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm0 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm-5 4h12a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2zm-2.6-3.8L6.2 12l-1.8-1.2a1 1 0 0 1 1.2-1.6l3 2a1 1 0 0 1 0 1.6l-3 2a1 1 0 1 1-1.2-1.6z" fill-rule="evenodd"/></svg>',
-        'indeterminate': '<svg width="24" height="24"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM9 11a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H9z" fill-rule="evenodd"/></svg>',
-        'info': '<svg width="24" height="24"><path d="M12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4zm-1 3v2h2V7h-2zm3 10v-1h-1v-5h-3v1h1v4h-1v1h4z" fill-rule="evenodd"/></svg>',
-        'insert-character': '<svg width="24" height="24"><path d="M15 18h4l1-2v4h-6v-3.3l1.4-1a6 6 0 0 0 1.8-2.9 6.3 6.3 0 0 0-.1-4.1 5.8 5.8 0 0 0-3-3.2c-.6-.3-1.3-.5-2.1-.5a5.1 5.1 0 0 0-3.9 1.8 6.3 6.3 0 0 0-1.3 6 6.2 6.2 0 0 0 1.8 3l1.4.9V20H4v-4l1 2h4v-.5l-2-1L5.4 15A6.5 6.5 0 0 1 4 11c0-1 .2-1.9.6-2.7A7 7 0 0 1 6.3 6C7.1 5.4 8 5 9 4.5c1-.3 2-.5 3.1-.5a8.8 8.8 0 0 1 5.7 2 7 7 0 0 1 1.7 2.3 6 6 0 0 1 .2 4.8c-.2.7-.6 1.3-1 1.9a7.6 7.6 0 0 1-3.6 2.5v.5z" fill-rule="evenodd"/></svg>',
-        'insert-time': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M19 2H5a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3zm-7 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/><path d="M15 12h-3V7a.5.5 0 0 0-1 0v6h4a.5.5 0 0 0 0-1z"/></g></svg>',
-        'invert': '<svg width="24" height="24"><path d="M18 19.3L16.5 18a5.8 5.8 0 0 1-3.1 1.9 6.1 6.1 0 0 1-5.5-1.6A5.8 5.8 0 0 1 6 14v-.3l.1-1.2A13.9 13.9 0 0 1 7.7 9l-3-3 .7-.8 2.8 2.9 9 8.9 1.5 1.6-.7.6zm0-5.5v.3l-.1 1.1-.4 1-1.2-1.2a4.3 4.3 0 0 0 .2-1v-.2c0-.4 0-.8-.2-1.3l-.5-1.4a14.8 14.8 0 0 0-3-4.2L12 6a26.1 26.1 0 0 0-2.2 2.5l-1-1a20.9 20.9 0 0 1 2.9-3.3L12 4l1 .8a22.2 22.2 0 0 1 4 5.4c.6 1.2 1 2.4 1 3.6z" fill-rule="evenodd"/></svg>',
-        'italic': '<svg width="24" height="24"><path d="M16.7 4.7l-.1.9h-.3c-.6 0-1 0-1.4.3-.3.3-.4.6-.5 1.1l-2.1 9.8v.6c0 .5.4.8 1.4.8h.2l-.2.8H8l.2-.8h.2c1.1 0 1.8-.5 2-1.5l2-9.8.1-.5c0-.6-.4-.8-1.4-.8h-.3l.2-.9h5.8z" fill-rule="evenodd"/></svg>',
-        'line': '<svg width="24" height="24"><path d="M15 9l-8 8H4v-3l8-8 3 3zm1-1l-3-3 1-1h1c-.2 0 0 0 0 0l2 2s0 .2 0 0v1l-1 1zM4 18h16v2H4v-2z" fill-rule="evenodd"/></svg>',
-        'link': '<svg width="24" height="24"><path d="M6.2 12.3a1 1 0 0 1 1.4 1.4l-2.1 2a2 2 0 1 0 2.7 2.8l4.8-4.8a1 1 0 0 0 0-1.4 1 1 0 1 1 1.4-1.3 2.9 2.9 0 0 1 0 4L9.6 20a3.9 3.9 0 0 1-5.5-5.5l2-2zm11.6-.6a1 1 0 0 1-1.4-1.4l2-2a2 2 0 1 0-2.6-2.8L11 10.3a1 1 0 0 0 0 1.4A1 1 0 1 1 9.6 13a2.9 2.9 0 0 1 0-4L14.4 4a3.9 3.9 0 0 1 5.5 5.5l-2 2z" fill-rule="nonzero"/></svg>',
-        'list-bull-circle': '<svg width="48" height="48"><g fill-rule="evenodd"><path d="M11 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM11 26a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM11 36a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill-rule="nonzero"/><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/></g></svg>',
-        'list-bull-default': '<svg width="48" height="48"><g fill-rule="evenodd"><circle cx="11" cy="14" r="3"/><circle cx="11" cy="24" r="3"/><circle cx="11" cy="34" r="3"/><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/></g></svg>',
-        'list-bull-square': '<svg width="48" height="48"><g fill-rule="evenodd"><path d="M8 11h6v6H8zM8 21h6v6H8zM8 31h6v6H8z"/><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/></g></svg>',
-        'list-num-default': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M10 17v-4.8l-1.5 1v-1.1l1.6-1h1.2V17h-1.2zm3.6.1c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zm-5 5.7c0-1.2.8-2 2.1-2s2.1.8 2.1 1.8c0 .7-.3 1.2-1.4 2.2l-1.1 1v.2h2.6v1H8.6v-.9l2-1.9c.8-.8 1-1.1 1-1.5 0-.5-.4-.8-1-.8-.5 0-.9.3-.9.9H8.5zm6.3 4.3c-.5 0-.7-.3-.7-.7 0-.4.2-.7.7-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zM10 34.4v-1h.7c.6 0 1-.3 1-.8 0-.4-.4-.7-1-.7s-1 .3-1 .8H8.6c0-1.1 1-1.8 2.2-1.8 1.3 0 2.1.6 2.1 1.6 0 .7-.4 1.2-1 1.3v.1c.8.1 1.3.7 1.3 1.4 0 1-1 1.9-2.4 1.9-1.3 0-2.2-.8-2.3-2h1.2c0 .6.5 1 1.1 1 .7 0 1-.4 1-1 0-.5-.3-.8-1-.8h-.7zm4.7 2.7c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .8.3.8.7 0 .4-.3.7-.8.7z"/></g></svg>',
-        'list-num-lower-alpha': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M10.3 15.2c.5 0 1-.4 1-.9V14h-1c-.5.1-.8.3-.8.6 0 .4.3.6.8.6zm-.4.9c-1 0-1.5-.6-1.5-1.4 0-.8.6-1.3 1.7-1.4h1.1v-.4c0-.4-.2-.6-.7-.6-.5 0-.8.1-.9.4h-1c0-.8.8-1.4 2-1.4 1.1 0 1.8.6 1.8 1.6V16h-1.1v-.6h-.1c-.2.4-.7.7-1.3.7zm4.6 0c-.5 0-.7-.3-.7-.7 0-.4.2-.7.7-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-3.2 10c-.6 0-1.2-.3-1.4-.8v.7H8.5v-6.3H10v2.5c.3-.5.8-.9 1.4-.9 1.2 0 1.9 1 1.9 2.4 0 1.5-.7 2.4-1.9 2.4zm-.4-3.7c-.7 0-1 .5-1 1.3s.3 1.4 1 1.4c.6 0 1-.6 1-1.4 0-.8-.4-1.3-1-1.3zm4 3.7c-.5 0-.7-.3-.7-.7 0-.4.2-.7.7-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-2.2 7h-1.2c0-.5-.4-.8-.9-.8-.6 0-1 .5-1 1.4 0 1 .4 1.4 1 1.4.5 0 .8-.2 1-.7h1c0 1-.8 1.7-2 1.7-1.4 0-2.2-.9-2.2-2.4s.8-2.4 2.2-2.4c1.2 0 2 .7 2 1.7zm1.8 3c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"/></g></svg>',
-        'list-num-lower-greek': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M10.5 15c.7 0 1-.5 1-1.3s-.3-1.3-1-1.3c-.5 0-.9.5-.9 1.3s.4 1.4 1 1.4zm-.3 1c-1.1 0-1.8-.8-1.8-2.3 0-1.5.7-2.4 1.8-2.4.7 0 1.1.4 1.3 1h.1v-.9h1.2v3.2c0 .4.1.5.4.5h.2v.9h-.6c-.6 0-1-.2-1.1-.7h-.1c-.2.4-.7.8-1.4.8zm5 .1c-.5 0-.8-.3-.8-.7 0-.4.3-.7.7-.7.5 0 .8.3.8.7 0 .4-.3.7-.8.7zm-4.9 7v-1h.3c.6 0 1-.2 1-.7 0-.5-.4-.8-1-.8-.5 0-.8.3-.8 1v2.2c0 .8.4 1.3 1.1 1.3.6 0 1-.4 1-1s-.5-1-1.3-1h-.3zM8.6 22c0-1.5.7-2.3 2-2.3 1.2 0 2 .6 2 1.6 0 .6-.3 1-.8 1.3.8.3 1.3.8 1.3 1.7 0 1.2-.8 1.9-1.9 1.9-.6 0-1.1-.3-1.3-.8v2.2H8.5V22zm6.2 4.2c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zm-4.5 8.5L8 30h1.4l1.7 3.5 1.7-3.5h1.1l-2.2 4.6v.1c.5.8.7 1.4.7 1.8 0 .4-.1.8-.4 1-.2.2-.6.3-1 .3-.9 0-1.3-.4-1.3-1.2 0-.5.2-1 .5-1.7l.1-.2zm.7 1a2 2 0 0 0-.4.9c0 .3.1.4.4.4.3 0 .4-.1.4-.4 0-.2-.1-.6-.4-1zm4.5.5c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"/></g></svg>',
-        'list-num-lower-roman': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M15.1 16v-1.2h1.3V16H15zm0 10v-1.2h1.3V26H15zm0 10v-1.2h1.3V36H15z"/><path fill-rule="nonzero" d="M12 21h1.5v5H12zM12 31h1.5v5H12zM9 21h1.5v5H9zM9 31h1.5v5H9zM6 31h1.5v5H6zM12 11h1.5v5H12zM12 19h1.5v1H12zM12 29h1.5v1H12zM9 19h1.5v1H9zM9 29h1.5v1H9zM6 29h1.5v1H6zM12 9h1.5v1H12z"/></g></svg>',
-        'list-num-upper-alpha': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M12.6 17l-.5-1.4h-2L9.5 17H8.3l2-6H12l2 6h-1.3zM11 12.3l-.7 2.3h1.6l-.8-2.3zm4.7 4.8c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zM11.4 27H8.7v-6h2.6c1.2 0 1.9.6 1.9 1.5 0 .6-.5 1.2-1 1.3.7.1 1.3.7 1.3 1.5 0 1-.8 1.7-2 1.7zM10 22v1.5h1c.6 0 1-.3 1-.8 0-.4-.4-.7-1-.7h-1zm0 4H11c.7 0 1.1-.3 1.1-.8 0-.6-.4-.9-1.1-.9H10V26zm5.4 1.1c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-4.1 10c-1.8 0-2.8-1.1-2.8-3.1s1-3.1 2.8-3.1c1.4 0 2.5.9 2.6 2.2h-1.3c0-.7-.6-1.1-1.3-1.1-1 0-1.6.7-1.6 2s.6 2 1.6 2c.7 0 1.2-.4 1.4-1h1.2c-.1 1.3-1.2 2.2-2.6 2.2zm4.5 0c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"/></g></svg>',
-        'list-num-upper-roman': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M15.1 17v-1.2h1.3V17H15zm0 10v-1.2h1.3V27H15zm0 10v-1.2h1.3V37H15z"/><path fill-rule="nonzero" d="M12 20h1.5v7H12zM12 30h1.5v7H12zM9 20h1.5v7H9zM9 30h1.5v7H9zM6 30h1.5v7H6zM12 10h1.5v7H12z"/></g></svg>',
-        'lock': '<svg width="24" height="24"><path d="M16.3 11c.2 0 .3 0 .5.2l.2.6v7.4c0 .3 0 .4-.2.6l-.6.2H7.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6v-7.4c0-.3 0-.4.2-.6l.5-.2H8V8c0-.8.3-1.5.9-2.1.6-.6 1.3-.9 2.1-.9h2c.8 0 1.5.3 2.1.9.6.6.9 1.3.9 2.1v3h.3zM10 8v3h4V8a1 1 0 0 0-.3-.7A1 1 0 0 0 13 7h-2a1 1 0 0 0-.7.3 1 1 0 0 0-.3.7z" fill-rule="evenodd"/></svg>',
-        'ltr': '<svg width="24" height="24"><path d="M11 5h7a1 1 0 0 1 0 2h-1v11a1 1 0 0 1-2 0V7h-2v11a1 1 0 0 1-2 0v-6c-.5 0-1 0-1.4-.3A3.4 3.4 0 0 1 7.8 10a3.3 3.3 0 0 1 0-2.8 3.4 3.4 0 0 1 1.8-1.8L11 5zM4.4 16.2L6.2 15l-1.8-1.2a1 1 0 0 1 1.2-1.6l3 2a1 1 0 0 1 0 1.6l-3 2a1 1 0 1 1-1.2-1.6z" fill-rule="evenodd"/></svg>',
-        'new-document': '<svg width="24" height="24"><path d="M14.4 3H7a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h10a2 2 0 0 0 2-2V7.6L14.4 3zM17 19H7V5h6v4h4v10z" fill-rule="nonzero"/></svg>',
-        'new-tab': '<svg width="24" height="24"><path d="M15 13l2-2v8H5V7h8l-2 2H7v8h8v-4zm4-8v5.5l-2-2-5.6 5.5H10v-1.4L15.5 7l-2-2H19z" fill-rule="evenodd"/></svg>',
-        'non-breaking': '<svg width="24" height="24"><path d="M11 11H8a1 1 0 1 1 0-2h3V6c0-.6.4-1 1-1s1 .4 1 1v3h3c.6 0 1 .4 1 1s-.4 1-1 1h-3v3c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-3zm10 4v5H3v-5c0-.6.4-1 1-1s1 .4 1 1v3h14v-3c0-.6.4-1 1-1s1 .4 1 1z" fill-rule="evenodd"/></svg>',
-        'notice': '<svg width="24" height="24"><path d="M17.8 9.8L15.4 4 20 8.5v7L15.5 20h-7L4 15.5v-7L8.5 4h7l2.3 5.8zm0 0l2.2 5.7-2.3-5.8zM13 17v-2h-2v2h2zm0-4V7h-2v6h2z" fill-rule="evenodd"/></svg>',
-        'ordered-list': '<svg width="24" height="24"><path d="M10 17h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 1 1 0-2zM6 4v3.5c0 .3-.2.5-.5.5a.5.5 0 0 1-.5-.5V5h-.5a.5.5 0 0 1 0-1H6zm-1 8.8l.2.2h1.3c.3 0 .5.2.5.5s-.2.5-.5.5H4.9a1 1 0 0 1-.9-1V13c0-.4.3-.8.6-1l1.2-.4.2-.3a.2.2 0 0 0-.2-.2H4.5a.5.5 0 0 1-.5-.5c0-.3.2-.5.5-.5h1.6c.5 0 .9.4.9 1v.1c0 .4-.3.8-.6 1l-1.2.4-.2.3zM7 17v2c0 .6-.4 1-1 1H4.5a.5.5 0 0 1 0-1h1.2c.2 0 .3-.1.3-.3 0-.2-.1-.3-.3-.3H4.4a.4.4 0 1 1 0-.8h1.3c.2 0 .3-.1.3-.3 0-.2-.1-.3-.3-.3H4.5a.5.5 0 1 1 0-1H6c.6 0 1 .4 1 1z" fill-rule="evenodd"/></svg>',
-        'orientation': '<svg width="24" height="24"><path d="M7.3 6.4L1 13l6.4 6.5 6.5-6.5-6.5-6.5zM3.7 13l3.6-3.7L11 13l-3.7 3.7-3.6-3.7zM12 6l2.8 2.7c.3.3.3.8 0 1-.3.4-.9.4-1.2 0L9.2 5.7a.8.8 0 0 1 0-1.2L13.6.2c.3-.3.9-.3 1.2 0 .3.3.3.8 0 1.1L12 4h1a9 9 0 1 1-4.3 16.9l1.5-1.5A7 7 0 1 0 13 6h-1z" fill-rule="nonzero"/></svg>',
-        'outdent': '<svg width="24" height="24"><path d="M7 5h12c.6 0 1 .4 1 1s-.4 1-1 1H7a1 1 0 1 1 0-2zm5 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm0 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm-5 4h12a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2zm1.6-3.8a1 1 0 0 1-1.2 1.6l-3-2a1 1 0 0 1 0-1.6l3-2a1 1 0 0 1 1.2 1.6L6.8 12l1.8 1.2z" fill-rule="evenodd"/></svg>',
-        'page-break': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M5 11c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h1c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm4 0c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h1c.6 0 1 .4 1 1s-.4 1-1 1h-1a1 1 0 0 1 0-2zm4 0c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zM7 3v5h10V3c0-.6.4-1 1-1s1 .4 1 1v7H5V3c0-.6.4-1 1-1s1 .4 1 1zM6 22a1 1 0 0 1-1-1v-7h14v7c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-5H7v5c0 .6-.4 1-1 1z"/></g></svg>',
-        'paragraph': '<svg width="24" height="24"><path d="M10 5h7a1 1 0 0 1 0 2h-1v11a1 1 0 0 1-2 0V7h-2v11a1 1 0 0 1-2 0v-6c-.5 0-1 0-1.4-.3A3.4 3.4 0 0 1 6.8 10a3.3 3.3 0 0 1 0-2.8 3.4 3.4 0 0 1 1.8-1.8L10 5z" fill-rule="evenodd"/></svg>',
-        'paste-text': '<svg width="24" height="24"><path d="M18 9V5h-2v1c0 .6-.4 1-1 1H9a1 1 0 0 1-1-1V5H6v13h3V9h9zM9 20H6a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.2A3 3 0 0 1 12 1a3 3 0 0 1 2.8 2H18a2 2 0 0 1 2 2v4h1v12H9v-1zm1.5-9.5v9h9v-9h-9zM12 3a1 1 0 0 0-1 1c0 .5.4 1 1 1s1-.5 1-1-.4-1-1-1zm0 9h6v2h-.5l-.5-1h-1v4h.8v1h-3.6v-1h.8v-4h-1l-.5 1H12v-2z" fill-rule="nonzero"/></svg>',
-        'paste': '<svg width="24" height="24"><path d="M18 9V5h-2v1c0 .6-.4 1-1 1H9a1 1 0 0 1-1-1V5H6v13h3V9h9zM9 20H6a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.2A3 3 0 0 1 12 1a3 3 0 0 1 2.8 2H18a2 2 0 0 1 2 2v4h1v12H9v-1zm1.5-9.5v9h9v-9h-9zM12 3a1 1 0 0 0-1 1c0 .5.4 1 1 1s1-.5 1-1-.4-1-1-1z" fill-rule="nonzero"/></svg>',
-        'permanent-pen': '<svg width="24" height="24"><path d="M10.5 17.5L8 20H3v-3l3.5-3.5a2 2 0 0 1 0-3L14 3l1 1-7.3 7.3a1 1 0 0 0 0 1.4l3.6 3.6c.4.4 1 .4 1.4 0L20 9l1 1-7.6 7.6a2 2 0 0 1-2.8 0l-.1-.1z" fill-rule="nonzero"/></svg>',
-        'plus': '<svg width="24" height="24"><g fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke="#000" stroke-width="2"><path d="M12 5v14M5 12h14"/></g></svg>',
-        'preferences': '<svg width="24" height="24"><path d="M20.1 13.5l-1.9.2a5.8 5.8 0 0 1-.6 1.5l1.2 1.5c.4.4.3 1 0 1.4l-.7.7a1 1 0 0 1-1.4 0l-1.5-1.2a6.2 6.2 0 0 1-1.5.6l-.2 1.9c0 .5-.5.9-1 .9h-1a1 1 0 0 1-1-.9l-.2-1.9a5.8 5.8 0 0 1-1.5-.6l-1.5 1.2a1 1 0 0 1-1.4 0l-.7-.7a1 1 0 0 1 0-1.4l1.2-1.5a6.2 6.2 0 0 1-.6-1.5l-1.9-.2a1 1 0 0 1-.9-1v-1c0-.5.4-1 .9-1l1.9-.2a5.8 5.8 0 0 1 .6-1.5L5.2 7.3a1 1 0 0 1 0-1.4l.7-.7a1 1 0 0 1 1.4 0l1.5 1.2a6.2 6.2 0 0 1 1.5-.6l.2-1.9c0-.5.5-.9 1-.9h1c.5 0 1 .4 1 .9l.2 1.9a5.8 5.8 0 0 1 1.5.6l1.5-1.2a1 1 0 0 1 1.4 0l.7.7c.3.4.4 1 0 1.4l-1.2 1.5a6.2 6.2 0 0 1 .6 1.5l1.9.2c.5 0 .9.5.9 1v1c0 .5-.4 1-.9 1zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill-rule="evenodd"/></svg>',
-        'preview': '<svg width="24" height="24"><path d="M3.5 12.5c.5.8 1.1 1.6 1.8 2.3 2 2 4.2 3.2 6.7 3.2s4.7-1.2 6.7-3.2a16.2 16.2 0 0 0 2.1-2.8 15.7 15.7 0 0 0-2.1-2.8c-2-2-4.2-3.2-6.7-3.2a9.3 9.3 0 0 0-6.7 3.2A16.2 16.2 0 0 0 3.2 12c0 .2.2.3.3.5zm-2.4-1l.7-1.2L4 7.8C6.2 5.4 8.9 4 12 4c3 0 5.8 1.4 8.1 3.8a18.2 18.2 0 0 1 2.8 3.7v1l-.7 1.2-2.1 2.5c-2.3 2.4-5 3.8-8.1 3.8-3 0-5.8-1.4-8.1-3.8a18.2 18.2 0 0 1-2.8-3.7 1 1 0 0 1 0-1zm12-3.3a2 2 0 1 0 2.7 2.6 4 4 0 1 1-2.6-2.6z" fill-rule="nonzero"/></svg>',
-        'print': '<svg width="24" height="24"><path d="M18 8H6a3 3 0 0 0-3 3v6h2v3h14v-3h2v-6a3 3 0 0 0-3-3zm-1 10H7v-4h10v4zm.5-5c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm.5-8H6v2h12V5z" fill-rule="nonzero"/></svg>',
-        'quote': '<svg width="24" height="24"><path d="M7.5 17h.9c.4 0 .7-.2.9-.6L11 13V8c0-.6-.4-1-1-1H6a1 1 0 0 0-1 1v4c0 .6.4 1 1 1h2l-1.3 2.7a1 1 0 0 0 .8 1.3zm8 0h.9c.4 0 .7-.2.9-.6L19 13V8c0-.6-.4-1-1-1h-4a1 1 0 0 0-1 1v4c0 .6.4 1 1 1h2l-1.3 2.7a1 1 0 0 0 .8 1.3z" fill-rule="nonzero"/></svg>',
-        'redo': '<svg width="24" height="24"><path d="M17.6 10H12c-2.8 0-4.4 1.4-4.9 3.5-.4 2 .3 4 1.4 4.6a1 1 0 1 1-1 1.8c-2-1.2-2.9-4.1-2.3-6.8.6-3 3-5.1 6.8-5.1h5.6l-3.3-3.3a1 1 0 1 1 1.4-1.4l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4-1.4l3.3-3.3z" fill-rule="nonzero"/></svg>',
-        'reload': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M5 22.1l-1.2-4.7v-.2a1 1 0 0 1 1-1l5 .4a1 1 0 1 1-.2 2l-2.2-.2a7.8 7.8 0 0 0 8.4.2 7.5 7.5 0 0 0 3.5-6.4 1 1 0 1 1 2 0 9.5 9.5 0 0 1-4.5 8 9.9 9.9 0 0 1-10.2 0l.4 1.4a1 1 0 1 1-2 .5zM13.6 7.4c0-.5.5-1 1-.9l2.8.2a8 8 0 0 0-9.5-1 7.5 7.5 0 0 0-3.6 7 1 1 0 0 1-2 0 9.5 9.5 0 0 1 4.5-8.6 10 10 0 0 1 10.9.3l-.3-1a1 1 0 0 1 2-.5l1.1 4.8a1 1 0 0 1-1 1.2l-5-.4a1 1 0 0 1-.9-1z"/></g></svg>',
-        'remove-formatting': '<svg width="24" height="24"><path d="M13.2 6a1 1 0 0 1 0 .2l-2.6 10a1 1 0 0 1-1 .8h-.2a.8.8 0 0 1-.8-1l2.6-10H8a1 1 0 1 1 0-2h9a1 1 0 0 1 0 2h-3.8zM5 18h7a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2zm13 1.5L16.5 18 15 19.5a.7.7 0 0 1-1-1l1.5-1.5-1.5-1.5a.7.7 0 0 1 1-1l1.5 1.5 1.5-1.5a.7.7 0 0 1 1 1L17.5 17l1.5 1.5a.7.7 0 0 1-1 1z" fill-rule="evenodd"/></svg>',
-        'remove': '<svg width="24" height="24"><path d="M16 7h3a1 1 0 0 1 0 2h-1v9a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V9H5a1 1 0 1 1 0-2h3V6a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v1zm-2 0V6c0-.6-.4-1-1-1h-2a1 1 0 0 0-1 1v1h4zm2 2H8v9c0 .6.4 1 1 1h6c.6 0 1-.4 1-1V9zm-7 3a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4zm4 0a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4z" fill-rule="nonzero"/></svg>',
-        'resize-handle': '<svg width="10" height="10"><g fill-rule="nonzero"><path d="M8.1 1.1A.5.5 0 1 1 9 2l-7 7A.5.5 0 1 1 1 8l7-7zM8.1 5.1A.5.5 0 1 1 9 6l-3 3A.5.5 0 1 1 5 8l3-3z"/></g></svg>',
-        'resize': '<svg width="24" height="24"><path d="M4 5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h6c.3 0 .5.1.7.3.2.2.3.4.3.7 0 .3-.1.5-.3.7a1 1 0 0 1-.7.3H7.4L18 16.6V13c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3.3 0 .5.1.7.3.2.2.3.4.3.7v6c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3h-6a1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h3.6L6 7.4V11c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3 1 1 0 0 1-.7-.3A1 1 0 0 1 4 11V5z" fill-rule="evenodd"/></svg>',
-        'restore-draft': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M17 13c0 .6-.4 1-1 1h-4V8c0-.6.4-1 1-1s1 .4 1 1v4h2c.6 0 1 .4 1 1z"/><path d="M4.7 10H9a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1V5a1 1 0 1 1 2 0v3l2.5-2.4a9.2 9.2 0 0 1 10.8-1.5A9 9 0 0 1 13.4 21c-2.4.1-4.7-.7-6.5-2.2a1 1 0 1 1 1.3-1.5 7.2 7.2 0 0 0 11.6-3.7 7 7 0 0 0-3.5-7.7A7.2 7.2 0 0 0 8 7L4.7 10z" fill-rule="nonzero"/></g></svg>',
-        'rotate-left': '<svg width="24" height="24"><path d="M4.7 10H9a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1V5a1 1 0 1 1 2 0v3l2.5-2.4a9.2 9.2 0 0 1 10.8-1.5A9 9 0 0 1 13.4 21c-2.4.1-4.7-.7-6.5-2.2a1 1 0 1 1 1.3-1.5 7.2 7.2 0 0 0 11.6-3.7 7 7 0 0 0-3.5-7.7A7.2 7.2 0 0 0 8 7L4.7 10z" fill-rule="nonzero"/></svg>',
-        'rotate-right': '<svg width="24" height="24"><path d="M20 8V5a1 1 0 0 1 2 0v6c0 .6-.4 1-1 1h-6a1 1 0 0 1 0-2h4.3L16 7A7.2 7.2 0 0 0 7.7 6a7 7 0 0 0 3 13.1c1.9.1 3.7-.5 5-1.7a1 1 0 0 1 1.4 1.5A9.2 9.2 0 0 1 2.2 14c-.9-3.9 1-8 4.5-9.9 3.5-1.9 8-1.3 10.8 1.5L20 8z" fill-rule="nonzero"/></svg>',
-        'rtl': '<svg width="24" height="24"><path d="M8 5h8v2h-2v12h-2V7h-2v12H8v-7c-.5 0-1 0-1.4-.3A3.4 3.4 0 0 1 4.8 10a3.3 3.3 0 0 1 0-2.8 3.4 3.4 0 0 1 1.8-1.8L8 5zm12 11.2a1 1 0 1 1-1 1.6l-3-2a1 1 0 0 1 0-1.6l3-2a1 1 0 1 1 1 1.6L18.4 15l1.8 1.2z" fill-rule="evenodd"/></svg>',
-        'save': '<svg width="24" height="24"><path d="M5 16h14a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2c0-1.1.9-2 2-2zm0 2v2h14v-2H5zm10 0h2v2h-2v-2zm-4-6.4L8.7 9.3a1 1 0 1 0-1.4 1.4l4 4c.4.4 1 .4 1.4 0l4-4a1 1 0 1 0-1.4-1.4L13 11.6V4a1 1 0 0 0-2 0v7.6z" fill-rule="nonzero"/></svg>',
-        'search': '<svg width="24" height="24"><path d="M16 17.3a8 8 0 1 1 1.4-1.4l4.3 4.4a1 1 0 0 1-1.4 1.4l-4.4-4.3zm-5-.3a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill-rule="nonzero"/></svg>',
-        'select-all': '<svg width="24" height="24"><path d="M3 5h2V3a2 2 0 0 0-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2a2 2 0 0 0-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8a2 2 0 0 0 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2zM7 17h10V7H7v10zm2-8h6v6H9V9z" fill-rule="nonzero"/></svg>',
-        'selected': '<svg width="24" height="24"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm-2.4-6.1L7 12.3a.7.7 0 0 0-1 1L9.6 17 18 8.6a.7.7 0 0 0 0-1 .7.7 0 0 0-1 0l-7.4 7.3z" fill-rule="evenodd"/></svg>',
-        'settings': '<svg width="24" height="24"><path d="M11 6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8v.3c0 .2 0 .3-.2.5l-.6.2H7.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6V8H5a1 1 0 1 1 0-2h2v-.3c0-.2 0-.3.2-.5l.5-.2h2.5c.3 0 .4 0 .6.2l.2.5V6zM8 8h2V6H8v2zm9 2.8v.2h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v.3c0 .2 0 .3-.2.5l-.6.2h-2.4c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6V13H5a1 1 0 0 1 0-2h8v-.3c0-.2 0-.3.2-.5l.6-.2h2.4c.3 0 .4 0 .6.2l.2.6zM14 13h2v-2h-2v2zm-3 2.8v.2h8c.6 0 1 .4 1 1s-.4 1-1 1h-8v.3c0 .2 0 .3-.2.5l-.6.2H7.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6V18H5a1 1 0 0 1 0-2h2v-.3c0-.2 0-.3.2-.5l.5-.2h2.5c.3 0 .4 0 .6.2l.2.6zM8 18h2v-2H8v2z" fill-rule="evenodd"/></svg>',
-        'sharpen': '<svg width="24" height="24"><path d="M16 6l4 4-8 9-8-9 4-4h8zm-4 10.2l5.5-6.2-.1-.1H12v-.3h5.1l-.2-.2H12V9h4.6l-.2-.2H12v-.3h4.1l-.2-.2H12V8h3.6l-.2-.2H8.7L6.5 10l.1.1H12v.3H6.9l.2.2H12v.3H7.3l.2.2H12v.3H7.7l.3.2h4v.3H8.2l.2.2H12v.3H8.6l.3.2H12v.3H9l.3.2H12v.3H9.5l.2.2H12v.3h-2l.2.2H12v.3h-1.6l.2.2H12v.3h-1.1l.2.2h.9v.3h-.7l.2.2h.5v.3h-.3l.3.2z" fill-rule="evenodd"/></svg>',
-        'sourcecode': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M9.8 15.7c.3.3.3.8 0 1-.3.4-.9.4-1.2 0l-4.4-4.1a.8.8 0 0 1 0-1.2l4.4-4.2c.3-.3.9-.3 1.2 0 .3.3.3.8 0 1.1L6 12l3.8 3.7zM14.2 15.7c-.3.3-.3.8 0 1 .4.4.9.4 1.2 0l4.4-4.1c.3-.3.3-.9 0-1.2l-4.4-4.2a.8.8 0 0 0-1.2 0c-.3.3-.3.8 0 1.1L18 12l-3.8 3.7z"/></g></svg>',
-        'spell-check': '<svg width="24" height="24"><path d="M6 8v3H5V5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h2c.3 0 .5.1.7.3.2.2.3.4.3.7v6H8V8H6zm0-3v2h2V5H6zm13 0h-3v5h3v1h-3a1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7V5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h3v1zm-5 1.5l-.1.7c-.1.2-.3.3-.6.3.3 0 .5.1.6.3l.1.7V10c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3h-3V4h3c.3 0 .5.1.7.3.2.2.3.4.3.7v1.5zM13 10V8h-2v2h2zm0-3V5h-2v2h2zm3 5l1 1-6.5 7L7 15.5l1.3-1 2.2 2.2L16 12z" fill-rule="evenodd"/></svg>',
-        'strike-through': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M15.6 8.5c-.5-.7-1-1.1-1.3-1.3-.6-.4-1.3-.6-2-.6-2.7 0-2.8 1.7-2.8 2.1 0 1.6 1.8 2 3.2 2.3 4.4.9 4.6 2.8 4.6 3.9 0 1.4-.7 4.1-5 4.1A6.2 6.2 0 0 1 7 16.4l1.5-1.1c.4.6 1.6 2 3.7 2 1.6 0 2.5-.4 3-1.2.4-.8.3-2-.8-2.6-.7-.4-1.6-.7-2.9-1-1-.2-3.9-.8-3.9-3.6C7.6 6 10.3 5 12.4 5c2.9 0 4.2 1.6 4.7 2.4l-1.5 1.1z"/><path d="M5 11h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z" fill-rule="nonzero"/></g></svg>',
-        'subscript': '<svg width="24" height="24"><path d="M10.4 10l4.6 4.6-1.4 1.4L9 11.4 4.4 16 3 14.6 7.6 10 3 5.4 4.4 4 9 8.6 13.6 4 15 5.4 10.4 10zM21 19h-5v-1l1-.8 1.7-1.6c.3-.4.5-.8.5-1.2 0-.3 0-.6-.2-.7-.2-.2-.5-.3-.9-.3a2 2 0 0 0-.8.2l-.7.3-.4-1.1 1-.6 1.2-.2c.8 0 1.4.3 1.8.7.4.4.6.9.6 1.5s-.2 1.1-.5 1.6a8 8 0 0 1-1.3 1.3l-.6.6h2.6V19z" fill-rule="nonzero"/></svg>',
-        'superscript': '<svg width="24" height="24"><path d="M15 9.4L10.4 14l4.6 4.6-1.4 1.4L9 15.4 4.4 20 3 18.6 7.6 14 3 9.4 4.4 8 9 12.6 13.6 8 15 9.4zm5.9 1.6h-5v-1l1-.8 1.7-1.6c.3-.5.5-.9.5-1.3 0-.3 0-.5-.2-.7-.2-.2-.5-.3-.9-.3l-.8.2-.7.4-.4-1.2c.2-.2.5-.4 1-.5.3-.2.8-.2 1.2-.2.8 0 1.4.2 1.8.6.4.4.6 1 .6 1.6 0 .5-.2 1-.5 1.5l-1.3 1.4-.6.5h2.6V11z" fill-rule="nonzero"/></svg>',
-        'table-cell-properties': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm10 10h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10 0v3h4v-3h-4zm0-1h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
-        'table-cell-select-all': '<svg width="24" height="24"><path d="M12.5 5.5v6h6v-6h-6zm-1 0h-6v6h6v-6zm1 13h6v-6h-6v6zm-1 0v-6h-6v6h6zm-7-14h15v15h-15v-15z" fill-rule="nonzero"/></svg>',
-        'table-cell-select-inner': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M5.5 5.5v13h13v-13h-13zm-1-1h15v15h-15v-15z" opacity=".2"/><path d="M11.5 11.5v-7h1v7h7v1h-7v7h-1v-7h-7v-1h7z"/></g></svg>',
-        'table-delete-column': '<svg width="24" height="24"><path d="M9 11.2l1 1v.2l-1 1v-2.2zm5 1l1-1v2.2l-1-1v-.2zM20 5v14H4V5h16zm-1 2h-4v.8l-.2-.2-.8.8V7h-4v1.4l-.8-.8-.2.2V7H5v11h4v-1.8l.5.5.5-.4V18h4v-1.8l.8.8.2-.3V18h4V7zm-3.9 3.4l-1.8 1.9 1.8 1.9c.4.3.4.9 0 1.2-.3.3-.8.3-1.2 0L12 13.5l-1.8 1.9a.8.8 0 0 1-1.2 0 .9.9 0 0 1 0-1.2l1.8-1.9-1.9-2a.9.9 0 0 1 1.2-1.2l2 2 1.8-1.8c.3-.4.9-.4 1.2 0a.8.8 0 0 1 0 1.1z" fill-rule="evenodd"/></svg>',
-        'table-delete-row': '<svg width="24" height="24"><path d="M16.7 8.8l1.1 1.2-2.4 2.5L18 15l-1.2 1.2-2.5-2.5-2.4 2.5-1.3-1.2 2.5-2.5-2.5-2.5 1.2-1.3 2.6 2.6 2.4-2.5zM4 5h16v14H4V5zm15 5V7H5v3h4.8l1 1H5v3h5.8l-1 1H5v3h14v-3h-.4l-1-1H19v-3h-1.3l1-1h.3z" fill-rule="evenodd"/></svg>',
-        'table-delete-table': '<svg width="24" height="26"><path d="M4 6h16v14H4V6zm1 2v11h14V8H5zm11.7 8.7l-1.5 1.5L12 15l-3.3 3.2-1.4-1.5 3.2-3.2-3.3-3.2 1.5-1.5L12 12l3.2-3.2 1.5 1.5-3.2 3.2 3.2 3.2z" fill-rule="evenodd"/></svg>',
-        'table-insert-column-after': '<svg width="24" height="24"><path d="M14.3 9c.4 0 .7.3.7.6v2.2h2.1c.4 0 .7.3.7.7 0 .4-.3.7-.7.7H15v2.2c0 .3-.3.6-.7.6a.7.7 0 0 1-.6-.6v-2.2h-2.2a.7.7 0 0 1 0-1.4h2.2V9.6c0-.3.3-.6.6-.6zM4 5h16v14H4V5zm5 13v-3H5v3h4zm0-4v-3H5v3h4zm0-4V7H5v3h4zm10 8V7h-9v11h9z" fill-rule="evenodd"/></svg>',
-        'table-insert-column-before': '<svg width="24" height="24"><path d="M9.7 16a.7.7 0 0 1-.7-.6v-2.2H6.9a.7.7 0 0 1 0-1.4H9V9.6c0-.3.3-.6.7-.6.3 0 .6.3.6.6v2.2h2.2c.4 0 .8.3.8.7 0 .4-.4.7-.8.7h-2.2v2.2c0 .3-.3.6-.6.6zM4 5h16v14H4V5zm10 13V7H5v11h9zm5 0v-3h-4v3h4zm0-4v-3h-4v3h4zm0-4V7h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table-insert-row-above': '<svg width="24" height="24"><path d="M14.8 10.5c0 .3-.2.5-.5.5h-1.8v1.8c0 .3-.2.5-.5.5a.5.5 0 0 1-.5-.6V11H9.7a.5.5 0 0 1 0-1h1.8V8.3c0-.3.2-.6.5-.6s.5.3.5.6V10h1.8c.3 0 .5.2.5.5zM4 5h16v14H4V5zm5 13v-3H5v3h4zm5 0v-3h-4v3h4zm5 0v-3h-4v3h4zm0-4V7H5v7h14z" fill-rule="evenodd"/></svg>',
-        'table-insert-row-after': '<svg width="24" height="24"><path d="M9.2 14.5c0-.3.2-.5.5-.5h1.8v-1.8c0-.3.2-.5.5-.5s.5.2.5.6V14h1.8c.3 0 .5.2.5.5s-.2.5-.5.5h-1.8v1.7c0 .3-.2.6-.5.6a.5.5 0 0 1-.5-.6V15H9.7a.5.5 0 0 1-.5-.5zM4 5h16v14H4V5zm6 2v3h4V7h-4zM5 7v3h4V7H5zm14 11v-7H5v7h14zm0-8V7h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table-left-header': '<svg width="24" height="24"><path d="M4 5h16v13H4V5zm10 12v-3h-4v3h4zm0-4v-3h-4v3h4zm0-4V6h-4v3h4zm5 8v-3h-4v3h4zm0-4v-3h-4v3h4zm0-4V6h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table-merge-cells': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 13h9v-7h-9v7zm4-11h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10-1h4V7h-4v3zM5 15v3h4v-3H5z" fill-rule="evenodd"/></svg>',
-        'table-row-properties': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm10 10h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm6 3h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
-        'table-split-cells': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 2v3h4V7h-4zM9 18v-3H5v3h4zm0-4v-3H5v3h4zm0-4V7H5v3h4zm10 8v-7h-9v7h9zm0-8V7h-4v3h4zm-3.5 4.5l1.5 1.6c.3.2.3.7 0 1-.2.2-.7.2-1 0l-1.5-1.6-1.6 1.5c-.2.3-.7.3-1 0a.7.7 0 0 1 0-1l1.6-1.5-1.5-1.6a.7.7 0 0 1 1-1l1.5 1.6 1.6-1.5c.2-.3.7-.3 1 0 .2.2.2.7 0 1l-1.6 1.5z" fill-rule="evenodd"/></svg>',
-        'table-top-header': '<svg width="24" height="24"><path d="M4 5h16v13H4V5zm5 12v-3H5v3h4zm0-4v-3H5v3h4zm5 4v-3h-4v3h4zm0-4v-3h-4v3h4zm5 4v-3h-4v3h4zm0-4v-3h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 9h4v-3h-4v3zm4 1h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10 0v3h4v-3h-4zm0-1h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
-        'template': '<svg width="24" height="24"><path d="M19 19v-1H5v1h14zM9 16v-4a5 5 0 1 1 6 0v4h4a2 2 0 0 1 2 2v3H3v-3c0-1.1.9-2 2-2h4zm4 0v-5l.8-.6a3 3 0 1 0-3.6 0l.8.6v5h2z" fill-rule="nonzero"/></svg>',
-        'temporary-placeholder': '<svg width="24" height="24"><path d="M20.5 2.5c-.8 0-1.5.7-1.5 1.5a1.5 1.5 0 0 1-3 0 3 3 0 0 0-6 0v2H8.5c-.3 0-.5.2-.5.5v1a8 8 0 1 0 6 0v-1c0-.3-.2-.5-.5-.5H11V4a2 2 0 0 1 4 0 2.5 2.5 0 0 0 5 0c0-.3.2-.5.5-.5a.5.5 0 0 0 0-1zM8.1 10.9a5 5 0 0 0-1.2 7 .5.5 0 0 1-.8.5 6 6 0 0 1 1.5-8.3.5.5 0 1 1 .5.8z" fill-rule="nonzero"/></svg>',
-        'text-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path id="tox-icon-text-color__color" d="M3 18h18v3H3z"/><path d="M8.7 16h-.8a.5.5 0 0 1-.5-.6l2.7-9c.1-.3.3-.4.5-.4h2.8c.2 0 .4.1.5.4l2.7 9a.5.5 0 0 1-.5.6h-.8a.5.5 0 0 1-.4-.4l-.7-2.2c0-.3-.3-.4-.5-.4h-3.4c-.2 0-.4.1-.5.4l-.7 2.2c0 .3-.2.4-.4.4zm2.6-7.6l-.6 2a.5.5 0 0 0 .5.6h1.6a.5.5 0 0 0 .5-.6l-.6-2c0-.3-.3-.4-.5-.4h-.4c-.2 0-.4.1-.5.4z"/></g></svg>',
-        'toc': '<svg width="24" height="24"><path d="M5 5c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 1 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm0-4c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'translate': '<svg width="24" height="24"><path d="M12.7 14.3l-.3.7-.4.7-2.2-2.2-3.1 3c-.3.4-.8.4-1 0a.7.7 0 0 1 0-1l3.1-3A12.4 12.4 0 0 1 6.7 9H8a10.1 10.1 0 0 0 1.7 2.4c.5-.5 1-1.1 1.4-1.8l.9-2H4.7a.7.7 0 1 1 0-1.5h4.4v-.7c0-.4.3-.8.7-.8.4 0 .7.4.7.8v.7H15c.4 0 .8.3.8.7 0 .4-.4.8-.8.8h-1.4a12.3 12.3 0 0 1-1 2.4 13.5 13.5 0 0 1-1.7 2.3l1.9 1.8zm4.3-3l2.7 7.3a.5.5 0 0 1-.4.7 1 1 0 0 1-1-.7l-.6-1.5h-3.4l-.6 1.5a1 1 0 0 1-1 .7.5.5 0 0 1-.4-.7l2.7-7.4a1 1 0 1 1 2 0zm-2.2 4.4h2.4L16 12.5l-1.2 3.2z" fill-rule="evenodd"/></svg>',
-        'underline': '<svg width="24" height="24"><path d="M16 5c.6 0 1 .4 1 1v5.5a4 4 0 0 1-.4 1.8l-1 1.4a5.3 5.3 0 0 1-5.5 1 5 5 0 0 1-1.6-1c-.5-.4-.8-.9-1.1-1.4a4 4 0 0 1-.4-1.8V6c0-.6.4-1 1-1s1 .4 1 1v5.5c0 .3 0 .6.2 1l.6.7a3.3 3.3 0 0 0 2.2.8 3.4 3.4 0 0 0 2.2-.8c.3-.2.4-.5.6-.8l.2-.9V6c0-.6.4-1 1-1zM8 17h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'undo': '<svg width="24" height="24"><path d="M6.4 8H12c3.7 0 6.2 2 6.8 5.1.6 2.7-.4 5.6-2.3 6.8a1 1 0 0 1-1-1.8c1.1-.6 1.8-2.7 1.4-4.6-.5-2.1-2.1-3.5-4.9-3.5H6.4l3.3 3.3a1 1 0 1 1-1.4 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.4 1.4L6.4 8z" fill-rule="nonzero"/></svg>',
-        'unlink': '<svg width="24" height="24"><path d="M6.2 12.3a1 1 0 0 1 1.4 1.4l-2 2a2 2 0 1 0 2.6 2.8l4.8-4.8a1 1 0 0 0 0-1.4 1 1 0 1 1 1.4-1.3 2.9 2.9 0 0 1 0 4L9.6 20a3.9 3.9 0 0 1-5.5-5.5l2-2zm11.6-.6a1 1 0 0 1-1.4-1.4l2.1-2a2 2 0 1 0-2.7-2.8L11 10.3a1 1 0 0 0 0 1.4A1 1 0 1 1 9.6 13a2.9 2.9 0 0 1 0-4L14.4 4a3.9 3.9 0 0 1 5.5 5.5l-2 2zM7.6 6.3a.8.8 0 0 1-1 1.1L3.3 4.2a.7.7 0 1 1 1-1l3.2 3.1zM5.1 8.6a.8.8 0 0 1 0 1.5H3a.8.8 0 0 1 0-1.5H5zm5-3.5a.8.8 0 0 1-1.5 0V3a.8.8 0 0 1 1.5 0V5zm6 11.8a.8.8 0 0 1 1-1l3.2 3.2a.8.8 0 0 1-1 1L16 17zm-2.2 2a.8.8 0 0 1 1.5 0V21a.8.8 0 0 1-1.5 0V19zm5-3.5a.7.7 0 1 1 0-1.5H21a.8.8 0 0 1 0 1.5H19z" fill-rule="nonzero"/></svg>',
-        'unlock': '<svg width="24" height="24"><path d="M16 5c.8 0 1.5.3 2.1.9.6.6.9 1.3.9 2.1v3h-2V8a1 1 0 0 0-.3-.7A1 1 0 0 0 16 7h-2a1 1 0 0 0-.7.3 1 1 0 0 0-.3.7v3h.3c.2 0 .3 0 .5.2l.2.6v7.4c0 .3 0 .4-.2.6l-.6.2H4.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6v-7.4c0-.3 0-.4.2-.6l.5-.2H11V8c0-.8.3-1.5.9-2.1.6-.6 1.3-.9 2.1-.9h2z" fill-rule="evenodd"/></svg>',
-        'unordered-list': '<svg width="24" height="24"><path d="M11 5h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0 6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0 6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zM4.5 6c0-.4.1-.8.4-1 .3-.4.7-.5 1.1-.5.4 0 .8.1 1 .4.4.3.5.7.5 1.1 0 .4-.1.8-.4 1-.3.4-.7.5-1.1.5-.4 0-.8-.1-1-.4-.4-.3-.5-.7-.5-1.1zm0 6c0-.4.1-.8.4-1 .3-.4.7-.5 1.1-.5.4 0 .8.1 1 .4.4.3.5.7.5 1.1 0 .4-.1.8-.4 1-.3.4-.7.5-1.1.5-.4 0-.8-.1-1-.4-.4-.3-.5-.7-.5-1.1zm0 6c0-.4.1-.8.4-1 .3-.4.7-.5 1.1-.5.4 0 .8.1 1 .4.4.3.5.7.5 1.1 0 .4-.1.8-.4 1-.3.4-.7.5-1.1.5-.4 0-.8-.1-1-.4-.4-.3-.5-.7-.5-1.1z" fill-rule="evenodd"/></svg>',
-        'unselected': '<svg width="24" height="24"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm0-1a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" fill-rule="evenodd"/></svg>',
-        'upload': '<svg width="24" height="24"><path d="M18 19v-2a1 1 0 0 1 2 0v3c0 .6-.4 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 2 0v2h12zM11 6.4L8.7 8.7a1 1 0 0 1-1.4-1.4l4-4a1 1 0 0 1 1.4 0l4 4a1 1 0 1 1-1.4 1.4L13 6.4V16a1 1 0 0 1-2 0V6.4z" fill-rule="nonzero"/></svg>',
-        'user': '<svg width="24" height="24"><path d="M12 24a12 12 0 1 1 0-24 12 12 0 0 1 0 24zm-8.7-5.3a11 11 0 0 0 17.4 0C19.4 16.3 14.6 15 12 15c-2.6 0-7.4 1.3-8.7 3.7zM12 13c2.2 0 4-2 4-4.5S14.2 4 12 4 8 6 8 8.5 9.8 13 12 13z" fill-rule="nonzero"/></svg>',
-        'warning': '<svg width="24" height="24"><path d="M19.8 18.3c.2.5.3.9 0 1.2-.1.3-.5.5-1 .5H5.2c-.5 0-.9-.2-1-.5-.3-.3-.2-.7 0-1.2L11 4.7l.5-.5.5-.2c.2 0 .3 0 .5.2.2 0 .3.3.5.5l6.8 13.6zM12 18c.3 0 .5-.1.7-.3.2-.2.3-.4.3-.7a1 1 0 0 0-.3-.7 1 1 0 0 0-.7-.3 1 1 0 0 0-.7.3 1 1 0 0 0-.3.7c0 .3.1.5.3.7.2.2.4.3.7.3zm.7-3l.3-4a1 1 0 0 0-.3-.7 1 1 0 0 0-.7-.3 1 1 0 0 0-.7.3 1 1 0 0 0-.3.7l.3 4h1.4z" fill-rule="evenodd"/></svg>',
-        'zoom-in': '<svg width="24" height="24"><path d="M16 17.3a8 8 0 1 1 1.4-1.4l4.3 4.4a1 1 0 0 1-1.4 1.4l-4.4-4.3zm-5-.3a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm-1-9a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8zm-2 4a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2H8z" fill-rule="nonzero"/></svg>',
-        'zoom-out': '<svg width="24" height="24"><path d="M16 17.3a8 8 0 1 1 1.4-1.4l4.3 4.4a1 1 0 0 1-1.4 1.4l-4.4-4.3zm-5-.3a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm-3-5a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2H8z" fill-rule="nonzero"/></svg>'
-      };
+    var defaultIcon = function (icons) {
+      return Option.from(icons()['temporary-placeholder']).getOr('!not found!');
     };
-
-    var defaultIcons = getAll();
-    var defaultIcon = Option.from(defaultIcons['temporary-placeholder']).getOr('!not found!');
-    var getDefault = function (name) {
-      return Option.from(defaultIcons[name]).getOr(defaultIcon);
-    };
-    var getDefaultOr = function (name, fallback) {
-      return Option.from(defaultIcons[name]).getOrThunk(function () {
-        return fallback.getOr(defaultIcon);
-      });
-    };
-    var get$e = function (name, icons) {
+    var get$c = function (name, icons) {
       return Option.from(icons()[name]).getOrThunk(function () {
-        return getDefault(name);
+        return defaultIcon(icons);
       });
     };
     var getOr = function (name, icons, fallback) {
-      return Option.from(icons()[name]).getOrThunk(function () {
-        return getDefaultOr(name, fallback);
+      return Option.from(icons()[name]).or(fallback).getOrThunk(function () {
+        return defaultIcon(icons);
       });
-    };
-    var getDefaultFirst = function (names) {
-      return findMap(names, function (name) {
-        return Option.from(defaultIcons[name]);
-      }).getOr(defaultIcon);
     };
     var getFirst$1 = function (names, icons) {
       return findMap(names, function (name) {
         return Option.from(icons()[name]);
       }).getOrThunk(function () {
-        return getDefaultFirst(names);
+        return defaultIcon(icons);
       });
     };
 
@@ -8723,10 +8564,10 @@ var silver = (function () {
           });
         }
       };
-      var updateText = function (comp, text$$1) {
+      var updateText = function (comp, text$1) {
         if (comp.getSystem().isConnected()) {
           var banner = memBannerText.get(comp);
-          Replacing.set(banner, [text(text$$1)]);
+          Replacing.set(banner, [text(text$1)]);
         }
       };
       var apis = {
@@ -8786,7 +8627,7 @@ var silver = (function () {
               dom: {
                 tag: 'div',
                 classes: ['tox-icon'],
-                innerHtml: get$e('close', detail.iconProvider),
+                innerHtml: get$c('close', detail.iconProvider),
                 attributes: { 'aria-label': detail.translationProvider('Close') }
               }
             }],
@@ -8813,8 +8654,8 @@ var silver = (function () {
         updateProgress: function (apis, comp, percent) {
           apis.updateProgress(comp, percent);
         },
-        updateText: function (apis, comp, text$$1) {
-          apis.updateText(comp, text$$1);
+        updateText: function (apis, comp, text) {
+          apis.updateText(comp, text);
         }
       }
     });
@@ -8917,7 +8758,7 @@ var silver = (function () {
       };
     }
 
-    var last$3 = function (fn, rate) {
+    var last$2 = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -9021,6 +8862,9 @@ var silver = (function () {
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
+    var isStartOfWord = function (rng, text) {
+      return rng.startOffset === 0 || /\s/.test(text.charAt(rng.startOffset - 1));
+    };
     var getTriggerContext = function (initRange, initText, database) {
       return findMap(database.triggerChars, function (ch) {
         return getContext(initRange, ch, initText, initRange.startOffset).map(function (_a) {
@@ -9039,7 +8883,7 @@ var silver = (function () {
       var startText = rng.startContainer.nodeValue;
       return getTriggerContext(rng, startText, database).map(function (context) {
         var autocompleters = filter(database.lookupByChar(context.triggerChar), function (autocompleter) {
-          return context.text.length >= autocompleter.minChars && autocompleter.matches(context.range, startText, context.text);
+          return context.text.length >= autocompleter.minChars && autocompleter.matches.getOr(isStartOfWord)(context.range, startText, context.text);
         });
         var lookupData = global$1.all(map(autocompleters, function (ac) {
           var fetchResult = ac.fetch(context.text, ac.maxResults);
@@ -9077,12 +8921,10 @@ var silver = (function () {
     var autocompleterSchema = objOf([
       strictString('type'),
       strictString('ch'),
-      defaultedNumber('minChars', 0),
+      defaultedNumber('minChars', 1),
       defaulted$1('columns', 1),
       defaultedNumber('maxResults', 10),
-      defaultedFunction('matches', function () {
-        return true;
-      }),
+      optionFunction('matches'),
       strictFunction('fetch'),
       strictFunction('onAction')
     ]);
@@ -9199,16 +9041,16 @@ var silver = (function () {
     };
 
     var detectSize = function (comp, margin, selectorClass) {
-      var descendants = descendants$1(comp.element(), '.' + selectorClass);
-      if (descendants.length > 0) {
-        var columnLength = findIndex(descendants, function (c) {
+      var descendants$1 = descendants(comp.element(), '.' + selectorClass);
+      if (descendants$1.length > 0) {
+        var columnLength = findIndex(descendants$1, function (c) {
           var thisTop = c.dom().getBoundingClientRect().top;
-          var cTop = descendants[0].dom().getBoundingClientRect().top;
+          var cTop = descendants$1[0].dom().getBoundingClientRect().top;
           return Math.abs(thisTop - cTop) > margin;
-        }).getOr(descendants.length);
+        }).getOr(descendants$1.length);
         return Option.some({
           numColumns: columnLength,
-          numRows: Math.ceil(descendants.length / columnLength)
+          numRows: Math.ceil(descendants$1.length / columnLength)
         });
       } else {
         return Option.none();
@@ -9225,91 +9067,6 @@ var silver = (function () {
       namedEvents: namedEvents,
       unnamedEvents: unnamedEvents
     };
-
-    var nativeDisabled = [
-      'input',
-      'button',
-      'textarea'
-    ];
-    var onLoad$5 = function (component, disableConfig, disableState) {
-      if (disableConfig.disabled) {
-        disable(component, disableConfig, disableState);
-      }
-    };
-    var hasNative = function (component) {
-      return contains(nativeDisabled, name(component.element()));
-    };
-    var nativeIsDisabled = function (component) {
-      return has$1(component.element(), 'disabled');
-    };
-    var nativeDisable = function (component) {
-      set$1(component.element(), 'disabled', 'disabled');
-    };
-    var nativeEnable = function (component) {
-      remove$1(component.element(), 'disabled');
-    };
-    var ariaIsDisabled = function (component) {
-      return get$2(component.element(), 'aria-disabled') === 'true';
-    };
-    var ariaDisable = function (component) {
-      set$1(component.element(), 'aria-disabled', 'true');
-    };
-    var ariaEnable = function (component) {
-      set$1(component.element(), 'aria-disabled', 'false');
-    };
-    var disable = function (component, disableConfig, disableState) {
-      disableConfig.disableClass.each(function (disableClass) {
-        add$2(component.element(), disableClass);
-      });
-      var f = hasNative(component) ? nativeDisable : ariaDisable;
-      f(component);
-    };
-    var enable = function (component, disableConfig, disableState) {
-      disableConfig.disableClass.each(function (disableClass) {
-        remove$4(component.element(), disableClass);
-      });
-      var f = hasNative(component) ? nativeEnable : ariaEnable;
-      f(component);
-    };
-    var isDisabled = function (component) {
-      return hasNative(component) ? nativeIsDisabled(component) : ariaIsDisabled(component);
-    };
-
-    var DisableApis = /*#__PURE__*/Object.freeze({
-        enable: enable,
-        disable: disable,
-        isDisabled: isDisabled,
-        onLoad: onLoad$5
-    });
-
-    var exhibit$3 = function (base, disableConfig, disableState) {
-      return nu$6({ classes: disableConfig.disabled ? disableConfig.disableClass.map(pure).getOr([]) : [] });
-    };
-    var events$8 = function (disableConfig, disableState) {
-      return derive([
-        abort(execute(), function (component, simulatedEvent) {
-          return isDisabled(component);
-        }),
-        loadEvent(disableConfig, disableState, onLoad$5)
-      ]);
-    };
-
-    var ActiveDisable = /*#__PURE__*/Object.freeze({
-        exhibit: exhibit$3,
-        events: events$8
-    });
-
-    var DisableSchema = [
-      defaulted$1('disabled', false),
-      option('disableClass')
-    ];
-
-    var Disabling = create$1({
-      fields: DisableSchema,
-      name: 'disabling',
-      active: ActiveDisable,
-      apis: DisableApis
-    });
 
     var TooltippingSchema = [
       strict$1('lazySink'),
@@ -9363,12 +9120,12 @@ var silver = (function () {
       };
       var clearTimer = function () {
         timer.get().each(function (t) {
-          clearTimeout(t);
+          domGlobals.clearTimeout(t);
         });
       };
       var resetTimer = function (f, delay) {
         clearTimer();
-        timer.set(Option.some(setTimeout(function () {
+        timer.set(Option.some(domGlobals.setTimeout(function () {
           f();
         }, delay)));
       };
@@ -9411,7 +9168,7 @@ var silver = (function () {
         setComponents: setComponents
     });
 
-    var events$9 = function (tooltipConfig, state) {
+    var events$8 = function (tooltipConfig, state) {
       var hide = function (comp) {
         state.getTooltip().each(function (p) {
           detach(p);
@@ -9490,7 +9247,7 @@ var silver = (function () {
     };
 
     var ActiveTooltipping = /*#__PURE__*/Object.freeze({
-        events: events$9
+        events: events$8
     });
 
     var Tooltipping = create$1({
@@ -9500,6 +9257,35 @@ var silver = (function () {
       state: TooltippingState,
       apis: TooltippingApis
     });
+
+    var getAttrs = function (elem) {
+      var attributes = elem.dom().attributes !== undefined ? elem.dom().attributes : [];
+      return foldl(attributes, function (b, attr) {
+        var _a;
+        if (attr.name === 'class') {
+          return b;
+        } else {
+          return __assign({}, b, (_a = {}, _a[attr.name] = attr.value, _a));
+        }
+      }, {});
+    };
+    var getClasses = function (elem) {
+      return Array.prototype.slice.call(elem.dom().classList, 0);
+    };
+    var fromHtml$2 = function (html) {
+      var elem = Element.fromHtml(html);
+      var children$1 = children(elem);
+      var attrs = getAttrs(elem);
+      var classes = getClasses(elem);
+      var contents = children$1.length === 0 ? {} : { innerHtml: get$1(elem) };
+      return __assign({
+        tag: name(elem),
+        classes: classes,
+        attributes: attrs
+      }, contents);
+    };
+
+    var global$2 = tinymce.util.Tools.resolve('tinymce.util.I18n');
 
     var navClass = 'tox-menu-nav__js';
     var selectableClass = 'tox-collection__item';
@@ -9520,8 +9306,6 @@ var silver = (function () {
       return readOptFrom$1(presetClasses, presets).getOr(navClass);
     };
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.I18n');
-
     var global$3 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var convertText = function (source) {
@@ -9529,9 +9313,13 @@ var silver = (function () {
         alt: '&#x2325;',
         ctrl: '&#x2303;',
         shift: '&#x21E7;',
-        meta: '&#x2318;'
+        meta: '&#x2318;',
+        access: '&#x2303;&#x2325;'
       };
-      var other = { meta: 'Ctrl' };
+      var other = {
+        meta: 'Ctrl',
+        access: 'Shift+Alt'
+      };
       var replace = global$3.mac ? mac : other;
       var shortcut = source.split('+');
       var updated = map(shortcut, function (segment) {
@@ -9551,16 +9339,16 @@ var silver = (function () {
         }
       };
     };
-    var renderText = function (text$$1) {
+    var renderText = function (text$1) {
       return {
         dom: {
           tag: 'span',
           classes: [textClass]
         },
-        components: [text(global$2.translate(text$$1))]
+        components: [text(global$2.translate(text$1))]
       };
     };
-    var renderStyledText = function (style, text$$1) {
+    var renderStyledText = function (style, text$1) {
       return {
         dom: {
           tag: 'span',
@@ -9571,7 +9359,7 @@ var silver = (function () {
               tag: style.tag,
               attributes: { style: style.styleAttr }
             },
-            components: [text(global$2.translate(text$$1))]
+            components: [text(global$2.translate(text$1))]
           }]
       };
     };
@@ -9592,7 +9380,7 @@ var silver = (function () {
             iconClass,
             checkmarkClass
           ],
-          innerHtml: get$e('checkmark', icons)
+          innerHtml: get$c('checkmark', icons)
         }
       };
     };
@@ -9601,36 +9389,9 @@ var silver = (function () {
         dom: {
           tag: 'span',
           classes: [caretClass],
-          innerHtml: get$e('chevron-right', icons)
+          innerHtml: get$c('chevron-right', icons)
         }
       };
-    };
-
-    var getAttrs = function (elem) {
-      var attributes = elem.dom().attributes !== undefined ? elem.dom().attributes : [];
-      return foldl(attributes, function (b, attr) {
-        var _a;
-        if (attr.name === 'class') {
-          return b;
-        } else {
-          return __assign({}, b, (_a = {}, _a[attr.name] = attr.value, _a));
-        }
-      }, {});
-    };
-    var getClasses = function (elem) {
-      return Array.prototype.slice.call(elem.dom().classList, 0);
-    };
-    var fromHtml$2 = function (html) {
-      var elem = Element$$1.fromHtml(html);
-      var children$$1 = children(elem);
-      var attrs = getAttrs(elem);
-      var classes = getClasses(elem);
-      var contents = children$$1.length === 0 ? {} : { innerHtml: get$1(elem) };
-      return __assign({
-        tag: name(elem),
-        classes: classes,
-        attributes: attrs
-      }, contents);
     };
 
     var renderColorStructure = function (itemText, itemValue, iconSvg) {
@@ -9699,6 +9460,91 @@ var silver = (function () {
       }
     };
 
+    var nativeDisabled = [
+      'input',
+      'button',
+      'textarea'
+    ];
+    var onLoad$5 = function (component, disableConfig, disableState) {
+      if (disableConfig.disabled) {
+        disable(component, disableConfig, disableState);
+      }
+    };
+    var hasNative = function (component) {
+      return contains(nativeDisabled, name(component.element()));
+    };
+    var nativeIsDisabled = function (component) {
+      return has$1(component.element(), 'disabled');
+    };
+    var nativeDisable = function (component) {
+      set$1(component.element(), 'disabled', 'disabled');
+    };
+    var nativeEnable = function (component) {
+      remove$1(component.element(), 'disabled');
+    };
+    var ariaIsDisabled = function (component) {
+      return get$2(component.element(), 'aria-disabled') === 'true';
+    };
+    var ariaDisable = function (component) {
+      set$1(component.element(), 'aria-disabled', 'true');
+    };
+    var ariaEnable = function (component) {
+      set$1(component.element(), 'aria-disabled', 'false');
+    };
+    var disable = function (component, disableConfig, disableState) {
+      disableConfig.disableClass.each(function (disableClass) {
+        add$2(component.element(), disableClass);
+      });
+      var f = hasNative(component) ? nativeDisable : ariaDisable;
+      f(component);
+    };
+    var enable = function (component, disableConfig, disableState) {
+      disableConfig.disableClass.each(function (disableClass) {
+        remove$4(component.element(), disableClass);
+      });
+      var f = hasNative(component) ? nativeEnable : ariaEnable;
+      f(component);
+    };
+    var isDisabled = function (component) {
+      return hasNative(component) ? nativeIsDisabled(component) : ariaIsDisabled(component);
+    };
+
+    var DisableApis = /*#__PURE__*/Object.freeze({
+        enable: enable,
+        disable: disable,
+        isDisabled: isDisabled,
+        onLoad: onLoad$5
+    });
+
+    var exhibit$3 = function (base, disableConfig, disableState) {
+      return nu$6({ classes: disableConfig.disabled ? disableConfig.disableClass.map(pure).getOr([]) : [] });
+    };
+    var events$9 = function (disableConfig, disableState) {
+      return derive([
+        abort(execute(), function (component, simulatedEvent) {
+          return isDisabled(component);
+        }),
+        loadEvent(disableConfig, disableState, onLoad$5)
+      ]);
+    };
+
+    var ActiveDisable = /*#__PURE__*/Object.freeze({
+        exhibit: exhibit$3,
+        events: events$9
+    });
+
+    var DisableSchema = [
+      defaulted$1('disabled', false),
+      option('disableClass')
+    ];
+
+    var Disabling = create$1({
+      fields: DisableSchema,
+      name: 'disabling',
+      active: ActiveDisable,
+      apis: DisableApis
+    });
+
     var item = function (disabled) {
       return Disabling.config({
         disabled: disabled,
@@ -9728,8 +9574,8 @@ var silver = (function () {
     };
     var onControlAttached = function (info, editorOffCell) {
       return runOnAttached(function (comp) {
-        var run$$1 = runWithApi(info, comp);
-        run$$1(function (api) {
+        var run = runWithApi(info, comp);
+        run(function (api) {
           var onDestroy = info.onSetup(api);
           if (onDestroy !== null && onDestroy !== undefined) {
             editorOffCell.set(onDestroy);
@@ -9815,13 +9661,16 @@ var silver = (function () {
             mode: 'follow-highlight',
             onShow: function (component, _tooltip) {
               tooltipWorker(function (elm) {
-                Tooltipping.setComponents(component, [external({ element: Element$$1.fromDom(elm) })]);
+                Tooltipping.setComponents(component, [external({ element: Element.fromDom(elm) })]);
               });
             }
           })];
       }).getOr([]);
     };
-    var renderAutocompleteItem = function (spec, useText, presets, onItemValueHandler, itemResponse, sharedBackstage) {
+    var renderAutocompleteItem = function (spec, useText, presets, onItemValueHandler, itemResponse, sharedBackstage, renderIcons) {
+      if (renderIcons === void 0) {
+        renderIcons = true;
+      }
       var structure = renderItemStructure({
         presets: presets,
         textContent: useText ? spec.text : Option.none(),
@@ -9831,7 +9680,7 @@ var silver = (function () {
         checkMark: Option.none(),
         caret: Option.none(),
         value: spec.value
-      }, sharedBackstage.providers, true, spec.icon);
+      }, sharedBackstage.providers, renderIcons, spec.icon);
       return renderCommonItem({
         data: buildData(spec),
         disabled: spec.disabled,
@@ -9849,6 +9698,7 @@ var silver = (function () {
         itemBehaviours: tooltipBehaviour(spec.meta, sharedBackstage)
       }, structure, itemResponse);
     };
+
     var renderChoiceItem = function (spec, useText, presets, onItemValueHandler, isSelected, itemResponse, providersBackstage) {
       var getApi = function (component) {
         return {
@@ -9911,7 +9761,7 @@ var silver = (function () {
           col: col
         });
       };
-      var emitExecute$$1 = function (c) {
+      var emitExecute = function (c) {
         return emitWith(c, cellExecuteEvent, {
           row: row,
           col: col
@@ -9925,8 +9775,8 @@ var silver = (function () {
         behaviours: derive$1([
           config('insert-table-picker-cell', [
             run(mouseover(), Focusing.focus),
-            run(execute(), emitExecute$$1),
-            run(tapOrClick(), emitExecute$$1)
+            run(execute(), emitExecute),
+            run(tapOrClick(), emitExecute)
           ]),
           Toggling.config({
             toggleClass: 'tox-insert-table-picker__selected',
@@ -10166,7 +10016,7 @@ var silver = (function () {
     var separator = renderSeparatorItem;
     var normal = renderNormalItem;
     var nested = renderNestedItem;
-    var toggle$4 = renderToggleMenuItem;
+    var toggle$1 = renderToggleMenuItem;
     var fancy = renderFancyMenuItem;
 
     var forMenu = function (presets) {
@@ -10197,7 +10047,7 @@ var silver = (function () {
         item: classForPreset(presets)
       };
     };
-    var dom$2 = function (hasIcons, columns, presets) {
+    var dom$1 = function (hasIcons, columns, presets) {
       var menuClasses = classes(presets);
       return {
         tag: 'div',
@@ -10413,7 +10263,7 @@ var silver = (function () {
         });
       case 'togglemenuitem':
         return createToggleMenuItem(item).fold(handleError, function (d) {
-          return Option.some(toggle$4(d, itemResponse, providersBackstage));
+          return Option.some(toggle$1(d, itemResponse, providersBackstage));
         });
       case 'separator':
         return createSeparatorMenuItem(item).fold(handleError, function (d) {
@@ -10466,7 +10316,7 @@ var silver = (function () {
           items: items
         };
       }
-      if (presets === 'toolbar' && columns !== 'auto') {
+      if (presets === 'listpreview' && columns !== 'auto') {
         var structure = forToolbar(columns);
         return {
           value: value,
@@ -10477,7 +10327,7 @@ var silver = (function () {
       }
       return {
         value: value,
-        dom: dom$2(hasIcons, columns, presets),
+        dom: dom$1(hasIcons, columns, presets),
         components: components$1,
         items: items
       };
@@ -10494,9 +10344,11 @@ var silver = (function () {
       }));
     };
     var createAutocompleteItems = function (items, onItemValueHandler, columns, itemResponse, sharedBackstage) {
+      var renderText = columns === 1;
+      var renderIcons = !renderText || menuHasIcons(items);
       return cat(map(items, function (item) {
         return createAutocompleterItem(item).fold(handleError, function (d) {
-          return Option.some(autocomplete(d, columns === 1, 'normal', onItemValueHandler, itemResponse, sharedBackstage));
+          return Option.some(autocomplete(d, renderText, 'normal', onItemValueHandler, itemResponse, sharedBackstage, renderIcons));
         });
       }));
     };
@@ -10580,7 +10432,7 @@ var silver = (function () {
           }, columns, ItemResponse$1.BUBBLE_TO_SANDBOX, sharedBackstage);
         });
       };
-      var onKeypress = last$3(function (e) {
+      var onKeypress = last$2(function (e) {
         var optMatches = e.key === ' ' ? Option.none() : lookup(editor, getAutocompleters);
         optMatches.fold(closeIfNecessary, function (lookupInfo) {
           lookupInfo.lookupData.then(function (lookupData) {
@@ -10591,17 +10443,17 @@ var silver = (function () {
               }).getOr(1);
               InlineView.showAt(autocompleter, {
                 anchor: 'selection',
-                root: Element$$1.fromDom(editor.getBody()),
+                root: Element.fromDom(editor.getBody()),
                 getSelection: function () {
                   return Option.some({
                     start: function () {
-                      return Element$$1.fromDom(lookupInfo.range.startContainer);
+                      return Element.fromDom(lookupInfo.range.startContainer);
                     },
                     soffset: function () {
                       return lookupInfo.range.startOffset;
                     },
                     finish: function () {
-                      return Element$$1.fromDom(lookupInfo.range.endContainer);
+                      return Element.fromDom(lookupInfo.range.endContainer);
                     },
                     foffset: function () {
                       return lookupInfo.range.endOffset;
@@ -10644,7 +10496,7 @@ var silver = (function () {
         if (!filter(rawEvent)) {
           return;
         }
-        var target = Element$$1.fromDom(rawEvent.target);
+        var target = Element.fromDom(rawEvent.target);
         var stop = function () {
           rawEvent.stopPropagation();
         };
@@ -10664,7 +10516,7 @@ var silver = (function () {
     var bind$2 = function (element, event, filter, handler) {
       return binder(element, event, filter, handler, false);
     };
-    var capture$1 = function (element, event, filter, handler) {
+    var capture = function (element, event, filter, handler) {
       return binder(element, event, filter, handler, true);
     };
     var unbind = function (element, event, handler, useCapture) {
@@ -10675,8 +10527,8 @@ var silver = (function () {
     var bind$3 = function (element, event, handler) {
       return bind$2(element, event, filter$1, handler);
     };
-    var capture$2 = function (element, event, handler) {
-      return capture$1(element, event, filter$1, handler);
+    var capture$1 = function (element, event, handler) {
+      return capture(element, event, filter$1, handler);
     };
 
     var closest$4 = function (scope, selector, isRoot) {
@@ -10690,14 +10542,14 @@ var silver = (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
           args[_i] = arguments[_i];
         }
-        ref = setTimeout(function () {
+        ref = domGlobals.setTimeout(function () {
           fun.apply(null, args);
           ref = null;
         }, delay);
       };
       var cancel = function () {
         if (ref !== null) {
-          clearTimeout(ref);
+          domGlobals.clearTimeout(ref);
           ref = null;
         }
       };
@@ -10723,25 +10575,25 @@ var silver = (function () {
     };
     var monitor = function (settings) {
       var startData = Cell(Option.none());
-      var longpress$$1 = DelayedFunction(function (event) {
+      var longpress$1 = DelayedFunction(function (event) {
         startData.set(Option.none());
         settings.triggerEvent(longpress(), event);
       }, LONGPRESS_DELAY);
       var handleTouchstart = function (event) {
         getTouch(event).each(function (touch) {
-          longpress$$1.cancel();
+          longpress$1.cancel();
           var data = {
             x: constant(touch.clientX),
             y: constant(touch.clientY),
             target: event.target
           };
-          longpress$$1.schedule(event);
+          longpress$1.schedule(event);
           startData.set(Option.some(data));
         });
         return Option.none();
       };
       var handleTouchmove = function (event) {
-        longpress$$1.cancel();
+        longpress$1.cancel();
         getTouch(event).each(function (touch) {
           startData.get().each(function (data) {
             if (isFarEnough(touch, data)) {
@@ -10752,7 +10604,7 @@ var silver = (function () {
         return Option.none();
       };
       var handleTouchend = function (event) {
-        longpress$$1.cancel();
+        longpress$1.cancel();
         var isSame = function (data) {
           return eq(data.target(), event.target());
         };
@@ -10782,12 +10634,12 @@ var silver = (function () {
       return { fireIfReady: fireIfReady };
     };
 
-    var isDangerous = function (event$$1) {
-      var keyEv = event$$1.raw();
+    var isDangerous = function (event) {
+      var keyEv = event.raw();
       return keyEv.which === BACKSPACE()[0] && !contains([
         'input',
         'textarea'
-      ], name(event$$1.target())) && !closest$4(event$$1.target(), '[contenteditable="true"]');
+      ], name(event.target())) && !closest$4(event.target(), '[contenteditable="true"]');
     };
     var isFirefox = PlatformDetection$1.detect().browser.isFirefox();
     var settingsSchema = objOfOnly([
@@ -10796,14 +10648,14 @@ var silver = (function () {
     ]);
     var bindFocus = function (container, handler) {
       if (isFirefox) {
-        return capture$2(container, 'focus', handler);
+        return capture$1(container, 'focus', handler);
       } else {
         return bind$3(container, 'focusin', handler);
       }
     };
     var bindBlur = function (container, handler) {
       if (isFirefox) {
-        return capture$2(container, 'blur', handler);
+        return capture$1(container, 'blur', handler);
       } else {
         return bind$3(container, 'focusout', handler);
       }
@@ -10838,56 +10690,56 @@ var silver = (function () {
         'dragover',
         'drop',
         'keyup'
-      ]), function (type$$1) {
-        return bind$3(container, type$$1, function (event$$1) {
-          tapEvent.fireIfReady(event$$1, type$$1).each(function (tapStopped) {
+      ]), function (type) {
+        return bind$3(container, type, function (event) {
+          tapEvent.fireIfReady(event, type).each(function (tapStopped) {
             if (tapStopped) {
-              event$$1.kill();
+              event.kill();
             }
           });
-          var stopped = settings.triggerEvent(type$$1, event$$1);
+          var stopped = settings.triggerEvent(type, event);
           if (stopped) {
-            event$$1.kill();
+            event.kill();
           }
         });
       });
       var pasteTimeout = Cell(Option.none());
-      var onPaste = bind$3(container, 'paste', function (event$$1) {
-        tapEvent.fireIfReady(event$$1, 'paste').each(function (tapStopped) {
+      var onPaste = bind$3(container, 'paste', function (event) {
+        tapEvent.fireIfReady(event, 'paste').each(function (tapStopped) {
           if (tapStopped) {
-            event$$1.kill();
+            event.kill();
           }
         });
-        var stopped = settings.triggerEvent('paste', event$$1);
+        var stopped = settings.triggerEvent('paste', event);
         if (stopped) {
-          event$$1.kill();
+          event.kill();
         }
-        pasteTimeout.set(Option.some(setTimeout(function () {
-          settings.triggerEvent(postPaste(), event$$1);
+        pasteTimeout.set(Option.some(domGlobals.setTimeout(function () {
+          settings.triggerEvent(postPaste(), event);
         }, 0)));
       });
-      var onKeydown = bind$3(container, 'keydown', function (event$$1) {
-        var stopped = settings.triggerEvent('keydown', event$$1);
+      var onKeydown = bind$3(container, 'keydown', function (event) {
+        var stopped = settings.triggerEvent('keydown', event);
         if (stopped) {
-          event$$1.kill();
-        } else if (settings.stopBackspace === true && isDangerous(event$$1)) {
-          event$$1.prevent();
+          event.kill();
+        } else if (settings.stopBackspace === true && isDangerous(event)) {
+          event.prevent();
         }
       });
-      var onFocusIn = bindFocus(container, function (event$$1) {
-        var stopped = settings.triggerEvent('focusin', event$$1);
+      var onFocusIn = bindFocus(container, function (event) {
+        var stopped = settings.triggerEvent('focusin', event);
         if (stopped) {
-          event$$1.kill();
+          event.kill();
         }
       });
       var focusoutTimeout = Cell(Option.none());
-      var onFocusOut = bindBlur(container, function (event$$1) {
-        var stopped = settings.triggerEvent('focusout', event$$1);
+      var onFocusOut = bindBlur(container, function (event) {
+        var stopped = settings.triggerEvent('focusout', event);
         if (stopped) {
-          event$$1.kill();
+          event.kill();
         }
-        focusoutTimeout.set(Option.some(setTimeout(function () {
-          settings.triggerEvent(postBlur(), event$$1);
+        focusoutTimeout.set(Option.some(domGlobals.setTimeout(function () {
+          settings.triggerEvent(postBlur(), event);
         }, 0)));
       });
       var unbind = function () {
@@ -10898,8 +10750,8 @@ var silver = (function () {
         onFocusIn.unbind();
         onFocusOut.unbind();
         onPaste.unbind();
-        pasteTimeout.get().each(clearTimeout);
-        focusoutTimeout.get().each(clearTimeout);
+        pasteTimeout.get().each(domGlobals.clearTimeout);
+        focusoutTimeout.get().each(domGlobals.clearTimeout);
       };
       return { unbind: unbind };
     };
@@ -10971,9 +10823,9 @@ var silver = (function () {
           return parent(handlerInfo.element()).fold(function () {
             logger.logNoParent(eventType, handlerInfo.element(), descHandler.purpose());
             return adt$a.complete();
-          }, function (parent$$1) {
+          }, function (parent) {
             logger.logEventResponse(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$a.resume(parent$$1);
+            return adt$a.resume(parent);
           });
         }
       });
@@ -10981,8 +10833,8 @@ var silver = (function () {
     var doTriggerOnUntilStopped = function (lookup, eventType, rawEvent, rawTarget, source, logger) {
       return doTriggerHandler(lookup, eventType, rawEvent, rawTarget, source, logger).fold(function () {
         return true;
-      }, function (parent$$1) {
-        return doTriggerOnUntilStopped(lookup, eventType, rawEvent, parent$$1, source, logger);
+      }, function (parent) {
+        return doTriggerOnUntilStopped(lookup, eventType, rawEvent, parent, source, logger);
       }, function () {
         return false;
       });
@@ -11125,7 +10977,7 @@ var silver = (function () {
           attributes: __assign({ role: 'presentation' }, attributes)
         }, domWithoutAttributes),
         components: detail.components,
-        behaviours: get$d(detail.containerBehaviours),
+        behaviours: get$b(detail.containerBehaviours),
         events: detail.events,
         domModification: detail.domModification,
         eventOrder: detail.eventOrder
@@ -11147,8 +10999,8 @@ var silver = (function () {
       var isAboveRoot = function (el) {
         return parent(root.element()).fold(function () {
           return true;
-        }, function (parent$$1) {
-          return eq(el, parent$$1);
+        }, function (parent) {
+          return eq(el, parent);
         });
       };
       var registry = Registry();
@@ -11171,10 +11023,10 @@ var silver = (function () {
         },
         triggerFocus: function (target, originator) {
           read$1(target).fold(function () {
-            focus$2(target);
+            focus$1(target);
           }, function (_alloyId) {
-            monitorEvent(focus$1(), target, function (logger) {
-              triggerHandler(lookup, focus$1(), {
+            monitorEvent(focus(), target, function (logger) {
+              triggerHandler(lookup, focus(), {
                 originator: constant(originator),
                 kill: noop,
                 prevent: noop,
@@ -11197,7 +11049,7 @@ var silver = (function () {
           add(c);
         },
         removeFromGui: function (c) {
-          remove$$1(c);
+          remove$1(c);
         },
         addToWorld: function (c) {
           addToWorld(c);
@@ -11206,7 +11058,7 @@ var silver = (function () {
           removeFromWorld(c);
         },
         broadcast: function (message) {
-          broadcast$$1(message);
+          broadcast$1(message);
         },
         broadcastOn: function (channels, message) {
           broadcastOn(channels, message);
@@ -11234,7 +11086,7 @@ var silver = (function () {
       var add = function (component) {
         attach(root, component);
       };
-      var remove$$1 = function (component) {
+      var remove$1 = function (component) {
         detach(component);
       };
       var destroy = function () {
@@ -11249,7 +11101,7 @@ var silver = (function () {
           handler(data);
         });
       };
-      var broadcast$$1 = function (message) {
+      var broadcast$1 = function (message) {
         broadcastData({
           universal: constant(true),
           data: constant(message)
@@ -11281,12 +11133,12 @@ var silver = (function () {
         element: root.element,
         destroy: destroy,
         add: add,
-        remove: remove$$1,
+        remove: remove$1,
         getByUid: getByUid,
         getByDom: getByDom,
         addToWorld: addToWorld,
         removeFromWorld: removeFromWorld,
-        broadcast: broadcast$$1,
+        broadcast: broadcast$1,
         broadcastOn: broadcastOn,
         broadcastEvent: broadcastEvent
       };
@@ -11352,8 +11204,8 @@ var silver = (function () {
       }
     };
     var getMultipleToolbarsSetting = function (editor) {
-      var keys$$1 = keys(editor.settings);
-      var toolbarKeys = filter(keys$$1, function (key) {
+      var keys$1 = keys(editor.settings);
+      var toolbarKeys = filter(keys$1, function (key) {
         return /^toolbar([1-9])$/.test(key);
       });
       var toolbars = map(toolbarKeys, function (key) {
@@ -11363,6 +11215,9 @@ var silver = (function () {
         return typeof toolbar === 'string';
       });
       return toolbarArray.length > 0 ? Option.some(toolbarArray) : Option.none();
+    };
+    var isSplitToolbar = function (editor) {
+      return editor.getParam('toolbar_drawer', false, 'boolean');
     };
 
     var formChangeEvent = generate$1('form-component-change');
@@ -11400,7 +11255,7 @@ var silver = (function () {
                     'tox-button--naked',
                     'tox-button--icon'
                   ],
-                  innerHtml: get$e(spec.icon, providersBackstage.icons),
+                  innerHtml: get$c(spec.icon, providersBackstage.icons),
                   attributes: { title: providersBackstage.translate(spec.actionLabel) }
                 },
                 action: function (comp) {
@@ -11463,7 +11318,7 @@ var silver = (function () {
       })
     ]);
 
-    var factory$4 = function (detail, components$$1, spec, externals) {
+    var factory$4 = function (detail, components, spec, externals) {
       var behaviours = augment(detail.fieldBehaviours, [
         Composing.config({
           find: function (container) {
@@ -11514,7 +11369,7 @@ var silver = (function () {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
+        components: components,
         behaviours: behaviours,
         events: events,
         apis: apis
@@ -11629,7 +11484,7 @@ var silver = (function () {
 
     var setup$2 = function (streamInfo, streamState) {
       var sInfo = streamInfo.stream;
-      var throttler = last$3(streamInfo.onStream, sInfo.delay);
+      var throttler = last$2(streamInfo.onStream, sInfo.delay);
       streamState.setTimer(throttler);
       return function (component, simulatedEvent) {
         throttler.throttle(component, simulatedEvent);
@@ -11643,7 +11498,7 @@ var silver = (function () {
         throttle: [
           strict$1('delay'),
           defaulted$1('stopEvent', true),
-          output$1('streams', {
+          output('streams', {
             setup: setup$2,
             state: throttle
           })
@@ -11664,7 +11519,7 @@ var silver = (function () {
     var nu$a = function (baseFn) {
       var data = Option.none();
       var callbacks = [];
-      var map$$1 = function (f) {
+      var map = function (f) {
         return nu$a(function (nCallback) {
           get(function (data) {
             nCallback(f(data));
@@ -11698,7 +11553,7 @@ var silver = (function () {
       baseFn(set);
       return {
         get: get,
-        map: map$$1,
+        map: map,
         isReady: isReady
       };
     };
@@ -11880,7 +11735,7 @@ var silver = (function () {
     };
     var matchWidth = function (hotspot, container, useMinWidth) {
       var menu = Composing.getCurrent(container).getOr(container);
-      var buttonWidth = get$8(hotspot.element());
+      var buttonWidth = get$7(hotspot.element());
       if (useMinWidth) {
         set$2(menu.element(), 'min-width', buttonWidth + 'px');
       } else {
@@ -11966,7 +11821,7 @@ var silver = (function () {
     };
     var setSelectionOn = function (input, f) {
       var el = input.element();
-      var value = get$6(el);
+      var value = get$5(el);
       var node = el.dom();
       if (get$2(el, 'type') !== 'number') {
         f(node, value);
@@ -12016,7 +11871,7 @@ var silver = (function () {
       return derive$1([Focusing.config({
           onFocus: detail.selectOnFocus === false ? noop : function (component) {
             var input = component.element();
-            var value = get$6(input);
+            var value = get$5(input);
             input.dom().setSelectionRange(0, value.length);
           }
         })]);
@@ -12027,10 +11882,10 @@ var silver = (function () {
             mode: 'manual',
             initialValue: detail.data.getOr(undefined),
             getValue: function (input) {
-              return get$6(input.element());
+              return get$5(input.element());
             },
             setValue: function (input, data) {
-              var current = get$6(input.element());
+              var current = get$5(input.element());
               if (current !== data) {
                 set$3(input.element(), data);
               }
@@ -12039,7 +11894,7 @@ var silver = (function () {
           onSetValue: detail.onSetValue
         })]));
     };
-    var dom$3 = function (detail) {
+    var dom$2 = function (detail) {
       return {
         tag: detail.tag,
         attributes: __assign({ type: 'input' }, detail.inputAttributes),
@@ -12069,7 +11924,7 @@ var silver = (function () {
           open$1(detail, mapFetch(comp), comp, sandbox, externals, onOpenSync, HighlightOnOpen.HighlightFirst).get(noop);
         }
       };
-      var focusBehaviours$$1 = focusBehaviours(detail);
+      var focusBehaviours$1 = focusBehaviours(detail);
       var mapFetch = function (comp) {
         return function (tdata) {
           return tdata.map(function (data) {
@@ -12087,14 +11942,14 @@ var silver = (function () {
           });
         };
       };
-      var behaviours$$1 = [
+      var behaviours = [
         Focusing.config({}),
         Representing.config({
           onSetValue: detail.onSetValue,
           store: __assign({
             mode: 'dataset',
             getDataKey: function (comp) {
-              return get$6(comp.element());
+              return get$5(comp.element());
             },
             getFallbackEntry: function (itemString) {
               return {
@@ -12119,7 +11974,7 @@ var silver = (function () {
             var sandbox = Coupling.getCoupled(component, 'sandbox');
             var focusInInput = Focusing.isFocused(component);
             if (focusInInput) {
-              if (get$6(component.element()).length >= detail.minChars) {
+              if (get$5(component.element()).length >= detail.minChars) {
                 var previousValue_1 = Composing.getCurrent(sandbox).bind(function (menu) {
                   return Highlighting.getHighlighted(menu).map(Representing.getValue);
                 });
@@ -12226,8 +12081,8 @@ var silver = (function () {
       ];
       return {
         uid: detail.uid,
-        dom: dom$3(detail),
-        behaviours: __assign({}, focusBehaviours$$1, augment(detail.typeaheadBehaviours, behaviours$$1)),
+        dom: dom$2(detail),
+        behaviours: __assign({}, focusBehaviours$1, augment(detail.typeaheadBehaviours, behaviours)),
         eventOrder: detail.eventOrder
       };
     };
@@ -12487,7 +12342,7 @@ var silver = (function () {
     var factory$5 = function (detail, spec) {
       return {
         uid: detail.uid,
-        dom: dom$3(detail),
+        dom: dom$2(detail),
         components: [],
         behaviours: behaviours(detail),
         eventOrder: detail.eventOrder
@@ -12504,10 +12359,10 @@ var silver = (function () {
       position: 'absolute',
       left: '-9999px'
     };
-    var create$5 = function (doc, text) {
-      var span = Element$$1.fromTag('span', doc.dom());
+    var create$3 = function (doc, text) {
+      var span = Element.fromTag('span', doc.dom());
       set$1(span, 'role', 'presentation');
-      var contents = Element$$1.fromText(text, doc.dom());
+      var contents = Element.fromText(text, doc.dom());
       append(span, contents);
       return span;
     };
@@ -12516,16 +12371,16 @@ var silver = (function () {
       set$1(token, 'id', id);
       set$1(item, 'aria-describedby', id);
     };
-    var base$1 = function (getAttrs, parent$$1, text) {
-      var doc = owner(parent$$1);
-      var token = create$5(doc, text);
+    var base$1 = function (getAttrs, parent, text) {
+      var doc = owner(parent);
+      var token = create$3(doc, text);
       if (isFirefox$1) {
-        linkToDescription(parent$$1, token);
+        linkToDescription(parent, token);
       }
       setAll(token, getAttrs(text));
       setAll$1(token, offscreen);
-      append(parent$$1, token);
-      setTimeout(function () {
+      append(parent, token);
+      domGlobals.setTimeout(function () {
         remove$1(token, 'aria-live');
         remove(token);
       }, 1000);
@@ -12537,8 +12392,8 @@ var silver = (function () {
         'role': 'alert'
       };
     };
-    var shout = function (parent$$1, text) {
-      return base$1(getShoutAttrs, parent$$1, text);
+    var shout = function (parent, text) {
+      return base$1(getShoutAttrs, parent, text);
     };
 
     var ariaElements = [
@@ -12546,8 +12401,8 @@ var silver = (function () {
       'textarea'
     ];
     var isAriaElement = function (elem) {
-      var name$$1 = name(elem);
-      return contains(ariaElements, name$$1);
+      var name$1 = name(elem);
+      return contains(ariaElements, name$1);
     };
     var markValid = function (component, invalidConfig) {
       var elem = invalidConfig.getRoot(component).getOr(component.element());
@@ -12778,8 +12633,8 @@ var silver = (function () {
       b = round(255 * (b + match));
       return rgbaColour(r, g, b, 1);
     };
-    var fromHex = function (hexColour$$1) {
-      var result = extractValues(hexColour$$1);
+    var fromHex = function (hexColour) {
+      var result = extractValues(hexColour);
       var red = parseInt(result[1], 16);
       var green = parseInt(result[2], 16);
       var blue = parseInt(result[3], 16);
@@ -12792,7 +12647,7 @@ var silver = (function () {
       var a = parseFloat(alpha);
       return rgbaColour(r, g, b, a);
     };
-    var fromString$1 = function (rgbaString) {
+    var fromString = function (rgbaString) {
       if (rgbaString === 'transparent') {
         return Option.some(rgbaColour(0, 0, 0, 0));
       } else if (rgbRegex.test(rgbaString)) {
@@ -12805,7 +12660,7 @@ var silver = (function () {
         return Option.none();
       }
     };
-    var toString$2 = function (rgba) {
+    var toString = function (rgba) {
       return 'rgba(' + rgba.red() + ',' + rgba.green() + ',' + rgba.blue() + ',' + rgba.alpha() + ')';
     };
     var red = constant(rgbaColour(255, 0, 0, 1));
@@ -13103,7 +12958,7 @@ var silver = (function () {
         select: function (value) {
           var optCurrentRgb = Option.from(getCurrentColor(editor, format));
           return optCurrentRgb.bind(function (currentRgb) {
-            return fromString$1(currentRgb).map(function (rgba) {
+            return fromString(currentRgb).map(function (rgba) {
               var currentHex = fromRgba(rgba).value();
               return contains$1(value.toLowerCase(), currentHex);
             });
@@ -13448,7 +13303,7 @@ var silver = (function () {
                 if (inputValue.length === 0) {
                   return Future.pure(Result.value(true));
                 } else {
-                  var span = Element$$1.fromTag('span');
+                  var span = Element.fromTag('span');
                   set$2(span, 'background-color', inputValue);
                   var res = getRaw(span, 'background-color').fold(function () {
                     return Result.error('blah');
@@ -13773,14 +13628,14 @@ var silver = (function () {
     var max1Y = function (detail) {
       return detail.model.maxY + 1;
     };
-    var range$2 = function (detail, max, min) {
+    var range$1 = function (detail, max, min) {
       return max(detail) - min(detail);
     };
     var xRange = function (detail) {
-      return range$2(detail, maxX, minX);
+      return range$1(detail, maxX, minX);
     };
     var yRange = function (detail) {
-      return range$2(detail, maxY, minY);
+      return range$1(detail, maxY, minY);
     };
     var halfX = function (detail) {
       return xRange(detail) / 2;
@@ -13788,7 +13643,7 @@ var silver = (function () {
     var halfY = function (detail) {
       return yRange(detail) / 2;
     };
-    var step$1 = function (detail) {
+    var step = function (detail) {
       return detail.stepSize;
     };
     var snap = function (detail) {
@@ -13872,50 +13727,50 @@ var silver = (function () {
     };
 
     var top = 'top', right = 'right', bottom = 'bottom', left = 'left', width = 'width', height = 'height';
-    var getBounds$2 = function (component) {
+    var getBounds = function (component) {
       return component.element().dom().getBoundingClientRect();
     };
     var getBoundsProperty = function (bounds, property) {
       return bounds[property];
     };
     var getMinXBounds = function (component) {
-      var bounds = getBounds$2(component);
+      var bounds = getBounds(component);
       return getBoundsProperty(bounds, left);
     };
     var getMaxXBounds = function (component) {
-      var bounds = getBounds$2(component);
+      var bounds = getBounds(component);
       return getBoundsProperty(bounds, right);
     };
     var getMinYBounds = function (component) {
-      var bounds = getBounds$2(component);
+      var bounds = getBounds(component);
       return getBoundsProperty(bounds, top);
     };
     var getMaxYBounds = function (component) {
-      var bounds = getBounds$2(component);
+      var bounds = getBounds(component);
       return getBoundsProperty(bounds, bottom);
     };
     var getXScreenRange = function (component) {
-      var bounds = getBounds$2(component);
+      var bounds = getBounds(component);
       return getBoundsProperty(bounds, width);
     };
     var getYScreenRange = function (component) {
-      var bounds = getBounds$2(component);
+      var bounds = getBounds(component);
       return getBoundsProperty(bounds, height);
     };
     var getCenterOffsetOf = function (componentMinEdge, componentMaxEdge, spectrumMinEdge) {
       return (componentMinEdge + componentMaxEdge) / 2 - spectrumMinEdge;
     };
     var getXCenterOffSetOf = function (component, spectrum) {
-      var componentBounds = getBounds$2(component);
-      var spectrumBounds = getBounds$2(spectrum);
+      var componentBounds = getBounds(component);
+      var spectrumBounds = getBounds(spectrum);
       var componentMinEdge = getBoundsProperty(componentBounds, left);
       var componentMaxEdge = getBoundsProperty(componentBounds, right);
       var spectrumMinEdge = getBoundsProperty(spectrumBounds, left);
       return getCenterOffsetOf(componentMinEdge, componentMaxEdge, spectrumMinEdge);
     };
     var getYCenterOffSetOf = function (component, spectrum) {
-      var componentBounds = getBounds$2(component);
-      var spectrumBounds = getBounds$2(spectrum);
+      var componentBounds = getBounds(component);
+      var spectrumBounds = getBounds(spectrum);
       var componentMinEdge = getBoundsProperty(componentBounds, top);
       var componentMaxEdge = getBoundsProperty(componentBounds, bottom);
       var spectrumMinEdge = getBoundsProperty(spectrumBounds, top);
@@ -13934,7 +13789,7 @@ var silver = (function () {
         max: maxX(detail),
         range: xRange(detail),
         value: left,
-        step: step$1(detail),
+        step: step(detail),
         snap: snap(detail),
         snapStart: snapStart(detail),
         rounded: rounded(detail),
@@ -13962,7 +13817,7 @@ var silver = (function () {
     };
     var moveBy = function (direction, spectrum, detail) {
       var f = direction > 0 ? increaseBy : reduceBy;
-      var xValue = f(currentValue(detail).x(), minX(detail), maxX(detail), step$1(detail));
+      var xValue = f(currentValue(detail).x(), minX(detail), maxX(detail), step(detail));
       fireSliderChange$1(spectrum, sliderValue(xValue));
       return Option.some(xValue);
     };
@@ -14011,7 +13866,7 @@ var silver = (function () {
     var setPositionFromValue = function (slider, thumb, detail, edges) {
       var value = currentValue(detail);
       var pos = findPositionOfValue(slider, edges.getSpectrum(slider), value.x(), edges.getLeftEdge(slider), edges.getRightEdge(slider), detail);
-      var thumbRadius = get$8(thumb.element()) / 2;
+      var thumbRadius = get$7(thumb.element()) / 2;
       set$2(thumb.element(), 'left', pos - thumbRadius + 'px');
     };
     var onLeft = handleMovement(-1);
@@ -14056,7 +13911,7 @@ var silver = (function () {
         max: maxY(detail),
         range: yRange(detail),
         value: top,
-        step: step$1(detail),
+        step: step(detail),
         snap: snap(detail),
         snapStart: snapStart(detail),
         rounded: rounded(detail),
@@ -14084,7 +13939,7 @@ var silver = (function () {
     };
     var moveBy$1 = function (direction, spectrum, detail) {
       var f = direction > 0 ? increaseBy : reduceBy;
-      var yValue = f(currentValue(detail).y(), minY(detail), maxY(detail), step$1(detail));
+      var yValue = f(currentValue(detail).y(), minY(detail), maxY(detail), step(detail));
       fireSliderChange$2(spectrum, sliderValue$1(yValue));
       return Option.some(yValue);
     };
@@ -14133,7 +13988,7 @@ var silver = (function () {
     var setPositionFromValue$1 = function (slider, thumb, detail, edges) {
       var value = currentValue(detail);
       var pos = findPositionOfValue$1(slider, edges.getSpectrum(slider), value.y(), edges.getTopEdge(slider), edges.getBottomEdge(slider), detail);
-      var thumbRadius = get$9(thumb.element()) / 2;
+      var thumbRadius = get$8(thumb.element()) / 2;
       set$2(thumb.element(), 'top', pos - thumbRadius + 'px');
     };
     var onLeft$1 = Option.none;
@@ -14184,8 +14039,8 @@ var silver = (function () {
     };
     var moveBy$2 = function (direction, isVerticalMovement, spectrum, detail) {
       var f = direction > 0 ? increaseBy : reduceBy;
-      var xValue = isVerticalMovement ? currentValue(detail).x() : f(currentValue(detail).x(), minX(detail), maxX(detail), step$1(detail));
-      var yValue = !isVerticalMovement ? currentValue(detail).y() : f(currentValue(detail).y(), minY(detail), maxY(detail), step$1(detail));
+      var xValue = isVerticalMovement ? currentValue(detail).x() : f(currentValue(detail).x(), minX(detail), maxX(detail), step(detail));
+      var yValue = !isVerticalMovement ? currentValue(detail).y() : f(currentValue(detail).y(), minY(detail), maxY(detail), step(detail));
       fireSliderChange$3(spectrum, sliderValue$2(xValue, yValue));
       return Option.some(xValue);
     };
@@ -14213,8 +14068,8 @@ var silver = (function () {
       var value = currentValue(detail);
       var xPos = findPositionOfValue(slider, edges.getSpectrum(slider), value.x(), edges.getLeftEdge(slider), edges.getRightEdge(slider), detail);
       var yPos = findPositionOfValue$1(slider, edges.getSpectrum(slider), value.y(), edges.getTopEdge(slider), edges.getBottomEdge(slider), detail);
-      var thumbXRadius = get$8(thumb.element()) / 2;
-      var thumbYRadius = get$9(thumb.element()) / 2;
+      var thumbXRadius = get$7(thumb.element()) / 2;
+      var thumbYRadius = get$8(thumb.element()) / 2;
       set$2(thumb.element(), 'left', xPos - thumbXRadius + 'px');
       set$2(thumb.element(), 'top', yPos - thumbYRadius + 'px');
     };
@@ -14265,7 +14120,7 @@ var silver = (function () {
             return Cell(spec.mode.minX);
           }),
           strict$1('getInitialValue'),
-          output$1('manager', HorizontalModel)
+          output('manager', HorizontalModel)
         ],
         y: [
           defaulted$1('minY', 0),
@@ -14274,7 +14129,7 @@ var silver = (function () {
             return Cell(spec.mode.minY);
           }),
           strict$1('getInitialValue'),
-          output$1('manager', VerticalModel)
+          output('manager', VerticalModel)
         ],
         xy: [
           defaulted$1('minX', 0),
@@ -14288,7 +14143,7 @@ var silver = (function () {
             });
           }),
           strict$1('getInitialValue'),
-          output$1('manager', TwoDModel)
+          output('manager', TwoDModel)
         ]
       })),
       field$1('sliderBehaviours', [
@@ -14300,7 +14155,7 @@ var silver = (function () {
       })] : []);
 
     var isTouch$3 = PlatformDetection$1.detect().deviceType.isTouch();
-    var sketch$1 = function (detail, components$$1, _spec, _externals) {
+    var sketch = function (detail, components, _spec, _externals) {
       var getThumb = function (component) {
         return getPartOrDie(component, detail, 'thumb');
       };
@@ -14365,7 +14220,7 @@ var silver = (function () {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
+        components: components,
         behaviours: augment(detail.sliderBehaviours, flatten([
           !isTouch$3 ? [Keying.config({
               mode: 'special',
@@ -14427,7 +14282,7 @@ var silver = (function () {
       name: 'Slider',
       configFields: SliderSchema,
       partFields: SliderParts,
-      factory: sketch$1,
+      factory: sketch,
       apis: {
         resetToMin: function (apis, slider) {
           apis.resetToMin(slider);
@@ -14479,7 +14334,7 @@ var silver = (function () {
       };
       var setSliderColour = function (slider, rgba) {
         var canvas = slider.components()[0].element().dom();
-        setColour(canvas, toString$2(rgba));
+        setColour(canvas, toString(rgba));
       };
       var factory = function (detail) {
         var getInitialValue = constant({
@@ -14490,7 +14345,7 @@ var silver = (function () {
           emitWith(slider, paletteUpdate(), { value: value });
         };
         var onInit = function (_slider, _thumb, spectrum, _value) {
-          setColour(spectrum.element().dom(), toString$2(red()));
+          setColour(spectrum.element().dom(), toString(red()));
         };
         var sliderBehaviours = derive$1([
           Composing.config({ find: Option.some }),
@@ -14574,7 +14429,7 @@ var silver = (function () {
     var getPartName = function (name) {
       return '<alloy.field.' + name + '>';
     };
-    var sketch$2 = function (fSpec) {
+    var sketch$1 = function (fSpec) {
       var parts = function () {
         var record = [];
         var field = function (name, config) {
@@ -14603,11 +14458,11 @@ var silver = (function () {
         return Result.error(e);
       }, Result.value);
     };
-    var make$4 = function (detail, components$$1, spec) {
+    var make$4 = function (detail, components, spec) {
       return {
         'uid': detail.uid,
         'dom': detail.dom,
-        'components': components$$1,
+        'components': components,
         'behaviours': augment(detail.formBehaviours, [Representing.config({
             store: {
               mode: 'manual',
@@ -14620,8 +14475,8 @@ var silver = (function () {
                   }).map(Representing.getValue);
                 });
               },
-              setValue: function (form, values$$1) {
-                each$1(values$$1, function (newValue, key) {
+              setValue: function (form, values) {
+                each$1(values, function (newValue, key) {
                   getPart(form, detail, key).each(function (wrapper) {
                     Composing.getCurrent(wrapper).each(function (field) {
                       Representing.setValue(field, newValue);
@@ -14642,7 +14497,7 @@ var silver = (function () {
       getField: makeApi(function (apis, component, key) {
         return apis.getField(component, key);
       }),
-      sketch: sketch$2
+      sketch: sketch$1
     };
 
     var validInput = generate$1('valid-input');
@@ -14700,8 +14555,8 @@ var silver = (function () {
           ]),
           onSetValue: function (input) {
             if (Invalidating.isInvalid(input)) {
-              var run$$1 = Invalidating.run(input);
-              run$$1.get(noop);
+              var run = Invalidating.run(input);
+              run.get(noop);
             }
           }
         });
@@ -14729,9 +14584,9 @@ var silver = (function () {
         return hex;
       };
       var copyRgbToForm = function (form, rgb) {
-        var red$$1 = rgb.red(), green = rgb.green(), blue = rgb.blue();
+        var red = rgb.red(), green = rgb.green(), blue = rgb.blue();
         Representing.setValue(form, {
-          red: red$$1,
+          red: red,
           green: green,
           blue: blue
         });
@@ -14768,17 +14623,17 @@ var silver = (function () {
           state[prop]().set(value);
         };
         var getValueRgb = function () {
-          return get('red').bind(function (red$$1) {
+          return get('red').bind(function (red) {
             return get('green').bind(function (green) {
               return get('blue').map(function (blue) {
-                return rgbaColour(red$$1, green, blue, 1);
+                return rgbaColour(red, green, blue, 1);
               });
             });
           });
         };
         var setValueRgb = function (rgb) {
-          var red$$1 = rgb.red(), green = rgb.green(), blue = rgb.blue();
-          set('red', Option.some(red$$1));
+          var red = rgb.red(), green = rgb.green(), blue = rgb.blue();
+          set('red', Option.some(red));
           set('green', Option.some(green));
           set('blue', Option.some(blue));
         };
@@ -14939,8 +14794,8 @@ var silver = (function () {
           return function (form, simulatedEvent) {
             var value = simulatedEvent.event().value();
             var oldRgb = state.paletteRgba().get();
-            var hsvColour$$1 = fromRgb(oldRgb);
-            var newHsvColour = hsvColour(hsvColour$$1.hue(), value.x(), 100 - value.y());
+            var hsvColour$1 = fromRgb(oldRgb);
+            var newHsvColour = hsvColour(hsvColour$1.hue(), value.x(), 100 - value.y());
             var rgb = fromHsv(newHsvColour);
             var nuHex = fromRgba(rgb);
             runUpdates(form, nuHex, updates);
@@ -15038,14 +14893,14 @@ var silver = (function () {
     var getEnglishText = function (key) {
       return english[key];
     };
-    var translate$1 = function (key) {
+    var translate = function (key) {
       return getEnglishText(key);
     };
     var renderColorPicker = function (spec) {
       var getClass = function (key) {
         return 'tox-' + key;
       };
-      var colourPickerFactory = ColourPicker.makeFactory(translate$1, getClass);
+      var colourPickerFactory = ColourPicker.makeFactory(translate, getClass);
       var onValidHex = function (form) {
         emitWith(form, formActionEvent, {
           name: 'hex-valid',
@@ -15193,7 +15048,7 @@ var silver = (function () {
       });
     };
     var domValue = function (optInitialValue) {
-      return withElement(optInitialValue, get$6, set$3);
+      return withElement(optInitialValue, get$5, set$3);
     };
     var domHtml = function (optInitialValue) {
       return withElement(optInitialValue, get$1, set);
@@ -15223,7 +15078,7 @@ var silver = (function () {
       });
     };
     var renderDropZone = function (spec, providersBackstage) {
-      var stopper$$1 = function (_, se) {
+      var stopper = function (_, se) {
         se.stop();
       };
       var sequence = function (actions) {
@@ -15252,7 +15107,7 @@ var silver = (function () {
           tag: 'input',
           attributes: {
             type: 'file',
-            multiple: 'multiple'
+            accept: 'image/*'
           },
           styles: { display: 'none' }
         },
@@ -15275,16 +15130,16 @@ var silver = (function () {
             }),
             config('dropzone-events', [
               run('dragenter', sequence([
-                stopper$$1,
+                stopper,
                 Toggling.toggle
               ])),
               run('dragleave', sequence([
-                stopper$$1,
+                stopper,
                 Toggling.toggle
               ])),
-              run('dragover', stopper$$1),
+              run('dragover', stopper),
               run('drop', sequence([
-                stopper$$1,
+                stopper,
                 onDrop
               ])),
               run(change(), onSelect)
@@ -15454,12 +15309,12 @@ var silver = (function () {
       return renderFormFieldWith(pLabel, pField, ['tox-form__group--stretched']);
     };
 
-    function create$6(width, height) {
-      return resize(document.createElement('canvas'), width, height);
+    function create$4(width, height) {
+      return resize(domGlobals.document.createElement('canvas'), width, height);
     }
-    function clone$3(canvas) {
+    function clone$1(canvas) {
       var tCanvas, ctx;
-      tCanvas = create$6(canvas.width, canvas.height);
+      tCanvas = create$4(canvas.width, canvas.height);
       ctx = get2dContext(tCanvas);
       ctx.drawImage(canvas, 0, 0);
       return tCanvas;
@@ -15484,8 +15339,8 @@ var silver = (function () {
       return canvas;
     }
     var Canvas = {
-      create: create$6,
-      clone: clone$3,
+      create: create$4,
+      clone: clone$1,
       resize: resize,
       get2dContext: get2dContext,
       get3dContext: get3dContext
@@ -15514,7 +15369,7 @@ var silver = (function () {
         doResolve(fn, bind(resolve, this), bind(reject, this));
       };
       var asap = Promise.immediateFn || typeof window.setImmediate === 'function' && window.setImmediate || function (fn) {
-        setTimeout(fn, 1);
+        domGlobals.setTimeout(fn, 1);
       };
       function bind(fn, thisArg) {
         return function () {
@@ -15663,7 +15518,7 @@ var silver = (function () {
       };
       return Promise;
     };
-    var Promise$2 = window.Promise ? window.Promise : promise();
+    var Promise = window.Promise ? window.Promise : promise();
 
     function Blob (parts, properties) {
       var f = Global$1.getOrDie('Blob');
@@ -15688,7 +15543,7 @@ var silver = (function () {
       var f = Global$1.getOrDie('atob');
       return f(base64);
     };
-    var Window$1 = {
+    var Window = {
       atob: atob,
       requestAnimationFrame: requestAnimationFrame
     };
@@ -15701,9 +15556,9 @@ var silver = (function () {
       return anyUriToBlob(src);
     }
     function blobToImage(blob) {
-      return new Promise$2(function (resolve, reject) {
-        var blobUrl = URL.createObjectURL(blob);
-        var image = new Image();
+      return new Promise(function (resolve, reject) {
+        var blobUrl = domGlobals.URL.createObjectURL(blob);
+        var image = new domGlobals.Image();
         var removeListeners = function () {
           image.removeEventListener('load', loaded);
           image.removeEventListener('error', error);
@@ -15725,8 +15580,8 @@ var silver = (function () {
       });
     }
     function anyUriToBlob(url) {
-      return new Promise$2(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
+      return new Promise(function (resolve, reject) {
+        var xhr = new domGlobals.XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'blob';
         xhr.onload = function () {
@@ -15758,7 +15613,7 @@ var silver = (function () {
       var mimetype = matches[1];
       var base64 = data[1];
       var sliceSize = 1024;
-      var byteCharacters = Window$1.atob(base64);
+      var byteCharacters = Window.atob(base64);
       var bytesLength = byteCharacters.length;
       var slicesCount = Math.ceil(bytesLength / sliceSize);
       var byteArrays = new Array(slicesCount);
@@ -15774,7 +15629,7 @@ var silver = (function () {
       return Option.some(Blob(byteArrays, { type: mimetype }));
     }
     function dataUriToBlob(uri) {
-      return new Promise$2(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         dataUriToBlobSync(uri).fold(function () {
           reject('uri is not base64: ' + uri);
         }, resolve);
@@ -15791,8 +15646,8 @@ var silver = (function () {
     }
     function canvasToBlob(canvas, type, quality) {
       type = type || 'image/png';
-      if (HTMLCanvasElement.prototype.toBlob) {
-        return new Promise$2(function (resolve) {
+      if (domGlobals.HTMLCanvasElement.prototype.toBlob) {
+        return new Promise(function (resolve) {
           canvas.toBlob(function (blob) {
             resolve(blob);
           }, type, quality);
@@ -15818,7 +15673,7 @@ var silver = (function () {
       });
     }
     function blobToDataUri(blob) {
-      return new Promise$2(function (resolve) {
+      return new Promise(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -15827,7 +15682,7 @@ var silver = (function () {
       });
     }
     function blobToArrayBuffer(blob) {
-      return new Promise$2(function (resolve) {
+      return new Promise(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -15841,7 +15696,7 @@ var silver = (function () {
       });
     }
     function revokeImageUrl(image) {
-      URL.revokeObjectURL(image.src);
+      domGlobals.URL.revokeObjectURL(image.src);
     }
     var Conversions = {
       blobToImage: blobToImage,
@@ -15856,11 +15711,11 @@ var silver = (function () {
       uriToBlob: uriToBlob
     };
 
-    function create$7(getCanvas, blob, uri) {
+    function create$5(getCanvas, blob, uri) {
       var initialType = blob.type;
       var getType = constant(initialType);
       function toBlob() {
-        return Promise$2.resolve(blob);
+        return Promise.resolve(blob);
       }
       function toDataURL() {
         return uri;
@@ -15899,12 +15754,12 @@ var silver = (function () {
     }
     function fromBlob(blob) {
       return Conversions.blobToDataUri(blob).then(function (uri) {
-        return create$7(Conversions.blobToCanvas(blob), blob, uri);
+        return create$5(Conversions.blobToCanvas(blob), blob, uri);
       });
     }
     function fromCanvas(canvas, type) {
       return Conversions.canvasToBlob(canvas, type).then(function (blob) {
-        return create$7(Promise$2.resolve(canvas), blob, canvas.toDataURL());
+        return create$5(Promise.resolve(canvas), blob, canvas.toDataURL());
       });
     }
     function fromImage(image) {
@@ -15913,7 +15768,7 @@ var silver = (function () {
       });
     }
     var fromBlobAndUrlSync = function (blob, url) {
-      return create$7(Conversions.blobToCanvas(blob), blob, url);
+      return create$5(Conversions.blobToCanvas(blob), blob, url);
     };
     var ImageResult = {
       fromBlob: fromBlob,
@@ -16573,7 +16428,7 @@ var silver = (function () {
       });
     }
     function _scale(image, wRatio, hRatio) {
-      return new Promise$2(function (resolve) {
+      return new Promise(function (resolve) {
         var sW = ImageSize.getWidth(image);
         var sH = ImageSize.getHeight(image);
         var dW = Math.floor(sW * wRatio);
@@ -17066,14 +16921,14 @@ var silver = (function () {
                 thumb: exifReader.thumb()
               };
             } else {
-              return Promise$2.reject('Headers did not include required information');
+              return Promise.reject('Headers did not include required information');
             }
             meta.rawHeaders = headers;
             return meta;
           }
-          return Promise$2.reject('Image was not a jpeg');
+          return Promise.reject('Image was not a jpeg');
         } catch (ex) {
-          return Promise$2.reject('Unsupported format or not an image: ' + blob.type + ' (Exception: ' + ex.message + ')');
+          return Promise.reject('Unsupported format or not an image: ' + blob.type + ' (Exception: ' + ex.message + ')');
         }
       });
     };
@@ -17208,10 +17063,10 @@ var silver = (function () {
       }, behaviours);
     };
     var renderIconFromPack = function (iconName, iconsProvider) {
-      return renderIcon$1(get$e(iconName, iconsProvider), {});
+      return renderIcon$1(get$c(iconName, iconsProvider), {});
     };
     var renderReplacableIconFromPack = function (iconName, iconsProvider) {
-      return renderIcon$1(get$e(iconName, iconsProvider), { behaviours: derive$1([Replacing.config({})]) });
+      return renderIcon$1(get$c(iconName, iconsProvider), { behaviours: derive$1([Replacing.config({})]) });
     };
     var renderLabel$1 = function (text, prefix, providersBackstage) {
       return {
@@ -17224,11 +17079,16 @@ var silver = (function () {
       };
     };
 
-    var renderCommon = function (spec, action, extraBehaviours, dom, components) {
+    var renderCommonSpec = function (spec, actionOpt, extraBehaviours, dom, components) {
       if (extraBehaviours === void 0) {
         extraBehaviours = [];
       }
-      var common = {
+      var action = actionOpt.fold(function () {
+        return {};
+      }, function (action) {
+        return { action: action };
+      });
+      var common = __assign({
         buttonBehaviours: derive$1([
           DisablingConfigs.button(spec.disabled),
           Tabstopping.config({}),
@@ -17246,14 +17106,19 @@ var silver = (function () {
             'button press',
             'alloy.base.behaviour'
           ]
-        },
-        action: action
-      };
+        }
+      }, action);
       var domFinal = deepMerge(common, { dom: dom });
-      var specFinal = deepMerge(domFinal, { components: components });
+      return deepMerge(domFinal, { components: components });
+    };
+    var renderCommon = function (spec, action, extraBehaviours, dom, components) {
+      if (extraBehaviours === void 0) {
+        extraBehaviours = [];
+      }
+      var specFinal = renderCommonSpec(spec, Option.some(action), extraBehaviours, dom, components);
       return Button.sketch(specFinal);
     };
-    var renderIconButton = function (spec, action, providersBackstage, extraBehaviours) {
+    var renderIconButtonSpec = function (spec, action, providersBackstage, extraBehaviours) {
       if (extraBehaviours === void 0) {
         extraBehaviours = [];
       }
@@ -17272,7 +17137,14 @@ var silver = (function () {
         return renderIconFromPack(iconName, providersBackstage.icons);
       });
       var components = componentRenderPipeline([icon]);
-      return renderCommon(spec, action, extraBehaviours, dom, components);
+      return renderCommonSpec(spec, action, extraBehaviours, dom, components);
+    };
+    var renderIconButton = function (spec, action, providersBackstage, extraBehaviours) {
+      if (extraBehaviours === void 0) {
+        extraBehaviours = [];
+      }
+      var iconButtonSpec = renderIconButtonSpec(spec, Option.some(action), providersBackstage, extraBehaviours);
+      return Button.sketch(iconButtonSpec);
     };
     var renderButton = function (spec, action, providersBackstage, extraBehaviours) {
       if (extraBehaviours === void 0) {
@@ -17374,11 +17246,11 @@ var silver = (function () {
       })
     ]);
 
-    var factory$7 = function (detail, components$$1, spec, externals) {
+    var factory$7 = function (detail, components, spec, externals) {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
+        components: components,
         behaviours: SketchBehaviours.augment(detail.coupledFieldBehaviours, [
           Composing.config({ find: Option.some }),
           Representing.config({
@@ -17551,7 +17423,7 @@ var silver = (function () {
                 'tox-icon',
                 'tox-lock-icon__lock'
               ],
-              innerHtml: get$e('lock', providersBackstage.icons)
+              innerHtml: get$c('lock', providersBackstage.icons)
             }
           },
           {
@@ -17561,7 +17433,7 @@ var silver = (function () {
                 'tox-icon',
                 'tox-lock-icon__unlock'
               ],
-              innerHtml: get$e('unlock', providersBackstage.icons)
+              innerHtml: get$c('unlock', providersBackstage.icons)
             }
           }
         ],
@@ -17659,7 +17531,7 @@ var silver = (function () {
     var redo = constant(generate$1('redo'));
     var zoom = constant(generate$1('zoom'));
     var back = constant(generate$1('back'));
-    var apply$1 = constant(generate$1('apply'));
+    var apply = constant(generate$1('apply'));
     var swap = constant(generate$1('swap'));
     var transform = constant(generate$1('transform'));
     var tempTransform = constant(generate$1('temp-transform'));
@@ -17669,7 +17541,7 @@ var silver = (function () {
       redo: redo,
       zoom: zoom,
       back: back,
-      apply: apply$1,
+      apply: apply,
       swap: swap,
       transform: transform,
       tempTransform: tempTransform,
@@ -17726,8 +17598,8 @@ var silver = (function () {
         ]
       };
       var none = Option.none();
-      var noop$$1 = noop;
-      var emit$$1 = function (comp, event, data) {
+      var noop$1 = noop;
+      var emit$1 = function (comp, event, data) {
         emitWith(comp, event, data);
       };
       var emitDisable = function (component) {
@@ -17738,12 +17610,12 @@ var silver = (function () {
       };
       var emitTransform = function (comp, transform) {
         emitDisable(comp);
-        emit$$1(comp, internal.transform(), { transform: transform });
+        emit$1(comp, internal.transform(), { transform: transform });
         emitEnable(comp);
       };
       var emitTempTransform = function (comp, transform) {
         emitDisable(comp);
-        emit$$1(comp, internal.tempTransform(), { transform: transform });
+        emit$1(comp, internal.tempTransform(), { transform: transform });
         emitEnable(comp);
       };
       var getBackSwap = function (anyInSystem) {
@@ -17755,7 +17627,7 @@ var silver = (function () {
       };
       var emitTransformApply = function (comp, transform) {
         emitDisable(comp);
-        emit$$1(comp, internal.transformApply(), {
+        emit$1(comp, internal.transformApply(), {
           transform: transform,
           swap: getBackSwap(comp)
         });
@@ -17763,7 +17635,7 @@ var silver = (function () {
       };
       var createBackButton = function () {
         return createButton('Back', function (button) {
-          return emit$$1(button, internal.back(), { swap: getBackSwap(button) });
+          return emit$1(button, internal.back(), { swap: getBackSwap(button) });
         }, false, false);
       };
       var createSpacer = function () {
@@ -17777,7 +17649,7 @@ var silver = (function () {
       };
       var createApplyButton = function () {
         return createButton('Apply', function (button) {
-          return emit$$1(button, internal.apply(), { swap: getBackSwap(button) });
+          return emit$1(button, internal.apply(), { swap: getBackSwap(button) });
         }, true, true);
       };
       var makeCropTransform = function () {
@@ -18029,7 +17901,7 @@ var silver = (function () {
               update(container);
             });
           };
-          emit$$1(button, internal.swap(), {
+          emit$1(button, internal.swap(), {
             transform: transform,
             swap: swap
           });
@@ -18054,13 +17926,13 @@ var silver = (function () {
       var buttonPanelComponents = [
         createIconButton('crop', 'Crop', getTransformPanelEvent(CropPanel, none, cropPanelUpdate), false),
         createIconButton('resize', 'Resize', getTransformPanelEvent(ResizePanel, none, resizePanelUpdate), false),
-        createIconButton('orientation', 'Orientation', getTransformPanelEvent(FlipRotatePanel, none, noop$$1), false),
-        createIconButton('brightness', 'Brightness', getTransformPanelEvent(BrightnessPanel, none, noop$$1), false),
-        createIconButton('sharpen', 'Sharpen', getTransformPanelEvent(FilterPanel, sharpenTransform, noop$$1), false),
-        createIconButton('contrast', 'Contrast', getTransformPanelEvent(ContrastPanel, none, noop$$1), false),
-        createIconButton('color-levels', 'Color levels', getTransformPanelEvent(ColorizePanel, none, noop$$1), false),
-        createIconButton('gamma', 'Gamma', getTransformPanelEvent(GammaPanel, none, noop$$1), false),
-        createIconButton('invert', 'Invert', getTransformPanelEvent(FilterPanel, invertTransform, noop$$1), false)
+        createIconButton('orientation', 'Orientation', getTransformPanelEvent(FlipRotatePanel, none, noop$1), false),
+        createIconButton('brightness', 'Brightness', getTransformPanelEvent(BrightnessPanel, none, noop$1), false),
+        createIconButton('sharpen', 'Sharpen', getTransformPanelEvent(FilterPanel, sharpenTransform, noop$1), false),
+        createIconButton('contrast', 'Contrast', getTransformPanelEvent(ContrastPanel, none, noop$1), false),
+        createIconButton('color-levels', 'Color levels', getTransformPanelEvent(ColorizePanel, none, noop$1), false),
+        createIconButton('gamma', 'Gamma', getTransformPanelEvent(GammaPanel, none, noop$1), false),
+        createIconButton('invert', 'Invert', getTransformPanelEvent(FilterPanel, invertTransform, noop$1), false)
       ];
       var ButtonPanel = Container.sketch({
         dom: panelDom,
@@ -18124,9 +17996,9 @@ var silver = (function () {
     }
     function DragHelper (id, settings) {
       var $eventOverlay;
-      var doc = settings.document || document;
+      var doc = settings.document || domGlobals.document;
       var downButton;
-      var start, stop$$1, drag, startX, startY;
+      var start, stop, drag, startX, startY;
       settings = settings || {};
       var handleElement = doc.getElementById(settings.handle || id);
       start = function (e) {
@@ -18138,8 +18010,8 @@ var silver = (function () {
         handleElm = handleElement;
         startX = e.screenX;
         startY = e.screenY;
-        if (window.getComputedStyle) {
-          cursor = window.getComputedStyle(handleElm, null).getPropertyValue('cursor');
+        if (domGlobals.window.getComputedStyle) {
+          cursor = domGlobals.window.getComputedStyle(handleElm, null).getPropertyValue('cursor');
         } else {
           cursor = handleElm.runtimeStyle.cursor;
         }
@@ -18153,22 +18025,22 @@ var silver = (function () {
           opacity: 0.0001,
           cursor: cursor
         }).appendTo(doc.body);
-        global$7(doc).on('mousemove touchmove', drag).on('mouseup touchend', stop$$1);
+        global$7(doc).on('mousemove touchmove', drag).on('mouseup touchend', stop);
         settings.start(e);
       };
       drag = function (e) {
         updateWithTouchData(e);
         if (e.button !== downButton) {
-          return stop$$1(e);
+          return stop(e);
         }
         e.deltaX = e.screenX - startX;
         e.deltaY = e.screenY - startY;
         e.preventDefault();
         settings.drag(e);
       };
-      stop$$1 = function (e) {
+      stop = function (e) {
         updateWithTouchData(e);
-        global$7(doc).off('mousemove touchmove', drag).off('mouseup touchend', stop$$1);
+        global$7(doc).off('mousemove touchmove', drag).off('mouseup touchend', stop);
         $eventOverlay.remove();
         if (settings.stop) {
           settings.stop(e);
@@ -18445,7 +18317,7 @@ var silver = (function () {
       return instance;
     }
 
-    var loadImage$1 = function (image) {
+    var loadImage = function (image) {
       return new global$1(function (resolve) {
         var loaded = function () {
           image.removeEventListener('load', loaded);
@@ -18483,8 +18355,8 @@ var silver = (function () {
       var repaintImg = function (anyInSystem, img) {
         memContainer.getOpt(anyInSystem).each(function (panel) {
           var zoom = zoomState.get();
-          var panelW = get$8(panel.element());
-          var panelH = get$9(panel.element());
+          var panelW = get$7(panel.element());
+          var panelH = get$8(panel.element());
           var width = img.dom().naturalWidth * zoom;
           var height = img.dom().naturalHeight * zoom;
           var left = Math.max(0, panelW / 2 - width / 2);
@@ -18525,8 +18397,8 @@ var silver = (function () {
       };
       var zoomFit = function (anyInSystem, img) {
         memContainer.getOpt(anyInSystem).each(function (panel) {
-          var panelW = get$8(panel.element());
-          var panelH = get$9(panel.element());
+          var panelW = get$7(panel.element());
+          var panelH = get$8(panel.element());
           var width = img.dom().naturalWidth;
           var height = img.dom().naturalHeight;
           var zoom = Math.min(panelW / width, panelH / height);
@@ -18538,9 +18410,9 @@ var silver = (function () {
         });
       };
       var updateSrc = function (anyInSystem, url) {
-        var img = Element$$1.fromTag('img');
+        var img = Element.fromTag('img');
         set$1(img, 'src', url);
-        return loadImage$1(img.dom()).then(function () {
+        return loadImage(img.dom()).then(function () {
           return memContainer.getOpt(anyInSystem).map(function (panel) {
             var aImg = external({ element: img });
             Replacing.replaceAt(panel, 1, Option.some(aImg));
@@ -18726,7 +18598,7 @@ var silver = (function () {
     var revokeObjectURL = function (u) {
       url().revokeObjectURL(u);
     };
-    var URL$1 = {
+    var URL = {
       createObjectURL: createObjectURL,
       revokeObjectURL: revokeObjectURL
     };
@@ -18796,11 +18668,11 @@ var silver = (function () {
       var createState = function (blob) {
         return {
           blob: blob,
-          url: URL$1.createObjectURL(blob)
+          url: URL.createObjectURL(blob)
         };
       };
       var destroyState = function (state) {
-        URL$1.revokeObjectURL(state.url);
+        URL.revokeObjectURL(state.url);
       };
       var destroyStates = function (states) {
         global$a.each(states, destroyState);
@@ -18951,7 +18823,7 @@ var silver = (function () {
         };
         blobManipulate(anyInSystem, blob, filter, action, swap);
       };
-      var apply$$1 = function (anyInSystem, simulatedEvent) {
+      var apply = function (anyInSystem, simulatedEvent) {
         var postApply = function () {
           destroyTempState(anyInSystem);
           var swap = simulatedEvent.event().swap();
@@ -19023,7 +18895,7 @@ var silver = (function () {
             run(internal.redo(), redo),
             run(internal.zoom(), zoom),
             run(internal.back(), back),
-            run(internal.apply(), apply$$1),
+            run(internal.apply(), apply),
             run(internal.transform(), transform),
             run(internal.tempTransform(), tempTransform),
             run(internal.transformApply(), transformApply),
@@ -19035,12 +18907,12 @@ var silver = (function () {
     };
 
     var factory$8 = function (detail, spec) {
-      var options = map(detail.options, function (option$$1) {
+      var options = map(detail.options, function (option) {
         return {
           dom: {
             tag: 'option',
-            value: option$$1.value,
-            innerHtml: option$$1.text
+            value: option.value,
+            innerHtml: option.text
           }
         };
       });
@@ -19061,7 +18933,7 @@ var silver = (function () {
             store: __assign({
               mode: 'manual',
               getValue: function (select) {
-                return get$6(select.element());
+                return get$5(select.element());
               },
               setValue: function (select, newValue) {
                 var found = find(detail.options, function (opt) {
@@ -19111,7 +18983,7 @@ var silver = (function () {
         dom: {
           tag: 'div',
           classes: ['tox-selectfield__icon-js'],
-          innerHtml: get$e('chevron-down', providersBackstage.icons)
+          innerHtml: get$c('chevron-down', providersBackstage.icons)
         }
       });
       var selectWrap = {
@@ -19162,13 +19034,13 @@ var silver = (function () {
       ];
       var validatingBehaviours = spec.validation.map(function (vl) {
         return Invalidating.config({
-          getRoot: function (input$$1) {
-            return parent(input$$1.element());
+          getRoot: function (input) {
+            return parent(input.element());
           },
           invalidClass: 'tox-invalid',
           validator: {
-            validate: function (input$$1) {
-              var v = Representing.getValue(input$$1);
+            validate: function (input) {
+              var v = Representing.getValue(input);
               var result = vl.validator(v);
               return Future.pure(result === true ? Result.value(v) : Result.error(result));
             },
@@ -19216,12 +19088,12 @@ var silver = (function () {
       }, providersBackstage);
     };
 
-    var wrap$3 = function (delegate) {
+    var wrap$2 = function (delegate) {
       var toCached = function () {
-        return wrap$3(delegate.toCached());
+        return wrap$2(delegate.toCached());
       };
       var bindFuture = function (f) {
-        return wrap$3(delegate.bind(function (resA) {
+        return wrap$2(delegate.bind(function (resA) {
           return resA.fold(function (err) {
             return Future.pure(Result.error(err));
           }, function (a) {
@@ -19230,17 +19102,17 @@ var silver = (function () {
         }));
       };
       var bindResult = function (f) {
-        return wrap$3(delegate.map(function (resA) {
+        return wrap$2(delegate.map(function (resA) {
           return resA.bind(f);
         }));
       };
       var mapResult = function (f) {
-        return wrap$3(delegate.map(function (resA) {
+        return wrap$2(delegate.map(function (resA) {
           return resA.map(f);
         }));
       };
       var mapError = function (f) {
-        return wrap$3(delegate.map(function (resA) {
+        return wrap$2(delegate.map(function (resA) {
           return resA.mapError(f);
         }));
       };
@@ -19250,7 +19122,7 @@ var silver = (function () {
         });
       };
       var withTimeout = function (timeout, errorThunk) {
-        return wrap$3(Future.nu(function (callback) {
+        return wrap$2(Future.nu(function (callback) {
           var timedOut = false;
           var timer = window.setTimeout(function () {
             timedOut = true;
@@ -19275,19 +19147,19 @@ var silver = (function () {
       });
     };
     var nu$c = function (worker) {
-      return wrap$3(Future.nu(worker));
+      return wrap$2(Future.nu(worker));
     };
-    var value$3 = function (value) {
-      return wrap$3(Future.pure(Result.value(value)));
+    var value$2 = function (value) {
+      return wrap$2(Future.pure(Result.value(value)));
     };
     var error$1 = function (error) {
-      return wrap$3(Future.pure(Result.error(error)));
+      return wrap$2(Future.pure(Result.error(error)));
     };
     var fromResult$1 = function (result) {
-      return wrap$3(Future.pure(result));
+      return wrap$2(Future.pure(result));
     };
     var fromFuture = function (future) {
-      return wrap$3(future.map(Result.value));
+      return wrap$2(future.map(Result.value));
     };
     var fromPromise = function (promise) {
       return nu$c(function (completer) {
@@ -19300,9 +19172,9 @@ var silver = (function () {
     };
     var FutureResult = {
       nu: nu$c,
-      wrap: wrap$3,
-      pure: value$3,
-      value: value$3,
+      wrap: wrap$2,
+      pure: value$2,
+      value: value$2,
       error: error$1,
       fromResult: fromResult$1,
       fromFuture: fromFuture,
@@ -19376,8 +19248,8 @@ var silver = (function () {
       });
     };
 
-    var getItems = function (fileType, input$$1, urlBackstage) {
-      var urlInputValue = Representing.getValue(input$$1);
+    var getItems = function (fileType, input, urlBackstage) {
+      var urlInputValue = Representing.getValue(input);
       var term = urlInputValue.meta.text !== undefined ? urlInputValue.meta.text : urlInputValue.value;
       var info = urlBackstage.getLinkInformation();
       return info.fold(function () {
@@ -19403,7 +19275,7 @@ var silver = (function () {
             'tox-tbtn',
             className
           ],
-          innerHtml: get$e(iconName, providersBackstage.icons),
+          innerHtml: get$c(iconName, providersBackstage.icons),
           attributes: { title: providersBackstage.translate(label.getOr('')) }
         },
         buttonBehaviours: derive$1([Tabstopping.config({})]),
@@ -19425,8 +19297,8 @@ var silver = (function () {
         sandboxClasses: ['tox-dialog__popups'],
         minChars: 0,
         responseTime: 0,
-        fetch: function (input$$1) {
-          var items = getItems(spec.filetype, input$$1, urlBackstage);
+        fetch: function (input) {
+          var items = getItems(spec.filetype, input, urlBackstage);
           var tdata = build$2(items, ItemResponse$1.BUBBLE_TO_SANDBOX, sharedBackstage.providers);
           return Future.pure(tdata);
         },
@@ -19447,14 +19319,14 @@ var silver = (function () {
               invalidClass: 'tox-control-wrap--status-invalid',
               notify: {},
               validator: {
-                validate: function (input$$1) {
-                  var urlEntry = Representing.getValue(input$$1);
+                validate: function (input) {
+                  var urlEntry = Representing.getValue(input);
                   return FutureResult.nu(function (completer) {
                     handler({
                       type: spec.filetype,
                       url: urlEntry.value
                     }, function (validation) {
-                      memUrlBox.getOpt(input$$1).each(function (urlBox) {
+                      memUrlBox.getOpt(input).each(function (urlBox) {
                         var toggle = function (component, clazz, b) {
                           (b ? add$2 : remove$4)(component.element(), clazz);
                         };
@@ -19528,7 +19400,7 @@ var silver = (function () {
               'tox-icon',
               'tox-control-wrap__status-icon-' + name
             ],
-            innerHtml: get$e(icon, sharedBackstage.providers.icons),
+            innerHtml: get$c(icon, sharedBackstage.providers.icons),
             attributes: { title: sharedBackstage.providers.translate(label) }
           }
         };
@@ -19646,7 +19518,7 @@ var silver = (function () {
               'tox-icon',
               'tox-checkbox-icon__' + className
             ],
-            innerHtml: get$e(iconName, providerBackstage.icons)
+            innerHtml: get$c(iconName, providerBackstage.icons)
           }
         };
       };
@@ -19765,7 +19637,7 @@ var silver = (function () {
       };
       var collectionEvents = [
         run(mouseover(), runOnItem(function (comp, tgt) {
-          focus$2(tgt);
+          focus$1(tgt);
         })),
         run(click(), runOnItem(function (comp, tgt, itemValue) {
           emitWith(comp, formActionEvent, {
@@ -19774,13 +19646,13 @@ var silver = (function () {
           });
         })),
         run(focusin(), runOnItem(function (comp, tgt, itemValue) {
-          descendant$2(comp.element(), '.' + activeClass).each(function (currentActive) {
+          descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
           });
           add$2(tgt, activeClass);
         })),
         run(focusout(), runOnItem(function (comp, tgt, itemValue) {
-          descendant$2(comp.element(), '.' + activeClass).each(function (currentActive) {
+          descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
           });
         })),
@@ -20231,7 +20103,7 @@ var silver = (function () {
       };
       var doEnrich = function (items) {
         return map(items, function (item) {
-          var keys$$1 = keys(item);
+          var keys$1 = keys(item);
           if (hasKey$1(item, 'items')) {
             var newItems_1 = doEnrich(item.items);
             return deepMerge(enrichMenu(item), {
@@ -20241,7 +20113,7 @@ var silver = (function () {
             });
           } else if (hasKey$1(item, 'format')) {
             return enrichSupported(item);
-          } else if (keys$$1.length === 1 && contains(keys$$1, 'title')) {
+          } else if (keys$1.length === 1 && contains(keys$1, 'title')) {
             return deepMerge(item, { type: 'separator' });
           } else {
             return enrichCustom(item);
@@ -20266,9 +20138,9 @@ var silver = (function () {
           }) : Option.none();
         };
       };
-      var flatten$$1 = function (fmt) {
+      var flatten = function (fmt) {
         var subs = fmt.items;
-        return subs !== undefined && subs.length > 0 ? bind(subs, flatten$$1) : [fmt.format];
+        return subs !== undefined && subs.length > 0 ? bind(subs, flatten) : [fmt.format];
       };
       var settingsFormats = Cell([]);
       var settingsFlattenedFormats = Cell([]);
@@ -20279,13 +20151,13 @@ var silver = (function () {
         var formats = getStyleFormats(editor);
         var enriched = register$3(editor, formats, isSelectedFor, getPreviewFor);
         settingsFormats.set(enriched);
-        settingsFlattenedFormats.set(bind(enriched, flatten$$1));
+        settingsFlattenedFormats.set(bind(enriched, flatten));
       });
       editor.on('addStyleModifications', function (e) {
         var modifications = register$3(editor, e.items, isSelectedFor, getPreviewFor);
         eventsFormats.set(modifications);
         replaceSettings.set(e.replace);
-        eventsFlattenedFormats.set(bind(modifications, flatten$$1));
+        eventsFlattenedFormats.set(bind(modifications, flatten));
       });
       var getData = function () {
         var fromSettings = replaceSettings.get() ? [] : settingsFormats.get();
@@ -20319,7 +20191,7 @@ var silver = (function () {
     };
     var isContentEditableTrue = hasContentEditableState('true');
     var isContentEditableFalse = hasContentEditableState('false');
-    var create$8 = function (type, title, url, level, attach) {
+    var create$6 = function (type, title, url, level, attach) {
       return {
         type: type,
         title: title,
@@ -20338,7 +20210,7 @@ var silver = (function () {
       return false;
     };
     var select = function (selector, root) {
-      return map(descendants$1(Element$$1.fromDom(root), selector), function (element) {
+      return map(descendants(Element.fromDom(root), selector), function (element) {
         return element.dom();
       });
     };
@@ -20371,12 +20243,12 @@ var silver = (function () {
       var attach = function () {
         elm.id = headerId;
       };
-      return create$8('header', getElementText(elm), '#' + headerId, getLevel(elm), attach);
+      return create$6('header', getElementText(elm), '#' + headerId, getLevel(elm), attach);
     };
     var anchorTarget = function (elm) {
       var anchorId = elm.id || elm.name;
       var anchorText = getElementText(elm);
-      return create$8('anchor', anchorText ? anchorText : '#' + anchorId, '#' + anchorId, 0, noop);
+      return create$6('anchor', anchorText ? anchorText : '#' + anchorId, '#' + anchorId, 0, noop);
     };
     var getHeaderTargets = function (elms) {
       return map(filter(elms, isValidHeader), headerTarget);
@@ -20391,11 +20263,11 @@ var silver = (function () {
     var hasTitle = function (target) {
       return trim$1(target.title).length > 0;
     };
-    var find$6 = function (elm) {
+    var find$5 = function (elm) {
       var elms = getTargetElements(elm);
       return filter(getHeaderTargets(elms).concat(getAnchorTargets(elms)), hasTitle);
     };
-    var LinkTargets = { find: find$6 };
+    var LinkTargets = { find: find$5 };
 
     var STORAGE_KEY = 'tinymce-url-history';
     var HISTORY_LENGTH = 5;
@@ -20411,13 +20283,13 @@ var silver = (function () {
       }).isNone();
     };
     var getAllHistory = function () {
-      var unparsedHistory = localStorage.getItem(STORAGE_KEY);
+      var unparsedHistory = domGlobals.localStorage.getItem(STORAGE_KEY);
       if (unparsedHistory === null) {
         return {};
       }
-      var history$$1;
+      var history;
       try {
-        history$$1 = JSON.parse(unparsedHistory);
+        history = JSON.parse(unparsedHistory);
       } catch (e) {
         if (e instanceof SyntaxError) {
           console.log('Local storage ' + STORAGE_KEY + ' was not valid JSON', e);
@@ -20425,33 +20297,33 @@ var silver = (function () {
         }
         throw e;
       }
-      if (!isRecordOfUrlArray(history$$1)) {
-        console.log('Local storage ' + STORAGE_KEY + ' was not valid format', history$$1);
+      if (!isRecordOfUrlArray(history)) {
+        console.log('Local storage ' + STORAGE_KEY + ' was not valid format', history);
         return {};
       }
-      return history$$1;
+      return history;
     };
-    var setAllHistory = function (history$$1) {
-      if (!isRecordOfUrlArray(history$$1)) {
-        throw new Error('Bad format for history:\n' + JSON.stringify(history$$1));
+    var setAllHistory = function (history) {
+      if (!isRecordOfUrlArray(history)) {
+        throw new Error('Bad format for history:\n' + JSON.stringify(history));
       }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(history$$1));
+      domGlobals.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
     };
     var getHistory = function (fileType) {
-      var history$$1 = getAllHistory();
-      return Object.prototype.hasOwnProperty.call(history$$1, fileType) ? history$$1[fileType] : [];
+      var history = getAllHistory();
+      return Object.prototype.hasOwnProperty.call(history, fileType) ? history[fileType] : [];
     };
     var addToHistory = function (url, fileType) {
       if (!isHttpUrl(url)) {
         return;
       }
-      var history$$1 = getAllHistory();
-      var items = Object.prototype.hasOwnProperty.call(history$$1, fileType) ? history$$1[fileType] : [];
+      var history = getAllHistory();
+      var items = Object.prototype.hasOwnProperty.call(history, fileType) ? history[fileType] : [];
       var itemsWithoutUrl = filter(items, function (item) {
         return item !== url;
       });
-      history$$1[fileType] = [url].concat(itemsWithoutUrl).slice(0, HISTORY_LENGTH);
-      setAllHistory(history$$1);
+      history[fileType] = [url].concat(itemsWithoutUrl).slice(0, HISTORY_LENGTH);
+      setAllHistory(history);
     };
 
     var hasOwnProperty$2 = Object.prototype.hasOwnProperty;
@@ -20461,11 +20333,11 @@ var silver = (function () {
     var makeMap = function (value) {
       return map$1(global$a.makeMap(value, /[, ]/), isTruthy);
     };
-    var getOpt$1 = function (obj, key) {
+    var getOpt = function (obj, key) {
       return hasOwnProperty$2.call(obj, key) ? Option.some(obj[key]) : Option.none();
     };
     var getTextSetting = function (settings, name, defaultValue) {
-      var value = getOpt$1(settings, name).getOr(defaultValue);
+      var value = getOpt(settings, name).getOr(defaultValue);
       return isString(value) ? Option.some(value) : Option.none();
     };
     var getPickerSetting = function (settings, filetype) {
@@ -20475,7 +20347,7 @@ var silver = (function () {
       var on = optTypes.fold(function () {
         return true;
       }, function (types) {
-        return getOpt$1(types, filetype).getOr(false);
+        return getOpt(types, filetype).getOr(false);
       });
       var optPicker = Option.some(settings.file_picker_callback).filter(isFunction);
       return !on ? Option.none() : optPicker;
@@ -20591,17 +20463,17 @@ var silver = (function () {
             cursor: function () {
               return {
                 anchor: 'selection',
-                root: Element$$1.fromDom(editor.getBody()),
+                root: Element.fromDom(editor.getBody()),
                 getSelection: function () {
                   var rng = editor.selection.getRng();
-                  return Option.some(range$1(Element$$1.fromDom(rng.startContainer), rng.startOffset, Element$$1.fromDom(rng.endContainer), rng.endOffset));
+                  return Option.some(range(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset));
                 }
               };
             },
             node: function (element) {
               return {
                 anchor: 'node',
-                root: Element$$1.fromDom(editor.getBody()),
+                root: Element.fromDom(editor.getBody()),
                 node: element
               };
             }
@@ -20621,6 +20493,308 @@ var silver = (function () {
 
     var showContextToolbarEvent = 'contexttoolbar-show';
 
+    var generate$6 = function (xs, f) {
+      var init = {
+        len: 0,
+        list: []
+      };
+      var r = foldl(xs, function (b, a) {
+        var value = f(a, b.len);
+        return value.fold(constant(b), function (v) {
+          return {
+            len: v.finish(),
+            list: b.list.concat([v])
+          };
+        });
+      }, init);
+      return r.list;
+    };
+
+    var output$1 = Immutable('within', 'extra', 'withinWidth');
+    var apportion = function (units, total, len) {
+      var parray = generate$6(units, function (unit, current) {
+        var width = len(unit);
+        return Option.some({
+          element: constant(unit),
+          start: constant(current),
+          finish: constant(current + width),
+          width: constant(width)
+        });
+      });
+      var within = filter(parray, function (unit) {
+        return unit.finish() <= total;
+      });
+      var withinWidth = foldr(within, function (acc, el) {
+        return acc + el.width();
+      }, 0);
+      var extra = parray.slice(within.length);
+      return {
+        within: constant(within),
+        extra: constant(extra),
+        withinWidth: constant(withinWidth)
+      };
+    };
+    var toUnit = function (parray) {
+      return map(parray, function (unit) {
+        return unit.element();
+      });
+    };
+    var fitLast = function (within, extra, withinWidth) {
+      var fits = toUnit(within.concat(extra));
+      return output$1(fits, [], withinWidth);
+    };
+    var overflow = function (within, extra, overflower, withinWidth) {
+      var fits = toUnit(within).concat([overflower]);
+      return output$1(fits, toUnit(extra), withinWidth);
+    };
+    var fitAll = function (within, extra, withinWidth) {
+      return output$1(toUnit(within), [], withinWidth);
+    };
+    var tryFit = function (total, units, len) {
+      var divide = apportion(units, total, len);
+      return divide.extra().length === 0 ? Option.some(divide) : Option.none();
+    };
+    var partition$3 = function (total, units, len, overflower) {
+      var divide = tryFit(total, units, len).getOrThunk(function () {
+        return apportion(units, total - len(overflower), len);
+      });
+      var within = divide.within();
+      var extra = divide.extra();
+      var withinWidth = divide.withinWidth();
+      if (extra.length === 1 && extra[0].width() <= len(overflower)) {
+        return fitLast(within, extra, withinWidth);
+      } else if (extra.length >= 1) {
+        return overflow(within, extra, overflower, withinWidth);
+      } else {
+        return fitAll(within, extra, withinWidth);
+      }
+    };
+
+    var getAnimationRoot = function (component, slideConfig) {
+      return slideConfig.getAnimationRoot.fold(function () {
+        return component.element();
+      }, function (get) {
+        return get(component);
+      });
+    };
+
+    var getDimensionProperty = function (slideConfig) {
+      return slideConfig.dimension.property;
+    };
+    var getDimension = function (slideConfig, elem) {
+      return slideConfig.dimension.getDimension(elem);
+    };
+    var disableTransitions = function (component, slideConfig) {
+      var root = getAnimationRoot(component, slideConfig);
+      remove$5(root, [
+        slideConfig.shrinkingClass,
+        slideConfig.growingClass
+      ]);
+    };
+    var setShrunk = function (component, slideConfig) {
+      remove$4(component.element(), slideConfig.openClass);
+      add$2(component.element(), slideConfig.closedClass);
+      set$2(component.element(), getDimensionProperty(slideConfig), '0px');
+      reflow(component.element());
+    };
+    var setGrown = function (component, slideConfig) {
+      remove$4(component.element(), slideConfig.closedClass);
+      add$2(component.element(), slideConfig.openClass);
+      remove$6(component.element(), getDimensionProperty(slideConfig));
+    };
+    var doImmediateShrink = function (component, slideConfig, slideState, _calculatedSize) {
+      slideState.setCollapsed();
+      set$2(component.element(), getDimensionProperty(slideConfig), getDimension(slideConfig, component.element()));
+      reflow(component.element());
+      disableTransitions(component, slideConfig);
+      setShrunk(component, slideConfig);
+      slideConfig.onStartShrink(component);
+      slideConfig.onShrunk(component);
+    };
+    var doStartShrink = function (component, slideConfig, slideState, calculatedSize) {
+      var size = calculatedSize.getOrThunk(function () {
+        return getDimension(slideConfig, component.element());
+      });
+      slideState.setCollapsed();
+      set$2(component.element(), getDimensionProperty(slideConfig), size);
+      reflow(component.element());
+      var root = getAnimationRoot(component, slideConfig);
+      remove$4(root, slideConfig.growingClass);
+      add$2(root, slideConfig.shrinkingClass);
+      setShrunk(component, slideConfig);
+      slideConfig.onStartShrink(component);
+    };
+    var doStartSmartShrink = function (component, slideConfig, slideState) {
+      var size = getDimension(slideConfig, component.element());
+      var shrinker = size === '0px' ? doImmediateShrink : doStartShrink;
+      shrinker(component, slideConfig, slideState, Option.some(size));
+    };
+    var doStartGrow = function (component, slideConfig, slideState) {
+      var root = getAnimationRoot(component, slideConfig);
+      var wasShrinking = has$2(root, slideConfig.shrinkingClass);
+      var beforeSize = getDimension(slideConfig, component.element());
+      setGrown(component, slideConfig);
+      var fullSize = getDimension(slideConfig, component.element());
+      var startPartialGrow = function () {
+        set$2(component.element(), getDimensionProperty(slideConfig), beforeSize);
+        reflow(component.element());
+      };
+      var startCompleteGrow = function () {
+        setShrunk(component, slideConfig);
+      };
+      var setStartSize = wasShrinking ? startPartialGrow : startCompleteGrow;
+      setStartSize();
+      remove$4(root, slideConfig.shrinkingClass);
+      add$2(root, slideConfig.growingClass);
+      setGrown(component, slideConfig);
+      set$2(component.element(), getDimensionProperty(slideConfig), fullSize);
+      slideState.setExpanded();
+      slideConfig.onStartGrow(component);
+    };
+    var refresh = function (component, slideConfig, slideState) {
+      if (slideState.isExpanded()) {
+        remove$6(component.element(), getDimensionProperty(slideConfig));
+        var fullSize = getDimension(slideConfig, component.element());
+        set$2(component.element(), getDimensionProperty(slideConfig), fullSize);
+      }
+    };
+    var grow = function (component, slideConfig, slideState) {
+      if (!slideState.isExpanded()) {
+        doStartGrow(component, slideConfig, slideState);
+      }
+    };
+    var shrink = function (component, slideConfig, slideState) {
+      if (slideState.isExpanded()) {
+        doStartSmartShrink(component, slideConfig, slideState);
+      }
+    };
+    var immediateShrink = function (component, slideConfig, slideState) {
+      if (slideState.isExpanded()) {
+        doImmediateShrink(component, slideConfig, slideState, Option.none());
+      }
+    };
+    var hasGrown = function (component, slideConfig, slideState) {
+      return slideState.isExpanded();
+    };
+    var hasShrunk = function (component, slideConfig, slideState) {
+      return slideState.isCollapsed();
+    };
+    var isGrowing = function (component, slideConfig, slideState) {
+      var root = getAnimationRoot(component, slideConfig);
+      return has$2(root, slideConfig.growingClass) === true;
+    };
+    var isShrinking = function (component, slideConfig, slideState) {
+      var root = getAnimationRoot(component, slideConfig);
+      return has$2(root, slideConfig.shrinkingClass) === true;
+    };
+    var isTransitioning = function (component, slideConfig, slideState) {
+      return isGrowing(component, slideConfig, slideState) === true || isShrinking(component, slideConfig, slideState) === true;
+    };
+    var toggleGrow = function (component, slideConfig, slideState) {
+      var f = slideState.isExpanded() ? doStartSmartShrink : doStartGrow;
+      f(component, slideConfig, slideState);
+    };
+
+    var SlidingApis = /*#__PURE__*/Object.freeze({
+        refresh: refresh,
+        grow: grow,
+        shrink: shrink,
+        immediateShrink: immediateShrink,
+        hasGrown: hasGrown,
+        hasShrunk: hasShrunk,
+        isGrowing: isGrowing,
+        isShrinking: isShrinking,
+        isTransitioning: isTransitioning,
+        toggleGrow: toggleGrow,
+        disableTransitions: disableTransitions
+    });
+
+    var exhibit$6 = function (base, slideConfig) {
+      var expanded = slideConfig.expanded;
+      return expanded ? nu$6({
+        classes: [slideConfig.openClass],
+        styles: {}
+      }) : nu$6({
+        classes: [slideConfig.closedClass],
+        styles: wrap$1(slideConfig.dimension.property, '0px')
+      });
+    };
+    var events$d = function (slideConfig, slideState) {
+      return derive([runOnSource(transitionend(), function (component, simulatedEvent) {
+          var raw = simulatedEvent.event().raw();
+          if (raw.propertyName === slideConfig.dimension.property) {
+            disableTransitions(component, slideConfig);
+            if (slideState.isExpanded()) {
+              remove$6(component.element(), slideConfig.dimension.property);
+            }
+            var notify = slideState.isExpanded() ? slideConfig.onGrown : slideConfig.onShrunk;
+            notify(component);
+          }
+        })]);
+    };
+
+    var ActiveSliding = /*#__PURE__*/Object.freeze({
+        exhibit: exhibit$6,
+        events: events$d
+    });
+
+    var SlidingSchema = [
+      strict$1('closedClass'),
+      strict$1('openClass'),
+      strict$1('shrinkingClass'),
+      strict$1('growingClass'),
+      option('getAnimationRoot'),
+      onHandler('onShrunk'),
+      onHandler('onStartShrink'),
+      onHandler('onGrown'),
+      onHandler('onStartGrow'),
+      defaulted$1('expanded', false),
+      strictOf('dimension', choose$1('property', {
+        width: [
+          output('property', 'width'),
+          output('getDimension', function (elem) {
+            return get$7(elem) + 'px';
+          })
+        ],
+        height: [
+          output('property', 'height'),
+          output('getDimension', function (elem) {
+            return get$8(elem) + 'px';
+          })
+        ]
+      }))
+    ];
+
+    var init$a = function (spec) {
+      var state = Cell(spec.expanded);
+      var readState = function () {
+        return 'expanded: ' + state.get();
+      };
+      return nu$5({
+        isExpanded: function () {
+          return state.get() === true;
+        },
+        isCollapsed: function () {
+          return state.get() === false;
+        },
+        setCollapsed: curry(state.set, false),
+        setExpanded: curry(state.set, true),
+        readState: readState
+      });
+    };
+
+    var SlidingState = /*#__PURE__*/Object.freeze({
+        init: init$a
+    });
+
+    var Sliding = create$1({
+      fields: SlidingSchema,
+      name: 'sliding',
+      active: ActiveSliding,
+      apis: SlidingApis,
+      state: SlidingState
+    });
+
     var schema$j = constant([
       defaulted$1('shell', true),
       field$1('toolbarBehaviours', [Replacing])
@@ -20633,10 +20807,10 @@ var silver = (function () {
         overrides: enhanceGroups
       })]);
 
-    var factory$9 = function (detail, components$$1, spec, _externals) {
-      var setGroups = function (toolbar$$1, groups) {
-        getGroupContainer(toolbar$$1).fold(function () {
-          console.error('Toolbar was defined to not be a shell, but no groups container was specified in components');
+    var factory$9 = function (detail, components, spec, _externals) {
+      var setGroups = function (toolbar, groups) {
+        getGroupContainer(toolbar).fold(function () {
+          domGlobals.console.error('Toolbar was defined to not be a shell, but no groups container was specified in components');
           throw new Error('Toolbar was defined to not be a shell, but no groups container was specified in components');
         }, function (container) {
           Replacing.set(container, groups);
@@ -20650,7 +20824,7 @@ var silver = (function () {
         components: []
       } : {
         behaviours: [],
-        components: components$$1
+        components: components
       };
       return {
         uid: detail.uid,
@@ -20667,18 +20841,68 @@ var silver = (function () {
       partFields: parts$7(),
       factory: factory$9,
       apis: {
-        setGroups: function (apis, toolbar$$1, groups) {
-          apis.setGroups(toolbar$$1, groups);
+        setGroups: function (apis, toolbar, groups) {
+          apis.setGroups(toolbar, groups);
         }
       }
     });
 
     var schema$k = constant([
+      markers([
+        'closedClass',
+        'openClass',
+        'shrinkingClass',
+        'growingClass',
+        'overflowToggledClass'
+      ]),
+      field$1('splitToolbarBehaviours', []),
+      state$1('builtGroups', function () {
+        return Cell([]);
+      })
+    ]);
+    var toolbarSchema = [strict$1('dom')];
+    var parts$8 = constant([
+      required({
+        factory: Toolbar,
+        schema: toolbarSchema,
+        name: 'primary'
+      }),
+      required({
+        factory: Toolbar,
+        schema: toolbarSchema,
+        name: 'overflow',
+        overrides: function (detail) {
+          return {
+            toolbarBehaviours: derive$1([Sliding.config({
+                dimension: { property: 'height' },
+                closedClass: detail.markers.closedClass,
+                openClass: detail.markers.openClass,
+                shrinkingClass: detail.markers.shrinkingClass,
+                growingClass: detail.markers.growingClass
+              })])
+          };
+        }
+      }),
+      external$1({
+        name: 'overflow-button',
+        overrides: function (toolbarDetail) {
+          return {
+            buttonBehaviours: derive$1([Toggling.config({
+                toggleClass: toolbarDetail.markers.overflowToggledClass,
+                aria: { mode: 'pressed' }
+              })])
+          };
+        }
+      }),
+      external$1({ name: 'overflow-group' })
+    ]);
+
+    var schema$l = constant([
       strict$1('items'),
       markers(['itemSelector']),
       field$1('tgroupBehaviours', [Keying])
     ]);
-    var parts$8 = constant([group({
+    var parts$9 = constant([group({
         name: 'items',
         unit: 'item'
       })]);
@@ -20697,18 +20921,99 @@ var silver = (function () {
     };
     var ToolbarGroup = composite$1({
       name: 'ToolbarGroup',
-      configFields: schema$k(),
-      partFields: parts$8(),
+      configFields: schema$l(),
+      partFields: parts$9(),
       factory: factory$a
     });
 
-    var renderToolbarGroup = function (foo) {
+    var setStoredGroups = function (bar, storedGroups) {
+      var bGroups = map(storedGroups, function (g) {
+        return premade$1(g);
+      });
+      Toolbar.setGroups(bar, bGroups);
+    };
+    var refresh$1 = function (toolbar, detail, externals) {
+      var ps = getPartsOrDie(toolbar, detail, [
+        'primary',
+        'overflow'
+      ]);
+      var primary = ps.primary();
+      var overflow = ps.overflow();
+      set$2(primary.element(), 'visibility', 'hidden');
+      Toolbar.setGroups(overflow, []);
+      var groups = detail.builtGroups.get();
+      var overflowGroupSpec = ToolbarGroup.sketch(__assign({}, externals['overflow-group'](), {
+        items: [Button.sketch(__assign({}, externals['overflow-button'](), {
+            action: function (button) {
+              Sliding.toggleGrow(ps.overflow());
+            }
+          }))]
+      }));
+      var overflowGroup = toolbar.getSystem().build(overflowGroupSpec);
+      setStoredGroups(primary, groups.concat([overflowGroup]));
+      var total = get$7(primary.element());
+      var overflows = partition$3(total, groups, function (comp) {
+        return get$7(comp.element());
+      }, overflowGroup);
+      if (overflows.extra().length === 0) {
+        Replacing.remove(primary, overflowGroup);
+        Toolbar.setGroups(overflow, []);
+      } else {
+        setStoredGroups(primary, overflows.within());
+        setStoredGroups(overflow, overflows.extra());
+      }
+      remove$6(primary.element(), 'visibility');
+      reflow(primary.element());
+      Sliding.refresh(overflow);
+      getPart(toolbar, detail, 'overflow-button').each(function (moreButton) {
+        Toggling.set(moreButton, Sliding.hasGrown(overflow));
+      });
+    };
+    var factory$b = function (detail, components, spec, externals) {
+      var doSetGroups = function (toolbar, groups) {
+        var built = map(groups, toolbar.getSystem().build);
+        detail.builtGroups.set(built);
+      };
+      var setGroups = function (toolbar, groups) {
+        doSetGroups(toolbar, groups);
+        refresh$1(toolbar, detail, externals);
+      };
+      return {
+        uid: detail.uid,
+        dom: detail.dom,
+        components: components,
+        behaviours: augment(detail.splitToolbarBehaviours, []),
+        apis: {
+          setGroups: setGroups,
+          refresh: function (toolbar) {
+            refresh$1(toolbar, detail, externals);
+          }
+        },
+        domModification: { attributes: { role: 'group' } }
+      };
+    };
+    var SplitToolbar = composite$1({
+      name: 'SplitToolbar',
+      configFields: schema$k(),
+      partFields: parts$8(),
+      factory: factory$b,
+      apis: {
+        setGroups: function (apis, toolbar, groups) {
+          apis.setGroups(toolbar, groups);
+        },
+        refresh: function (apis, toolbar) {
+          apis.refresh(toolbar);
+        }
+      }
+    });
+
+    var renderToolbarGroupCommon = function (foo) {
       var attributes = foo.title.fold(function () {
         return {};
       }, function (title) {
         return { attributes: { title: title } };
       });
-      return ToolbarGroup.sketch({
+      return {
         dom: __assign({
           tag: 'div',
           classes: ['tox-toolbar__group']
@@ -20720,6 +21025,66 @@ var silver = (function () {
           Tabstopping.config({}),
           Focusing.config({})
         ])
+      };
+    };
+    var renderToolbarGroup = function (foo) {
+      return ToolbarGroup.sketch(renderToolbarGroupCommon(foo));
+    };
+    var getToolbarbehaviours = function (foo, modeName) {
+      return derive$1([
+        Keying.config({
+          mode: modeName,
+          onEscape: foo.onEscape,
+          selector: '.tox-toolbar__group'
+        }),
+        config('toolbar-events', [runOnAttached(function (component) {
+            var groups = map(foo.initGroups, renderToolbarGroup);
+            Toolbar.setGroups(component, groups);
+          })])
+      ]);
+    };
+    var renderMoreToolbar = function (foo) {
+      var modeName = foo.cyclicKeying ? 'cyclic' : 'acyclic';
+      return SplitToolbar.sketch({
+        uid: foo.uid,
+        dom: {
+          tag: 'div',
+          classes: ['tox-toolbar-overlord']
+        },
+        parts: {
+          'overflow-group': renderToolbarGroupCommon({
+            title: Option.none(),
+            items: []
+          }),
+          'overflow-button': renderIconButtonSpec({
+            name: 'more',
+            icon: Option.some('more-drawer'),
+            disabled: false,
+            tooltip: Option.some('More...')
+          }, Option.none(), foo.backstage.shared.providers)
+        },
+        components: [
+          SplitToolbar.parts().primary({
+            dom: {
+              tag: 'div',
+              classes: ['tox-toolbar__primary']
+            }
+          }),
+          SplitToolbar.parts().overflow({
+            dom: {
+              tag: 'div',
+              classes: ['tox-toolbar__overflow']
+            }
+          })
+        ],
+        markers: {
+          openClass: 'tox-toolbar__overflow--open',
+          closedClass: 'tox-toolbar__overflow--closed',
+          growingClass: 'tox-toolbar__overflow--growing',
+          shrinkingClass: 'tox-toolbar__overflow--shrinking',
+          overflowToggledClass: 'tox-tbtn--enabled'
+        },
+        splitToolbarBehaviours: getToolbarbehaviours(foo, modeName)
       });
     };
     var renderToolbar = function (foo) {
@@ -20731,17 +21096,7 @@ var silver = (function () {
           classes: ['tox-toolbar']
         },
         components: [Toolbar.parts().groups({})],
-        toolbarBehaviours: derive$1([
-          Keying.config({
-            mode: modeName,
-            onEscape: foo.onEscape,
-            selector: '.tox-toolbar__group'
-          }),
-          config('toolbar-events', [runOnAttached(function (component) {
-              var groups = map(foo.initGroups, renderToolbarGroup);
-              Toolbar.setGroups(component, groups);
-            })])
-        ])
+        toolbarBehaviours: getToolbarbehaviours(foo, modeName)
       });
     };
 
@@ -20789,7 +21144,7 @@ var silver = (function () {
       defaultedStringEnum('presets', 'normal', [
         'normal',
         'color',
-        'toolbar'
+        'listpreview'
       ]),
       defaulted$1('columns', 1),
       strictFunction('onAction'),
@@ -20889,7 +21244,7 @@ var silver = (function () {
         getState: getState$2
     });
 
-    var events$d = function (reflectingConfig, reflectingState) {
+    var events$e = function (reflectingConfig, reflectingState) {
       var update = function (component, data) {
         reflectingConfig.updateState.each(function (updateState) {
           var newState = updateState(component, data);
@@ -20919,10 +21274,10 @@ var silver = (function () {
     };
 
     var ActiveReflecting = /*#__PURE__*/Object.freeze({
-        events: events$d
+        events: events$e
     });
 
-    var init$a = function (spec) {
+    var init$b = function (spec) {
       var cell = Cell(Option.none());
       var set = function (optS) {
         return cell.set(optS);
@@ -20945,7 +21300,7 @@ var silver = (function () {
     };
 
     var ReflectingState = /*#__PURE__*/Object.freeze({
-        init: init$a
+        init: init$b
     });
 
     var ReflectingSchema = [
@@ -20963,7 +21318,7 @@ var silver = (function () {
       state: ReflectingState
     });
 
-    var schema$l = constant([
+    var schema$m = constant([
       strict$1('toggleClass'),
       strict$1('fetch'),
       onStrictHandler('onExecute'),
@@ -21027,7 +21382,7 @@ var silver = (function () {
         };
       }
     });
-    var parts$9 = constant([
+    var parts$a = constant([
       arrowPart,
       buttonPart,
       optional({
@@ -21063,7 +21418,7 @@ var silver = (function () {
       partType()
     ]);
 
-    var factory$b = function (detail, components$$1, spec, externals) {
+    var factory$c = function (detail, components, spec, externals) {
       var switchToMenu = function (sandbox) {
         Composing.getCurrent(sandbox).each(function (current) {
           Highlighting.highlightFirst(current);
@@ -21096,7 +21451,7 @@ var silver = (function () {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
+        components: components,
         eventOrder: __assign({}, detail.eventOrder, {
           'alloy.execute': [
             'disabling',
@@ -21138,7 +21493,7 @@ var silver = (function () {
         ]),
         domModification: {
           attributes: {
-            role: detail.role.getOr('button'),
+            'role': detail.role.getOr('button'),
             'aria-haspopup': true
           }
         }
@@ -21146,9 +21501,9 @@ var silver = (function () {
     };
     var SplitDropdown = composite$1({
       name: 'SplitDropdown',
-      configFields: schema$l(),
-      partFields: parts$9(),
-      factory: factory$b
+      configFields: schema$m(),
+      partFields: parts$a(),
+      factory: factory$c
     });
 
     var getButtonApi = function (component) {
@@ -21311,25 +21666,25 @@ var silver = (function () {
             return state ? Disabling.disable(comp) : Disabling.enable(comp);
           },
           setIconFill: function (id, value) {
-            descendant$2(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
+            descendant$1(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
               set$1(underlinePath, 'fill', value);
             });
           },
           setIconStroke: function (id, value) {
-            descendant$2(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
+            descendant$1(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
               set$1(underlinePath, 'stroke', value);
             });
           },
           setActive: function (state) {
             set$1(comp.element(), 'aria-pressed', state);
-            descendant$2(comp.element(), 'span').each(function (button) {
+            descendant$1(comp.element(), 'span').each(function (button) {
               comp.getSystem().getByDom(button).each(function (buttonComp) {
                 return Toggling.set(buttonComp, state);
               });
             });
           },
           isActive: function () {
-            return descendant$2(comp.element(), 'span').exists(function (button) {
+            return descendant$1(comp.element(), 'span').exists(function (button) {
               return comp.getSystem().getByDom(button).exists(Toggling.isOn);
             });
           }
@@ -21379,7 +21734,7 @@ var silver = (function () {
                 'tox-tbtn',
                 'tox-split-button__chevron'
               ],
-              innerHtml: get$e('chevron-down', sharedBackstage.providers.icons)
+              innerHtml: get$c('chevron-down', sharedBackstage.providers.icons)
             }
           }),
           SplitDropdown.parts()['aria-descriptor']({ text: sharedBackstage.providers.translate('To open the popup, press Shift+Enter') })
@@ -21430,7 +21785,7 @@ var silver = (function () {
         return renderContextButton(memInput, button, extras);
       }
     };
-    var generate$6 = function (memInput, buttons, providersBackstage) {
+    var generate$7 = function (memInput, buttons, providersBackstage) {
       var mementos = map(buttons, function (button) {
         return record(generateOne$1(memInput, button, providersBackstage));
       });
@@ -21456,7 +21811,7 @@ var silver = (function () {
       };
     };
 
-    var renderContextForm = function (ctx, providersBackstage) {
+    var renderContextForm = function (ctx, backstage) {
       var inputAttributes = ctx.label.fold(function () {
         return {};
       }, function (label) {
@@ -21488,7 +21843,7 @@ var silver = (function () {
             }
           })])
       }));
-      var commands = generate$6(memInput, ctx.commands, providersBackstage);
+      var commands = generate$7(memInput, ctx.commands, backstage.shared.providers);
       return renderToolbar({
         uid: generate$1('context-toolbar'),
         initGroups: [
@@ -21502,7 +21857,8 @@ var silver = (function () {
           }
         ],
         onEscape: Option.none,
-        cyclicKeying: true
+        cyclicKeying: true,
+        backstage: backstage
       });
     };
     var ContextForm = { renderContextForm: renderContextForm };
@@ -21537,14 +21893,14 @@ var silver = (function () {
             }),
             run(changeSlideEvent, function (comp, se) {
               remove$6(comp.element(), 'width');
-              var currentWidth = get$8(comp.element());
+              var currentWidth = get$7(comp.element());
               InlineView.setContent(comp, se.event().contents());
               add$2(comp.element(), resizingClass);
-              var newWidth = get$8(comp.element());
+              var newWidth = get$7(comp.element());
               set$2(comp.element(), 'width', currentWidth + 'px');
               InlineView.getContent(comp).each(function (newContents) {
                 se.event().focus().bind(function (f) {
-                  focus$2(f);
+                  focus$1(f);
                   return search$1(comp.element());
                 }).orThunk(function () {
                   Keying.focusIn(newContents);
@@ -21568,11 +21924,11 @@ var silver = (function () {
               });
             }),
             run(backSlideEvent, function (comp, se) {
-              last(stack.get()).each(function (last$$1) {
+              last(stack.get()).each(function (last) {
                 stack.set(stack.get().slice(0, stack.get().length - 1));
                 emitWith(comp, changeSlideEvent, {
-                  contents: premade$1(last$$1.bar),
-                  focus: last$$1.focus
+                  contents: premade$1(last.bar),
+                  focus: last.focus
                 });
               });
             })
@@ -21595,12 +21951,12 @@ var silver = (function () {
       });
     };
 
-    var ancestor$4 = function (scope, transform, isRoot) {
+    var ancestor$2 = function (scope, transform, isRoot) {
       var element = scope.dom();
       var stop = isFunction(isRoot) ? isRoot : constant(false);
       while (element.parentNode) {
         element = element.parentNode;
-        var el = Element$$1.fromDom(element);
+        var el = Element.fromDom(element);
         var transformed = transform(el);
         if (transformed.isSome()) {
           return transformed;
@@ -21623,10 +21979,10 @@ var silver = (function () {
       var isRoot = function (elem) {
         return elem.dom() === editor.getBody();
       };
-      var startNode = Element$$1.fromDom(editor.selection.getNode());
+      var startNode = Element.fromDom(editor.selection.getNode());
       return matchTargetWith(startNode, scopes.inNodeScope).orThunk(function () {
         return matchTargetWith(startNode, scopes.inEditorScope).orThunk(function () {
-          return ancestor$4(startNode, function (elem) {
+          return ancestor$2(startNode, function (elem) {
             return matchTargetWith(elem, scopes.inNodeScope);
           }, isRoot);
         });
@@ -21668,8 +22024,8 @@ var silver = (function () {
           lookupTable[key] = contextToolbar;
         });
       };
-      var keys$$1 = keys(contextToolbars);
-      each(keys$$1, function (key) {
+      var keys$1 = keys(contextToolbars);
+      each(keys$1, function (key) {
         var toolbarApi = contextToolbars[key];
         if (toolbarApi.type === 'contextform') {
           registerForm(key, toolbarApi);
@@ -21690,8 +22046,8 @@ var silver = (function () {
     var updateMenuText = generate$1('update-menu-text');
     var updateMenuIcon = generate$1('update-menu-icon');
     var renderCommonDropdown = function (spec, prefix, sharedBackstage) {
-      var optMemDisplayText = spec.text.map(function (text$$1) {
-        return record(renderLabel$1(text$$1, prefix, sharedBackstage.providers));
+      var optMemDisplayText = spec.text.map(function (text) {
+        return record(renderLabel$1(text, prefix, sharedBackstage.providers));
       });
       var optMemDisplayIcon = spec.icon.map(function (iconName) {
         return record(renderReplacableIconFromPack(iconName, sharedBackstage.providers.icons));
@@ -21739,7 +22095,7 @@ var silver = (function () {
             dom: {
               tag: 'div',
               classes: [prefix + '__select-chevron'],
-              innerHtml: get$e('chevron-down', sharedBackstage.providers.icons)
+              innerHtml: get$c('chevron-down', sharedBackstage.providers.icons)
             }
           })
         ]),
@@ -22653,11 +23009,11 @@ var silver = (function () {
         }
       }));
       var getBoxElement = function () {
-        return Option.some(Element$$1.fromDom(editor.contentAreaContainer));
+        return Option.some(Element.fromDom(editor.contentAreaContainer));
       };
       editor.on('init', function () {
         var scroller = editor.getBody().ownerDocument.defaultView;
-        var onScroll = bind$3(Element$$1.fromDom(scroller), 'scroll', function () {
+        var onScroll = bind$3(Element.fromDom(scroller), 'scroll', function () {
           lastAnchor.get().each(function (anchor) {
             var elem = lastElement.get().getOr(editor.selection.getNode());
             var nodeBounds = elem.getBoundingClientRect();
@@ -22720,10 +23076,11 @@ var silver = (function () {
             uid: generate$1('context-toolbar'),
             initGroups: initGroups,
             onEscape: Option.none,
-            cyclicKeying: true
+            cyclicKeying: true,
+            backstage: extras.backstage
           });
         }() : function () {
-          return ContextForm.renderContextForm(ctx, extras.backstage.shared.providers);
+          return ContextForm.renderContextForm(ctx, extras.backstage);
         }();
       };
       editor.on(showContextToolbarEvent, function (e) {
@@ -22790,7 +23147,7 @@ var silver = (function () {
       var launchContext = function (toolbarApi, elem) {
         clearTimer();
         var toolbarSpec = buildToolbar(toolbarApi);
-        var sElem = elem.map(Element$$1.fromDom);
+        var sElem = elem.map(Element.fromDom);
         var anchor = getAnchor(toolbarApi.position, sElem);
         lastAnchor.set(Option.some(anchor));
         lastElement.set(elem);
@@ -22817,20 +23174,30 @@ var silver = (function () {
         clearTimer();
         timer.set(t);
       };
-      editor.on('click keyup setContent ObjectResized ResizeEditor', function (e) {
-        resetTimer(global$c.setEditorTimeout(editor, launchContextToolbar, 0));
-      });
-      editor.on('nodeChange', function (e) {
-        search$1(contextbar.element()).fold(function () {
+      editor.on('init', function () {
+        editor.on('click keyup setContent ObjectResized ResizeEditor', function (e) {
           resetTimer(global$c.setEditorTimeout(editor, launchContextToolbar, 0));
-        }, function (_) {
+        });
+        editor.on('focusout', function (e) {
+          global$c.setEditorTimeout(editor, function () {
+            if (search$1(sink.element()).isNone() && search$1(contextbar.element()).isNone()) {
+              lastAnchor.set(Option.none());
+              InlineView.hide(contextbar);
+            }
+          }, 0);
+        });
+        editor.on('nodeChange', function (e) {
+          search$1(contextbar.element()).fold(function () {
+            resetTimer(global$c.setEditorTimeout(editor, launchContextToolbar, 0));
+          }, function (_) {
+          });
         });
       });
     };
     var ContextToolbar = { register: register$4 };
 
     var setup$3 = function (editor, mothership, uiMothership) {
-      var onMousedown = bind$3(Element$$1.fromDom(document), 'mousedown', function (evt) {
+      var onMousedown = bind$3(Element.fromDom(domGlobals.document), 'mousedown', function (evt) {
         each([
           mothership,
           uiMothership
@@ -22838,7 +23205,7 @@ var silver = (function () {
           ship.broadcastOn([dismissPopups()], { target: evt.target() });
         });
       });
-      var onTouchstart = bind$3(Element$$1.fromDom(document), 'touchstart', function (evt) {
+      var onTouchstart = bind$3(Element.fromDom(domGlobals.document), 'touchstart', function (evt) {
         each([
           mothership,
           uiMothership
@@ -22846,7 +23213,7 @@ var silver = (function () {
           ship.broadcastOn([dismissPopups()], { target: evt.target() });
         });
       });
-      var onMouseup = bind$3(Element$$1.fromDom(document), 'mouseup', function (evt) {
+      var onMouseup = bind$3(Element.fromDom(domGlobals.document), 'mouseup', function (evt) {
         if (evt.raw().button === 0) {
           each([
             mothership,
@@ -22861,7 +23228,7 @@ var silver = (function () {
           mothership,
           uiMothership
         ], function (ship) {
-          ship.broadcastOn([dismissPopups()], { target: Element$$1.fromDom(raw.target) });
+          ship.broadcastOn([dismissPopups()], { target: Element.fromDom(raw.target) });
         });
       };
       editor.on('mousedown', onContentMousedown);
@@ -22872,7 +23239,7 @@ var silver = (function () {
             mothership,
             uiMothership
           ], function (ship) {
-            ship.broadcastOn([mouseReleased()], { target: Element$$1.fromDom(raw.target) });
+            ship.broadcastOn([mouseReleased()], { target: Element.fromDom(raw.target) });
           });
         }
       };
@@ -22914,10 +23281,10 @@ var silver = (function () {
     };
     var Events = { setup: setup$3 };
 
-    var parts$a = AlloyParts;
+    var parts$b = AlloyParts;
     var partType$1 = PartType;
 
-    var factory$c = function (detail, spec) {
+    var factory$d = function (detail, spec) {
       var setMenus = function (comp, menus) {
         var newMenus = map(menus, function (m) {
           var buttonSpec = {
@@ -22950,7 +23317,7 @@ var silver = (function () {
               detail.onSetup(component);
             }),
             run(mouseover(), function (comp, se) {
-              descendant$2(comp.element(), '.' + 'tox-mbtn--active').each(function (activeButton) {
+              descendant$1(comp.element(), '.' + 'tox-mbtn--active').each(function (activeButton) {
                 closest$3(se.event().target(), '.' + 'tox-mbtn').each(function (hoveredButton) {
                   if (!eq(activeButton, hoveredButton)) {
                     comp.getSystem().getByDom(activeButton).each(function (activeComp) {
@@ -22994,7 +23361,7 @@ var silver = (function () {
       };
     };
     var SilverMenubar = single$2({
-      factory: factory$c,
+      factory: factory$d,
       name: 'silver.Menubar',
       configFields: [
         strict$1('dom'),
@@ -23014,229 +23381,12 @@ var silver = (function () {
       }
     });
 
-    var getAnimationRoot = function (component, slideConfig) {
-      return slideConfig.getAnimationRoot.fold(function () {
-        return component.element();
-      }, function (get) {
-        return get(component);
-      });
-    };
-
-    var getDimensionProperty = function (slideConfig) {
-      return slideConfig.dimension.property;
-    };
-    var getDimension = function (slideConfig, elem) {
-      return slideConfig.dimension.getDimension(elem);
-    };
-    var disableTransitions = function (component, slideConfig) {
-      var root = getAnimationRoot(component, slideConfig);
-      remove$5(root, [
-        slideConfig.shrinkingClass,
-        slideConfig.growingClass
-      ]);
-    };
-    var setShrunk = function (component, slideConfig) {
-      remove$4(component.element(), slideConfig.openClass);
-      add$2(component.element(), slideConfig.closedClass);
-      set$2(component.element(), getDimensionProperty(slideConfig), '0px');
-      reflow(component.element());
-    };
-    var setGrown = function (component, slideConfig) {
-      remove$4(component.element(), slideConfig.closedClass);
-      add$2(component.element(), slideConfig.openClass);
-      remove$6(component.element(), getDimensionProperty(slideConfig));
-    };
-    var doImmediateShrink = function (component, slideConfig, slideState, _calculatedSize) {
-      slideState.setCollapsed();
-      set$2(component.element(), getDimensionProperty(slideConfig), getDimension(slideConfig, component.element()));
-      reflow(component.element());
-      disableTransitions(component, slideConfig);
-      setShrunk(component, slideConfig);
-      slideConfig.onStartShrink(component);
-      slideConfig.onShrunk(component);
-    };
-    var doStartShrink = function (component, slideConfig, slideState, calculatedSize) {
-      var size = calculatedSize.getOrThunk(function () {
-        return getDimension(slideConfig, component.element());
-      });
-      slideState.setCollapsed();
-      set$2(component.element(), getDimensionProperty(slideConfig), size);
-      reflow(component.element());
-      var root = getAnimationRoot(component, slideConfig);
-      remove$4(root, slideConfig.growingClass);
-      add$2(root, slideConfig.shrinkingClass);
-      setShrunk(component, slideConfig);
-      slideConfig.onStartShrink(component);
-    };
-    var doStartSmartShrink = function (component, slideConfig, slideState) {
-      var size = getDimension(slideConfig, component.element());
-      var shrinker = size === '0px' ? doImmediateShrink : doStartShrink;
-      shrinker(component, slideConfig, slideState, Option.some(size));
-    };
-    var doStartGrow = function (component, slideConfig, slideState) {
-      var root = getAnimationRoot(component, slideConfig);
-      var wasShrinking = has$2(root, slideConfig.shrinkingClass);
-      var beforeSize = getDimension(slideConfig, component.element());
-      setGrown(component, slideConfig);
-      var fullSize = getDimension(slideConfig, component.element());
-      var startPartialGrow = function () {
-        set$2(component.element(), getDimensionProperty(slideConfig), beforeSize);
-        reflow(component.element());
-      };
-      var startCompleteGrow = function () {
-        setShrunk(component, slideConfig);
-      };
-      var setStartSize = wasShrinking ? startPartialGrow : startCompleteGrow;
-      setStartSize();
-      remove$4(root, slideConfig.shrinkingClass);
-      add$2(root, slideConfig.growingClass);
-      setGrown(component, slideConfig);
-      set$2(component.element(), getDimensionProperty(slideConfig), fullSize);
-      slideState.setExpanded();
-      slideConfig.onStartGrow(component);
-    };
-    var grow = function (component, slideConfig, slideState) {
-      if (!slideState.isExpanded()) {
-        doStartGrow(component, slideConfig, slideState);
-      }
-    };
-    var shrink = function (component, slideConfig, slideState) {
-      if (slideState.isExpanded()) {
-        doStartSmartShrink(component, slideConfig, slideState);
-      }
-    };
-    var immediateShrink = function (component, slideConfig, slideState) {
-      if (slideState.isExpanded()) {
-        doImmediateShrink(component, slideConfig, slideState, Option.none());
-      }
-    };
-    var hasGrown = function (component, slideConfig, slideState) {
-      return slideState.isExpanded();
-    };
-    var hasShrunk = function (component, slideConfig, slideState) {
-      return slideState.isCollapsed();
-    };
-    var isGrowing = function (component, slideConfig, slideState) {
-      var root = getAnimationRoot(component, slideConfig);
-      return has$2(root, slideConfig.growingClass) === true;
-    };
-    var isShrinking = function (component, slideConfig, slideState) {
-      var root = getAnimationRoot(component, slideConfig);
-      return has$2(root, slideConfig.shrinkingClass) === true;
-    };
-    var isTransitioning = function (component, slideConfig, slideState) {
-      return isGrowing(component, slideConfig, slideState) === true || isShrinking(component, slideConfig, slideState) === true;
-    };
-    var toggleGrow = function (component, slideConfig, slideState) {
-      var f = slideState.isExpanded() ? doStartSmartShrink : doStartGrow;
-      f(component, slideConfig, slideState);
-    };
-
-    var SlidingApis = /*#__PURE__*/Object.freeze({
-        grow: grow,
-        shrink: shrink,
-        immediateShrink: immediateShrink,
-        hasGrown: hasGrown,
-        hasShrunk: hasShrunk,
-        isGrowing: isGrowing,
-        isShrinking: isShrinking,
-        isTransitioning: isTransitioning,
-        toggleGrow: toggleGrow,
-        disableTransitions: disableTransitions
-    });
-
-    var exhibit$6 = function (base, slideConfig) {
-      var expanded = slideConfig.expanded;
-      return expanded ? nu$6({
-        classes: [slideConfig.openClass],
-        styles: {}
-      }) : nu$6({
-        classes: [slideConfig.closedClass],
-        styles: wrap$1(slideConfig.dimension.property, '0px')
-      });
-    };
-    var events$e = function (slideConfig, slideState) {
-      return derive([runOnSource(transitionend(), function (component, simulatedEvent) {
-          var raw = simulatedEvent.event().raw();
-          if (raw.propertyName === slideConfig.dimension.property) {
-            disableTransitions(component, slideConfig);
-            if (slideState.isExpanded()) {
-              remove$6(component.element(), slideConfig.dimension.property);
-            }
-            var notify = slideState.isExpanded() ? slideConfig.onGrown : slideConfig.onShrunk;
-            notify(component);
-          }
-        })]);
-    };
-
-    var ActiveSliding = /*#__PURE__*/Object.freeze({
-        exhibit: exhibit$6,
-        events: events$e
-    });
-
-    var SlidingSchema = [
-      strict$1('closedClass'),
-      strict$1('openClass'),
-      strict$1('shrinkingClass'),
-      strict$1('growingClass'),
-      option('getAnimationRoot'),
-      onHandler('onShrunk'),
-      onHandler('onStartShrink'),
-      onHandler('onGrown'),
-      onHandler('onStartGrow'),
-      defaulted$1('expanded', false),
-      strictOf('dimension', choose$1('property', {
-        width: [
-          output$1('property', 'width'),
-          output$1('getDimension', function (elem) {
-            return get$8(elem) + 'px';
-          })
-        ],
-        height: [
-          output$1('property', 'height'),
-          output$1('getDimension', function (elem) {
-            return get$9(elem) + 'px';
-          })
-        ]
-      }))
-    ];
-
-    var init$b = function (spec) {
-      var state = Cell(spec.expanded);
-      var readState = function () {
-        return 'expanded: ' + state.get();
-      };
-      return nu$5({
-        isExpanded: function () {
-          return state.get() === true;
-        },
-        isCollapsed: function () {
-          return state.get() === false;
-        },
-        setCollapsed: curry(state.set, false),
-        setExpanded: curry(state.set, true),
-        readState: readState
-      });
-    };
-
-    var SlidingState = /*#__PURE__*/Object.freeze({
-        init: init$b
-    });
-
-    var Sliding = create$1({
-      fields: SlidingSchema,
-      name: 'sliding',
-      active: ActiveSliding,
-      apis: SlidingApis,
-      state: SlidingState
-    });
-
     var owner$4 = 'container';
-    var schema$m = [field$1('slotBehaviours', [])];
+    var schema$n = [field$1('slotBehaviours', [])];
     var getPartName$1 = function (name) {
       return '<alloy.field.' + name + '>';
     };
-    var sketch$3 = function (sSpec) {
+    var sketch$2 = function (sSpec) {
       var parts = function () {
         var record = [];
         var slot = function (name, config) {
@@ -23258,9 +23408,9 @@ var silver = (function () {
           pname: getPartName$1(n)
         });
       });
-      return composite(owner$4, schema$m, fieldParts, make$7, spec);
+      return composite(owner$4, schema$n, fieldParts, make$7, spec);
     };
-    var make$7 = function (detail, components$$1, spec) {
+    var make$7 = function (detail, components, spec) {
       var getSlotNames = function (_) {
         return getAllPartNames(detail);
       };
@@ -23278,8 +23428,8 @@ var silver = (function () {
         };
       };
       var onSlots = function (f) {
-        return function (container, keys$$1) {
-          each(keys$$1, function (key) {
+        return function (container, keys) {
+          each(keys, function (key) {
             return f(container, key);
           });
         };
@@ -23327,8 +23477,8 @@ var silver = (function () {
       return {
         'uid': detail.uid,
         'dom': detail.dom,
-        'components': components$$1,
-        'behaviours': get$d(detail.slotBehaviours),
+        'components': components,
+        'behaviours': get$b(detail.slotBehaviours),
         'apis': apis
       };
     };
@@ -23352,7 +23502,7 @@ var silver = (function () {
         return apis.showSlot(c, key);
       }
     }, makeApi);
-    var SlotContainer = __assign({}, slotApis, { sketch: sketch$3 });
+    var SlotContainer = __assign({}, slotApis, { sketch: sketch$2 });
 
     var sidebarSchema = objOf([
       optionString('icon'),
@@ -23424,8 +23574,8 @@ var silver = (function () {
             onControlDetached(spec, editorOffCell),
             run(slotVisibility(), function (sidepanel, se) {
               var data = se.event();
-              var optSidePanelSpec = find(specs, function (config$$1) {
-                return config$$1.name === data.name();
+              var optSidePanelSpec = find(specs, function (config) {
+                return config.name === data.name();
               });
               optSidePanelSpec.each(function (sidePanelSpec) {
                 var handler = data.visible() ? sidePanelSpec.onShow : sidePanelSpec.onHide;
@@ -23529,7 +23679,7 @@ var silver = (function () {
                   emitWith(slider, fixSize, { width: getRaw(slider.element(), 'width').getOr('') });
                 },
                 onStartShrink: function (slider) {
-                  emitWith(slider, fixSize, { width: get$8(slider.element()) + 'px' });
+                  emitWith(slider, fixSize, { width: get$7(slider.element()) + 'px' });
                 }
               }),
               Replacing.config({}),
@@ -23555,44 +23705,44 @@ var silver = (function () {
       };
     };
 
-    var factory$d = function (detail, components, spec) {
+    var factory$e = function (detail, components, spec) {
       var apis = {
         getSocket: function (comp) {
-          return parts$a.getPart(comp, detail, 'socket');
+          return parts$b.getPart(comp, detail, 'socket');
         },
         setSidebar: function (comp, panelConfigs) {
-          parts$a.getPart(comp, detail, 'sidebar').each(function (sidebar) {
+          parts$b.getPart(comp, detail, 'sidebar').each(function (sidebar) {
             return setSidebar(sidebar, panelConfigs);
           });
         },
         toggleSidebar: function (comp, name) {
-          parts$a.getPart(comp, detail, 'sidebar').each(function (sidebar) {
+          parts$b.getPart(comp, detail, 'sidebar').each(function (sidebar) {
             return toggleSidebar(sidebar, name);
           });
         },
         whichSidebar: function (comp) {
-          return parts$a.getPart(comp, detail, 'sidebar').bind(whichSidebar).getOrNull();
+          return parts$b.getPart(comp, detail, 'sidebar').bind(whichSidebar).getOrNull();
         },
         getToolbar: function (comp) {
-          return parts$a.getPart(comp, detail, 'toolbar');
+          return parts$b.getPart(comp, detail, 'toolbar');
         },
         setToolbar: function (comp, groups) {
-          parts$a.getPart(comp, detail, 'toolbar').each(function (toolbar) {
+          parts$b.getPart(comp, detail, 'toolbar').each(function (toolbar) {
             Toolbar.setGroups(toolbar, groups);
           });
         },
         focusToolbar: function (comp) {
-          parts$a.getPart(comp, detail, 'toolbar').each(function (toolbar) {
+          parts$b.getPart(comp, detail, 'toolbar').each(function (toolbar) {
             Keying.focusIn(toolbar);
           });
         },
         setMenubar: function (comp, menus) {
-          parts$a.getPart(comp, detail, 'menubar').each(function (menubar) {
+          parts$b.getPart(comp, detail, 'menubar').each(function (menubar) {
             SilverMenubar.setMenus(menubar, menus);
           });
         },
         focusMenubar: function (comp) {
-          parts$a.getPart(comp, detail, 'menubar').each(function (menubar) {
+          parts$b.getPart(comp, detail, 'menubar').each(function (menubar) {
             SilverMenubar.focus(menubar);
           });
         }
@@ -23616,14 +23766,16 @@ var silver = (function () {
     var partToolbar = partType$1.optional({
       factory: {
         sketch: function (spec) {
-          return renderToolbar({
+          var renderer = spec.split ? renderMoreToolbar : renderToolbar;
+          return renderer({
             uid: spec.uid,
             onEscape: function () {
               spec.onEscape();
               return Option.some(true);
             },
             cyclicKeying: false,
-            initGroups: []
+            initGroups: [],
+            backstage: spec.backstage
           });
         }
       },
@@ -23644,7 +23796,7 @@ var silver = (function () {
     });
     var OuterContainer = composite$1({
       name: 'OuterContainer',
-      factory: factory$d,
+      factory: factory$e,
       configFields: [
         strict$1('dom'),
         strict$1('behaviours')
@@ -23698,10 +23850,14 @@ var silver = (function () {
     var fireBeforeRenderUI = function (editor) {
       return editor.fire('BeforeRenderUI');
     };
+    var fireResizeContent = function (editor) {
+      return editor.fire('ResizeContent');
+    };
     var Events$1 = {
       fireSkinLoaded: fireSkinLoaded,
       fireResizeEditor: fireResizeEditor,
-      fireBeforeRenderUI: fireBeforeRenderUI
+      fireBeforeRenderUI: fireBeforeRenderUI,
+      fireResizeContent: fireResizeContent
     };
 
     var fireSkinLoaded$1 = function (editor) {
@@ -23735,6 +23891,7 @@ var silver = (function () {
     var iframe = curry(loadSkin, false);
     var inline = curry(loadSkin, true);
 
+    var DOM = global$4.DOM;
     var handleSwitchMode = function (uiComponents) {
       return function (e) {
         var outerContainer = uiComponents.outerContainer;
@@ -23753,7 +23910,7 @@ var silver = (function () {
     };
     var render = function (editor, uiComponents, rawUiConfig, backstage, args) {
       iframe(editor);
-      attachSystemAfter(Element$$1.fromDom(args.targetNode), uiComponents.mothership);
+      attachSystemAfter(Element.fromDom(args.targetNode), uiComponents.mothership);
       attachSystem(body(), uiComponents.uiMothership);
       editor.on('init', function () {
         OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }));
@@ -23762,6 +23919,21 @@ var silver = (function () {
         if (editor.readonly) {
           handleSwitchMode(uiComponents)({ mode: 'readonly' });
         }
+        var lastDimensions = Cell(Position(0, 0));
+        var window = editor.contentWindow;
+        var resize = function () {
+          var last = lastDimensions.get();
+          if (last.left() !== window.innerWidth || last.top() !== window.innerHeight) {
+            var next = Position(window.innerWidth, window.innerHeight);
+            lastDimensions.set(next);
+            Events$1.fireResizeContent(editor);
+          }
+        };
+        DOM.bind(window, 'resize', resize);
+        var removeResize = function () {
+          DOM.unbind(window, 'resize', resize);
+        };
+        editor.on('remove', removeResize);
       });
       var socket = OuterContainer.getSocket(uiComponents.outerContainer).getOrDie('Could not find expected socket element');
       editor.on('SwitchMode', handleSwitchMode(uiComponents));
@@ -23775,6 +23947,14 @@ var silver = (function () {
       editor.addQueryValueHandler('ToggleSidebar', function () {
         return OuterContainer.whichSidebar(uiComponents.outerContainer);
       });
+      var split = isSplitToolbar(editor);
+      var refreshMore = function () {
+        if (split) {
+          var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
+          toolbar.each(SplitToolbar.refresh);
+        }
+      };
+      editor.on('ResizeContent', refreshMore);
       return {
         iframeContainer: socket.element().dom(),
         editorContainer: uiComponents.outerContainer.element().dom()
@@ -23789,11 +23969,11 @@ var silver = (function () {
 
     var getOrigin = function (element, scroll) {
       return offsetParent(element).orThunk(function () {
-        var marker = Element$$1.fromTag('span');
+        var marker = Element.fromTag('span');
         before(element, marker);
-        var offsetParent$$1 = offsetParent(marker);
+        var offsetParent$1 = offsetParent(marker);
         remove(marker);
-        return offsetParent$$1;
+        return offsetParent$1;
       }).map(function (offsetP) {
         var loc = absolute(offsetP);
         return loc.translate(-scroll.left(), -scroll.top());
@@ -23880,7 +24060,7 @@ var silver = (function () {
         };
       });
     };
-    var translate$2 = function (coord, deltaX, deltaY) {
+    var translate$1 = function (coord, deltaX, deltaY) {
       return coord.fold(function (x, y) {
         return adt$b.offset(x + deltaX, y + deltaY);
       }, function (x, y) {
@@ -23899,7 +24079,7 @@ var silver = (function () {
       return partialCoord.fold(absorbOne(asOffset, adt$b.offset), absorbOne(asAbsolute, adt$b.absolute), absorbOne(asFixed, adt$b.fixed));
     };
     var offset = adt$b.offset;
-    var absolute$3 = adt$b.absolute;
+    var absolute$2 = adt$b.absolute;
     var fixed$1 = adt$b.fixed;
 
     var appear = function (component, contextualInfo) {
@@ -23912,11 +24092,11 @@ var silver = (function () {
       remove$4(component.element(), contextualInfo.fadeInClass);
       add$2(component.element(), contextualInfo.fadeOutClass);
     };
-    var isPartiallyVisible = function (box$$1, viewport$$1) {
-      return box$$1.y() < viewport$$1.bottom() && box$$1.bottom() > viewport$$1.y();
+    var isPartiallyVisible = function (box, viewport) {
+      return box.y() < viewport.bottom() && box.bottom() > viewport.y();
     };
-    var isCompletelyVisible = function (box$$1, viewport$$1) {
-      return box$$1.y() >= viewport$$1.y() && box$$1.bottom() <= viewport$$1.bottom();
+    var isCompletelyVisible = function (box, viewport) {
+      return box.y() >= viewport.y() && box.bottom() <= viewport.bottom();
     };
     var getAttr = function (elem, attr) {
       return has$1(elem, attr) ? Option.some(parseInt(get$2(elem, attr), 10)) : Option.none();
@@ -23925,8 +24105,8 @@ var silver = (function () {
       var elem = component.element();
       return getAttr(elem, dockInfo.leftAttr).bind(function (left) {
         return getAttr(elem, dockInfo.topAttr).map(function (top) {
-          var w = get$8(component.element());
-          var h = get$9(component.element());
+          var w = get$7(component.element());
+          var h = get$8(component.element());
           return bounds(left, top, w, h);
         });
       });
@@ -23941,48 +24121,48 @@ var silver = (function () {
       remove$1(elem, dockInfo.leftAttr);
       remove$1(elem, dockInfo.topAttr);
     };
-    var morphToAbsolute = function (component, dockInfo, viewport$$1) {
-      return getPrior(component, dockInfo).bind(function (box$$1) {
-        if (isCompletelyVisible(box$$1, viewport$$1)) {
+    var morphToAbsolute = function (component, dockInfo, viewport) {
+      return getPrior(component, dockInfo).bind(function (box) {
+        if (isCompletelyVisible(box, viewport)) {
           clearPrior(component, dockInfo);
-          return Option.some(absolute$3(box$$1.x(), box$$1.y()));
+          return Option.some(absolute$2(box.x(), box.y()));
         } else {
           return Option.none();
         }
       });
     };
-    var morphToFixed = function (component, dockInfo, viewport$$1, scroll, origin) {
+    var morphToFixed = function (component, dockInfo, viewport, scroll, origin) {
       var loc = absolute(component.element());
-      var box$$1 = bounds(loc.left(), loc.top(), get$8(component.element()), get$9(component.element()));
-      if (!isCompletelyVisible(box$$1, viewport$$1)) {
+      var box = bounds(loc.left(), loc.top(), get$7(component.element()), get$8(component.element()));
+      if (!isCompletelyVisible(box, viewport)) {
         setPrior(component, dockInfo, loc.left(), loc.top());
-        var coord = absolute$3(loc.left(), loc.top());
-        var asFixed$$1 = asFixed(coord, scroll, origin);
-        var viewportPt = absolute$3(viewport$$1.x(), viewport$$1.y());
+        var coord = absolute$2(loc.left(), loc.top());
+        var asFixed$1 = asFixed(coord, scroll, origin);
+        var viewportPt = absolute$2(viewport.x(), viewport.y());
         var fixedViewport = asFixed(viewportPt, scroll, origin);
-        var fixedY = box$$1.y() <= viewport$$1.y() ? fixedViewport.top() : fixedViewport.top() + viewport$$1.height() - box$$1.height();
-        return Option.some(fixed$1(asFixed$$1.left(), fixedY));
+        var fixedY = box.y() <= viewport.y() ? fixedViewport.top() : fixedViewport.top() + viewport.height() - box.height();
+        return Option.some(fixed$1(asFixed$1.left(), fixedY));
       } else {
         return Option.none();
       }
     };
-    var getMorph = function (component, dockInfo, viewport$$1, scroll, origin) {
+    var getMorph = function (component, dockInfo, viewport, scroll, origin) {
       var isDocked = getRaw(component.element(), 'position').is('fixed');
-      return isDocked ? morphToAbsolute(component, dockInfo, viewport$$1) : morphToFixed(component, dockInfo, viewport$$1, scroll, origin);
+      return isDocked ? morphToAbsolute(component, dockInfo, viewport) : morphToFixed(component, dockInfo, viewport, scroll, origin);
     };
 
-    var refresh = function (component, config, state) {
+    var refresh$2 = function (component, config, state) {
       var viewport = config.lazyViewport(component);
       config.contextual.each(function (contextInfo) {
         contextInfo.lazyContext(component).each(function (elem) {
-          var box$$1 = box(elem);
-          var isVisible = isPartiallyVisible(box$$1, viewport);
+          var box$1 = box(elem);
+          var isVisible = isPartiallyVisible(box$1, viewport);
           var method = isVisible ? appear : disappear;
           method(component, contextInfo);
         });
       });
       var doc = owner(component.element());
-      var scroll = get$7(doc);
+      var scroll = get$6(doc);
       var origin = getOrigin(component.element(), scroll);
       getMorph(component, config, viewport, scroll, origin).each(function (morph) {
         var styles = toStyles(morph, scroll, origin);
@@ -23991,7 +24171,7 @@ var silver = (function () {
     };
 
     var DockingApis = /*#__PURE__*/Object.freeze({
-        refresh: refresh
+        refresh: refresh$2
     });
 
     var events$f = function (dockInfo, dockState) {
@@ -24005,7 +24185,7 @@ var silver = (function () {
           });
         }),
         run(windowScroll(), function (component, _) {
-          refresh(component, dockInfo, dockState);
+          refresh$2(component, dockInfo, dockState);
         })
       ]);
     };
@@ -24015,8 +24195,8 @@ var silver = (function () {
     });
 
     var defaultLazyViewport = function (_component) {
-      var scroll$$1 = get$7();
-      return bounds(scroll$$1.left(), scroll$$1.top(), window.innerWidth, window.innerHeight);
+      var scroll = get$6();
+      return bounds(scroll.left(), scroll.top(), domGlobals.window.innerWidth, domGlobals.window.innerHeight);
     };
     var DockingSchema = [
       optionObjOf('contextual', [
@@ -24041,13 +24221,30 @@ var silver = (function () {
       var floatContainer;
       var DOM = global$4.DOM;
       inline(editor);
+      var split = isSplitToolbar(editor);
+      var calcPosition = function (offset) {
+        if (offset === void 0) {
+          offset = 0;
+        }
+        var location = absolute(Element.fromDom(editor.getBody()));
+        return {
+          top: Math.round(location.top() - get$8(floatContainer.element())) + offset + 'px',
+          left: Math.round(location.left()) + 'px'
+        };
+      };
       var setPosition = function () {
+        var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
+        if (split) {
+          toolbar.each(SplitToolbar.refresh);
+        }
         var isDocked = getRaw(floatContainer.element(), 'position').is('fixed');
         if (!isDocked) {
-          setAll$1(floatContainer.element(), {
-            top: absolute(Element$$1.fromDom(editor.getBody())).top() - get$9(floatContainer.element()) + 'px',
-            left: absolute(Element$$1.fromDom(editor.getBody())).left() + 'px'
-          });
+          var offset = split ? toolbar.fold(function () {
+            return 0;
+          }, function (tbar) {
+            return get$8(tbar.components()[1].element());
+          }) : 0;
+          setAll$1(floatContainer.element(), calcPosition(offset));
         }
         Docking.refresh(floatContainer);
       };
@@ -24073,11 +24270,7 @@ var silver = (function () {
         attachSystem(body(), uiComponents.uiMothership);
         OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }));
         OuterContainer.setMenubar(uiComponents.outerContainer, identifyMenus(editor, rawUiConfig));
-        setAll$1(floatContainer.element(), {
-          position: 'absolute',
-          top: absolute(Element$$1.fromDom(editor.getBody())).top() - get$9(floatContainer.element()) + 'px',
-          left: absolute(Element$$1.fromDom(editor.getBody())).left() + 'px'
-        });
+        set$2(floatContainer.element(), 'position', 'absolute');
         setPosition();
         show();
         editor.on('nodeChange ResizeWindow', setPosition);
@@ -24087,6 +24280,11 @@ var silver = (function () {
       };
       editor.on('focus', render);
       editor.on('blur hide', hide);
+      editor.on('init', function () {
+        if (editor.hasFocus()) {
+          render();
+        }
+      });
       return { editorContainer: uiComponents.outerContainer.element().dom() };
     };
     var getBehaviours$2 = function (editor) {
@@ -24097,7 +24295,7 @@ var silver = (function () {
           contextual: {
             lazyContext: function (_) {
               return Option.from(editor).map(function (ed) {
-                return Element$$1.fromDom(ed.getBody());
+                return Element.fromDom(ed.getBody());
               });
             },
             fadeInClass: 'tox-toolbar-dock-fadein',
@@ -24147,14 +24345,14 @@ var silver = (function () {
     var getSelectionAnchor = function (editor) {
       return {
         anchor: 'selection',
-        root: Element$$1.fromDom(editor.selection.getNode())
+        root: Element.fromDom(editor.selection.getNode())
       };
     };
     var getNodeAnchor = function (editor) {
       return {
         anchor: 'node',
-        node: Option.some(Element$$1.fromDom(editor.selection.getNode())),
-        root: Element$$1.fromDom(editor.getBody())
+        node: Option.some(Element.fromDom(editor.selection.getNode())),
+        root: Element.fromDom(editor.getBody())
       };
     };
 
@@ -24266,21 +24464,23 @@ var silver = (function () {
               editor.focus();
             })])])
       }));
-      editor.on('contextmenu', function (e) {
-        if (isNativeOverrideKeyEvent(editor, e)) {
-          return;
-        }
-        var isTriggeredByKeyboardEvent = e.button !== 2 || e.target === editor.getBody();
-        var anchorSpec = isTriggeredByKeyboardEvent ? getNodeAnchor(editor) : getPointAnchor(editor, e);
-        var registry = editor.ui.registry.getAll();
-        var menuConfig = Settings$1.getContextMenu(editor);
-        var selectedElement = isTriggeredByKeyboardEvent ? editor.selection.getStart(true) : e.target;
-        var items = generateContextMenu(registry.contextMenus, menuConfig, selectedElement);
-        build$2(items, ItemResponse$1.CLOSE_ON_EXECUTE, sharedBackstage.providers).map(function (menuData) {
-          e.preventDefault();
-          InlineView.showMenuAt(contextmenu, anchorSpec, {
-            menu: { markers: markers$1('normal') },
-            data: menuData
+      editor.on('init', function () {
+        editor.on('contextmenu', function (e) {
+          if (isNativeOverrideKeyEvent(editor, e)) {
+            return;
+          }
+          var isTriggeredByKeyboardEvent = e.button !== 2 || e.target === editor.getBody();
+          var anchorSpec = isTriggeredByKeyboardEvent ? getNodeAnchor(editor) : getPointAnchor(editor, e);
+          var registry = editor.ui.registry.getAll();
+          var menuConfig = Settings$1.getContextMenu(editor);
+          var selectedElement = isTriggeredByKeyboardEvent ? editor.selection.getStart(true) : e.target;
+          var items = generateContextMenu(registry.contextMenus, menuConfig, selectedElement);
+          build$2(items, ItemResponse$1.CLOSE_ON_EXECUTE, sharedBackstage.providers).map(function (menuData) {
+            e.preventDefault();
+            InlineView.showMenuAt(contextmenu, anchorSpec, {
+              menu: { markers: markers$1('normal') },
+              data: menuData
+            });
           });
         });
       });
@@ -24318,7 +24518,7 @@ var silver = (function () {
         getRaw(root, 'z-index').each(function (zindex) {
           set$1(root, initialAttribute, zindex);
         });
-        set$2(root, 'z-index', get$5(blocker.element(), 'z-index'));
+        set$2(root, 'z-index', get$4(blocker.element(), 'z-index'));
       });
     };
     var instigate = function (anyComponent, blocker) {
@@ -24330,25 +24530,25 @@ var silver = (function () {
       blocker.getSystem().removeFromGui(blocker);
     };
 
-    var get$f = function (component, snapsInfo) {
+    var get$d = function (component, snapsInfo) {
       var element = component.element();
       var x = parseInt(get$2(element, snapsInfo.leftAttr), 10);
       var y = parseInt(get$2(element, snapsInfo.topAttr), 10);
       return isNaN(x) || isNaN(y) ? Option.none() : Option.some(Position(x, y));
     };
-    var set$9 = function (component, snapsInfo, pt) {
+    var set$7 = function (component, snapsInfo, pt) {
       var element = component.element();
       set$1(element, snapsInfo.leftAttr, pt.left() + 'px');
       set$1(element, snapsInfo.topAttr, pt.top() + 'px');
     };
-    var clear$1 = function (component, snapsInfo) {
+    var clear = function (component, snapsInfo) {
       var element = component.element();
       remove$1(element, snapsInfo.leftAttr);
       remove$1(element, snapsInfo.topAttr);
     };
 
     var getCoords = function (component, snapInfo, coord, delta) {
-      return get$f(component, snapInfo).fold(function () {
+      return get$d(component, snapInfo).fold(function () {
         return coord;
       }, function (fixed) {
         return fixed$1(fixed.left() + delta.left(), fixed.top() + delta.top());
@@ -24358,7 +24558,7 @@ var silver = (function () {
       var newCoord = getCoords(component, snapInfo, coord, delta);
       var snap = findSnap(component, snapInfo, newCoord, scroll, origin);
       var fixedCoord = asFixed(newCoord, scroll, origin);
-      set$9(component, snapInfo, fixedCoord);
+      set$7(component, snapInfo, fixedCoord);
       return snap.fold(function () {
         return {
           coord: fixed$1(fixedCoord.left(), fixedCoord.top()),
@@ -24372,7 +24572,7 @@ var silver = (function () {
       });
     };
     var stopDrag = function (component, snapInfo) {
-      clear$1(component, snapInfo);
+      clear(component, snapInfo);
     };
     var findSnap = function (component, snapInfo, newCoord, scroll, origin) {
       var snaps = snapInfo.getSnapPoints(component);
@@ -24396,12 +24596,12 @@ var silver = (function () {
         });
       }).getOrThunk(function () {
         var location = absolute(target);
-        return absolute$3(location.left(), location.top());
+        return absolute$2(location.left(), location.top());
       });
     };
     var calcNewCoord = function (component, optSnaps, currentCoord, scroll, origin, delta) {
       return optSnaps.fold(function () {
-        var translated = translate$2(currentCoord, delta.left(), delta.top());
+        var translated = translate$1(currentCoord, delta.left(), delta.top());
         var fixedCoord = asFixed(translated, scroll, origin);
         return fixed$1(fixedCoord.left(), fixedCoord.top());
       }, function (snapInfo) {
@@ -24416,7 +24616,7 @@ var silver = (function () {
       var target = dragConfig.getTarget(component.element());
       if (dragConfig.repositionTarget) {
         var doc = owner(component.element());
-        var scroll = get$7(doc);
+        var scroll = get$6(doc);
         var origin = getOrigin(target, scroll);
         var currentCoord = getCurrentCoord(target);
         var newCoord = calcNewCoord(component, dragConfig.snaps, currentCoord, scroll, origin, delta);
@@ -24427,14 +24627,14 @@ var silver = (function () {
     };
 
     var defaultLazyViewport$1 = function () {
-      var scroll$$1 = get$7();
+      var scroll = get$6();
       return {
-        x: scroll$$1.left,
-        y: scroll$$1.top,
-        width: constant(window.innerWidth),
-        height: constant(window.innerHeight),
-        bottom: constant(scroll$$1.top() + window.innerHeight),
-        right: constant(scroll$$1.left() + window.innerWidth)
+        x: scroll.left,
+        y: scroll.top,
+        width: constant(domGlobals.window.innerWidth),
+        height: constant(domGlobals.window.innerHeight),
+        bottom: constant(scroll.top() + domGlobals.window.innerHeight),
+        right: constant(scroll.left() + domGlobals.window.innerWidth)
       };
     };
     var SnapSchema = optionObjOf('snaps', [
@@ -24523,7 +24723,7 @@ var silver = (function () {
           start();
         })]);
     };
-    var schema$n = [
+    var schema$o = [
       defaulted$1('useFixed', false),
       strict$1('blockerClass'),
       defaulted$1('getTarget', identity),
@@ -24531,7 +24731,7 @@ var silver = (function () {
       defaulted$1('repositionTarget', true),
       onHandler('onDrop'),
       SnapSchema,
-      output$1('dragger', { handlers: handlers })
+      output('dragger', { handlers: handlers })
     ];
 
     var getDataFrom = function (touches) {
@@ -24572,18 +24772,18 @@ var silver = (function () {
         })
       ]);
     };
-    var schema$o = [
+    var schema$p = [
       defaulted$1('useFixed', false),
       defaulted$1('getTarget', identity),
       defaulted$1('onDrag', noop),
       defaulted$1('repositionTarget', true),
       defaulted$1('onDrop', noop),
       SnapSchema,
-      output$1('dragger', { handlers: handlers$1 })
+      output('dragger', { handlers: handlers$1 })
     ];
 
-    var mouse = schema$n;
-    var touch = schema$o;
+    var mouse = schema$o;
+    var touch = schema$p;
 
     var DraggingBranches = /*#__PURE__*/Object.freeze({
         mouse: mouse,
@@ -24664,8 +24864,8 @@ var silver = (function () {
       return dimensions;
     };
     var resize$3 = function (editor, deltas, resizeType) {
-      var container = Element$$1.fromDom(editor.getContainer());
-      var dimensions = getDimensions(editor, deltas, resizeType, get$9(container), get$8(container));
+      var container = Element.fromDom(editor.getContainer());
+      var dimensions = getDimensions(editor, deltas, resizeType, get$8(container), get$7(container));
       each$1(dimensions, function (val, dim) {
         return set$2(container, dim, Utils.numToPx(val));
       });
@@ -24842,7 +25042,7 @@ var silver = (function () {
             tag: 'div',
             classes: ['tox-statusbar__resize-handle'],
             attributes: { title: providersBackstage.translate('Resize') },
-            innerHtml: get$e('resize-handle', providersBackstage.icons)
+            innerHtml: get$c('resize-handle', providersBackstage.icons)
           },
           behaviours: derive$1([Dragging.config({
               mode: 'mouse',
@@ -24969,9 +25169,12 @@ var silver = (function () {
           tag: 'div',
           classes: ['tox-toolbar']
         },
+        getSink: lazySink,
+        backstage: backstage,
         onEscape: function () {
           editor.focus();
-        }
+        },
+        split: isSplitToolbar(editor)
       });
       var partSocket = OuterContainer.parts().socket({
         dom: {
@@ -25253,6 +25456,15 @@ var silver = (function () {
           onAction: toggleFormat(editor, btn.name)
         });
       });
+      for (var i = 1; i <= 6; i++) {
+        var name = 'h' + i;
+        editor.ui.registry.addToggleButton(name, {
+          text: name.toUpperCase(),
+          tooltip: 'Heading ' + i,
+          onSetup: onSetupFormatToggle(editor, name),
+          onAction: toggleFormat(editor, name)
+        });
+      }
     };
     var registerCommandButtons = function (editor) {
       global$a.each([
@@ -25610,7 +25822,7 @@ var silver = (function () {
       }
     };
 
-    var schema$p = constant([
+    var schema$q = constant([
       strict$1('lazySink'),
       option('dragBlockClass'),
       defaulted$1('useTabstopAt', constant(true)),
@@ -25619,8 +25831,8 @@ var silver = (function () {
       onKeyboardHandler('onExecute'),
       onStrictKeyboardHandler('onEscape')
     ]);
-    var basic$1 = { sketch: identity };
-    var parts$b = constant([
+    var basic = { sketch: identity };
+    var parts$c = constant([
       optional({
         name: 'draghandle',
         overrides: function (detail, spec) {
@@ -25628,7 +25840,7 @@ var silver = (function () {
             behaviours: derive$1([Dragging.config({
                 mode: 'mouse',
                 getTarget: function (handle) {
-                  return ancestor$2(handle, '[role="dialog"]').getOr(handle);
+                  return ancestor$1(handle, '[role="dialog"]').getOr(handle);
                 },
                 blockerClass: detail.dragBlockClass.getOrDie(new Error('The drag blocker class was not specified for a dialog with a drag handle: \n' + JSON$1.stringify(spec, null, 2)).message)
               })])
@@ -25640,17 +25852,17 @@ var silver = (function () {
         name: 'title'
       }),
       required({
-        factory: basic$1,
+        factory: basic,
         schema: [strict$1('dom')],
         name: 'close'
       }),
       required({
-        factory: basic$1,
+        factory: basic,
         schema: [strict$1('dom')],
         name: 'body'
       }),
       required({
-        factory: basic$1,
+        factory: basic,
         schema: [strict$1('dom')],
         name: 'footer'
       }),
@@ -25680,7 +25892,16 @@ var silver = (function () {
       })
     ]);
 
-    var factory$e = function (detail, components$$1, spec, externals) {
+    var describedBy = function (describedElement, describeElement) {
+      var describeId = Option.from(get$2(describedElement, 'id')).fold(function () {
+        var id = generate$1('dialog-describe');
+        set$1(describeElement, 'id', id);
+        return id;
+      }, identity);
+      set$1(describedElement, 'aria-describedby', describeId);
+    };
+
+    var factory$f = function (detail, components, spec, externals) {
       var dialogBusyEvent = generate$1('alloy.dialog.busy');
       var dialogIdleEvent = generate$1('alloy.dialog.idle');
       var busyBehaviours = derive$1([
@@ -25753,7 +25974,7 @@ var silver = (function () {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
+        components: components,
         apis: {
           show: showDialog,
           hide: hideDialog,
@@ -25779,15 +26000,16 @@ var silver = (function () {
           }),
           config(modalEventsId, [runOnAttached(function (c) {
               AriaLabel.labelledBy(c.element(), getPartOrDie(c, detail, 'title').element());
+              describedBy(c.element(), getPartOrDie(c, detail, 'body').element());
             })])
         ])
       };
     };
     var ModalDialog = composite$1({
       name: 'ModalDialog',
-      configFields: schema$p(),
-      partFields: parts$b(),
-      factory: factory$e,
+      configFields: schema$q(),
+      partFields: parts$c(),
+      factory: factory$f,
       apis: {
         show: function (apis, dialog) {
           apis.show(dialog);
@@ -25913,7 +26135,11 @@ var silver = (function () {
 
     var htmlPanelFields = [
       strictString('type'),
-      strictString('html')
+      strictString('html'),
+      defaultedStringEnum('presets', 'presentation', [
+        'presentation',
+        'document'
+      ])
     ];
 
     var imageToolsFields = formComponentFields.concat([strictOf('currentState', objOf([
@@ -26097,10 +26323,10 @@ var silver = (function () {
     var bodyChannel = generate$1('update-body');
     var footerChannel = generate$1('update-footer');
 
-    var toValidValues = function (values$$1) {
+    var toValidValues = function (values) {
       var errors = [];
       var result = {};
-      each$1(values$$1, function (value, name) {
+      each$1(values, function (value, name) {
         value.fold(function () {
           errors.push(name);
         }, function (v) {
@@ -26148,7 +26374,7 @@ var silver = (function () {
       };
     };
 
-    var factory$f = function (detail, spec) {
+    var factory$g = function (detail, spec) {
       return {
         uid: detail.uid,
         dom: detail.dom,
@@ -26194,10 +26420,10 @@ var silver = (function () {
         ]),
         strict$1('view')
       ],
-      factory: factory$f
+      factory: factory$g
     });
 
-    var schema$q = constant([
+    var schema$r = constant([
       strict$1('tabs'),
       strict$1('dom'),
       defaulted$1('clickToDismiss', false),
@@ -26215,14 +26441,14 @@ var silver = (function () {
       name: 'tabs',
       unit: 'tab',
       overrides: function (barDetail, tabSpec) {
-        var dismissTab$$1 = function (tabbar, button) {
+        var dismissTab$1 = function (tabbar, button) {
           Highlighting.dehighlight(tabbar, button);
           emitWith(tabbar, dismissTab(), {
             tabbar: tabbar,
             button: button
           });
         };
-        var changeTab$$1 = function (tabbar, button) {
+        var changeTab$1 = function (tabbar, button) {
           Highlighting.highlight(tabbar, button);
           emitWith(tabbar, changeTab(), {
             tabbar: tabbar,
@@ -26235,9 +26461,9 @@ var silver = (function () {
             var activeButton = Highlighting.isHighlighted(tabbar, button);
             var response = function () {
               if (activeButton && barDetail.clickToDismiss) {
-                return dismissTab$$1;
+                return dismissTab$1;
               } else if (!activeButton) {
-                return changeTab$$1;
+                return changeTab$1;
               } else {
                 return noop;
               }
@@ -26248,9 +26474,9 @@ var silver = (function () {
         };
       }
     });
-    var parts$c = constant([tabsPart]);
+    var parts$d = constant([tabsPart]);
 
-    var factory$g = function (detail, components, spec, externals) {
+    var factory$h = function (detail, components, spec, externals) {
       return {
         'uid': detail.uid,
         'dom': detail.dom,
@@ -26283,12 +26509,12 @@ var silver = (function () {
     };
     var Tabbar = composite$1({
       name: 'Tabbar',
-      configFields: schema$q(),
-      partFields: parts$c(),
-      factory: factory$g
+      configFields: schema$r(),
+      partFields: parts$d(),
+      factory: factory$h
     });
 
-    var factory$h = function (detail, spec) {
+    var factory$i = function (detail, spec) {
       return {
         uid: detail.uid,
         dom: detail.dom,
@@ -26299,10 +26525,10 @@ var silver = (function () {
     var Tabview = single$2({
       name: 'Tabview',
       configFields: [field$1('tabviewBehaviours', [Replacing])],
-      factory: factory$h
+      factory: factory$i
     });
 
-    var schema$r = constant([
+    var schema$s = constant([
       defaulted$1('selectFirst', true),
       onHandler('onChangeTab'),
       onHandler('onDismissTab'),
@@ -26327,13 +26553,13 @@ var silver = (function () {
       factory: Tabview,
       name: 'tabview'
     });
-    var parts$d = constant([
+    var parts$e = constant([
       barPart,
       viewPart
     ]);
 
-    var factory$i = function (detail, components$$1, spec, externals) {
-      var changeTab$$1 = function (button) {
+    var factory$j = function (detail, components, spec, externals) {
+      var changeTab$1 = function (button) {
         var tabValue = Representing.getValue(button);
         getPart(button, detail, 'tabview').each(function (tabview) {
           var tabWithValue = find(detail.tabs, function (t) {
@@ -26355,8 +26581,8 @@ var silver = (function () {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
-        behaviours: get$d(detail.tabSectionBehaviours),
+        components: components,
+        behaviours: get$b(detail.tabSectionBehaviours),
         events: derive(flatten([
           detail.selectFirst ? [runOnAttached(function (section, simulatedEvent) {
               changeTabBy(section, Highlighting.getFirst);
@@ -26364,7 +26590,7 @@ var silver = (function () {
           [
             run(changeTab(), function (section, simulatedEvent) {
               var button = simulatedEvent.event().button();
-              changeTab$$1(button);
+              changeTab$1(button);
             }),
             run(dismissTab(), function (section, simulatedEvent) {
               var button = simulatedEvent.event().button();
@@ -26395,9 +26621,9 @@ var silver = (function () {
     };
     var TabSection = composite$1({
       name: 'TabSection',
-      configFields: schema$r(),
-      partFields: parts$d(),
-      factory: factory$i,
+      configFields: schema$s(),
+      partFields: parts$e(),
+      factory: factory$j,
       apis: {
         getViewItems: function (apis, component) {
           return apis.getViewItems(component);
@@ -26428,13 +26654,13 @@ var silver = (function () {
       }));
     };
     var getMaxTabviewHeight = function (dialog, dialogBody) {
-      var rootElm = ancestor$2(dialog, '.tox-dialog-wrap').getOr(dialog);
-      var isFixed = get$5(rootElm, 'position') === 'fixed';
+      var rootElm = ancestor$1(dialog, '.tox-dialog-wrap').getOr(dialog);
+      var isFixed = get$4(rootElm, 'position') === 'fixed';
       var maxHeight;
       if (isFixed) {
-        maxHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+        maxHeight = Math.max(domGlobals.document.documentElement.clientHeight, domGlobals.window.innerHeight);
       } else {
-        maxHeight = Math.max(document.documentElement.offsetHeight, document.documentElement.scrollHeight);
+        maxHeight = Math.max(domGlobals.document.documentElement.offsetHeight, domGlobals.document.documentElement.scrollHeight);
       }
       var dialogChrome = dialog.dom().getBoundingClientRect().height - dialogBody.dom().getBoundingClientRect().height;
       return maxHeight - dialogChrome;
@@ -26445,7 +26671,7 @@ var silver = (function () {
       });
     };
     var updateTabviewHeight = function (dialogBody, tabview, maxTabHeight) {
-      ancestor$2(dialogBody, '[role="dialog"]').each(function (dialog) {
+      ancestor$1(dialogBody, '[role="dialog"]').each(function (dialog) {
         maxTabHeight.get().map(function (height) {
           set$2(tabview, 'height', '0');
           return Math.min(height, getMaxTabviewHeight(dialog, dialogBody));
@@ -26459,7 +26685,7 @@ var silver = (function () {
         var maxTabHeight = Cell(Option.none());
         var extraEvents = [
           runOnAttached(function (comp) {
-            descendant$2(comp.element(), '[role="tabpanel"]').each(function (tabview) {
+            descendant$1(comp.element(), '[role="tabpanel"]').each(function (tabview) {
               set$2(tabview, 'visibility', 'hidden');
               comp.getSystem().getByDom(tabview).toOption().each(function (tabviewComp) {
                 var heights = measureHeights(allTabs, tabview, tabviewComp);
@@ -26475,12 +26701,12 @@ var silver = (function () {
             });
           }),
           run(windowResize(), function (comp) {
-            descendant$2(comp.element(), '[role="tabpanel"]').each(function (tabview) {
+            descendant$1(comp.element(), '[role="tabpanel"]').each(function (tabview) {
               updateTabviewHeight(comp.element(), tabview, maxTabHeight);
             });
           }),
           run(formResizeEvent, function (comp, se) {
-            descendant$2(comp.element(), '[role="tabpanel"]').each(function (tabview) {
+            descendant$1(comp.element(), '[role="tabpanel"]').each(function (tabview) {
               var oldFocus = active();
               set$2(tabview, 'visibility', 'hidden');
               var oldHeight = getRaw(tabview, 'height').map(function (h) {
@@ -26500,7 +26726,7 @@ var silver = (function () {
                 });
               }
               remove$6(tabview, 'visibility');
-              oldFocus.each(focus$2);
+              oldFocus.each(focus$1);
             });
           })
         ];
@@ -27009,7 +27235,7 @@ var silver = (function () {
         title: backstage.shared.providers.translate(dialogInit.internalDialog.title),
         draggable: true
       }, backstage.shared.providers);
-      var body = renderModalBody({ body: dialogInit.internalDialog.body }, backstage);
+      var body$1 = renderModalBody({ body: dialogInit.internalDialog.body }, backstage);
       var footer = renderModalFooter({ buttons: dialogInit.internalDialog.buttons }, backstage.shared.providers);
       var dialogEvents = SilverDialogEvents.init(function () {
         return instanceApi;
@@ -27061,11 +27287,26 @@ var silver = (function () {
           config('execute-on-form', dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
               Keying.focusIn(comp);
             })])),
+          config('scroll-lock', [
+            runOnAttached(function () {
+              add$2(body(), 'tox-dialog__disable-scroll');
+            }),
+            runOnDetached(function () {
+              remove$4(body(), 'tox-dialog__disable-scroll');
+            })
+          ]),
           RepresentingConfigs.memory({})
         ]),
         eventOrder: (_a = {}, _a[execute()] = ['execute-on-form'], _a[attachedToDom()] = [
+          'scroll-lock',
           'reflecting',
-          'execute-on-form'
+          'execute-on-form',
+          'alloy.base.behaviour'
+        ], _a[detachedFromDom()] = [
+          'alloy.base.behaviour',
+          'execute-on-form',
+          'reflecting',
+          'scroll-lock'
         ], _a),
         dom: {
           tag: 'div',
@@ -27074,7 +27315,7 @@ var silver = (function () {
         },
         components: [
           header,
-          body,
+          body$1,
           footer
         ],
         dragBlockClass: 'tox-dialog-wrap',
@@ -27404,16 +27645,16 @@ var silver = (function () {
     var setup$a = function (extras) {
       var alertDialog = setup$8(extras);
       var confirmDialog = setup$9(extras);
-      var open = function (config$$1, params, closeWindow) {
+      var open = function (config, params, closeWindow) {
         if (params !== undefined && params.inline === 'toolbar') {
-          return openInlineDialog(config$$1, extras.backstage.shared.anchors.toolbar(), closeWindow);
+          return openInlineDialog(config, extras.backstage.shared.anchors.toolbar(), closeWindow);
         } else if (params !== undefined && params.inline === 'cursor') {
-          return openInlineDialog(config$$1, extras.backstage.shared.anchors.cursor(), closeWindow);
+          return openInlineDialog(config, extras.backstage.shared.anchors.cursor(), closeWindow);
         } else {
-          return openModalDialog(config$$1, closeWindow);
+          return openModalDialog(config, closeWindow);
         }
       };
-      var openModalDialog = function (config$$1, closeWindow) {
+      var openModalDialog = function (config, closeWindow) {
         var factory = function (contents, internalInitialData, dataValidator) {
           var initialData = internalInitialData;
           var dialogInit = {
@@ -27432,9 +27673,9 @@ var silver = (function () {
           dialog.instanceApi.setData(initialData);
           return dialog.instanceApi;
         };
-        return DialogManager.open(factory, config$$1);
+        return DialogManager.open(factory, config);
       };
-      var openInlineDialog = function (config$$1, anchor, closeWindow) {
+      var openInlineDialog = function (config$1, anchor, closeWindow) {
         var factory = function (contents, internalInitialData, dataValidator) {
           var initialData = validateData$1(internalInitialData, dataValidator);
           var dialogInit = {
@@ -27465,7 +27706,7 @@ var silver = (function () {
           Keying.focusIn(dialogUi.dialog);
           return dialogUi.instanceApi;
         };
-        return DialogManager.open(factory, config$$1);
+        return DialogManager.open(factory, config$1);
       };
       var confirm = function (message, callback) {
         confirmDialog.open(message, function (state) {
@@ -27510,5 +27751,5 @@ var silver = (function () {
 
     return Theme;
 
-}());
+}(window));
 })();

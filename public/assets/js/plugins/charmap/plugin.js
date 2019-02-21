@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
 var charmap = (function () {
@@ -53,13 +53,13 @@ var charmap = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -75,17 +75,17 @@ var charmap = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -233,7 +233,7 @@ var charmap = (function () {
       return slice.call(x);
     };
 
-    var isArray$1 = global$1.isArray;
+    var isArray = global$1.isArray;
     var UserDefined = 'User Defined';
     var getDefaultCharMap = function () {
       return [
@@ -1428,11 +1428,11 @@ var charmap = (function () {
     };
     var charmapFilter = function (charmap) {
       return global$1.grep(charmap, function (item) {
-        return isArray$1(item) && item.length === 2;
+        return isArray(item) && item.length === 2;
       });
     };
     var getCharsFromSetting = function (settingValue) {
-      if (isArray$1(settingValue)) {
+      if (isArray(settingValue)) {
         return [].concat(charmapFilter(settingValue));
       }
       if (typeof settingValue === 'function') {
@@ -1507,7 +1507,7 @@ var charmap = (function () {
       };
     };
 
-    var last$1 = function (fn, rate) {
+    var last = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -1533,15 +1533,15 @@ var charmap = (function () {
       };
     };
 
-    var contains$1 = function (str, substr) {
+    var contains = function (str, substr) {
       return str.indexOf(substr) !== -1;
     };
 
     var charMatches = function (charCode, name, lowerCasePattern) {
-      if (contains$1(String.fromCharCode(charCode).toLowerCase(), lowerCasePattern)) {
+      if (contains(String.fromCharCode(charCode).toLowerCase(), lowerCasePattern)) {
         return true;
       } else {
-        return contains$1(name.toLowerCase(), lowerCasePattern) || contains$1(name.toLowerCase().replace(/\s+/g, ''), lowerCasePattern);
+        return contains(name.toLowerCase(), lowerCasePattern) || contains(name.toLowerCase().replace(/\s+/g, ''), lowerCasePattern);
       }
     };
     var scan = function (group, pattern) {
@@ -1607,7 +1607,7 @@ var charmap = (function () {
         });
       };
       var SEARCH_DELAY = 40;
-      var updateFilter = last$1(function (dialogApi) {
+      var updateFilter = last(function (dialogApi) {
         var pattern = dialogApi.getData().pattern;
         scanAndSet(dialogApi, pattern);
       }, SEARCH_DELAY);
@@ -1656,15 +1656,11 @@ var charmap = (function () {
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
-    var isStartOfWord = function (rng, text) {
-      return rng.startOffset === 0 || /\s/.test(text.charAt(rng.startOffset - 1));
-    };
     var init = function (editor, all) {
       editor.ui.registry.addAutocompleter('charmap', {
         ch: ':',
         columns: 'auto',
         minChars: 2,
-        matches: isStartOfWord,
         fetch: function (pattern, maxResults) {
           return new global$2(function (resolve, reject) {
             resolve(Scan.scan(all, pattern));

@@ -1,4 +1,5 @@
 2019-02-21 DariusIII
+	* Chg: Update tinymce to version 5.0.1
 	* Chg: Purge accounts that have not logged in and don't have api access for more than 6 months, daily
 	* Fix: Fix getAlternate function error when there is no similar release match
 	* Chg: Add switch to enable full telescope reporting in production

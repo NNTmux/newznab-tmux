@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
 var media = (function () {
@@ -27,6 +27,7 @@ var media = (function () {
         return typeOf(value) === type;
       };
     };
+    var isString = isType('string');
     var isFunction = isType('function');
 
     var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -70,13 +71,13 @@ var media = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -92,17 +93,17 @@ var media = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -198,6 +199,12 @@ var media = (function () {
       return hasOwnProperty$1.call(obj, key);
     };
 
+    var each = function (xs, f) {
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        f(x, i, xs);
+      }
+    };
     var push = Array.prototype.push;
     var flatten = function (xs) {
       var r = [];
@@ -761,8 +768,12 @@ var media = (function () {
     var unwrap = function (data) {
       return merge(data, {
         source1: data.source1.value,
-        source2: data.source2.value,
-        poster: data.poster.value
+        source2: get(data, 'source2').bind(function (source2) {
+          return get(source2, 'value');
+        }).getOr(''),
+        poster: get(data, 'poster').bind(function (poster) {
+          return get(poster, 'value');
+        }).getOr('')
       });
     };
     var wrap = function (data) {
@@ -802,17 +813,25 @@ var media = (function () {
     };
     var addEmbedHtml = function (win, editor) {
       return function (response) {
-        var html = response.html;
-        var snippetData = snippetToData(editor, html);
-        var nuData = {
-          source1: response.url,
-          embed: html,
-          dimensions: {
-            width: snippetData.width ? snippetData.width : '',
-            height: snippetData.height ? snippetData.height : ''
-          }
-        };
-        win.setData(wrap(nuData));
+        if (isString(response.url) && response.url.trim().length > 0) {
+          var html = response.html;
+          var snippetData_1 = snippetToData(editor, html);
+          var nuData_1 = {
+            source1: response.url,
+            embed: html
+          };
+          each([
+            'width',
+            'height'
+          ], function (prop) {
+            get(snippetData_1, prop).each(function (value) {
+              var dimensions = nuData_1.dimensions || {};
+              dimensions[prop] = value;
+              nuData_1.dimensions = dimensions;
+            });
+          });
+          win.setData(wrap(nuData_1));
+        }
       };
     };
     var selectPlaceholder = function (editor, beforeObjects) {
@@ -911,7 +930,7 @@ var media = (function () {
           name: 'source2',
           type: 'urlinput',
           filetype: 'media',
-          label: 'Alternative image URL'
+          label: 'Alternative source URL'
         });
       }
       if (Settings.hasPoster(editor)) {
@@ -964,10 +983,9 @@ var media = (function () {
           case 'source1':
             handleSource1(api);
             break;
-          case 'dimensions':
-            handleSource1(api);
           case 'embed':
             handleEmbed(api);
+            break;
           default:
             break;
           }

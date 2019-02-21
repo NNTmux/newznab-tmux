@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
 var searchreplace = (function () {
@@ -440,13 +440,13 @@ var searchreplace = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -462,17 +462,17 @@ var searchreplace = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -514,12 +514,12 @@ var searchreplace = (function () {
       }
     };
     var slice = Array.prototype.slice;
-    var from$1 = isFunction(Array.from) ? Array.from : function (x) {
+    var from = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
 
     var open = function (editor, currentIndexState) {
-      var last$$1 = {}, selectedText;
+      var last = {}, selectedText;
       editor.undoManager.add();
       selectedText = global$1.trim(editor.selection.getContent({ format: 'text' }));
       function updateButtonStates(api) {
@@ -551,7 +551,7 @@ var searchreplace = (function () {
           updateButtonStates(api);
           return;
         }
-        if (last$$1.text === data.findtext && last$$1.caseState === data.matchcase && last$$1.wholeWord === data.wholewords) {
+        if (last.text === data.findtext && last.caseState === data.matchcase && last.wholeWord === data.wholewords) {
           if (!Actions.hasNext(editor, currentIndexState)) {
             notFoundAlert(api);
             return;
@@ -566,7 +566,7 @@ var searchreplace = (function () {
         }
         disableAll(api, count === 0);
         updateButtonStates(api);
-        last$$1 = {
+        last = {
           text: data.findtext,
           caseState: data.matchcase,
           wholeWord: data.wholewords
@@ -662,13 +662,13 @@ var searchreplace = (function () {
             if (!Actions.replace(editor, currentIndexState, data.replacetext)) {
               disableAll(api, true);
               currentIndexState.set(-1);
-              last$$1 = {};
+              last = {};
             }
             break;
           case 'replaceall':
             Actions.replace(editor, currentIndexState, data.replacetext, true, true);
             disableAll(api, true);
-            last$$1 = {};
+            last = {};
             break;
           case 'prev':
             Actions.prev(editor, currentIndexState);

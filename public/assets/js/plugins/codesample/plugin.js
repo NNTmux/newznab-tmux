@@ -4,19 +4,19 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var codesample = (function () {
+var codesample = (function (domGlobals) {
   'use strict';
 
   var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
   var global$1 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-  var window$$1 = {};
-  var global$2 = window$$1;
-  var _self = typeof window$$1 !== 'undefined' ? window$$1 : typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope ? self : {};
+  var window = {};
+  var global$2 = window;
+  var _self = typeof window !== 'undefined' ? window : typeof WorkerGlobalScope !== 'undefined' && domGlobals.self instanceof WorkerGlobalScope ? domGlobals.self : {};
   var Prism = function () {
     var lang = /\blang(?:uage)?-(?!\*)(\w+)\b/i;
     var _ = _self.Prism = {
@@ -107,27 +107,27 @@ var codesample = (function () {
       },
       plugins: {},
       highlightAll: function (async, callback) {
-        var elements = document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');
+        var elements = domGlobals.document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');
         for (var i = 0, element = void 0; element = elements[i++];) {
           _.highlightElement(element, async === true, callback);
         }
       },
       highlightElement: function (element, async, callback) {
-        var language, grammar, parent$$1 = element;
-        while (parent$$1 && !lang.test(parent$$1.className)) {
-          parent$$1 = parent$$1.parentNode;
+        var language, grammar, parent = element;
+        while (parent && !lang.test(parent.className)) {
+          parent = parent.parentNode;
         }
-        if (parent$$1) {
-          language = (parent$$1.className.match(lang) || [
+        if (parent) {
+          language = (parent.className.match(lang) || [
             ,
             ''
           ])[1];
           grammar = _.languages[language];
         }
         element.className = element.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
-        parent$$1 = element.parentNode;
-        if (/pre/i.test(parent$$1.nodeName)) {
-          parent$$1.className = parent$$1.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
+        parent = element.parentNode;
+        if (/pre/i.test(parent.nodeName)) {
+          parent.className = parent.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
         }
         var code = element.textContent;
         var env = {
@@ -142,7 +142,7 @@ var codesample = (function () {
         }
         _.hooks.run('before-highlight', env);
         if (async && _self.Worker) {
-          var worker = new Worker(_.filename);
+          var worker = new domGlobals.Worker(_.filename);
           worker.onmessage = function (evt) {
             env.highlightedCode = evt.data;
             _.hooks.run('before-insert', env);
@@ -235,13 +235,13 @@ var codesample = (function () {
       },
       hooks: {
         all: {},
-        add: function (name$$1, callback) {
+        add: function (name, callback) {
           var hooks = _.hooks.all;
-          hooks[name$$1] = hooks[name$$1] || [];
-          hooks[name$$1].push(callback);
+          hooks[name] = hooks[name] || [];
+          hooks[name].push(callback);
         },
-        run: function (name$$1, env) {
-          var callbacks = _.hooks.all[name$$1];
+        run: function (name, env) {
+          var callbacks = _.hooks.all[name];
           if (!callbacks || !callbacks.length) {
             return;
           }
@@ -256,7 +256,7 @@ var codesample = (function () {
       this.content = content;
       this.alias = alias;
     };
-    Token.stringify = function (o, language, parent$$1) {
+    Token.stringify = function (o, language, parent) {
       if (typeof o === 'string') {
         return o;
       }
@@ -267,7 +267,7 @@ var codesample = (function () {
       }
       var env = {
         type: o.type,
-        content: Token.stringify(o.content, language, parent$$1),
+        content: Token.stringify(o.content, language, parent),
         tag: 'span',
         classes: [
           'token',
@@ -275,7 +275,7 @@ var codesample = (function () {
         ],
         attributes: {},
         language: language,
-        parent: parent$$1
+        parent: parent
       };
       if (env.type === 'comment') {
         env.attributes.spellcheck = 'true';
@@ -286,8 +286,8 @@ var codesample = (function () {
       }
       _.hooks.run('wrap', env);
       var attributes = '';
-      for (var name$$1 in env.attributes) {
-        attributes += (attributes ? ' ' : '') + name$$1 + '="' + (env.attributes[name$$1] || '') + '"';
+      for (var name in env.attributes) {
+        attributes += (attributes ? ' ' : '') + name + '="' + (env.attributes[name] || '') + '"';
       }
       return '<' + env.tag + ' class="' + env.classes.join(' ') + '" ' + attributes + '>' + env.content + '</' + env.tag + '>';
     };
@@ -711,13 +711,13 @@ var codesample = (function () {
     var eq = function (o) {
       return o.isNone();
     };
-    var call$$1 = function (thunk) {
+    var call = function (thunk) {
       return thunk();
     };
     var id = function (n) {
       return n;
     };
-    var noop$$1 = function () {
+    var noop = function () {
     };
     var nul = function () {
       return null;
@@ -733,17 +733,17 @@ var codesample = (function () {
       isSome: never$1,
       isNone: always$1,
       getOr: id,
-      getOrThunk: call$$1,
+      getOrThunk: call,
       getOrDie: function (msg) {
         throw new Error(msg || 'error: getOrDie called on none.');
       },
       getOrNull: nul,
       getOrUndefined: undef,
       or: id,
-      orThunk: call$$1,
+      orThunk: call,
       map: none,
       ap: none,
-      each: noop$$1,
+      each: noop,
       bind: none,
       flatten: none,
       exists: never$1,
@@ -1056,12 +1056,25 @@ var codesample = (function () {
   };
   var FilterContent = { setup: setup };
 
+  var isCodeSampleSelection = function (editor) {
+    var node = editor.selection.getStart();
+    return editor.dom.is(node, 'pre.language-markup');
+  };
   var register$1 = function (editor) {
-    editor.ui.registry.addButton('codesample', {
+    editor.ui.registry.addToggleButton('codesample', {
       icon: 'code-sample',
       tooltip: 'Insert/edit code sample',
       onAction: function () {
         return Dialog.open(editor);
+      },
+      onSetup: function (api) {
+        var nodeChangeHandler = function () {
+          api.setActive(isCodeSampleSelection(editor));
+        };
+        editor.on('nodeChange', nodeChangeHandler);
+        return function () {
+          return editor.off('nodeChange', nodeChangeHandler);
+        };
       }
     });
     editor.ui.registry.addMenuItem('codesample', {
@@ -1089,5 +1102,5 @@ var codesample = (function () {
 
   return Plugin;
 
-}());
+}(window));
 })();

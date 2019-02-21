@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
 var wordcount = (function () {
@@ -82,6 +82,9 @@ var wordcount = (function () {
         return value;
       };
     };
+    var identity = function (x) {
+      return x;
+    };
     var never = constant(false);
     var always = constant(true);
 
@@ -94,13 +97,13 @@ var wordcount = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -116,17 +119,17 @@ var wordcount = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -171,19 +174,17 @@ var wordcount = (function () {
       return r;
     };
     var slice = Array.prototype.slice;
-    var from$1 = isFunction(Array.from) ? Array.from : function (x) {
+    var from = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
 
     var SETS$1 = SETS;
     var OTHER = characterIndices.OTHER;
     var getType = function (char) {
-      var j;
-      var set;
       var type = OTHER;
       var setsLength = SETS$1.length;
-      for (j = 0; j < setsLength; ++j) {
-        set = SETS$1[j];
+      for (var j = 0; j < setsLength; ++j) {
+        var set = SETS$1[j];
         if (set && set.test(char)) {
           type = j;
           break;
@@ -328,7 +329,7 @@ var wordcount = (function () {
       return findWords(filteredChars, extractedChars, characterMap, options);
     };
 
-    var Words = { getWords: getWords };
+    var getWords$1 = getWords;
 
     var getText = function (node, schema) {
       var blockElements = schema.getBlockElements();
@@ -351,17 +352,9 @@ var wordcount = (function () {
     var getTextContent = function (editor) {
       return editor.removed ? '' : getText(editor.getBody(), editor.schema);
     };
-    var extractCharacter = function (char) {
-      return char.character;
-    };
-    var parseString = function (str) {
-      return map(str.split(''), function (character) {
-        return { character: character };
-      });
-    };
     var getCount = function (textContent) {
       return {
-        words: Words.getWords(parseString(textContent), extractCharacter).length,
+        words: getWords$1(textContent.split(''), identity).length,
         characters: textContent.length,
         charactersNoSpace: textContent.replace(/\s/g, '').length
       };

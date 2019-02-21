@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
 var emoticons = (function () {
@@ -43,13 +43,13 @@ var emoticons = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -65,17 +65,17 @@ var emoticons = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -206,13 +206,13 @@ var emoticons = (function () {
       return slice.call(x);
     };
 
-    var contains$1 = function (str, substr) {
+    var contains = function (str, substr) {
       return str.indexOf(substr) !== -1;
     };
 
     var emojiMatches = function (emoji, lowerCasePattern) {
-      return contains$1(emoji.title.toLowerCase(), lowerCasePattern) || exists(emoji.keywords, function (k) {
-        return contains$1(k.toLowerCase(), lowerCasePattern);
+      return contains(emoji.title.toLowerCase(), lowerCasePattern) || exists(emoji.keywords, function (k) {
+        return contains(k.toLowerCase(), lowerCasePattern);
       });
     };
     var emojisFrom = function (list, pattern, maxResults) {
@@ -240,15 +240,11 @@ var emoticons = (function () {
       return matches;
     };
 
-    var isStartOfWord = function (rng, text) {
-      return rng.startOffset === 0 || /\s/.test(text.charAt(rng.startOffset - 1));
-    };
     var init = function (editor, database) {
       editor.ui.registry.addAutocompleter('emoticons', {
         ch: ':',
         columns: 'auto',
         minChars: 2,
-        matches: isStartOfWord,
         fetch: function (pattern, maxResults) {
           return database.waitForLoad().then(function () {
             var candidates = database.listAll();
@@ -281,7 +277,7 @@ var emoticons = (function () {
       };
     };
 
-    var last$2 = function (fn, rate) {
+    var last = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -311,13 +307,29 @@ var emoticons = (function () {
 
     var keys = Object.keys;
     var hasOwnProperty = Object.hasOwnProperty;
-    var each$1 = function (obj, f) {
+    var each = function (obj, f) {
       var props = keys(obj);
       for (var k = 0, len = props.length; k < len; k++) {
         var i = props[k];
         var x = obj[i];
         f(x, i, obj);
       }
+    };
+    var map$1 = function (obj, f) {
+      return tupleMap(obj, function (x, i, obj) {
+        return {
+          k: i,
+          v: f(x, i, obj)
+        };
+      });
+    };
+    var tupleMap = function (obj, f) {
+      var r = {};
+      each(obj, function (x, i) {
+        var tuple = f(x, i, obj);
+        r[tuple.k] = tuple.v;
+      });
+      return r;
     };
     var has = function (obj, key) {
       return hasOwnProperty.call(obj, key);
@@ -425,9 +437,44 @@ var emoticons = (function () {
       error: error
     };
 
+    var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+    var shallow = function (old, nu) {
+      return nu;
+    };
+    var baseMerge = function (merger) {
+      return function () {
+        var objects = new Array(arguments.length);
+        for (var i = 0; i < objects.length; i++)
+          objects[i] = arguments[i];
+        if (objects.length === 0)
+          throw new Error('Can\'t merge zero objects');
+        var ret = {};
+        for (var j = 0; j < objects.length; j++) {
+          var curObject = objects[j];
+          for (var key in curObject)
+            if (hasOwnProperty$1.call(curObject, key)) {
+              ret[key] = merger(ret[key], curObject[key]);
+            }
+        }
+        return ret;
+      };
+    };
+    var merge = baseMerge(shallow);
+
     var global$1 = tinymce.util.Tools.resolve('tinymce.dom.ScriptLoader');
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.Promise');
+
+    var getEmoticonDatabaseUrl = function (editor, pluginUrl) {
+      return editor.getParam('emoticons_database_url', pluginUrl + '/js/emojis' + editor.suffix + '.js');
+    };
+    var getAppendedEmoticons = function (editor) {
+      return editor.getParam('emoticons_append', {}, 'object');
+    };
+    var Settings = {
+      getEmoticonDatabaseUrl: getEmoticonDatabaseUrl,
+      getAppendedEmoticons: getAppendedEmoticons
+    };
 
     var ALL_CATEGORY = 'All';
     var categoryNameMap = {
@@ -438,7 +485,8 @@ var emoticons = (function () {
       activity: 'Activity',
       travel_and_places: 'Travel and Places',
       objects: 'Objects',
-      flags: 'Flags'
+      flags: 'Flags',
+      user: 'User Defined'
     };
     var GLOBAL_NAME = 'emoticons_plugin_database';
     var extractGlobal = function (url) {
@@ -450,34 +498,47 @@ var emoticons = (function () {
         return Result.error('URL ' + url + ' did not contain the expected format for emoticons');
       }
     };
-    var translateCategory = function (name) {
-      return has(categoryNameMap, name) ? categoryNameMap[name] : name;
+    var translateCategory = function (categories, name) {
+      return has(categories, name) ? categories[name] : name;
+    };
+    var getUserDefinedEmoticons = function (editor) {
+      var userDefinedEmoticons = Settings.getAppendedEmoticons(editor);
+      return map$1(userDefinedEmoticons, function (value) {
+        return merge({
+          keywords: [],
+          category: 'user'
+        }, value);
+      });
     };
     var initDatabase = function (editor, databaseUrl) {
       var categories = Cell(Option.none());
       var all = Cell(Option.none());
+      var processEmojis = function (emojis) {
+        var cats = {};
+        var everything = [];
+        each(emojis, function (lib, title) {
+          var entry = {
+            title: title,
+            keywords: lib.keywords,
+            char: lib.char,
+            category: translateCategory(categoryNameMap, lib.category)
+          };
+          var current = cats[entry.category] !== undefined ? cats[entry.category] : [];
+          cats[entry.category] = current.concat([entry]);
+          everything.push(entry);
+        });
+        categories.set(Option.some(cats));
+        all.set(Option.some(everything));
+      };
       editor.on('init', function () {
         global$1.ScriptLoader.loadScript(databaseUrl, function () {
-          var cats = {};
-          var everything = [];
           extractGlobal(databaseUrl).fold(function (err) {
             console.log(err);
             categories.set(Option.some({}));
             all.set(Option.some([]));
           }, function (emojis) {
-            each$1(emojis, function (lib, n) {
-              var entry = {
-                title: n,
-                keywords: lib.keywords,
-                char: lib.char,
-                category: translateCategory(lib.category)
-              };
-              var current = cats[entry.category] !== undefined ? cats[entry.category] : [];
-              cats[entry.category] = current.concat([entry]);
-              everything.push(entry);
-            });
-            categories.set(Option.some(cats));
-            all.set(Option.some(everything));
+            var userEmojis = getUserDefinedEmoticons(editor);
+            processEmojis(merge(emojis, userEmojis));
           });
         }, function () {
         });
@@ -546,7 +607,7 @@ var emoticons = (function () {
         var results = emojisFrom(candidates, dialogData[patternName], category === ALL_CATEGORY ? Option.some(300) : Option.none());
         dialogApi.setData({ results: results });
       };
-      var updateFilter = last$2(function (dialogApi) {
+      var updateFilter = last(function (dialogApi) {
         var category = currentTab.get();
         scan(dialogApi, category);
       }, 200);
@@ -650,11 +711,6 @@ var emoticons = (function () {
       });
     };
     var Buttons = { register: register };
-
-    var getEmoticonDatabaseUrl = function (editor, pluginUrl) {
-      return editor.getParam('emoticons_database_url', pluginUrl + '/js/emojis' + editor.suffix + '.js');
-    };
-    var Settings = { getEmoticonDatabaseUrl: getEmoticonDatabaseUrl };
 
     global.add('emoticons', function (editor, pluginUrl) {
       var databaseUrl = Settings.getEmoticonDatabaseUrl(editor, pluginUrl);

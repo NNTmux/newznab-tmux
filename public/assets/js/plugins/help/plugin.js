@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
 var help = (function () {
@@ -52,13 +52,13 @@ var help = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -74,17 +74,17 @@ var help = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -272,39 +272,39 @@ var help = (function () {
         action: 'Undo'
       },
       {
-        shortcuts: ['Ctrl + Alt + 1'],
+        shortcuts: ['Access + 1'],
         action: 'Header 1'
       },
       {
-        shortcuts: ['Ctrl + Alt + 2'],
+        shortcuts: ['Access + 2'],
         action: 'Header 2'
       },
       {
-        shortcuts: ['Ctrl + Alt + 3'],
+        shortcuts: ['Access + 3'],
         action: 'Header 3'
       },
       {
-        shortcuts: ['Ctrl + Alt + 4'],
+        shortcuts: ['Access + 4'],
         action: 'Header 4'
       },
       {
-        shortcuts: ['Ctrl + Alt + 5'],
+        shortcuts: ['Access + 5'],
         action: 'Header 5'
       },
       {
-        shortcuts: ['Ctrl + Alt + 6'],
+        shortcuts: ['Access + 6'],
         action: 'Header 6'
       },
       {
-        shortcuts: ['Ctrl + Alt + 7'],
+        shortcuts: ['Access + 7'],
         action: 'Paragraph'
       },
       {
-        shortcuts: ['Ctrl + Alt + 8'],
+        shortcuts: ['Access + 8'],
         action: 'Div'
       },
       {
-        shortcuts: ['Ctrl + Alt + 9'],
+        shortcuts: ['Access + 9'],
         action: 'Address'
       },
       {
@@ -363,9 +363,13 @@ var help = (function () {
         alt: '&#x2325;',
         ctrl: '&#x2303;',
         shift: '&#x21E7;',
-        meta: '&#x2318;'
+        meta: '&#x2318;',
+        access: '&#x2303;&#x2325;'
       };
-      var other = { meta: 'Ctrl ' };
+      var other = {
+        meta: 'Ctrl ',
+        access: 'Shift + Alt '
+      };
       var replace = global$1.mac ? mac : other;
       var shortcut = source.split('+');
       var updated = map(shortcut, function (segment) {
@@ -655,8 +659,8 @@ var help = (function () {
         });
       };
       var getPluginKeys = function (editor) {
-        var keys$$1 = keys(editor.plugins);
-        return editor.settings.forced_plugins === undefined ? keys$$1 : filter(keys$$1, not(curry(contains, editor.settings.forced_plugins)));
+        var keys$1 = keys(editor.plugins);
+        return editor.settings.forced_plugins === undefined ? keys$1 : filter(keys$1, not(curry(contains, editor.settings.forced_plugins)));
       };
       var pluginLister = function (editor) {
         var pluginKeys = getPluginKeys(editor);
@@ -693,7 +697,7 @@ var help = (function () {
 
     var global$3 = tinymce.util.Tools.resolve('tinymce.EditorManager');
 
-    var tab$2 = function () {
+    var defaultPanel = function () {
       var getVersion = function (major, minor) {
         return major.indexOf('@') === 0 ? 'X.X.X' : major + '.' + minor;
       };
@@ -706,9 +710,19 @@ var help = (function () {
           changeLogLink
         ]) + '</p>'
       };
+      return htmlPanel;
+    };
+    var VersionPanel = { defaultPanel: defaultPanel };
+
+    var getVersionPanel = function (editor) {
+      return editor.getParam('help_version', VersionPanel.defaultPanel, 'function')();
+    };
+    var Settings = { getVersionPanel: getVersionPanel };
+
+    var tab$2 = function (editor) {
       return {
         title: 'Version',
-        items: [htmlPanel]
+        items: [Settings.getVersionPanel(editor)]
       };
     };
     var VersionTab = { tab: tab$2 };
@@ -720,7 +734,7 @@ var help = (function () {
           tabs: [
             KeyboardShortcutsTab.tab(),
             PluginsTab.tab(editor),
-            VersionTab.tab()
+            VersionTab.tab(editor)
           ]
         };
         editor.windowManager.open({

@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var imagetools = (function () {
+var imagetools = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -33,7 +33,7 @@ var imagetools = (function () {
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
     function create(width, height) {
-      return resize(document.createElement('canvas'), width, height);
+      return resize(domGlobals.document.createElement('canvas'), width, height);
     }
     function clone(canvas) {
       var tCanvas, ctx;
@@ -92,7 +92,7 @@ var imagetools = (function () {
         doResolve(fn, bind(resolve, this), bind(reject, this));
       };
       var asap = Promise.immediateFn || typeof window.setImmediate === 'function' && window.setImmediate || function (fn) {
-        setTimeout(fn, 1);
+        domGlobals.setTimeout(fn, 1);
       };
       function bind(fn, thisArg) {
         return function () {
@@ -269,13 +269,13 @@ var imagetools = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -291,17 +291,17 @@ var imagetools = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -450,8 +450,8 @@ var imagetools = (function () {
     }
     function blobToImage(blob) {
       return new Promise(function (resolve, reject) {
-        var blobUrl = URL.createObjectURL(blob);
-        var image = new Image();
+        var blobUrl = domGlobals.URL.createObjectURL(blob);
+        var image = new domGlobals.Image();
         var removeListeners = function () {
           image.removeEventListener('load', loaded);
           image.removeEventListener('error', error);
@@ -474,7 +474,7 @@ var imagetools = (function () {
     }
     function anyUriToBlob(url) {
       return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
+        var xhr = new domGlobals.XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'blob';
         xhr.onload = function () {
@@ -539,7 +539,7 @@ var imagetools = (function () {
     }
     function canvasToBlob(canvas, type, quality) {
       type = type || 'image/png';
-      if (HTMLCanvasElement.prototype.toBlob) {
+      if (domGlobals.HTMLCanvasElement.prototype.toBlob) {
         return new Promise(function (resolve) {
           canvas.toBlob(function (blob) {
             resolve(blob);
@@ -589,7 +589,7 @@ var imagetools = (function () {
       });
     }
     function revokeImageUrl(image) {
-      URL.revokeObjectURL(image.src);
+      domGlobals.URL.revokeObjectURL(image.src);
     }
     var Conversions = {
       blobToImage: blobToImage,
@@ -706,7 +706,7 @@ var imagetools = (function () {
       }
       return value;
     }
-    function identity$1() {
+    function identity() {
       return [
         1,
         0,
@@ -1102,7 +1102,7 @@ var imagetools = (function () {
       ], value));
     }
     var ColorMatrix = {
-      identity: identity$1,
+      identity: identity,
       adjust: adjust,
       multiply: multiply,
       adjustContrast: adjustContrast,
@@ -1979,7 +1979,7 @@ var imagetools = (function () {
     var revokeObjectURL = function (u) {
       url().revokeObjectURL(u);
     };
-    var URL$1 = {
+    var URL = {
       createObjectURL: createObjectURL,
       revokeObjectURL: revokeObjectURL
     };
@@ -2099,7 +2099,7 @@ var imagetools = (function () {
       return slice.call(x);
     };
 
-    function XMLHttpRequest$1 () {
+    function XMLHttpRequest () {
       var f = Global$1.getOrDie('XMLHttpRequest');
       return new f();
     }
@@ -2117,7 +2117,7 @@ var imagetools = (function () {
     var requestUrlAsBlob = function (url, headers, withCredentials) {
       return new global$3(function (resolve) {
         var xhr;
-        xhr = XMLHttpRequest$1();
+        xhr = XMLHttpRequest();
         xhr.onreadystatechange = function () {
           if (xhr.readyState === 4) {
             resolve({
@@ -2274,7 +2274,7 @@ var imagetools = (function () {
     var documentPositionContainedBy = function (a, b) {
       return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
     };
-    var Node$1 = {
+    var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
     };
@@ -2473,14 +2473,14 @@ var imagetools = (function () {
       detectOs: detectOs
     };
 
-    var contains$1 = function (str, substr) {
+    var contains = function (str, substr) {
       return str.indexOf(substr) !== -1;
     };
 
     var normalVersionRegex = /.*?version\/\ ?([0-9]+)\.([0-9]+).*/;
     var checkContains = function (target) {
       return function (uastring) {
-        return contains$1(uastring, target);
+        return contains(uastring, target);
       };
     };
     var browsers = [
@@ -2488,7 +2488,7 @@ var imagetools = (function () {
         name: 'Edge',
         versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
         search: function (uastring) {
-          var monstrosity = contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
+          var monstrosity = contains(uastring, 'edge/') && contains(uastring, 'chrome') && contains(uastring, 'safari') && contains(uastring, 'applewebkit');
           return monstrosity;
         }
       },
@@ -2499,7 +2499,7 @@ var imagetools = (function () {
           normalVersionRegex
         ],
         search: function (uastring) {
-          return contains$1(uastring, 'chrome') && !contains$1(uastring, 'chromeframe');
+          return contains(uastring, 'chrome') && !contains(uastring, 'chromeframe');
         }
       },
       {
@@ -2509,7 +2509,7 @@ var imagetools = (function () {
           /.*?rv:([0-9]+)\.([0-9]+).*/
         ],
         search: function (uastring) {
-          return contains$1(uastring, 'msie') || contains$1(uastring, 'trident');
+          return contains(uastring, 'msie') || contains(uastring, 'trident');
         }
       },
       {
@@ -2532,7 +2532,7 @@ var imagetools = (function () {
           /.*?cpu os ([0-9]+)_([0-9]+).*/
         ],
         search: function (uastring) {
-          return (contains$1(uastring, 'safari') || contains$1(uastring, 'mobile/')) && contains$1(uastring, 'applewebkit');
+          return (contains(uastring, 'safari') || contains(uastring, 'mobile/')) && contains(uastring, 'applewebkit');
         }
       }
     ];
@@ -2545,7 +2545,7 @@ var imagetools = (function () {
       {
         name: 'iOS',
         search: function (uastring) {
-          return contains$1(uastring, 'iphone') || contains$1(uastring, 'ipad');
+          return contains(uastring, 'iphone') || contains(uastring, 'ipad');
         },
         versionRegexes: [
           /.*?version\/\ ?([0-9]+)\.([0-9]+).*/,
@@ -2599,28 +2599,28 @@ var imagetools = (function () {
     var PlatformDetection = { detect: detect$2 };
 
     var detect$3 = cached(function () {
-      var userAgent = navigator.userAgent;
+      var userAgent = domGlobals.navigator.userAgent;
       return PlatformDetection.detect(userAgent);
     });
     var PlatformDetection$1 = { detect: detect$3 };
 
     var fromHtml = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
       if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        console.error('HTML does not have a single root node', html);
+        domGlobals.console.error('HTML does not have a single root node', html);
         throw new Error('HTML must have a single root node');
       }
       return fromDom(div.childNodes[0]);
     };
     var fromTag = function (tag, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createElement(tag);
       return fromDom(node);
     };
     var fromText = function (text, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createTextNode(text);
       return fromDom(node);
     };
@@ -2634,7 +2634,7 @@ var imagetools = (function () {
       var doc = docElm.dom();
       return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
     };
-    var Element$$1 = {
+    var Element = {
       fromHtml: fromHtml,
       fromTag: fromTag,
       fromText: fromText,
@@ -2642,18 +2642,18 @@ var imagetools = (function () {
       fromPoint: fromPoint
     };
 
-    var ATTRIBUTE = Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = Node.CDATA_SECTION_NODE;
-    var COMMENT = Node.COMMENT_NODE;
-    var DOCUMENT = Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = Node.ELEMENT_NODE;
-    var TEXT = Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = Node.ENTITY_NODE;
-    var NOTATION = Node.NOTATION_NODE;
+    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
+    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
+    var COMMENT = domGlobals.Node.COMMENT_NODE;
+    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
+    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
+    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
+    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
+    var TEXT = domGlobals.Node.TEXT_NODE;
+    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
+    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
+    var ENTITY = domGlobals.Node.ENTITY_NODE;
+    var NOTATION = domGlobals.Node.NOTATION_NODE;
 
     var ELEMENT$1 = ELEMENT;
     var is = function (element, selector) {
@@ -2679,14 +2679,14 @@ var imagetools = (function () {
       return d1 === d2 ? false : d1.contains(d2);
     };
     var ieContains = function (e1, e2) {
-      return Node$1.documentPositionContainedBy(e1.dom(), e2.dom());
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
     var browser = PlatformDetection$1.detect().browser;
-    var contains$2 = browser.isIE() ? ieContains : regularContains;
+    var contains$1 = browser.isIE() ? ieContains : regularContains;
 
     var child = function (scope, predicate) {
-      var result = find(scope.dom().childNodes, compose(predicate, Element$$1.fromDom));
-      return result.map(Element$$1.fromDom);
+      var result = find(scope.dom().childNodes, compose(predicate, Element.fromDom));
+      return result.map(Element.fromDom);
     };
 
     var child$1 = function (scope, selector) {
@@ -2697,7 +2697,7 @@ var imagetools = (function () {
 
     var count = 0;
     var getFigureImg = function (elem) {
-      return child$1(Element$$1.fromDom(elem), 'img');
+      return child$1(Element.fromDom(elem), 'img');
     };
     var isFigure = function (editor, elem) {
       return editor.dom.is(elem, 'figure');
@@ -2728,7 +2728,7 @@ var imagetools = (function () {
       if (isFigure(editor, elem)) {
         return getFigureImg(elem);
       } else {
-        return Option.some(Element$$1.fromDom(elem));
+        return Option.some(Element.fromDom(elem));
       }
     };
     var extractFilename = function (editor, url) {
@@ -2875,7 +2875,7 @@ var imagetools = (function () {
               ImageSize$1.setImageSize(img, newSize);
             }
           }
-          URL$1.revokeObjectURL(newImage.src);
+          URL.revokeObjectURL(newImage.src);
           return blob;
         }).then(ResultConversions.blobToImageResult).then(function (imageResult) {
           return updateSelectedImage(editor, imageResult, true, imageUploadTimerState, img);
@@ -2900,7 +2900,7 @@ var imagetools = (function () {
     var createState = function (blob) {
       return {
         blob: blob,
-        url: URL$1.createObjectURL(blob)
+        url: URL.createObjectURL(blob)
       };
     };
     var makeOpen = function (editor, imageUploadTimerState) {
@@ -3096,5 +3096,5 @@ var imagetools = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

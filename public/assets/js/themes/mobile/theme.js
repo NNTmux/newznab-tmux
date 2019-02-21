@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var mobile = (function (exports) {
+var mobile = (function (exports, domGlobals) {
     'use strict';
 
     var __assign = function () {
@@ -100,13 +100,13 @@ var mobile = (function (exports) {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -122,17 +122,17 @@ var mobile = (function (exports) {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -296,7 +296,7 @@ var mobile = (function (exports) {
       }
       return undefined;
     };
-    var find$1 = function (regexes, agent) {
+    var find = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
       if (!r)
         return {
@@ -312,7 +312,7 @@ var mobile = (function (exports) {
       var cleanedAgent = String(agent).toLowerCase();
       if (versionRegexes.length === 0)
         return unknown();
-      return find$1(versionRegexes, cleanedAgent);
+      return find(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
       return nu(0, 0);
@@ -518,7 +518,7 @@ var mobile = (function (exports) {
       });
       return acc;
     };
-    var find$2 = function (xs, pred) {
+    var find$1 = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
         if (pred(x, i, xs)) {
@@ -587,7 +587,7 @@ var mobile = (function (exports) {
 
     var detect$1 = function (candidates, userAgent) {
       var agent = String(userAgent).toLowerCase();
-      return find$2(candidates, function (candidate) {
+      return find$1(candidates, function (candidate) {
         return candidate.search(agent);
       });
     };
@@ -764,13 +764,13 @@ var mobile = (function (exports) {
     var PlatformDetection = { detect: detect$2 };
 
     var detect$3 = cached(function () {
-      var userAgent = navigator.userAgent;
+      var userAgent = domGlobals.navigator.userAgent;
       return PlatformDetection.detect(userAgent);
     });
     var PlatformDetection$1 = { detect: detect$3 };
 
     var alloy = { tap: constant('alloy.tap') };
-    var focus$1 = constant('alloy.focus');
+    var focus = constant('alloy.focus');
     var postBlur = constant('alloy.blur.post');
     var postPaste = constant('alloy.paste.post');
     var receive = constant('alloy.receive');
@@ -810,22 +810,22 @@ var mobile = (function (exports) {
     };
 
     var fromHtml = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
       if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        console.error('HTML does not have a single root node', html);
+        domGlobals.console.error('HTML does not have a single root node', html);
         throw new Error('HTML must have a single root node');
       }
       return fromDom(div.childNodes[0]);
     };
     var fromTag = function (tag, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createElement(tag);
       return fromDom(node);
     };
     var fromText = function (text, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createTextNode(text);
       return fromDom(node);
     };
@@ -839,7 +839,7 @@ var mobile = (function (exports) {
       var doc = docElm.dom();
       return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
     };
-    var Element$$1 = {
+    var Element = {
       fromHtml: fromHtml,
       fromTag: fromTag,
       fromText: fromText,
@@ -847,18 +847,18 @@ var mobile = (function (exports) {
       fromPoint: fromPoint
     };
 
-    var ATTRIBUTE = Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = Node.CDATA_SECTION_NODE;
-    var COMMENT = Node.COMMENT_NODE;
-    var DOCUMENT = Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = Node.ELEMENT_NODE;
-    var TEXT = Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = Node.ENTITY_NODE;
-    var NOTATION = Node.NOTATION_NODE;
+    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
+    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
+    var COMMENT = domGlobals.Node.COMMENT_NODE;
+    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
+    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
+    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
+    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
+    var TEXT = domGlobals.Node.TEXT_NODE;
+    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
+    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
+    var ENTITY = domGlobals.Node.ENTITY_NODE;
+    var NOTATION = domGlobals.Node.NOTATION_NODE;
 
     var name = function (element) {
       var r = element.dom().nodeName;
@@ -880,14 +880,14 @@ var mobile = (function (exports) {
       return dom !== undefined && dom !== null && dom.ownerDocument.body.contains(dom);
     };
     var body = cached(function () {
-      return getBody(Element$$1.fromDom(document));
+      return getBody(Element.fromDom(domGlobals.document));
     });
     var getBody = function (doc) {
       var b = doc.dom().body;
       if (b === null || b === undefined) {
         throw new Error('Body is not available yet');
       }
-      return Element$$1.fromDom(b);
+      return Element.fromDom(b);
     };
 
     var Immutable = function () {
@@ -911,14 +911,14 @@ var mobile = (function (exports) {
       };
     };
 
-    var sort$1 = function (arr) {
+    var sort = function (arr) {
       return arr.slice(0).sort();
     };
     var reqMessage = function (required, keys) {
-      throw new Error('All required keys (' + sort$1(required).join(', ') + ') were not specified. Specified keys were: ' + sort$1(keys).join(', ') + '.');
+      throw new Error('All required keys (' + sort(required).join(', ') + ') were not specified. Specified keys were: ' + sort(keys).join(', ') + '.');
     };
     var unsuppMessage = function (unsupported) {
-      throw new Error('Unsupported keys for object: ' + sort$1(unsupported).join(', '));
+      throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
     };
     var validateStrArr = function (label, array) {
       if (!isArray(array))
@@ -929,8 +929,8 @@ var mobile = (function (exports) {
       });
     };
     var checkDupes = function (everything) {
-      var sorted = sort$1(everything);
-      var dupe = find$2(sorted, function (s, i) {
+      var sorted = sort(everything);
+      var dupe = find$1(sorted, function (s, i) {
         return i < sorted.length - 1 && s === sorted[i + 1];
       });
       dupe.each(function (d) {
@@ -946,13 +946,13 @@ var mobile = (function (exports) {
       validateStrArr('optional', optional);
       checkDupes(everything);
       return function (obj) {
-        var keys$$1 = keys(obj);
+        var keys$1 = keys(obj);
         var allReqd = forall(required, function (req) {
-          return contains(keys$$1, req);
+          return contains(keys$1, req);
         });
         if (!allReqd)
-          reqMessage(required, keys$$1);
-        var unsupported = filter(keys$$1, function (key) {
+          reqMessage(required, keys$1);
+        var unsupported = filter(keys$1, function (key) {
           return !contains(everything, key);
         });
         if (unsupported.length > 0)
@@ -1005,7 +1005,7 @@ var mobile = (function (exports) {
     var documentPositionContainedBy = function (a, b) {
       return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
     };
-    var Node$1 = {
+    var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
     };
@@ -1032,12 +1032,12 @@ var mobile = (function (exports) {
       return dom.nodeType !== ELEMENT$1 && dom.nodeType !== DOCUMENT$1 || dom.childElementCount === 0;
     };
     var all = function (selector, scope) {
-      var base = scope === undefined ? document : scope.dom();
-      return bypassSelector(base) ? [] : map$1(base.querySelectorAll(selector), Element$$1.fromDom);
+      var base = scope === undefined ? domGlobals.document : scope.dom();
+      return bypassSelector(base) ? [] : map$1(base.querySelectorAll(selector), Element.fromDom);
     };
     var one = function (selector, scope) {
-      var base = scope === undefined ? document : scope.dom();
-      return bypassSelector(base) ? Option.none() : Option.from(base.querySelector(selector)).map(Element$$1.fromDom);
+      var base = scope === undefined ? domGlobals.document : scope.dom();
+      return bypassSelector(base) ? Option.none() : Option.from(base.querySelector(selector)).map(Element.fromDom);
     };
 
     var eq = function (e1, e2) {
@@ -1049,17 +1049,17 @@ var mobile = (function (exports) {
       return d1 === d2 ? false : d1.contains(d2);
     };
     var ieContains = function (e1, e2) {
-      return Node$1.documentPositionContainedBy(e1.dom(), e2.dom());
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
     var browser = PlatformDetection$1.detect().browser;
     var contains$2 = browser.isIE() ? ieContains : regularContains;
 
     var owner = function (element) {
-      return Element$$1.fromDom(element.dom().ownerDocument);
+      return Element.fromDom(element.dom().ownerDocument);
     };
     var parent = function (element) {
       var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element$$1.fromDom);
+      return Option.from(dom.parentNode).map(Element.fromDom);
     };
     var parents = function (element, isRoot) {
       var stop = isFunction(isRoot) ? isRoot : constant(false);
@@ -1067,7 +1067,7 @@ var mobile = (function (exports) {
       var ret = [];
       while (dom.parentNode !== null && dom.parentNode !== undefined) {
         var rawParent = dom.parentNode;
-        var p = Element$$1.fromDom(rawParent);
+        var p = Element.fromDom(rawParent);
         ret.push(p);
         if (stop(p) === true) {
           break;
@@ -1087,15 +1087,15 @@ var mobile = (function (exports) {
     };
     var nextSibling = function (element) {
       var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element$$1.fromDom);
+      return Option.from(dom.nextSibling).map(Element.fromDom);
     };
     var children = function (element) {
       var dom = element.dom();
-      return map$1(dom.childNodes, Element$$1.fromDom);
+      return map$1(dom.childNodes, Element.fromDom);
     };
     var child = function (element, index) {
       var cs = element.dom().childNodes;
-      return Option.from(cs[index]).map(Element$$1.fromDom);
+      return Option.from(cs[index]).map(Element.fromDom);
     };
     var firstChild = function (element) {
       return child(element, 0);
@@ -1103,36 +1103,36 @@ var mobile = (function (exports) {
     var spot = Immutable('element', 'offset');
 
     var before = function (marker, element) {
-      var parent$$1 = parent(marker);
-      parent$$1.each(function (v) {
+      var parent$1 = parent(marker);
+      parent$1.each(function (v) {
         v.dom().insertBefore(element.dom(), marker.dom());
       });
     };
     var after = function (marker, element) {
       var sibling = nextSibling(marker);
       sibling.fold(function () {
-        var parent$$1 = parent(marker);
-        parent$$1.each(function (v) {
+        var parent$1 = parent(marker);
+        parent$1.each(function (v) {
           append(v, element);
         });
       }, function (v) {
         before(v, element);
       });
     };
-    var prepend = function (parent$$1, element) {
-      var firstChild$$1 = firstChild(parent$$1);
-      firstChild$$1.fold(function () {
-        append(parent$$1, element);
+    var prepend = function (parent, element) {
+      var firstChild$1 = firstChild(parent);
+      firstChild$1.fold(function () {
+        append(parent, element);
       }, function (v) {
-        parent$$1.dom().insertBefore(element.dom(), v.dom());
+        parent.dom().insertBefore(element.dom(), v.dom());
       });
     };
-    var append = function (parent$$1, element) {
-      parent$$1.dom().appendChild(element.dom());
+    var append = function (parent, element) {
+      parent.dom().appendChild(element.dom());
     };
-    var appendAt = function (parent$$1, element, index) {
-      child(parent$$1, index).fold(function () {
-        append(parent$$1, element);
+    var appendAt = function (parent, element, index) {
+      child(parent, index).fold(function () {
+        append(parent, element);
       }, function (v) {
         before(v, element);
       });
@@ -1159,24 +1159,24 @@ var mobile = (function (exports) {
 
     var fireDetaching = function (component) {
       emit(component, detachedFromDom());
-      var children$$1 = component.components();
-      each$1(children$$1, fireDetaching);
+      var children = component.components();
+      each$1(children, fireDetaching);
     };
     var fireAttaching = function (component) {
-      var children$$1 = component.components();
-      each$1(children$$1, fireAttaching);
+      var children = component.components();
+      each$1(children, fireAttaching);
       emit(component, attachedToDom());
     };
-    var attach = function (parent$$1, child$$1) {
-      attachWith(parent$$1, child$$1, append);
+    var attach = function (parent, child) {
+      attachWith(parent, child, append);
     };
-    var attachWith = function (parent$$1, child$$1, insertion) {
-      parent$$1.getSystem().addToWorld(child$$1);
-      insertion(parent$$1.element(), child$$1.element());
-      if (inBody(parent$$1.element())) {
-        fireAttaching(child$$1);
+    var attachWith = function (parent, child, insertion) {
+      parent.getSystem().addToWorld(child);
+      insertion(parent.element(), child.element());
+      if (inBody(parent.element())) {
+        fireAttaching(child);
       }
-      parent$$1.syncComponents();
+      parent.syncComponents();
     };
     var doDetach = function (component) {
       fireDetaching(component);
@@ -1184,11 +1184,11 @@ var mobile = (function (exports) {
       component.getSystem().removeFromWorld(component);
     };
     var detach = function (component) {
-      var parent$$1 = parent(component.element()).bind(function (p) {
+      var parent$1 = parent(component.element()).bind(function (p) {
         return component.getSystem().getByDom(p).fold(Option.none, Option.some);
       });
       doDetach(component);
-      parent$$1.each(function (p) {
+      parent$1.each(function (p) {
         p.syncComponents();
       });
     };
@@ -1203,27 +1203,27 @@ var mobile = (function (exports) {
     };
     var attachSystemInternal = function (element, guiSystem, inserter) {
       inserter(element, guiSystem.element());
-      var children$$1 = children(guiSystem.element());
-      each$1(children$$1, function (child$$1) {
-        guiSystem.getByDom(child$$1).each(fireAttaching);
+      var children$1 = children(guiSystem.element());
+      each$1(children$1, function (child) {
+        guiSystem.getByDom(child).each(fireAttaching);
       });
     };
 
-    var value$1 = function (o) {
+    var value = function (o) {
       var is = function (v) {
         return o === v;
       };
       var or = function (opt) {
-        return value$1(o);
+        return value(o);
       };
       var orThunk = function (f) {
-        return value$1(o);
+        return value(o);
       };
       var map = function (f) {
-        return value$1(f(o));
+        return value(f(o));
       };
       var mapError = function (f) {
-        return value$1(o);
+        return value(o);
       };
       var each = function (f) {
         f(o);
@@ -1307,7 +1307,7 @@ var mobile = (function (exports) {
       };
     };
     var Result = {
-      value: value$1,
+      value: value,
       error: error
     };
 
@@ -1321,11 +1321,11 @@ var mobile = (function (exports) {
       var constructors = [];
       var adt = {};
       each$1(cases, function (acase, count) {
-        var keys$$1 = keys(acase);
-        if (keys$$1.length !== 1) {
+        var keys$1 = keys(acase);
+        if (keys$1.length !== 1) {
           throw new Error('one and only one name per case');
         }
-        var key = keys$$1[0];
+        var key = keys$1[0];
         var value = acase[key];
         if (adt[key] !== undefined) {
           throw new Error('duplicate key detected:' + key);
@@ -1453,7 +1453,7 @@ var mobile = (function (exports) {
       return has(obj, key) && obj[key] !== undefined && obj[key] !== null;
     };
 
-    var wrap$1 = function (key, value) {
+    var wrap = function (key, value) {
       var r = {};
       r[key] = value;
       return r;
@@ -1492,7 +1492,7 @@ var mobile = (function (exports) {
         ]
       }
     ]);
-    var partition$1 = function (results) {
+    var partition = function (results) {
       var errors = [];
       var values = [];
       each$1(results, function (result) {
@@ -1520,8 +1520,8 @@ var mobile = (function (exports) {
     var readOptFrom$1 = function (obj, key) {
       return readOptFrom(obj, key);
     };
-    var wrap$2 = function (key, value) {
-      return wrap$1(key, value);
+    var wrap$1 = function (key, value) {
+      return wrap(key, value);
     };
     var wrapAll$1 = function (keyvalues) {
       return wrapAll(keyvalues);
@@ -1533,7 +1533,7 @@ var mobile = (function (exports) {
       return compose(Result.error, flatten)(errors);
     };
     var consolidate = function (objs, base) {
-      var partitions = partition$1(objs);
+      var partitions = partition(objs);
       return partitions.errors.length > 0 ? mergeErrors(partitions.errors) : mergeValues(partitions.values, base);
     };
     var hasKey$1 = function (obj, key) {
@@ -1548,7 +1548,7 @@ var mobile = (function (exports) {
     var fold = function (res, onError, onValue) {
       return res.stype === SimpleResultType.Error ? onError(res.serror) : onValue(res.svalue);
     };
-    var partition$2 = function (results) {
+    var partition$1 = function (results) {
       var values = [];
       var errors = [];
       each$1(results, function (obj) {
@@ -1619,7 +1619,7 @@ var mobile = (function (exports) {
       fromResult: fromResult,
       toResult: toResult,
       svalue: svalue,
-      partition: partition$2,
+      partition: partition$1,
       serror: serror,
       bind: bind$1,
       bindError: bindError,
@@ -1635,8 +1635,8 @@ var mobile = (function (exports) {
       return compose(SimpleResult.serror, flatten)(errors);
     };
     var consolidateObj = function (objects, base) {
-      var partition$$1 = SimpleResult.partition(objects);
-      return partition$$1.errors.length > 0 ? mergeErrors$1(partition$$1.errors) : mergeValues$1(partition$$1.values, base);
+      var partition = SimpleResult.partition(objects);
+      return partition.errors.length > 0 ? mergeErrors$1(partition.errors) : mergeValues$1(partition.values, base);
     };
     var consolidateArr = function (objects) {
       var partitions = SimpleResult.partition(objects);
@@ -1784,17 +1784,17 @@ var mobile = (function (exports) {
         var bundle = function (av) {
           var result = prop.extract(path.concat([key]), strength, av);
           return SimpleResult.map(result, function (res) {
-            return wrap$1(okey, strength(res));
+            return wrap(okey, strength(res));
           });
         };
         var bundleAsOption = function (optValue) {
           return optValue.fold(function () {
-            var outcome = wrap$1(okey, strength(Option.none()));
+            var outcome = wrap(okey, strength(Option.none()));
             return SimpleResult.svalue(outcome);
           }, function (ov) {
             var result = prop.extract(path.concat([key]), strength, ov);
             return SimpleResult.map(result, function (res) {
-              return wrap$1(okey, strength(Option.some(res)));
+              return wrap(okey, strength(Option.some(res)));
             });
           });
         };
@@ -1817,7 +1817,7 @@ var mobile = (function (exports) {
         }();
       }, function (okey, instantiator) {
         var state = instantiator(obj);
-        return SimpleResult.svalue(wrap$1(okey, strength(state)));
+        return SimpleResult.svalue(wrap(okey, strength(state)));
       });
     };
     var cExtract = function (path, obj, fields, strength) {
@@ -1826,13 +1826,13 @@ var mobile = (function (exports) {
       });
       return ResultCombine.consolidateObj(results, {});
     };
-    var value$2 = function (validator) {
+    var value$1 = function (validator) {
       var extract = function (path, strength, val) {
         return SimpleResult.bindError(validator(val, strength), function (err) {
           return custom(path, err);
         });
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'val';
       };
       var toDsl = function () {
@@ -1840,13 +1840,13 @@ var mobile = (function (exports) {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
     var getSetKeys = function (obj) {
-      var keys$$1 = keys(obj);
-      return filter(keys$$1, function (k) {
+      var keys$1 = keys(obj);
+      return filter(keys$1, function (k) {
         return hasKey$1(obj, k);
       });
     };
@@ -1854,12 +1854,12 @@ var mobile = (function (exports) {
       var delegate = objOf(fields);
       var fieldNames = foldr(fields, function (acc, f) {
         return f.fold(function (key) {
-          return deepMerge(acc, wrap$2(key, true));
+          return deepMerge(acc, wrap$1(key, true));
         }, constant(acc));
       }, {});
       var extract = function (path, strength, o) {
-        var keys$$1 = isBoolean(o) ? [] : getSetKeys(o);
-        var extra = filter(keys$$1, function (k) {
+        var keys = isBoolean(o) ? [] : getSetKeys(o);
+        var extra = filter(keys, function (k) {
           return !hasKey$1(fieldNames, k);
         });
         return extra.length === 0 ? delegate.extract(path, strength, o) : unsupportedFields(path, extra);
@@ -1874,7 +1874,7 @@ var mobile = (function (exports) {
       var extract = function (path, strength, o) {
         return cExtract(path, o, fields, strength);
       };
-      var toString$$1 = function () {
+      var toString = function () {
         var fieldStrings = map$1(fields, function (field) {
           return field.fold(function (key, okey, presence, prop) {
             return key + ' -> ' + prop.toString();
@@ -1895,7 +1895,7 @@ var mobile = (function (exports) {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
@@ -1906,7 +1906,7 @@ var mobile = (function (exports) {
         });
         return ResultCombine.consolidateArr(results);
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'array(' + prop.toString() + ')';
       };
       var toDsl = function () {
@@ -1914,17 +1914,17 @@ var mobile = (function (exports) {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
     var setOf = function (validator, prop) {
-      var validateKeys = function (path, keys$$1) {
-        return arrOf(value$2(validator)).extract(path, identity, keys$$1);
+      var validateKeys = function (path, keys) {
+        return arrOf(value$1(validator)).extract(path, identity, keys);
       };
       var extract = function (path, strength, o) {
-        var keys$$1 = keys(o);
-        var validatedKeys = validateKeys(path, keys$$1);
+        var keys$1 = keys(o);
+        var validatedKeys = validateKeys(path, keys$1);
         return SimpleResult.bind(validatedKeys, function (validKeys) {
           var schema = map$1(validKeys, function (vk) {
             return adt$1.field(vk, vk, strict(), prop);
@@ -1932,7 +1932,7 @@ var mobile = (function (exports) {
           return objOf(schema).extract(path, strength, o);
         });
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'setOf(' + prop.toString() + ')';
       };
       var toDsl = function () {
@@ -1940,11 +1940,11 @@ var mobile = (function (exports) {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
-    var anyValue = constant(value$2(SimpleResult.svalue));
+    var anyValue = constant(value$1(SimpleResult.svalue));
     var state = adt$1.state;
     var field = adt$1.field;
 
@@ -1965,7 +1965,7 @@ var mobile = (function (exports) {
           return chooseFrom(path, strength, input, branches, chosen);
         });
       };
-      var toString$$1 = function () {
+      var toString = function () {
         return 'chooseOn(' + key + '). Possible values: ' + keys(branches);
       };
       var toDsl = function () {
@@ -1973,14 +1973,14 @@ var mobile = (function (exports) {
       };
       return {
         extract: extract,
-        toString: toString$$1,
+        toString: toString,
         toDsl: toDsl
       };
     };
 
-    var _anyValue = value$2(SimpleResult.svalue);
+    var _anyValue = value$1(SimpleResult.svalue);
     var valueOf = function (validator) {
-      return value$2(function (v) {
+      return value$1(function (v) {
         return validator(v).fold(SimpleResult.serror, SimpleResult.svalue);
       });
     };
@@ -2017,7 +2017,7 @@ var mobile = (function (exports) {
     };
     var anyValue$1 = constant(_anyValue);
     var typedValue = function (validator, expectedType) {
-      return value$2(function (a) {
+      return value$1(function (a) {
         var actualType = typeof a;
         return validator(a) ? SimpleResult.svalue(a) : SimpleResult.serror('Expected type: ' + expectedType + ' but got: ' + actualType);
       });
@@ -2034,7 +2034,7 @@ var mobile = (function (exports) {
       return strictOf(key, functionProcessor);
     };
     var forbid = function (key, message) {
-      return field(key, key, asOption(), value$2(function (v) {
+      return field(key, key, asOption(), value$1(function (v) {
         return SimpleResult.serror('The field: ' + key + ' is forbidden. ' + message);
       }));
     };
@@ -2141,7 +2141,7 @@ var mobile = (function (exports) {
       var stop = isFunction(isRoot) ? isRoot : constant(false);
       while (element.parentNode) {
         element = element.parentNode;
-        var el = Element$$1.fromDom(element);
+        var el = Element.fromDom(element);
         if (predicate(el)) {
           return Option.some(el);
         } else if (stop(el)) {
@@ -2159,8 +2159,8 @@ var mobile = (function (exports) {
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
-          if (predicate(Element$$1.fromDom(node.childNodes[i]))) {
-            return Option.some(Element$$1.fromDom(node.childNodes[i]));
+          if (predicate(Element.fromDom(node.childNodes[i]))) {
+            return Option.some(Element.fromDom(node.childNodes[i]));
           }
           var res = descend(node.childNodes[i]);
           if (res.isSome()) {
@@ -2459,16 +2459,16 @@ var mobile = (function (exports) {
     };
     var revoke = constant(undefined);
 
-    var rawSet = function (dom, key, value$$1) {
-      if (isString(value$$1) || isBoolean(value$$1) || isNumber(value$$1)) {
-        dom.setAttribute(key, value$$1 + '');
+    var rawSet = function (dom, key, value) {
+      if (isString(value) || isBoolean(value) || isNumber(value)) {
+        dom.setAttribute(key, value + '');
       } else {
-        console.error('Invalid call to Attr.set. Key ', key, ':: Value ', value$$1, ':: Element ', dom);
+        domGlobals.console.error('Invalid call to Attr.set. Key ', key, ':: Value ', value, ':: Element ', dom);
         throw new Error('Attribute value was not simple');
       }
     };
-    var set = function (element, key, value$$1) {
-      rawSet(element.dom(), key, value$$1);
+    var set = function (element, key, value) {
+      rawSet(element.dom(), key, value);
     };
     var setAll = function (element, attrs) {
       var dom = element.dom();
@@ -2476,7 +2476,7 @@ var mobile = (function (exports) {
         rawSet(dom, k, v);
       });
     };
-    var get$1 = function (element, key) {
+    var get = function (element, key) {
       var v = element.dom().getAttribute(key);
       return v === null ? undefined : v;
     };
@@ -2489,7 +2489,7 @@ var mobile = (function (exports) {
     };
 
     var read$1 = function (element, attr) {
-      var value = get$1(element, attr);
+      var value = get(element, attr);
       return value === undefined || value === '' ? [] : value.split(' ');
     };
     var add = function (element, attr, id) {
@@ -2513,7 +2513,7 @@ var mobile = (function (exports) {
     var supports = function (element) {
       return element.dom().classList !== undefined;
     };
-    var get$2 = function (element) {
+    var get$1 = function (element) {
       return read$1(element, 'class');
     };
     var add$1 = function (element, clazz) {
@@ -2531,7 +2531,7 @@ var mobile = (function (exports) {
       }
     };
     var cleanClass = function (element) {
-      var classList = supports(element) ? element.dom().classList : get$2(element);
+      var classList = supports(element) ? element.dom().classList : get$1(element);
       if (classList.length === 0) {
         remove$1(element, 'class');
       }
@@ -2607,10 +2607,10 @@ var mobile = (function (exports) {
       };
     };
 
-    var focus$2 = function (element) {
+    var focus$1 = function (element) {
       element.dom().focus();
     };
-    var blur$$1 = function (element) {
+    var blur = function (element) {
       element.dom().blur();
     };
     var hasFocus = function (element) {
@@ -2618,8 +2618,8 @@ var mobile = (function (exports) {
       return element.dom() === doc.activeElement;
     };
     var active = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : document;
-      return Option.from(doc.activeElement).map(Element$$1.fromDom);
+      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+      return Option.from(doc.activeElement).map(Element.fromDom);
     };
     var search = function (element) {
       return active(owner(element)).filter(function (e) {
@@ -2632,15 +2632,15 @@ var mobile = (function (exports) {
     var global$1 = tinymce.util.Tools.resolve('tinymce.ThemeManager');
 
     var openLink = function (target) {
-      var link = document.createElement('a');
+      var link = domGlobals.document.createElement('a');
       link.target = '_blank';
       link.href = target.href;
       link.rel = 'noreferrer noopener';
-      var nuEvt = document.createEvent('MouseEvents');
-      nuEvt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-      document.body.appendChild(link);
+      var nuEvt = domGlobals.document.createEvent('MouseEvents');
+      nuEvt.initMouseEvent('click', true, true, domGlobals.window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+      domGlobals.document.body.appendChild(link);
       link.dispatchEvent(nuEvt);
-      document.body.removeChild(link);
+      domGlobals.document.body.removeChild(link);
     };
     var TinyCodeDupe = { openLink: openLink };
 
@@ -2661,36 +2661,36 @@ var mobile = (function (exports) {
     };
 
     var fromHtml$1 = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
-      return children(Element$$1.fromDom(div));
+      return children(Element.fromDom(div));
     };
 
-    var get$3 = function (element) {
+    var get$2 = function (element) {
       return element.dom().innerHTML;
     };
     var set$1 = function (element, content) {
-      var owner$$1 = owner(element);
-      var docDom = owner$$1.dom();
-      var fragment = Element$$1.fromDom(docDom.createDocumentFragment());
+      var owner$1 = owner(element);
+      var docDom = owner$1.dom();
+      var fragment = Element.fromDom(docDom.createDocumentFragment());
       var contentElements = fromHtml$1(content, docDom);
       append$1(fragment, contentElements);
       empty(element);
       append(element, fragment);
     };
     var getOuter = function (element) {
-      var container = Element$$1.fromTag('div');
-      var clone = Element$$1.fromDom(element.dom().cloneNode(true));
+      var container = Element.fromTag('div');
+      var clone = Element.fromDom(element.dom().cloneNode(true));
       append(container, clone);
-      return get$3(container);
+      return get$2(container);
     };
 
-    var clone$1 = function (original, isDeep) {
-      return Element$$1.fromDom(original.dom().cloneNode(isDeep));
+    var clone = function (original, isDeep) {
+      return Element.fromDom(original.dom().cloneNode(isDeep));
     };
     var shallow$1 = function (original) {
-      return clone$1(original, false);
+      return clone(original, false);
     };
 
     var getHtml = function (element) {
@@ -2757,34 +2757,34 @@ var mobile = (function (exports) {
       var sequence = [];
       var startTime = new Date().getTime();
       return {
-        logEventCut: function (name$$1, target, purpose) {
+        logEventCut: function (name, target, purpose) {
           sequence.push({
             outcome: 'cut',
             target: target,
             purpose: purpose
           });
         },
-        logEventStopped: function (name$$1, target, purpose) {
+        logEventStopped: function (name, target, purpose) {
           sequence.push({
             outcome: 'stopped',
             target: target,
             purpose: purpose
           });
         },
-        logNoParent: function (name$$1, target, purpose) {
+        logNoParent: function (name, target, purpose) {
           sequence.push({
             outcome: 'no-parent',
             target: target,
             purpose: purpose
           });
         },
-        logEventNoHandlers: function (name$$1, target) {
+        logEventNoHandlers: function (name, target) {
           sequence.push({
             outcome: 'no-handlers-left',
             target: target
           });
         },
-        logEventResponse: function (name$$1, target, purpose) {
+        logEventResponse: function (name, target, purpose) {
           sequence.push({
             outcome: 'response',
             purpose: purpose,
@@ -2801,7 +2801,7 @@ var mobile = (function (exports) {
             ], eventName)) {
             return;
           }
-          console.log(eventName, {
+          domGlobals.console.log(eventName, {
             event: eventName,
             time: finishTime - startTime,
             target: initialTarget.dom(),
@@ -2821,13 +2821,13 @@ var mobile = (function (exports) {
       };
     };
     var processEvent = function (eventName, initialTarget, f) {
-      var status$$1 = readOptFrom$1(eventConfig.get(), eventName).orThunk(function () {
+      var status = readOptFrom$1(eventConfig.get(), eventName).orThunk(function () {
         var patterns = keys(eventConfig.get());
         return findMap(patterns, function (p) {
           return eventName.indexOf(p) > -1 ? Option.some(eventConfig.get()[p]) : Option.none();
         });
       }).getOr(EventConfiguration.NORMAL);
-      switch (status$$1) {
+      switch (status) {
       case EventConfiguration.NORMAL:
         return f(noLogger());
       case EventConfiguration.LOGGING: {
@@ -2848,7 +2848,7 @@ var mobile = (function (exports) {
       var err = new Error();
       if (err.stack !== undefined) {
         var lines = err.stack.split('\n');
-        return find$2(lines, function (line) {
+        return find$1(lines, function (line) {
           return line.indexOf('alloy') > 0 && !exists(path$1, function (p) {
             return line.indexOf(p) > -1;
           });
@@ -2918,10 +2918,10 @@ var mobile = (function (exports) {
     var onStrictKeyboardHandler = function (fieldName) {
       return onPresenceHandler('onKeyboardHandler', fieldName, strict());
     };
-    var output$1 = function (name, value) {
+    var output = function (name, value) {
       return state$1(name, constant(value));
     };
-    var snapshot$1 = function (name) {
+    var snapshot = function (name) {
       return state$1(name, identity);
     };
     var initSize = constant(_initSize);
@@ -2950,7 +2950,7 @@ var mobile = (function (exports) {
         }
       });
     };
-    var toggle$2 = function (component, toggleConfig, toggleState) {
+    var toggle = function (component, toggleConfig, toggleState) {
       set$2(component, toggleConfig, toggleState, !toggleState.get());
     };
     var on = function (component, toggleConfig, toggleState) {
@@ -2976,7 +2976,7 @@ var mobile = (function (exports) {
 
     var ToggleApis = /*#__PURE__*/Object.freeze({
         onLoad: onLoad,
-        toggle: toggle$2,
+        toggle: toggle,
         isOn: isOn,
         on: on,
         off: off,
@@ -2987,7 +2987,7 @@ var mobile = (function (exports) {
       return nu$5({});
     };
     var events$1 = function (toggleConfig, toggleState) {
-      var execute = executeEvent(toggleConfig, toggleState, toggle$2);
+      var execute = executeEvent(toggleConfig, toggleState, toggle);
       var load = loadEvent(toggleConfig, toggleState, onLoad);
       return derive(flatten([
         toggleConfig.toggleOnExecute ? [execute] : [],
@@ -3049,12 +3049,12 @@ var mobile = (function (exports) {
       defaultedOf('aria', { mode: 'none' }, choose$1('mode', {
         pressed: [
           defaulted$1('syncWithExpanded', false),
-          output$1('update', updatePressed)
+          output('update', updatePressed)
         ],
-        checked: [output$1('update', updateChecked)],
-        expanded: [output$1('update', updateExpanded)],
-        selected: [output$1('update', updateSelected)],
-        none: [output$1('update', noop)]
+        checked: [output('update', updateChecked)],
+        expanded: [output('update', updateExpanded)],
+        selected: [output('update', updateSelected)],
+        none: [output('update', noop)]
       }))
     ];
 
@@ -3068,7 +3068,7 @@ var mobile = (function (exports) {
 
     var format = function (command, update) {
       return Receiving.config({
-        channels: wrap$2(TinyChannels.formatChanged(), {
+        channels: wrap$1(TinyChannels.formatChanged(), {
           onReceive: function (button, data) {
             if (data.command === command) {
               update(button, data.state);
@@ -3078,7 +3078,7 @@ var mobile = (function (exports) {
       });
     };
     var orientation = function (onReceive) {
-      return Receiving.config({ channels: wrap$2(TinyChannels.orientationChanged(), { onReceive: onReceive }) });
+      return Receiving.config({ channels: wrap$1(TinyChannels.orientationChanged(), { onReceive: onReceive }) });
     };
     var receive$1 = function (channel, onReceive) {
       return {
@@ -3125,15 +3125,15 @@ var mobile = (function (exports) {
       ]));
     };
 
-    var focus$3 = function (component, focusConfig) {
+    var focus$2 = function (component, focusConfig) {
       if (!focusConfig.ignore) {
-        focus$2(component.element());
+        focus$1(component.element());
         focusConfig.onFocus(component);
       }
     };
     var blur$1 = function (component, focusConfig) {
       if (!focusConfig.ignore) {
-        blur$$1(component.element());
+        blur(component.element());
       }
     };
     var isFocused = function (component) {
@@ -3141,7 +3141,7 @@ var mobile = (function (exports) {
     };
 
     var FocusApis = /*#__PURE__*/Object.freeze({
-        focus: focus$3,
+        focus: focus$2,
         blur: blur$1,
         isFocused: isFocused
     });
@@ -3151,8 +3151,8 @@ var mobile = (function (exports) {
       return nu$5(mod);
     };
     var events$3 = function (focusConfig) {
-      return derive([run(focus$1(), function (component, simulatedEvent) {
-          focus$3(component, focusConfig);
+      return derive([run(focus(), function (component, simulatedEvent) {
+          focus$2(component, focusConfig);
           simulatedEvent.stop();
         })].concat(focusConfig.stopMousedown ? [run(mousedown(), function (_, simulatedEvent) {
           simulatedEvent.event().prevent();
@@ -3181,13 +3181,13 @@ var mobile = (function (exports) {
       return dom.style !== undefined;
     };
 
-    var internalSet = function (dom, property, value$$1) {
-      if (!isString(value$$1)) {
-        console.error('Invalid call to CSS.set. Property ', property, ':: Value ', value$$1, ':: Element ', dom);
-        throw new Error('CSS value must be a string: ' + value$$1);
+    var internalSet = function (dom, property, value) {
+      if (!isString(value)) {
+        domGlobals.console.error('Invalid call to CSS.set. Property ', property, ':: Value ', value, ':: Element ', dom);
+        throw new Error('CSS value must be a string: ' + value);
       }
       if (isSupported(dom)) {
-        dom.style.setProperty(property, value$$1);
+        dom.style.setProperty(property, value);
       }
     };
     var internalRemove = function (dom, property) {
@@ -3195,9 +3195,9 @@ var mobile = (function (exports) {
         dom.style.removeProperty(property);
       }
     };
-    var set$3 = function (element, property, value$$1) {
+    var set$3 = function (element, property, value) {
       var dom = element.dom();
-      internalSet(dom, property, value$$1);
+      internalSet(dom, property, value);
     };
     var setAll$1 = function (element, css) {
       var dom = element.dom();
@@ -3205,9 +3205,9 @@ var mobile = (function (exports) {
         internalSet(dom, k, v);
       });
     };
-    var get$4 = function (element, property) {
+    var get$3 = function (element, property) {
       var dom = element.dom();
-      var styles = window.getComputedStyle(dom);
+      var styles = domGlobals.window.getComputedStyle(dom);
       var r = styles.getPropertyValue(property);
       var v = r === '' && !inBody(element) ? getUnsafeProperty(dom, property) : r;
       return v === null ? undefined : v;
@@ -3225,7 +3225,7 @@ var mobile = (function (exports) {
     var remove$5 = function (element, property) {
       var dom = element.dom();
       internalRemove(dom, property);
-      if (has$1(element, 'style') && trim(get$1(element, 'style')) === '') {
+      if (has$1(element, 'style') && trim(get(element, 'style')) === '') {
         remove$1(element, 'style');
       }
     };
@@ -3246,7 +3246,7 @@ var mobile = (function (exports) {
       var get = function (element) {
         var r = getOffset(element);
         if (r <= 0 || r === null) {
-          var css = get$4(element, name);
+          var css = get$3(element, name);
           return parseFloat(css) || 0;
         }
         return r;
@@ -3254,7 +3254,7 @@ var mobile = (function (exports) {
       var getOuter = get;
       var aggregate = function (element, properties) {
         return foldl(properties, function (acc, property) {
-          var val = get$4(element, property);
+          var val = get$3(element, property);
           var value = val === undefined ? 0 : parseInt(val, 10);
           return isNaN(value) ? acc : acc + value;
         }, 0);
@@ -3277,7 +3277,7 @@ var mobile = (function (exports) {
       var dom = element.dom();
       return inBody(element) ? dom.getBoundingClientRect().height : dom.offsetHeight;
     });
-    var get$5 = function (element) {
+    var get$4 = function (element) {
       return api.get(element);
     };
 
@@ -3288,7 +3288,7 @@ var mobile = (function (exports) {
       return filter(siblings(scope), predicate);
     };
 
-    var all$3 = function (selector) {
+    var all$2 = function (selector) {
       return all(selector);
     };
     var ancestors$1 = function (scope, selector, isRoot) {
@@ -3301,23 +3301,23 @@ var mobile = (function (exports) {
         return is(e, selector);
       });
     };
-    var descendants$1 = function (scope, selector) {
+    var descendants = function (scope, selector) {
       return all(selector, scope);
     };
 
-    var first$2 = function (selector) {
+    var first = function (selector) {
       return one(selector);
     };
-    var ancestor$2 = function (scope, selector, isRoot) {
+    var ancestor$1 = function (scope, selector, isRoot) {
       return ancestor(scope, function (e) {
         return is(e, selector);
       }, isRoot);
     };
-    var descendant$2 = function (scope, selector) {
+    var descendant$1 = function (scope, selector) {
       return one(selector, scope);
     };
-    var closest$3 = function (scope, selector, isRoot) {
-      return ClosestOrAncestor(is, ancestor$2, scope, selector, isRoot);
+    var closest$2 = function (scope, selector, isRoot) {
+      return ClosestOrAncestor(is, ancestor$1, scope, selector, isRoot);
     };
 
     var BACKSPACE = function () {
@@ -3351,20 +3351,20 @@ var mobile = (function (exports) {
     var cyclePrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
       var after = reverse(values.slice(index + 1));
-      return find$2(before.concat(after), predicate);
+      return find$1(before.concat(after), predicate);
     };
     var tryPrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
-      return find$2(before, predicate);
+      return find$1(before, predicate);
     };
     var cycleNext = function (values, index, predicate) {
       var before = values.slice(0, index);
       var after = values.slice(index + 1);
-      return find$2(after.concat(before), predicate);
+      return find$1(after.concat(before), predicate);
     };
     var tryNext = function (values, index, predicate) {
       var after = values.slice(index + 1);
-      return find$2(after, predicate);
+      return find$1(after, predicate);
     };
 
     var inSet = function (keys) {
@@ -3397,7 +3397,7 @@ var mobile = (function (exports) {
       };
     };
     var choose$2 = function (transitions, event) {
-      var transition = find$2(transitions, function (t) {
+      var transition = find$1(transitions, function (t) {
         return t.matches(event);
       });
       return transition.map(function (t) {
@@ -3422,7 +3422,7 @@ var mobile = (function (exports) {
     };
 
     var dehighlightAllExcept = function (component, hConfig, hState, skip) {
-      var highlighted = descendants$1(component.element(), '.' + hConfig.highlightClass);
+      var highlighted = descendants(component.element(), '.' + hConfig.highlightClass);
       each$1(highlighted, function (h) {
         if (!exists(skip, function (skipComp) {
             return skipComp.element() === h;
@@ -3472,7 +3472,7 @@ var mobile = (function (exports) {
     };
     var highlightBy = function (component, hConfig, hState, predicate) {
       var candidates = getCandidates(component, hConfig, hState);
-      var targetComp = find$2(candidates, predicate);
+      var targetComp = find$1(candidates, predicate);
       targetComp.each(function (c) {
         highlight$1(component, hConfig, hState, c);
       });
@@ -3481,30 +3481,30 @@ var mobile = (function (exports) {
       return has$2(queryTarget.element(), hConfig.highlightClass);
     };
     var getHighlighted = function (component, hConfig, hState) {
-      return descendant$2(component.element(), '.' + hConfig.highlightClass).bind(function (e) {
+      return descendant$1(component.element(), '.' + hConfig.highlightClass).bind(function (e) {
         return component.getSystem().getByDom(e).toOption();
       });
     };
     var getByIndex = function (component, hConfig, hState, index) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
       return Option.from(items[index]).fold(function () {
         return Result.error('No element found with index ' + index);
       }, component.getSystem().getByDom);
     };
     var getFirst = function (component, hConfig, hState) {
-      return descendant$2(component.element(), '.' + hConfig.itemClass).bind(function (e) {
+      return descendant$1(component.element(), '.' + hConfig.itemClass).bind(function (e) {
         return component.getSystem().getByDom(e).toOption();
       });
     };
     var getLast = function (component, hConfig, hState) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
-      var last$$1 = items.length > 0 ? Option.some(items[items.length - 1]) : Option.none();
-      return last$$1.bind(function (c) {
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
+      var last = items.length > 0 ? Option.some(items[items.length - 1]) : Option.none();
+      return last.bind(function (c) {
         return component.getSystem().getByDom(c).toOption();
       });
     };
     var getDelta = function (component, hConfig, hState, delta) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
       var current = findIndex(items, function (item) {
         return has$2(item, hConfig.highlightClass);
       });
@@ -3520,7 +3520,7 @@ var mobile = (function (exports) {
       return getDelta(component, hConfig, hState, +1);
     };
     var getCandidates = function (component, hConfig, hState) {
-      var items = descendants$1(component.element(), '.' + hConfig.itemClass);
+      var items = descendants(component.element(), '.' + hConfig.itemClass);
       return cat(map$1(items, function (i) {
         return component.getSystem().getByDom(i).toOption();
       }));
@@ -3622,20 +3622,20 @@ var mobile = (function (exports) {
               'onApi'
             ], val) ? Result.value(val) : Result.error('Invalid value for focusInside');
           })),
-          output$1('handler', me),
-          output$1('state', stateInit),
-          output$1('sendFocusIn', optFocusIn)
+          output('handler', me),
+          output('state', stateInit),
+          output('sendFocusIn', optFocusIn)
         ]);
       };
       var processKey = function (component, simulatedEvent, getRules, keyingConfig, keyingState) {
         var rules = getRules(component, simulatedEvent, keyingConfig, keyingState);
-        return choose$2(rules, simulatedEvent.event()).bind(function (rule$$1) {
-          return rule$$1(component, simulatedEvent, keyingConfig, keyingState);
+        return choose$2(rules, simulatedEvent.event()).bind(function (rule) {
+          return rule(component, simulatedEvent, keyingConfig, keyingState);
         });
       };
       var toEvents = function (keyingConfig, keyingState) {
         var onFocusHandler = keyingConfig.focusInside !== FocusInsideModes.OnFocusMode ? Option.none() : optFocusIn(keyingConfig).map(function (focusIn) {
-          return run(focus$1(), function (component, simulatedEvent) {
+          return run(focus(), function (component, simulatedEvent) {
             focusIn(component, keyingConfig, keyingState);
             simulatedEvent.stop();
           });
@@ -3683,12 +3683,12 @@ var mobile = (function (exports) {
       ].concat([cyclicField]);
       var isVisible = function (tabbingConfig, element) {
         var target = tabbingConfig.visibilitySelector.bind(function (sel) {
-          return closest$3(element, sel);
+          return closest$2(element, sel);
         }).getOr(element);
-        return get$5(target) > 0;
+        return get$4(target) > 0;
       };
       var findInitial = function (component, tabbingConfig) {
-        var tabstops = descendants$1(component.element(), tabbingConfig.selector);
+        var tabstops = descendants(component.element(), tabbingConfig.selector);
         var visibles = filter(tabstops, function (elem) {
           return isVisible(tabbingConfig, elem);
         });
@@ -3696,7 +3696,7 @@ var mobile = (function (exports) {
       };
       var findCurrent = function (component, tabbingConfig) {
         return tabbingConfig.focusManager.get(component).bind(function (elem) {
-          return closest$3(elem, tabbingConfig.selector);
+          return closest$2(elem, tabbingConfig.selector);
         });
       };
       var isTabstop = function (tabbingConfig, element) {
@@ -3718,7 +3718,7 @@ var mobile = (function (exports) {
         });
       };
       var go = function (component, simulatedEvent, tabbingConfig, cycle) {
-        var tabstops = descendants$1(component.element(), tabbingConfig.selector);
+        var tabstops = descendants(component.element(), tabbingConfig.selector);
         return findCurrent(component, tabbingConfig).bind(function (tabstop) {
           var optStopIndex = findIndex(tabstops, curry(eq, tabstop));
           return optStopIndex.bind(function (stopIndex) {
@@ -3767,7 +3767,7 @@ var mobile = (function (exports) {
     var CyclicType = create$2(state$1('cyclic', constant(true)));
 
     var inside = function (target) {
-      return name(target) === 'input' && get$1(target, 'type') !== 'radio' || name(target) === 'textarea';
+      return name(target) === 'input' && get(target, 'type') !== 'radio' || name(target) === 'textarea';
     };
 
     var doDefaultExecute = function (component, simulatedEvent, focused) {
@@ -3858,7 +3858,7 @@ var mobile = (function (exports) {
       };
     };
     var getDirection = function (element) {
-      return get$4(element, 'direction') === 'rtl' ? 'rtl' : 'ltr';
+      return get$3(element, 'direction') === 'rtl' ? 'rtl' : 'ltr';
     };
 
     var useH = function (movement) {
@@ -3915,16 +3915,16 @@ var mobile = (function (exports) {
     };
 
     var locateVisible = function (container, current, selector) {
-      var filter$$1 = isVisible;
-      return locateIn(container, current, selector, filter$$1);
+      var filter = isVisible;
+      return locateIn(container, current, selector, filter);
     };
-    var locateIn = function (container, current, selector, filter$$1) {
+    var locateIn = function (container, current, selector, filter$1) {
       var predicate = curry(eq, current);
-      var candidates = descendants$1(container, selector);
+      var candidates = descendants(container, selector);
       var visible = filter(candidates, isVisible);
       return locate(visible, predicate);
     };
-    var findIndex$2 = function (elements, target) {
+    var findIndex$1 = function (elements, target) {
       return findIndex(elements, function (elem) {
         return eq(target, elem);
       });
@@ -3982,13 +3982,13 @@ var mobile = (function (exports) {
       initSize()
     ];
     var focusIn = function (component, gridConfig, gridState) {
-      descendant$2(component.element(), gridConfig.selector).each(function (first) {
+      descendant$1(component.element(), gridConfig.selector).each(function (first) {
         gridConfig.focusManager.set(component, first);
       });
     };
     var findCurrent = function (component, gridConfig) {
       return gridConfig.focusManager.get(component).bind(function (elem) {
-        return closest$3(elem, gridConfig.selector);
+        return closest$2(elem, gridConfig.selector);
       });
     };
     var execute$2 = function (component, simulatedEvent, gridConfig, gridState) {
@@ -4036,7 +4036,7 @@ var mobile = (function (exports) {
 
     var horizontal = function (container, selector, current, delta) {
       var isDisabledButton = function (candidate) {
-        return name(candidate) === 'button' && get$1(candidate, 'disabled') === 'disabled';
+        return name(candidate) === 'button' && get(candidate, 'disabled') === 'disabled';
       };
       var tryCycle = function (initial, index, candidates) {
         var newIndex = cycleBy(index, delta, 0, candidates.length - 1);
@@ -4063,7 +4063,7 @@ var mobile = (function (exports) {
     ];
     var findCurrent$1 = function (component, flowConfig) {
       return flowConfig.focusManager.get(component).bind(function (elem) {
-        return closest$3(elem, flowConfig.selector);
+        return closest$2(elem, flowConfig.selector);
       });
     };
     var execute$3 = function (component, simulatedEvent, flowConfig) {
@@ -4073,7 +4073,7 @@ var mobile = (function (exports) {
     };
     var focusIn$1 = function (component, flowConfig) {
       flowConfig.getInitial(component).orThunk(function () {
-        return descendant$2(component.element(), flowConfig.selector);
+        return descendant$1(component.element(), flowConfig.selector);
       }).each(function (first) {
         flowConfig.focusManager.set(component, first);
       });
@@ -4187,7 +4187,7 @@ var mobile = (function (exports) {
     var focusIn$2 = function (component, matrixConfig) {
       var focused = matrixConfig.previousSelector(component).orThunk(function () {
         var selectors = matrixConfig.selectors;
-        return descendant$2(component.element(), selectors.cell);
+        return descendant$1(component.element(), selectors.cell);
       });
       focused.each(function (cell) {
         matrixConfig.focusManager.set(component, cell);
@@ -4200,19 +4200,19 @@ var mobile = (function (exports) {
     };
     var toMatrix = function (rows, matrixConfig) {
       return map$1(rows, function (row) {
-        return descendants$1(row, matrixConfig.selectors.cell);
+        return descendants(row, matrixConfig.selectors.cell);
       });
     };
     var doMove$2 = function (ifCycle, ifMove) {
       return function (element, focused, matrixConfig) {
-        var move$$1 = matrixConfig.cycles ? ifCycle : ifMove;
-        return closest$3(focused, matrixConfig.selectors.row).bind(function (inRow) {
-          var cellsInRow = descendants$1(inRow, matrixConfig.selectors.cell);
-          return findIndex$2(cellsInRow, focused).bind(function (colIndex) {
-            var allRows = descendants$1(element, matrixConfig.selectors.row);
-            return findIndex$2(allRows, inRow).bind(function (rowIndex) {
+        var move = matrixConfig.cycles ? ifCycle : ifMove;
+        return closest$2(focused, matrixConfig.selectors.row).bind(function (inRow) {
+          var cellsInRow = descendants(inRow, matrixConfig.selectors.cell);
+          return findIndex$1(cellsInRow, focused).bind(function (colIndex) {
+            var allRows = descendants(element, matrixConfig.selectors.row);
+            return findIndex$1(allRows, inRow).bind(function (rowIndex) {
               var matrix = toMatrix(allRows, matrixConfig);
-              return move$$1(matrix, rowIndex, colIndex).map(function (next) {
+              return move(matrix, rowIndex, colIndex).map(function (next) {
                 return next.cell();
               });
             });
@@ -4247,7 +4247,7 @@ var mobile = (function (exports) {
       });
     };
     var focusIn$3 = function (component, menuConfig) {
-      descendant$2(component.element(), menuConfig.selector).each(function (first) {
+      descendant$1(component.element(), menuConfig.selector).each(function (first) {
         menuConfig.focusManager.set(component, first);
       });
     };
@@ -4370,7 +4370,7 @@ var mobile = (function (exports) {
         },
         setGridSize: function (component, keyConfig, keyState, numRows, numColumns) {
           if (!hasKey$1(keyState, 'setGridSize')) {
-            console.error('Layout does not support setGridSize');
+            domGlobals.console.error('Layout does not support setGridSize');
           } else {
             keyState.setGridSize(numRows, numColumns);
           }
@@ -4384,7 +4384,7 @@ var mobile = (function (exports) {
         return forbid(f.name(), 'Cannot configure ' + f.name() + ' for ' + name);
       }).concat([state$1('dump', identity)]));
     };
-    var get$6 = function (data) {
+    var get$5 = function (data) {
       return data.dump;
     };
     var augment = function (data, original) {
@@ -4393,7 +4393,7 @@ var mobile = (function (exports) {
     var SketchBehaviours = {
       field: field$1,
       augment: augment,
-      get: get$6
+      get: get$5
     };
 
     var _placeholder = 'placeholder';
@@ -4440,9 +4440,9 @@ var mobile = (function (exports) {
         });
         return [__assign({}, value, { components: substituted })];
       }, function (req, valuesThunk) {
-        var values$$1 = valuesThunk(detail, compSpec.config, compSpec.validated);
+        var values = valuesThunk(detail, compSpec.config, compSpec.validated);
         var preprocessor = compSpec.validated.preprocess.getOr(identity);
-        return preprocessor(values$$1);
+        return preprocessor(values);
       });
     };
     var substituteAll = function (owner, detail, components, placeholders) {
@@ -4631,7 +4631,7 @@ var mobile = (function (exports) {
     var schemas = function (parts) {
       return bind(parts, function (part) {
         return part.fold(Option.none, Option.some, Option.none, Option.none).map(function (data) {
-          return strictObjOf(data.name, data.schema.concat([snapshot$1(original())]));
+          return strictObjOf(data.name, data.schema.concat([snapshot(original())]));
         }).toArray();
       });
     };
@@ -4674,7 +4674,7 @@ var mobile = (function (exports) {
 
     var premadeTag = generate$1('alloy-premade');
     var premade = function (comp) {
-      return wrap$2(premadeTag, comp);
+      return wrap$1(premadeTag, comp);
     };
     var getPremade = function (spec) {
       return readOptFrom$1(spec, premadeTag);
@@ -4719,7 +4719,7 @@ var mobile = (function (exports) {
         strict$1('uid'),
         defaulted$1('dom', {}),
         defaulted$1('components', []),
-        snapshot$1('originalSpec'),
+        snapshot('originalSpec'),
         defaulted$1('debug.sketcher', {})
       ]).concat(partUidsSchemas);
     };
@@ -4739,8 +4739,8 @@ var mobile = (function (exports) {
       var partUidsSchema = defaultUidsSchema(partTypes);
       var detail = asRawOrDie$1(owner, schema, specWithUid, partSchemas, [partUidsSchema]);
       var subs = substitutes(owner, detail, partTypes);
-      var components$$1 = components(owner, detail, subs.internals());
-      return factory(detail, components$$1, specWithUid, subs.externals());
+      var components$1 = components(owner, detail, subs.internals());
+      return factory(detail, components$1, specWithUid, subs.externals());
     };
     var supplyUid = function (spec) {
       return spec.hasOwnProperty('uid') ? spec : __assign({}, spec, { uid: generate$3('uid') });
@@ -4894,11 +4894,11 @@ var mobile = (function (exports) {
       return Array.prototype.slice.call(elem.dom().classList, 0);
     };
     var fromHtml$2 = function (html) {
-      var elem = Element$$1.fromHtml(html);
-      var children$$1 = children(elem);
+      var elem = Element.fromHtml(html);
+      var children$1 = children(elem);
       var attrs = getAttrs(elem);
       var classes = getClasses(elem);
-      var contents = children$$1.length === 0 ? {} : { innerHtml: get$3(elem) };
+      var contents = children$1.length === 0 ? {} : { innerHtml: get$2(elem) };
       return __assign({
         tag: name(elem),
         classes: classes,
@@ -4906,160 +4906,13 @@ var mobile = (function (exports) {
       }, contents);
     };
 
-    var dom$2 = function (rawHtml) {
+    var dom$1 = function (rawHtml) {
       var html = supplant(rawHtml, { prefix: Styles.prefix() });
       return fromHtml$2(html);
     };
     var spec = function (rawHtml) {
-      var sDom = dom$2(rawHtml);
+      var sDom = dom$1(rawHtml);
       return { dom: sDom };
-    };
-
-    var getAll = function () {
-      return {
-        'accessibility-check': '<svg width="24" height="24"><path d="M12 2a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2c0-1.1.9-2 2-2zm8 7h-5v12c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-5c0-.6-.4-1-1-1a1 1 0 0 0-1 1v5c0 .6-.4 1-1 1a1 1 0 0 1-1-1V9H4a1 1 0 1 1 0-2h16c.6 0 1 .4 1 1s-.4 1-1 1z" fill-rule="nonzero"/></svg>',
-        'align-center': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm3 4h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 1 1 0-2zm0 8h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm-3-4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'align-justify': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2zm0 4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'align-left': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 4h8c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm0 8h8c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2zm0-4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'align-none': '<svg width="24" height="24"><path d="M14.2 5L13 7H5a1 1 0 1 1 0-2h9.2zm4 0h.8a1 1 0 0 1 0 2h-2l1.2-2zm-6.4 4l-1.2 2H5a1 1 0 0 1 0-2h6.8zm4 0H19a1 1 0 0 1 0 2h-4.4l1.2-2zm-6.4 4l-1.2 2H5a1 1 0 0 1 0-2h4.4zm4 0H19a1 1 0 0 1 0 2h-6.8l1.2-2zM7 17l-1.2 2H5a1 1 0 0 1 0-2h2zm4 0h8a1 1 0 0 1 0 2H9.8l1.2-2zm5.2-13.5l1.3.7-9.7 16.3-1.3-.7 9.7-16.3z" fill-rule="evenodd"/></svg>',
-        'align-right': '<svg width="24" height="24"><path d="M5 5h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 1 1 0-2zm6 4h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0 8h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm-6-4h14c.6 0 1 .4 1 1s-.4 1-1 1H5a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'arrow-left': '<svg width="24" height="24"><path d="M5.6 13l12 6a1 1 0 0 0 1.4-1V6a1 1 0 0 0-1.4-.9l-12 6a1 1 0 0 0 0 1.8z" fill-rule="evenodd"/></svg>',
-        'arrow-right': '<svg width="24" height="24"><path d="M18.5 13l-12 6A1 1 0 0 1 5 18V6a1 1 0 0 1 1.4-.9l12 6a1 1 0 0 1 0 1.8z" fill-rule="evenodd"/></svg>',
-        'bold': '<svg width="24" height="24"><path d="M7.8 19c-.3 0-.5 0-.6-.2l-.2-.5V5.7c0-.2 0-.4.2-.5l.6-.2h5c1.5 0 2.7.3 3.5 1 .7.6 1.1 1.4 1.1 2.5a3 3 0 0 1-.6 1.9c-.4.6-1 1-1.6 1.2.4.1.9.3 1.3.6s.8.7 1 1.2c.4.4.5 1 .5 1.6 0 1.3-.4 2.3-1.3 3-.8.7-2.1 1-3.8 1H7.8zm5-8.3c.6 0 1.2-.1 1.6-.5.4-.3.6-.7.6-1.3 0-1.1-.8-1.7-2.3-1.7H9.3v3.5h3.4zm.5 6c.7 0 1.3-.1 1.7-.4.4-.4.6-.9.6-1.5s-.2-1-.7-1.4c-.4-.3-1-.4-2-.4H9.4v3.8h4z" fill-rule="evenodd"/></svg>',
-        'bookmark': '<svg width="24" height="24"><path d="M6 4v17l6-4 6 4V4c0-.6-.4-1-1-1H7a1 1 0 0 0-1 1z" fill-rule="nonzero"/></svg>',
-        'border-width': '<svg width="24" height="24"><path d="M5 14.8h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2zm-.5 3.7h15c.3 0 .5.2.5.5s-.2.5-.5.5h-15a.5.5 0 1 1 0-1zm.5-8.3h14c.6 0 1 .4 1 1v1c0 .5-.4 1-1 1H5a1 1 0 0 1-1-1v-1c0-.6.4-1 1-1zm0-5.7h14c.6 0 1 .4 1 1v2c0 .6-.4 1-1 1H5a1 1 0 0 1-1-1v-2c0-.6.4-1 1-1z" fill-rule="evenodd"/></svg>',
-        'brightness': '<svg width="24" height="24"><path d="M12 17c.3 0 .5.1.7.3.2.2.3.4.3.7v1c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3 1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7v-1c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3zm0-10a1 1 0 0 1-.7-.3A1 1 0 0 1 11 6V5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3.3 0 .5.1.7.3.2.2.3.4.3.7v1c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3zm7 4c.3 0 .5.1.7.3.2.2.3.4.3.7 0 .3-.1.5-.3.7a1 1 0 0 1-.7.3h-1a1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h1zM7 12c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3H5a1 1 0 0 1-.7-.3A1 1 0 0 1 4 12c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h1c.3 0 .5.1.7.3.2.2.3.4.3.7zm10 3.5l.7.8c.2.1.3.4.3.6 0 .3-.1.6-.3.8a1 1 0 0 1-.8.3 1 1 0 0 1-.6-.3l-.8-.7a1 1 0 0 1-.3-.8c0-.2.1-.5.3-.7a1 1 0 0 1 1.4 0zm-10-7l-.7-.8a1 1 0 0 1-.3-.6c0-.3.1-.6.3-.8.2-.2.5-.3.8-.3.2 0 .5.1.7.3l.7.7c.2.2.3.5.3.8 0 .2-.1.5-.3.7a1 1 0 0 1-.7.3 1 1 0 0 1-.8-.3zm10 0a1 1 0 0 1-.8.3 1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7c0-.3.1-.6.3-.8l.8-.7c.1-.2.4-.3.6-.3.3 0 .6.1.8.3.2.2.3.5.3.8 0 .2-.1.5-.3.7l-.7.7zm-10 7c.2-.2.5-.3.8-.3.2 0 .5.1.7.3a1 1 0 0 1 0 1.4l-.8.8a1 1 0 0 1-.6.3 1 1 0 0 1-.8-.3 1 1 0 0 1-.3-.8c0-.2.1-.5.3-.6l.7-.8zM12 8a4 4 0 0 1 3.7 2.4 4 4 0 0 1 0 3.2A4 4 0 0 1 12 16a4 4 0 0 1-3.7-2.4 4 4 0 0 1 0-3.2A4 4 0 0 1 12 8zm0 6.5c.7 0 1.3-.2 1.8-.7.5-.5.7-1.1.7-1.8s-.2-1.3-.7-1.8c-.5-.5-1.1-.7-1.8-.7s-1.3.2-1.8.7c-.5.5-.7 1.1-.7 1.8s.2 1.3.7 1.8c.5.5 1.1.7 1.8.7z" fill-rule="evenodd"/></svg>',
-        'browse': '<svg width="24" height="24"><path d="M19 4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4v-2h4V8H5v10h4v2H5a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h14zm-8 9.4l-2.3 2.3a1 1 0 1 1-1.4-1.4l4-4a1 1 0 0 1 1.4 0l4 4a1 1 0 0 1-1.4 1.4L13 13.4V20a1 1 0 0 1-2 0v-6.6z" fill-rule="nonzero"/></svg>',
-        'cancel': '<svg width="24" height="24"><path d="M12 4.6a7.4 7.4 0 1 1 0 14.8 7.4 7.4 0 0 1 0-14.8zM12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 8L14.8 8l1 1.1-2.7 2.8 2.7 2.7-1.1 1.1-2.7-2.7-2.7 2.7-1-1.1 2.6-2.7-2.7-2.7 1-1.1 2.8 2.7z" fill-rule="nonzero"/></svg>',
-        'change-case': '<svg width="24" height="24"><path d="M18.4 18.2v-.6c-.5.8-1.3 1.2-2.4 1.2-2.2 0-3.3-1.6-3.3-4.8 0-3.1 1-4.7 3.3-4.7 1.1 0 1.8.3 2.4 1.1v-.6c0-.5.4-.8.8-.8s.8.3.8.8v8.4c0 .5-.4.8-.8.8a.8.8 0 0 1-.8-.8zm-2-7.4c-1.3 0-1.8.9-1.8 3.2 0 2.4.5 3.3 1.7 3.3 1.3 0 1.8-.9 1.8-3.2 0-2.4-.5-3.3-1.7-3.3zM10 15.7H5.5l-.8 2.6a1 1 0 0 1-1 .7h-.2a.7.7 0 0 1-.7-1l4-12a1 1 0 1 1 2 0l4 12a.7.7 0 0 1-.8 1h-.2a1 1 0 0 1-1-.7l-.8-2.6zm-.3-1.5l-2-6.5-1.9 6.5h3.9z" fill-rule="evenodd"/></svg>',
-        'character-count': '<svg width="24" height="24"><path d="M4 11.5h16v1H4v-1zm4.8-6.8V10H7.7V5.8h-1v-1h2zM11 8.3V9h2v1h-3V7.7l2-1v-.9h-2v-1h3v2.4l-2 1zm6.3-3.4V10h-3.1V9h2.1V8h-2.1V6.8h2.1v-1h-2.1v-1h3.1zM5.8 16.4c0-.5.2-.8.5-1 .2-.2.6-.3 1.2-.3l.8.1c.2 0 .4.2.5.3l.4.4v2.8l.2.3H8.2v-.1-.2l-.6.3H7c-.4 0-.7 0-1-.2a1 1 0 0 1-.3-.9c0-.3 0-.6.3-.8.3-.2.7-.4 1.2-.4l.6-.2h.3v-.2l-.1-.2a.8.8 0 0 0-.5-.1 1 1 0 0 0-.4 0l-.3.4h-1zm2.3.8h-.2l-.2.1-.4.1a1 1 0 0 0-.4.2l-.2.2.1.3.5.1h.4l.4-.4v-.6zm2-3.4h1.2v1.7l.5-.3h.5c.5 0 .9.1 1.2.5.3.4.5.8.5 1.4 0 .6-.2 1.1-.5 1.5-.3.4-.7.6-1.3.6l-.6-.1-.4-.4v.4h-1.1v-5.4zm1.1 3.3c0 .3 0 .6.2.8a.7.7 0 0 0 1.2 0l.2-.8c0-.4 0-.6-.2-.8a.7.7 0 0 0-.6-.3l-.6.3-.2.8zm6.1-.5c0-.2 0-.3-.2-.4a.8.8 0 0 0-.5-.2c-.3 0-.5.1-.6.3l-.2.9c0 .3 0 .6.2.8.1.2.3.3.6.3.2 0 .4 0 .5-.2l.2-.4h1.1c0 .5-.3.8-.6 1.1a2 2 0 0 1-1.3.4c-.5 0-1-.2-1.3-.6a2 2 0 0 1-.5-1.4c0-.6.1-1.1.5-1.5.3-.4.8-.5 1.4-.5.5 0 1 0 1.2.3.4.3.5.7.5 1.2h-1v-.1z" fill-rule="evenodd"/></svg>',
-        'checklist': '<svg width="24" height="24"><path d="M11 17h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8a1 1 0 0 1 0 2h-8a1 1 0 0 1 0-2zM7.2 16c.2-.4.6-.5.9-.3.3.2.4.6.2 1L6 20c-.2.3-.7.4-1 0l-1.3-1.3a.7.7 0 0 1 0-1c.3-.2.7-.2 1 0l.7.9 1.7-2.8zm0-6c.2-.4.6-.5.9-.3.3.2.4.6.2 1L6 14c-.2.3-.7.4-1 0l-1.3-1.3a.7.7 0 0 1 0-1c.3-.2.7-.2 1 0l.7.9 1.7-2.8zm0-6c.2-.4.6-.5.9-.3.3.2.4.6.2 1L6 8c-.2.3-.7.4-1 0L3.8 6.9a.7.7 0 0 1 0-1c.3-.2.7-.2 1 0l.7.9 1.7-2.8z" fill-rule="evenodd"/></svg>',
-        'checkmark': '<svg width="24" height="24"><path d="M18.2 5.4a1 1 0 0 1 1.6 1.2l-8 12a1 1 0 0 1-1.5.1l-5-5a1 1 0 1 1 1.4-1.4l4.1 4.1 7.4-11z" fill-rule="nonzero"/></svg>',
-        'chevron-down': '<svg width="10" height="10"><path d="M8.7 2.2c.3-.3.8-.3 1 0 .4.4.4.9 0 1.2L5.7 7.8c-.3.3-.9.3-1.2 0L.2 3.4a.8.8 0 0 1 0-1.2c.3-.3.8-.3 1.1 0L5 6l3.7-3.8z" fill-rule="nonzero"/></svg>',
-        'chevron-left': '<svg width="10" height="10"><path d="M7.8 1.3L4 5l3.8 3.7c.3.3.3.8 0 1-.4.4-.9.4-1.2 0L2.2 5.7a.8.8 0 0 1 0-1.2L6.6.2C7 0 7.4 0 7.8.2c.3.3.3.8 0 1.1z" fill-rule="nonzero"/></svg>',
-        'chevron-right': '<svg width="10" height="10"><path d="M2.2 1.3a.8.8 0 0 1 0-1c.4-.4.9-.4 1.2 0l4.4 4.1c.3.4.3.9 0 1.2L3.4 9.8c-.3.3-.8.3-1.2 0a.8.8 0 0 1 0-1.1L6 5 2.2 1.3z" fill-rule="nonzero"/></svg>',
-        'chevron-up': '<svg width="10" height="10"><path d="M8.7 7.8L5 4 1.3 7.8c-.3.3-.8.3-1 0a.8.8 0 0 1 0-1.2l4.1-4.4c.3-.3.9-.3 1.2 0l4.2 4.4c.3.3.3.9 0 1.2-.3.3-.8.3-1.1 0z" fill-rule="nonzero"/></svg>',
-        'close': '<svg width="24" height="24"><path d="M17.3 8.2L13.4 12l3.9 3.8a1 1 0 0 1-1.5 1.5L12 13.4l-3.8 3.9a1 1 0 0 1-1.5-1.5l3.9-3.8-3.9-3.8a1 1 0 0 1 1.5-1.5l3.8 3.9 3.8-3.9a1 1 0 0 1 1.5 1.5z" fill-rule="evenodd"/></svg>',
-        'code-sample': '<svg width="24" height="26"><path d="M7.1 11a2.8 2.8 0 0 1-.8 2 2.8 2.8 0 0 1 .8 2v1.7c0 .3.1.6.4.8.2.3.5.4.8.4.3 0 .4.2.4.4v.8c0 .2-.1.4-.4.4-.7 0-1.4-.3-2-.8-.5-.6-.8-1.3-.8-2V15c0-.3-.1-.6-.4-.8-.2-.3-.5-.4-.8-.4a.4.4 0 0 1-.4-.4v-.8c0-.2.2-.4.4-.4.3 0 .6-.1.8-.4.3-.2.4-.5.4-.8V9.3c0-.7.3-1.4.8-2 .6-.5 1.3-.8 2-.8.3 0 .4.2.4.4v.8c0 .2-.1.4-.4.4-.3 0-.6.1-.8.4-.3.2-.4.5-.4.8V11zm9.8 0V9.3c0-.3-.1-.6-.4-.8-.2-.3-.5-.4-.8-.4a.4.4 0 0 1-.4-.4V7c0-.2.1-.4.4-.4.7 0 1.4.3 2 .8.5.6.8 1.3.8 2V11c0 .3.1.6.4.8.2.3.5.4.8.4.2 0 .4.2.4.4v.8c0 .2-.2.4-.4.4-.3 0-.6.1-.8.4-.3.2-.4.5-.4.8v1.7c0 .7-.3 1.4-.8 2-.6.5-1.3.8-2 .8a.4.4 0 0 1-.4-.4v-.8c0-.2.1-.4.4-.4.3 0 .6-.1.8-.4.3-.2.4-.5.4-.8V15a2.8 2.8 0 0 1 .8-2 2.8 2.8 0 0 1-.8-2zm-3.3-.4c0 .4-.1.8-.5 1.1-.3.3-.7.5-1.1.5-.4 0-.8-.2-1.1-.5-.4-.3-.5-.7-.5-1.1 0-.5.1-.9.5-1.2.3-.3.7-.4 1.1-.4.4 0 .8.1 1.1.4.4.3.5.7.5 1.2zM12 13c.4 0 .8.1 1.1.5.4.3.5.7.5 1.1 0 1-.1 1.6-.5 2a3 3 0 0 1-1.1 1c-.4.3-.8.4-1.1.4a.5.5 0 0 1-.5-.5V17a3 3 0 0 0 1-.2l.6-.6c-.6 0-1-.2-1.3-.5-.2-.3-.3-.7-.3-1 0-.5.1-1 .5-1.2.3-.4.7-.5 1.1-.5z" fill-rule="evenodd"/></svg>',
-        'color-levels': '<svg width="24" height="24"><path d="M17.5 11.4A9 9 0 0 1 18 14c0 .5 0 1-.2 1.4 0 .4-.3.9-.5 1.3a6.2 6.2 0 0 1-3.7 3 5.7 5.7 0 0 1-3.2 0A5.9 5.9 0 0 1 7.6 18a6.2 6.2 0 0 1-1.4-2.6 6.7 6.7 0 0 1 0-2.8c0-.4.1-.9.3-1.3a13.6 13.6 0 0 1 2.3-4A20 20 0 0 1 12 4a26.4 26.4 0 0 1 3.2 3.4 18.2 18.2 0 0 1 2.3 4zm-2 4.5c.4-.7.5-1.4.5-2a7.3 7.3 0 0 0-1-3.2c.2.6.2 1.2.2 1.9a4.5 4.5 0 0 1-1.3 3 5.3 5.3 0 0 1-2.3 1.5 4.9 4.9 0 0 1-2 .1 4.3 4.3 0 0 0 2.4.8 4 4 0 0 0 2-.6 4 4 0 0 0 1.5-1.5z" fill-rule="evenodd"/></svg>',
-        'color-picker': '<svg width="24" height="24"><path d="M12 3a9 9 0 0 0 0 18 1.5 1.5 0 0 0 1.1-2.5c-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" fill-rule="nonzero"/></svg>',
-        'color-swatch-remove-color': '<svg width="24" height="24"><path stroke="#000" stroke-width="2" d="M21 3L3 21" fill-rule="evenodd"/></svg>',
-        'color-swatch': '<svg width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="1" fill-rule="evenodd"/></svg>',
-        'comment': '<svg width="24" height="24"><path d="M9 19l3-2h7c.6 0 1-.4 1-1V6c0-.6-.4-1-1-1H5a1 1 0 0 0-1 1v10c0 .6.4 1 1 1h4v2zm-2 4v-4H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-6.4L7 23z" fill-rule="nonzero"/></svg>',
-        'contrast': '<svg width="24" height="24"><path d="M12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4zm-6 8a6 6 0 0 0 6 6V6a6 6 0 0 0-6 6z" fill-rule="evenodd"/></svg>',
-        'copy': '<svg width="24" height="24"><path d="M16 3H6a2 2 0 0 0-2 2v11h2V5h10V3zm1 4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9c0-1.2.9-2 2-2h7zm0 12V9h-7v10h7z" fill-rule="nonzero"/></svg>',
-        'crop': '<svg width="24" height="24"><path d="M17 8v7h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v2c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-2H7V9H5a1 1 0 1 1 0-2h2V5c0-.6.4-1 1-1s1 .4 1 1v2h7l3-3 1 1-3 3zM9 9v5l5-5H9zm1 6h5v-5l-5 5z" fill-rule="evenodd"/></svg>',
-        'cut': '<svg width="24" height="24"><path d="M18 15c.6.7 1 1.4 1 2.3 0 .8-.2 1.5-.7 2l-.8.5-1 .2c-.4 0-.8 0-1.2-.3a3.9 3.9 0 0 1-2.1-2.2c-.2-.5-.3-1-.2-1.5l-1-1-1 1c0 .5 0 1-.2 1.5-.1.5-.4 1-.9 1.4-.3.4-.7.6-1.2.8l-1.2.3c-.4 0-.7 0-1-.2-.3 0-.6-.3-.8-.5-.5-.5-.8-1.2-.7-2 0-.9.4-1.6 1-2.2A3.7 3.7 0 0 1 8.6 14H9l1-1-4-4-.5-1a3.3 3.3 0 0 1 0-2c0-.4.3-.7.5-1l6 6 6-6 .5 1a3.3 3.3 0 0 1 0 2c0 .4-.3.7-.5 1l-4 4 1 1h.5c.4 0 .8 0 1.2.3.5.2.9.4 1.2.8zm-8.5 2.2l.1-.4v-.3-.4a1 1 0 0 0-.2-.5 1 1 0 0 0-.4-.2 1.6 1.6 0 0 0-.8 0 2.6 2.6 0 0 0-.8.3 2.5 2.5 0 0 0-.9 1.1l-.1.4v.7l.2.5.5.2h.7a2.5 2.5 0 0 0 .8-.3 2.8 2.8 0 0 0 1-1zm2.5-2.8c.4 0 .7-.1 1-.4.3-.3.4-.6.4-1s-.1-.7-.4-1c-.3-.3-.6-.4-1-.4s-.7.1-1 .4c-.3.3-.4.6-.4 1s.1.7.4 1c.3.3.6.4 1 .4zm5.4 4l.2-.5v-.4-.3a2.6 2.6 0 0 0-.3-.8 2.4 2.4 0 0 0-.7-.7 2.5 2.5 0 0 0-.8-.3 1.5 1.5 0 0 0-.8 0 1 1 0 0 0-.4.2 1 1 0 0 0-.2.5 1.5 1.5 0 0 0 0 .7v.4l.3.4.3.4a2.8 2.8 0 0 0 .8.5l.4.1h.7l.5-.2z" fill-rule="evenodd"/></svg>',
-        'document-properties': '<svg width="24" height="24"><path d="M14.4 3H7a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h10a2 2 0 0 0 2-2V7.6L14.4 3zM17 19H7V5h6v4h4v10z" fill-rule="nonzero"/></svg>',
-        'drag': '<svg width="24" height="24"><path d="M13 5h2v2h-2V5zm0 4h2v2h-2V9zM9 9h2v2H9V9zm4 4h2v2h-2v-2zm-4 0h2v2H9v-2zm0 4h2v2H9v-2zm4 0h2v2h-2v-2zM9 5h2v2H9V5z" fill-rule="evenodd"/></svg>',
-        'duplicate': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M16 3v2H6v11H4V5c0-1.1.9-2 2-2h10zm3 8h-2V9h-7v10h9a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9c0-1.2.9-2 2-2h7a2 2 0 0 1 2 2v2z"/><path d="M17 14h1a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1h-1a1 1 0 0 1 0-2h1v-1a1 1 0 0 1 2 0v1z"/></g></svg>',
-        'edit-image': '<svg width="24" height="24"><path d="M18 16h2V7a2 2 0 0 0-2-2H7v2h11v9zM6 17h15a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1H6a2 2 0 0 1-2-2V7H3a1 1 0 1 1 0-2h1V4a1 1 0 1 1 2 0v13zm3-5.3l1.3 2 3-4.7 3.7 6H7l2-3.3z" fill-rule="nonzero"/></svg>',
-        'embed-page': '<svg width="24" height="24"><path d="M19 6V5H5v14h2A13 13 0 0 1 19 6zm0 1.4c-.8.8-1.6 2.4-2.2 4.6H19V7.4zm0 5.6h-2.4c-.4 1.8-.6 3.8-.6 6h3v-6zm-4 6c0-2.2.2-4.2.6-6H13c-.7 1.8-1.1 3.8-1.1 6h3zm-4 0c0-2.2.4-4.2 1-6H9.6A12 12 0 0 0 8 19h3zM4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm11.8 9c.4-1.9 1-3.4 1.8-4.5a9.2 9.2 0 0 0-4 4.5h2.2zm-3.4 0a12 12 0 0 1 2.8-4 12 12 0 0 0-5 4h2.2z" fill-rule="nonzero"/></svg>',
-        'embed': '<svg width="24" height="24"><path d="M4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm1 2v14h14V5H5zm4.8 2.6l5.6 4a.5.5 0 0 1 0 .8l-5.6 4A.5.5 0 0 1 9 16V8a.5.5 0 0 1 .8-.4z" fill-rule="nonzero"/></svg>',
-        'emoji': '<svg width="24" height="24"><path d="M9 11c.6 0 1-.4 1-1s-.4-1-1-1a1 1 0 0 0-1 1c0 .6.4 1 1 1zm6 0c.6 0 1-.4 1-1s-.4-1-1-1a1 1 0 0 0-1 1c0 .6.4 1 1 1zm-3 5.5c2.1 0 4-1.5 4.4-3.5H7.6c.5 2 2.3 3.5 4.4 3.5zM12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13z" fill-rule="nonzero"/></svg>',
-        'fill': '<svg width="24" height="26"><path d="M16.6 12l-9-9-1.4 1.4 2.4 2.4-5.2 5.1c-.5.6-.5 1.6 0 2.2L9 19.6a1.5 1.5 0 0 0 2.2 0l5.5-5.5c.5-.6.5-1.6 0-2.2zM5.2 13L10 8.2l4.8 4.8H5.2zM19 14.5s-2 2.2-2 3.5c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.3-2-3.5-2-3.5z" fill-rule="nonzero"/></svg>',
-        'flip-horizontally': '<svg width="24" height="24"><path d="M14 19h2v-2h-2v2zm4-8h2V9h-2v2zM4 7v10c0 1.1.9 2 2 2h3v-2H6V7h3V5H6a2 2 0 0 0-2 2zm14-2v2h2a2 2 0 0 0-2-2zm-7 16h2V3h-2v18zm7-6h2v-2h-2v2zm-4-8h2V5h-2v2zm4 12a2 2 0 0 0 2-2h-2v2z" fill-rule="nonzero"/></svg>',
-        'flip-vertically': '<svg width="24" height="24"><path d="M5 14v2h2v-2H5zm8 4v2h2v-2h-2zm4-14H7a2 2 0 0 0-2 2v3h2V6h10v3h2V6a2 2 0 0 0-2-2zm2 14h-2v2a2 2 0 0 0 2-2zM3 11v2h18v-2H3zm6 7v2h2v-2H9zm8-4v2h2v-2h-2zM5 18c0 1.1.9 2 2 2v-2H5z" fill-rule="nonzero"/></svg>',
-        'format-painter': '<svg width="24" height="24"><path d="M18 5V4c0-.5-.4-1-1-1H5a1 1 0 0 0-1 1v4c0 .6.5 1 1 1h12c.6 0 1-.4 1-1V7h1v4H9v9c0 .6.4 1 1 1h2c.6 0 1-.4 1-1v-7h8V5h-3z" fill-rule="nonzero"/></svg>',
-        'fullscreen': '<svg width="24" height="24"><path d="M15.3 10l-1.2-1.3 2.9-3h-2.3a.9.9 0 1 1 0-1.7H19c.5 0 .9.4.9.9v4.4a.9.9 0 1 1-1.8 0V7l-2.9 3zm0 4l3 3v-2.3a.9.9 0 1 1 1.7 0V19c0 .5-.4.9-.9.9h-4.4a.9.9 0 1 1 0-1.8H17l-3-2.9 1.3-1.2zM10 15.4l-2.9 3h2.3a.9.9 0 1 1 0 1.7H5a.9.9 0 0 1-.9-.9v-4.4a.9.9 0 1 1 1.8 0V17l2.9-3 1.2 1.3zM8.7 10L5.7 7v2.3a.9.9 0 0 1-1.7 0V5c0-.5.4-.9.9-.9h4.4a.9.9 0 0 1 0 1.8H7l3 2.9-1.3 1.2z" fill-rule="nonzero"/></svg>',
-        'gamma': '<svg width="24" height="24"><path d="M4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm1 2v14h14V5H5zm6.5 11.8V14L9.2 8.7a5.1 5.1 0 0 0-.4-.8l-.1-.2H8 8v-1l.3-.1.3-.1h.7a1 1 0 0 1 .6.5l.1.3a8.5 8.5 0 0 1 .3.6l1.9 4.6 2-5.2a1 1 0 0 1 1-.6.5.5 0 0 1 .5.6L13 14v2.8a.7.7 0 0 1-1.4 0z" fill-rule="nonzero"/></svg>',
-        'help': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M12 5.5a6.5 6.5 0 0 0-6 9 6.3 6.3 0 0 0 1.4 2l1 1a6.3 6.3 0 0 0 3.6 1 6.5 6.5 0 0 0 6-9 6.3 6.3 0 0 0-1.4-2l-1-1a6.3 6.3 0 0 0-3.6-1zM12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4z"/><path d="M9.6 9.7a.7.7 0 0 1-.7-.8c0-1.1 1.5-1.8 3.2-1.8 1.8 0 3.2.8 3.2 2.4 0 1.4-.4 2.1-1.5 2.8-.2 0-.3.1-.3.2a2 2 0 0 0-.8.8.8.8 0 0 1-1.4-.6c.3-.7.8-1 1.3-1.5l.4-.2c.7-.4.8-.6.8-1.5 0-.5-.6-.9-1.7-.9-.5 0-1 .1-1.4.3-.2 0-.3.1-.3.2v-.2c0 .4-.4.8-.8.8z" fill-rule="nonzero"/><circle cx="12" cy="16" r="1"/></g></svg>',
-        'highlight-bg-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path id="tox-icon-highlight-bg-color__color" d="M3 18h18v3H3z"/><path fill-rule="nonzero" d="M7.7 16.7H3l3.3-3.3-.7-.8L10.2 8l4 4.1-4 4.2c-.2.2-.6.2-.8 0l-.6-.7-1.1 1.1zm5-7.5L11 7.4l3-2.9a2 2 0 0 1 2.6 0L18 6c.7.7.7 2 0 2.7l-2.9 2.9-1.8-1.8-.5-.6"/></g></svg>',
-        'home': '<svg width="24" height="24"><path fill-rule="nonzero" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
-        'horizontal-rule': '<svg width="24" height="24"><path d="M4 11h16v2H4z" fill-rule="evenodd"/></svg>',
-        'image-options': '<svg width="24" height="24"><path d="M6 10a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2zm12 0a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2zm-6 0a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2z" fill-rule="nonzero"/></svg>',
-        'image': '<svg width="24" height="24"><path d="M5 15.7l3.3-3.2c.3-.3.7-.3 1 0L12 15l4.1-4c.3-.4.8-.4 1 0l2 1.9V5H5v10.7zM5 18V19h3l2.8-2.9-2-2L5 17.9zm14-3l-2.5-2.4-6.4 6.5H19v-4zM4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm6 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" fill-rule="nonzero"/></svg>',
-        'indent': '<svg width="24" height="24"><path d="M7 5h12c.6 0 1 .4 1 1s-.4 1-1 1H7a1 1 0 1 1 0-2zm5 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm0 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm-5 4h12a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2zm-2.6-3.8L6.2 12l-1.8-1.2a1 1 0 0 1 1.2-1.6l3 2a1 1 0 0 1 0 1.6l-3 2a1 1 0 1 1-1.2-1.6z" fill-rule="evenodd"/></svg>',
-        'indeterminate': '<svg width="24" height="24"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM9 11a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2H9z" fill-rule="evenodd"/></svg>',
-        'info': '<svg width="24" height="24"><path d="M12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4zm-1 3v2h2V7h-2zm3 10v-1h-1v-5h-3v1h1v4h-1v1h4z" fill-rule="evenodd"/></svg>',
-        'insert-character': '<svg width="24" height="24"><path d="M15 18h4l1-2v4h-6v-3.3l1.4-1a6 6 0 0 0 1.8-2.9 6.3 6.3 0 0 0-.1-4.1 5.8 5.8 0 0 0-3-3.2c-.6-.3-1.3-.5-2.1-.5a5.1 5.1 0 0 0-3.9 1.8 6.3 6.3 0 0 0-1.3 6 6.2 6.2 0 0 0 1.8 3l1.4.9V20H4v-4l1 2h4v-.5l-2-1L5.4 15A6.5 6.5 0 0 1 4 11c0-1 .2-1.9.6-2.7A7 7 0 0 1 6.3 6C7.1 5.4 8 5 9 4.5c1-.3 2-.5 3.1-.5a8.8 8.8 0 0 1 5.7 2 7 7 0 0 1 1.7 2.3 6 6 0 0 1 .2 4.8c-.2.7-.6 1.3-1 1.9a7.6 7.6 0 0 1-3.6 2.5v.5z" fill-rule="evenodd"/></svg>',
-        'insert-time': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M19 2H5a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3zm-7 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/><path d="M15 12h-3V7a.5.5 0 0 0-1 0v6h4a.5.5 0 0 0 0-1z"/></g></svg>',
-        'invert': '<svg width="24" height="24"><path d="M18 19.3L16.5 18a5.8 5.8 0 0 1-3.1 1.9 6.1 6.1 0 0 1-5.5-1.6A5.8 5.8 0 0 1 6 14v-.3l.1-1.2A13.9 13.9 0 0 1 7.7 9l-3-3 .7-.8 2.8 2.9 9 8.9 1.5 1.6-.7.6zm0-5.5v.3l-.1 1.1-.4 1-1.2-1.2a4.3 4.3 0 0 0 .2-1v-.2c0-.4 0-.8-.2-1.3l-.5-1.4a14.8 14.8 0 0 0-3-4.2L12 6a26.1 26.1 0 0 0-2.2 2.5l-1-1a20.9 20.9 0 0 1 2.9-3.3L12 4l1 .8a22.2 22.2 0 0 1 4 5.4c.6 1.2 1 2.4 1 3.6z" fill-rule="evenodd"/></svg>',
-        'italic': '<svg width="24" height="24"><path d="M16.7 4.7l-.1.9h-.3c-.6 0-1 0-1.4.3-.3.3-.4.6-.5 1.1l-2.1 9.8v.6c0 .5.4.8 1.4.8h.2l-.2.8H8l.2-.8h.2c1.1 0 1.8-.5 2-1.5l2-9.8.1-.5c0-.6-.4-.8-1.4-.8h-.3l.2-.9h5.8z" fill-rule="evenodd"/></svg>',
-        'line': '<svg width="24" height="24"><path d="M15 9l-8 8H4v-3l8-8 3 3zm1-1l-3-3 1-1h1c-.2 0 0 0 0 0l2 2s0 .2 0 0v1l-1 1zM4 18h16v2H4v-2z" fill-rule="evenodd"/></svg>',
-        'link': '<svg width="24" height="24"><path d="M6.2 12.3a1 1 0 0 1 1.4 1.4l-2.1 2a2 2 0 1 0 2.7 2.8l4.8-4.8a1 1 0 0 0 0-1.4 1 1 0 1 1 1.4-1.3 2.9 2.9 0 0 1 0 4L9.6 20a3.9 3.9 0 0 1-5.5-5.5l2-2zm11.6-.6a1 1 0 0 1-1.4-1.4l2-2a2 2 0 1 0-2.6-2.8L11 10.3a1 1 0 0 0 0 1.4A1 1 0 1 1 9.6 13a2.9 2.9 0 0 1 0-4L14.4 4a3.9 3.9 0 0 1 5.5 5.5l-2 2z" fill-rule="nonzero"/></svg>',
-        'list-bull-circle': '<svg width="48" height="48"><g fill-rule="evenodd"><path d="M11 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM11 26a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM11 36a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill-rule="nonzero"/><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/></g></svg>',
-        'list-bull-default': '<svg width="48" height="48"><g fill-rule="evenodd"><circle cx="11" cy="14" r="3"/><circle cx="11" cy="24" r="3"/><circle cx="11" cy="34" r="3"/><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/></g></svg>',
-        'list-bull-square': '<svg width="48" height="48"><g fill-rule="evenodd"><path d="M8 11h6v6H8zM8 21h6v6H8zM8 31h6v6H8z"/><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/></g></svg>',
-        'list-num-default': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M10 17v-4.8l-1.5 1v-1.1l1.6-1h1.2V17h-1.2zm3.6.1c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zm-5 5.7c0-1.2.8-2 2.1-2s2.1.8 2.1 1.8c0 .7-.3 1.2-1.4 2.2l-1.1 1v.2h2.6v1H8.6v-.9l2-1.9c.8-.8 1-1.1 1-1.5 0-.5-.4-.8-1-.8-.5 0-.9.3-.9.9H8.5zm6.3 4.3c-.5 0-.7-.3-.7-.7 0-.4.2-.7.7-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zM10 34.4v-1h.7c.6 0 1-.3 1-.8 0-.4-.4-.7-1-.7s-1 .3-1 .8H8.6c0-1.1 1-1.8 2.2-1.8 1.3 0 2.1.6 2.1 1.6 0 .7-.4 1.2-1 1.3v.1c.8.1 1.3.7 1.3 1.4 0 1-1 1.9-2.4 1.9-1.3 0-2.2-.8-2.3-2h1.2c0 .6.5 1 1.1 1 .7 0 1-.4 1-1 0-.5-.3-.8-1-.8h-.7zm4.7 2.7c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .8.3.8.7 0 .4-.3.7-.8.7z"/></g></svg>',
-        'list-num-lower-alpha': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M10.3 15.2c.5 0 1-.4 1-.9V14h-1c-.5.1-.8.3-.8.6 0 .4.3.6.8.6zm-.4.9c-1 0-1.5-.6-1.5-1.4 0-.8.6-1.3 1.7-1.4h1.1v-.4c0-.4-.2-.6-.7-.6-.5 0-.8.1-.9.4h-1c0-.8.8-1.4 2-1.4 1.1 0 1.8.6 1.8 1.6V16h-1.1v-.6h-.1c-.2.4-.7.7-1.3.7zm4.6 0c-.5 0-.7-.3-.7-.7 0-.4.2-.7.7-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-3.2 10c-.6 0-1.2-.3-1.4-.8v.7H8.5v-6.3H10v2.5c.3-.5.8-.9 1.4-.9 1.2 0 1.9 1 1.9 2.4 0 1.5-.7 2.4-1.9 2.4zm-.4-3.7c-.7 0-1 .5-1 1.3s.3 1.4 1 1.4c.6 0 1-.6 1-1.4 0-.8-.4-1.3-1-1.3zm4 3.7c-.5 0-.7-.3-.7-.7 0-.4.2-.7.7-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-2.2 7h-1.2c0-.5-.4-.8-.9-.8-.6 0-1 .5-1 1.4 0 1 .4 1.4 1 1.4.5 0 .8-.2 1-.7h1c0 1-.8 1.7-2 1.7-1.4 0-2.2-.9-2.2-2.4s.8-2.4 2.2-2.4c1.2 0 2 .7 2 1.7zm1.8 3c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"/></g></svg>',
-        'list-num-lower-greek': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M10.5 15c.7 0 1-.5 1-1.3s-.3-1.3-1-1.3c-.5 0-.9.5-.9 1.3s.4 1.4 1 1.4zm-.3 1c-1.1 0-1.8-.8-1.8-2.3 0-1.5.7-2.4 1.8-2.4.7 0 1.1.4 1.3 1h.1v-.9h1.2v3.2c0 .4.1.5.4.5h.2v.9h-.6c-.6 0-1-.2-1.1-.7h-.1c-.2.4-.7.8-1.4.8zm5 .1c-.5 0-.8-.3-.8-.7 0-.4.3-.7.7-.7.5 0 .8.3.8.7 0 .4-.3.7-.8.7zm-4.9 7v-1h.3c.6 0 1-.2 1-.7 0-.5-.4-.8-1-.8-.5 0-.8.3-.8 1v2.2c0 .8.4 1.3 1.1 1.3.6 0 1-.4 1-1s-.5-1-1.3-1h-.3zM8.6 22c0-1.5.7-2.3 2-2.3 1.2 0 2 .6 2 1.6 0 .6-.3 1-.8 1.3.8.3 1.3.8 1.3 1.7 0 1.2-.8 1.9-1.9 1.9-.6 0-1.1-.3-1.3-.8v2.2H8.5V22zm6.2 4.2c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zm-4.5 8.5L8 30h1.4l1.7 3.5 1.7-3.5h1.1l-2.2 4.6v.1c.5.8.7 1.4.7 1.8 0 .4-.1.8-.4 1-.2.2-.6.3-1 .3-.9 0-1.3-.4-1.3-1.2 0-.5.2-1 .5-1.7l.1-.2zm.7 1a2 2 0 0 0-.4.9c0 .3.1.4.4.4.3 0 .4-.1.4-.4 0-.2-.1-.6-.4-1zm4.5.5c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"/></g></svg>',
-        'list-num-lower-roman': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M15.1 16v-1.2h1.3V16H15zm0 10v-1.2h1.3V26H15zm0 10v-1.2h1.3V36H15z"/><path fill-rule="nonzero" d="M12 21h1.5v5H12zM12 31h1.5v5H12zM9 21h1.5v5H9zM9 31h1.5v5H9zM6 31h1.5v5H6zM12 11h1.5v5H12zM12 19h1.5v1H12zM12 29h1.5v1H12zM9 19h1.5v1H9zM9 29h1.5v1H9zM6 29h1.5v1H6zM12 9h1.5v1H12z"/></g></svg>',
-        'list-num-upper-alpha': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M12.6 17l-.5-1.4h-2L9.5 17H8.3l2-6H12l2 6h-1.3zM11 12.3l-.7 2.3h1.6l-.8-2.3zm4.7 4.8c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zM11.4 27H8.7v-6h2.6c1.2 0 1.9.6 1.9 1.5 0 .6-.5 1.2-1 1.3.7.1 1.3.7 1.3 1.5 0 1-.8 1.7-2 1.7zM10 22v1.5h1c.6 0 1-.3 1-.8 0-.4-.4-.7-1-.7h-1zm0 4H11c.7 0 1.1-.3 1.1-.8 0-.6-.4-.9-1.1-.9H10V26zm5.4 1.1c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-4.1 10c-1.8 0-2.8-1.1-2.8-3.1s1-3.1 2.8-3.1c1.4 0 2.5.9 2.6 2.2h-1.3c0-.7-.6-1.1-1.3-1.1-1 0-1.6.7-1.6 2s.6 2 1.6 2c.7 0 1.2-.4 1.4-1h1.2c-.1 1.3-1.2 2.2-2.6 2.2zm4.5 0c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"/></g></svg>',
-        'list-num-upper-roman': '<svg width="48" height="48"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"/><path d="M15.1 17v-1.2h1.3V17H15zm0 10v-1.2h1.3V27H15zm0 10v-1.2h1.3V37H15z"/><path fill-rule="nonzero" d="M12 20h1.5v7H12zM12 30h1.5v7H12zM9 20h1.5v7H9zM9 30h1.5v7H9zM6 30h1.5v7H6zM12 10h1.5v7H12z"/></g></svg>',
-        'lock': '<svg width="24" height="24"><path d="M16.3 11c.2 0 .3 0 .5.2l.2.6v7.4c0 .3 0 .4-.2.6l-.6.2H7.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6v-7.4c0-.3 0-.4.2-.6l.5-.2H8V8c0-.8.3-1.5.9-2.1.6-.6 1.3-.9 2.1-.9h2c.8 0 1.5.3 2.1.9.6.6.9 1.3.9 2.1v3h.3zM10 8v3h4V8a1 1 0 0 0-.3-.7A1 1 0 0 0 13 7h-2a1 1 0 0 0-.7.3 1 1 0 0 0-.3.7z" fill-rule="evenodd"/></svg>',
-        'ltr': '<svg width="24" height="24"><path d="M11 5h7a1 1 0 0 1 0 2h-1v11a1 1 0 0 1-2 0V7h-2v11a1 1 0 0 1-2 0v-6c-.5 0-1 0-1.4-.3A3.4 3.4 0 0 1 7.8 10a3.3 3.3 0 0 1 0-2.8 3.4 3.4 0 0 1 1.8-1.8L11 5zM4.4 16.2L6.2 15l-1.8-1.2a1 1 0 0 1 1.2-1.6l3 2a1 1 0 0 1 0 1.6l-3 2a1 1 0 1 1-1.2-1.6z" fill-rule="evenodd"/></svg>',
-        'new-document': '<svg width="24" height="24"><path d="M14.4 3H7a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h10a2 2 0 0 0 2-2V7.6L14.4 3zM17 19H7V5h6v4h4v10z" fill-rule="nonzero"/></svg>',
-        'new-tab': '<svg width="24" height="24"><path d="M15 13l2-2v8H5V7h8l-2 2H7v8h8v-4zm4-8v5.5l-2-2-5.6 5.5H10v-1.4L15.5 7l-2-2H19z" fill-rule="evenodd"/></svg>',
-        'non-breaking': '<svg width="24" height="24"><path d="M11 11H8a1 1 0 1 1 0-2h3V6c0-.6.4-1 1-1s1 .4 1 1v3h3c.6 0 1 .4 1 1s-.4 1-1 1h-3v3c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-3zm10 4v5H3v-5c0-.6.4-1 1-1s1 .4 1 1v3h14v-3c0-.6.4-1 1-1s1 .4 1 1z" fill-rule="evenodd"/></svg>',
-        'notice': '<svg width="24" height="24"><path d="M17.8 9.8L15.4 4 20 8.5v7L15.5 20h-7L4 15.5v-7L8.5 4h7l2.3 5.8zm0 0l2.2 5.7-2.3-5.8zM13 17v-2h-2v2h2zm0-4V7h-2v6h2z" fill-rule="evenodd"/></svg>',
-        'ordered-list': '<svg width="24" height="24"><path d="M10 17h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0-6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 1 1 0-2zM6 4v3.5c0 .3-.2.5-.5.5a.5.5 0 0 1-.5-.5V5h-.5a.5.5 0 0 1 0-1H6zm-1 8.8l.2.2h1.3c.3 0 .5.2.5.5s-.2.5-.5.5H4.9a1 1 0 0 1-.9-1V13c0-.4.3-.8.6-1l1.2-.4.2-.3a.2.2 0 0 0-.2-.2H4.5a.5.5 0 0 1-.5-.5c0-.3.2-.5.5-.5h1.6c.5 0 .9.4.9 1v.1c0 .4-.3.8-.6 1l-1.2.4-.2.3zM7 17v2c0 .6-.4 1-1 1H4.5a.5.5 0 0 1 0-1h1.2c.2 0 .3-.1.3-.3 0-.2-.1-.3-.3-.3H4.4a.4.4 0 1 1 0-.8h1.3c.2 0 .3-.1.3-.3 0-.2-.1-.3-.3-.3H4.5a.5.5 0 1 1 0-1H6c.6 0 1 .4 1 1z" fill-rule="evenodd"/></svg>',
-        'orientation': '<svg width="24" height="24"><path d="M7.3 6.4L1 13l6.4 6.5 6.5-6.5-6.5-6.5zM3.7 13l3.6-3.7L11 13l-3.7 3.7-3.6-3.7zM12 6l2.8 2.7c.3.3.3.8 0 1-.3.4-.9.4-1.2 0L9.2 5.7a.8.8 0 0 1 0-1.2L13.6.2c.3-.3.9-.3 1.2 0 .3.3.3.8 0 1.1L12 4h1a9 9 0 1 1-4.3 16.9l1.5-1.5A7 7 0 1 0 13 6h-1z" fill-rule="nonzero"/></svg>',
-        'outdent': '<svg width="24" height="24"><path d="M7 5h12c.6 0 1 .4 1 1s-.4 1-1 1H7a1 1 0 1 1 0-2zm5 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm0 4h7c.6 0 1 .4 1 1s-.4 1-1 1h-7a1 1 0 0 1 0-2zm-5 4h12a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2zm1.6-3.8a1 1 0 0 1-1.2 1.6l-3-2a1 1 0 0 1 0-1.6l3-2a1 1 0 0 1 1.2 1.6L6.8 12l1.8 1.2z" fill-rule="evenodd"/></svg>',
-        'page-break': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M5 11c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h1c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm4 0c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h1c.6 0 1 .4 1 1s-.4 1-1 1h-1a1 1 0 0 1 0-2zm4 0c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zM7 3v5h10V3c0-.6.4-1 1-1s1 .4 1 1v7H5V3c0-.6.4-1 1-1s1 .4 1 1zM6 22a1 1 0 0 1-1-1v-7h14v7c0 .6-.4 1-1 1a1 1 0 0 1-1-1v-5H7v5c0 .6-.4 1-1 1z"/></g></svg>',
-        'paragraph': '<svg width="24" height="24"><path d="M10 5h7a1 1 0 0 1 0 2h-1v11a1 1 0 0 1-2 0V7h-2v11a1 1 0 0 1-2 0v-6c-.5 0-1 0-1.4-.3A3.4 3.4 0 0 1 6.8 10a3.3 3.3 0 0 1 0-2.8 3.4 3.4 0 0 1 1.8-1.8L10 5z" fill-rule="evenodd"/></svg>',
-        'paste-text': '<svg width="24" height="24"><path d="M18 9V5h-2v1c0 .6-.4 1-1 1H9a1 1 0 0 1-1-1V5H6v13h3V9h9zM9 20H6a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.2A3 3 0 0 1 12 1a3 3 0 0 1 2.8 2H18a2 2 0 0 1 2 2v4h1v12H9v-1zm1.5-9.5v9h9v-9h-9zM12 3a1 1 0 0 0-1 1c0 .5.4 1 1 1s1-.5 1-1-.4-1-1-1zm0 9h6v2h-.5l-.5-1h-1v4h.8v1h-3.6v-1h.8v-4h-1l-.5 1H12v-2z" fill-rule="nonzero"/></svg>',
-        'paste': '<svg width="24" height="24"><path d="M18 9V5h-2v1c0 .6-.4 1-1 1H9a1 1 0 0 1-1-1V5H6v13h3V9h9zM9 20H6a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.2A3 3 0 0 1 12 1a3 3 0 0 1 2.8 2H18a2 2 0 0 1 2 2v4h1v12H9v-1zm1.5-9.5v9h9v-9h-9zM12 3a1 1 0 0 0-1 1c0 .5.4 1 1 1s1-.5 1-1-.4-1-1-1z" fill-rule="nonzero"/></svg>',
-        'permanent-pen': '<svg width="24" height="24"><path d="M10.5 17.5L8 20H3v-3l3.5-3.5a2 2 0 0 1 0-3L14 3l1 1-7.3 7.3a1 1 0 0 0 0 1.4l3.6 3.6c.4.4 1 .4 1.4 0L20 9l1 1-7.6 7.6a2 2 0 0 1-2.8 0l-.1-.1z" fill-rule="nonzero"/></svg>',
-        'plus': '<svg width="24" height="24"><g fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke="#000" stroke-width="2"><path d="M12 5v14M5 12h14"/></g></svg>',
-        'preferences': '<svg width="24" height="24"><path d="M20.1 13.5l-1.9.2a5.8 5.8 0 0 1-.6 1.5l1.2 1.5c.4.4.3 1 0 1.4l-.7.7a1 1 0 0 1-1.4 0l-1.5-1.2a6.2 6.2 0 0 1-1.5.6l-.2 1.9c0 .5-.5.9-1 .9h-1a1 1 0 0 1-1-.9l-.2-1.9a5.8 5.8 0 0 1-1.5-.6l-1.5 1.2a1 1 0 0 1-1.4 0l-.7-.7a1 1 0 0 1 0-1.4l1.2-1.5a6.2 6.2 0 0 1-.6-1.5l-1.9-.2a1 1 0 0 1-.9-1v-1c0-.5.4-1 .9-1l1.9-.2a5.8 5.8 0 0 1 .6-1.5L5.2 7.3a1 1 0 0 1 0-1.4l.7-.7a1 1 0 0 1 1.4 0l1.5 1.2a6.2 6.2 0 0 1 1.5-.6l.2-1.9c0-.5.5-.9 1-.9h1c.5 0 1 .4 1 .9l.2 1.9a5.8 5.8 0 0 1 1.5.6l1.5-1.2a1 1 0 0 1 1.4 0l.7.7c.3.4.4 1 0 1.4l-1.2 1.5a6.2 6.2 0 0 1 .6 1.5l1.9.2c.5 0 .9.5.9 1v1c0 .5-.4 1-.9 1zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill-rule="evenodd"/></svg>',
-        'preview': '<svg width="24" height="24"><path d="M3.5 12.5c.5.8 1.1 1.6 1.8 2.3 2 2 4.2 3.2 6.7 3.2s4.7-1.2 6.7-3.2a16.2 16.2 0 0 0 2.1-2.8 15.7 15.7 0 0 0-2.1-2.8c-2-2-4.2-3.2-6.7-3.2a9.3 9.3 0 0 0-6.7 3.2A16.2 16.2 0 0 0 3.2 12c0 .2.2.3.3.5zm-2.4-1l.7-1.2L4 7.8C6.2 5.4 8.9 4 12 4c3 0 5.8 1.4 8.1 3.8a18.2 18.2 0 0 1 2.8 3.7v1l-.7 1.2-2.1 2.5c-2.3 2.4-5 3.8-8.1 3.8-3 0-5.8-1.4-8.1-3.8a18.2 18.2 0 0 1-2.8-3.7 1 1 0 0 1 0-1zm12-3.3a2 2 0 1 0 2.7 2.6 4 4 0 1 1-2.6-2.6z" fill-rule="nonzero"/></svg>',
-        'print': '<svg width="24" height="24"><path d="M18 8H6a3 3 0 0 0-3 3v6h2v3h14v-3h2v-6a3 3 0 0 0-3-3zm-1 10H7v-4h10v4zm.5-5c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm.5-8H6v2h12V5z" fill-rule="nonzero"/></svg>',
-        'quote': '<svg width="24" height="24"><path d="M7.5 17h.9c.4 0 .7-.2.9-.6L11 13V8c0-.6-.4-1-1-1H6a1 1 0 0 0-1 1v4c0 .6.4 1 1 1h2l-1.3 2.7a1 1 0 0 0 .8 1.3zm8 0h.9c.4 0 .7-.2.9-.6L19 13V8c0-.6-.4-1-1-1h-4a1 1 0 0 0-1 1v4c0 .6.4 1 1 1h2l-1.3 2.7a1 1 0 0 0 .8 1.3z" fill-rule="nonzero"/></svg>',
-        'redo': '<svg width="24" height="24"><path d="M17.6 10H12c-2.8 0-4.4 1.4-4.9 3.5-.4 2 .3 4 1.4 4.6a1 1 0 1 1-1 1.8c-2-1.2-2.9-4.1-2.3-6.8.6-3 3-5.1 6.8-5.1h5.6l-3.3-3.3a1 1 0 1 1 1.4-1.4l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4-1.4l3.3-3.3z" fill-rule="nonzero"/></svg>',
-        'reload': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M5 22.1l-1.2-4.7v-.2a1 1 0 0 1 1-1l5 .4a1 1 0 1 1-.2 2l-2.2-.2a7.8 7.8 0 0 0 8.4.2 7.5 7.5 0 0 0 3.5-6.4 1 1 0 1 1 2 0 9.5 9.5 0 0 1-4.5 8 9.9 9.9 0 0 1-10.2 0l.4 1.4a1 1 0 1 1-2 .5zM13.6 7.4c0-.5.5-1 1-.9l2.8.2a8 8 0 0 0-9.5-1 7.5 7.5 0 0 0-3.6 7 1 1 0 0 1-2 0 9.5 9.5 0 0 1 4.5-8.6 10 10 0 0 1 10.9.3l-.3-1a1 1 0 0 1 2-.5l1.1 4.8a1 1 0 0 1-1 1.2l-5-.4a1 1 0 0 1-.9-1z"/></g></svg>',
-        'remove-formatting': '<svg width="24" height="24"><path d="M13.2 6a1 1 0 0 1 0 .2l-2.6 10a1 1 0 0 1-1 .8h-.2a.8.8 0 0 1-.8-1l2.6-10H8a1 1 0 1 1 0-2h9a1 1 0 0 1 0 2h-3.8zM5 18h7a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2zm13 1.5L16.5 18 15 19.5a.7.7 0 0 1-1-1l1.5-1.5-1.5-1.5a.7.7 0 0 1 1-1l1.5 1.5 1.5-1.5a.7.7 0 0 1 1 1L17.5 17l1.5 1.5a.7.7 0 0 1-1 1z" fill-rule="evenodd"/></svg>',
-        'remove': '<svg width="24" height="24"><path d="M16 7h3a1 1 0 0 1 0 2h-1v9a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V9H5a1 1 0 1 1 0-2h3V6a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v1zm-2 0V6c0-.6-.4-1-1-1h-2a1 1 0 0 0-1 1v1h4zm2 2H8v9c0 .6.4 1 1 1h6c.6 0 1-.4 1-1V9zm-7 3a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4zm4 0a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4z" fill-rule="nonzero"/></svg>',
-        'resize-handle': '<svg width="10" height="10"><g fill-rule="nonzero"><path d="M8.1 1.1A.5.5 0 1 1 9 2l-7 7A.5.5 0 1 1 1 8l7-7zM8.1 5.1A.5.5 0 1 1 9 6l-3 3A.5.5 0 1 1 5 8l3-3z"/></g></svg>',
-        'resize': '<svg width="24" height="24"><path d="M4 5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h6c.3 0 .5.1.7.3.2.2.3.4.3.7 0 .3-.1.5-.3.7a1 1 0 0 1-.7.3H7.4L18 16.6V13c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3.3 0 .5.1.7.3.2.2.3.4.3.7v6c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3h-6a1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h3.6L6 7.4V11c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3 1 1 0 0 1-.7-.3A1 1 0 0 1 4 11V5z" fill-rule="evenodd"/></svg>',
-        'restore-draft': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M17 13c0 .6-.4 1-1 1h-4V8c0-.6.4-1 1-1s1 .4 1 1v4h2c.6 0 1 .4 1 1z"/><path d="M4.7 10H9a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1V5a1 1 0 1 1 2 0v3l2.5-2.4a9.2 9.2 0 0 1 10.8-1.5A9 9 0 0 1 13.4 21c-2.4.1-4.7-.7-6.5-2.2a1 1 0 1 1 1.3-1.5 7.2 7.2 0 0 0 11.6-3.7 7 7 0 0 0-3.5-7.7A7.2 7.2 0 0 0 8 7L4.7 10z" fill-rule="nonzero"/></g></svg>',
-        'rotate-left': '<svg width="24" height="24"><path d="M4.7 10H9a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1V5a1 1 0 1 1 2 0v3l2.5-2.4a9.2 9.2 0 0 1 10.8-1.5A9 9 0 0 1 13.4 21c-2.4.1-4.7-.7-6.5-2.2a1 1 0 1 1 1.3-1.5 7.2 7.2 0 0 0 11.6-3.7 7 7 0 0 0-3.5-7.7A7.2 7.2 0 0 0 8 7L4.7 10z" fill-rule="nonzero"/></svg>',
-        'rotate-right': '<svg width="24" height="24"><path d="M20 8V5a1 1 0 0 1 2 0v6c0 .6-.4 1-1 1h-6a1 1 0 0 1 0-2h4.3L16 7A7.2 7.2 0 0 0 7.7 6a7 7 0 0 0 3 13.1c1.9.1 3.7-.5 5-1.7a1 1 0 0 1 1.4 1.5A9.2 9.2 0 0 1 2.2 14c-.9-3.9 1-8 4.5-9.9 3.5-1.9 8-1.3 10.8 1.5L20 8z" fill-rule="nonzero"/></svg>',
-        'rtl': '<svg width="24" height="24"><path d="M8 5h8v2h-2v12h-2V7h-2v12H8v-7c-.5 0-1 0-1.4-.3A3.4 3.4 0 0 1 4.8 10a3.3 3.3 0 0 1 0-2.8 3.4 3.4 0 0 1 1.8-1.8L8 5zm12 11.2a1 1 0 1 1-1 1.6l-3-2a1 1 0 0 1 0-1.6l3-2a1 1 0 1 1 1 1.6L18.4 15l1.8 1.2z" fill-rule="evenodd"/></svg>',
-        'save': '<svg width="24" height="24"><path d="M5 16h14a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2c0-1.1.9-2 2-2zm0 2v2h14v-2H5zm10 0h2v2h-2v-2zm-4-6.4L8.7 9.3a1 1 0 1 0-1.4 1.4l4 4c.4.4 1 .4 1.4 0l4-4a1 1 0 1 0-1.4-1.4L13 11.6V4a1 1 0 0 0-2 0v7.6z" fill-rule="nonzero"/></svg>',
-        'search': '<svg width="24" height="24"><path d="M16 17.3a8 8 0 1 1 1.4-1.4l4.3 4.4a1 1 0 0 1-1.4 1.4l-4.4-4.3zm-5-.3a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" fill-rule="nonzero"/></svg>',
-        'select-all': '<svg width="24" height="24"><path d="M3 5h2V3a2 2 0 0 0-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2a2 2 0 0 0-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8a2 2 0 0 0 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2zM7 17h10V7H7v10zm2-8h6v6H9V9z" fill-rule="nonzero"/></svg>',
-        'selected': '<svg width="24" height="24"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm-2.4-6.1L7 12.3a.7.7 0 0 0-1 1L9.6 17 18 8.6a.7.7 0 0 0 0-1 .7.7 0 0 0-1 0l-7.4 7.3z" fill-rule="evenodd"/></svg>',
-        'settings': '<svg width="24" height="24"><path d="M11 6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8v.3c0 .2 0 .3-.2.5l-.6.2H7.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6V8H5a1 1 0 1 1 0-2h2v-.3c0-.2 0-.3.2-.5l.5-.2h2.5c.3 0 .4 0 .6.2l.2.5V6zM8 8h2V6H8v2zm9 2.8v.2h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v.3c0 .2 0 .3-.2.5l-.6.2h-2.4c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6V13H5a1 1 0 0 1 0-2h8v-.3c0-.2 0-.3.2-.5l.6-.2h2.4c.3 0 .4 0 .6.2l.2.6zM14 13h2v-2h-2v2zm-3 2.8v.2h8c.6 0 1 .4 1 1s-.4 1-1 1h-8v.3c0 .2 0 .3-.2.5l-.6.2H7.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6V18H5a1 1 0 0 1 0-2h2v-.3c0-.2 0-.3.2-.5l.5-.2h2.5c.3 0 .4 0 .6.2l.2.6zM8 18h2v-2H8v2z" fill-rule="evenodd"/></svg>',
-        'sharpen': '<svg width="24" height="24"><path d="M16 6l4 4-8 9-8-9 4-4h8zm-4 10.2l5.5-6.2-.1-.1H12v-.3h5.1l-.2-.2H12V9h4.6l-.2-.2H12v-.3h4.1l-.2-.2H12V8h3.6l-.2-.2H8.7L6.5 10l.1.1H12v.3H6.9l.2.2H12v.3H7.3l.2.2H12v.3H7.7l.3.2h4v.3H8.2l.2.2H12v.3H8.6l.3.2H12v.3H9l.3.2H12v.3H9.5l.2.2H12v.3h-2l.2.2H12v.3h-1.6l.2.2H12v.3h-1.1l.2.2h.9v.3h-.7l.2.2h.5v.3h-.3l.3.2z" fill-rule="evenodd"/></svg>',
-        'sourcecode': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M9.8 15.7c.3.3.3.8 0 1-.3.4-.9.4-1.2 0l-4.4-4.1a.8.8 0 0 1 0-1.2l4.4-4.2c.3-.3.9-.3 1.2 0 .3.3.3.8 0 1.1L6 12l3.8 3.7zM14.2 15.7c-.3.3-.3.8 0 1 .4.4.9.4 1.2 0l4.4-4.1c.3-.3.3-.9 0-1.2l-4.4-4.2a.8.8 0 0 0-1.2 0c-.3.3-.3.8 0 1.1L18 12l-3.8 3.7z"/></g></svg>',
-        'spell-check': '<svg width="24" height="24"><path d="M6 8v3H5V5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h2c.3 0 .5.1.7.3.2.2.3.4.3.7v6H8V8H6zm0-3v2h2V5H6zm13 0h-3v5h3v1h-3a1 1 0 0 1-.7-.3 1 1 0 0 1-.3-.7V5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3h3v1zm-5 1.5l-.1.7c-.1.2-.3.3-.6.3.3 0 .5.1.6.3l.1.7V10c0 .3-.1.5-.3.7a1 1 0 0 1-.7.3h-3V4h3c.3 0 .5.1.7.3.2.2.3.4.3.7v1.5zM13 10V8h-2v2h2zm0-3V5h-2v2h2zm3 5l1 1-6.5 7L7 15.5l1.3-1 2.2 2.2L16 12z" fill-rule="evenodd"/></svg>',
-        'strike-through': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M15.6 8.5c-.5-.7-1-1.1-1.3-1.3-.6-.4-1.3-.6-2-.6-2.7 0-2.8 1.7-2.8 2.1 0 1.6 1.8 2 3.2 2.3 4.4.9 4.6 2.8 4.6 3.9 0 1.4-.7 4.1-5 4.1A6.2 6.2 0 0 1 7 16.4l1.5-1.1c.4.6 1.6 2 3.7 2 1.6 0 2.5-.4 3-1.2.4-.8.3-2-.8-2.6-.7-.4-1.6-.7-2.9-1-1-.2-3.9-.8-3.9-3.6C7.6 6 10.3 5 12.4 5c2.9 0 4.2 1.6 4.7 2.4l-1.5 1.1z"/><path d="M5 11h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z" fill-rule="nonzero"/></g></svg>',
-        'subscript': '<svg width="24" height="24"><path d="M10.4 10l4.6 4.6-1.4 1.4L9 11.4 4.4 16 3 14.6 7.6 10 3 5.4 4.4 4 9 8.6 13.6 4 15 5.4 10.4 10zM21 19h-5v-1l1-.8 1.7-1.6c.3-.4.5-.8.5-1.2 0-.3 0-.6-.2-.7-.2-.2-.5-.3-.9-.3a2 2 0 0 0-.8.2l-.7.3-.4-1.1 1-.6 1.2-.2c.8 0 1.4.3 1.8.7.4.4.6.9.6 1.5s-.2 1.1-.5 1.6a8 8 0 0 1-1.3 1.3l-.6.6h2.6V19z" fill-rule="nonzero"/></svg>',
-        'superscript': '<svg width="24" height="24"><path d="M15 9.4L10.4 14l4.6 4.6-1.4 1.4L9 15.4 4.4 20 3 18.6 7.6 14 3 9.4 4.4 8 9 12.6 13.6 8 15 9.4zm5.9 1.6h-5v-1l1-.8 1.7-1.6c.3-.5.5-.9.5-1.3 0-.3 0-.5-.2-.7-.2-.2-.5-.3-.9-.3l-.8.2-.7.4-.4-1.2c.2-.2.5-.4 1-.5.3-.2.8-.2 1.2-.2.8 0 1.4.2 1.8.6.4.4.6 1 .6 1.6 0 .5-.2 1-.5 1.5l-1.3 1.4-.6.5h2.6V11z" fill-rule="nonzero"/></svg>',
-        'table-cell-properties': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm10 10h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10 0v3h4v-3h-4zm0-1h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
-        'table-cell-select-all': '<svg width="24" height="24"><path d="M12.5 5.5v6h6v-6h-6zm-1 0h-6v6h6v-6zm1 13h6v-6h-6v6zm-1 0v-6h-6v6h6zm-7-14h15v15h-15v-15z" fill-rule="nonzero"/></svg>',
-        'table-cell-select-inner': '<svg width="24" height="24"><g fill-rule="nonzero"><path d="M5.5 5.5v13h13v-13h-13zm-1-1h15v15h-15v-15z" opacity=".2"/><path d="M11.5 11.5v-7h1v7h7v1h-7v7h-1v-7h-7v-1h7z"/></g></svg>',
-        'table-delete-column': '<svg width="24" height="24"><path d="M9 11.2l1 1v.2l-1 1v-2.2zm5 1l1-1v2.2l-1-1v-.2zM20 5v14H4V5h16zm-1 2h-4v.8l-.2-.2-.8.8V7h-4v1.4l-.8-.8-.2.2V7H5v11h4v-1.8l.5.5.5-.4V18h4v-1.8l.8.8.2-.3V18h4V7zm-3.9 3.4l-1.8 1.9 1.8 1.9c.4.3.4.9 0 1.2-.3.3-.8.3-1.2 0L12 13.5l-1.8 1.9a.8.8 0 0 1-1.2 0 .9.9 0 0 1 0-1.2l1.8-1.9-1.9-2a.9.9 0 0 1 1.2-1.2l2 2 1.8-1.8c.3-.4.9-.4 1.2 0a.8.8 0 0 1 0 1.1z" fill-rule="evenodd"/></svg>',
-        'table-delete-row': '<svg width="24" height="24"><path d="M16.7 8.8l1.1 1.2-2.4 2.5L18 15l-1.2 1.2-2.5-2.5-2.4 2.5-1.3-1.2 2.5-2.5-2.5-2.5 1.2-1.3 2.6 2.6 2.4-2.5zM4 5h16v14H4V5zm15 5V7H5v3h4.8l1 1H5v3h5.8l-1 1H5v3h14v-3h-.4l-1-1H19v-3h-1.3l1-1h.3z" fill-rule="evenodd"/></svg>',
-        'table-delete-table': '<svg width="24" height="26"><path d="M4 6h16v14H4V6zm1 2v11h14V8H5zm11.7 8.7l-1.5 1.5L12 15l-3.3 3.2-1.4-1.5 3.2-3.2-3.3-3.2 1.5-1.5L12 12l3.2-3.2 1.5 1.5-3.2 3.2 3.2 3.2z" fill-rule="evenodd"/></svg>',
-        'table-insert-column-after': '<svg width="24" height="24"><path d="M14.3 9c.4 0 .7.3.7.6v2.2h2.1c.4 0 .7.3.7.7 0 .4-.3.7-.7.7H15v2.2c0 .3-.3.6-.7.6a.7.7 0 0 1-.6-.6v-2.2h-2.2a.7.7 0 0 1 0-1.4h2.2V9.6c0-.3.3-.6.6-.6zM4 5h16v14H4V5zm5 13v-3H5v3h4zm0-4v-3H5v3h4zm0-4V7H5v3h4zm10 8V7h-9v11h9z" fill-rule="evenodd"/></svg>',
-        'table-insert-column-before': '<svg width="24" height="24"><path d="M9.7 16a.7.7 0 0 1-.7-.6v-2.2H6.9a.7.7 0 0 1 0-1.4H9V9.6c0-.3.3-.6.7-.6.3 0 .6.3.6.6v2.2h2.2c.4 0 .8.3.8.7 0 .4-.4.7-.8.7h-2.2v2.2c0 .3-.3.6-.6.6zM4 5h16v14H4V5zm10 13V7H5v11h9zm5 0v-3h-4v3h4zm0-4v-3h-4v3h4zm0-4V7h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table-insert-row-above': '<svg width="24" height="24"><path d="M14.8 10.5c0 .3-.2.5-.5.5h-1.8v1.8c0 .3-.2.5-.5.5a.5.5 0 0 1-.5-.6V11H9.7a.5.5 0 0 1 0-1h1.8V8.3c0-.3.2-.6.5-.6s.5.3.5.6V10h1.8c.3 0 .5.2.5.5zM4 5h16v14H4V5zm5 13v-3H5v3h4zm5 0v-3h-4v3h4zm5 0v-3h-4v3h4zm0-4V7H5v7h14z" fill-rule="evenodd"/></svg>',
-        'table-insert-row-after': '<svg width="24" height="24"><path d="M9.2 14.5c0-.3.2-.5.5-.5h1.8v-1.8c0-.3.2-.5.5-.5s.5.2.5.6V14h1.8c.3 0 .5.2.5.5s-.2.5-.5.5h-1.8v1.7c0 .3-.2.6-.5.6a.5.5 0 0 1-.5-.6V15H9.7a.5.5 0 0 1-.5-.5zM4 5h16v14H4V5zm6 2v3h4V7h-4zM5 7v3h4V7H5zm14 11v-7H5v7h14zm0-8V7h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table-left-header': '<svg width="24" height="24"><path d="M4 5h16v13H4V5zm10 12v-3h-4v3h4zm0-4v-3h-4v3h4zm0-4V6h-4v3h4zm5 8v-3h-4v3h4zm0-4v-3h-4v3h4zm0-4V6h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table-merge-cells': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 13h9v-7h-9v7zm4-11h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10-1h4V7h-4v3zM5 15v3h4v-3H5z" fill-rule="evenodd"/></svg>',
-        'table-row-properties': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm10 10h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm6 3h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
-        'table-split-cells': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 2v3h4V7h-4zM9 18v-3H5v3h4zm0-4v-3H5v3h4zm0-4V7H5v3h4zm10 8v-7h-9v7h9zm0-8V7h-4v3h4zm-3.5 4.5l1.5 1.6c.3.2.3.7 0 1-.2.2-.7.2-1 0l-1.5-1.6-1.6 1.5c-.2.3-.7.3-1 0a.7.7 0 0 1 0-1l1.6-1.5-1.5-1.6a.7.7 0 0 1 1-1l1.5 1.6 1.6-1.5c.2-.3.7-.3 1 0 .2.2.2.7 0 1l-1.6 1.5z" fill-rule="evenodd"/></svg>',
-        'table-top-header': '<svg width="24" height="24"><path d="M4 5h16v13H4V5zm5 12v-3H5v3h4zm0-4v-3H5v3h4zm5 4v-3h-4v3h4zm0-4v-3h-4v3h4zm5 4v-3h-4v3h4zm0-4v-3h-4v3h4z" fill-rule="evenodd"/></svg>',
-        'table': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 9h4v-3h-4v3zm4 1h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10 0v3h4v-3h-4zm0-1h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
-        'template': '<svg width="24" height="24"><path d="M19 19v-1H5v1h14zM9 16v-4a5 5 0 1 1 6 0v4h4a2 2 0 0 1 2 2v3H3v-3c0-1.1.9-2 2-2h4zm4 0v-5l.8-.6a3 3 0 1 0-3.6 0l.8.6v5h2z" fill-rule="nonzero"/></svg>',
-        'temporary-placeholder': '<svg width="24" height="24"><path d="M20.5 2.5c-.8 0-1.5.7-1.5 1.5a1.5 1.5 0 0 1-3 0 3 3 0 0 0-6 0v2H8.5c-.3 0-.5.2-.5.5v1a8 8 0 1 0 6 0v-1c0-.3-.2-.5-.5-.5H11V4a2 2 0 0 1 4 0 2.5 2.5 0 0 0 5 0c0-.3.2-.5.5-.5a.5.5 0 0 0 0-1zM8.1 10.9a5 5 0 0 0-1.2 7 .5.5 0 0 1-.8.5 6 6 0 0 1 1.5-8.3.5.5 0 1 1 .5.8z" fill-rule="nonzero"/></svg>',
-        'text-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path id="tox-icon-text-color__color" d="M3 18h18v3H3z"/><path d="M8.7 16h-.8a.5.5 0 0 1-.5-.6l2.7-9c.1-.3.3-.4.5-.4h2.8c.2 0 .4.1.5.4l2.7 9a.5.5 0 0 1-.5.6h-.8a.5.5 0 0 1-.4-.4l-.7-2.2c0-.3-.3-.4-.5-.4h-3.4c-.2 0-.4.1-.5.4l-.7 2.2c0 .3-.2.4-.4.4zm2.6-7.6l-.6 2a.5.5 0 0 0 .5.6h1.6a.5.5 0 0 0 .5-.6l-.6-2c0-.3-.3-.4-.5-.4h-.4c-.2 0-.4.1-.5.4z"/></g></svg>',
-        'toc': '<svg width="24" height="24"><path d="M5 5c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 1 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm0-4c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'translate': '<svg width="24" height="24"><path d="M12.7 14.3l-.3.7-.4.7-2.2-2.2-3.1 3c-.3.4-.8.4-1 0a.7.7 0 0 1 0-1l3.1-3A12.4 12.4 0 0 1 6.7 9H8a10.1 10.1 0 0 0 1.7 2.4c.5-.5 1-1.1 1.4-1.8l.9-2H4.7a.7.7 0 1 1 0-1.5h4.4v-.7c0-.4.3-.8.7-.8.4 0 .7.4.7.8v.7H15c.4 0 .8.3.8.7 0 .4-.4.8-.8.8h-1.4a12.3 12.3 0 0 1-1 2.4 13.5 13.5 0 0 1-1.7 2.3l1.9 1.8zm4.3-3l2.7 7.3a.5.5 0 0 1-.4.7 1 1 0 0 1-1-.7l-.6-1.5h-3.4l-.6 1.5a1 1 0 0 1-1 .7.5.5 0 0 1-.4-.7l2.7-7.4a1 1 0 1 1 2 0zm-2.2 4.4h2.4L16 12.5l-1.2 3.2z" fill-rule="evenodd"/></svg>',
-        'underline': '<svg width="24" height="24"><path d="M16 5c.6 0 1 .4 1 1v5.5a4 4 0 0 1-.4 1.8l-1 1.4a5.3 5.3 0 0 1-5.5 1 5 5 0 0 1-1.6-1c-.5-.4-.8-.9-1.1-1.4a4 4 0 0 1-.4-1.8V6c0-.6.4-1 1-1s1 .4 1 1v5.5c0 .3 0 .6.2 1l.6.7a3.3 3.3 0 0 0 2.2.8 3.4 3.4 0 0 0 2.2-.8c.3-.2.4-.5.6-.8l.2-.9V6c0-.6.4-1 1-1zM8 17h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
-        'undo': '<svg width="24" height="24"><path d="M6.4 8H12c3.7 0 6.2 2 6.8 5.1.6 2.7-.4 5.6-2.3 6.8a1 1 0 0 1-1-1.8c1.1-.6 1.8-2.7 1.4-4.6-.5-2.1-2.1-3.5-4.9-3.5H6.4l3.3 3.3a1 1 0 1 1-1.4 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.4 1.4L6.4 8z" fill-rule="nonzero"/></svg>',
-        'unlink': '<svg width="24" height="24"><path d="M6.2 12.3a1 1 0 0 1 1.4 1.4l-2 2a2 2 0 1 0 2.6 2.8l4.8-4.8a1 1 0 0 0 0-1.4 1 1 0 1 1 1.4-1.3 2.9 2.9 0 0 1 0 4L9.6 20a3.9 3.9 0 0 1-5.5-5.5l2-2zm11.6-.6a1 1 0 0 1-1.4-1.4l2.1-2a2 2 0 1 0-2.7-2.8L11 10.3a1 1 0 0 0 0 1.4A1 1 0 1 1 9.6 13a2.9 2.9 0 0 1 0-4L14.4 4a3.9 3.9 0 0 1 5.5 5.5l-2 2zM7.6 6.3a.8.8 0 0 1-1 1.1L3.3 4.2a.7.7 0 1 1 1-1l3.2 3.1zM5.1 8.6a.8.8 0 0 1 0 1.5H3a.8.8 0 0 1 0-1.5H5zm5-3.5a.8.8 0 0 1-1.5 0V3a.8.8 0 0 1 1.5 0V5zm6 11.8a.8.8 0 0 1 1-1l3.2 3.2a.8.8 0 0 1-1 1L16 17zm-2.2 2a.8.8 0 0 1 1.5 0V21a.8.8 0 0 1-1.5 0V19zm5-3.5a.7.7 0 1 1 0-1.5H21a.8.8 0 0 1 0 1.5H19z" fill-rule="nonzero"/></svg>',
-        'unlock': '<svg width="24" height="24"><path d="M16 5c.8 0 1.5.3 2.1.9.6.6.9 1.3.9 2.1v3h-2V8a1 1 0 0 0-.3-.7A1 1 0 0 0 16 7h-2a1 1 0 0 0-.7.3 1 1 0 0 0-.3.7v3h.3c.2 0 .3 0 .5.2l.2.6v7.4c0 .3 0 .4-.2.6l-.6.2H4.8c-.3 0-.4 0-.6-.2a.7.7 0 0 1-.2-.6v-7.4c0-.3 0-.4.2-.6l.5-.2H11V8c0-.8.3-1.5.9-2.1.6-.6 1.3-.9 2.1-.9h2z" fill-rule="evenodd"/></svg>',
-        'unordered-list': '<svg width="24" height="24"><path d="M11 5h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0 6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm0 6h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zM4.5 6c0-.4.1-.8.4-1 .3-.4.7-.5 1.1-.5.4 0 .8.1 1 .4.4.3.5.7.5 1.1 0 .4-.1.8-.4 1-.3.4-.7.5-1.1.5-.4 0-.8-.1-1-.4-.4-.3-.5-.7-.5-1.1zm0 6c0-.4.1-.8.4-1 .3-.4.7-.5 1.1-.5.4 0 .8.1 1 .4.4.3.5.7.5 1.1 0 .4-.1.8-.4 1-.3.4-.7.5-1.1.5-.4 0-.8-.1-1-.4-.4-.3-.5-.7-.5-1.1zm0 6c0-.4.1-.8.4-1 .3-.4.7-.5 1.1-.5.4 0 .8.1 1 .4.4.3.5.7.5 1.1 0 .4-.1.8-.4 1-.3.4-.7.5-1.1.5-.4 0-.8-.1-1-.4-.4-.3-.5-.7-.5-1.1z" fill-rule="evenodd"/></svg>',
-        'unselected': '<svg width="24" height="24"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm0-1a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" fill-rule="evenodd"/></svg>',
-        'upload': '<svg width="24" height="24"><path d="M18 19v-2a1 1 0 0 1 2 0v3c0 .6-.4 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 2 0v2h12zM11 6.4L8.7 8.7a1 1 0 0 1-1.4-1.4l4-4a1 1 0 0 1 1.4 0l4 4a1 1 0 1 1-1.4 1.4L13 6.4V16a1 1 0 0 1-2 0V6.4z" fill-rule="nonzero"/></svg>',
-        'user': '<svg width="24" height="24"><path d="M12 24a12 12 0 1 1 0-24 12 12 0 0 1 0 24zm-8.7-5.3a11 11 0 0 0 17.4 0C19.4 16.3 14.6 15 12 15c-2.6 0-7.4 1.3-8.7 3.7zM12 13c2.2 0 4-2 4-4.5S14.2 4 12 4 8 6 8 8.5 9.8 13 12 13z" fill-rule="nonzero"/></svg>',
-        'warning': '<svg width="24" height="24"><path d="M19.8 18.3c.2.5.3.9 0 1.2-.1.3-.5.5-1 .5H5.2c-.5 0-.9-.2-1-.5-.3-.3-.2-.7 0-1.2L11 4.7l.5-.5.5-.2c.2 0 .3 0 .5.2.2 0 .3.3.5.5l6.8 13.6zM12 18c.3 0 .5-.1.7-.3.2-.2.3-.4.3-.7a1 1 0 0 0-.3-.7 1 1 0 0 0-.7-.3 1 1 0 0 0-.7.3 1 1 0 0 0-.3.7c0 .3.1.5.3.7.2.2.4.3.7.3zm.7-3l.3-4a1 1 0 0 0-.3-.7 1 1 0 0 0-.7-.3 1 1 0 0 0-.7.3 1 1 0 0 0-.3.7l.3 4h1.4z" fill-rule="evenodd"/></svg>',
-        'zoom-in': '<svg width="24" height="24"><path d="M16 17.3a8 8 0 1 1 1.4-1.4l4.3 4.4a1 1 0 0 1-1.4 1.4l-4.4-4.3zm-5-.3a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm-1-9a1 1 0 0 1 2 0v6a1 1 0 0 1-2 0V8zm-2 4a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2H8z" fill-rule="nonzero"/></svg>',
-        'zoom-out': '<svg width="24" height="24"><path d="M16 17.3a8 8 0 1 1 1.4-1.4l4.3 4.4a1 1 0 0 1-1.4 1.4l-4.4-4.3zm-5-.3a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm-3-5a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2H8z" fill-rule="nonzero"/></svg>'
-      };
     };
 
     var forToolbarCommand = function (editor, command) {
@@ -5090,17 +4943,13 @@ var mobile = (function (exports) {
       var extraBehaviours = getToggleBehaviours(command);
       return forToolbar(clazz, action, extraBehaviours, editor);
     };
-    var defaultIcons = getAll();
-    var getIcon = function (name, icons) {
-      return Option.from(icons[name]).or(Option.from(defaultIcons[name]));
-    };
     var getToolbarIconButton = function (clazz, editor) {
       var icons = editor.ui.registry.getAll().icons;
-      var optOxideIcon = getIcon(clazz, icons);
+      var optOxideIcon = Option.from(icons[clazz]);
       return optOxideIcon.fold(function () {
-        return dom$2('<span class="${prefix}-toolbar-button ${prefix}-toolbar-group-item ${prefix}-icon-' + clazz + ' ${prefix}-icon"></span>');
+        return dom$1('<span class="${prefix}-toolbar-button ${prefix}-toolbar-group-item ${prefix}-icon-' + clazz + ' ${prefix}-icon"></span>');
       }, function (icon) {
-        return dom$2('<span class="${prefix}-toolbar-button ${prefix}-toolbar-group-item">' + icon + '</span>');
+        return dom$1('<span class="${prefix}-toolbar-button ${prefix}-toolbar-group-item">' + icon + '</span>');
       });
     };
     var forToolbar = function (clazz, action, extraBehaviours, editor) {
@@ -5381,7 +5230,7 @@ var mobile = (function (exports) {
       strict$1('getFallbackEntry'),
       strict$1('getDataKey'),
       strict$1('setValue'),
-      output$1('manager', {
+      output('manager', {
         setValue: setValue$1,
         getValue: getValue$1,
         onLoad: onLoad$2,
@@ -5406,7 +5255,7 @@ var mobile = (function (exports) {
       strict$1('getValue'),
       defaulted$1('setValue', noop),
       option('initialValue'),
-      output$1('manager', {
+      output('manager', {
         setValue: setValue$2,
         getValue: getValue$2,
         onLoad: onLoad$3,
@@ -5434,7 +5283,7 @@ var mobile = (function (exports) {
     };
     var MemoryStore = [
       option('initialValue'),
-      output$1('manager', {
+      output('manager', {
         setValue: setValue$3,
         getValue: getValue$3,
         onLoad: onLoad$4,
@@ -5574,10 +5423,10 @@ var mobile = (function (exports) {
     var api$1 = Dimension('width', function (element) {
       return element.dom().offsetWidth;
     });
-    var set$5 = function (element, h) {
+    var set$4 = function (element, h) {
       api$1.set(element, h);
     };
-    var get$7 = function (element) {
+    var get$6 = function (element) {
       return api$1.get(element);
     };
 
@@ -5606,14 +5455,14 @@ var mobile = (function (exports) {
     var max1Y = function (detail) {
       return detail.model.maxY + 1;
     };
-    var range$1 = function (detail, max, min) {
+    var range = function (detail, max, min) {
       return max(detail) - min(detail);
     };
     var xRange = function (detail) {
-      return range$1(detail, maxX, minX);
+      return range(detail, maxX, minX);
     };
     var yRange = function (detail) {
-      return range$1(detail, maxY, minY);
+      return range(detail, maxY, minY);
     };
     var halfX = function (detail) {
       return xRange(detail) / 2;
@@ -5621,7 +5470,7 @@ var mobile = (function (exports) {
     var halfY = function (detail) {
       return yRange(detail) / 2;
     };
-    var step$1 = function (detail) {
+    var step = function (detail) {
       return detail.stepSize;
     };
     var snap = function (detail) {
@@ -5767,7 +5616,7 @@ var mobile = (function (exports) {
         max: maxX(detail),
         range: xRange(detail),
         value: left,
-        step: step$1(detail),
+        step: step(detail),
         snap: snap(detail),
         snapStart: snapStart(detail),
         rounded: rounded(detail),
@@ -5795,7 +5644,7 @@ var mobile = (function (exports) {
     };
     var moveBy = function (direction, spectrum, detail) {
       var f = direction > 0 ? increaseBy : reduceBy;
-      var xValue = f(currentValue(detail).x(), minX(detail), maxX(detail), step$1(detail));
+      var xValue = f(currentValue(detail).x(), minX(detail), maxX(detail), step(detail));
       fireSliderChange$1(spectrum, sliderValue(xValue));
       return Option.some(xValue);
     };
@@ -5844,7 +5693,7 @@ var mobile = (function (exports) {
     var setPositionFromValue = function (slider, thumb, detail, edges) {
       var value = currentValue(detail);
       var pos = findPositionOfValue(slider, edges.getSpectrum(slider), value.x(), edges.getLeftEdge(slider), edges.getRightEdge(slider), detail);
-      var thumbRadius = get$7(thumb.element()) / 2;
+      var thumbRadius = get$6(thumb.element()) / 2;
       set$3(thumb.element(), 'left', pos - thumbRadius + 'px');
     };
     var onLeft = handleMovement(-1);
@@ -5889,7 +5738,7 @@ var mobile = (function (exports) {
         max: maxY(detail),
         range: yRange(detail),
         value: top,
-        step: step$1(detail),
+        step: step(detail),
         snap: snap(detail),
         snapStart: snapStart(detail),
         rounded: rounded(detail),
@@ -5917,7 +5766,7 @@ var mobile = (function (exports) {
     };
     var moveBy$1 = function (direction, spectrum, detail) {
       var f = direction > 0 ? increaseBy : reduceBy;
-      var yValue = f(currentValue(detail).y(), minY(detail), maxY(detail), step$1(detail));
+      var yValue = f(currentValue(detail).y(), minY(detail), maxY(detail), step(detail));
       fireSliderChange$2(spectrum, sliderValue$1(yValue));
       return Option.some(yValue);
     };
@@ -5966,7 +5815,7 @@ var mobile = (function (exports) {
     var setPositionFromValue$1 = function (slider, thumb, detail, edges) {
       var value = currentValue(detail);
       var pos = findPositionOfValue$1(slider, edges.getSpectrum(slider), value.y(), edges.getTopEdge(slider), edges.getBottomEdge(slider), detail);
-      var thumbRadius = get$5(thumb.element()) / 2;
+      var thumbRadius = get$4(thumb.element()) / 2;
       set$3(thumb.element(), 'top', pos - thumbRadius + 'px');
     };
     var onLeft$1 = Option.none;
@@ -6017,8 +5866,8 @@ var mobile = (function (exports) {
     };
     var moveBy$2 = function (direction, isVerticalMovement, spectrum, detail) {
       var f = direction > 0 ? increaseBy : reduceBy;
-      var xValue = isVerticalMovement ? currentValue(detail).x() : f(currentValue(detail).x(), minX(detail), maxX(detail), step$1(detail));
-      var yValue = !isVerticalMovement ? currentValue(detail).y() : f(currentValue(detail).y(), minY(detail), maxY(detail), step$1(detail));
+      var xValue = isVerticalMovement ? currentValue(detail).x() : f(currentValue(detail).x(), minX(detail), maxX(detail), step(detail));
+      var yValue = !isVerticalMovement ? currentValue(detail).y() : f(currentValue(detail).y(), minY(detail), maxY(detail), step(detail));
       fireSliderChange$3(spectrum, sliderValue$2(xValue, yValue));
       return Option.some(xValue);
     };
@@ -6046,8 +5895,8 @@ var mobile = (function (exports) {
       var value = currentValue(detail);
       var xPos = findPositionOfValue(slider, edges.getSpectrum(slider), value.x(), edges.getLeftEdge(slider), edges.getRightEdge(slider), detail);
       var yPos = findPositionOfValue$1(slider, edges.getSpectrum(slider), value.y(), edges.getTopEdge(slider), edges.getBottomEdge(slider), detail);
-      var thumbXRadius = get$7(thumb.element()) / 2;
-      var thumbYRadius = get$5(thumb.element()) / 2;
+      var thumbXRadius = get$6(thumb.element()) / 2;
+      var thumbYRadius = get$4(thumb.element()) / 2;
       set$3(thumb.element(), 'left', xPos - thumbXRadius + 'px');
       set$3(thumb.element(), 'top', yPos - thumbYRadius + 'px');
     };
@@ -6098,7 +5947,7 @@ var mobile = (function (exports) {
             return Cell(spec.mode.minX);
           }),
           strict$1('getInitialValue'),
-          output$1('manager', HorizontalModel)
+          output('manager', HorizontalModel)
         ],
         y: [
           defaulted$1('minY', 0),
@@ -6107,7 +5956,7 @@ var mobile = (function (exports) {
             return Cell(spec.mode.minY);
           }),
           strict$1('getInitialValue'),
-          output$1('manager', VerticalModel)
+          output('manager', VerticalModel)
         ],
         xy: [
           defaulted$1('minX', 0),
@@ -6121,7 +5970,7 @@ var mobile = (function (exports) {
             });
           }),
           strict$1('getInitialValue'),
-          output$1('manager', TwoDModel)
+          output('manager', TwoDModel)
         ]
       })),
       field$1('sliderBehaviours', [
@@ -6133,7 +5982,7 @@ var mobile = (function (exports) {
       })] : []);
 
     var isTouch$3 = PlatformDetection$1.detect().deviceType.isTouch();
-    var sketch$1 = function (detail, components$$1, _spec, _externals) {
+    var sketch = function (detail, components, _spec, _externals) {
       var getThumb = function (component) {
         return getPartOrDie(component, detail, 'thumb');
       };
@@ -6198,7 +6047,7 @@ var mobile = (function (exports) {
       return {
         uid: detail.uid,
         dom: detail.dom,
-        components: components$$1,
+        components: components,
         behaviours: augment(detail.sliderBehaviours, flatten([
           !isTouch$3 ? [Keying.config({
               mode: 'special',
@@ -6260,7 +6109,7 @@ var mobile = (function (exports) {
       name: 'Slider',
       configFields: SliderSchema,
       partFields: SliderParts,
-      factory: sketch$1,
+      factory: sketch,
       apis: {
         resetToMin: function (apis, slider) {
           apis.resetToMin(slider);
@@ -6285,7 +6134,7 @@ var mobile = (function (exports) {
     };
 
     var BLACK = -1;
-    var makeSlider = function (spec$$1) {
+    var makeSlider = function (spec$1) {
       var getColor = function (hue) {
         if (hue < 0) {
           return 'black';
@@ -6302,20 +6151,20 @@ var mobile = (function (exports) {
       var onChange = function (slider, thumb, value) {
         var color = getColor(value.x());
         set$3(thumb.element(), 'background-color', color);
-        spec$$1.onChange(slider, thumb, color);
+        spec$1.onChange(slider, thumb, color);
       };
       return Slider.sketch({
-        dom: dom$2('<div class="${prefix}-slider ${prefix}-hue-slider-container"></div>'),
+        dom: dom$1('<div class="${prefix}-slider ${prefix}-hue-slider-container"></div>'),
         components: [
           Slider.parts()['left-edge'](spec('<div class="${prefix}-hue-slider-black"></div>')),
           Slider.parts().spectrum({
-            dom: dom$2('<div class="${prefix}-slider-gradient-container"></div>'),
+            dom: dom$1('<div class="${prefix}-slider-gradient-container"></div>'),
             components: [spec('<div class="${prefix}-slider-gradient"></div>')],
             behaviours: derive$1([Toggling.config({ toggleClass: Styles.resolve('thumb-active') })])
           }),
           Slider.parts()['right-edge'](spec('<div class="${prefix}-hue-slider-white"></div>')),
           Slider.parts().thumb({
-            dom: dom$2('<div class="${prefix}-slider-thumb"></div>'),
+            dom: dom$1('<div class="${prefix}-slider-thumb"></div>'),
             behaviours: derive$1([Toggling.config({ toggleClass: Styles.resolve('thumb-active') })])
           })
         ],
@@ -6335,7 +6184,7 @@ var mobile = (function (exports) {
           getInitialValue: function () {
             return {
               x: function () {
-                return spec$$1.getInitialValue();
+                return spec$1.getInitialValue();
               }
             };
           }
@@ -6343,11 +6192,11 @@ var mobile = (function (exports) {
         sliderBehaviours: derive$1([Receivers.orientation(Slider.refresh)])
       });
     };
-    var makeItems = function (spec$$1) {
-      return [makeSlider(spec$$1)];
+    var makeItems = function (spec) {
+      return [makeSlider(spec)];
     };
-    var sketch$2 = function (realm, editor) {
-      var spec$$1 = {
+    var sketch$1 = function (realm, editor) {
+      var spec = {
         onChange: function (slider, thumb, color) {
           editor.undoManager.transact(function () {
             editor.formatter.apply('forecolor', { value: color });
@@ -6359,12 +6208,12 @@ var mobile = (function (exports) {
         }
       };
       return button(realm, 'color-levels', function () {
-        return makeItems(spec$$1);
+        return makeItems(spec);
       }, editor);
     };
     var ColorSlider = {
       makeItems: makeItems,
-      sketch: sketch$2
+      sketch: sketch$1
     };
 
     var schema$7 = objOfOnly([
@@ -6373,22 +6222,22 @@ var mobile = (function (exports) {
       strict$1('category'),
       strict$1('sizes')
     ]);
-    var sketch$3 = function (rawSpec) {
-      var spec$$1 = asRawOrDie('SizeSlider', schema$7, rawSpec);
+    var sketch$2 = function (rawSpec) {
+      var spec$1 = asRawOrDie('SizeSlider', schema$7, rawSpec);
       var isValidValue = function (valueIndex) {
-        return valueIndex >= 0 && valueIndex < spec$$1.sizes.length;
+        return valueIndex >= 0 && valueIndex < spec$1.sizes.length;
       };
       var onChange = function (slider, thumb, valueIndex) {
         var index = valueIndex.x();
         if (isValidValue(index)) {
-          spec$$1.onChange(index);
+          spec$1.onChange(index);
         }
       };
       return Slider.sketch({
         dom: {
           tag: 'div',
           classes: [
-            Styles.resolve('slider-' + spec$$1.category + '-size-container'),
+            Styles.resolve('slider-' + spec$1.category + '-size-container'),
             Styles.resolve('slider'),
             Styles.resolve('slider-size-container')
           ]
@@ -6403,11 +6252,11 @@ var mobile = (function (exports) {
         model: {
           mode: 'x',
           minX: 0,
-          maxX: spec$$1.sizes.length - 1,
+          maxX: spec$1.sizes.length - 1,
           getInitialValue: function () {
             return {
               x: function () {
-                return spec$$1.getInitialValue();
+                return spec$1.getInitialValue();
               }
             };
           }
@@ -6417,17 +6266,17 @@ var mobile = (function (exports) {
         sliderBehaviours: derive$1([Receivers.orientation(Slider.refresh)]),
         components: [
           Slider.parts().spectrum({
-            dom: dom$2('<div class="${prefix}-slider-size-container"></div>'),
+            dom: dom$1('<div class="${prefix}-slider-size-container"></div>'),
             components: [spec('<div class="${prefix}-slider-size-line"></div>')]
           }),
           Slider.parts().thumb({
-            dom: dom$2('<div class="${prefix}-slider-thumb"></div>'),
+            dom: dom$1('<div class="${prefix}-slider-thumb"></div>'),
             behaviours: derive$1([Toggling.config({ toggleClass: Styles.resolve('thumb-active') })])
           })
         ]
       });
     };
-    var SizeSlider = { sketch: sketch$3 };
+    var SizeSlider = { sketch: sketch$2 };
 
     var candidates = [
       '9px',
@@ -6461,29 +6310,29 @@ var mobile = (function (exports) {
           return getRaw(elem, 'font-size');
         });
         return inline.getOrThunk(function () {
-          return get$4(start, 'font-size');
+          return get$3(start, 'font-size');
         });
       }).getOr('');
     };
     var getSize = function (editor) {
       var node = editor.selection.getStart();
-      var elem = Element$$1.fromDom(node);
-      var root = Element$$1.fromDom(editor.getBody());
+      var elem = Element.fromDom(node);
+      var root = Element.fromDom(editor.getBody());
       var isRoot = function (e) {
         return eq(root, e);
       };
       var elemSize = getRawOrComputed(isRoot, elem);
-      return find$2(candidates, function (size) {
+      return find$1(candidates, function (size) {
         return elemSize === size;
       }).getOr(defaultSize);
     };
-    var applySize = function (editor, value$$1) {
+    var applySize = function (editor, value) {
       var currentValue = getSize(editor);
-      if (currentValue !== value$$1) {
-        editor.execCommand('fontSize', false, value$$1);
+      if (currentValue !== value) {
+        editor.execCommand('fontSize', false, value);
       }
     };
-    var get$8 = function (editor) {
+    var get$7 = function (editor) {
       var size = getSize(editor);
       return sizeToIndex(size).getOr(defaultIndex);
     };
@@ -6494,28 +6343,28 @@ var mobile = (function (exports) {
     };
     var FontSizes = {
       candidates: constant(candidates),
-      get: get$8,
+      get: get$7,
       apply: apply$1
     };
 
     var sizes = FontSizes.candidates();
-    var makeSlider$1 = function (spec$$1) {
+    var makeSlider$1 = function (spec) {
       return SizeSlider.sketch({
-        onChange: spec$$1.onChange,
+        onChange: spec.onChange,
         sizes: sizes,
         category: 'font',
-        getInitialValue: spec$$1.getInitialValue
+        getInitialValue: spec.getInitialValue
       });
     };
-    var makeItems$1 = function (spec$$1) {
+    var makeItems$1 = function (spec$1) {
       return [
         spec('<span class="${prefix}-toolbar-button ${prefix}-icon-small-font ${prefix}-icon"></span>'),
-        makeSlider$1(spec$$1),
+        makeSlider$1(spec$1),
         spec('<span class="${prefix}-toolbar-button ${prefix}-icon-large-font ${prefix}-icon"></span>')
       ];
     };
-    var sketch$4 = function (realm, editor) {
-      var spec$$1 = {
+    var sketch$3 = function (realm, editor) {
+      var spec = {
         onChange: function (value) {
           FontSizes.apply(editor, value);
         },
@@ -6524,7 +6373,7 @@ var mobile = (function (exports) {
         }
       };
       return button(realm, 'font-size', function () {
-        return makeItems$1(spec$$1);
+        return makeItems$1(spec);
       }, editor);
     };
 
@@ -6547,9 +6396,9 @@ var mobile = (function (exports) {
     };
 
     function create$3(width, height) {
-      return resize(document.createElement('canvas'), width, height);
+      return resize(domGlobals.document.createElement('canvas'), width, height);
     }
-    function clone$2(canvas) {
+    function clone$1(canvas) {
       var tCanvas, ctx;
       tCanvas = create$3(canvas.width, canvas.height);
       ctx = get2dContext(tCanvas);
@@ -6577,7 +6426,7 @@ var mobile = (function (exports) {
     }
     var Canvas = {
       create: create$3,
-      clone: clone$2,
+      clone: clone$1,
       resize: resize,
       get2dContext: get2dContext,
       get3dContext: get3dContext
@@ -6606,7 +6455,7 @@ var mobile = (function (exports) {
         doResolve(fn, bind(resolve, this), bind(reject, this));
       };
       var asap = Promise.immediateFn || typeof window.setImmediate === 'function' && window.setImmediate || function (fn) {
-        setTimeout(fn, 1);
+        domGlobals.setTimeout(fn, 1);
       };
       function bind(fn, thisArg) {
         return function () {
@@ -6755,7 +6604,7 @@ var mobile = (function (exports) {
       };
       return Promise;
     };
-    var Promise$1 = window.Promise ? window.Promise : promise();
+    var Promise = window.Promise ? window.Promise : promise();
 
     function Blob (parts, properties) {
       var f = Global$1.getOrDie('Blob');
@@ -6793,9 +6642,9 @@ var mobile = (function (exports) {
       return anyUriToBlob(src);
     }
     function blobToImage(blob) {
-      return new Promise$1(function (resolve, reject) {
-        var blobUrl = URL.createObjectURL(blob);
-        var image = new Image();
+      return new Promise(function (resolve, reject) {
+        var blobUrl = domGlobals.URL.createObjectURL(blob);
+        var image = new domGlobals.Image();
         var removeListeners = function () {
           image.removeEventListener('load', loaded);
           image.removeEventListener('error', error);
@@ -6817,8 +6666,8 @@ var mobile = (function (exports) {
       });
     }
     function anyUriToBlob(url) {
-      return new Promise$1(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
+      return new Promise(function (resolve, reject) {
+        var xhr = new domGlobals.XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'blob';
         xhr.onload = function () {
@@ -6866,7 +6715,7 @@ var mobile = (function (exports) {
       return Option.some(Blob(byteArrays, { type: mimetype }));
     }
     function dataUriToBlob(uri) {
-      return new Promise$1(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         dataUriToBlobSync(uri).fold(function () {
           reject('uri is not base64: ' + uri);
         }, resolve);
@@ -6883,8 +6732,8 @@ var mobile = (function (exports) {
     }
     function canvasToBlob(canvas, type, quality) {
       type = type || 'image/png';
-      if (HTMLCanvasElement.prototype.toBlob) {
-        return new Promise$1(function (resolve) {
+      if (domGlobals.HTMLCanvasElement.prototype.toBlob) {
+        return new Promise(function (resolve) {
           canvas.toBlob(function (blob) {
             resolve(blob);
           }, type, quality);
@@ -6910,7 +6759,7 @@ var mobile = (function (exports) {
       });
     }
     function blobToDataUri(blob) {
-      return new Promise$1(function (resolve) {
+      return new Promise(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -6919,7 +6768,7 @@ var mobile = (function (exports) {
       });
     }
     function blobToArrayBuffer(blob) {
-      return new Promise$1(function (resolve) {
+      return new Promise(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -6933,7 +6782,7 @@ var mobile = (function (exports) {
       });
     }
     function revokeImageUrl(image) {
-      URL.revokeObjectURL(image.src);
+      domGlobals.URL.revokeObjectURL(image.src);
     }
     var Conversions = {
       blobToImage: blobToImage,
@@ -6991,7 +6840,7 @@ var mobile = (function (exports) {
       var files = event.raw().target.files || event.raw().dataTransfer.files;
       return Option.from(files[0]);
     };
-    var sketch$5 = function (editor) {
+    var sketch$4 = function (editor) {
       var pickerDom = {
         tag: 'input',
         attributes: {
@@ -7025,10 +6874,10 @@ var mobile = (function (exports) {
       });
     };
 
-    var get$9 = function (element) {
+    var get$8 = function (element) {
       return element.dom().textContent;
     };
-    var set$6 = function (element, value) {
+    var set$5 = function (element, value) {
       element.dom().textContent = value;
     };
 
@@ -7049,10 +6898,10 @@ var mobile = (function (exports) {
       };
     };
     var fromLink = function (link) {
-      var text = get$9(link);
-      var url = get$1(link, 'href');
-      var title = get$1(link, 'title');
-      var target = get$1(link, 'target');
+      var text = get$8(link);
+      var url = get(link, 'href');
+      var title = get(link, 'title');
+      var target = get(link, 'target');
       return {
         url: defaultToEmpty(url),
         text: text !== url ? defaultToEmpty(text) : '',
@@ -7069,8 +6918,8 @@ var mobile = (function (exports) {
       });
     };
     var wasSimple = function (link) {
-      var prevHref = get$1(link, 'href');
-      var prevText = get$9(link);
+      var prevHref = get(link, 'href');
+      var prevText = get$8(link);
       return prevHref === prevText;
     };
     var getTextToApply = function (link, url, info) {
@@ -7108,14 +6957,14 @@ var mobile = (function (exports) {
           var text = getTextToApply(link, url, info);
           setAll(link, attrs);
           text.each(function (newText) {
-            set$6(link, newText);
+            set$5(link, newText);
           });
         });
       });
     };
     var query = function (editor) {
-      var start = Element$$1.fromDom(editor.selection.getStart());
-      return closest$3(start, 'a');
+      var start = Element.fromDom(editor.selection.getStart());
+      return closest$2(start, 'a');
     };
     var LinkBridge = {
       getInfo: getInfo,
@@ -7124,13 +6973,13 @@ var mobile = (function (exports) {
     };
 
     var platform$1 = PlatformDetection$1.detect();
-    var preserve$1 = function (f, editor) {
+    var preserve = function (f, editor) {
       var rng = editor.selection.getRng();
       f();
       editor.selection.setRng(rng);
     };
     var forAndroid = function (editor, f) {
-      var wrapper = platform$1.os.isAndroid() ? preserve$1 : apply;
+      var wrapper = platform$1.os.isAndroid() ? preserve : apply;
       wrapper(f, editor);
     };
     var RangePreserver = { forAndroid: forAndroid };
@@ -7182,7 +7031,7 @@ var mobile = (function (exports) {
           attributes: __assign({ role: 'presentation' }, attributes)
         }, domWithoutAttributes),
         components: detail.components,
-        behaviours: get$6(detail.containerBehaviours),
+        behaviours: get$5(detail.containerBehaviours),
         events: detail.events,
         domModification: detail.domModification,
         eventOrder: detail.eventOrder
@@ -7232,10 +7081,10 @@ var mobile = (function (exports) {
       ]
     });
 
-    var get$a = function (element) {
+    var get$9 = function (element) {
       return element.dom().value;
     };
-    var set$7 = function (element, value) {
+    var set$6 = function (element, value) {
       if (value === undefined) {
         throw new Error('Value.set was undefined');
       }
@@ -7261,7 +7110,7 @@ var mobile = (function (exports) {
       return derive$1([Focusing.config({
           onFocus: detail.selectOnFocus === false ? noop : function (component) {
             var input = component.element();
-            var value = get$a(input);
+            var value = get$9(input);
             input.dom().setSelectionRange(0, value.length);
           }
         })]);
@@ -7272,19 +7121,19 @@ var mobile = (function (exports) {
             mode: 'manual',
             initialValue: detail.data.getOr(undefined),
             getValue: function (input) {
-              return get$a(input.element());
+              return get$9(input.element());
             },
             setValue: function (input, data) {
-              var current = get$a(input.element());
+              var current = get$9(input.element());
               if (current !== data) {
-                set$7(input.element(), data);
+                set$6(input.element(), data);
               }
             }
           },
           onSetValue: detail.onSetValue
         })]));
     };
-    var dom$3 = function (detail) {
+    var dom$2 = function (detail) {
       return {
         tag: detail.tag,
         attributes: __assign({ type: 'input' }, detail.inputAttributes),
@@ -7296,7 +7145,7 @@ var mobile = (function (exports) {
     var factory$3 = function (detail, spec) {
       return {
         uid: detail.uid,
-        dom: dom$3(detail),
+        dom: dom$2(detail),
         components: [],
         behaviours: behaviours(detail),
         eventOrder: detail.eventOrder
@@ -7333,8 +7182,8 @@ var mobile = (function (exports) {
     var field$2 = function (name, placeholder) {
       var inputSpec = record(Input.sketch({
         inputAttributes: { placeholder: placeholder },
-        onSetValue: function (input$$1, data) {
-          emit(input$$1, input());
+        onSetValue: function (input$1, data) {
+          emit(input$1, input());
         },
         inputBehaviours: derive$1([
           Composing.config({ find: Option.some }),
@@ -7344,16 +7193,16 @@ var mobile = (function (exports) {
         selectOnFocus: false
       }));
       var buttonSpec = record(Button.sketch({
-        dom: dom$2('<button class="${prefix}-input-container-x ${prefix}-icon-cancel-circle ${prefix}-icon"></button>'),
+        dom: dom$1('<button class="${prefix}-input-container-x ${prefix}-icon-cancel-circle ${prefix}-icon"></button>'),
         action: function (button) {
-          var input$$1 = inputSpec.get(button);
-          Representing.setValue(input$$1, '');
+          var input = inputSpec.get(button);
+          Representing.setValue(input, '');
         }
       }));
       return {
         name: name,
         spec: Container.sketch({
-          dom: dom$2('<div class="${prefix}-input-container"></div>'),
+          dom: dom$1('<div class="${prefix}-input-container"></div>'),
           components: [
             inputSpec.asSpec(),
             buttonSpec.asSpec()
@@ -7366,8 +7215,8 @@ var mobile = (function (exports) {
               }
             }),
             config(clearInputBehaviour, [run(input(), function (iContainer) {
-                var input$$1 = inputSpec.get(iContainer);
-                var val = Representing.getValue(input$$1);
+                var input = inputSpec.get(iContainer);
+                var val = Representing.getValue(input);
                 var f = val.length > 0 ? Toggling.off : Toggling.on;
                 f(iContainer);
               })])
@@ -7413,7 +7262,7 @@ var mobile = (function (exports) {
       remove$1(component.element(), 'disabled');
     };
     var ariaIsDisabled = function (component) {
-      return get$1(component.element(), 'aria-disabled') === 'true';
+      return get(component.element(), 'aria-disabled') === 'true';
     };
     var ariaDisable = function (component) {
       set(component.element(), 'aria-disabled', 'true');
@@ -7480,7 +7329,7 @@ var mobile = (function (exports) {
     var getPartName = function (name) {
       return '<alloy.field.' + name + '>';
     };
-    var sketch$6 = function (fSpec) {
+    var sketch$5 = function (fSpec) {
       var parts = function () {
         var record = [];
         var field = function (name, config) {
@@ -7509,11 +7358,11 @@ var mobile = (function (exports) {
         return Result.error(e);
       }, Result.value);
     };
-    var make = function (detail, components$$1, spec) {
+    var make = function (detail, components, spec) {
       return {
         'uid': detail.uid,
         'dom': detail.dom,
-        'components': components$$1,
+        'components': components,
         'behaviours': augment(detail.formBehaviours, [Representing.config({
             store: {
               mode: 'manual',
@@ -7526,8 +7375,8 @@ var mobile = (function (exports) {
                   }).map(Representing.getValue);
                 });
               },
-              setValue: function (form, values$$1) {
-                each(values$$1, function (newValue, key) {
+              setValue: function (form, values) {
+                each(values, function (newValue, key) {
                   getPart(form, detail, key).each(function (wrapper) {
                     Composing.getCurrent(wrapper).each(function (field) {
                       Representing.setValue(field, newValue);
@@ -7548,7 +7397,7 @@ var mobile = (function (exports) {
       getField: makeApi(function (apis, component, key) {
         return apis.getField(component, key);
       }),
-      sketch: sketch$6
+      sketch: sketch$5
     };
 
     var api$2 = function () {
@@ -7579,7 +7428,7 @@ var mobile = (function (exports) {
         run: run
       };
     };
-    var value$3 = function () {
+    var value$2 = function () {
       var subject = Cell(Option.none());
       var clear = function () {
         subject.set(Option.none());
@@ -7647,7 +7496,7 @@ var mobile = (function (exports) {
       complete: complete
     };
 
-    var sketch$7 = function (rawSpec) {
+    var sketch$6 = function (rawSpec) {
       var navigateEvent = 'navigateEvent';
       var wrapperAdhocEvents = 'serializer-wrapper-events';
       var formAdhocEvents = 'form-events';
@@ -7658,15 +7507,15 @@ var mobile = (function (exports) {
         strict$1('getInitialValue'),
         state$1('state', function () {
           return {
-            dialogSwipeState: value$3(),
+            dialogSwipeState: value$2(),
             currentScreen: Cell(0)
           };
         })
       ]);
-      var spec$$1 = asRawOrDie('SerialisedDialog', schema, rawSpec);
+      var spec$1 = asRawOrDie('SerialisedDialog', schema, rawSpec);
       var navigationButton = function (direction, directionName, enabled) {
         return Button.sketch({
-          dom: dom$2('<span class="${prefix}-icon-' + directionName + ' ${prefix}-icon"></span>'),
+          dom: dom$1('<span class="${prefix}-icon-' + directionName + ' ${prefix}-icon"></span>'),
           action: function (button) {
             emitWith(button, navigateEvent, { direction: direction });
           },
@@ -7677,52 +7526,52 @@ var mobile = (function (exports) {
         });
       };
       var reposition = function (dialog, message) {
-        descendant$2(dialog.element(), '.' + Styles.resolve('serialised-dialog-chain')).each(function (parent) {
-          set$3(parent, 'left', -spec$$1.state.currentScreen.get() * message.width + 'px');
+        descendant$1(dialog.element(), '.' + Styles.resolve('serialised-dialog-chain')).each(function (parent) {
+          set$3(parent, 'left', -spec$1.state.currentScreen.get() * message.width + 'px');
         });
       };
       var navigate = function (dialog, direction) {
-        var screens = descendants$1(dialog.element(), '.' + Styles.resolve('serialised-dialog-screen'));
-        descendant$2(dialog.element(), '.' + Styles.resolve('serialised-dialog-chain')).each(function (parent) {
-          if (spec$$1.state.currentScreen.get() + direction >= 0 && spec$$1.state.currentScreen.get() + direction < screens.length) {
+        var screens = descendants(dialog.element(), '.' + Styles.resolve('serialised-dialog-screen'));
+        descendant$1(dialog.element(), '.' + Styles.resolve('serialised-dialog-chain')).each(function (parent) {
+          if (spec$1.state.currentScreen.get() + direction >= 0 && spec$1.state.currentScreen.get() + direction < screens.length) {
             getRaw(parent, 'left').each(function (left) {
               var currentLeft = parseInt(left, 10);
-              var w = get$7(screens[0]);
+              var w = get$6(screens[0]);
               set$3(parent, 'left', currentLeft - direction * w + 'px');
             });
-            spec$$1.state.currentScreen.set(spec$$1.state.currentScreen.get() + direction);
+            spec$1.state.currentScreen.set(spec$1.state.currentScreen.get() + direction);
           }
         });
       };
       var focusInput = function (dialog) {
-        var inputs = descendants$1(dialog.element(), 'input');
-        var optInput = Option.from(inputs[spec$$1.state.currentScreen.get()]);
-        optInput.each(function (input$$1) {
-          dialog.getSystem().getByDom(input$$1).each(function (inputComp) {
+        var inputs = descendants(dialog.element(), 'input');
+        var optInput = Option.from(inputs[spec$1.state.currentScreen.get()]);
+        optInput.each(function (input) {
+          dialog.getSystem().getByDom(input).each(function (inputComp) {
             dispatchFocus(dialog, inputComp.element());
           });
         });
         var dotitems = memDots.get(dialog);
-        Highlighting.highlightAt(dotitems, spec$$1.state.currentScreen.get());
+        Highlighting.highlightAt(dotitems, spec$1.state.currentScreen.get());
       };
       var resetState = function () {
-        spec$$1.state.currentScreen.set(0);
-        spec$$1.state.dialogSwipeState.clear();
+        spec$1.state.currentScreen.set(0);
+        spec$1.state.dialogSwipeState.clear();
       };
       var memForm = record(Form.sketch(function (parts) {
         return {
-          dom: dom$2('<div class="${prefix}-serialised-dialog"></div>'),
+          dom: dom$1('<div class="${prefix}-serialised-dialog"></div>'),
           components: [Container.sketch({
-              dom: dom$2('<div class="${prefix}-serialised-dialog-chain" style="left: 0px; position: absolute;"></div>'),
-              components: map$1(spec$$1.fields, function (field$$1, i) {
-                return i <= spec$$1.maxFieldIndex ? Container.sketch({
-                  dom: dom$2('<div class="${prefix}-serialised-dialog-screen"></div>'),
+              dom: dom$1('<div class="${prefix}-serialised-dialog-chain" style="left: 0px; position: absolute;"></div>'),
+              components: map$1(spec$1.fields, function (field, i) {
+                return i <= spec$1.maxFieldIndex ? Container.sketch({
+                  dom: dom$1('<div class="${prefix}-serialised-dialog-screen"></div>'),
                   components: [
                     navigationButton(-1, 'previous', i > 0),
-                    parts.field(field$$1.name, field$$1.spec),
-                    navigationButton(+1, 'next', i < spec$$1.maxFieldIndex)
+                    parts.field(field.name, field.spec),
+                    navigationButton(+1, 'next', i < spec$1.maxFieldIndex)
                   ]
-                }) : parts.field(field$$1.name, field$$1.spec);
+                }) : parts.field(field.name, field.spec);
               })
             })],
           formBehaviours: derive$1([
@@ -7748,11 +7597,11 @@ var mobile = (function (exports) {
                 resetState();
                 var dotitems = memDots.get(dialog);
                 Highlighting.highlightFirst(dotitems);
-                spec$$1.getInitialValue(dialog).each(function (v) {
+                spec$1.getInitialValue(dialog).each(function (v) {
                   Representing.setValue(dialog, v);
                 });
               }),
-              runOnExecute(spec$$1.onExecute),
+              runOnExecute(spec$1.onExecute),
               run(transitionend(), function (dialog, simulatedEvent) {
                 var event = simulatedEvent.event();
                 if (event.raw().propertyName === 'left') {
@@ -7769,17 +7618,17 @@ var mobile = (function (exports) {
         };
       }));
       var memDots = record({
-        dom: dom$2('<div class="${prefix}-dot-container"></div>'),
+        dom: dom$1('<div class="${prefix}-dot-container"></div>'),
         behaviours: derive$1([Highlighting.config({
             highlightClass: Styles.resolve('dot-active'),
             itemClass: Styles.resolve('dot-item')
           })]),
-        components: bind(spec$$1.fields, function (_f, i) {
-          return i <= spec$$1.maxFieldIndex ? [spec('<div class="${prefix}-dot-item ${prefix}-icon-full-dot ${prefix}-icon"></div>')] : [];
+        components: bind(spec$1.fields, function (_f, i) {
+          return i <= spec$1.maxFieldIndex ? [spec('<div class="${prefix}-dot-item ${prefix}-icon-full-dot ${prefix}-icon"></div>')] : [];
         })
       });
       return {
-        dom: dom$2('<div class="${prefix}-serializer-wrapper"></div>'),
+        dom: dom$1('<div class="${prefix}-serializer-wrapper"></div>'),
         components: [
           memForm.asSpec(),
           memDots.asSpec()
@@ -7795,17 +7644,17 @@ var mobile = (function (exports) {
           config(wrapperAdhocEvents, [
             run(touchstart(), function (wrapper, simulatedEvent) {
               var event = simulatedEvent.event();
-              spec$$1.state.dialogSwipeState.set(SwipingModel.init(event.raw().touches[0].clientX));
+              spec$1.state.dialogSwipeState.set(SwipingModel.init(event.raw().touches[0].clientX));
             }),
             run(touchmove(), function (wrapper, simulatedEvent) {
               var event = simulatedEvent.event();
-              spec$$1.state.dialogSwipeState.on(function (state) {
+              spec$1.state.dialogSwipeState.on(function (state) {
                 simulatedEvent.event().prevent();
-                spec$$1.state.dialogSwipeState.set(SwipingModel.move(state, event.raw().touches[0].clientX));
+                spec$1.state.dialogSwipeState.set(SwipingModel.move(state, event.raw().touches[0].clientX));
               });
             }),
             run(touchend(), function (wrapper) {
-              spec$$1.state.dialogSwipeState.on(function (state) {
+              spec$1.state.dialogSwipeState.on(function (state) {
                 var dialog = memForm.get(wrapper);
                 var direction = -1 * SwipingModel.complete(state);
                 navigate(dialog, direction);
@@ -7819,7 +7668,7 @@ var mobile = (function (exports) {
     var getGroups = cached(function (realm, editor) {
       return [{
           label: 'the link group',
-          items: [sketch$7({
+          items: [sketch$6({
               fields: [
                 field$2('url', 'Type or paste URL'),
                 field$2('text', 'Link text'),
@@ -7845,7 +7694,7 @@ var mobile = (function (exports) {
             })]
         }];
     });
-    var sketch$8 = function (realm, editor) {
+    var sketch$7 = function (realm, editor) {
       return Buttons.forToolbarStateAction(editor, 'link', 'link', function () {
         var groups = getGroups(realm, editor);
         realm.setContextToolbar(groups);
@@ -7979,11 +7828,11 @@ var mobile = (function (exports) {
     var isRecursive = function (component, originator, target) {
       return eq(originator, component.element()) && !eq(originator, target);
     };
-    var events$8 = derive([can(focus$1(), function (component, simulatedEvent) {
+    var events$8 = derive([can(focus(), function (component, simulatedEvent) {
         var originator = simulatedEvent.event().originator();
         var target = simulatedEvent.event().target();
         if (isRecursive(component, originator, target)) {
-          console.warn(focus$1() + ' did not get interpreted by the desired target. ' + '\nOriginator: ' + element(originator) + '\nTarget: ' + element(target) + '\nCheck the ' + focus$1() + ' event handlers');
+          domGlobals.console.warn(focus() + ' did not get interpreted by the desired target. ' + '\nOriginator: ' + element(originator) + '\nTarget: ' + element(target) + '\nCheck the ' + focus() + ' event handlers');
           return false;
         } else {
           return true;
@@ -8211,7 +8060,7 @@ var mobile = (function (exports) {
               return t.name() === o;
             });
           }).join(' > ') : tuples[0].name();
-          return wrap$2(eventName, uncurried(assembled, purpose));
+          return wrap$1(eventName, uncurried(assembled, purpose));
         });
       });
       return consolidate(r, {});
@@ -8303,7 +8152,7 @@ var mobile = (function (exports) {
     };
 
     var renderToDom = function (definition) {
-      var subject = Element$$1.fromTag(definition.tag);
+      var subject = Element.fromTag(definition.tag);
       setAll(subject, definition.attributes);
       add$3(subject, definition.classes);
       setAll$1(subject, definition.styles);
@@ -8313,7 +8162,7 @@ var mobile = (function (exports) {
       var children = definition.domChildren;
       append$1(subject, children);
       definition.value.each(function (value) {
-        set$7(subject, value);
+        set$6(subject, value);
       });
       if (!definition.uid) {
         debugger;
@@ -8324,10 +8173,10 @@ var mobile = (function (exports) {
 
     var getBehaviours$1 = function (spec) {
       var behaviours = readOr$1('behaviours', {})(spec);
-      var keys$$1 = filter(keys(behaviours), function (k) {
+      var keys$1 = filter(keys(behaviours), function (k) {
         return behaviours[k] !== undefined;
       });
-      return map$1(keys$$1, function (k) {
+      return map$1(keys$1, function (k) {
         return behaviours[k].me;
       });
     };
@@ -8370,9 +8219,9 @@ var mobile = (function (exports) {
         systemApi.set(NoContextApi(getMe));
       };
       var syncComponents = function () {
-        var children$$1 = children(item);
-        var subs = bind(children$$1, function (child$$1) {
-          return systemApi.get().getByDom(child$$1).fold(function () {
+        var children$1 = children(item);
+        var subs = bind(children$1, function (child) {
+          return systemApi.get().getByDom(child).fold(function () {
             return [];
           }, function (c) {
             return [c];
@@ -8429,10 +8278,10 @@ var mobile = (function (exports) {
       return Result.value(build(completeSpec));
     };
     var text = function (textContent) {
-      var element = Element$$1.fromText(textContent);
-      return external$1({ element: element });
+      var element = Element.fromText(textContent);
+      return external({ element: element });
     };
-    var external$1 = function (spec) {
+    var external = function (spec) {
       var extSpec = asRawOrDie('external.component', objOfOnly([
         strict$1('element'),
         option('uid')
@@ -8492,7 +8341,7 @@ var mobile = (function (exports) {
       emitWith(item, focusEvent, { item: item });
     };
     var hover = constant(hoverEvent);
-    var focus$4 = constant(focusEvent);
+    var focus$3 = constant(focusEvent);
 
     var builder = function (detail) {
       return {
@@ -8541,7 +8390,7 @@ var mobile = (function (exports) {
       ]),
       defaulted$1('ignoreFocus', false),
       defaulted$1('domModification', {}),
-      output$1('builder', builder),
+      output('builder', builder),
       defaulted$1('eventOrder', {})
     ];
 
@@ -8555,7 +8404,7 @@ var mobile = (function (exports) {
     var schema$b = [
       strict$1('dom'),
       strict$1('components'),
-      output$1('builder', builder$1)
+      output('builder', builder$1)
     ];
 
     var owner$2 = function () {
@@ -8581,7 +8430,7 @@ var mobile = (function (exports) {
 
     var builder$2 = function (detail) {
       var subs = substitutes(owner$2(), detail, parts());
-      var components$$1 = components(owner$2(), detail, subs.internals());
+      var components$1 = components(owner$2(), detail, subs.internals());
       var focusWidget = function (component) {
         return getPart(component, detail, 'widget').map(function (widget) {
           Keying.focusIn(widget);
@@ -8600,7 +8449,7 @@ var mobile = (function (exports) {
       };
       return {
         dom: detail.dom,
-        components: components$$1,
+        components: components$1,
         domModification: detail.domModification,
         events: derive([
           runOnExecute(function (component, simulatedEvent) {
@@ -8666,7 +8515,7 @@ var mobile = (function (exports) {
       ]),
       defaulted$1('domModification', {}),
       defaultUidsSchema(parts()),
-      output$1('builder', builder$2)
+      output('builder', builder$2)
     ];
 
     var itemSchema$1 = choose$1('type', {
@@ -8741,15 +8590,15 @@ var mobile = (function (exports) {
       }, choose$1('mode', {
         grid: [
           initSize(),
-          output$1('config', configureGrid)
+          output('config', configureGrid)
         ],
         matrix: [
-          output$1('config', configureMatrix),
+          output('config', configureMatrix),
           strict$1('rowSelector')
         ],
         menu: [
           defaulted$1('moveOnTab', true),
-          output$1('config', configureMenu)
+          output('config', configureMenu)
         ]
       })),
       itemMarkers(),
@@ -8758,7 +8607,7 @@ var mobile = (function (exports) {
       onHandler('onHighlight')
     ]);
 
-    var focus$5 = constant('alloy.menu-focus');
+    var focus$4 = constant('alloy.menu-focus');
 
     var make$2 = function (detail, components, spec, externals) {
       return {
@@ -8781,12 +8630,12 @@ var mobile = (function (exports) {
           Keying.config(detail.movement.config(detail, detail.movement))
         ]),
         events: derive([
-          run(focus$4(), function (menu, simulatedEvent) {
+          run(focus$3(), function (menu, simulatedEvent) {
             var event = simulatedEvent.event();
             menu.getSystem().getByDom(event.target()).each(function (item) {
               Highlighting.highlight(menu, item);
               simulatedEvent.stop();
-              emitWith(menu, focus$5(), {
+              emitWith(menu, focus$4(), {
                 menu: menu,
                 item: item
               });
@@ -8810,28 +8659,28 @@ var mobile = (function (exports) {
       factory: make$2
     });
 
-    var preserve$2 = function (f, container) {
+    var preserve$1 = function (f, container) {
       var ownerDoc = owner(container);
       var refocus = active(ownerDoc).bind(function (focused) {
-        var hasFocus$$1 = function (elem) {
+        var hasFocus = function (elem) {
           return eq(focused, elem);
         };
-        return hasFocus$$1(container) ? Option.some(container) : descendant(container, hasFocus$$1);
+        return hasFocus(container) ? Option.some(container) : descendant(container, hasFocus);
       });
       var result = f(container);
       refocus.each(function (oldFocus) {
         active(ownerDoc).filter(function (newFocus) {
           return eq(newFocus, oldFocus);
         }).fold(function () {
-          focus$2(oldFocus);
+          focus$1(oldFocus);
         }, noop);
       });
       return result;
     };
 
-    var set$8 = function (component, replaceConfig, replaceState, data) {
+    var set$7 = function (component, replaceConfig, replaceState, data) {
       detachChildren(component);
-      preserve$2(function () {
+      preserve$1(function () {
         var children = map$1(data, component.getSystem().build);
         each$1(children, function (l) {
           attach(component, l);
@@ -8845,12 +8694,12 @@ var mobile = (function (exports) {
     var append$2 = function (component, replaceConfig, replaceState, appendee) {
       insert(component, replaceConfig, append, appendee);
     };
-    var prepend$2 = function (component, replaceConfig, replaceState, prependee) {
+    var prepend$1 = function (component, replaceConfig, replaceState, prependee) {
       insert(component, replaceConfig, prepend, prependee);
     };
     var remove$7 = function (component, replaceConfig, replaceState, removee) {
       var children = contents(component, replaceConfig);
-      var foundChild = find$2(children, function (child) {
+      var foundChild = find$1(children, function (child) {
         return eq(removee.element(), child.element());
       });
       foundChild.each(detach);
@@ -8879,11 +8728,11 @@ var mobile = (function (exports) {
 
     var ReplaceApis = /*#__PURE__*/Object.freeze({
         append: append$2,
-        prepend: prepend$2,
+        prepend: prepend$1,
         remove: remove$7,
         replaceAt: replaceAt,
         replaceBy: replaceBy,
-        set: set$8,
+        set: set$7,
         contents: contents
     });
 
@@ -9070,9 +8919,9 @@ var mobile = (function (exports) {
       var getSubmenuParents = function (container) {
         return submenuParentItems.get().getOrThunk(function () {
           var r = {};
-          var items = descendants$1(container.element(), '.' + detail.markers.item);
+          var items = descendants(container.element(), '.' + detail.markers.item);
           var parentItems = filter(items, function (i) {
-            return get$1(i, 'aria-haspopup') === 'true';
+            return get(i, 'aria-haspopup') === 'true';
           });
           each$1(parentItems, function (i) {
             container.getSystem().getByDom(i).each(function (itemComp) {
@@ -9184,7 +9033,7 @@ var mobile = (function (exports) {
       };
       var keyOnItem = function (f) {
         return function (container, simulatedEvent) {
-          return closest$3(simulatedEvent.getSource(), '.' + detail.markers.item).bind(function (target) {
+          return closest$2(simulatedEvent.getSource(), '.' + detail.markers.item).bind(function (target) {
             return container.getSystem().getByDom(target).toOption().bind(function (item) {
               return f(container, item).map(function () {
                 return true;
@@ -9194,7 +9043,7 @@ var mobile = (function (exports) {
         };
       };
       var events = derive([
-        run(focus$5(), function (sandbox, simulatedEvent) {
+        run(focus$4(), function (sandbox, simulatedEvent) {
           var menu = simulatedEvent.event().menu();
           Highlighting.highlight(sandbox, menu);
           var value = getItemValue(simulatedEvent.event().item());
@@ -9290,7 +9139,7 @@ var mobile = (function (exports) {
     var singleData = function (name, menu) {
       return {
         primary: name,
-        menus: wrap$2(name, menu),
+        menus: wrap$1(name, menu),
         expansions: {}
       };
     };
@@ -9375,27 +9224,27 @@ var mobile = (function (exports) {
     };
     var getNewRoute = function (comp, transConfig, transState, destination) {
       return {
-        start: get$1(comp.element(), transConfig.stateAttr),
+        start: get(comp.element(), transConfig.stateAttr),
         destination: destination
       };
     };
     var getCurrentRoute = function (comp, transConfig, transState) {
       var el = comp.element();
       return has$1(el, transConfig.destinationAttr) ? Option.some({
-        start: get$1(comp.element(), transConfig.stateAttr),
-        destination: get$1(comp.element(), transConfig.destinationAttr)
+        start: get(comp.element(), transConfig.stateAttr),
+        destination: get(comp.element(), transConfig.destinationAttr)
       }) : Option.none();
     };
     var jumpTo = function (comp, transConfig, transState, destination) {
       disableTransition(comp, transConfig, transState);
-      if (has$1(comp.element(), transConfig.stateAttr) && get$1(comp.element(), transConfig.stateAttr) !== destination) {
+      if (has$1(comp.element(), transConfig.stateAttr) && get(comp.element(), transConfig.stateAttr) !== destination) {
         transConfig.onFinish(comp, destination);
       }
       set(comp.element(), transConfig.stateAttr, destination);
     };
     var fasttrack = function (comp, transConfig, transState, destination) {
       if (has$1(comp.element(), transConfig.destinationAttr)) {
-        set(comp.element(), transConfig.stateAttr, get$1(comp.element(), transConfig.destinationAttr));
+        set(comp.element(), transConfig.stateAttr, get(comp.element(), transConfig.destinationAttr));
         remove$1(comp.element(), transConfig.destinationAttr);
       }
     };
@@ -9413,7 +9262,7 @@ var mobile = (function (exports) {
     };
     var getState$1 = function (comp, transConfig, transState) {
       var e = comp.element();
-      return has$1(e, transConfig.stateAttr) ? Option.some(get$1(e, transConfig.stateAttr)) : Option.none();
+      return has$1(e, transConfig.stateAttr) ? Option.some(get(e, transConfig.stateAttr)) : Option.none();
     };
 
     var TransitionApis = /*#__PURE__*/Object.freeze({
@@ -9466,8 +9315,8 @@ var mobile = (function (exports) {
       var r = {};
       each(routes, function (v, k) {
         var waypoints = k.split('<->');
-        r[waypoints[0]] = wrap$2(waypoints[1], v);
-        r[waypoints[1]] = wrap$2(waypoints[0], v);
+        r[waypoints[0]] = wrap$1(waypoints[1], v);
+        r[waypoints[1]] = wrap$1(waypoints[0], v);
       });
       return r;
     };
@@ -9475,11 +9324,11 @@ var mobile = (function (exports) {
       return wrapAll$1([
         {
           key: first,
-          value: wrap$2(second, transitions)
+          value: wrap$1(second, transitions)
         },
         {
           key: second,
-          value: wrap$2(first, transitions)
+          value: wrap$1(first, transitions)
         }
       ]);
     };
@@ -9564,15 +9413,15 @@ var mobile = (function (exports) {
         });
         return makeMenu(menuName, items, memMenuThunk, true);
       });
-      var menus = deepMerge(submenus, wrap$2('styles', mainMenu));
+      var menus = deepMerge(submenus, wrap$1('styles', mainMenu));
       var tmenu = tieredMenu.tieredData('styles', menus, formats.expansions);
       return { tmenu: tmenu };
     };
-    var makeItem = function (value, text$$1, selected, preview, isMenu) {
+    var makeItem = function (value, text, selected, preview, isMenu) {
       return {
         data: {
           value: value,
-          text: text$$1
+          text: text
         },
         type: 'item',
         dom: {
@@ -9592,7 +9441,7 @@ var mobile = (function (exports) {
             dom: {
               tag: 'div',
               attributes: { style: preview },
-              innerHtml: text$$1
+              innerHtml: text
             }
           }]
       };
@@ -9655,7 +9504,7 @@ var mobile = (function (exports) {
           })])
       };
     };
-    var sketch$9 = function (settings) {
+    var sketch$8 = function (settings) {
       var dataset = convert$1(settings.formats, function () {
         return memMenu;
       });
@@ -9676,21 +9525,21 @@ var mobile = (function (exports) {
           return Option.none();
         },
         onOpenMenu: function (container, menu) {
-          var w = get$7(container.element());
-          set$5(menu.element(), w);
+          var w = get$6(container.element());
+          set$4(menu.element(), w);
           Transitioning.jumpTo(menu, 'current');
         },
         onOpenSubmenu: function (container, item, submenu) {
-          var w = get$7(container.element());
-          var menu = ancestor$2(item.element(), '[role="menu"]').getOrDie('hacky');
+          var w = get$6(container.element());
+          var menu = ancestor$1(item.element(), '[role="menu"]').getOrDie('hacky');
           var menuComp = container.getSystem().getByDom(menu).getOrDie();
-          set$5(submenu.element(), w);
+          set$4(submenu.element(), w);
           Transitioning.progressTo(menuComp, 'before');
           Transitioning.jumpTo(submenu, 'after');
           Transitioning.progressTo(submenu, 'current');
         },
         onCollapseMenu: function (container, item, menu) {
-          var submenu = ancestor$2(item.element(), '[role="menu"]').getOrDie('hacky');
+          var submenu = ancestor$1(item.element(), '[role="menu"]').getOrDie('hacky');
           var submenuComp = container.getSystem().getByDom(submenu).getOrDie();
           Transitioning.progressTo(submenuComp, 'after');
           Transitioning.progressTo(menu, 'current');
@@ -9708,13 +9557,13 @@ var mobile = (function (exports) {
       }));
       return memMenu.asSpec();
     };
-    var StylesMenu = { sketch: sketch$9 };
+    var StylesMenu = { sketch: sketch$8 };
 
     var getFromExpandingItem = function (item) {
       var newItem = deepMerge(exclude$1(item, ['items']), { menu: true });
       var rest = expand(item.items);
-      var newMenus = deepMerge(rest.menus, wrap$2(item.title, rest.items));
-      var newExpansions = deepMerge(rest.expansions, wrap$2(item.title, item.title));
+      var newMenus = deepMerge(rest.menus, wrap$1(item.title, rest.items));
+      var newExpansions = deepMerge(rest.expansions, wrap$1(item.title, item.title));
       return {
         item: newItem,
         menus: newMenus,
@@ -9874,13 +9723,13 @@ var mobile = (function (exports) {
       var underline = stateCommandSketch('underline');
       var removeformat = commandSketch('removeformat');
       var link = function () {
-        return sketch$8(realm, editor);
+        return sketch$7(realm, editor);
       };
       var unlink = actionSketch('unlink', 'link', function () {
         editor.execCommand('unlink', null, false);
       });
       var image = function () {
-        return sketch$5(editor);
+        return sketch$4(editor);
       };
       var bullist = actionSketch('unordered-list', 'ul', function () {
         editor.execCommand('InsertUnorderedList', null, false);
@@ -9889,7 +9738,7 @@ var mobile = (function (exports) {
         editor.execCommand('InsertOrderedList', null, false);
       });
       var fontsizeselect = function () {
-        return sketch$4(realm, editor);
+        return sketch$3(realm, editor);
       };
       var forecolor = function () {
         return ColorSlider.sketch(realm, editor);
@@ -9976,7 +9825,7 @@ var mobile = (function (exports) {
         if (!filter(rawEvent)) {
           return;
         }
-        var target = Element$$1.fromDom(rawEvent.target);
+        var target = Element.fromDom(rawEvent.target);
         var stop = function () {
           rawEvent.stopPropagation();
         };
@@ -10013,21 +9862,21 @@ var mobile = (function (exports) {
 
     var INTERVAL = 50;
     var INSURANCE = 1000 / INTERVAL;
-    var get$c = function (outerWindow) {
+    var get$a = function (outerWindow) {
       var isPortrait = outerWindow.matchMedia('(orientation: portrait)').matches;
       return { isPortrait: constant(isPortrait) };
     };
     var getActualWidth = function (outerWindow) {
       var isIos = PlatformDetection$1.detect().os.isiOS();
-      var isPortrait = get$c(outerWindow).isPortrait();
+      var isPortrait = get$a(outerWindow).isPortrait();
       return isIos && !isPortrait ? outerWindow.screen.height : outerWindow.screen.width;
     };
     var onChange = function (outerWindow, listeners) {
-      var win = Element$$1.fromDom(outerWindow);
+      var win = Element.fromDom(outerWindow);
       var poller = null;
       var change = function () {
         clearInterval(poller);
-        var orientation = get$c(outerWindow);
+        var orientation = get$a(outerWindow);
         listeners.onChange(orientation);
         onAdjustment(function () {
           listeners.onReady(orientation);
@@ -10058,7 +9907,7 @@ var mobile = (function (exports) {
       };
     };
     var Orientation = {
-      get: get$c,
+      get: get$a,
       onChange: onChange,
       getActualWidth: getActualWidth
     };
@@ -10070,14 +9919,14 @@ var mobile = (function (exports) {
         for (var _i = 0; _i < arguments.length; _i++) {
           args[_i] = arguments[_i];
         }
-        ref = setTimeout(function () {
+        ref = domGlobals.setTimeout(function () {
           fun.apply(null, args);
           ref = null;
         }, delay);
       };
       var cancel = function () {
         if (ref !== null) {
-          clearTimeout(ref);
+          domGlobals.clearTimeout(ref);
           ref = null;
         }
       };
@@ -10103,25 +9952,25 @@ var mobile = (function (exports) {
     };
     var monitor = function (settings) {
       var startData = Cell(Option.none());
-      var longpress$$1 = DelayedFunction(function (event) {
+      var longpress$1 = DelayedFunction(function (event) {
         startData.set(Option.none());
         settings.triggerEvent(longpress(), event);
       }, LONGPRESS_DELAY);
       var handleTouchstart = function (event) {
         getTouch(event).each(function (touch) {
-          longpress$$1.cancel();
+          longpress$1.cancel();
           var data = {
             x: constant(touch.clientX),
             y: constant(touch.clientY),
             target: event.target
           };
-          longpress$$1.schedule(event);
+          longpress$1.schedule(event);
           startData.set(Option.some(data));
         });
         return Option.none();
       };
       var handleTouchmove = function (event) {
-        longpress$$1.cancel();
+        longpress$1.cancel();
         getTouch(event).each(function (touch) {
           startData.get().each(function (data) {
             if (isFarEnough(touch, data)) {
@@ -10132,7 +9981,7 @@ var mobile = (function (exports) {
         return Option.none();
       };
       var handleTouchend = function (event) {
-        longpress$$1.cancel();
+        longpress$1.cancel();
         var isSame = function (data) {
           return eq(data.target(), event.target());
         };
@@ -10218,7 +10067,7 @@ var mobile = (function (exports) {
           editorApi.onTouchToolstrip();
         }),
         editorApi.onToReading(function () {
-          blur$$1(editorApi.body());
+          blur(editorApi.body());
         }),
         editorApi.onToEditing(noop),
         editorApi.onScrollToCursor(function (tinyEvent) {
@@ -10233,7 +10082,7 @@ var mobile = (function (exports) {
           });
         })
       ].concat(isAndroid6 === true ? [] : [
-        bind$3(Element$$1.fromDom(editorApi.win()), 'blur', function () {
+        bind$3(Element.fromDom(editorApi.win()), 'blur', function () {
           alloy.getByDom(toolstrip).each(Toggling.off);
         }),
         bind$3(outerDoc, 'select', updateMargin),
@@ -10249,7 +10098,7 @@ var mobile = (function (exports) {
     var AndroidEvents = { initEvents: initEvents };
 
     var safeParse = function (element, attribute) {
-      var parsed = parseInt(get$1(element, attribute), 10);
+      var parsed = parseInt(get(element, attribute), 10);
       return isNaN(parsed) ? 0 : parsed;
     };
     var DataAttributes = { safeParse: safeParse };
@@ -10287,7 +10136,7 @@ var mobile = (function (exports) {
     }
 
     var api$3 = NodeValue(isText, 'text');
-    var get$d = function (element) {
+    var get$b = function (element) {
       return api$3.get(element);
     };
     var getOption = function (element) {
@@ -10332,13 +10181,13 @@ var mobile = (function (exports) {
     var getStart = function (situ) {
       return situ.fold(identity, identity, identity);
     };
-    var before$2 = adt$4.before;
+    var before$1 = adt$4.before;
     var on$1 = adt$4.on;
-    var after$2 = adt$4.after;
+    var after$1 = adt$4.after;
     var Situ = {
-      before: before$2,
+      before: before$1,
       on: on$1,
-      after: after$2,
+      after: after$1,
       cata: cata,
       getStart: getStart
     };
@@ -10360,7 +10209,7 @@ var mobile = (function (exports) {
         ]
       }
     ]);
-    var range$2 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var range$1 = Immutable('start', 'soffset', 'finish', 'foffset');
     var relative = type$1.relative;
     var exact = type$1.exact;
 
@@ -10371,7 +10220,7 @@ var mobile = (function (exports) {
       rng.setEnd(finish.dom(), foffset);
       return rng;
     };
-    var after$3 = function (start, soffset, finish, foffset) {
+    var after$2 = function (start, soffset, finish, foffset) {
       var r = makeRange(start, soffset, finish, foffset);
       var same = eq(start, finish) && soffset === foffset;
       return r.collapsed && !same;
@@ -10442,7 +10291,7 @@ var mobile = (function (exports) {
       }
     ]);
     var fromRange = function (win, type, range) {
-      return type(Element$$1.fromDom(range.startContainer), range.startOffset, Element$$1.fromDom(range.endContainer), range.endOffset);
+      return type(Element.fromDom(range.startContainer), range.startOffset, Element.fromDom(range.endContainer), range.endOffset);
     };
     var getRanges = function (win, selection) {
       return selection.match({
@@ -10481,7 +10330,7 @@ var mobile = (function (exports) {
           return rev.collapsed === false;
         });
         return reversed.map(function (rev) {
-          return adt$5.rtl(Element$$1.fromDom(rev.endContainer), rev.endOffset, Element$$1.fromDom(rev.startContainer), rev.startOffset);
+          return adt$5.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
         }).getOrThunk(function () {
           return fromRange(win, adt$5.ltr, rng);
         });
@@ -10546,7 +10395,7 @@ var mobile = (function (exports) {
         var r = rangeForOffset(o);
         return r.getBoundingClientRect();
       };
-      var length = get$d(textnode).length;
+      var length = get$b(textnode).length;
       var offset = searchForPoint(rectForOffset, x, y, rect.right, length);
       return rangeForOffset(offset);
     };
@@ -10583,21 +10432,21 @@ var mobile = (function (exports) {
       return locateNode(doc, node, boundedX, boundedY);
     };
 
-    var first$3 = function (element) {
+    var first$1 = function (element) {
       return descendant(element, isCursorPosition);
     };
-    var last$2 = function (element) {
+    var last = function (element) {
       return descendantRtl(element, isCursorPosition);
     };
     var descendantRtl = function (scope, predicate) {
       var descend = function (element) {
-        var children$$1 = children(element);
-        for (var i = children$$1.length - 1; i >= 0; i--) {
-          var child$$1 = children$$1[i];
-          if (predicate(child$$1)) {
-            return Option.some(child$$1);
+        var children$1 = children(element);
+        for (var i = children$1.length - 1; i >= 0; i--) {
+          var child = children$1[i];
+          if (predicate(child)) {
+            return Option.some(child);
           }
-          var res = descend(child$$1);
+          var res = descend(child);
           if (res.isSome()) {
             return res;
           }
@@ -10623,7 +10472,7 @@ var mobile = (function (exports) {
       cursorRange.selectNode(node.dom());
       var rect = cursorRange.getBoundingClientRect();
       var collapseDirection = getCollapseDirection(rect, x);
-      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$3 : last$2;
+      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$1 : last;
       return f(node).map(function (target) {
         return createCollapsedNode(doc, target, collapseDirection);
       });
@@ -10661,7 +10510,7 @@ var mobile = (function (exports) {
       return locate$2(doc, node, boundedX, boundedY);
     };
     var searchFromPoint = function (doc, x, y) {
-      return Element$$1.fromPoint(doc, x, y).bind(function (elem) {
+      return Element.fromPoint(doc, x, y).bind(function (elem) {
         var fallback = function () {
           return search$1(doc, elem, x);
         };
@@ -10671,13 +10520,13 @@ var mobile = (function (exports) {
     var availableSearch = document.caretPositionFromPoint ? caretPositionFromPoint : document.caretRangeFromPoint ? caretRangeFromPoint : searchFromPoint;
 
     var beforeSpecial = function (element, offset) {
-      var name$$1 = name(element);
-      if ('input' === name$$1) {
+      var name$1 = name(element);
+      if ('input' === name$1) {
         return Situ.after(element);
       } else if (!contains([
           'br',
           'img'
-        ], name$$1)) {
+        ], name$1)) {
         return Situ.on(element, offset);
       } else {
         return offset === 0 ? Situ.before(element) : Situ.after(element);
@@ -10703,8 +10552,8 @@ var mobile = (function (exports) {
       selection.collapse(start.dom(), soffset);
       selection.extend(finish.dom(), foffset);
     };
-    var setRangeFromRelative = function (win, relative$$1) {
-      return diagnose(win, relative$$1).match({
+    var setRangeFromRelative = function (win, relative) {
+      return diagnose(win, relative).match({
         ltr: function (start, soffset, finish, foffset) {
           doSetRange(win, start, soffset, finish, foffset);
         },
@@ -10725,29 +10574,29 @@ var mobile = (function (exports) {
       });
     };
     var setExact = function (win, start, soffset, finish, foffset) {
-      var relative$$1 = preprocessExact(start, soffset, finish, foffset);
-      setRangeFromRelative(win, relative$$1);
+      var relative = preprocessExact(start, soffset, finish, foffset);
+      setRangeFromRelative(win, relative);
     };
     var readRange = function (selection) {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range$2(Element$$1.fromDom(firstRng.startContainer), firstRng.startOffset, Element$$1.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(range$1(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
     };
     var doGetExact = function (selection) {
-      var anchorNode = Element$$1.fromDom(selection.anchorNode);
-      var focusNode = Element$$1.fromDom(selection.focusNode);
-      return after$3(anchorNode, selection.anchorOffset, focusNode, selection.focusOffset) ? Option.some(range$2(Element$$1.fromDom(selection.anchorNode), selection.anchorOffset, Element$$1.fromDom(selection.focusNode), selection.focusOffset)) : readRange(selection);
+      var anchor = Element.fromDom(selection.anchorNode);
+      var focus = Element.fromDom(selection.focusNode);
+      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range$1(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var getExact = function (win) {
       return Option.from(win.getSelection()).filter(function (sel) {
         return sel.rangeCount > 0;
       }).bind(doGetExact);
     };
-    var get$e = function (win) {
+    var get$c = function (win) {
       return getExact(win).map(function (range) {
         return exact(range.start(), range.soffset(), range.finish(), range.foffset());
       });
@@ -10782,14 +10631,14 @@ var mobile = (function (exports) {
         height: constant(rawRect.height)
       };
     };
-    var getRectsFromRange = function (range$$1) {
-      if (!range$$1.collapsed) {
-        return map$1(range$$1.getClientRects(), toRect$1);
+    var getRectsFromRange = function (range) {
+      if (!range.collapsed) {
+        return map$1(range.getClientRects(), toRect$1);
       } else {
-        var start_1 = Element$$1.fromDom(range$$1.startContainer);
-        return parent(start_1).bind(function (parent$$1) {
-          var selection = exact(start_1, range$$1.startOffset, parent$$1, getEnd(parent$$1));
-          var optRect = getFirstRect$1(range$$1.startContainer.ownerDocument.defaultView, selection);
+        var start_1 = Element.fromDom(range.startContainer);
+        return parent(start_1).bind(function (parent) {
+          var selection = exact(start_1, range.startOffset, parent, getEnd(parent));
+          var optRect = getFirstRect$1(range.startContainer.ownerDocument.defaultView, selection);
           return optRect.map(collapsedRect).map(pure);
         }).getOr([]);
       }
@@ -10809,7 +10658,7 @@ var mobile = (function (exports) {
     };
     var resume = function (cWin) {
       cWin.focus();
-      var iBody = Element$$1.fromDom(cWin.document.body);
+      var iBody = Element.fromDom(cWin.document.body);
       var inInput = active().exists(function (elem) {
         return contains([
           'input',
@@ -10818,8 +10667,8 @@ var mobile = (function (exports) {
       });
       var transaction = inInput ? autocompleteHack() : apply;
       transaction(function () {
-        active().each(blur$$1);
-        focus$2(iBody);
+        active().each(blur);
+        focus$1(iBody);
       });
     };
     var ResumeEditing = { resume: resume };
@@ -10838,7 +10687,7 @@ var mobile = (function (exports) {
         bottom: constant(rect.top() + rect.height())
       };
     };
-    var getBounds$3 = function (cWin) {
+    var getBounds$1 = function (cWin) {
       var rects = Rectangles.getRectangles(cWin);
       return rects.length > 0 ? Option.some(rects[0]).map(getBoundsFrom) : Option.none();
     };
@@ -10852,13 +10701,13 @@ var mobile = (function (exports) {
       return isOutside ? Math.min(delta, bounds.bottom() - cWin.innerHeight + EXTRA_SPACING) : 0;
     };
     var setup$1 = function (outerWindow, cWin) {
-      var cBody = Element$$1.fromDom(cWin.document.body);
+      var cBody = Element.fromDom(cWin.document.body);
       var toEditing = function () {
         ResumeEditing.resume(cWin);
       };
-      var onResize = bind$3(Element$$1.fromDom(outerWindow), 'resize', function () {
+      var onResize = bind$3(Element.fromDom(outerWindow), 'resize', function () {
         findDelta(outerWindow, cBody).each(function (delta) {
-          getBounds$3(cWin).each(function (bounds) {
+          getBounds$1(cWin).each(function (bounds) {
             var cScrollBy = calculate(cWin, bounds, delta);
             if (cScrollBy !== 0) {
               cWin.scrollTo(cWin.pageXOffset, cWin.pageYOffset + cScrollBy);
@@ -10879,10 +10728,10 @@ var mobile = (function (exports) {
     var AndroidSetup = { setup: setup$1 };
 
     var getBodyFromFrame = function (frame) {
-      return Option.some(Element$$1.fromDom(frame.dom().contentWindow.document.body));
+      return Option.some(Element.fromDom(frame.dom().contentWindow.document.body));
     };
     var getDocFromFrame = function (frame) {
-      return Option.some(Element$$1.fromDom(frame.dom().contentWindow.document));
+      return Option.some(Element.fromDom(frame.dom().contentWindow.document));
     };
     var getWinFromFrame = function (frame) {
       return Option.from(frame.dom().contentWindow);
@@ -10925,22 +10774,22 @@ var mobile = (function (exports) {
     var getActiveApi = function (editor) {
       var frame = getFrame(editor);
       var tryFallbackBox = function (win) {
-        var isCollapsed$$1 = function (sel) {
+        var isCollapsed = function (sel) {
           return eq(sel.start(), sel.finish()) && sel.soffset() === sel.foffset();
         };
         var toStartRect = function (sel) {
           var rect = sel.start().dom().getBoundingClientRect();
           return rect.width > 0 || rect.height > 0 ? Option.some(rect).map(toRect$2) : Option.none();
         };
-        return getExact(win).filter(isCollapsed$$1).bind(toStartRect);
+        return getExact(win).filter(isCollapsed).bind(toStartRect);
       };
       return getBodyFromFrame(frame).bind(function (body) {
         return getDocFromFrame(frame).bind(function (doc) {
           return getWinFromFrame(frame).map(function (win) {
-            var html = Element$$1.fromDom(doc.dom().documentElement);
+            var html = Element.fromDom(doc.dom().documentElement);
             var getCursorBox = editor.getCursorBox.getOrThunk(function () {
               return function () {
-                return get$e(win).bind(function (sel) {
+                return get$c(win).bind(function (sel) {
                   return getFirstRect$1(win, sel).orThunk(function () {
                     return tryFallbackBox(win);
                   });
@@ -10999,7 +10848,7 @@ var mobile = (function (exports) {
     var bgFallback = 'background-color:rgb(255,255,255)!important;';
     var isAndroid = PlatformDetection$1.detect().os.isAndroid();
     var matchColor = function (editorBody) {
-      var color = get$4(editorBody, 'background-color');
+      var color = get$3(editorBody, 'background-color');
       return color !== undefined && color !== '' ? 'background-color:' + color + '!important' : bgFallback;
     };
     var clobberStyles = function (container, editorBody) {
@@ -11009,7 +10858,7 @@ var mobile = (function (exports) {
       };
       var clobber = function (clobberStyle) {
         return function (element) {
-          var styles = get$1(element, 'style');
+          var styles = get(element, 'style');
           var backup = styles === undefined ? 'no-styles' : styles.trim();
           if (backup === clobberStyle) {
             return;
@@ -11028,9 +10877,9 @@ var mobile = (function (exports) {
       clobber(containerStyles + ancestorStyles + bgColor)(container);
     };
     var restoreStyles = function () {
-      var clobberedEls = all$3('[' + attr + ']');
+      var clobberedEls = all$2('[' + attr + ']');
       each$1(clobberedEls, function (element) {
-        var restore = get$1(element, attr);
+        var restore = get(element, attr);
         if (restore !== 'no-styles') {
           set(element, 'style', restore);
         } else {
@@ -11045,15 +10894,15 @@ var mobile = (function (exports) {
     };
 
     var tag = function () {
-      var head = first$2('head').getOrDie();
+      var head = first('head').getOrDie();
       var nu = function () {
-        var meta = Element$$1.fromTag('meta');
+        var meta = Element.fromTag('meta');
         set(meta, 'name', 'viewport');
         append(head, meta);
         return meta;
       };
-      var element = first$2('meta[name="viewport"]').getOrThunk(nu);
-      var backup = get$1(element, 'content');
+      var element = first('meta[name="viewport"]').getOrThunk(nu);
+      var backup = get(element, 'content');
       var maximize = function () {
         set(element, 'content', 'width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0');
       };
@@ -11071,7 +10920,7 @@ var mobile = (function (exports) {
     };
     var MetaViewport = { tag: tag };
 
-    var create$5 = function (platform, mask) {
+    var create$4 = function (platform, mask) {
       var meta = MetaViewport.tag();
       var androidApi = api$2();
       var androidEvents = api$2();
@@ -11102,9 +10951,9 @@ var mobile = (function (exports) {
         exit: exit
       };
     };
-    var AndroidMode = { create: create$5 };
+    var AndroidMode = { create: create$4 };
 
-    var first$4 = function (fn, rate) {
+    var first$2 = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -11129,7 +10978,7 @@ var mobile = (function (exports) {
         throttle: throttle
       };
     };
-    var last$3 = function (fn, rate) {
+    var last$1 = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -11155,21 +11004,21 @@ var mobile = (function (exports) {
       };
     };
 
-    var sketch$a = function (onView, translate) {
+    var sketch$9 = function (onView, translate) {
       var memIcon = record(Container.sketch({
-        dom: dom$2('<div aria-hidden="true" class="${prefix}-mask-tap-icon"></div>'),
+        dom: dom$1('<div aria-hidden="true" class="${prefix}-mask-tap-icon"></div>'),
         containerBehaviours: derive$1([Toggling.config({
             toggleClass: Styles.resolve('mask-tap-icon-selected'),
             toggleOnExecute: false
           })])
       }));
-      var onViewThrottle = first$4(onView, 200);
+      var onViewThrottle = first$2(onView, 200);
       return Container.sketch({
-        dom: dom$2('<div class="${prefix}-disabled-mask"></div>'),
+        dom: dom$1('<div class="${prefix}-disabled-mask"></div>'),
         components: [Container.sketch({
-            dom: dom$2('<div class="${prefix}-content-container"></div>'),
+            dom: dom$1('<div class="${prefix}-content-container"></div>'),
             components: [Button.sketch({
-                dom: dom$2('<div class="${prefix}-content-tap-section"></div>'),
+                dom: dom$1('<div class="${prefix}-content-tap-section"></div>'),
                 components: [memIcon.asSpec()],
                 action: function (button) {
                   onViewThrottle.throttle();
@@ -11179,7 +11028,7 @@ var mobile = (function (exports) {
           })]
       });
     };
-    var TapToEditMask = { sketch: sketch$a };
+    var TapToEditMask = { sketch: sketch$9 };
 
     var MobileSchema = objOf([
       strictObjOf('editor', [
@@ -11214,7 +11063,7 @@ var mobile = (function (exports) {
         return owner(spec.socket).dom().defaultView;
       }),
       state$1('body', function (spec) {
-        return Element$$1.fromDom(spec.socket.dom().ownerDocument.body);
+        return Element.fromDom(spec.socket.dom().ownerDocument.body);
       }),
       defaulted$1('translate', identity),
       defaulted$1('setReadOnly', noop),
@@ -11262,10 +11111,10 @@ var mobile = (function (exports) {
         overrides: enhanceGroups
       })]);
 
-    var factory$4 = function (detail, components$$1, spec, _externals) {
-      var setGroups = function (toolbar$$1, groups) {
-        getGroupContainer(toolbar$$1).fold(function () {
-          console.error('Toolbar was defined to not be a shell, but no groups container was specified in components');
+    var factory$4 = function (detail, components, spec, _externals) {
+      var setGroups = function (toolbar, groups) {
+        getGroupContainer(toolbar).fold(function () {
+          domGlobals.console.error('Toolbar was defined to not be a shell, but no groups container was specified in components');
           throw new Error('Toolbar was defined to not be a shell, but no groups container was specified in components');
         }, function (container) {
           Replacing.set(container, groups);
@@ -11279,7 +11128,7 @@ var mobile = (function (exports) {
         components: []
       } : {
         behaviours: [],
-        components: components$$1
+        components: components
       };
       return {
         uid: detail.uid,
@@ -11296,8 +11145,8 @@ var mobile = (function (exports) {
       partFields: parts$2(),
       factory: factory$4,
       apis: {
-        setGroups: function (apis, toolbar$$1, groups) {
-          apis.setGroups(toolbar$$1, groups);
+        setGroups: function (apis, toolbar, groups) {
+          apis.setGroups(toolbar, groups);
         }
       }
     });
@@ -11354,11 +11203,11 @@ var mobile = (function (exports) {
       set(container, dataHorizontal, 'true');
     };
     var hasScroll = function (container) {
-      return get$1(container, dataHorizontal) === 'true' ? hasHorizontalScroll(container) : hasVerticalScroll(container);
+      return get(container, dataHorizontal) === 'true' ? hasHorizontalScroll(container) : hasVerticalScroll(container);
     };
     var exclusive = function (scope, selector) {
       return bind$3(scope, 'touchmove', function (event) {
-        closest$3(event.target(), selector).filter(hasScroll).fold(function () {
+        closest$2(event.target(), selector).filter(hasScroll).fold(function () {
           event.raw().preventDefault();
         }, noop);
       });
@@ -11372,7 +11221,7 @@ var mobile = (function (exports) {
       var makeGroup = function (gSpec) {
         var scrollClass = gSpec.scrollable === true ? '${prefix}-toolbar-scrollable-group' : '';
         return {
-          dom: dom$2('<div aria-label="' + gSpec.label + '" class="${prefix}-toolbar-group ' + scrollClass + '"></div>'),
+          dom: dom$1('<div aria-label="' + gSpec.label + '" class="${prefix}-toolbar-group ' + scrollClass + '"></div>'),
           tgroupBehaviours: derive$1([config('adhoc-scrollable-toolbar', gSpec.scrollable === true ? [runOnInit(function (component, simulatedEvent) {
                 set$3(component.element(), 'overflow-x', 'auto');
                 Scrollables.markAsHorizontal(component.element());
@@ -11384,7 +11233,7 @@ var mobile = (function (exports) {
         };
       };
       var toolbar = build$1(Toolbar.sketch({
-        dom: dom$2('<div class="${prefix}-toolbar"></div>'),
+        dom: dom$1('<div class="${prefix}-toolbar"></div>'),
         components: [Toolbar.parts().groups({})],
         toolbarBehaviours: derive$1([
           Toggling.config({
@@ -11444,7 +11293,7 @@ var mobile = (function (exports) {
 
     var makeEditSwitch = function (webapp) {
       return build$1(Button.sketch({
-        dom: dom$2('<div class="${prefix}-mask-edit-icon ${prefix}-icon"></div>'),
+        dom: dom$1('<div class="${prefix}-mask-edit-icon ${prefix}-icon"></div>'),
         action: function () {
           webapp.run(function (w) {
             w.setReadOnly(false);
@@ -11454,7 +11303,7 @@ var mobile = (function (exports) {
     };
     var makeSocket = function () {
       return build$1(Container.sketch({
-        dom: dom$2('<div class="${prefix}-editor-socket"></div>'),
+        dom: dom$1('<div class="${prefix}-editor-socket"></div>'),
         components: [],
         containerBehaviours: derive$1([Replacing.config({})])
       }));
@@ -11558,6 +11407,13 @@ var mobile = (function (exports) {
       slideState.setExpanded();
       slideConfig.onStartGrow(component);
     };
+    var refresh = function (component, slideConfig, slideState) {
+      if (slideState.isExpanded()) {
+        remove$5(component.element(), getDimensionProperty(slideConfig));
+        var fullSize = getDimension(slideConfig, component.element());
+        set$3(component.element(), getDimensionProperty(slideConfig), fullSize);
+      }
+    };
     var grow = function (component, slideConfig, slideState) {
       if (!slideState.isExpanded()) {
         doStartGrow(component, slideConfig, slideState);
@@ -11596,6 +11452,7 @@ var mobile = (function (exports) {
     };
 
     var SlidingApis = /*#__PURE__*/Object.freeze({
+        refresh: refresh,
         grow: grow,
         shrink: shrink,
         immediateShrink: immediateShrink,
@@ -11615,7 +11472,7 @@ var mobile = (function (exports) {
         styles: {}
       }) : nu$5({
         classes: [slideConfig.closedClass],
-        styles: wrap$2(slideConfig.dimension.property, '0px')
+        styles: wrap$1(slideConfig.dimension.property, '0px')
       });
     };
     var events$a = function (slideConfig, slideState) {
@@ -11650,15 +11507,15 @@ var mobile = (function (exports) {
       defaulted$1('expanded', false),
       strictOf('dimension', choose$1('property', {
         width: [
-          output$1('property', 'width'),
-          output$1('getDimension', function (elem) {
-            return get$7(elem) + 'px';
+          output('property', 'width'),
+          output('getDimension', function (elem) {
+            return get$6(elem) + 'px';
           })
         ],
         height: [
-          output$1('property', 'height'),
-          output$1('getDimension', function (elem) {
-            return get$5(elem) + 'px';
+          output('property', 'height'),
+          output('getDimension', function (elem) {
+            return get$4(elem) + 'px';
           })
         ]
       }))
@@ -11726,7 +11583,7 @@ var mobile = (function (exports) {
       }));
       var appear = function (menu, update, component) {
         if (Sliding.hasShrunk(dropup) === true && Sliding.isTransitioning(dropup) === false) {
-          window.requestAnimationFrame(function () {
+          domGlobals.window.requestAnimationFrame(function () {
             update(component);
             Replacing.set(dropup, [menu()]);
             Sliding.grow(dropup);
@@ -11734,7 +11591,7 @@ var mobile = (function (exports) {
         }
       };
       var disappear = function (onReadyToShrink) {
-        window.requestAnimationFrame(function () {
+        domGlobals.window.requestAnimationFrame(function () {
           onReadyToShrink();
           Sliding.shrink(dropup);
         });
@@ -11747,16 +11604,16 @@ var mobile = (function (exports) {
       };
     };
 
-    var closest$4 = function (scope, selector, isRoot) {
-      return closest$3(scope, selector, isRoot).isSome();
+    var closest$3 = function (scope, selector, isRoot) {
+      return closest$2(scope, selector, isRoot).isSome();
     };
 
-    var isDangerous = function (event$$1) {
-      var keyEv = event$$1.raw();
+    var isDangerous = function (event) {
+      var keyEv = event.raw();
       return keyEv.which === BACKSPACE()[0] && !contains([
         'input',
         'textarea'
-      ], name(event$$1.target())) && !closest$4(event$$1.target(), '[contenteditable="true"]');
+      ], name(event.target())) && !closest$3(event.target(), '[contenteditable="true"]');
     };
     var isFirefox = PlatformDetection$1.detect().browser.isFirefox();
     var settingsSchema = objOfOnly([
@@ -11807,56 +11664,56 @@ var mobile = (function (exports) {
         'dragover',
         'drop',
         'keyup'
-      ]), function (type$$1) {
-        return bind$3(container, type$$1, function (event$$1) {
-          tapEvent.fireIfReady(event$$1, type$$1).each(function (tapStopped) {
+      ]), function (type) {
+        return bind$3(container, type, function (event) {
+          tapEvent.fireIfReady(event, type).each(function (tapStopped) {
             if (tapStopped) {
-              event$$1.kill();
+              event.kill();
             }
           });
-          var stopped = settings.triggerEvent(type$$1, event$$1);
+          var stopped = settings.triggerEvent(type, event);
           if (stopped) {
-            event$$1.kill();
+            event.kill();
           }
         });
       });
       var pasteTimeout = Cell(Option.none());
-      var onPaste = bind$3(container, 'paste', function (event$$1) {
-        tapEvent.fireIfReady(event$$1, 'paste').each(function (tapStopped) {
+      var onPaste = bind$3(container, 'paste', function (event) {
+        tapEvent.fireIfReady(event, 'paste').each(function (tapStopped) {
           if (tapStopped) {
-            event$$1.kill();
+            event.kill();
           }
         });
-        var stopped = settings.triggerEvent('paste', event$$1);
+        var stopped = settings.triggerEvent('paste', event);
         if (stopped) {
-          event$$1.kill();
+          event.kill();
         }
-        pasteTimeout.set(Option.some(setTimeout(function () {
-          settings.triggerEvent(postPaste(), event$$1);
+        pasteTimeout.set(Option.some(domGlobals.setTimeout(function () {
+          settings.triggerEvent(postPaste(), event);
         }, 0)));
       });
-      var onKeydown = bind$3(container, 'keydown', function (event$$1) {
-        var stopped = settings.triggerEvent('keydown', event$$1);
+      var onKeydown = bind$3(container, 'keydown', function (event) {
+        var stopped = settings.triggerEvent('keydown', event);
         if (stopped) {
-          event$$1.kill();
-        } else if (settings.stopBackspace === true && isDangerous(event$$1)) {
-          event$$1.prevent();
+          event.kill();
+        } else if (settings.stopBackspace === true && isDangerous(event)) {
+          event.prevent();
         }
       });
-      var onFocusIn = bindFocus(container, function (event$$1) {
-        var stopped = settings.triggerEvent('focusin', event$$1);
+      var onFocusIn = bindFocus(container, function (event) {
+        var stopped = settings.triggerEvent('focusin', event);
         if (stopped) {
-          event$$1.kill();
+          event.kill();
         }
       });
       var focusoutTimeout = Cell(Option.none());
-      var onFocusOut = bindBlur(container, function (event$$1) {
-        var stopped = settings.triggerEvent('focusout', event$$1);
+      var onFocusOut = bindBlur(container, function (event) {
+        var stopped = settings.triggerEvent('focusout', event);
         if (stopped) {
-          event$$1.kill();
+          event.kill();
         }
-        focusoutTimeout.set(Option.some(setTimeout(function () {
-          settings.triggerEvent(postBlur(), event$$1);
+        focusoutTimeout.set(Option.some(domGlobals.setTimeout(function () {
+          settings.triggerEvent(postBlur(), event);
         }, 0)));
       });
       var unbind = function () {
@@ -11867,8 +11724,8 @@ var mobile = (function (exports) {
         onFocusIn.unbind();
         onFocusOut.unbind();
         onPaste.unbind();
-        pasteTimeout.get().each(clearTimeout);
-        focusoutTimeout.get().each(clearTimeout);
+        pasteTimeout.get().each(domGlobals.clearTimeout);
+        focusoutTimeout.get().each(domGlobals.clearTimeout);
       };
       return { unbind: unbind };
     };
@@ -11940,9 +11797,9 @@ var mobile = (function (exports) {
           return parent(handlerInfo.element()).fold(function () {
             logger.logNoParent(eventType, handlerInfo.element(), descHandler.purpose());
             return adt$6.complete();
-          }, function (parent$$1) {
+          }, function (parent) {
             logger.logEventResponse(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.resume(parent$$1);
+            return adt$6.resume(parent);
           });
         }
       });
@@ -11950,8 +11807,8 @@ var mobile = (function (exports) {
     var doTriggerOnUntilStopped = function (lookup, eventType, rawEvent, rawTarget, source, logger) {
       return doTriggerHandler(lookup, eventType, rawEvent, rawTarget, source, logger).fold(function () {
         return true;
-      }, function (parent$$1) {
-        return doTriggerOnUntilStopped(lookup, eventType, rawEvent, parent$$1, source, logger);
+      }, function (parent) {
+        return doTriggerOnUntilStopped(lookup, eventType, rawEvent, parent, source, logger);
       }, function () {
         return false;
       });
@@ -12011,7 +11868,7 @@ var mobile = (function (exports) {
           });
         }).getOr([]);
       };
-      var find$$1 = function (isAboveRoot, type, target) {
+      var find = function (isAboveRoot, type, target) {
         var readType = readOpt$1(type);
         var handlers = readType(registry);
         return closest$1(target, function (elem) {
@@ -12029,7 +11886,7 @@ var mobile = (function (exports) {
         registerId: registerId,
         unregisterId: unregisterId,
         filterByType: filterByType,
-        find: find$$1
+        find: find
       };
     }
 
@@ -12089,8 +11946,8 @@ var mobile = (function (exports) {
       var isAboveRoot = function (el) {
         return parent(root.element()).fold(function () {
           return true;
-        }, function (parent$$1) {
-          return eq(el, parent$$1);
+        }, function (parent) {
+          return eq(el, parent);
         });
       };
       var registry = Registry();
@@ -12113,10 +11970,10 @@ var mobile = (function (exports) {
         },
         triggerFocus: function (target, originator) {
           read$2(target).fold(function () {
-            focus$2(target);
+            focus$1(target);
           }, function (_alloyId) {
-            monitorEvent(focus$1(), target, function (logger) {
-              triggerHandler(lookup, focus$1(), {
+            monitorEvent(focus(), target, function (logger) {
+              triggerHandler(lookup, focus(), {
                 originator: constant(originator),
                 kill: noop,
                 prevent: noop,
@@ -12139,7 +11996,7 @@ var mobile = (function (exports) {
           add(c);
         },
         removeFromGui: function (c) {
-          remove$$1(c);
+          remove$1(c);
         },
         addToWorld: function (c) {
           addToWorld(c);
@@ -12148,7 +12005,7 @@ var mobile = (function (exports) {
           removeFromWorld(c);
         },
         broadcast: function (message) {
-          broadcast$$1(message);
+          broadcast$1(message);
         },
         broadcastOn: function (channels, message) {
           broadcastOn(channels, message);
@@ -12176,7 +12033,7 @@ var mobile = (function (exports) {
       var add = function (component) {
         attach(root, component);
       };
-      var remove$$1 = function (component) {
+      var remove$1 = function (component) {
         detach(component);
       };
       var destroy = function () {
@@ -12191,7 +12048,7 @@ var mobile = (function (exports) {
           handler(data);
         });
       };
-      var broadcast$$1 = function (message) {
+      var broadcast$1 = function (message) {
         broadcastData({
           universal: constant(true),
           data: constant(message)
@@ -12223,12 +12080,12 @@ var mobile = (function (exports) {
         element: root.element,
         destroy: destroy,
         add: add,
-        remove: remove$$1,
+        remove: remove$1,
         getByUid: getByUid,
         getByDom: getByDom,
         addToWorld: addToWorld,
         removeFromWorld: removeFromWorld,
-        broadcast: broadcast$$1,
+        broadcast: broadcast$1,
         broadcastOn: broadcastOn,
         broadcastEvent: broadcastEvent
       };
@@ -12299,7 +12156,7 @@ var mobile = (function (exports) {
     }
 
     var input$1 = function (parent, operation) {
-      var input = Element$$1.fromTag('input');
+      var input = Element.fromTag('input');
       setAll$1(input, {
         opacity: '0',
         position: 'absolute',
@@ -12307,7 +12164,7 @@ var mobile = (function (exports) {
         left: '-1000px'
       });
       append(parent, input);
-      focus$2(input);
+      focus$1(input);
       operation(input);
       remove(input);
     };
@@ -12319,10 +12176,10 @@ var mobile = (function (exports) {
       var dir = input.dom().selectionDirection;
       setTimeout(function () {
         input.dom().setSelectionRange(start, end, dir);
-        focus$2(input);
+        focus$1(input);
       }, 50);
     };
-    var refresh = function (winScope) {
+    var refresh$1 = function (winScope) {
       var sel = winScope.getSelection();
       if (sel.rangeCount > 0) {
         var br = sel.getRangeAt(0);
@@ -12335,17 +12192,17 @@ var mobile = (function (exports) {
     };
     var CursorRefresh = {
       refreshInput: refreshInput,
-      refresh: refresh
+      refresh: refresh$1
     };
 
     var resume$1 = function (cWin, frame) {
-      active().each(function (active$$1) {
-        if (!eq(active$$1, frame)) {
-          blur$$1(active$$1);
+      active().each(function (active) {
+        if (!eq(active, frame)) {
+          blur(active);
         }
       });
       cWin.focus();
-      focus$2(Element$$1.fromDom(cWin.document.body));
+      focus$1(Element.fromDom(cWin.document.body));
       CursorRefresh.refresh(cWin);
     };
     var ResumeEditing$1 = { resume: resume$1 };
@@ -12355,7 +12212,7 @@ var mobile = (function (exports) {
         ResumeEditing$1.resume(cWin, frame);
       };
       var toReading = function () {
-        CaptureBin.input(outerBody, blur$$1);
+        CaptureBin.input(outerBody, blur);
       };
       var captureInput = bind$3(page, 'keydown', function (evt) {
         if (!contains([
@@ -12379,7 +12236,7 @@ var mobile = (function (exports) {
     };
     var timid = function (outerBody, cWin, page, frame) {
       var dismissKeyboard = function () {
-        blur$$1(frame);
+        blur(frame);
       };
       var onToolbarTouch = function () {
         dismissKeyboard();
@@ -12443,7 +12300,7 @@ var mobile = (function (exports) {
         });
       };
       var reposition = function () {
-        var toolbarHeight = get$5(toolstrip);
+        var toolbarHeight = get$4(toolstrip);
         iosApi.run(function (api) {
           api.setViewportOffset(toolbarHeight);
         });
@@ -12466,7 +12323,7 @@ var mobile = (function (exports) {
         });
       };
       var tapping = TappingEvent.monitor(editorApi);
-      var refreshThrottle = last$3(refreshView, 300);
+      var refreshThrottle = last$1(refreshView, 300);
       var listeners = [
         editorApi.onKeyup(clearAndRefresh),
         editorApi.onNodeChanged(refreshIosSelection),
@@ -12519,16 +12376,16 @@ var mobile = (function (exports) {
 
     function FakeSelection (win, frame) {
       var doc = win.document;
-      var container = Element$$1.fromTag('div');
+      var container = Element.fromTag('div');
       add$2(container, Styles.resolve('unfocused-selections'));
-      append(Element$$1.fromDom(doc.documentElement), container);
+      append(Element.fromDom(doc.documentElement), container);
       var onTouch = bind$3(container, 'touchstart', function (event) {
         event.prevent();
         ResumeEditing$1.resume(win, frame);
         clear();
       });
       var make = function (rectangle) {
-        var span = Element$$1.fromTag('span');
+        var span = Element.fromTag('span');
         add$3(span, [
           Styles.resolve('layer-editor'),
           Styles.resolve('unfocused-selection')
@@ -12695,7 +12552,7 @@ var mobile = (function (exports) {
         return Option.some(value - amount);
       }
     };
-    var create$7 = function () {
+    var create$5 = function () {
       var interval = null;
       var animate = function (getCurrent, destination, amount, increment, doFinish, rate) {
         var finished = false;
@@ -12728,7 +12585,7 @@ var mobile = (function (exports) {
       return { animate: animate };
     };
     var SmoothAnimation = {
-      create: create$7,
+      create: create$5,
       adjust: adjust
     };
 
@@ -12804,13 +12661,13 @@ var mobile = (function (exports) {
     };
     var getGreenzone = function (socket, dropup) {
       var outerWindow = owner(socket).dom().defaultView;
-      var viewportHeight = get$5(socket) + get$5(dropup);
+      var viewportHeight = get$4(socket) + get$4(dropup);
       var acc = accountableKeyboardHeight(outerWindow);
       return viewportHeight - acc;
     };
     var updatePadding = function (contentBody, socket, dropup) {
       var greenzoneHeight = getGreenzone(socket, dropup);
-      var deltaHeight = get$5(socket) + get$5(dropup) - greenzoneHeight;
+      var deltaHeight = get$4(socket) + get$4(dropup) - greenzoneHeight;
       set$3(contentBody, 'padding-bottom', deltaHeight + 'px');
     };
     var DeviceZones = {
@@ -12841,7 +12698,7 @@ var mobile = (function (exports) {
       return DataAttributes.safeParse(element, yFixedData);
     };
     var getYFixedProperty = function (element) {
-      return get$1(element, yFixedProperty);
+      return get(element, yFixedProperty);
     };
     var getLastWindowSize = function (element) {
       return DataAttributes.safeParse(element, windowSizeData);
@@ -12855,15 +12712,15 @@ var mobile = (function (exports) {
     };
     var classify = function (element) {
       var offsetY = getYFixedData(element);
-      var classifier = get$1(element, yScrollingData) === 'true' ? classifyScrolling : classifyFixed;
+      var classifier = get(element, yScrollingData) === 'true' ? classifyScrolling : classifyFixed;
       return classifier(element, offsetY);
     };
     var findFixtures = function (container) {
-      var candidates = descendants$1(container, '[' + yFixedData + ']');
+      var candidates = descendants(container, '[' + yFixedData + ']');
       return map$1(candidates, classify);
     };
     var takeoverToolbar = function (toolbar) {
-      var oldToolbarStyle = get$1(toolbar, 'style');
+      var oldToolbarStyle = get(toolbar, 'style');
       setAll$1(toolbar, {
         position: 'absolute',
         top: '0px'
@@ -12878,7 +12735,7 @@ var mobile = (function (exports) {
       return { restore: restore };
     };
     var takeoverViewport = function (toolbarHeight, height, viewport) {
-      var oldViewportStyle = get$1(viewport, 'style');
+      var oldViewportStyle = get(viewport, 'style');
       Scrollable.register(viewport);
       setAll$1(viewport, {
         position: 'absolute',
@@ -12899,7 +12756,7 @@ var mobile = (function (exports) {
       return { restore: restore };
     };
     var takeoverDropup = function (dropup, toolbarHeight, viewportHeight) {
-      var oldDropupStyle = get$1(dropup, 'style');
+      var oldDropupStyle = get(dropup, 'style');
       setAll$1(dropup, {
         position: 'absolute',
         bottom: '0px'
@@ -12922,8 +12779,8 @@ var mobile = (function (exports) {
     var takeover$1 = function (viewport, contentBody, toolbar, dropup) {
       var outerWindow = owner(viewport).dom().defaultView;
       var toolbarSetup = takeoverToolbar(toolbar);
-      var toolbarHeight = get$5(toolbar);
-      var dropupHeight = get$5(dropup);
+      var toolbarHeight = get$4(toolbar);
+      var dropupHeight = get$4(dropup);
       var viewportHeight = deriveViewportHeight(viewport, toolbarHeight, dropupHeight);
       var viewportSetup = takeoverViewport(toolbarHeight, viewportHeight, viewport);
       var dropupSetup = takeoverDropup(dropup, toolbarHeight, viewportHeight);
@@ -12941,8 +12798,8 @@ var mobile = (function (exports) {
       };
       var refresh = function () {
         if (isActive) {
-          var newToolbarHeight = get$5(toolbar);
-          var dropupHeight_1 = get$5(dropup);
+          var newToolbarHeight = get$4(toolbar);
+          var dropupHeight_1 = get$4(dropup);
           var newHeight = deriveViewportHeight(viewport, newToolbarHeight, dropupHeight_1);
           set(viewport, yFixedData, newToolbarHeight + 'px');
           set$3(viewport, 'height', newHeight + 'px');
@@ -13156,7 +13013,7 @@ var mobile = (function (exports) {
           }) : Option.none();
         });
       };
-      var scrollThrottle = last$3(function () {
+      var scrollThrottle = last$1(function () {
         scroller.idle(function () {
           IosUpdates.updatePositions(container, outerWindow.pageYOffset).get(function () {
             var extraScroll = scrollBounds();
@@ -13168,7 +13025,7 @@ var mobile = (function (exports) {
           });
         });
       }, 1000);
-      var onScroll = bind$3(Element$$1.fromDom(outerWindow), 'scroll', function () {
+      var onScroll = bind$3(Element.fromDom(outerWindow), 'scroll', function () {
         if (outerWindow.pageYOffset < 0) {
           return;
         }
@@ -13206,7 +13063,7 @@ var mobile = (function (exports) {
       onOrientation.onAdjustment(function () {
         structure.refresh();
       });
-      var onResize = bind$3(Element$$1.fromDom(outerWindow), 'resize', function () {
+      var onResize = bind$3(Element.fromDom(outerWindow), 'resize', function () {
         if (structure.isExpanding()) {
           structure.refresh();
         }
@@ -13241,7 +13098,7 @@ var mobile = (function (exports) {
         onResize.unbind();
         keyboardModel.destroy();
         unfocusedSelection.destroy();
-        CaptureBin.input(body(), blur$$1);
+        CaptureBin.input(body(), blur);
       };
       return {
         toEditing: toEditing,
@@ -13260,20 +13117,20 @@ var mobile = (function (exports) {
     };
     var IosSetup = { setup: setup$3 };
 
-    var create$8 = function (platform, mask) {
+    var create$6 = function (platform, mask) {
       var meta = MetaViewport.tag();
-      var priorState = value$3();
-      var scrollEvents = value$3();
+      var priorState = value$2();
+      var scrollEvents = value$2();
       var iosApi = api$2();
       var iosEvents = api$2();
       var enter = function () {
         mask.hide();
-        var doc = Element$$1.fromDom(document);
+        var doc = Element.fromDom(domGlobals.document);
         PlatformEditor.getActiveApi(platform.editor).each(function (editorApi) {
           priorState.set({
             socketHeight: getRaw(platform.socket, 'height'),
             iframeHeight: getRaw(editorApi.frame(), 'height'),
-            outerScroll: document.body.scrollTop
+            outerScroll: domGlobals.document.body.scrollTop
           });
           scrollEvents.set({ exclusives: Scrollables.exclusive(doc, '.' + Scrollable.scrollable()) });
           add$2(platform.container, Styles.resolve('fullscreen-maximized'));
@@ -13281,7 +13138,7 @@ var mobile = (function (exports) {
           meta.maximize();
           set$3(platform.socket, 'overflow', 'scroll');
           set$3(platform.socket, '-webkit-overflow-scrolling', 'touch');
-          focus$2(editorApi.body());
+          focus$1(editorApi.body());
           var setupBag = MixedBag([
             'cWin',
             'ceBody',
@@ -13333,7 +13190,7 @@ var mobile = (function (exports) {
           s.iframeHeight.each(function (h) {
             set$3(platform.editor.getFrame(), 'height', h);
           });
-          document.body.scrollTop = s.scrollTop;
+          domGlobals.document.body.scrollTop = s.scrollTop;
         });
         priorState.clear();
         scrollEvents.on(function (s) {
@@ -13345,7 +13202,7 @@ var mobile = (function (exports) {
         Scrollable.deregister(platform.toolbar);
         remove$5(platform.socket, 'overflow');
         remove$5(platform.socket, '-webkit-overflow-scrolling');
-        blur$$1(platform.editor.getFrame());
+        blur(platform.editor.getFrame());
         PlatformEditor.getActiveApi(platform.editor).each(function (editorApi) {
           editorApi.clearSelection();
         });
@@ -13361,7 +13218,7 @@ var mobile = (function (exports) {
         exit: exit
       };
     };
-    var IosMode = { create: create$8 };
+    var IosMode = { create: create$6 };
 
     var produce$1 = function (raw) {
       var mobile = asRawOrDie('Getting IosWebapp schema', MobileSchema, raw);
@@ -13526,9 +13383,9 @@ var mobile = (function (exports) {
         var doScrollIntoView = function () {
           editor.fire('scrollIntoView');
         };
-        var wrapper = Element$$1.fromTag('div');
+        var wrapper = Element.fromTag('div');
         var realm = PlatformDetection$1.detect().os.isAndroid() ? AndroidRealm(doScrollIntoView) : IosRealm(doScrollIntoView);
-        var original = Element$$1.fromDom(targetNode);
+        var original = Element.fromDom(targetNode);
         after(original, wrapper);
         attachSystem(wrapper, realm.system());
         var findFocusIn = function (elem) {
@@ -13574,7 +13431,7 @@ var mobile = (function (exports) {
           realm.init({
             editor: {
               getFrame: function () {
-                return Element$$1.fromDom(editor.contentAreaContainer.querySelector('iframe'));
+                return Element.fromDom(editor.contentAreaContainer.querySelector('iframe'));
               },
               onDomChanged: function () {
                 return { unbind: noop };
@@ -13599,7 +13456,7 @@ var mobile = (function (exports) {
                 hideDropup();
               },
               onTouchContent: function () {
-                var toolbar = Element$$1.fromDom(editor.editorContainer.querySelector('.' + Styles.resolve('toolbar')));
+                var toolbar = Element.fromDom(editor.editorContainer.querySelector('.' + Styles.resolve('toolbar')));
                 findFocusIn(toolbar).each(emitExecute);
                 realm.restoreToolbar();
                 hideDropup();
@@ -13610,7 +13467,7 @@ var mobile = (function (exports) {
                   editor.selection.select(target.dom());
                   evt.kill();
                 } else if (name(target) === 'a') {
-                  var component = realm.system().getByDom(Element$$1.fromDom(editor.editorContainer));
+                  var component = realm.system().getByDom(Element.fromDom(editor.editorContainer));
                   component.each(function (container) {
                     if (Swapping.isAlpha(container)) {
                       TinyCodeDupe.openLink(target.dom());
@@ -13619,10 +13476,10 @@ var mobile = (function (exports) {
                 }
               }
             },
-            container: Element$$1.fromDom(editor.editorContainer),
-            socket: Element$$1.fromDom(editor.contentAreaContainer),
-            toolstrip: Element$$1.fromDom(editor.editorContainer.querySelector('.' + Styles.resolve('toolstrip'))),
-            toolbar: Element$$1.fromDom(editor.editorContainer.querySelector('.' + Styles.resolve('toolbar'))),
+            container: Element.fromDom(editor.editorContainer),
+            socket: Element.fromDom(editor.contentAreaContainer),
+            toolstrip: Element.fromDom(editor.editorContainer.querySelector('.' + Styles.resolve('toolstrip'))),
+            toolbar: Element.fromDom(editor.editorContainer.querySelector('.' + Styles.resolve('toolbar'))),
             dropup: realm.dropup(),
             alloy: realm.system(),
             translate: noop,
@@ -13713,5 +13570,5 @@ var mobile = (function (exports) {
 
     return exports;
 
-}({}));
+}({}, window));
 })();

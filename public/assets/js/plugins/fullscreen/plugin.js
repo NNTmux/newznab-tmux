@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var fullscreen = (function () {
+var fullscreen = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -50,8 +50,8 @@ var fullscreen = (function () {
     var getWindowSize = function () {
       var w;
       var h;
-      var win = window;
-      var doc = document;
+      var win = domGlobals.window;
+      var doc = domGlobals.document;
       var body = doc.body;
       if (body.offsetWidth) {
         w = body.offsetWidth;
@@ -74,11 +74,11 @@ var fullscreen = (function () {
       };
     };
     var setScrollPos = function (pos) {
-      window.scrollTo(pos.x, pos.y);
+      domGlobals.window.scrollTo(pos.x, pos.y);
     };
     var toggleFullscreen = function (editor, fullscreenState) {
-      var body = document.body;
-      var documentElement = document.documentElement;
+      var body = domGlobals.document.body;
+      var documentElement = domGlobals.document.documentElement;
       var editorContainerStyle;
       var editorContainer, iframe, iframeStyle;
       var fullscreenInfo = fullscreenState.get();
@@ -86,7 +86,7 @@ var fullscreen = (function () {
         DOM.setStyle(iframe, 'height', getWindowSize().h - (editorContainer.clientHeight - iframe.clientHeight));
       };
       var removeResize = function () {
-        DOM.unbind(window, 'resize', resize);
+        DOM.unbind(domGlobals.window, 'resize', resize);
       };
       editorContainer = editor.getContainer();
       editorContainerStyle = editorContainer.style;
@@ -107,7 +107,7 @@ var fullscreen = (function () {
         DOM.addClass(body, 'tox-fullscreen');
         DOM.addClass(documentElement, 'tox-fullscreen');
         DOM.addClass(editorContainer, 'tox-fullscreen');
-        DOM.bind(window, 'resize', resize);
+        DOM.bind(domGlobals.window, 'resize', resize);
         editor.on('remove', removeResize);
         resize();
         fullscreenState.set(newFullScreenInfo);
@@ -125,7 +125,7 @@ var fullscreen = (function () {
         DOM.removeClass(documentElement, 'tox-fullscreen');
         DOM.removeClass(editorContainer, 'tox-fullscreen');
         setScrollPos(fullscreenInfo.scrollPos);
-        DOM.unbind(window, 'resize', fullscreenInfo.resizeHandler);
+        DOM.unbind(domGlobals.window, 'resize', fullscreenInfo.resizeHandler);
         editor.off('remove', fullscreenInfo.removeHandler);
         fullscreenState.set(null);
         Events.fireFullscreenStateChanged(editor, false);
@@ -187,5 +187,5 @@ var fullscreen = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

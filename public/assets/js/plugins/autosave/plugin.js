@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var autosave = (function () {
+var autosave = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -59,9 +59,9 @@ var autosave = (function () {
     };
     var getAutoSavePrefix = function (editor) {
       var prefix = editor.getParam('autosave_prefix', 'tinymce-autosave-{path}{query}{hash}-{id}-');
-      prefix = prefix.replace(/\{path\}/g, document.location.pathname);
-      prefix = prefix.replace(/\{query\}/g, document.location.search);
-      prefix = prefix.replace(/\{hash\}/g, document.location.hash);
+      prefix = prefix.replace(/\{path\}/g, domGlobals.document.location.pathname);
+      prefix = prefix.replace(/\{query\}/g, domGlobals.document.location.search);
+      prefix = prefix.replace(/\{hash\}/g, domGlobals.document.location.hash);
       prefix = prefix.replace(/\{id\}/g, editor.id);
       return prefix;
     };
@@ -173,7 +173,7 @@ var autosave = (function () {
       return msg;
     };
     var setup = function (editor) {
-      window.onbeforeunload = global$3._beforeUnloadHandler;
+      domGlobals.window.onbeforeunload = global$3._beforeUnloadHandler;
     };
 
     var makeSetupHandler = function (editor, started) {
@@ -224,5 +224,5 @@ var autosave = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

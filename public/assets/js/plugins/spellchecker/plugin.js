@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var spellchecker = (function () {
+var spellchecker = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -32,8 +32,8 @@ var spellchecker = (function () {
 
     var hasProPlugin = function (editor) {
       if (/(^|[ ,])tinymcespellchecker([, ]|$)/.test(editor.settings.plugins) && global.get('tinymcespellchecker')) {
-        if (typeof window.console !== 'undefined' && window.console.log) {
-          window.console.log('Spell Checker Pro is incompatible with Spell Checker plugin! ' + 'Remove \'spellchecker\' from the \'plugins\' option.');
+        if (typeof domGlobals.window.console !== 'undefined' && domGlobals.window.console.log) {
+          domGlobals.window.console.log('Spell Checker Pro is incompatible with Spell Checker plugin! ' + 'Remove \'spellchecker\' from the \'plugins\' option.');
         }
         return true;
       } else {
@@ -768,5 +768,5 @@ var spellchecker = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

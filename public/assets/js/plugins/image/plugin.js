@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var image = (function () {
+var image = (function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -43,13 +43,13 @@ var image = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -65,17 +65,17 @@ var image = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -209,6 +209,9 @@ var image = (function () {
       return r;
     };
     var slice = Array.prototype.slice;
+    var head = function (xs) {
+      return xs.length === 0 ? Option.none() : Option.some(xs[0]);
+    };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -229,7 +232,7 @@ var image = (function () {
     var nu = function (baseFn) {
       var data = Option.none();
       var callbacks = [];
-      var map$$1 = function (f) {
+      var map = function (f) {
         return nu(function (nCallback) {
           get(function (data) {
             nCallback(f(data));
@@ -263,18 +266,18 @@ var image = (function () {
       baseFn(set);
       return {
         get: get,
-        map: map$$1,
+        map: map,
         isReady: isReady
       };
     };
-    var pure$1 = function (a) {
+    var pure = function (a) {
       return nu(function (callback) {
         callback(a);
       });
     };
     var LazyValue = {
       nu: nu,
-      pure: pure$1
+      pure: pure
     };
 
     var bounce = function (f) {
@@ -337,14 +340,14 @@ var image = (function () {
         get: get
       };
     };
-    var pure$2 = function (a) {
+    var pure$1 = function (a) {
       return nu$1(function (callback) {
         callback(a);
       });
     };
     var Future = {
       nu: nu$1,
-      pure: pure$2
+      pure: pure$1
     };
 
     var value = function (o) {
@@ -756,7 +759,7 @@ var image = (function () {
       return Math.max(parseInt(val1, 10), parseInt(val2, 10));
     };
     var getImageSize = function (url, callback) {
-      var img = document.createElement('img');
+      var img = domGlobals.document.createElement('img');
       function done(dimensions) {
         if (img.parentNode) {
           img.parentNode.removeChild(img);
@@ -780,7 +783,7 @@ var image = (function () {
       style.position = 'fixed';
       style.bottom = style.left = '0px';
       style.width = style.height = 'auto';
-      document.body.appendChild(img);
+      domGlobals.document.body.appendChild(img);
       img.src = url;
     };
     var buildListItems = function (inputList, itemCallback, startItems) {
@@ -925,21 +928,21 @@ var image = (function () {
         return '';
       }
     };
-    var getAttrib = function (image, name$$1) {
-      if (image.hasAttribute(name$$1)) {
-        return image.getAttribute(name$$1);
+    var getAttrib = function (image, name) {
+      if (image.hasAttribute(name)) {
+        return image.getAttribute(name);
       } else {
         return '';
       }
     };
-    var getStyle = function (image, name$$1) {
-      return image.style[name$$1] ? image.style[name$$1] : '';
+    var getStyle = function (image, name) {
+      return image.style[name] ? image.style[name] : '';
     };
     var hasCaption = function (image) {
       return image.parentNode !== null && image.parentNode.nodeName === 'FIGURE';
     };
-    var setAttrib = function (image, name$$1, value) {
-      image.setAttribute(name$$1, value);
+    var setAttrib = function (image, name, value) {
+      image.setAttribute(name, value);
     };
     var wrapInFigure = function (image) {
       var figureElm = DOM.create('figure', { class: 'image' });
@@ -970,21 +973,21 @@ var image = (function () {
         image.removeAttribute('style');
       }
     };
-    var setSize = function (name$$1, normalizeCss) {
-      return function (image, name$$1, value) {
-        if (image.style[name$$1]) {
-          image.style[name$$1] = Utils.addPixelSuffix(value);
+    var setSize = function (name, normalizeCss) {
+      return function (image, name, value) {
+        if (image.style[name]) {
+          image.style[name] = Utils.addPixelSuffix(value);
           normalizeStyle(image, normalizeCss);
         } else {
-          setAttrib(image, name$$1, value);
+          setAttrib(image, name, value);
         }
       };
     };
-    var getSize = function (image, name$$1) {
-      if (image.style[name$$1]) {
-        return Utils.removePixelSuffix(image.style[name$$1]);
+    var getSize = function (image, name) {
+      if (image.style[name]) {
+        return Utils.removePixelSuffix(image.style[name]);
       } else {
-        return getAttrib(image, name$$1);
+        return getAttrib(image, name);
       }
     };
     var setHspace = function (image, value) {
@@ -1030,7 +1033,7 @@ var image = (function () {
       };
     };
     var getStyleValue = function (normalizeCss, data) {
-      var image = document.createElement('img');
+      var image = domGlobals.document.createElement('img');
       setAttrib(image, 'style', data.style);
       if (getHspace(image) || data.hspace !== '') {
         setHspace(image, data.hspace);
@@ -1047,7 +1050,7 @@ var image = (function () {
       return normalizeCss(image.getAttribute('style'));
     };
     var create = function (normalizeCss, data) {
-      var image = document.createElement('img');
+      var image = domGlobals.document.createElement('img');
       write(normalizeCss, merge(data, { caption: false }), image);
       setAttrib(image, 'alt', data.alt);
       if (data.caption) {
@@ -1076,13 +1079,13 @@ var image = (function () {
         borderStyle: getStyle(image, 'borderStyle')
       };
     };
-    var updateProp = function (image, oldData, newData, name$$1, set) {
-      if (newData[name$$1] !== oldData[name$$1]) {
-        set(image, name$$1, newData[name$$1]);
+    var updateProp = function (image, oldData, newData, name, set) {
+      if (newData[name] !== oldData[name]) {
+        set(image, name, newData[name]);
       }
     };
     var normalized = function (set, normalizeCss) {
-      return function (image, name$$1, value) {
+      return function (image, name, value) {
         set(image, value);
         normalizeStyle(image, normalizeCss);
       };
@@ -1313,7 +1316,7 @@ var image = (function () {
           }
           success(pathJoin(settings.basePath, json.location));
         };
-        formData = new FormData();
+        formData = new domGlobals.FormData();
         formData.append('file', blobInfo.blob(), blobInfo.filename());
         xhr.send(formData);
       };
@@ -1701,33 +1704,36 @@ var image = (function () {
     var changeFileInput = function (helpers, info, state, api) {
       var data = api.getData();
       api.block('Uploading image');
-      var file = data.fileinput[0];
-      var blobUri = URL.createObjectURL(file);
-      var uploader = Uploader({
-        url: info.url,
-        basePath: info.basePath,
-        credentials: info.credentials,
-        handler: info.handler
-      });
-      var finalize = function () {
+      head(data.fileinput).fold(function () {
         api.unblock();
-        URL.revokeObjectURL(blobUri);
-      };
-      Utils.blobToDataUri(file).then(function (dataUrl) {
-        var blobInfo = helpers.createBlobCache(file, blobUri, dataUrl);
-        uploader.upload(blobInfo).then(function (url) {
-          api.setData({
-            src: {
-              value: url,
-              meta: {}
-            }
+      }, function (file) {
+        var blobUri = URL.createObjectURL(file);
+        var uploader = Uploader({
+          url: info.url,
+          basePath: info.basePath,
+          credentials: info.credentials,
+          handler: info.handler
+        });
+        var finalize = function () {
+          api.unblock();
+          URL.revokeObjectURL(blobUri);
+        };
+        Utils.blobToDataUri(file).then(function (dataUrl) {
+          var blobInfo = helpers.createBlobCache(file, blobUri, dataUrl);
+          uploader.upload(blobInfo).then(function (url) {
+            api.setData({
+              src: {
+                value: url,
+                meta: {}
+              }
+            });
+            api.showTab('General');
+            changeSrc(helpers, info, state, api);
+            finalize();
+          }).catch(function (err) {
+            finalize();
+            helpers.alertErr(api, err);
           });
-          api.showTab('General');
-          changeSrc(helpers, info, state, api);
-          finalize();
-        }).catch(function (err) {
-          finalize();
-          helpers.alertErr(api, err);
         });
       });
     };
@@ -1907,22 +1913,22 @@ var image = (function () {
     var FilterContent = { setup: setup };
 
     var fromHtml = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
       if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        console.error('HTML does not have a single root node', html);
+        domGlobals.console.error('HTML does not have a single root node', html);
         throw new Error('HTML must have a single root node');
       }
       return fromDom(div.childNodes[0]);
     };
     var fromTag = function (tag, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createElement(tag);
       return fromDom(node);
     };
     var fromText = function (text, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createTextNode(text);
       return fromDom(node);
     };
@@ -1936,7 +1942,7 @@ var image = (function () {
       var doc = docElm.dom();
       return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
     };
-    var Element$$1 = {
+    var Element = {
       fromHtml: fromHtml,
       fromTag: fromTag,
       fromText: fromText,
@@ -1944,18 +1950,18 @@ var image = (function () {
       fromPoint: fromPoint
     };
 
-    var ATTRIBUTE = Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = Node.CDATA_SECTION_NODE;
-    var COMMENT = Node.COMMENT_NODE;
-    var DOCUMENT = Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = Node.ELEMENT_NODE;
-    var TEXT = Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = Node.ENTITY_NODE;
-    var NOTATION = Node.NOTATION_NODE;
+    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
+    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
+    var COMMENT = domGlobals.Node.COMMENT_NODE;
+    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
+    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
+    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
+    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
+    var TEXT = domGlobals.Node.TEXT_NODE;
+    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
+    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
+    var ENTITY = domGlobals.Node.ENTITY_NODE;
+    var NOTATION = domGlobals.Node.NOTATION_NODE;
 
     var name = function (element) {
       var r = element.dom().nodeName;
@@ -1996,7 +2002,7 @@ var image = (function () {
     var documentPositionContainedBy = function (a, b) {
       return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
     };
-    var Node$1 = {
+    var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
     };
@@ -2025,7 +2031,7 @@ var image = (function () {
       }
       return undefined;
     };
-    var find$2 = function (regexes, agent) {
+    var find$1 = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
       if (!r)
         return {
@@ -2041,7 +2047,7 @@ var image = (function () {
       var cleanedAgent = String(agent).toLowerCase();
       if (versionRegexes.length === 0)
         return unknown();
-      return find$2(versionRegexes, cleanedAgent);
+      return find$1(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
       return nu$3(0, 0);
@@ -2195,14 +2201,14 @@ var image = (function () {
       detectOs: detectOs
     };
 
-    var contains$1 = function (str, substr) {
+    var contains = function (str, substr) {
       return str.indexOf(substr) !== -1;
     };
 
     var normalVersionRegex = /.*?version\/\ ?([0-9]+)\.([0-9]+).*/;
     var checkContains = function (target) {
       return function (uastring) {
-        return contains$1(uastring, target);
+        return contains(uastring, target);
       };
     };
     var browsers = [
@@ -2210,7 +2216,7 @@ var image = (function () {
         name: 'Edge',
         versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
         search: function (uastring) {
-          var monstrosity = contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
+          var monstrosity = contains(uastring, 'edge/') && contains(uastring, 'chrome') && contains(uastring, 'safari') && contains(uastring, 'applewebkit');
           return monstrosity;
         }
       },
@@ -2221,7 +2227,7 @@ var image = (function () {
           normalVersionRegex
         ],
         search: function (uastring) {
-          return contains$1(uastring, 'chrome') && !contains$1(uastring, 'chromeframe');
+          return contains(uastring, 'chrome') && !contains(uastring, 'chromeframe');
         }
       },
       {
@@ -2231,7 +2237,7 @@ var image = (function () {
           /.*?rv:([0-9]+)\.([0-9]+).*/
         ],
         search: function (uastring) {
-          return contains$1(uastring, 'msie') || contains$1(uastring, 'trident');
+          return contains(uastring, 'msie') || contains(uastring, 'trident');
         }
       },
       {
@@ -2254,7 +2260,7 @@ var image = (function () {
           /.*?cpu os ([0-9]+)_([0-9]+).*/
         ],
         search: function (uastring) {
-          return (contains$1(uastring, 'safari') || contains$1(uastring, 'mobile/')) && contains$1(uastring, 'applewebkit');
+          return (contains(uastring, 'safari') || contains(uastring, 'mobile/')) && contains(uastring, 'applewebkit');
         }
       }
     ];
@@ -2267,7 +2273,7 @@ var image = (function () {
       {
         name: 'iOS',
         search: function (uastring) {
-          return contains$1(uastring, 'iphone') || contains$1(uastring, 'ipad');
+          return contains(uastring, 'iphone') || contains(uastring, 'ipad');
         },
         versionRegexes: [
           /.*?version\/\ ?([0-9]+)\.([0-9]+).*/,
@@ -2321,7 +2327,7 @@ var image = (function () {
     var PlatformDetection = { detect: detect$2 };
 
     var detect$3 = cached(function () {
-      var userAgent = navigator.userAgent;
+      var userAgent = domGlobals.navigator.userAgent;
       return PlatformDetection.detect(userAgent);
     });
     var PlatformDetection$1 = { detect: detect$3 };
@@ -2332,14 +2338,14 @@ var image = (function () {
       return d1 === d2 ? false : d1.contains(d2);
     };
     var ieContains = function (e1, e2) {
-      return Node$1.documentPositionContainedBy(e1.dom(), e2.dom());
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
     var browser = PlatformDetection$1.detect().browser;
-    var contains$2 = browser.isIE() ? ieContains : regularContains;
+    var contains$1 = browser.isIE() ? ieContains : regularContains;
 
     var parent = function (element) {
       var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element$$1.fromDom);
+      return Option.from(dom.parentNode).map(Element.fromDom);
     };
     var spot = Immutable('element', 'offset');
 
@@ -2354,7 +2360,7 @@ var image = (function () {
           text: 'Image',
           icon: 'image',
           onAction: function () {
-            var rootElm = getRootElement(Element$$1.fromDom(node));
+            var rootElm = getRootElement(Element.fromDom(node));
             editor.selection.select(rootElm.dom());
             Dialog(editor).open();
           }
@@ -2391,5 +2397,5 @@ var image = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

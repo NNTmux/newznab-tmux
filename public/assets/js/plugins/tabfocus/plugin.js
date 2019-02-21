@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var tabfocus = (function () {
+var tabfocus = (function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -98,7 +98,7 @@ var tabfocus = (function () {
           } else {
             global$4.setTimeout(function () {
               if (!global$3.webkit) {
-                window.focus();
+                domGlobals.window.focus();
               }
               el.focus();
             }, 10);
@@ -128,5 +128,5 @@ var tabfocus = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

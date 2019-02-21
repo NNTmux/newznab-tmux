@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var quickbars = (function () {
+var quickbars = (function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -110,13 +110,13 @@ var quickbars = (function () {
     var pickFile = function () {
       return new global$1(function (resolve) {
         var fileInput;
-        fileInput = document.createElement('input');
+        fileInput = domGlobals.document.createElement('input');
         fileInput.type = 'file';
         fileInput.style.position = 'fixed';
         fileInput.style.left = 0;
         fileInput.style.top = 0;
         fileInput.style.opacity = 0.001;
-        document.body.appendChild(fileInput);
+        domGlobals.document.body.appendChild(fileInput);
         fileInput.onchange = function (e) {
           resolve(Array.prototype.slice.call(e.target.files));
         };
@@ -166,13 +166,13 @@ var quickbars = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -188,17 +188,17 @@ var quickbars = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -287,22 +287,22 @@ var quickbars = (function () {
     };
 
     var fromHtml = function (html, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var div = doc.createElement('div');
       div.innerHTML = html;
       if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        console.error('HTML does not have a single root node', html);
+        domGlobals.console.error('HTML does not have a single root node', html);
         throw new Error('HTML must have a single root node');
       }
       return fromDom(div.childNodes[0]);
     };
     var fromTag = function (tag, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createElement(tag);
       return fromDom(node);
     };
     var fromText = function (text, scope) {
-      var doc = scope || document;
+      var doc = scope || domGlobals.document;
       var node = doc.createTextNode(text);
       return fromDom(node);
     };
@@ -316,7 +316,7 @@ var quickbars = (function () {
       var doc = docElm.dom();
       return Option.from(doc.elementFromPoint(x, y)).map(fromDom);
     };
-    var Element$$1 = {
+    var Element = {
       fromHtml: fromHtml,
       fromTag: fromTag,
       fromText: fromText,
@@ -324,18 +324,18 @@ var quickbars = (function () {
       fromPoint: fromPoint
     };
 
-    var ATTRIBUTE = Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = Node.CDATA_SECTION_NODE;
-    var COMMENT = Node.COMMENT_NODE;
-    var DOCUMENT = Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = Node.ELEMENT_NODE;
-    var TEXT = Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = Node.ENTITY_NODE;
-    var NOTATION = Node.NOTATION_NODE;
+    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
+    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
+    var COMMENT = domGlobals.Node.COMMENT_NODE;
+    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
+    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
+    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
+    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
+    var TEXT = domGlobals.Node.TEXT_NODE;
+    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
+    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
+    var ENTITY = domGlobals.Node.ENTITY_NODE;
+    var NOTATION = domGlobals.Node.NOTATION_NODE;
 
     var name = function (element) {
       var r = element.dom().nodeName;
@@ -352,17 +352,17 @@ var quickbars = (function () {
         return 'string';
       return t;
     };
-    var isType$1 = function (type) {
+    var isType = function (type) {
       return function (value) {
         return typeOf(value) === type;
       };
     };
-    var isString = isType$1('string');
-    var isObject = isType$1('object');
-    var isArray = isType$1('array');
-    var isBoolean = isType$1('boolean');
-    var isUndefined = isType$1('undefined');
-    var isFunction = isType$1('function');
+    var isString = isType('string');
+    var isObject = isType('object');
+    var isArray = isType('array');
+    var isBoolean = isType('boolean');
+    var isUndefined = isType('undefined');
+    var isFunction = isType('function');
 
     var find = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
@@ -395,7 +395,7 @@ var quickbars = (function () {
     var documentPositionContainedBy = function (a, b) {
       return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
     };
-    var Node$1 = {
+    var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
     };
@@ -594,14 +594,14 @@ var quickbars = (function () {
       detectOs: detectOs
     };
 
-    var contains$1 = function (str, substr) {
+    var contains = function (str, substr) {
       return str.indexOf(substr) !== -1;
     };
 
     var normalVersionRegex = /.*?version\/\ ?([0-9]+)\.([0-9]+).*/;
     var checkContains = function (target) {
       return function (uastring) {
-        return contains$1(uastring, target);
+        return contains(uastring, target);
       };
     };
     var browsers = [
@@ -609,7 +609,7 @@ var quickbars = (function () {
         name: 'Edge',
         versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
         search: function (uastring) {
-          var monstrosity = contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
+          var monstrosity = contains(uastring, 'edge/') && contains(uastring, 'chrome') && contains(uastring, 'safari') && contains(uastring, 'applewebkit');
           return monstrosity;
         }
       },
@@ -620,7 +620,7 @@ var quickbars = (function () {
           normalVersionRegex
         ],
         search: function (uastring) {
-          return contains$1(uastring, 'chrome') && !contains$1(uastring, 'chromeframe');
+          return contains(uastring, 'chrome') && !contains(uastring, 'chromeframe');
         }
       },
       {
@@ -630,7 +630,7 @@ var quickbars = (function () {
           /.*?rv:([0-9]+)\.([0-9]+).*/
         ],
         search: function (uastring) {
-          return contains$1(uastring, 'msie') || contains$1(uastring, 'trident');
+          return contains(uastring, 'msie') || contains(uastring, 'trident');
         }
       },
       {
@@ -653,7 +653,7 @@ var quickbars = (function () {
           /.*?cpu os ([0-9]+)_([0-9]+).*/
         ],
         search: function (uastring) {
-          return (contains$1(uastring, 'safari') || contains$1(uastring, 'mobile/')) && contains$1(uastring, 'applewebkit');
+          return (contains(uastring, 'safari') || contains(uastring, 'mobile/')) && contains(uastring, 'applewebkit');
         }
       }
     ];
@@ -666,7 +666,7 @@ var quickbars = (function () {
       {
         name: 'iOS',
         search: function (uastring) {
-          return contains$1(uastring, 'iphone') || contains$1(uastring, 'ipad');
+          return contains(uastring, 'iphone') || contains(uastring, 'ipad');
         },
         versionRegexes: [
           /.*?version\/\ ?([0-9]+)\.([0-9]+).*/,
@@ -720,7 +720,7 @@ var quickbars = (function () {
     var PlatformDetection = { detect: detect$2 };
 
     var detect$3 = cached(function () {
-      var userAgent = navigator.userAgent;
+      var userAgent = domGlobals.navigator.userAgent;
       return PlatformDetection.detect(userAgent);
     });
     var PlatformDetection$1 = { detect: detect$3 };
@@ -749,17 +749,17 @@ var quickbars = (function () {
       return d1 === d2 ? false : d1.contains(d2);
     };
     var ieContains = function (e1, e2) {
-      return Node$1.documentPositionContainedBy(e1.dom(), e2.dom());
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
     var browser = PlatformDetection$1.detect().browser;
-    var contains$2 = browser.isIE() ? ieContains : regularContains;
+    var contains$1 = browser.isIE() ? ieContains : regularContains;
 
     var ancestor = function (scope, predicate, isRoot) {
       var element = scope.dom();
       var stop = isFunction(isRoot) ? isRoot : constant(false);
       while (element.parentNode) {
         element = element.parentNode;
-        var el = Element$$1.fromDom(element);
+        var el = Element.fromDom(element);
         if (predicate(el)) {
           return Option.some(el);
         } else if (stop(el)) {
@@ -825,7 +825,7 @@ var quickbars = (function () {
     var addToEditor = function (editor) {
       editor.ui.registry.addContextToolbar('quickblock', {
         predicate: function (node) {
-          var sugarNode = Element$$1.fromDom(node);
+          var sugarNode = Element.fromDom(node);
           var textBlockElementsMap = editor.schema.getTextBlockElements();
           var isRoot = function (elem) {
             return elem.dom() === editor.getBody();
@@ -845,189 +845,14 @@ var quickbars = (function () {
     };
     var InsertToolbars = { addToEditor: addToEditor };
 
-    var create = function (dom, rng) {
-      var bookmark = {};
-      function setupEndPoint(start) {
-        var offsetNode, container, offset;
-        container = rng[start ? 'startContainer' : 'endContainer'];
-        offset = rng[start ? 'startOffset' : 'endOffset'];
-        if (container.nodeType === 1) {
-          offsetNode = dom.create('span', { 'data-mce-type': 'bookmark' });
-          if (container.hasChildNodes()) {
-            offset = Math.min(offset, container.childNodes.length - 1);
-            if (start) {
-              container.insertBefore(offsetNode, container.childNodes[offset]);
-            } else {
-              dom.insertAfter(offsetNode, container.childNodes[offset]);
-            }
-          } else {
-            container.appendChild(offsetNode);
-          }
-          container = offsetNode;
-          offset = 0;
-        }
-        bookmark[start ? 'startContainer' : 'endContainer'] = container;
-        bookmark[start ? 'startOffset' : 'endOffset'] = offset;
-      }
-      setupEndPoint(true);
-      if (!rng.collapsed) {
-        setupEndPoint();
-      }
-      return bookmark;
-    };
-    var resolve$1 = function (dom, bookmark) {
-      function restoreEndPoint(start) {
-        var container, offset, node;
-        function nodeIndex(container) {
-          var node = container.parentNode.firstChild, idx = 0;
-          while (node) {
-            if (node === container) {
-              return idx;
-            }
-            if (node.nodeType !== 1 || node.getAttribute('data-mce-type') !== 'bookmark') {
-              idx++;
-            }
-            node = node.nextSibling;
-          }
-          return -1;
-        }
-        container = node = bookmark[start ? 'startContainer' : 'endContainer'];
-        offset = bookmark[start ? 'startOffset' : 'endOffset'];
-        if (!container) {
-          return;
-        }
-        if (container.nodeType === 1) {
-          offset = nodeIndex(container);
-          container = container.parentNode;
-          dom.remove(node);
-        }
-        bookmark[start ? 'startContainer' : 'endContainer'] = container;
-        bookmark[start ? 'startOffset' : 'endOffset'] = offset;
-      }
-      restoreEndPoint(true);
-      restoreEndPoint();
-      var rng = dom.createRng();
-      rng.setStart(bookmark.startContainer, bookmark.startOffset);
-      if (bookmark.endContainer) {
-        rng.setEnd(bookmark.endContainer, bookmark.endOffset);
-      }
-      return rng;
-    };
-    var Bookmark = {
-      create: create,
-      resolve: resolve$1
-    };
-
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.TreeWalker');
-
-    var global$4 = tinymce.util.Tools.resolve('tinymce.dom.RangeUtils');
-
-    var getSelectedElements = function (rootElm, startNode, endNode) {
-      var walker, node;
-      var elms = [];
-      walker = new global$3(startNode, rootElm);
-      for (node = startNode; node; node = walker.next()) {
-        if (node.nodeType === 1) {
-          elms.push(node);
-        }
-        if (node === endNode) {
-          break;
-        }
-      }
-      return elms;
-    };
-    var unwrapElements = function (editor, elms) {
-      var bookmark, dom, selection;
-      dom = editor.dom;
-      selection = editor.selection;
-      bookmark = Bookmark.create(dom, selection.getRng());
-      global$2.each(elms, function (elm) {
-        editor.dom.remove(elm, true);
-      });
-      selection.setRng(Bookmark.resolve(dom, bookmark));
-    };
-    var isLink = function (elm) {
-      return elm.nodeName === 'A' && elm.hasAttribute('href');
-    };
-    var getParentAnchorOrSelf = function (dom, elm) {
-      var anchorElm = dom.getParent(elm, isLink);
-      return anchorElm ? anchorElm : elm;
-    };
-    var getSelectedAnchors = function (editor) {
-      var startElm, endElm, rootElm, anchorElms, selection, dom, rng;
-      selection = editor.selection;
-      dom = editor.dom;
-      rng = selection.getRng();
-      startElm = getParentAnchorOrSelf(dom, global$4.getNode(rng.startContainer, rng.startOffset));
-      endElm = global$4.getNode(rng.endContainer, rng.endOffset);
-      rootElm = editor.getBody();
-      anchorElms = global$2.grep(getSelectedElements(rootElm, startElm, endElm), isLink);
-      return anchorElms;
-    };
-    var unlinkSelection = function (editor) {
-      unwrapElements(editor, getSelectedAnchors(editor));
-    };
-    var Unlink = { unlinkSelection: unlinkSelection };
-
-    var formatBlock = function (editor, formatName) {
-      editor.execCommand('FormatBlock', false, formatName);
-    };
-    var collapseSelectionToEnd = function (editor) {
-      editor.selection.collapse(false);
-    };
-    var unlink = function (editor) {
-      editor.focus();
-      Unlink.unlinkSelection(editor);
-      collapseSelectionToEnd(editor);
-    };
-    var changeHref = function (editor, elm, url) {
-      editor.focus();
-      editor.dom.setAttrib(elm, 'href', url);
-      collapseSelectionToEnd(editor);
-    };
-    var insertLink = function (editor, url) {
-      editor.execCommand('mceInsertLink', false, { href: url });
-      collapseSelectionToEnd(editor);
-    };
-    var updateOrInsertLink = function (editor, url) {
-      var elm = editor.dom.getParent(editor.selection.getStart(), 'a[href]');
-      elm ? changeHref(editor, elm, url) : insertLink(editor, url);
-    };
-    var createLink = function (editor, url) {
-      url.trim().length === 0 ? unlink(editor) : updateOrInsertLink(editor, url);
-    };
-    var Actions$1 = {
-      formatBlock: formatBlock,
-      createLink: createLink,
-      unlink: unlink
-    };
-
-    var setupButtons$1 = function (editor) {
-      var formatBlock = function (name) {
-        return function () {
-          Actions$1.formatBlock(editor, name);
-        };
-      };
-      var _loop_1 = function (i) {
-        var name = 'h' + i;
-        editor.ui.registry.addToggleButton(name, {
-          text: name.toUpperCase(),
-          tooltip: 'Heading ' + i,
-          onSetup: function (buttonApi) {
-            return editor.selection.selectorChangedWithUnbind(name, buttonApi.setActive).unbind;
-          },
-          onAction: formatBlock(name)
-        });
-      };
-      for (var i = 1; i < 6; i++) {
-        _loop_1(i);
-      }
-    };
-    var SelectionButtons = { setupButtons: setupButtons$1 };
-
     var addToEditor$1 = function (editor) {
+      editor.ui.registry.addContextToolbar('imageselection', {
+        predicate: function (node) {
+          return node.nodeName === 'IMG' || node.nodeName === 'FIGURE' && /image/i.test(node.className);
+        },
+        items: 'alignleft aligncenter alignright',
+        position: 'node'
+      });
       editor.ui.registry.addContextToolbar('textselection', {
         predicate: function (node) {
           return !editor.selection.isCollapsed();
@@ -1041,7 +866,6 @@ var quickbars = (function () {
     global.add('quickbars', function (editor) {
       InsertButtons.setupButtons(editor);
       InsertToolbars.addToEditor(editor);
-      SelectionButtons.setupButtons(editor);
       SelectionToolbars.addToEditor(editor);
     });
     function Plugin () {
@@ -1049,5 +873,5 @@ var quickbars = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();

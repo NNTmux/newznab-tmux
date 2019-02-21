@@ -4,10 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.0-1 (2019-02-04)
+ * Version: 5.0.1 (2019-02-21)
  */
 (function () {
-var textpattern = (function () {
+var textpattern = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -61,13 +61,13 @@ var textpattern = (function () {
       var eq = function (o) {
         return o.isNone();
       };
-      var call$$1 = function (thunk) {
+      var call = function (thunk) {
         return thunk();
       };
       var id = function (n) {
         return n;
       };
-      var noop$$1 = function () {
+      var noop = function () {
       };
       var nul = function () {
         return null;
@@ -83,17 +83,17 @@ var textpattern = (function () {
         isSome: never$1,
         isNone: always$1,
         getOr: id,
-        getOrThunk: call$$1,
+        getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
         getOrNull: nul,
         getOrUndefined: undef,
         or: id,
-        orThunk: call$$1,
+        orThunk: call,
         map: none,
         ap: none,
-        each: noop$$1,
+        each: noop,
         bind: none,
         flatten: none,
         exists: never$1,
@@ -291,11 +291,11 @@ var textpattern = (function () {
       var constructors = [];
       var adt = {};
       each(cases, function (acase, count) {
-        var keys$$1 = keys(acase);
-        if (keys$$1.length !== 1) {
+        var keys$1 = keys(acase);
+        if (keys$1.length !== 1) {
           throw new Error('one and only one name per case');
         }
-        var key = keys$$1[0];
+        var key = keys$1[0];
         var value = acase[key];
         if (adt[key] !== undefined) {
           throw new Error('duplicate key detected:' + key);
@@ -374,7 +374,7 @@ var textpattern = (function () {
         ]
       }
     ]);
-    var partition$1 = function (results) {
+    var partition = function (results) {
       var errors = [];
       var values = [];
       each(results, function (result) {
@@ -648,7 +648,7 @@ var textpattern = (function () {
 
     var get$1 = function (patternsState) {
       var setPatterns = function (newPatterns) {
-        var normalized = partition$1(map(newPatterns, normalizePattern));
+        var normalized = partition(map(newPatterns, normalizePattern));
         if (normalized.errors.length > 0) {
           var firstError = normalized.errors[0];
           throw new Error(firstError.message + ':\n' + JSON.stringify(firstError.pattern, null, 2));
@@ -738,7 +738,7 @@ var textpattern = (function () {
           blockPatterns: []
         };
       }
-      var normalized = partition$1(map(patterns, normalizePattern));
+      var normalized = partition(map(patterns, normalizePattern));
       each(normalized.errors, function (err) {
         return error$1(err.message, err.pattern);
       });
@@ -768,18 +768,18 @@ var textpattern = (function () {
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
-    var ATTRIBUTE = Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = Node.CDATA_SECTION_NODE;
-    var COMMENT = Node.COMMENT_NODE;
-    var DOCUMENT = Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = Node.ELEMENT_NODE;
-    var TEXT = Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = Node.ENTITY_NODE;
-    var NOTATION = Node.NOTATION_NODE;
+    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
+    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
+    var COMMENT = domGlobals.Node.COMMENT_NODE;
+    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
+    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
+    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
+    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
+    var TEXT = domGlobals.Node.TEXT_NODE;
+    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
+    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
+    var ENTITY = domGlobals.Node.ENTITY_NODE;
+    var NOTATION = domGlobals.Node.NOTATION_NODE;
 
     var isElement = function (node) {
       return node.nodeType === ELEMENT;
@@ -832,10 +832,10 @@ var textpattern = (function () {
         return Option.none();
       });
     };
-    var resolvePathRange = function (root, range$$1) {
-      return resolvePath(root, range$$1.start).bind(function (_a) {
+    var resolvePathRange = function (root, range) {
+      return resolvePath(root, range.start).bind(function (_a) {
         var startNode = _a.node, startOffset = _a.offset;
-        return resolvePath(root, range$$1.end).map(function (_a) {
+        return resolvePath(root, range.end).map(function (_a) {
           var endNode = _a.node, endOffset = _a.offset;
           return {
             startNode: startNode,
@@ -1057,14 +1057,14 @@ var textpattern = (function () {
         var start = Option.from(dom.select('#' + ids.start)[0]);
         var end = Option.from(dom.select('#' + ids.end)[0]);
         return lift(start, end, function (start, end) {
-          var range$$1 = dom.createRng();
-          range$$1.setStartAfter(start);
+          var range = dom.createRng();
+          range.setStartAfter(start);
           if (!isCollapsed(start, end, dom.getRoot())) {
-            range$$1.setEndBefore(end);
+            range.setEndBefore(end);
           } else {
-            range$$1.collapse(true);
+            range.collapse(true);
           }
-          return range$$1;
+          return range;
         });
       };
       var markerPrefix = generate$1('mce_');
@@ -1076,8 +1076,8 @@ var textpattern = (function () {
       });
       var cursor = editor.selection.getBookmark();
       for (var i = areas.length - 1; i >= 0; i--) {
-        var _a = areas[i], pattern = _a.pattern, range$$1 = _a.range;
-        var _b = resolvePath(dom.getRoot(), range$$1.end).getOrDie('Failed to resolve range[' + i + '].end'), endNode = _b.node, endOffset = _b.offset;
+        var _a = areas[i], pattern = _a.pattern, range = _a.range;
+        var _b = resolvePath(dom.getRoot(), range.end).getOrDie('Failed to resolve range[' + i + '].end'), endNode = _b.node, endOffset = _b.offset;
         var textOutsideRange = endOffset === 0 ? endNode : endNode.splitText(endOffset);
         textOutsideRange.parentNode.insertBefore(newMarker(markerIds[i].end), textOutsideRange);
         if (pattern.start.length > 0) {
@@ -1085,8 +1085,8 @@ var textpattern = (function () {
         }
       }
       for (var i = 0; i < areas.length; i++) {
-        var _c = areas[i], pattern = _c.pattern, range$$1 = _c.range;
-        var _d = resolvePath(dom.getRoot(), range$$1.start).getOrDie('Failed to resolve range.start'), startNode = _d.node, startOffset = _d.offset;
+        var _c = areas[i], pattern = _c.pattern, range = _c.range;
+        var _d = resolvePath(dom.getRoot(), range.start).getOrDie('Failed to resolve range.start'), startNode = _d.node, startOffset = _d.offset;
         var textInsideRange = startOffset === 0 ? startNode : startNode.splitText(startOffset);
         textInsideRange.parentNode.insertBefore(newMarker(markerIds[i].start), textInsideRange);
         if (pattern.start.length > 0) {
@@ -1098,8 +1098,8 @@ var textpattern = (function () {
       var _loop_1 = function (i) {
         var pattern = areas[i].pattern;
         var optRange = markerRange(markerIds[i]);
-        optRange.each(function (range$$1) {
-          editor.selection.setRng(range$$1);
+        optRange.each(function (range) {
+          editor.selection.setRng(range);
           if (pattern.type === 'inline-format') {
             pattern.format.forEach(function (format) {
               editor.formatter.apply(format);
@@ -1269,5 +1269,5 @@ var textpattern = (function () {
 
     return Plugin;
 
-}());
+}(window));
 })();
