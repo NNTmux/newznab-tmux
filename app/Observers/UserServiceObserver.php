@@ -7,6 +7,7 @@ use App\Jobs\SendWelcomeEmail;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Jobs\SendNewRegisteredAccountMail;
 use Jrean\UserVerification\Facades\UserVerification;
+use Spatie\Permission\Models\Role;
 
 class UserServiceObserver
 {
@@ -20,6 +21,8 @@ class UserServiceObserver
      */
     public function created(User $user)
     {
+        $roleName = Role::query()->where('id', $user->roles_id)->value('name');
+        $user->assignRole($roleName);
         SendNewRegisteredAccountMail::dispatch($user);
         SendWelcomeEmail::dispatch($user);
         UserVerification::generate($user);
