@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
+use App\Models\UsenetGroup;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
@@ -117,14 +117,14 @@ class NZBExport
 
                 return $this->returnValue();
             }
-            $groups = Group::query()->where('id', $params['3'])->select(['id', 'name'])->get();
+            $groups = UsenetGroup::query()->where('id', $params['3'])->select(['id', 'name'])->get();
             if ($groups === null) {
                 $this->echoOut('The group ID is not in the DB: '.$params[3]);
 
                 return $this->returnValue();
             }
         } else {
-            $groups = Group::query()->select(['id', 'name'])->get();
+            $groups = UsenetGroup::query()->select(['id', 'name'])->get();
         }
 
         $exported = 0;

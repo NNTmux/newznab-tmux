@@ -12,9 +12,9 @@ class GroupsTableSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('groups')->delete();
+        \DB::table('usenet_groups')->delete();
 
-        \DB::table('groups')->insert([
+        \DB::table('usenet_groups')->insert([
             0 =>
             [
                 'id' => 1,

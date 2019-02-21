@@ -37,7 +37,7 @@ if ($argv[3] === 'true') {
 
 $pdo = DB::connection()->getPdo();
 
-$group = DB::selectOne(sprintf('SELECT id FROM groups WHERE name = %s', escapeString($argv[1])));
+$group = DB::selectOne(sprintf('SELECT id FROM usenet_groups WHERE name = %s', escapeString($argv[1])));
 
 if ($group === false) {
     exit('No group with name '.$argv[1].' found in the database.');

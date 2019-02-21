@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use App\Mail\ForgottenPassword;
 use Illuminate\Support\Facades\Mail;
@@ -15,9 +14,12 @@ class SendPasswordForgottenEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $email;
-
     private $resetLink;
+
+    /**
+     * @var \App\Models\User
+     */
+    private $user;
 
     /**
      * Create a new job instance.
@@ -25,9 +27,9 @@ class SendPasswordForgottenEmail implements ShouldQueue
      * @param \App\Models\User $user
      * @param $resetLink
      */
-    public function __construct(User $user, $resetLink)
+    public function __construct($user, $resetLink)
     {
-        $this->email = $user->email;
+        $this->user = $user;
         $this->resetLink = $resetLink;
     }
 
@@ -38,6 +40,6 @@ class SendPasswordForgottenEmail implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->email)->send(new ForgottenPassword($this->resetLink));
+        Mail::to($this->user->email)->send(new ForgottenPassword($this->resetLink));
     }
 }

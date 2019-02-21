@@ -64,9 +64,6 @@ class UserController extends BasePageController
             ]
         );
 
-        User::updateExpiredRoles();
-        User::deleteUnVerified();
-
         foreach ($ordering as $orderType) {
             $this->smarty->assign('orderby'.$orderType, WWW_TOP.'user-list?ob='.$orderType);
         }
@@ -227,7 +224,9 @@ class UserController extends BasePageController
     public function destroy(Request $request)
     {
         if ($request->has('id')) {
-            User::deleteUser($request->input('id'));
+            $user = User::find($request->input('id'));
+
+            $user->delete();
 
             return redirect('admin/user-list');
         }

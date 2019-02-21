@@ -2,23 +2,16 @@
 
 namespace Blacklight;
 
-use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
-use ApaiIO\Operations\Search;
 use Illuminate\Support\Carbon;
-use ApaiIO\Configuration\Country;
-use ApaiIO\Request\GuzzleRequest;
 use Messerli90\IGDB\Facades\IGDB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\ClientException;
-use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 /**
  * Class Console.
@@ -224,7 +217,7 @@ class Console
 				genres.title AS genre,
 				rn.releases_id AS nfoid
 				FROM releases r
-				LEFT OUTER JOIN groups g ON g.id = r.groups_id
+				LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfo_id
@@ -358,58 +351,18 @@ class Console
     {
         $consoleId = self::CONS_NTFND;
 
-        $amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
-
-        if ($amaz) {
-            $gameInfo['platform'] = $this->_replacePlatform($gameInfo['platform']);
-
-            $con = $this->_setConBeforeMatch($amaz, $gameInfo);
-
-            // Basically the XBLA names contain crap, this is to reduce the title down far enough to be usable.
-            if (stripos('xbla', $gameInfo['platform']) !== false) {
-                $gameInfo['title'] = substr($gameInfo['title'], 0, 10);
-                $con['substr'] = $gameInfo['title'];
+        $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
+        if ($igdb !== false) {
+            if ($igdb['coverurl'] !== '') {
+                $igdb['cover'] = 1;
+            } else {
+                $igdb['cover'] = 0;
             }
 
-            if ($this->_matchConToGameInfo($gameInfo, $con)) {
-                $con += $this->_setConAfterMatch($amaz);
-                $con += $this->_matchGenre($amaz);
+            $consoleId = $this->_updateConsoleTable($igdb);
 
-                // Set covers properties
-                $con['coverurl'] = (string) $amaz->LargeImage->URL;
-
-                if ($con['coverurl'] !== '') {
-                    $con['cover'] = 1;
-                } else {
-                    $con['cover'] = 0;
-                }
-
-                $consoleId = $this->_updateConsoleTable($con);
-
-                if ($this->echooutput && $consoleId !== -2) {
-                    $this->colorCli->header('Added/updated game: ').
-                        $this->colorCli->alternateOver('   Title:    ').
-                        $this->colorCli->primary($con['title']).
-                        $this->colorCli->alternateOver('   Platform: ').
-                        $this->colorCli->primary($con['platform']).
-                        $this->colorCli->alternateOver('   Genre: ').
-                        $this->colorCli->primary($con['consolegenre']);
-                }
-            }
-        } else {
-            $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
-            if ($igdb !== false) {
-                if ($igdb['coverurl'] !== '') {
-                    $igdb['cover'] = 1;
-                } else {
-                    $igdb['cover'] = 0;
-                }
-
-                $consoleId = $this->_updateConsoleTable($igdb);
-
-                if ($this->echooutput && $consoleId !== -2) {
-                    $this->colorCli->header('Added/updated game: ').$this->colorCli->alternateOver('   Title:    ').$this->colorCli->primary($igdb['title']).$this->colorCli->alternateOver('   Platform: ').$this->colorCli->primary($igdb['platform']).$this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary($igdb['consolegenre']);
-                }
+            if ($this->echooutput && $consoleId !== -2) {
+                $this->colorCli->header('Added/updated game: ').$this->colorCli->alternateOver('   Title:    ').$this->colorCli->primary($igdb['title']).$this->colorCli->alternateOver('   Platform: ').$this->colorCli->primary($igdb['platform']).$this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary($igdb['consolegenre']);
             }
         }
 
@@ -734,59 +687,6 @@ class Console
         }
 
         return $consoleId;
-    }
-
-    /**
-     * @param $title
-     * @param $node
-     *
-     * @return false|mixed
-     */
-    public function fetchAmazonProperties($title, $node)
-    {
-        $conf = new GenericConfiguration();
-        $client = new Client();
-        $request = new GuzzleRequest($client);
-
-        try {
-            $conf
-                ->setCountry(Country::INTERNATIONAL)
-                ->setAccessKey($this->pubkey)
-                ->setSecretKey($this->privkey)
-                ->setAssociateTag($this->asstag)
-                ->setRequest($request)
-                ->setResponseTransformer(new XmlToSimpleXmlObject());
-        } catch (\Throwable $e) {
-            echo $e->getMessage();
-        }
-
-        $search = new Search();
-        $search->setCategory('VideoGames');
-        $search->setKeywords($title);
-        $search->setBrowseNode($node);
-        $search->setResponseGroup(['Large']);
-
-        $apaiIo = new ApaiIO($conf);
-
-        $this->colorCli->info('Trying to find info on Amazon');
-        $responses = $apaiIo->runOperation($search);
-
-        if ($responses === false) {
-            throw new \RuntimeException('Could not connect to Amazon');
-        }
-
-        foreach ($responses->Items->Item as $response) {
-            similar_text($title, $response->ItemAttributes->Title, $percent);
-            if ($percent > self::MATCH_PERCENT && isset($response->ItemAttributes->Title)) {
-                $this->colorCli->info('Found matching info on Amazon: '.$response->ItemAttributes->Title);
-
-                return $response;
-            }
-        }
-
-        $this->colorCli->info('Could not find match on Amazon');
-
-        return false;
     }
 
     /**

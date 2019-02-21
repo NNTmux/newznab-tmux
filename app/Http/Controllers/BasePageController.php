@@ -11,6 +11,7 @@ use App\Models\Settings;
 use Blacklight\Contents;
 use App\Models\Forumpost;
 use Illuminate\Support\Arr;
+use App\Events\UserLoggedIn;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -243,7 +244,7 @@ class BasePageController extends Controller
 
         // Update last login every 15 mins.
         if ((strtotime($this->userdata['now']) - 900) > strtotime($this->userdata['lastlogin'])) {
-            User::updateSiteAccessed($this->userdata->id);
+            event(new UserLoggedIn($this->userdata));
         }
 
         $this->smarty->assign('userdata', $this->userdata);

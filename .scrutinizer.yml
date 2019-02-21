@@ -1,6 +1,6 @@
 build:
-    environment:
-        mysql: 5.7
+    services:
+        mariadb: 10.3
     dependencies:
         before:
         override:

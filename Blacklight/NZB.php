@@ -132,7 +132,7 @@ class NZB
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
 				g.name AS groupname
 			FROM collections c
-			INNER JOIN groups g ON c.groups_id = g.id
+			INNER JOIN usenet_groups g ON c.groups_id = g.id
 			WHERE c.releases_id = ';
         $this->_binariesQuery = '
 			SELECT b.id, b.name, b.totalparts
@@ -303,7 +303,7 @@ class NZB
 
         $nzbPath = $this->siteNzbPath.$nzbPath;
 
-        if ($createIfNotExist === true && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) {
+        if ($createIfNotExist && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
         }
 

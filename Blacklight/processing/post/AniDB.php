@@ -260,6 +260,8 @@ class AniDB
                     }
                 }
 
+                $episodeTitle = $updatedAni['episode_title'] ?? 'Unknown';
+
                 $this->updateRelease($anidbId->anidbid, $release->id);
 
                 $this->colorCli->headerOver('Matched '.$type.' AniDB ID: ').
@@ -269,7 +271,7 @@ class AniDB
                     $this->colorCli->alternateOver('   Episode #: ').
                     $this->colorCli->primary($cleanArr['epno']).
                     $this->colorCli->alternateOver('   Episode Title: ').
-                    $this->colorCli->primary($updatedAni['episode_title']);
+                    $this->colorCli->primary($episodeTitle);
 
                 $matched = true;
             } else {

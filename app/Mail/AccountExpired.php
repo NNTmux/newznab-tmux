@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -17,11 +16,11 @@ class AccountExpired extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param $userId
+     * @param $user
      */
-    public function __construct($userId)
+    public function __construct($user)
     {
-        $this->user = User::find($userId);
+        $this->user = $user;
     }
 
     /**

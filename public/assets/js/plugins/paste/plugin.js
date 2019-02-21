@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) Tiny Technologies, Inc. All rights reserved.
+ * Licensed under the LGPL or a commercial license.
+ * For LGPL see License.txt in the project root for license information.
+ * For commercial licenses see https://www.tiny.cloud/
+ *
+ * Version: 5.0.0-1 (2019-02-04)
+ */
 (function () {
 var paste = (function () {
     'use strict';
@@ -138,7 +146,7 @@ var paste = (function () {
     };
     var displayNotification = function (editor, message) {
       editor.notificationManager.open({
-        text: editor.translate(message),
+        text: message,
         type: 'info'
       });
     };
@@ -759,20 +767,6 @@ var paste = (function () {
         return value;
       };
     };
-    function curry(fn) {
-      var initialArgs = [];
-      for (var _i = 1; _i < arguments.length; _i++) {
-        initialArgs[_i - 1] = arguments[_i];
-      }
-      return function () {
-        var restArgs = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          restArgs[_i] = arguments[_i];
-        }
-        var all = initialArgs.concat(restArgs);
-        return fn.apply(null, all);
-      };
-    }
     var never = constant(false);
     var always = constant(true);
 
@@ -1808,28 +1802,34 @@ var paste = (function () {
     };
     var Quirks = { setup: setup$2 };
 
-    var stateChange = function (editor, clipboard, e) {
-      var ctrl = e.control;
-      ctrl.active(clipboard.pasteFormat.get() === 'text');
-      editor.on('PastePlainTextToggle', function (e) {
-        ctrl.active(e.state);
-      });
+    var makeSetupHandler = function (editor, clipboard) {
+      return function (api) {
+        api.setActive(clipboard.pasteFormat.get() === 'text');
+        var pastePlainTextToggleHandler = function (e) {
+          return api.setActive(e.state);
+        };
+        editor.on('PastePlainTextToggle', pastePlainTextToggleHandler);
+        return function () {
+          return editor.off('PastePlainTextToggle', pastePlainTextToggleHandler);
+        };
+      };
     };
     var register$2 = function (editor, clipboard) {
-      var postRender = curry(stateChange, editor, clipboard);
-      editor.addButton('pastetext', {
+      editor.ui.registry.addToggleButton('pastetext', {
         active: false,
-        icon: 'pastetext',
+        icon: 'paste-text',
         tooltip: 'Paste as text',
-        cmd: 'mceTogglePlainTextPaste',
-        onPostRender: postRender
+        onAction: function () {
+          return editor.execCommand('mceTogglePlainTextPaste');
+        },
+        onSetup: makeSetupHandler(editor, clipboard)
       });
-      editor.addMenuItem('pastetext', {
+      editor.ui.registry.addToggleMenuItem('pastetext', {
         text: 'Paste as text',
-        selectable: true,
-        active: clipboard.pasteFormat,
-        cmd: 'mceTogglePlainTextPaste',
-        onPostRender: postRender
+        onAction: function () {
+          return editor.execCommand('mceTogglePlainTextPaste');
+        },
+        onSetup: makeSetupHandler(editor, clipboard)
       });
     };
     var Buttons = { register: register$2 };

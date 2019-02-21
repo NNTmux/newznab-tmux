@@ -9,6 +9,7 @@ use Blacklight\Releases;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
+use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
 use App\Http\Controllers\BasePageController;
 
@@ -89,7 +90,7 @@ class ApiController extends BasePageController
 
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
         if ($uid !== '') {
-            User::updateApiAccessed($uid);
+            event(new UserAccessedApi($res));
             $apiRequests = UserRequest::getApiRequests($uid);
             if ($apiRequests > $maxRequests) {
                 Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');
@@ -119,18 +120,19 @@ class ApiController extends BasePageController
                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                $categoryID = $api->categoryID();
                $limit = $api->limit();
+               $searchArr = [
+                   'searchname' => $request->input('q') ?? -1,
+                   'name' => -1,
+                   'fromname' => -1,
+                   'filename' => -1,
+               ];
 
                if ($request->has('q')) {
                    $relData = $releases->search(
-                       $request->input('q'),
-                       -1,
-                       -1,
-                       -1,
+                       $searchArr,
                        $groupName,
                        -1,
                        -1,
-                       0,
-                       0,
                        -1,
                        -1,
                        $offset,

@@ -4,7 +4,6 @@ namespace Blacklight\processing;
 
 use Blacklight\NZB;
 use Blacklight\NNTP;
-use App\Models\Group;
 use App\Models\Predb;
 use Blacklight\Genres;
 use App\Models\Release;
@@ -13,6 +12,7 @@ use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\Categorize;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
@@ -164,7 +164,7 @@ class ProcessReleases
         $groupID = '';
 
         if (! empty($groupName) && $groupName !== 'mgr') {
-            $groupInfo = Group::getByName($groupName);
+            $groupInfo = UsenetGroup::getByName($groupName);
             if ($groupInfo !== null) {
                 $groupID = $groupInfo['id'];
             }
@@ -313,7 +313,7 @@ class ProcessReleases
             $totalTime = now()->diffInSeconds($startTime);
 
             $this->colorCli->primary(
-                    ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
+                ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
                     $totalTime.Str::plural(' second', $totalTime),
                 true
                 );
@@ -377,7 +377,7 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.');
         }
 
-        $groupID === '' ? $groupIDs = Group::getActiveIDs() : $groupIDs = [['id' => $groupID]];
+        $groupID === '' ? $groupIDs = UsenetGroup::getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
@@ -388,7 +388,7 @@ class ProcessReleases
         foreach ($groupIDs as $grpID) {
             $groupMinSizeSetting = $groupMinFilesSetting = 0;
 
-            $groupMinimums = Group::getGroupByID($grpID['id']);
+            $groupMinimums = UsenetGroup::getGroupByID($grpID['id']);
             if ($groupMinimums !== null) {
                 if (! empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
                     $groupMinSizeSetting = (int) $groupMinimums['minsizetoformrelease'];
@@ -480,7 +480,7 @@ class ProcessReleases
                 '
 				SELECT SQL_NO_CACHE c.*, g.name AS gname
 				FROM collections c
-				INNER JOIN groups g ON c.groups_id = g.id
+				INNER JOIN usenet_groups g ON c.groups_id = g.id
 				WHERE %s c.filecheck = %d
 				AND c.filesize > 0
 				LIMIT %d',
@@ -497,7 +497,7 @@ class ProcessReleases
         foreach ($collections as $collection) {
             $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
             $fromName = utf8_encode(
-                    trim($collection->fromname, "'")
+                trim($collection->fromname, "'")
                 );
 
             // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
@@ -509,9 +509,9 @@ class ProcessReleases
 
             if ($dupeCheck === null) {
                 $cleanedName = $this->releaseCleaning->releaseCleaner(
-                        $collection->subject,
-                        $collection->fromname,
-                        $collection->gname
+                    $collection->subject,
+                    $collection->fromname,
+                    $collection->gname
                     );
 
                 if (\is_array($cleanedName)) {
@@ -536,7 +536,7 @@ class ProcessReleases
                 $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
 
                 $releaseID = Release::insertRelease(
-                        [
+                    [
                             'name' => $cleanRelName,
                             'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
                             'totalpart' => $collection->totalfiles,
@@ -584,13 +584,13 @@ class ProcessReleases
                     if (preg_match_all('#(\S+):\S+#', $collection->xref, $matches)) {
                         foreach ($matches[1] as $grp) {
                             //check if the group name is in a valid format
-                            $grpTmp = Group::isValidGroup($grp);
+                            $grpTmp = UsenetGroup::isValidGroup($grp);
                             if ($grpTmp !== false) {
                                 //check if the group already exists in database
-                                $xrefGrpID = Group::getIDByName($grpTmp);
+                                $xrefGrpID = UsenetGroup::getIDByName($grpTmp);
                                 if ($xrefGrpID === '') {
-                                    $xrefGrpID = Group::addGroup(
-                                            [
+                                    $xrefGrpID = UsenetGroup::addGroup(
+                                        [
                                                 'name'                  => $grpTmp,
                                                 'description'           => 'Added by Release processing',
                                                 'backfill_target'       => 1,
@@ -605,7 +605,7 @@ class ProcessReleases
                                 }
 
                                 $relGroupsChk = ReleasesGroups::query()->where(
-                                        [
+                                    [
                                             ['releases_id', '=', $releaseID],
                                             ['groups_id', '=', $xrefGrpID],
                                         ]
@@ -613,7 +613,7 @@ class ProcessReleases
 
                                 if ($relGroupsChk === null) {
                                     ReleasesGroups::query()->insert(
-                                            [
+                                        [
                                                 'releases_id' => $releaseID,
                                                 'groups_id'   => $xrefGrpID,
                                             ]
@@ -651,7 +651,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    PHP_EOL.
+                PHP_EOL.
                     number_format($returnCount).
                     ' Releases added and '.
                     number_format($duplicate).
@@ -714,7 +714,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    number_format($nzbCount).' NZBs created/Collections deleted in '.
+                number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
                     'Total time: '.$totalTime.Str::plural(' second', $totalTime),
                 true
@@ -778,7 +778,7 @@ class ProcessReleases
             (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
         } elseif ($this->echoCLI) {
             $this->colorCli->info(
-                    'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
+                'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
                     'If you are using tmux or screen they might have their own scripts running Post-processing.'
                 );
         }
@@ -1008,7 +1008,7 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.');
         }
 
-        $groupID === '' ? $groupIDs = Group::getActiveIDs() : $groupIDs = [['id' => $groupID]];
+        $groupID === '' ? $groupIDs = UsenetGroup::getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
         $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
         $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');
@@ -1020,7 +1020,7 @@ class ProcessReleases
                     '
 					SELECT SQL_NO_CACHE r.guid, r.id
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groups_id
+					INNER JOIN usenet_groups g ON g.id = r.groups_id
 					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
 					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)',
@@ -1053,11 +1053,11 @@ class ProcessReleases
             }
             if ($minFilesSetting > 0) {
                 $releases = Release::fromQuery(
-                     sprintf(
+                    sprintf(
                          '
 				SELECT SQL_NO_CACHE r.id, r.guid
 				FROM releases r
-				INNER JOIN groups g ON g.id = r.groups_id
+				INNER JOIN usenet_groups g ON g.id = r.groups_id
 				WHERE r.groups_id = %d
 				AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 				AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
@@ -1077,7 +1077,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
+                'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
                     ' releases: '.PHP_EOL.
                     $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
                     ' with less files than site/groups setting in: '.
@@ -1199,7 +1199,7 @@ class ProcessReleases
         foreach ($categories as $category) {
             if ((int) $category->minsize > 0) {
                 $releases = Release::fromQuery(
-                        sprintf(
+                    sprintf(
                             '
 							SELECT id, guid
 							FROM releases
@@ -1282,7 +1282,7 @@ class ProcessReleases
 
         if ($this->echoCLI) {
             $this->colorCli->primary(
-                    'Removed releases: '.
+                'Removed releases: '.
                     number_format($retentionDeleted).
                     ' past retention, '.
                     number_format($passwordDeleted).
@@ -1315,7 +1315,7 @@ class ProcessReleases
             if ($totalDeleted > 0) {
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary(
-                        'Removed '.number_format($totalDeleted).' releases in '.
+                    'Removed '.number_format($totalDeleted).' releases in '.
                         $totalTime.Str::plural(' second', $totalTime),
                     true
                     );
@@ -1448,7 +1448,7 @@ class ProcessReleases
     {
         DB::transaction(function () use ($where) {
             DB::update(
-            sprintf(
+                sprintf(
                 '
 				UPDATE binaries b
 				INNER JOIN

@@ -110,7 +110,7 @@
             <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-list" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Blacklist</span>
             </a>
-            <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit?action=add" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{$smarty.const.WWW_TOP}/admin/binaryblacklist-edit" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Add Blacklist</span>
             </a>
         </div>
@@ -238,6 +238,30 @@
         <div id='submenu14' class="collapse sidebar-submenu">
             <a href="{$smarty.const.WWW_TOP}/admin/predb" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">View Pre Database</span>
+            </a>
+        </div>
+        <a href="#submenu15" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+            <div class="d-flex w-100 justify-content-start align-items-center">
+                <span class="fa fa-database fa-fw mr-3"></span>
+                <span class="menu-collapsed">Laravel Telescope</span>
+                <span class="submenu-icon ml-auto"></span>
+            </div>
+        </a>
+        <div id='submenu15' class="collapse sidebar-submenu">
+            <a href="{$smarty.const.WWW_TOP}/telescope" class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
+                <span class="menu-collapsed">View Telescope Monitoring tool</span>
+            </a>
+        </div>
+        <a href="#submenu16" data-toggle="collapse" aria-expanded="false" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+            <div class="d-flex w-100 justify-content-start align-items-center">
+                <span class="fa fa-database fa-fw mr-3"></span>
+                <span class="menu-collapsed">Laravel Horizon</span>
+                <span class="submenu-icon ml-auto"></span>
+            </div>
+        </a>
+        <div id='submenu16' class="collapse sidebar-submenu">
+            <a href="{$smarty.const.WWW_TOP}/horizon" class="list-group-item list-group-item-action bg-dark text-white" target="_blank">
+                <span class="menu-collapsed">View Horizon Redis Queue Monitoring tool</span>
             </a>
         </div>
     </ul>

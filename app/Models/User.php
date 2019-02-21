@@ -228,7 +228,7 @@ class User extends Authenticatable
      */
     public static function deleteUser($id): void
     {
-        self::whereId($id)->delete();
+        self::find($id)->delete();
     }
 
     /**
@@ -331,9 +331,8 @@ class User extends Authenticatable
             $sql += ['email' => $email];
         }
 
-        self::whereId($id)->update($sql);
-
         $user = self::find($id);
+        $user->update($sql);
         $user->syncRoles([$rateLimit['name']]);
 
         return self::SUCCESS;
@@ -362,11 +361,12 @@ class User extends Authenticatable
     /**
      * @param int $uid
      * @param int $role
-     * @return int
+     *
+     * @return bool
      */
-    public static function updateUserRole(int $uid, int $role): int
+    public static function updateUserRole(int $uid, int $role)
     {
-        return self::whereId($uid)->update(['roles_id' => $role]);
+        return self::find($uid)->update(['roles_id' => $role]);
     }
 
     /**
@@ -374,14 +374,15 @@ class User extends Authenticatable
      * @param $date
      * @param int $addYear
      */
-    public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0)
+    public static function updateUserRoleChangeDate($uid, $date = '', $addYear = 0): void
     {
-        $currRoleExp = self::whereId($uid)->select(['rolechangedate'])->first();
+        $user = self::find($uid);
+        $currRoleExp = $user::select(['rolechangedate'])->first();
         if (! empty($date)) {
-            self::whereId($uid)->update(['rolechangedate' => $date]);
+            $user->update(['rolechangedate' => $date]);
         }
         if (empty($date) && ! empty($addYear)) {
-            self::whereId($uid)->update(['rolechangedate' => Carbon::createFromDate($currRoleExp['rolechangedate'])->addYears($addYear)]);
+            $user->update(['rolechangedate' => Carbon::createFromDate($currRoleExp['rolechangedate'])->addYears($addYear)]);
         }
     }
 
@@ -430,7 +431,7 @@ class User extends Authenticatable
 				ORDER BY %s %s %s ";
         } else {
             $query = '
-				SELECT users.*, roles.name AS rolename,
+				SELECT users.*, roles.name AS rolename
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
 				WHERE 1=1 %s %s %s %s
@@ -525,7 +526,7 @@ class User extends Authenticatable
             $hash = self::hashPassword($password);
 
             if ($hash !== false) {
-                self::whereId($userID)->update(['password' => $hash]);
+                self::find($userID)->update(['password' => $hash]);
             }
         }
 
@@ -539,7 +540,7 @@ class User extends Authenticatable
      */
     public static function updateRssKey($uid): int
     {
-        self::whereId($uid)->update(['api_token' => md5(Password::getRepository()->createNewToken())]);
+        self::find($uid)->update(['api_token' => md5(Password::getRepository()->createNewToken())]);
 
         return self::SUCCESS;
     }
@@ -552,7 +553,7 @@ class User extends Authenticatable
      */
     public static function updatePassResetGuid($id, $guid): int
     {
-        self::whereId($id)->update(['resetguid' => $guid]);
+        self::find($id)->update(['resetguid' => $guid]);
 
         return self::SUCCESS;
     }
@@ -565,7 +566,7 @@ class User extends Authenticatable
      */
     public static function updatePassword(int $id, string $password): int
     {
-        self::whereId($id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
+        self::find($id)->update(['password' => self::hashPassword($password), 'userseed' => md5(Str::uuid()->toString())]);
 
         return self::SUCCESS;
     }
@@ -596,7 +597,7 @@ class User extends Authenticatable
      */
     public static function incrementGrabs(int $id, $num = 1): void
     {
-        self::whereId($id)->increment('grabs', $num);
+        self::find($id)->increment('grabs', $num);
     }
 
     /**
@@ -777,30 +778,6 @@ class User extends Authenticatable
         $user->assignRole($roleName);
 
         return $user->id;
-    }
-
-    /**
-     * When a user logs in, update the last time they logged in.
-     *
-     * @param int    $userID ID of the user.
-     * @param string $host
-     */
-    public static function updateSiteAccessed($userID, $host = ''): void
-    {
-        self::whereId($userID)->update(
-            [
-                'lastlogin' => now(),
-                'host' => $host,
-            ]
-        );
-    }
-
-    /**
-     * @param $uid
-     */
-    public static function updateApiAccessed($uid): void
-    {
-        self::whereId($uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
     }
 
     /**

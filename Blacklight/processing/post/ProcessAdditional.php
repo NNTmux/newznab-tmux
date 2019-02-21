@@ -7,7 +7,6 @@ use Blacklight\Nfo;
 use Blacklight\NZB;
 use FFMpeg\FFProbe;
 use Blacklight\NNTP;
-use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
@@ -16,6 +15,7 @@ use Blacklight\Releases;
 use Blacklight\NameFixer;
 use Blacklight\Categorize;
 use App\Models\ReleaseFile;
+use App\Models\UsenetGroup;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
@@ -875,7 +875,7 @@ class ProcessAdditional
             // Check if it's a rar/zip.
             if (! $this->_NZBHasCompressedFile &&
                 preg_match(
-                    '/\.(part\d+|r\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+                    '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                     $this->_currentNZBFile['title']
                 )
             ) {
@@ -974,7 +974,7 @@ class ProcessAdditional
 
             // Probably not a rar/zip.
             if (! preg_match(
-                '/\.(part\d+|r\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+                '/\.(part\d+|[r|z]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
                 $nzbFile['title']
             )
             ) {
@@ -1045,14 +1045,18 @@ class ProcessAdditional
         $this->_compressedFilesChecked++;
         // Give the data to archive info so it can check if it's a rar.
         if (! $this->_archiveInfo->setData($compressedData, true)) {
-            $this->_debug('Data is probably not RAR or ZIP.');
+            if (config('app.debug') === true) {
+                $this->_debug('Data is probably not RAR or ZIP.');
+            }
 
             return false;
         }
 
         // Check if there's an error.
         if ($this->_archiveInfo->error !== '') {
-            $this->_debug('ArchiveInfo Error: '.$this->_archiveInfo->error);
+            if (config('app.debug') === true) {
+                $this->_debug('ArchiveInfo Error: '.$this->_archiveInfo->error);
+            }
 
             return false;
         }
@@ -1071,7 +1075,9 @@ class ProcessAdditional
 
         // Check if the compressed file is encrypted.
         if (! empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && (int) $dataSummary['is_encrypted'] !== 0)) {
-            $this->_debug('ArchiveInfo: Compressed file has a password.');
+            if (config('app.debug') === true) {
+                $this->_debug('ArchiveInfo: Compressed file has a password.');
+            }
             $this->_releaseHasPassword = true;
             $this->_passwordStatus[] = Releases::PASSWD_RAR;
 
@@ -1132,7 +1138,9 @@ class ProcessAdditional
 
             if (isset($file['name'])) {
                 if (isset($file['error'])) {
-                    $this->_debug("Error: {$file['error']} (in: {$file['source']})");
+                    if (config('app.debug') === true) {
+                        $this->_debug("Error: {$file['error']} (in: {$file['source']})");
+                    }
                     continue;
                 }
 
@@ -1185,7 +1193,7 @@ class ProcessAdditional
     {
         // Don't add rar/zip files to the DB.
         if (! isset($file['error']) && isset($file['source']) &&
-            ! preg_match($this->_supportFileRegex.'|part\d+|r\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
+            ! preg_match($this->_supportFileRegex.'|part\d+|[r|z]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx|zip|rar)(\s*\.rar)?$/i', $file['name'])
         ) {
 
             // Cache the amount of files we find in the RAR or ZIP, return this to say we did find RAR or ZIP content.
@@ -1208,7 +1216,9 @@ class ProcessAdditional
                     if (preg_match('/alt\.binaries\.movies($|\.divx$)/', $this->_releaseGroupName) &&
                         preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe$/i', $file['name'])
                     ) {
-                        $this->_debug('Codec spam found, setting release to potentially passworded.');
+                        if (config('app.debug') === true) {
+                            $this->_debug('Codec spam found, setting release to potentially passworded.');
+                        }
                         $this->_releaseHasPassword = true;
                         $this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
                     } //Run a PreDB filename check on insert to try and match the release
@@ -1647,8 +1657,8 @@ class ProcessAdditional
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getTraceAsString());
+                $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
             }
-            $this->_debug('ERROR: Could not open temp dir: '.$e->getMessage());
 
             return false;
         }
@@ -2239,10 +2249,10 @@ class ProcessAdditional
         $a = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $a['title']);
         $b = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $b['title']);
 
-        if (preg_match('/\.(part\d+|r\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
+        if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
             $af = true;
         }
-        if (preg_match('/\.(part\d+|r\d+)(\s*\.rar)*($|[ ")\]-])/i', $b)) {
+        if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $b)) {
             $bf = true;
         }
 
@@ -2299,7 +2309,7 @@ class ProcessAdditional
         $this->_passwordStatus = [Releases::PASSWD_NONE];
         $this->_releaseHasPassword = false;
 
-        $this->_releaseGroupName = Group::getNameByID($this->_release->groups_id);
+        $this->_releaseGroupName = UsenetGroup::getNameByID($this->_release->groups_id);
 
         $this->_releaseHasNoNFO = false;
         // Make sure we don't already have an nfo.

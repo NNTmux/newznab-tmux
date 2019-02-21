@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) Tiny Technologies, Inc. All rights reserved.
+ * Licensed under the LGPL or a commercial license.
+ * For LGPL see License.txt in the project root for license information.
+ * For commercial licenses see https://www.tiny.cloud/
+ *
+ * Version: 5.0.0-1 (2019-02-04)
+ */
 (function () {
 var autosave = (function () {
     'use strict';
@@ -168,31 +176,35 @@ var autosave = (function () {
       window.onbeforeunload = global$3._beforeUnloadHandler;
     };
 
-    var postRender = function (editor, started) {
-      return function (e) {
-        var ctrl = e.control;
-        ctrl.disabled(!hasDraft(editor));
-        editor.on('StoreDraft RestoreDraft RemoveDraft', function () {
-          ctrl.disabled(!hasDraft(editor));
-        });
-        startStoreDraft(editor, started);
+    var makeSetupHandler = function (editor, started) {
+      return function (api) {
+        api.setDisabled(!hasDraft(editor));
+        var editorEventCallback = function () {
+          return api.setDisabled(!hasDraft(editor));
+        };
+        editor.on('StoreDraft RestoreDraft RemoveDraft', editorEventCallback);
+        return function () {
+          return editor.off('StoreDraft RestoreDraft RemoveDraft', editorEventCallback);
+        };
       };
     };
     var register = function (editor, started) {
-      editor.addButton('restoredraft', {
-        title: 'Restore last draft',
-        onclick: function () {
+      startStoreDraft(editor, started);
+      editor.ui.registry.addButton('restoredraft', {
+        tooltip: 'Restore last draft',
+        icon: 'restore-draft',
+        onAction: function () {
           restoreLastDraft(editor);
         },
-        onPostRender: postRender(editor, started)
+        onSetup: makeSetupHandler(editor, started)
       });
-      editor.addMenuItem('restoredraft', {
+      editor.ui.registry.addMenuItem('restoredraft', {
         text: 'Restore last draft',
-        onclick: function () {
+        icon: 'restore-draft',
+        onAction: function () {
           restoreLastDraft(editor);
         },
-        onPostRender: postRender(editor, started),
-        context: 'file'
+        onSetup: makeSetupHandler(editor, started)
       });
     };
 

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Group;
 use App\Models\Release;
+use App\Models\UsenetGroup;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -39,7 +39,7 @@ class NntmuxResetTruncate extends Command
      */
     public function handle()
     {
-        Group::query()->update(['first_record' => 0, 'first_record_postdate' => null, 'last_record' => 0, 'last_record_postdate' => null, 'last_updated' => null]);
+        UsenetGroup::query()->update(['first_record' => 0, 'first_record_postdate' => null, 'last_record' => 0, 'last_record_postdate' => null, 'last_updated' => null]);
         $this->info('Reseting all groups completed.');
         DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 

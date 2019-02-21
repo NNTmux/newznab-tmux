@@ -160,12 +160,15 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
+        App\Providers\TelescopeServiceProvider::class,
         Jrean\UserVerification\UserVerificationServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Way\Generators\GeneratorsServiceProvider::class,
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         Orangehill\Iseed\IseedServiceProvider::class,
         Messerli90\IGDB\IGDBServiceProvider::class,
+        App\Providers\UserServiceProvider::class,
 
     ],
 

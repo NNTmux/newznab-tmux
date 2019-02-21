@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
 use App\Models\Settings;
 use App\Models\Collection;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
@@ -254,7 +254,7 @@ class Binaries
      */
     public function updateAllGroups($maxHeaders = 100000): void
     {
-        $groups = Group::getActive();
+        $groups = UsenetGroup::getActive();
 
         $groupCount = \count($groups);
         if ($groupCount > 0) {
@@ -278,8 +278,9 @@ class Binaries
                 $counter++;
             }
 
+            $endTime = now()->diffInSeconds($allTime);
             $this->log(
-                'Updating completed in '.Str::plural(' second', now()->diffInSeconds($allTime)),
+                'Updating completed in '.$endTime.Str::plural(' second', $endTime),
                 __FUNCTION__,
                 'primary'
             );
@@ -318,13 +319,13 @@ class Binaries
 
         // Select the group on the NNTP server, gets the latest info on it.
         $groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
-        if ($this->_nntp->isError($groupNNTP)) {
+        if ($this->_nntp::isError($groupNNTP)) {
             $groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
 
             if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
-                Group::disableIfNotExist($groupMySQL['id']);
+                UsenetGroup::disableIfNotExist($groupMySQL['id']);
             }
-            if ($this->_nntp->isError($groupNNTP)) {
+            if ($this->_nntp::isError($groupNNTP)) {
                 return;
             }
         }
@@ -348,7 +349,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
+            UsenetGroup::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
         }
 
         // Get first article we want aka the oldest.
@@ -410,11 +411,11 @@ class Binaries
         if ($total > 0) {
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
-                        (
+                    (
                         (int) $groupMySQL['last_record'] === 0
                             ? 'New group '.$groupNNTP['group'].' starting with '.
                             (
-                            $this->_newGroupScanByDays
+                                $this->_newGroupScanByDays
                                 ? $this->_newGroupDaysToScan.' days'
                                 : number_format($this->_newGroupMessagesToScan).' messages'
                             ).' worth.'
@@ -429,7 +430,7 @@ class Binaries
 
             $done = false;
             // Get all the parts (in portions of $this->messageBuffer to not use too much memory).
-            while ($done === false) {
+            while (! $done) {
 
                 // Increment last until we reach $groupLast (group newest article).
                 if ($total > $this->messageBuffer) {
@@ -444,7 +445,7 @@ class Binaries
 
                 if ($this->_echoCLI) {
                     $this->colorCli->header(
-                            PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
+                        PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
                             ' to '.number_format($last).') from '.$groupMySQL['name'].' - ('.
                             number_format($groupLast - $last).' articles in queue).'
                         );
@@ -466,7 +467,7 @@ class Binaries
                             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
                         }
 
-                        Group::query()
+                        UsenetGroup::query()
                             ->where('id', $groupMySQL['id'])
                             ->update(
                                 [
@@ -483,7 +484,7 @@ class Binaries
                         $scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
                     }
 
-                    Group::query()
+                    UsenetGroup::query()
                         ->where('id', $groupMySQL['id'])
                         ->update(
                             [
@@ -494,7 +495,7 @@ class Binaries
                         );
                 } else {
                     // If we didn't fetch headers, update the record still.
-                    Group::query()
+                    UsenetGroup::query()
                         ->where('id', $groupMySQL['id'])
                         ->update(
                             [
@@ -512,14 +513,15 @@ class Binaries
             }
 
             if ($this->_echoCLI) {
+                $endGroup = now()->diffInSeconds($startGroup);
                 $this->colorCli->primary(
-                        PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
-                        Str::plural(' second', now()->diffInSeconds($startGroup))
+                    PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.
+                        $endGroup.Str::plural(' second', $endGroup)
                     );
             }
         } elseif ($this->_echoCLI) {
             $this->colorCli->primary(
-                    'No new articles for '.$groupMySQL['name'].' (first '.number_format($first).
+                'No new articles for '.$groupMySQL['name'].' (first '.number_format($first).
                     ', last '.number_format($last).', grouplast '.number_format($groupMySQL['last_record']).
                     ', total '.number_format($total).")\n".'Server oldest: '.number_format($groupNNTP['first']).
                     ' Server newest: '.number_format($groupNNTP['last']).' Local newest: '.number_format($groupMySQL['last_record'])
@@ -556,7 +558,7 @@ class Binaries
         $this->addToPartRepair = ($type === 'update' && $this->_partRepair);
 
         // Download the headers.
-        if ($partRepair === true) {
+        if ($partRepair) {
             // This is slower but possibly is better with missing headers.
             $headers = $this->_nntp->getOverview($this->first.'-'.$this->last, true, false);
         } else {
@@ -564,10 +566,10 @@ class Binaries
         }
 
         // If there was an error, try to reconnect.
-        if ($this->_nntp->isError($headers)) {
+        if ($this->_nntp::isError($headers)) {
 
             // Increment if part repair and return false.
-            if ($partRepair === true) {
+            if ($partRepair) {
                 DB::update(
                     sprintf(
                         'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
@@ -591,7 +593,7 @@ class Binaries
             $this->_nntp->enableCompression();
 
             // Check if the non-compression headers have an error.
-            if ($this->_nntp->isError($headers)) {
+            if ($this->_nntp::isError($headers)) {
                 $message = ((int) $headers->code === 0 ? 'Unknown error' : $headers->message);
                 $this->log(
                     "Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}",
@@ -633,7 +635,7 @@ class Binaries
             }
 
             // If set we are running in partRepair mode.
-            if ($partRepair === true && $missingParts !== null) {
+            if ($partRepair && $missingParts !== null) {
                 if (! \in_array($header['Number'], $missingParts, false)) {
                     // If article isn't one that is missing skip it.
                     continue;
@@ -681,7 +683,7 @@ class Binaries
             $this->updateBlacklistUsage();
         }
 
-        if ($this->_echoCLI && $partRepair === false) {
+        if ($this->_echoCLI && ! $partRepair) {
             $this->outputHeaderInitial();
         }
 
@@ -728,7 +730,7 @@ class Binaries
 
                 if ($this->_echoCLI) {
                     $this->colorCli->alternate(
-                            'Server did not return '.$notReceivedCount.
+                        'Server did not return '.$notReceivedCount.
                             ' articles from '.$this->groupMySQL['name'].'.'
                         );
                 }
@@ -988,7 +990,7 @@ class Binaries
     protected function outputHeaderInitial(): void
     {
         $this->colorCli->primary(
-                'Received '.\count($this->headersReceived).
+            'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
             );
@@ -1064,7 +1066,7 @@ class Binaries
         if ($missingCount > 0) {
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
-                        'Attempting to repair '.
+                    'Attempting to repair '.
                         number_format($missingCount).
                         ' parts.'
                     );
@@ -1144,7 +1146,7 @@ class Binaries
 
             if ($this->_echoCLI) {
                 $this->colorCli->primary(
-                        PHP_EOL.
+                    PHP_EOL.
                         number_format($partsRepaired).
                         ' parts repaired.'
                     );
@@ -1181,14 +1183,14 @@ class Binaries
             // Try to get the article date locally first.
             // Try to get locally.
             $local = DB::select(
-                    sprintf(
-                        '
+                sprintf(
+                    '
 						SELECT c.date AS date
 						FROM collections c
 						INNER JOIN binaries b ON(c.id=b.collections_id)
 						INNER JOIN parts p ON(b.id=p.binaries_id)
 						WHERE p.number = %s',
-                        $currentPost
+                    $currentPost
                     )
                 );
             if (! empty($local) && \count($local) > 0) {
@@ -1198,7 +1200,7 @@ class Binaries
 
             // If we could not find it locally, try usenet.
             $header = $this->_nntp->getXOVER($currentPost);
-            if (! $this->_nntp->isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
+            if (! $this->_nntp::isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
                 $date = $header[0]['Date'];
                 break;
             }
@@ -1263,7 +1265,7 @@ class Binaries
 
         if ($this->_echoCLI) {
             $this->colorCli->primary(
-                    'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
+                'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
                 );
         }
 
@@ -1321,7 +1323,7 @@ class Binaries
         $wantedArticle = (int) $wantedArticle;
         if ($this->_echoCLI) {
             $this->colorCli->primary(
-                    PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
+                PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
                 );
         }
@@ -1480,7 +1482,7 @@ class Binaries
 					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
 					bb.last_activity as last_activity
 				FROM binaryblacklist bb
-				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
+				LEFT OUTER JOIN usenet_groups g ON g.name %s bb.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
                 ($groupRegex ? 'REGEXP' : '='),
@@ -1591,12 +1593,8 @@ class Binaries
     protected function _ignoreFileCount($groupName, $subject): bool
     {
         $ignore = false;
-        switch ($groupName) {
-            case 'alt.binaries.erotica':
-                if (preg_match('/^\[\d+\]-\[FULL\]-\[#a\.b\.erotica@EFNet\]-\[ \d{2,3}_/', $subject)) {
-                    $ignore = true;
-                }
-                break;
+        if (($groupName === 'alt.binaries.erotica') && preg_match('/^\[\d+\]-\[FULL\]-\[#a\.b\.erotica@EFNet\]-\[ \d{2,3}_/', $subject)) {
+            $ignore = true;
         }
 
         return $ignore;

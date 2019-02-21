@@ -11,12 +11,10 @@ use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Jrean\UserVerification\Traits\VerifiesUsers;
-use Jrean\UserVerification\Facades\UserVerification;
 
 class RegisterController extends Controller
 {
@@ -82,7 +80,6 @@ class RegisterController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
      */
     public function register(Request $request)
     {
@@ -156,12 +153,6 @@ class RegisterController extends Controller
                                 'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
                             ]
                         );
-
-                    event(new Registered($user));
-
-                    UserVerification::generate($user);
-
-                    UserVerification::send($user, 'User email verification required');
 
                     return $this->registered($request, $user) ?: redirect($this->redirectPath());
 

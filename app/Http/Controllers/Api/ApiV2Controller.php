@@ -10,6 +10,7 @@ use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
+use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
 use App\Transformers\ApiTransformer;
 use App\Transformers\TagsTransformer;
@@ -70,6 +71,7 @@ class ApiV2Controller extends BasePageController
         $maxAge = $api->maxAge();
         $catExclusions = User::getCategoryExclusionForApi($request);
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        event(new UserAccessedApi($user));
 
         $imdbId = $request->has('imdbid') && ! empty($request->input('imdbid')) ? $request->input('imdbid') : -1;
         $tmdbId = $request->has('tmdbid') && ! empty($request->input('tmdbid')) ? $request->input('tmdbid') : -1;
@@ -116,6 +118,7 @@ class ApiV2Controller extends BasePageController
         $maxAge = $api->maxAge();
         $groupName = $api->group();
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        event(new UserAccessedApi($user));
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
@@ -180,6 +183,7 @@ class ApiV2Controller extends BasePageController
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        event(new UserAccessedApi($user));
 
         $siteIdArr = [
             'id'     => $request->input('vid') ?? '0',
@@ -230,6 +234,8 @@ class ApiV2Controller extends BasePageController
      */
     public function getNzb(Request $request)
     {
+        $user = User::query()->where('api_token', $request->input('api_token'))->first();
+        event(new UserAccessedApi($user));
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData) {
@@ -252,6 +258,7 @@ class ApiV2Controller extends BasePageController
 
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $userData = User::query()->where('api_token', $request->input('api_token'))->first();
+        event(new UserAccessedApi($userData));
         $relData = Release::getByGuid($request->input('id'));
 
         $relData = fractal($relData, new DetailsTransformer($userData));

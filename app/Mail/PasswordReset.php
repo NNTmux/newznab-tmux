@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -12,19 +11,25 @@ class PasswordReset extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
-
-    public $newPass;
+    /**
+     * @var \App\Models\User
+     */
+    private $user;
 
     /**
-     * Create a new message instance.
-     *
-     * @param $userId
-     * @param $newPass
+     * @var string
      */
-    public function __construct($userId, $newPass)
+    private $newPass;
+
+    /**
+     * PasswordReset constructor.
+     *
+     * @param \App\Models\User $user
+     * @param                  $newPass
+     */
+    public function __construct($user, $newPass)
     {
-        $this->user = User::find($userId);
+        $this->user = $user;
         $this->newPass = $newPass;
     }
 

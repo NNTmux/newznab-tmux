@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
 use App\Models\Predb;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -456,7 +456,7 @@ class IRCScraper extends IRCClient
     protected function _getGroupID($groupName)
     {
         if (! isset($this->_groupList[$groupName])) {
-            $group = Group::query()->where('name', $groupName)->first(['id']);
+            $group = UsenetGroup::query()->where('name', $groupName)->first(['id']);
             $this->_groupList[$groupName] = $group !== null ? $group['id'] : '';
         }
 

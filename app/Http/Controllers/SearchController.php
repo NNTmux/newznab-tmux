@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Group;
 use App\Models\Category;
 use Blacklight\Releases;
+use App\Models\UsenetGroup;
 use Illuminate\Http\Request;
 
 class SearchController extends BasePageController
@@ -42,15 +42,15 @@ class SearchController extends BasePageController
         );
 
         if ($searchType === 'basic' && ! $request->has('searchadvr') && ($request->has('id') || $request->has('subject'))) {
-            $searchString = '';
+            $searchString = [];
             switch (true) {
                 case $request->has('subject'):
-                    $searchString = (string) $request->input('subject');
-                    $this->smarty->assign('subject', $searchString);
+                    $searchString['searchname'] = (string) $request->input('subject');
+                    $this->smarty->assign('subject', $searchString['searchname']);
                     break;
                 case $request->has('id'):
-                    $searchString = (string) $request->input('id');
-                    $this->smarty->assign('search', $searchString);
+                    $searchString['searchname'] = (string) $request->input('id');
+                    $this->smarty->assign('search', $searchString['searchname']);
                     break;
             }
 
@@ -61,7 +61,7 @@ class SearchController extends BasePageController
             foreach ($releases->getBrowseOrdering() as $orderType) {
                 $this->smarty->assign(
                     'orderby'.$orderType,
-                    WWW_TOP.'/search?id='.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType
+                    WWW_TOP.'/search?id='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&amp;ob='.$orderType
                 );
             }
 
@@ -75,11 +75,6 @@ class SearchController extends BasePageController
                 -1,
                 -1,
                 -1,
-                -1,
-                -1,
-                -1,
-                0,
-                0,
                 -1,
                 -1,
                 $offset,
@@ -104,10 +99,18 @@ class SearchController extends BasePageController
         }
 
         $searchVars = [
-            'searchadvr' => '', 'searchadvsubject' => '', 'searchadvposter' => '',
-            'searchadvfilename' => '', 'searchadvdaysnew' => '', 'searchadvdaysold' => '',
-            'searchadvgroups' => '', 'searchadvcat' => '', 'searchadvsizefrom' => '',
-            'searchadvsizeto' => '', 'searchadvhasnfo' => '', 'searchadvhascomments' => '',
+            'searchadvr' => '',
+            'searchadvsubject' => '',
+            'searchadvposter' => '',
+            'searchadvfilename' => '',
+            'searchadvdaysnew' => '',
+            'searchadvdaysold' => '',
+            'searchadvgroups' => '',
+            'searchadvcat' => '',
+            'searchadvsizefrom' => '',
+            'searchadvsizeto' => '',
+            'searchadvhasnfo' => '',
+            'searchadvhascomments' => '',
         ];
 
         foreach ($searchVars as $searchVarKey => $searchVar) {
@@ -136,16 +139,18 @@ class SearchController extends BasePageController
                 );
             }
 
+            $searchArr = [
+                'searchname' => $searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr'],
+                'name' => $searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject'],
+                'fromname' => $searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter'],
+                'filename' => $searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename'],
+            ];
+
             $rslt = $releases->search(
-                ($searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr']),
-                ($searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject']),
-                ($searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter']),
-                ($searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename']),
+                $searchArr,
                 $searchVars['searchadvgroups'],
                 $searchVars['searchadvsizefrom'],
                 $searchVars['searchadvsizeto'],
-                $searchVars['searchadvhasnfo'],
-                $searchVars['searchadvhascomments'],
                 ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
                 ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
                 $offset,
@@ -166,22 +171,6 @@ class SearchController extends BasePageController
             );
         }
 
-        $search_description =
-            'Sphinx Search Rules:<br />
-The search is case insensitive.<br />
-All words must be separated by spaces.
-Do not seperate words using . or _ or -, sphinx will match a space against those automatically.<br />
-Putting | between words makes any of those words optional.<br />
-Putting << between words makes the word on the left have to be before the word on the right.<br />
-Putting - or ! in front of a word makes that word excluded. Do not add a space between the - or ! and the word.<br />
-Quoting all the words using " will look for an exact match.<br />
-Putting ^ at the start will limit searches to releases that start with that word.<br />
-Putting $ at the end will limit searches to releases that end with that word.<br />
-Putting a * after a word will do a partial word search. ie: fish* will match fishing.<br />
-If your search is only words seperated by spaces, all those words will be mandatory, the order of the words is not important.<br />
-You can enclose words using paranthesis. ie: (^game*|^dex*)s03*(x264<&lt;nogrp$)<br />
-You can combine some of these rules, but not all.<br />';
-
         $this->smarty->assign(
             [
                 'sizelist' => [
@@ -190,9 +179,8 @@ You can combine some of these rules, but not all.<br />';
                 ],
                 'results' => $results,
                 'sadvanced' => $searchType !== 'basic',
-                'grouplist' => Group::getGroupsForSelect(),
+                'grouplist' => UsenetGroup::getGroupsForSelect(),
                 'catlist' => Category::getForSelect(),
-                'search_description' => $search_description,
             ]
         );
 

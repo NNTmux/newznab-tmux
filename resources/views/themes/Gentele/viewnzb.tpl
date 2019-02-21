@@ -638,7 +638,7 @@
 									</ul>
 									<br/>
 									<a title="Search for similar Nzbs"
-									   href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"htmlall"}">Search for
+									   href="{$smarty.const.WWW_TOP}/search?id={$searchname|escape:"htmlall"}">Search for
 										similar NZBs...</a>
 									<br/>
 									</td>

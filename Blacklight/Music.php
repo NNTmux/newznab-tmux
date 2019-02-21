@@ -2,20 +2,14 @@
 
 namespace Blacklight;
 
-use ApaiIO\ApaiIO;
 use App\Models\Genre;
-use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MusicInfo;
-use ApaiIO\Operations\Search;
 use DariusIII\ItunesApi\iTunes;
-use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
 use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
 use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
@@ -211,7 +205,7 @@ class Music
 				g.name AS group_name,
 				rn.releases_id AS nfoid
 			FROM releases r
-			LEFT OUTER JOIN groups g ON g.id = r.groups_id
+			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			INNER JOIN musicinfo m ON m.id = r.musicinfo_id
@@ -362,13 +356,7 @@ class Music
         if ($amazdata !== null) {
             $mus = $amazdata;
         } elseif ($title !== '') {
-            $mus = $this->fetchAmazonProperties($title);
-        }
-
-        if ($mus === false) {
             $mus = $this->fetchItunesMusicProperties($title);
-        } else {
-            $mus = false;
         }
 
         if ($mus === false) {
@@ -451,194 +439,6 @@ class Music
     }
 
     /**
-     * @param $title
-     *
-     * @return array|bool
-     * @throws \Exception
-     */
-    protected function fetchAmazonProperties($title)
-    {
-        $gen = new Genres(['Settings' => null]);
-        $titlepercent = 0;
-        $mus = [];
-        $responses = false;
-        $conf = new GenericConfiguration();
-        $client = new Client();
-        $request = new GuzzleRequest($client);
-
-        try {
-            $conf
-                ->setCountry('com')
-                ->setAccessKey($this->pubkey)
-                ->setSecretKey($this->privkey)
-                ->setAssociateTag($this->asstag)
-                ->setRequest($request)
-                ->setResponseTransformer(new XmlToSimpleXmlObject());
-        } catch (\Throwable $e) {
-            echo $e->getMessage();
-        }
-
-        $apaiIo = new ApaiIO($conf);
-        // Try Music category.
-        try {
-            $search = new Search();
-            $search->setCategory('Music')
-            ->setKeywords($title)
-            ->setResponseGroup(['Large']);
-            $responses = $apaiIo->runOperation($search);
-        } catch (\Throwable $e) {
-            // Empty because we try another method.
-        }
-
-        // Try MP3 category.
-        if ($responses === false) {
-            usleep(700000);
-            try {
-                $search = new Search();
-                $search->setCategory('MP3Downloads')
-                ->setKeywords($title)
-                ->setResponseGroup(['Large']);
-                $responses = $apaiIo->runOperation($search);
-            } catch (\Throwable $e) {
-                // Empty because we try another method.
-            }
-        }
-
-        // Try Digital Music category.
-        if ($responses === false) {
-            usleep(700000);
-            try {
-                $search = new Search();
-                $search->setCategory('DigitalMusic')
-                ->setKeywords($title)
-                ->setResponseGroup(['Large']);
-                $responses = $apaiIo->runOperation($search);
-            } catch (\Throwable $e) {
-                // Empty because we try another method.
-            }
-        }
-
-        // Try Music Tracks category.
-        if ($responses === false) {
-            usleep(700000);
-            try {
-                $search = new Search();
-                $search->setCategory('MusicTracks')
-                ->setKeywords($title)
-                ->setResponseGroup(['Large']);
-                $responses = $apaiIo->runOperation($search);
-            } catch (\Throwable $e) {
-                // Empty because we exhausted all possibilities.
-            }
-        }
-        if ($responses === false) {
-            throw new \RuntimeException('Could not connect to Amazon');
-        }
-        foreach ($responses->Items->Item as $response) {
-            similar_text($title, $response->ItemAttributes->Title, $percent);
-            if ($percent > self::MATCH_PERCENT && isset($response->ItemAttributes->Title)) {
-                if (isset($response->ItemAttributes->Title)) {
-                    $mus['title'] = (string) $response->ItemAttributes->Title;
-                    if (empty($mus['title'])) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-
-                // Load genres.
-                $defaultGenres = $gen->loadGenres(Genres::MUSIC_TYPE);
-
-                // Get album properties.
-                $mus['coverurl'] = (string) $response->LargeImage->URL;
-                if ($mus['coverurl'] !== '') {
-                    $mus['cover'] = 1;
-                } else {
-                    $mus['cover'] = 0;
-                }
-
-                $mus['asin'] = (string) $response->ASIN;
-
-                $mus['url'] = (string) $response->DetailPageURL;
-                $mus['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $mus['url']);
-
-                $mus['salesrank'] = (string) $response->SalesRank;
-                if ($mus['salesrank'] === '') {
-                    $mus['salesrank'] = 'null';
-                }
-
-                $mus['artist'] = (string) $response->ItemAttributes->Artist;
-                if (empty($mus['artist'])) {
-                    $mus['artist'] = (string) $response->ItemAttributes->Creator;
-                    if (empty($mus['artist'])) {
-                        $mus['artist'] = '';
-                    }
-                }
-
-                $mus['publisher'] = (string) $response->ItemAttributes->Publisher;
-
-                $mus['releasedate'] = escapeString((string) $response->ItemAttributes->ReleaseDate);
-                if ($mus['releasedate'] === "''") {
-                    $mus['releasedate'] = 'null';
-                }
-
-                $mus['review'] = '';
-                if (isset($response->EditorialReviews)) {
-                    $mus['review'] = trim(strip_tags((string) $response->EditorialReviews->EditorialReview->Content));
-                }
-
-                if (empty($mus['year'])) {
-                    $mus['year'] = ($mus['releasedate'] !== 'null' ? substr($mus['releasedate'], 1, 4) : date('Y'));
-                }
-
-                $mus['tracks'] = '';
-                if (isset($response->Tracks)) {
-                    $tmpTracks = (array) $response->Tracks->Disc;
-                    $tracks = $tmpTracks['Track'];
-                    $mus['tracks'] = (\is_array($tracks) && ! empty($tracks)) ? implode('|', $tracks) : '';
-                }
-
-                similar_text($mus['artist'].' '.$mus['title'], $title, $titlepercent);
-                if ($titlepercent < 60) {
-                    return false;
-                }
-
-                $genreKey = -1;
-                $genreName = '';
-                if (isset($response->BrowseNodes)) {
-                    // Had issues getting this out of the browsenodes obj.
-                    // Workaround is to get the xml and load that into its own obj.
-                    $amazGenresXml = $response->BrowseNodes->asXml();
-                    $amazGenres = simplexml_load_string($amazGenresXml)->xpath('//BrowseNodeId');
-
-                    foreach ($amazGenres as $amazGenre) {
-                        $currNode = trim($amazGenre[0]);
-                        if (empty($genreName)) {
-                            $genreMatch = $this->matchBrowseNode($currNode);
-                            if ($genreMatch !== false) {
-                                $genreName = $genreMatch;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (\in_array(strtolower($genreName), $defaultGenres, false)) {
-                        $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
-                    } else {
-                        $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
-                    }
-                }
-                $mus['musicgenre'] = $genreName;
-                $mus['musicgenres_id'] = $genreKey;
-
-                return $mus;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @param bool $local
      * @throws \Exception
      */
@@ -646,7 +446,7 @@ class Music
     {
         $res = DB::select(
             sprintf(
-            '
+                '
 					SELECT searchname, id
 					FROM releases
 					WHERE musicinfo_id IS NULL
@@ -654,12 +454,12 @@ class Music
 					AND categories_id IN (%s, %s, %s)
 					ORDER BY postdate DESC
 					LIMIT %d',
-            NZB::NZB_ADDED,
-            $this->renamed,
-            Category::MUSIC_MP3,
-            Category::MUSIC_LOSSLESS,
-            Category::MUSIC_OTHER,
-            $this->musicqty
+                NZB::NZB_ADDED,
+                $this->renamed,
+                Category::MUSIC_MP3,
+                Category::MUSIC_LOSSLESS,
+                Category::MUSIC_OTHER,
+                $this->musicqty
         )
         );
 

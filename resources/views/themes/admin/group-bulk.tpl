@@ -1,7 +1,7 @@
 <div class="card card-body">
 	<h1>{$title}</h1>
 
-	{if $groupmsglist}
+	{if !empty($groupmsglist)}
 		<table class="data table table-striped responsive-utilities jambo-table Sortable">
 
 			<tr>
@@ -9,7 +9,7 @@
 				<th>msg</th>
 			</tr>
 
-			{foreach from=$groupmsglist item=group}
+			{foreach $groupmsglist as $group}
 				<tr>
 					<td>{$group.group}</td>
 					<td>{$group.msg}</td>
@@ -20,10 +20,8 @@
 		<p>View <a href="group-list">all groups</a>.</p>
 	{else}
 		<p>Regex of groups to add to the site.</p>
-		<form action="group-bulk?action=submit" method="POST">
-			{{csrf_field()}}
+		{{Form::open(['url'=> "admin/group-bulk?action=submit"])}}
 			<table class="input">
-
 				<tr>
 					<td width="90">Group List:</td>
 					<td>
@@ -56,6 +54,6 @@
 
 			</table>
 
-		</form>
+		{{Form::close()}}
 	{/if}
 </div>

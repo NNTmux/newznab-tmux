@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 
 /**
  * Categorizing of releases by name/group.
@@ -123,7 +123,7 @@ class Categorize
     private function groupName(): string
     {
         if (! isset($this->ugroups[$this->groupid])) {
-            $group = Group::query()->where('id', $this->groupid)->first(['name']);
+            $group = UsenetGroup::query()->where('id', $this->groupid)->first(['name']);
             $this->ugroups[$this->groupid] = ($group === null ? false : $group['name']);
         }
 

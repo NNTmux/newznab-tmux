@@ -17,7 +17,7 @@ class BlacklistController extends BasePageController
         $this->setAdminPrefs();
         $binaries = new Binaries();
 
-        $meta_title = $title = 'Binary Black/Whitelist List';
+        $meta_title = $title = 'Binary Black/White List';
 
         $binlist = $binaries->getBlacklist(false);
         $this->smarty->assign('binlist', $binlist);
@@ -39,7 +39,7 @@ class BlacklistController extends BasePageController
         $binaries = new Binaries(['Settings' => null]);
         $error = '';
         $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
-        $meta_title = $title = 'Binary Black/Whitelist';
+        $meta_title = $title = 'Binary Black/White list';
 
         switch ($request->input('action') ?? 'view') {
             case 'submit':
@@ -53,7 +53,7 @@ class BlacklistController extends BasePageController
                     break;
                 }
 
-                if ($request->input('id') === '') {
+                if (empty($request->input('id'))) {
                     $binaries->addBlacklist($request->all());
                 } else {
                     $binaries->updateBlacklist($request->all());

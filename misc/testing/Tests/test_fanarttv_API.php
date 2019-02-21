@@ -14,7 +14,7 @@ if (! empty($argv[1])) {
     // Test if you can fetch Fanart.TV images
 
     // Search for a movie/tv
-    $moviefanart = $fanart->getMovieFanart((string) $argv[1]);
+    $moviefanart = $fanart->getMovieFanArt((string) $argv[1]);
     if ($moviefanart) {
         dump($moviefanart);
     } else {

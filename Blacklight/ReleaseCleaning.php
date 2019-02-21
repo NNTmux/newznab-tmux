@@ -132,7 +132,7 @@ class ReleaseCleaning
             preg_match('/^(\d{4,6})-\d{1}\[/', $subject, $match) ||
             preg_match('/(\d{4,6}) -/', $subject, $match)
         ) {
-            $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $groupName])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+            $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $groupName])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             //check for predb title matches against other groups where it matches relative size / fromname
             //known crossposted requests only atm
             $reqGname = '';
@@ -156,7 +156,7 @@ class ReleaseCleaning
                     break;
             }
             if ($title === null && ! empty($reqGname)) {
-                $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $reqGname])->join('groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
+                $title = Predb::query()->where(['predb.requestid'=> $match[1], 'g.name' => $reqGname])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             }
             // don't match against ab.teevee if title is for just the season
             if ($groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {

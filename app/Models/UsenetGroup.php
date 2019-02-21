@@ -27,22 +27,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $backfill
  * @property string|null $description
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfill($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereBackfillTarget($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecord($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereFirstRecordPostdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecord($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastRecordPostdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereLastUpdated($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinfilestoformrelease($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereMinsizetoformrelease($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Group whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfill($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfillTarget($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereFirstRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereFirstRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereLastRecord($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereLastRecordPostdate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereLastUpdated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinfilestoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereMinsizetoformrelease($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereName($value)
  * @mixin \Eloquent
  */
-class Group extends Model
+class UsenetGroup extends Model
 {
     /**
      * @var bool
@@ -197,13 +197,13 @@ class Group extends Model
      *
      * @param string $name The group name.
      *
-     * @return string|int Empty string on failure, groups_id on success.
+     * @return false|int false on failure, groups_id on success.
      */
     public static function getIDByName($name)
     {
         $res = self::query()->where('name', $name)->first(['id']);
 
-        return $res === null ? '' : $res->id;
+        return $res === null ? false : $res->id;
     }
 
     /**
@@ -297,25 +297,28 @@ class Group extends Model
     /**
      * Add a new group.
      *
-     * @param array $group
      *
-     * @return bool
+     * @param $group
+     * @return int|mixed
      */
-    public static function addGroup($group): bool
+    public static function addGroup($group)
     {
-        return self::query()->insertGetId(
-            [
-                'name' => trim($group['name']),
-                'description' => isset($group['description']) ? trim($group['description']) : '',
-                'backfill_target' => $group['backfill_target'] ?? 1,
-                'first_record' => $group['first_record'] ?? 0,
-                'last_record' => $group['last_record'] ?? 0,
-                'active' => $group['active'] ?? 0,
-                'backfill' => $group['backfill'] ?? 0,
-                'minsizetoformrelease' => $group['minsizetoformrelease'] ?? null,
-                'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
-            ]
-        );
+        $checkOld = UsenetGroup::query()->where('name', trim($group['name']))->first();
+        if (empty($checkOld)) {
+            return self::query()->insertGetId([
+                    'name' => trim($group['name']),
+                    'description' => isset($group['description']) ? trim($group['description']) : '',
+                    'backfill_target' => $group['backfill_target'] ?? 1,
+                    'first_record' => $group['first_record'] ?? 0,
+                    'last_record' => $group['last_record'] ?? 0,
+                    'active' => $group['active'] ?? 0,
+                    'backfill' => $group['backfill'] ?? 0,
+                    'minsizetoformrelease' => $group['minsizetoformrelease'] ?? null,
+                    'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
+                ]);
+        }
+
+        return $checkOld->id;
     }
 
     /**
@@ -419,12 +422,12 @@ class Group extends Model
         $releaseImage = new ReleaseImage();
         foreach ($res as $row) {
             $releases->deleteSingle(
-                    [
+                [
                         'g' => $row['guid'],
                         'i' => $row['id'],
                     ],
-                    $nzb,
-                    $releaseImage
+                $nzb,
+                $releaseImage
                 );
         }
     }
@@ -452,7 +455,7 @@ class Group extends Model
             $nntp->doQuit();
 
             if ($nntp->isError($groups)) {
-                return 'Problem fetching groups from usenet.';
+                return 'Problem fetching usenet_groups from usenet.';
             }
 
             $regFilter = '/'.$groupList.'/i';
@@ -462,7 +465,7 @@ class Group extends Model
             foreach ($groups as $group) {
                 if (preg_match($regFilter, $group['group']) > 0) {
                     $res = self::getIDByName($group['group']);
-                    if ($res === '') {
+                    if ($res === false) {
                         self::addGroup(
                             [
                                 'name'        => $group['group'],
@@ -477,7 +480,7 @@ class Group extends Model
             }
 
             if (\count($ret) === 0) {
-                $ret = 'No groups found with your regex, try again!';
+                $ret[] = ['group' => '', 'msg' => 'No groups found with your regex or groups already exist in database, try again!'];
             }
         }
 

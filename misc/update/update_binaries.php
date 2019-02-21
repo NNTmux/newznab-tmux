@@ -3,10 +3,10 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
-use App\Models\Group;
 use App\Models\Settings;
 use Blacklight\Binaries;
 use Blacklight\ColorCLI;
+use App\Models\UsenetGroup;
 
 $maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
 $colorCli = new ColorCLI();
@@ -23,7 +23,7 @@ if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $groupName = $argv[1];
     $colorCli->header("Updating group: $groupName");
 
-    $group = Group::getByName($groupName);
+    $group = UsenetGroup::getByName($groupName);
     if (is_array($group)) {
         $binaries->updateGroup(
             $group,

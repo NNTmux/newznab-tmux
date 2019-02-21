@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Group;
 use App\Models\Sharing;
 use Blacklight\Regexes;
 use Blacklight\Binaries;
 use App\Models\SharingSite;
+use App\Models\UsenetGroup;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use App\Http\Controllers\BasePageController;
@@ -51,39 +51,39 @@ class AjaxController extends BasePageController
                 break;
 
             case 'group_edit_purge_all':
-                Group::purge();
+                UsenetGroup::purge();
                 echo 'All groups purged.';
                 break;
 
             case 'group_edit_reset_all':
-                Group::resetall();
+                UsenetGroup::resetall();
                 echo 'All groups reset.';
                 break;
 
             case 'group_edit_purge_single':
                 $id = (int) $request->input('group_id');
-                Group::purge($id);
+                UsenetGroup::purge($id);
                 echo "Group $id purged.";
                 break;
 
             case 'group_edit_reset_single':
                 $id = (int) $request->input('group_id');
-                Group::reset($id);
+                UsenetGroup::reset($id);
                 echo "Group $id reset.";
                 break;
 
             case 'group_edit_delete_single':
                 $id = (int) $request->input('group_id');
-                Group::deleteGroup($id);
+                UsenetGroup::deleteGroup($id);
                 echo "Group $id deleted.";
                 break;
 
             case 'toggle_group_active_status':
-                print Group::updateGroupStatus((int) $request->input('group_id'), 'active', ($request->has('group_status') ? (int) $request->input('group_status') : 0));
+                print UsenetGroup::updateGroupStatus((int) $request->input('group_id'), 'active', ($request->has('group_status') ? (int) $request->input('group_status') : 0));
                 break;
 
             case 'toggle_group_backfill_status':
-                print Group::updateGroupStatus(
+                print UsenetGroup::updateGroupStatus(
                     (int) $request->input('group_id'),
                     'backfill',
                     ($request->has('backfill_status') ? (int) $request->input('backfill_status') : 0)

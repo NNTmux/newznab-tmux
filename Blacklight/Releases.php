@@ -2,11 +2,11 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use Chumper\Zipper\Zipper;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +83,7 @@ class Releases
 			(
 				SELECT r.*, g.name AS group_name
 				FROM releases r
-				LEFT JOIN groups g ON g.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				%s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
@@ -150,7 +150,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s
 				%s %s %s %s ',
-            ($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
+            ($groupName !== -1 ? 'LEFT JOIN usenet_groups g ON g.id = r.groups_id' : ''),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
             NZB::NZB_ADDED,
             $this->showPasswords(),
@@ -269,7 +269,7 @@ class Releases
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->leftJoin('groups as g', 'g.id', '=', 'r.groups_id');
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'r.groups_id');
 
         if ($groupID !== '') {
             $query->where('r.groups_id', $groupID);
@@ -330,7 +330,7 @@ class Releases
     {
         $groups = Release::query()
             ->selectRaw('DISTINCT g.id, g.name')
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
         $temp_array = [];
 
@@ -393,13 +393,13 @@ class Releases
                 "SELECT r.*,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
-					groups.name AS group_name,
+					usenet_groups.name AS group_name,
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					df.failed AS failed
 				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				LEFT JOIN groups ON groups.id = r.groups_id
+				LEFT JOIN usenet_groups ON usenet_groups.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				LEFT JOIN categories c ON c.id = r.categories_id
@@ -574,30 +574,25 @@ class Releases
      * Function for searching on the site (by subject, searchname or advanced).
      *
      *
-     * @param              $searchName
-     * @param              $usenetName
-     * @param              $posterName
-     * @param              $fileName
+     * @param  array       $searchArr
      * @param              $groupName
      * @param              $sizeFrom
      * @param              $sizeTo
-     * @param              $hasNfo
-     * @param              $hasComments
      * @param              $daysNew
      * @param              $daysOld
-     * @param int $offset
-     * @param int $limit
+     * @param int          $offset
+     * @param int          $limit
      * @param string|array $orderBy
-     * @param int $maxAge
-     * @param array $excludedCats
-     * @param string $type
-     * @param array $cat
-     * @param int $minSize
-     * @param array $tags
+     * @param int          $maxAge
+     * @param array        $excludedCats
+     * @param string       $type
+     * @param array        $cat
+     * @param int          $minSize
+     * @param array        $tags
      *
      * @return array|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
+    public function search($searchArr, $groupName, $sizeFrom, $sizeTo, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0, array $tags = [])
     {
         $sizeRange = [
             1 => 1,
@@ -620,19 +615,9 @@ class Releases
             $orderBy = $this->getBrowseOrder($orderBy);
         }
 
-        $searchFields = [];
-        if ($searchName !== -1) {
-            $searchFields['searchname'] = $searchName;
-        }
-        if ($usenetName !== -1) {
-            $searchFields['name'] = $usenetName;
-        }
-        if ($posterName !== -1) {
-            $searchFields['fromname'] = $posterName;
-        }
-        if ($fileName !== -1) {
-            $searchFields['filename'] = $fileName;
-        }
+        $searchFields = Arr::where($searchArr, function ($value) {
+            return $value !== -1;
+        });
 
         $results = $this->sphinxSearch->searchIndexes('releases_rt', '', [], $searchFields);
 
@@ -645,16 +630,14 @@ class Releases
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
         $whereSql = sprintf(
-            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s %s',
+            'WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s',
             $this->showPasswords(),
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
             (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
-            ((int) $hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
-            ((int) $hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
             $catQuery,
             ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
             ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
@@ -678,7 +661,7 @@ class Releases
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
@@ -743,7 +726,7 @@ class Releases
             NZB::NZB_ADDED,
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', UsenetGroup::getIDByName($groupName)) : ''),
             $catQuery,
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
@@ -761,7 +744,7 @@ class Releases
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			%s %s",
@@ -889,7 +872,7 @@ class Releases
             $this->showPasswords(),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
             $showSql,
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
+            ((! empty($name) && ! empty($searchResult)) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
@@ -912,7 +895,7 @@ class Releases
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
@@ -932,8 +915,8 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
-        if ($releases->isNotEmpty()) {
+        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = Release::fromQuery($sql) : [];
+        if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -1053,7 +1036,7 @@ class Releases
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
@@ -1125,7 +1108,7 @@ class Releases
 			FROM releases r
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
 			%s",
@@ -1202,7 +1185,7 @@ class Releases
 				rn.releases_id AS nfoid
 			FROM releases r
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
@@ -1249,7 +1232,7 @@ class Releases
             $catRow = Category::find($currRow['categories_id']);
             $parentCat = $catRow['parentid'];
 
-            $results = $this->search(getSimilarName($name), -1, -1, -1, -1, '', '', 0, 0, -1, -1, 0, '', '', -1, $excludedCats, [$parentCat]);
+            $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
             if (! $results) {
                 return $results;
             }

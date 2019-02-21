@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) Tiny Technologies, Inc. All rights reserved.
+ * Licensed under the LGPL or a commercial license.
+ * For LGPL see License.txt in the project root for license information.
+ * For commercial licenses see https://www.tiny.cloud/
+ *
+ * Version: 5.0.0-1 (2019-02-04)
+ */
 (function () {
 var fullscreen = (function () {
     'use strict';
@@ -96,9 +104,9 @@ var fullscreen = (function () {
         };
         iframeStyle.width = iframeStyle.height = '100%';
         editorContainerStyle.width = editorContainerStyle.height = '';
-        DOM.addClass(body, 'mce-fullscreen');
-        DOM.addClass(documentElement, 'mce-fullscreen');
-        DOM.addClass(editorContainer, 'mce-fullscreen');
+        DOM.addClass(body, 'tox-fullscreen');
+        DOM.addClass(documentElement, 'tox-fullscreen');
+        DOM.addClass(editorContainer, 'tox-fullscreen');
         DOM.bind(window, 'resize', resize);
         editor.on('remove', removeResize);
         resize();
@@ -113,9 +121,9 @@ var fullscreen = (function () {
         if (fullscreenInfo.containerHeight) {
           editorContainerStyle.height = fullscreenInfo.containerHeight;
         }
-        DOM.removeClass(body, 'mce-fullscreen');
-        DOM.removeClass(documentElement, 'mce-fullscreen');
-        DOM.removeClass(editorContainer, 'mce-fullscreen');
+        DOM.removeClass(body, 'tox-fullscreen');
+        DOM.removeClass(documentElement, 'tox-fullscreen');
+        DOM.removeClass(editorContainer, 'tox-fullscreen');
         setScrollPos(fullscreenInfo.scrollPos);
         DOM.unbind(window, 'resize', fullscreenInfo.resizeHandler);
         editor.off('remove', fullscreenInfo.removeHandler);
@@ -132,28 +140,34 @@ var fullscreen = (function () {
     };
     var Commands = { register: register };
 
-    var postRender = function (editor) {
-      return function (e) {
-        var ctrl = e.control;
-        editor.on('FullscreenStateChanged', function (e) {
-          ctrl.active(e.state);
-        });
+    var makeSetupHandler = function (editor, fullscreenState) {
+      return function (api) {
+        api.setActive(fullscreenState.get() !== null);
+        var editorEventCallback = function (e) {
+          return api.setActive(e.state);
+        };
+        editor.on('FullscreenStateChanged', editorEventCallback);
+        return function () {
+          return editor.off('FullscreenStateChanged', editorEventCallback);
+        };
       };
     };
-    var register$1 = function (editor) {
-      editor.addMenuItem('fullscreen', {
+    var register$1 = function (editor, fullscreenState) {
+      editor.ui.registry.addToggleMenuItem('fullscreen', {
         text: 'Fullscreen',
-        shortcut: 'Ctrl+Shift+F',
-        selectable: true,
-        cmd: 'mceFullScreen',
-        onPostRender: postRender(editor),
-        context: 'view'
+        shortcut: 'Meta+Shift+F',
+        onAction: function () {
+          return editor.execCommand('mceFullScreen');
+        },
+        onSetup: makeSetupHandler(editor, fullscreenState)
       });
-      editor.addButton('fullscreen', {
-        active: false,
+      editor.ui.registry.addToggleButton('fullscreen', {
         tooltip: 'Fullscreen',
-        cmd: 'mceFullScreen',
-        onPostRender: postRender(editor)
+        icon: 'fullscreen',
+        onAction: function () {
+          return editor.execCommand('mceFullScreen');
+        },
+        onSetup: makeSetupHandler(editor, fullscreenState)
       });
     };
     var Buttons = { register: register$1 };
@@ -164,8 +178,8 @@ var fullscreen = (function () {
         return Api.get(fullscreenState);
       }
       Commands.register(editor, fullscreenState);
-      Buttons.register(editor);
-      editor.addShortcut('Ctrl+Shift+F', '', 'mceFullScreen');
+      Buttons.register(editor, fullscreenState);
+      editor.addShortcut('Meta+Shift+F', '', 'mceFullScreen');
       return Api.get(fullscreenState);
     });
     function Plugin () {

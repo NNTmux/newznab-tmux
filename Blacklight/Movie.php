@@ -303,7 +303,7 @@ class Movie
 			g.name AS group_name,
 			rn.releases_id AS nfoid
 			FROM releases r
-			LEFT OUTER JOIN groups g ON g.id = r.groups_id
+			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			LEFT OUTER JOIN categories c ON c.id = r.categories_id
@@ -744,7 +744,7 @@ class Movie
     protected function fetchFanartTVProperties($imdbId)
     {
         if ($this->fanartapikey !== null) {
-            $art = $this->fanart->getMovieFanart('tt'.$imdbId);
+            $art = $this->fanart->getMovieFanArt('tt'.$imdbId);
 
             if (! empty($art)) {
                 if (isset($art['status']) && $art['status'] === 'error') {

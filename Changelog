@@ -1,4 +1,97 @@
+2019-02-21 DariusIII
+	* Chg: Add switch to enable full telescope reporting in production
+	* Chg: Update admin menu with link to laravel horizon
+	* Chg: Add laravel telescope migration
+2019-02-20 DariusIII
+	* Chg: Add laravel/horizon to manage redis queues
+	* Chg: Add link to laravel telescope to admin area
+	* Chg: Add laravel/telescope to monitor indexer various data
+	* Chg: Update display of date for dates when user registered, logged in and accessed the api to show exact time not just date
+	* Chg: Add user API access tracking to ApiV2
+	* Chg: Increase timeout value for composer install command
+	* Chg: Move certain user functions (api accessed and logged in) into specific events
+	* Chg: Do some small code simplification
+	* Chg: Add table to track failed jobs
+	* Fix: Add missing import of ColorCLI class. Fixes issue #897
+	* Chg: Update nette/neon (v2.4.3 => v3.0.0)
+2019-02-19 DariusIII
+	* Chg: Use getRawHtml in place of Utility::getUrl in predb_import_daily_batch script
+	* Chg: Update config/database mysql connection settings
+	* Fix: Fix FanArt error when fetching covers
+	* Fix: Fix missing number on group processing time message
+	* Chg: Update nesbot/carbon (2.10.1 => 2.12.0)
+	* Chg: Update laravel/framework to version 5.7.27
+	* Chg: Rename groups table to usenet_groups as groups is a reserved word in mysql now
+	* Chg: Move role expiration and verification checks into separate script and schedule them in Kernel.php
+	* CHg: Update archive handling regexes
+	* Chg: Update friendsofphp/php-cs-fixer (v2.14.1 => v2.14.2)
+	* Chg: Update phpunit/phpunit (7.5.5 => 7.5.6)
+	* Chg: Update nikic/php-parser (v4.2.0 => v4.2.1)
+2019-02-17 DariusIII
+	* Fix: Fix addition of new blacklist regexes (Fixes issue #894)
+2019-02-16 DariusIII
+	* Fix: Fix error when adding already existing group. Fixes issue #892
+	* Fix: Fix bulk adding of groups when groups exist. Fixes issue #891
+2019-02-15 DariusIII
+	* Chg: Update phpunit/phpunit to latest version
+2019-02-14 DariusIII
+	* Chg: Update font-awesome and bootstrap to latest versions
+	* Fix: Fix link to images in admin predb template
+	* Chg: Remove Amazon as data source completely
+	* Fix: Fix coverurl error on Books
+	* Chg: Disable fetching amazon properties as a start of removal from NNTmux
+	* Chg: Show debug messages in PPA only if app env is set to debug
+2019-02-13 DariusIII
+	* Chg: Update spatie/laravel-permission (2.31.0 => 2.32.0)
+	* Chg: Remove messages about missing nzb, too annoying and not helpfull at all
+2019-02-12 DariusIII
+	* Chg: Update laravel/framework (v5.7.25 => v5.7.26)
+	* Chg: Update phpstan/phpstan (0.11.1 => 0.11.2)
+	* Fix: Fix reset_postprocessing script to reset only requested categories and not all releases because of wrong query setup
+	* Chg: Update Bootstrap to version 4.3.0
+2019-02-11 DariusIII
+	* Chg: Update composer/composer (1.8.3 => 1.8.4)
+	* Fix: Fix search returned values when search has no actual results (returning 125k unrelated releases)
+	* Chg: Update used libraries to their latest versions
+2019-02-08 DariusIII
+	* Chg: Update code style of NameFixer class
+	* Chg: Move account deletion emails sending to user observer
+	* Chg: Add email notifications for new registered user on site, send welcome email to new users
+	* Chg: Comment out missed dict definition in sphinx.conf (resolves issue #878)
+2019-02-07 DariusIII
+	* Chg: Update used libraries
+	* Chg: Update Blacklight\processing\post\AniDB class
+	* Chg: Update FanartTV class and add check for error response
+	* Chg: Add UserServiceObserver and move account verification to it
+	* Chg: Update package.json with new version of Vue (2.6.2)
+2019-02-06 DariusIII
+	* Chg: Updated pear/console_getopt (v1.4.1 => v1.4.2)
+	* Chg: Update sphinx.conf to allow usage of sphinx 3.1.1 and up
+	* Chg: Update php-cs-fixer config files
+	* Chg: Update ProfileController
+	* Chg: Fix errors in email sending Jobs
+	* Chg: Update Mail and Jobs to use user directly
+	* Chg: Update User model
+2019-02-05 DariusIII
+	* Chg: Update laravel/framework (v5.7.24 => v5.7.25)
+	* Chg: Update barryvdh/laravel-debugbar (v3.2.1 => v3.2.2)
+	* Chg: Improve getAlternate function
+	* Fix: Change TinyMCE theme to Silver (modern has been removed from TinyMCE 5)
+	* Chg: Update TinyMCE to version 5.0.0
+2019-02-04 DariusIII
+	* Fix: Fix getSimilarName function
+	* Chg: Update search code to reduce number of variables used in search function
+	* Chg: Remove nfo and comments options from search function (searching for releases that are commented or have nfo)
+	* Chg: Remove SphinxSearch rules description as those do not apply anymore (not using raw queries but SphinxQL query builder)
+	* Chg: Update spatie/laravel-permission (2.30.0 => 2.31.0)
+	* Chg: Update sebastian/diff (3.0.1 => 3.0.2)
+2019-02-03 DariusIII
+	* Chg: Update code style of various files
+	* Chg: Update package.json
+	* Chg: Update symfony components to their latest versions
 2019-02-02 DariusIII
+	* Chg: Update package.json
+	* Chg: Update font-awesome to version 5.7.1
 	* Fix: Properly fix site searches and api related searches
 2019-02-01 DariusIII
 	* Fix: Fix count of rows for apiv2 searches

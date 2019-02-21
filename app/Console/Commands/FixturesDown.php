@@ -16,7 +16,7 @@ class FixturesDown extends Command
         'category_regexes',
         'collection_regexes',
         'content',
-        'groups',
+        'usenet_groups',
         'menu',
         'release_naming_regexes',
         'settings',
@@ -42,7 +42,7 @@ class FixturesDown extends Command
     category_regexes
     collection_regexes
     content
-    groups
+    usenet_groups
     release_naming_regexes
     settings
     tmux';

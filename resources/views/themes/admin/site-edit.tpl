@@ -209,32 +209,6 @@
 			<legend>3<sup>rd</sup> Party API Keys</legend>
 			<table class="input data table table-striped responsive-utilities jambo-table">
 				<tr>
-					<td><label for="amazonpubkey">Amazon Public Key</label>:</td>
-					<td>
-						<input id="amazonpubkey" class="long" name="amazonpubkey" type="text"
-							   value="{$site->amazonpubkey}"/>
-						<div class="hint">The amazon public api key. Used for cover lookups.</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="amazonprivkey">Amazon Private Key</label>:</td>
-					<td>
-						<input id="amazonprivkey" class="long" name="amazonprivkey" type="text"
-							   value="{$site->amazonprivkey}"/>
-						<div class="hint">The amazon private api key. Used for cover lookups.</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="amazonassociatetag">Amazon Associate Tag</label>:</td>
-					<td>
-						<input id="amazonassociatetag" class="long" name="amazonassociatetag" type="text"
-							   value="{$site->amazonassociatetag}"/>
-						<div class="hint">The amazon associate tag. Used for cover lookups.</div>
-					</td>
-				</tr>
-				<tr>
 					<td style="width:180px;"><label for="trakttvclientkey">Trakt.tv API Client ID:</label></td>
 					<td>
 						<input id="trakttvclientkey" class="long" name="trakttvclientkey" type="text"

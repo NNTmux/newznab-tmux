@@ -24,7 +24,7 @@
 	</div>
 	<br>
 	<div class="well well-sm">
-		<div style="text-align: center">{$search_description}
+		<div style="text-align: center">
 			<div>
 				<br>
 				{{Form::open(['url' => 'search', 'method' => 'get'])}}
@@ -50,37 +50,37 @@
 							<tr>
 								<th><label for="searchadvr">Release Name:</label></th>
 								<td><input class="searchadv" id="searchadvr" name="searchadvr"
-										   value="{$searchadvr|escape:'html'}"
+										   value="{$searchadvr|escape:'htmlall'}"
 										   type="text"></td>
 							</tr>
 							<tr>
 								<th><label for="searchadvsubject">Usenet Name:</label></th>
 								<td><input class="searchadv" id="searchadvsubject" name="searchadvsubject"
-										   value="{$searchadvsubject|escape:'html'}" type="text"></td>
+										   value="{$searchadvsubject|escape:'htmlall'}" type="text"></td>
 							</tr>
 							<tr>
 								<th><label for="searchadvposter">Poster:</label></th>
 								<td><input class="searchadv" id="searchadvposter" name="searchadvposter"
-										   value="{$searchadvposter|escape:'html'}" type="text"></td>
+										   value="{$searchadvposter|escape:'htmlall'}" type="text"></td>
 							</tr>
 							<tr>
 								<th><label for="searchadvfilename">Filename:</label></th>
 								<td><input class="searchadv" id="searchadvfilename" name="searchadvfilename"
-										   value="{$searchadvfilename|escape:'html'}" type="text"/></td>
+										   value="{$searchadvfilename|escape:'htmlall'}" type="text"/></td>
 							</tr>
 							<tr>
 							<tr>
 								<th><label for="searchadvdaysnew">Min age(days):</label></th>
 								<td>
 									<input class="searchdaysinput" id="searchadvdaysnew" name="searchadvdaysnew"
-										   value="{$searchadvdaysnew|escape:'html'}" type="text">
+										   value="{$searchadvdaysnew|escape:'htmlall'}" type="text">
 								</td>
 							</tr>
 							<tr>
 								<th><label for="searchadvdaysold">Max age(days):</label></th>
 								<td>
 									<input class="searchdaysinput" id="searchadvdaysold" name="searchadvdaysold"
-										   value="{$searchadvdaysold|escape:'html'}" type="text">
+										   value="{$searchadvdaysold|escape:'htmlall'}" type="text">
 								</td>
 							</tr>
 							<tr>
@@ -99,16 +99,9 @@
 								</td>
 							</tr>
 							<tr>
-								<th><label for="searchadvhasnfo">NFO/Comments:</label></th>
 								<td>
-									<input type="hidden" name="searchadvhasnfo" value="0">
-									<input type="checkbox" name="searchadvhasnfo" value="1">
-									<input type="hidden" name="searchadvhascomments" value="0">
-									<input type="checkbox" name="searchadvhascomments" value="1">
-									<div style="float:right;"><input type="hidden" name="search_type" value="adv"
-																	 id="search_type">
-										<input id="search_adv_button" class="btn btn-success" type="submit"
-											   value="Search">
+									<div style="float:right;"><input type="hidden" name="search_type" value="adv" id="search_type">
+										<input id="search_adv_button" class="btn btn-success" type="submit" value="Search">
 									</div>
 								</td>
 							</tr>

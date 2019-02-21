@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Group;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use Blacklight\SphinxSearch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +45,7 @@ class NntmuxResetDb extends Command
 
             DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
-            Group::query()->update([
+            UsenetGroup::query()->update([
                 'first_record' => 0,
                 'first_record_postdate' => null,
                 'last_record' => 0,

@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Arr;
 use App\Models\CategoryRegex;
 use App\Models\CollectionRegex;
@@ -185,14 +185,14 @@ class Regexes
      */
     public function testCollectionRegex($groupName, $regex, $limit): array
     {
-        $groupID = Group::getIDByName($groupName);
+        $groupID = UsenetGroup::getIDByName($groupName);
 
         if (! $groupID) {
             return [];
         }
 
         $rows = DB::select(
-                'SELECT
+            'SELECT
 					b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
 					c.fromname, c.collectionhash
 				FROM binaries b
@@ -251,7 +251,7 @@ class Regexes
      */
     public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
     {
-        $groupID = Group::getIDByName($groupName);
+        $groupID = UsenetGroup::getIDByName($groupName);
 
         if (! $groupID) {
             return [];

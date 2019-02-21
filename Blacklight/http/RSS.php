@@ -85,7 +85,7 @@ class RSS extends Capabilities
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				LEFT JOIN groups g ON g.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
 				LEFT OUTER JOIN genres mug ON mug.id = mu.genres_id
 				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfo_id
@@ -140,7 +140,7 @@ class RSS extends Capabilities
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				LEFT JOIN groups g ON g.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN videos v ON v.id = r.videos_id
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE %s %s %s
@@ -204,7 +204,7 @@ class RSS extends Capabilities
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				LEFT JOIN groups g ON g.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT JOIN movieinfo mi ON mi.id = r.movieinfo_id
 				WHERE %s %s
 				AND r.nzbstatus = %d
