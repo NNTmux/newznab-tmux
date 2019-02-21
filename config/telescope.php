@@ -38,6 +38,7 @@ return [
     */
 
     'enabled' => env('TELESCOPE_ENABLED', true),
+    'full_enabled_in_production' => env('TELESCOPE_FULL_IN_PRODUCTION', false),
 
     /*
     |--------------------------------------------------------------------------
