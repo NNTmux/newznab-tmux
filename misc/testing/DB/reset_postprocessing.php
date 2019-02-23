@@ -305,9 +305,9 @@ if (isset($argv[1]) && ($argv[1] === 'nfos' || $argv[1] === 'all')) {
 
 if ($ran === false) {
     $colorCli->error(
-        '\nThis script will reset postprocessing per category. It can also truncate the associated tables.'
-            .'\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the '
-            .'second argument false.\n'
+        'This script will reset postprocessing per category. It can also truncate the associated tables.'.PHP_EOL
+            .'To reset only those that have previously failed, those without covers, samples, previews, etc. use the'.PHP_EOL
+            .'second argument false.'.PHP_EOL
             .'To reset even those previously post processed, use the second argument true.'.PHP_EOL
             .'To truncate the associated table, use the third argument truncate.'.PHP_EOL.PHP_EOL
             .'php reset_postprocessing.php consoles true    ...: To reset all consoles.'.PHP_EOL
