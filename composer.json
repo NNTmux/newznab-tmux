@@ -136,6 +136,7 @@
     "rtconner/laravel-tagging": "^3.0",
     "smarty/smarty": "^3.1",
     "spatie/laravel-directory-cleanup": "^1.2",
+    "spatie/laravel-feed": "^2.1",
     "spatie/laravel-fractal": "^5.3",
     "spatie/laravel-permission": "^2.12",
     "tunaabutbul/cloudflare-middleware": "^1.2",

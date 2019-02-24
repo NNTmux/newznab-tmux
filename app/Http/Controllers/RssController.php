@@ -72,11 +72,11 @@ class RssController extends BasePageController
                 $rssToken = $this->userdata['api_token'];
                 $maxRequests = $this->userdata->role->apirequests;
             } else {
-                if (! $request->has('r')) {
+                if (! $request->has('api_token')) {
                     Utility::showApiError(100, 'API key is required for viewing the RSS!');
                 }
 
-                $res = User::getByRssToken($request->input('r'));
+                $res = User::getByRssToken($request->input('api_token'));
 
                 if ($res === null) {
                     return response()->json(['error' => 'Invalid RSS token'], 403);
