@@ -1,4 +1,5 @@
 2019-02-24 DariusIII
+	* Chg: Move RSS route out of authentification
 	* Chg: Change routes handling for api and rss
 2019-02-22 DariusIII
 	* Chg: Update middleware in routes/web.php

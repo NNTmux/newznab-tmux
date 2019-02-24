@@ -29,7 +29,7 @@ Route::get('login', 'Auth\LoginController@showLoginForm');
 Route::post('login', 'Auth\LoginController@login')->name('login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::group(['middleware' => ['auth', 'web', 'isVerified', 'fw-block-blacklisted']], function () {
+Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function () {
     Route::get('resetpassword', 'Auth\ResetPasswordController@reset');
     Route::post('resetpassword', 'Auth\ResetPasswordController@reset');
 
@@ -56,10 +56,6 @@ Route::group(['middleware' => ['auth', 'web', 'isVerified', 'fw-block-blackliste
 
     Route::get('getnzb', 'GetNzbController@getNzb');
     Route::post('getnzb', 'GetNzbController@getNzb');
-
-    Route::get('rss', 'RssController@rss');
-
-    Route::post('rss', 'RssController@rss');
 
     Route::get('profile', 'ProfileController@show');
 
@@ -214,7 +210,7 @@ Route::get('forum-delete/{id}', 'ForumController@destroy')->middleware('role:Adm
 
 Route::post('forum-delete/{id}', 'ForumController@destroy')->middleware('role:Admin');
 
-Route::group(['middleware' => ['auth', 'web', 'role:Admin'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
+Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' => 'Admin'], function () {
     Route::get('index', 'AdminPageController@index');
     Route::get('anidb-delete/{id}', 'AnidbController@destroy');
     Route::post('anidb-delete/{id}', 'AnidbController@destroy');
@@ -341,3 +337,6 @@ Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'
     Route::get('release-edit', 'ReleasesController@edit');
     Route::post('release-edit', 'ReleasesController@edit');
 });
+
+Route::get('rss', 'RssController@rss');
+Route::post('rss', 'RssController@rss');
