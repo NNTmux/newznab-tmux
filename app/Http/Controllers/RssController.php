@@ -14,122 +14,217 @@ class RssController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
+     * @return void
+     * @throws \Exception
      * @throws \Throwable
      */
-    public function rss(Request $request)
+    public function MyMoviesRss(Request $request)
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
 
-        // If no content id provided then show user the rss selection page.
-        if (! $request->has('t') && ! $request->has('show') && ! $request->has('anidb')) {
-            // User has to either be logged in, or using rsskey.
+        $user = $this->userCheck($request->all());
 
-            $title = 'Rss Info';
-            $meta_title = 'Rss Nzb Info';
-            $meta_keywords = 'view,nzb,description,details,rss,atom';
-            $meta_description = 'View information about NNTmux RSS Feeds.';
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
-            $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
-            $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
 
-            if ($firstShow !== null) {
-                $this->smarty->assign('show', $firstShow->videos_id);
-            } else {
-                $this->smarty->assign('show', 1);
-            }
+        $relData = $rss->getMyMoviesRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']));
 
-            if ($firstAni !== null) {
-                $this->smarty->assign('anidb', $firstAni->anidbid);
-            } else {
-                $this->smarty->assign('anidb', 1);
-            }
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
 
-            $this->smarty->assign(
-                [
-                    'categorylist'       => Category::getCategories(true, $this->userdata['categoryexclusions']),
-                    'parentcategorylist' => Category::getForMenu($this->userdata['categoryexclusions']),
-                ]
-            );
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function MyShowsRss(Request $request)
+    {
+        $this->setPrefs();
+        $rss = new RSS(['Settings' => $this->settings]);
+        $offset = 0;
+        $user = $this->userCheck($request->all());
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $relData = $rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
-            $content = $this->smarty->fetch('rssdesc.tpl');
-            $this->smarty->assign(
-                [
-                    'content' => $content,
-                    'title' => $title,
-                    'meta_title' => $meta_title,
-                    'meta_keywords' => $meta_keywords,
-                    'meta_description' => $meta_description,
-                ]
-            );
-            $this->pagerender();
-        } else {
-            $uid = -1;
-            // User requested a feed, ensure either logged in or passing a valid token.
-            if (Auth::check()) {
-                $uid = $this->userdata->id;
-                $rssToken = $this->userdata['api_token'];
-                $maxRequests = $this->userdata->role->apirequests;
-            } else {
-                if (! $request->has('api_token')) {
-                    Utility::showApiError(100, 'API key is required for viewing the RSS!');
-                }
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
 
-                $res = User::getByRssToken($request->input('api_token'));
-
-                if ($res === null) {
-                    return response()->json(['error' => 'Invalid RSS token'], 403);
-                }
-
-                $uid = $res['id'];
-                $rssToken = $res['api_token'];
-                $maxRequests = $res->role->apirequests;
-
-                if ($res->hasRole('Disabled')) {
-                    Utility::showApiError(101);
-                }
-            }
-
-            if (UserRequest::getApiRequests($uid) > $maxRequests) {
-                Utility::showApiError(500, 'You have reached your daily limit for API requests!');
-            } else {
-                UserRequest::addApiRequest($rssToken, $request->getRequestUri());
-            }
-
-            // Valid or logged in user, get them the requested feed.
-            $userShow = $userAnidb = -1;
-            if ($request->has('show')) {
-                $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
-            } elseif ($request->has('anidb')) {
-                $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
-            }
-
-            $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-
-            $userCat = ($request->has('t') ? ((int) $request->input('t') === 0 ? -1 : (int) $request->input('t')) : -1);
-            $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
-            $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
-            $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
-
-            $params =
-                [
-                    'dl'       => $request->has('dl') && $request->input('dl') === '1' ? '1' : '0',
-                    'del'      => $request->has('del') && $request->input('del') === '1' ? '1' : '0',
-                    'extended' => 1,
-                    'uid'      => $uid,
-                    'token'    => $rssToken,
-                ];
-
-            if ($userCat === -3) {
-                $relData = $rss->getShowsRss($userNum, $uid, User::getCategoryExclusionById($uid), $userAirDate);
-            } elseif ($userCat === -4) {
-                $relData = $rss->getMyMoviesRss($userNum, $uid, User::getCategoryExclusionById($uid));
-            } else {
-                $relData = $rss->getRss(explode(',', $userCat), $userShow, $userAnidb, $uid, $userAirDate, $userLimit, $userNum);
-            }
-
-            $rss->output($relData, $params, $outputXML, $offset, 'rss');
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function fullFeedRss(Request $request)
+    {
+        $this->setPrefs();
+        $rss = new RSS(['Settings' => $this->settings]);
+        $offset = 0;
+        $user = $this->userCheck($request->all());
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
+        $userShow = $userAnidb = -1;
+        if ($request->has('show')) {
+            $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
+        } elseif ($request->has('anidb')) {
+            $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
         }
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
+        $relData = $rss->getRss([0], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function showRssDesc()
+    {
+        $this->setPrefs();
+        $rss = new RSS(['Settings' => $this->settings]);
+
+        $title = 'Rss Info';
+        $meta_title = 'Rss Nzb Info';
+        $meta_keywords = 'view,nzb,description,details,rss,atom';
+        $meta_description = 'View information about NNTmux RSS Feeds.';
+
+        $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
+        $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
+
+        if ($firstShow !== null) {
+            $this->smarty->assign('show', $firstShow->videos_id);
+        } else {
+            $this->smarty->assign('show', 1);
+        }
+
+        if ($firstAni !== null) {
+            $this->smarty->assign('anidb', $firstAni->anidbid);
+        } else {
+            $this->smarty->assign('anidb', 1);
+        }
+
+        $this->smarty->assign(
+            [
+                'categorylist'       => Category::getCategories(true, $this->userdata['categoryexclusions']),
+                'parentcategorylist' => Category::getForMenu($this->userdata['categoryexclusions']),
+            ]
+        );
+
+        $content = $this->smarty->fetch('rssdesc.tpl');
+        $this->smarty->assign(
+            [
+                'content' => $content,
+                'title' => $title,
+                'meta_title' => $meta_title,
+                'meta_keywords' => $meta_keywords,
+                'meta_description' => $meta_description,
+            ]
+        );
+        $this->pagerender();
+    }
+
+    public function cartRss(Request $request)
+    {
+        $this->setPrefs();
+        $rss = new RSS(['Settings' => $this->settings]);
+        $offset = 0;
+        $user = $this->userCheck($request->all());
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
+        $userShow = $userAnidb = -1;
+        if ($request->has('show')) {
+            $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
+        } elseif ($request->has('anidb')) {
+            $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
+        }
+
+        $relData = $rss->getRss([-2], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function categoryFeedRss(Request $request)
+    {
+        $this->setPrefs();
+        $rss = new RSS(['Settings' => $this->settings]);
+        $offset = 0;
+        if (! $request->has('id')) {
+            return response()->json(['error' => 'Category ID is missing'], '403');
+        }
+
+        $user = $this->userCheck($request->all());
+        $categoryId = (int) $request->input('id');
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
+        $userShow = $userAnidb = -1;
+        if ($request->has('show')) {
+            $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
+        } elseif ($request->has('anidb')) {
+            $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
+        }
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
+        $relData = $rss->getRss($categoryId, $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return array|\Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    private function userCheck(Request $request)
+    {
+        // User requested a feed, ensure user is passing a valid api_token.
+        if (Auth::check()) {
+            $uid = $this->userdata->id;
+            $rssToken = $this->userdata['api_token'];
+            $maxRequests = $this->userdata->role->apirequests;
+        } else {
+            if (! $request->has('api_token')) {
+                return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);
+            }
+
+            $res = User::getByRssToken($request->input('api_token'));
+
+            if ($res === null) {
+                return response()->json(['error' => 'Invalid RSS token'], 403);
+            }
+
+            $uid = $res['id'];
+            $rssToken = $res['api_token'];
+            $maxRequests = $res->role->apirequests;
+
+            if ($res->hasRole('Disabled')) {
+                return response()->json(['error' => 'Your account is disabled'], 403);
+            }
+        }
+
+        if (UserRequest::getApiRequests($uid) > $maxRequests) {
+            return response()->json(['error' => 'You have reached your daily limit for API requests!'], 403);
+        } else {
+            UserRequest::addApiRequest($rssToken, $request->getRequestUri());
+        }
+        $params =
+            [
+                'dl'       => $request->has('dl') && $request->input('dl') === '1' ? '1' : '0',
+                'del'      => $request->has('del') && $request->input('del') === '1' ? '1' : '0',
+                'extended' => 1,
+                'uid'      => $uid,
+                'token'    => $rssToken,
+            ];
+
+        return ['user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];
     }
 }

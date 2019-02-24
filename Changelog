@@ -1,4 +1,5 @@
 2019-02-24 DariusIII
+	* Chg: Refactor RSS feeds
 	* Chg: Move rss routes to their own route file
 	* Chg: Move RSS route out of authentification
 	* Chg: Change routes handling for api and rss
