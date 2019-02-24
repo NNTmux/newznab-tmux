@@ -78,7 +78,7 @@ class RssController extends BasePageController
 
                 $res = User::getByRssToken($request->input('r'));
 
-                if (! $res) {
+                if ($res === null) {
                     return response()->json(['error' => 'Invalid RSS token'], 403);
                 }
 
