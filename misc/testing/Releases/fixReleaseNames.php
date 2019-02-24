@@ -110,7 +110,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             .'The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.'.PHP_EOL
             .'The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.'.PHP_EOL
             .'The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.'.PHP_EOL
-            .'The 5th argument (optional), show, will display the release changes or only show a counter.\n'.PHP_EOL
+            .'The 5th argument (optional), show, will display the release changes or only show a counter.'.PHP_EOL
             .'php '.$argv[0].' 1 false other no ...: Fix release names using the usenet subject in the past 3 hours with predb information.'.PHP_EOL
             .'php '.$argv[0].' 2 false other no ...: Fix release names using the usenet subject with predb information.'.PHP_EOL
             .'php '.$argv[0].' 3 false other no ...: Fix release names using NFO in the past 6 hours.'.PHP_EOL
@@ -128,6 +128,9 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             .'php '.$argv[0].' 15 false other no ...: Fix release names in misc categories using PAR2 hash_16K block in the past 6 hours.'.PHP_EOL
             .'php '.$argv[0].' 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.'.PHP_EOL
             .'php '.$argv[0].' 17 false other no ...: Fix release names in misc categories using Mediainfo in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL);
+            .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL
+            .'php '.$argv[0].' 19 false other no ...: Fix release names in misc categories using CRC32 in the past 6 hours.'.PHP_EOL
+            .'php '.$argv[0].' 20 false other no ...: Fix release names in misc categories using CRC32.'.PHP_EOL);         
+    
     exit();
 }
