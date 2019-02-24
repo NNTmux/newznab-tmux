@@ -7,7 +7,6 @@ use App\Models\Category;
 use Blacklight\http\RSS;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 
 class RssController extends BasePageController
