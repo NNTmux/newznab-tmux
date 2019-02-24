@@ -1,3 +1,5 @@
+2019-02-24 DariusIII
+	* Chg: Change routes handling for api and rss
 2019-02-22 DariusIII
 	* Chg: Update middleware in routes/web.php
 	* Chg: Update opis/closure (3.1.5 => 3.1.6)

@@ -106,7 +106,7 @@ class ApiV2Controller extends BasePageController
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function search(Request $request): \Illuminate\Http\JsonResponse
+    public function apiSearch(Request $request): \Illuminate\Http\JsonResponse
     {
         $api = new API();
         $releases = new Releases();
