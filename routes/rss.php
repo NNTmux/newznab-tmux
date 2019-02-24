@@ -22,5 +22,3 @@ Route::get('cart', 'RssController@cartRss');
 Route::post('cart', 'RssController@cartRss');
 Route::get('category', 'RssController@categoryRss');
 Route::post('category', 'RssController@categoryRss');
-
-
