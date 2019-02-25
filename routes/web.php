@@ -297,12 +297,6 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('game-list', 'GameController@index');
     Route::get('game-edit', 'GameController@edit');
     Route::post('game-edit', 'GameController@edit');
-    Route::get('menu-list', 'MenuController@index');
-    Route::post('menu-list', 'MenuController@index');
-    Route::get('menu-edit', 'MenuController@edit');
-    Route::post('menu-edit', 'MenuController@edit');
-    Route::get('menu-delete/{id}', 'MenuController@destroy');
-    Route::post('menu-delete/{id}', 'MenuController@destroy');
     Route::get('movie-list', 'MovieController@index');
     Route::post('movie-list', 'MovieController@index');
     Route::get('movie-edit', 'MovieController@edit');
@@ -337,6 +331,3 @@ Route::group(['middleware' => ['role_or_permission:Admin|Moderator|edit release'
     Route::get('release-edit', 'ReleasesController@edit');
     Route::post('release-edit', 'ReleasesController@edit');
 });
-
-Route::get('rss', 'RssController@rss');
-Route::post('rss', 'RssController@rss');

@@ -81,7 +81,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapRssRoutes()
     {
         Route::prefix('rss')
-            ->middleware(['api', 'auth:api', ['except' => ['showRssDesc']]])
+            ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/rss.php'));
     }

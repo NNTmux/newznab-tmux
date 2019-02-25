@@ -17,7 +17,7 @@ class RssController extends BasePageController
      * @throws \Exception
      * @throws \Throwable
      */
-    public function MyMoviesRss(Request $request)
+    public function myMoviesRss(Request $request)
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
@@ -39,7 +39,7 @@ class RssController extends BasePageController
      * @throws \Exception
      * @throws \Throwable
      */
-    public function MyShowsRss(Request $request)
+    public function myShowsRss(Request $request)
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
