@@ -14,7 +14,7 @@
 		<a class="btn btn-sm btn-success" title="View a list of all releases in your shows"
 		   href="{$smarty.const.WWW_TOP}/myshows/browse">View releases for My Shows</a>
 		<a class="btn btn-sm btn-success" title="All releases in your shows as an RSS feed"
-		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS Feed for
+		   href="{$smarty.const.WWW_TOP}/rss/myshows?dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS Feed for
 			My Shows <i class="fa fa-rss"></i></a>
 	</div>
 	<hr>

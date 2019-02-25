@@ -94,8 +94,8 @@
 	<ul style="text-align: left;">
 		<li>
 			Tv Series (Use the TVRage ID)<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-				/rss?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}</a>
+			<a href="{$smarty.const.WWW_TOP}/rss/full-feed?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
+				/rss/full-feedc?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}</a>
 		</li>
 		<li>
 			Tv Series aired in last seven days (Using the Video ID and airdate)<br/>
