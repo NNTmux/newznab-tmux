@@ -130,7 +130,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             .'php '.$argv[0].' 17 false other no ...: Fix release names in misc categories using Mediainfo in the past 6 hours.'.PHP_EOL
             .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL
             .'php '.$argv[0].' 19 false other no ...: Fix release names in misc categories using CRC32 in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 20 false other no ...: Fix release names in misc categories using CRC32.'.PHP_EOL);         
-    
+            .'php '.$argv[0].' 20 false other no ...: Fix release names in misc categories using CRC32.'.PHP_EOL);
+
     exit();
 }
