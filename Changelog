@@ -1,3 +1,5 @@
+2019-02-25 DariusIII
+	* Chg: Update canihavesomecoffee/thetvdbapi (1.0.9 => 1.1.0)
 2019-02-24 DariusIII
 	* Chg: Refactor RSS feeds
 	* Chg: Move rss routes to their own route file

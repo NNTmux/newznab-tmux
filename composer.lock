@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f71a4761addac08399fd0311cda48c1b",
+    "content-hash": "2bb038c6329ef149ab0a4d7f30b2371e",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -356,27 +356,28 @@
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
-            "version": "1.0.9",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
-                "reference": "e50a0203335896eb925f61a12855bca1c0be703a"
+                "reference": "f23f544029269fe2a244818209b060d08654eca6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/e50a0203335896eb925f61a12855bca1c0be703a",
-                "reference": "e50a0203335896eb925f61a12855bca1c0be703a",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/f23f544029269fe2a244818209b060d08654eca6",
+                "reference": "f23f544029269fe2a244818209b060d08654eca6",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.2",
-                "php": ">=7.1",
+                "php": ">=7.2",
                 "symfony/property-access": "^3.3",
                 "symfony/property-info": "^3.3",
                 "symfony/serializer": "^3.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.1"
+                "phpunit/phpunit": "^8"
             },
             "type": "library",
             "autoload": {
@@ -395,7 +396,7 @@
                 }
             ],
             "description": "PHP implementation for the 2nd version of the TheTVDb API.",
-            "time": "2018-05-19T09:06:38+00:00"
+            "time": "2019-02-24T20:49:53+00:00"
         },
         {
             "name": "chumper/zipper",
@@ -5989,77 +5990,6 @@
                 "spatie"
             ],
             "time": "2019-01-18T16:32:41+00:00"
-        },
-        {
-            "name": "spatie/laravel-feed",
-            "version": "2.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-feed.git",
-                "reference": "ee9aab3b33553e0f621ccd9c0cbc2016a5be73e5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-feed/zipball/ee9aab3b33553e0f621ccd9c0cbc2016a5be73e5",
-                "reference": "ee9aab3b33553e0f621ccd9c0cbc2016a5be73e5",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "~5.5.0|~5.6.0|~5.7.0",
-                "nesbot/carbon": "^1.0",
-                "php": "^7.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "~3.5.0|~3.6.0|~3.7.0",
-                "phpunit/phpunit": "^6.0|^7.0",
-                "spatie/phpunit-snapshot-assertions": "^1.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Spatie\\Feed\\FeedServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\Feed\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sebastian De Deyne",
-                    "email": "sebastian@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Jolita Grazyte",
-                    "email": "jolita@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Generates rss feed",
-            "homepage": "https://github.com/spatie/laravel-feed",
-            "keywords": [
-                "laravel",
-                "laravel-feed",
-                "rss",
-                "spatie"
-            ],
-            "time": "2018-08-27T15:07:12+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
