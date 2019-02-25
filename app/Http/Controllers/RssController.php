@@ -7,7 +7,7 @@ use App\Models\Category;
 use Blacklight\http\RSS;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
 
 class RssController extends BasePageController
 {
@@ -19,11 +19,10 @@ class RssController extends BasePageController
      */
     public function myMoviesRss(Request $request)
     {
-        $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
 
-        $user = $this->userCheck($request->all());
+        $user = $this->userCheck($request);
 
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
@@ -41,10 +40,9 @@ class RssController extends BasePageController
      */
     public function myShowsRss(Request $request)
     {
-        $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
-        $user = $this->userCheck($request->all());
+        $user = $this->userCheck($request);
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
         $relData = $rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
@@ -60,10 +58,9 @@ class RssController extends BasePageController
      */
     public function fullFeedRss(Request $request)
     {
-        $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
-        $user = $this->userCheck($request->all());
+        $user = $this->userCheck($request);
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
         $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
@@ -74,7 +71,7 @@ class RssController extends BasePageController
             $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
         }
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-        $relData = $rss->getRss([0], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $relData = $rss->getRss(Arr::wrap(0), $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
     }
 
@@ -115,13 +112,7 @@ class RssController extends BasePageController
 
         $content = $this->smarty->fetch('rssdesc.tpl');
         $this->smarty->assign(
-            [
-                'content' => $content,
-                'title' => $title,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
+            compact('content', 'title', 'meta_title', 'meta_keywords', 'meta_description')
         );
         $this->pagerender();
     }
@@ -131,7 +122,7 @@ class RssController extends BasePageController
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
-        $user = $this->userCheck($request->all());
+        $user = $this->userCheck($request);
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
@@ -162,8 +153,8 @@ class RssController extends BasePageController
             return response()->json(['error' => 'Category ID is missing'], '403');
         }
 
-        $user = $this->userCheck($request->all());
-        $categoryId = (int) $request->input('id');
+        $user = $this->userCheck($request);
+        $categoryId = explode(',', $request->input('id'));
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
         $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
@@ -185,29 +176,22 @@ class RssController extends BasePageController
      */
     private function userCheck(Request $request)
     {
-        // User requested a feed, ensure user is passing a valid api_token.
-        if (Auth::check()) {
-            $uid = $this->userdata->id;
-            $rssToken = $this->userdata['api_token'];
-            $maxRequests = $this->userdata->role->apirequests;
-        } else {
-            if (! $request->has('api_token')) {
-                return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);
-            }
+        if (! $request->has('api_token')) {
+            return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);
+        }
 
-            $res = User::getByRssToken($request->input('api_token'));
+        $res = User::getByRssToken($request->input('api_token'));
 
-            if ($res === null) {
-                return response()->json(['error' => 'Invalid RSS token'], 403);
-            }
+        if ($res === null) {
+            return response()->json(['error' => 'Invalid RSS token'], 403);
+        }
 
-            $uid = $res['id'];
-            $rssToken = $res['api_token'];
-            $maxRequests = $res->role->apirequests;
+        $uid = $res['id'];
+        $rssToken = $res['api_token'];
+        $maxRequests = $res->role->apirequests;
 
-            if ($res->hasRole('Disabled')) {
-                return response()->json(['error' => 'Your account is disabled'], 403);
-            }
+        if ($res->hasRole('Disabled')) {
+            return response()->json(['error' => 'Your account is disabled'], 403);
         }
 
         if (UserRequest::getApiRequests($uid) > $maxRequests) {
@@ -224,6 +208,6 @@ class RssController extends BasePageController
                 'token'    => $rssToken,
             ];
 
-        return ['user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];
+        return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];
     }
 }

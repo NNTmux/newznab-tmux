@@ -57,6 +57,9 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
     Route::get('getnzb', 'GetNzbController@getNzb');
     Route::post('getnzb', 'GetNzbController@getNzb');
 
+    Route::get('rsshelp', 'RssController@showRssDesc');
+    Route::post('rsshelp', 'RssController@showRssDesc');
+
     Route::get('profile', 'ProfileController@show');
 
     Route::get('apihelp', 'ApiHelpController@index');
