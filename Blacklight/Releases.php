@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * Class Releases.
  */
-class Releases
+class Releases extends Release
 {
     // RAR/ZIP Passworded indicator.
     public const PASSWD_NONE = 0; // No password.
@@ -38,14 +38,9 @@ class Releases
      * @var array Class instances.
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-            'Groups'   => null,
-        ];
-        $options += $defaults;
-
+        parent::__construct();
         $this->sphinxSearch = new SphinxSearch();
     }
 
@@ -117,7 +112,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $sql = Release::fromQuery($qry);
+        $sql = self::fromQuery($qry);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName, $tags);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
@@ -164,7 +159,7 @@ class Releases
         if ($count !== null) {
             return $count;
         }
-        $count = Release::fromQuery($sql);
+        $count = self::fromQuery($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
@@ -263,7 +258,7 @@ class Releases
      */
     public function getForExport($postFrom = '', $postTo = '', $groupID = '')
     {
-        $query = Release::query()
+        $query = self::query()
             ->where('r.nzbstatus', NZB::NZB_ADDED)
             ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
             ->from('releases as r')
@@ -300,7 +295,7 @@ class Releases
      */
     public function getEarliestUsenetPostDate()
     {
-        $row = Release::query()->selectRaw("DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate")->first();
+        $row = self::query()->selectRaw("DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate")->first();
 
         return $row === null ? '01/01/2014' : $row['postdate'];
     }
@@ -313,7 +308,7 @@ class Releases
      */
     public function getLatestUsenetPostDate()
     {
-        $row = Release::query()->selectRaw("DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate")->first();
+        $row = self::query()->selectRaw("DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate")->first();
 
         return $row === null ? '01/01/2014' : $row['postdate'];
     }
@@ -328,7 +323,7 @@ class Releases
      */
     public function getReleasedGroupsForSelect($blnIncludeAll = true): array
     {
-        $groups = Release::query()
+        $groups = self::query()
             ->selectRaw('DISTINCT g.id, g.name')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
@@ -390,7 +385,7 @@ class Releases
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
-                "SELECT r.*,
+            "SELECT r.*,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
 					usenet_groups.name AS group_name,
@@ -412,17 +407,17 @@ class Releases
 				%s
 				GROUP BY r.id
 				ORDER BY %s %s %s",
-                $this->getConcatenatedCategoryIDs(),
-                $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
-                Category::TV_ROOT,
-                Category::TV_OTHER,
-                $this->showPasswords(),
-                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-                $orderBy[0],
-                $orderBy[1],
-                ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
+            $this->getConcatenatedCategoryIDs(),
+            $this->uSQL($userShows, 'videos_id'),
+            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            NZB::NZB_ADDED,
+            Category::TV_ROOT,
+            Category::TV_OTHER,
+            $this->showPasswords(),
+            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
+            $orderBy[0],
+            $orderBy[1],
+            ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -431,7 +426,7 @@ class Releases
             return $result;
         }
 
-        $result = Release::fromQuery($sql);
+        $result = self::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -511,7 +506,7 @@ class Releases
         $this->sphinxSearch->deleteRelease($identifiers);
 
         // Delete from DB.
-        Release::whereGuid($identifiers['g'])->delete();
+        self::whereGuid($identifiers['g'])->delete();
     }
 
     /**
@@ -539,7 +534,7 @@ class Releases
             'imdbid'         => $imdbId,
         ];
 
-        return Release::query()->whereIn('guid', $guids)->update($update);
+        return self::query()->whereIn('guid', $guids)->update($update);
     }
 
     /**
@@ -686,7 +681,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ! empty($searchResult) ? Release::fromQuery($sql) : collect();
+        $releases = ! empty($searchResult) ? self::fromQuery($sql) : collect();
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -767,11 +762,11 @@ class Releases
             return $releases;
         }
         if ($searchName !== -1 && ! empty($searchResult)) {
-            $releases = Release::fromQuery($sql);
+            $releases = self::fromQuery($sql);
         } elseif ($searchName !== -1 && empty($searchResult)) {
             $releases = collect();
         } else {
-            $releases = Release::fromQuery($sql);
+            $releases = self::fromQuery($sql);
         }
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
@@ -828,7 +823,7 @@ class Releases
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = Release::fromQuery($showQry);
+            $show = self::fromQuery($showQry);
 
             if (! empty($show[0])) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
@@ -915,7 +910,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = Release::fromQuery($sql) : [];
+        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
         if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -973,7 +968,7 @@ class Releases
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = Release::fromQuery($showQry);
+            $show = self::fromQuery($showQry);
 
             if ($show->isNotEmpty()) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes != '') {
@@ -1054,7 +1049,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -1127,7 +1122,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1207,7 +1202,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1227,7 +1222,7 @@ class Releases
     {
         // Get the category for the parent of this release.
         $ret = false;
-        $currRow = Release::getCatByRelId($currentID);
+        $currRow = self::getCatByRelId($currentID);
         if ($currRow !== null) {
             $catRow = Category::find($currRow['categories_id']);
             $parentCat = $catRow['parentid'];
@@ -1269,7 +1264,7 @@ class Releases
 
                 if ($nzbContents) {
                     $filename = $guid;
-                    $r = Release::getByGuid($guid);
+                    $r = self::getByGuid($guid);
                     if ($r) {
                         $filename = $r['searchname'];
                     }
@@ -1302,7 +1297,7 @@ class Releases
         if ($count !== null) {
             return $count;
         }
-        $count = Release::fromQuery($sql);
+        $count = self::fromQuery($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
