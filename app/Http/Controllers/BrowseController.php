@@ -14,7 +14,7 @@ class BrowseController extends BasePageController
     public function index()
     {
         $this->setPrefs();
-        $releases = new Releases(['Settings' => $this->settings]);
+        $releases = new Releases();
 
         $this->smarty->assign('category', -1);
 
@@ -57,7 +57,7 @@ class BrowseController extends BasePageController
     public function show(string $parentCategory, string $id = 'All')
     {
         $this->setPrefs();
-        $releases = new Releases(['Settings' => $this->settings]);
+        $releases = new Releases();
 
         $parentId = Category::query()->where('title', $parentCategory)->first(['id']);
 

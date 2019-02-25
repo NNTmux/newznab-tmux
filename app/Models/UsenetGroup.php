@@ -417,7 +417,7 @@ class UsenetGroup extends Model
 
         $res->get();
 
-        $releases = new Releases(['Groups' => self::class]);
+        $releases = new Releases();
         $nzb = new NZB();
         $releaseImage = new ReleaseImage();
         foreach ($res as $row) {

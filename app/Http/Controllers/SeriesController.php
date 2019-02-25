@@ -19,7 +19,7 @@ class SeriesController extends BasePageController
     public function index($id = '', Request $request)
     {
         $this->setPrefs();
-        $releases = new Releases(['Settings' => $this->settings]);
+        $releases = new Releases();
         $title = 'Series';
         $meta_title = 'View TV Series';
         $meta_keywords = 'view,series,tv,show,description,details';

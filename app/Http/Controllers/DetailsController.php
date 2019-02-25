@@ -37,7 +37,7 @@ class DetailsController extends BasePageController
         $this->setPrefs();
 
         if ($guid !== null) {
-            $releases = new Releases(['Settings' => $this->settings]);
+            $releases = new Releases();
             $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
             $user = User::find(Auth::id());

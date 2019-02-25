@@ -82,7 +82,7 @@ class NzbController extends BasePageController
         }
 
         $this->setAdminPrefs();
-        $rel = new Releases(['Settings' => null]);
+        $rel = new Releases();
 
         if ($this->isPostBack()) {
             $path = $request->input('folder');
