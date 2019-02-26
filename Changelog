@@ -1,3 +1,5 @@
+2019-02-26 DariusIII
+	* Chg: Update isPcGame function categorization regex
 2019-02-25 DariusIII
 	* Fix: Fix Releases class instantiation
 	* Chg: Releases class now extends Release model
