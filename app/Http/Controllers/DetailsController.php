@@ -29,7 +29,7 @@ class DetailsController extends BasePageController
     /**
      * @param $guid
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function show($guid)

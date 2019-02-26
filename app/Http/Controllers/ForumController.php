@@ -162,7 +162,7 @@ class ForumController extends BasePageController
     /**
      * @param $id
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function destroy($id)

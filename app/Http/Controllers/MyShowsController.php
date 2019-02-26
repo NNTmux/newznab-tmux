@@ -13,7 +13,7 @@ class MyShowsController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function show(Request $request)
