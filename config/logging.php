@@ -15,6 +15,7 @@ return [
     |
     */
     'default' => env('LOG_CHANNEL', 'stack'),
+
     /*
     |--------------------------------------------------------------------------
     | Log Channels
@@ -25,14 +26,17 @@ return [
     | you a variety of powerful log handlers / formatters to utilize.
     |
     | Available Drivers: "single", "daily", "slack", "syslog",
-    |                    "errorlog", "custom", "stack"
+    |                    "errorlog", "monolog",
+    |                    "custom", "stack"
     |
     */
+
     'channels' => [
         'stack' => [
             'driver' => 'stack',
             'name' => 'NNTmux',
             'channels' => ['daily'],
+            'ignore_exceptions' => false,
         ],
         'single' => [
             'driver' => 'single',
