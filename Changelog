@@ -1,4 +1,5 @@
 2019-02-27 DariusIII
+	* Chg: Update laravel/telescope (v1.0.13 => v1.1)
 	* Chg: Use compact where possible in ForumController
 	* Chg: Add tmux-ui:restart command to restart tmux scripts
 	* Chg: Remove now unused libraries
