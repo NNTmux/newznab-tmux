@@ -164,9 +164,6 @@ return [
         App\Providers\TelescopeServiceProvider::class,
         Jrean\UserVerification\UserVerificationServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Way\Generators\GeneratorsServiceProvider::class,
-        Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
-        Orangehill\Iseed\IseedServiceProvider::class,
         Messerli90\IGDB\IGDBServiceProvider::class,
         App\Providers\UserServiceProvider::class,
 

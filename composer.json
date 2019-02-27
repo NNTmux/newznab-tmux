@@ -159,10 +159,8 @@
     "moontoast/math": "^1.1",
     "nunomaduro/collision": "^2.0",
     "nunomaduro/larastan": "^0.3.4",
-    "orangehill/iseed": "^2.5",
     "php-coveralls/php-coveralls": "^2.0",
-    "phpunit/phpunit": "^7.0",
-    "xethron/migrations-generator": "^2.0"
+    "phpunit/phpunit": "^7.0"
   },
 
   "scripts": {
