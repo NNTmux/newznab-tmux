@@ -1,3 +1,5 @@
+2019-02-27 DariusIII
+	* Chg: Update used libraries to their latest versions
 2019-02-26 DariusIII
 	* Chg: Update config files for laravel 5.8 changes
 	* Chg: Fix return declarations in multiple controllers

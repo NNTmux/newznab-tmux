@@ -5210,26 +5210,26 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "762a5372afb16b9ebcfa5bda0e5a70a2453229eb"
+                "reference": "f652b00eb47382f385fc83e9a8dc6ce37c42d572"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/762a5372afb16b9ebcfa5bda0e5a70a2453229eb",
-                "reference": "762a5372afb16b9ebcfa5bda0e5a70a2453229eb",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/f652b00eb47382f385fc83e9a8dc6ce37c42d572",
+                "reference": "f652b00eb47382f385fc83e9a8dc6ce37c42d572",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": ">=5.0,<5.8",
-                "illuminate/config": ">=5.0,<5.8",
-                "illuminate/console": ">=5.0,<5.8",
-                "illuminate/contracts": ">=5.0,<5.8",
-                "illuminate/support": ">=5.0,<5.8",
-                "illuminate/validation": ">=5.0,<5.8",
-                "php": ">=7.0"
+                "illuminate/cache": ">=5.0,<5.9",
+                "illuminate/config": ">=5.0,<5.9",
+                "illuminate/console": ">=5.0,<5.9",
+                "illuminate/contracts": ">=5.0,<5.9",
+                "illuminate/support": ">=5.0,<5.9",
+                "illuminate/validation": ">=5.0,<5.9",
+                "php": ">=7.1"
             },
             "require-dev": {
                 "mockery/mockery": "*",
@@ -5270,7 +5270,7 @@
                 "throwaway",
                 "validator"
             ],
-            "time": "2018-10-14T08:25:07+00:00"
+            "time": "2019-02-27T06:32:17+00:00"
         },
         {
             "name": "psr/container",
@@ -5993,28 +5993,27 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "5.4.3",
+            "version": "5.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "514663b6b331a6c62ab6321cdf68d790a706e082"
+                "reference": "8ff6e6658806ca5778e3ceaa0e54ccc4c3566ce3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/514663b6b331a6c62ab6321cdf68d790a706e082",
-                "reference": "514663b6b331a6c62ab6321cdf68d790a706e082",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/8ff6e6658806ca5778e3ceaa0e54ccc4c3566ce3",
+                "reference": "8ff6e6658806ca5778e3ceaa0e54ccc4c3566ce3",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "~5.5.0|~5.6.0|~5.7.0",
-                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0",
-                "php": "^7.0",
+                "illuminate/contracts": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+                "php": "^7.1",
                 "spatie/fractalistic": "^2.5"
             },
             "require-dev": {
-                "orchestra/testbench": "~3.5.0|~3.6.0|~3.7.0",
-                "phpunit/phpunit": "^6.2|^7.0",
-                "scrutinizer/ocular": "^1.5"
+                "orchestra/testbench": "~3.5.0|~3.6.0|~3.7.0|~3.8.0",
+                "phpunit/phpunit": "^6.2|^7.0"
             },
             "type": "library",
             "extra": {
@@ -6058,20 +6057,20 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2019-01-16T12:38:34+00:00"
+            "time": "2019-02-27T00:32:04+00:00"
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.33.0",
+            "version": "2.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "9da0a1618b0c85f71ef7e11b942d5f6f92d2c063"
+                "reference": "10f6b2e19cce79936e42b65f08549cbf564c052e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/9da0a1618b0c85f71ef7e11b942d5f6f92d2c063",
-                "reference": "9da0a1618b0c85f71ef7e11b942d5f6f92d2c063",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/10f6b2e19cce79936e42b65f08549cbf564c052e",
+                "reference": "10f6b2e19cce79936e42b65f08549cbf564c052e",
                 "shasum": ""
             },
             "require": {
@@ -6123,7 +6122,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2019-02-20T15:56:22+00:00"
+            "time": "2019-02-26T21:25:08+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
