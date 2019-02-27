@@ -5993,27 +5993,28 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "5.4.4",
+            "version": "5.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "8ff6e6658806ca5778e3ceaa0e54ccc4c3566ce3"
+                "reference": "c79bf1581e9961ed2420b5573b1aaf9f71fd2308"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/8ff6e6658806ca5778e3ceaa0e54ccc4c3566ce3",
-                "reference": "8ff6e6658806ca5778e3ceaa0e54ccc4c3566ce3",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/c79bf1581e9961ed2420b5573b1aaf9f71fd2308",
+                "reference": "c79bf1581e9961ed2420b5573b1aaf9f71fd2308",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-                "php": "^7.1",
+                "illuminate/contracts": "~5.7.0|~5.8.0",
+                "illuminate/support": "~5.7.0|~5.8.0",
+                "php": "^7.2",
                 "spatie/fractalistic": "^2.5"
             },
             "require-dev": {
-                "orchestra/testbench": "~3.5.0|~3.6.0|~3.7.0|~3.8.0",
-                "phpunit/phpunit": "^6.2|^7.0"
+                "dms/phpunit-arraysubset-asserts": "^0.1.0",
+                "orchestra/testbench": "~3.7.0|~3.8.0",
+                "phpunit/phpunit": "^8.0"
             },
             "type": "library",
             "extra": {
@@ -6057,7 +6058,7 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2019-02-27T00:32:04+00:00"
+            "time": "2019-02-27T10:49:15+00:00"
         },
         {
             "name": "spatie/laravel-permission",
