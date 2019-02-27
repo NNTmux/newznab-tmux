@@ -32,7 +32,6 @@ class TmuxUIRestart extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle()
     {
