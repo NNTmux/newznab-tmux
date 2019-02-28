@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba9b0e0332ffd1b455916ad4c861563f",
+    "content-hash": "bbe5aafd24303dee15d4e3e4c342da43",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -817,6 +817,113 @@
                 "source": "https://github.com/DariusIII/laravel-database-trigger/tree/master"
             },
             "time": "2019-02-27T18:51:47+00:00"
+        },
+        {
+            "name": "dariusiii/laravel-smarty",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/Laravel.Smarty.git",
+                "reference": "4ebc955ee2b6dd1eb6037f4c984b19bf7828f4cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/Laravel.Smarty/zipball/4ebc955ee2b6dd1eb6037f4c984b19bf7828f4cd",
+                "reference": "4ebc955ee2b6dd1eb6037f4c984b19bf7828f4cd",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "5.5.*|5.6.*|5.7.*|5.8.*",
+                "illuminate/console": "5.5.*|5.6.*|5.7.*|5.8.*",
+                "illuminate/events": "5.5.*|5.6.*|5.7.*|5.8.*",
+                "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*",
+                "illuminate/view": "5.5.*|5.6.*|5.7.*|5.8.*",
+                "php": ">=7.0.0",
+                "smarty/smarty": "^3.1.31"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.11.6",
+                "pdepend/pdepend": "^2.2.4",
+                "phploc/phploc": "*",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "^5.0",
+                "predis/predis": "~1.0",
+                "satooshi/php-coveralls": "*",
+                "sebastian/phpcpd": "*",
+                "sensiolabs/security-checker": "^4.0.0",
+                "squizlabs/php_codesniffer": "~2.7",
+                "symfony/console": "^3.0",
+                "symfony/framework-bundle": "^3.0"
+            },
+            "suggest": {
+                "ext-memcached": "memcached Template Cache Driver",
+                "predis/predis": "Redis Template Cache Driver"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ytake\\LaravelSmarty\\SmartyServiceProvider",
+                        "Ytake\\LaravelSmarty\\SmartyConsoleServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ytake\\LaravelSmarty\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "files": [
+                    "tests/SmartyTestCase.php"
+                ]
+            },
+            "scripts": {
+                "md": [
+                    "php ./vendor/bin/phpmd src text ./phpmd.xml"
+                ],
+                "quality-assurance": [
+                    "php ./vendor/bin/phpunit",
+                    "php ./vendor/bin/phpcpd src/"
+                ],
+                "pdepend": [
+                    "php ./vendor/bin/pdepend  --summary-xml=tests/build/summary.xml --jdepend-chart=tests/quality-assurance/jdepend.svg --overview-pyramid=tests/quality-assurance/pyramid.svg src/"
+                ],
+                "loc": [
+                    "php ./vendor/bin/phploc src/ --log-xml=tests/quality-assurance/phploc.xml"
+                ],
+                "cs": [
+                    "php ./vendor/bin/php-cs-fixer fix"
+                ],
+                "phpcs": [
+                    "./vendor/bin/phpcs src/ --report-full --report-source --standard=PSR2 --colors"
+                ],
+                "sc": [
+                    "security-checker security:check ./composer.lock"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yuuki Takezawa",
+                    "email": "yuuki.takezawa@comnect.jp.net"
+                }
+            ],
+            "description": "Smarty template engine for Laravel and Lumen",
+            "keywords": [
+                "cache",
+                "laravel",
+                "lumen",
+                "smarty",
+                "template",
+                "view"
+            ],
+            "support": {
+                "source": "https://github.com/DariusIII/Laravel.Smarty/tree/master"
+            },
+            "time": "2019-02-28T11:51:22+00:00"
         },
         {
             "name": "dariusiii/laravel-user-verification",
@@ -7915,82 +8022,6 @@
                 "mysql"
             ],
             "time": "2017-04-27T16:19:41+00:00"
-        },
-        {
-            "name": "ytake/laravel-smarty",
-            "version": "2.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ytake/Laravel.Smarty.git",
-                "reference": "b0c33cc9db91e85db83fac80bfedecc82affb237"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/b0c33cc9db91e85db83fac80bfedecc82affb237",
-                "reference": "b0c33cc9db91e85db83fac80bfedecc82affb237",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/config": "^5.5",
-                "illuminate/console": "^5.5",
-                "illuminate/events": "^5.5",
-                "illuminate/support": "^5.5",
-                "illuminate/view": "^5.5",
-                "php": ">=7.0.0",
-                "smarty/smarty": "^3.1.31"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^1.11.6",
-                "pdepend/pdepend": "^2.2.4",
-                "phploc/phploc": "*",
-                "phpmd/phpmd": "@stable",
-                "phpunit/phpunit": "^5.0",
-                "predis/predis": "~1.0",
-                "satooshi/php-coveralls": "*",
-                "sebastian/phpcpd": "*",
-                "sensiolabs/security-checker": "^4.0.0",
-                "squizlabs/php_codesniffer": "~2.7",
-                "symfony/console": "^3.0",
-                "symfony/framework-bundle": "^3.0"
-            },
-            "suggest": {
-                "ext-memcached": "memcached Template Cache Driver",
-                "predis/predis": "Redis Template Cache Driver"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Ytake\\LaravelSmarty\\SmartyServiceProvider",
-                        "Ytake\\LaravelSmarty\\SmartyConsoleServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Ytake\\LaravelSmarty\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Yuuki Takezawa",
-                    "email": "yuuki.takezawa@comnect.jp.net"
-                }
-            ],
-            "description": "Smarty template engine for Laravel and Lumen",
-            "keywords": [
-                "cache",
-                "laravel",
-                "lumen",
-                "smarty",
-                "template",
-                "view"
-            ],
-            "time": "2017-09-05T17:47:10+00:00"
         }
     ],
     "packages-dev": [
@@ -11702,7 +11733,8 @@
         "joshpinkney/tv-maze-php-api": 20,
         "mayconbordin/l5-fixtures": 20,
         "dariusiii/laravel-database-trigger": 20,
-        "dariusiii/laravel": 20
+        "dariusiii/laravel": 20,
+        "dariusiii/laravel-smarty": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

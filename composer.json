@@ -72,6 +72,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/laravel"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/Laravel.Smarty"
         }
     ],
   "require": {
@@ -159,7 +163,7 @@
     "watson/rememberable": "^2.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
     "yadakhov/insert-on-duplicate-key": "^1.2",
-    "ytake/laravel-smarty": "^2.2"
+    "dariusiii/laravel-smarty": "dev-master"
   },
 
   "require-dev": {
