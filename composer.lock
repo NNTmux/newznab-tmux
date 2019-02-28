@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f27a1b73dc3b5257d8bb61c18e07bb0",
+    "content-hash": "b8fee59889f5bf392485f84011c77ade",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2843,29 +2843,31 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v2.2.2",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "b79bb2762ed3f234125892c811d3a73d13bf66cc"
+                "reference": "11acb6eafee4a0ea3bea87c6277f4342ebd2e1e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/b79bb2762ed3f234125892c811d3a73d13bf66cc",
-                "reference": "b79bb2762ed3f234125892c811d3a73d13bf66cc",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/11acb6eafee4a0ea3bea87c6277f4342ebd2e1e3",
+                "reference": "11acb6eafee4a0ea3bea87c6277f4342ebd2e1e3",
                 "shasum": ""
             },
             "require": {
                 "cakephp/chronos": "^1.0",
+                "ext-json": "*",
                 "ext-pcntl": "*",
                 "ext-posix": "*",
-                "illuminate/contracts": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-                "illuminate/queue": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+                "illuminate/contracts": "~5.7.0|~5.8.0",
+                "illuminate/queue": "~5.7.0|~5.8.0",
+                "illuminate/support": "~5.7.0|~5.8.0",
                 "php": ">=7.1.0",
                 "predis/predis": "^1.1",
                 "ramsey/uuid": "^3.5",
-                "symfony/debug": "~3.3|~4.0"
+                "symfony/debug": "^4.2",
+                "symfony/process": "^4.2"
             },
             "require-dev": {
                 "mockery/mockery": "^1.0",
@@ -2876,7 +2878,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "3.0-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -2907,7 +2909,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-02-21T19:56:21+00:00"
+            "time": "2019-02-27T15:44:24+00:00"
         },
         {
             "name": "laravel/scout",
@@ -9371,33 +9373,33 @@
         },
         {
             "name": "nette/finder",
-            "version": "v2.4.2",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/finder.git",
-                "reference": "ee951a656cb8ac622e5dd33474a01fd2470505a0"
+                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/finder/zipball/ee951a656cb8ac622e5dd33474a01fd2470505a0",
-                "reference": "ee951a656cb8ac622e5dd33474a01fd2470505a0",
+                "url": "https://api.github.com/repos/nette/finder/zipball/6be1b83ea68ac558aff189d640abe242e0306fe2",
+                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "~2.4",
-                "php": ">=5.6.0"
+                "nette/utils": "^2.4 || ~3.0.0",
+                "php": ">=7.1"
             },
             "conflict": {
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "nette/tester": "~2.0",
+                "nette/tester": "^2.0",
                 "tracy/tracy": "^2.3"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -9429,7 +9431,7 @@
                 "iterator",
                 "nette"
             ],
-            "time": "2018-06-28T11:49:23+00:00"
+            "time": "2019-02-28T18:13:25+00:00"
         },
         {
             "name": "nette/neon",
