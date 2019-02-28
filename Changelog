@@ -1,4 +1,5 @@
 2019-02-28 DariusIII
+	* Chg: Add package to support postmark to send emails
 	* Chg: Reduce maximum number of compressed files checked in PPA to 10
 	* Fix: Cast Category constants to string in Blacklight/http/API.php to prevent strpos errors
 	* Chg: Update laravel/framework to 5.8.2, use forks of packages used untill they add support for laravel 5.8

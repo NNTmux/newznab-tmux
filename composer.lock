@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bbe5aafd24303dee15d4e3e4c342da43",
+    "content-hash": "6f27a1b73dc3b5257d8bb61c18e07bb0",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -7928,6 +7928,46 @@
             "time": "2017-12-21T01:09:18+00:00"
         },
         {
+            "name": "wildbit/swiftmailer-postmark",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wildbit/swiftmailer-postmark.git",
+                "reference": "1cf0fd1aa6cbacd5ca6ff87425c02f0e17bb7519"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wildbit/swiftmailer-postmark/zipball/1cf0fd1aa6cbacd5ca6ff87425c02f0e17bb7519",
+                "reference": "1cf0fd1aa6cbacd5ca6ff87425c02f0e17bb7519",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0.0",
+                "swiftmailer/swiftmailer": "^6.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Postmark\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Postmark",
+                    "email": "support@postmarkapp.com"
+                }
+            ],
+            "description": "A Swiftmailer Transport for Postmark.",
+            "time": "2018-07-20T15:34:31+00:00"
+        },
+        {
             "name": "yab/laravel-scout-mysql-driver",
             "version": "v2.1.0",
             "source": {
@@ -11730,11 +11770,11 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
-        "joshpinkney/tv-maze-php-api": 20,
-        "mayconbordin/l5-fixtures": 20,
-        "dariusiii/laravel-database-trigger": 20,
         "dariusiii/laravel": 20,
-        "dariusiii/laravel-smarty": 20
+        "dariusiii/laravel-database-trigger": 20,
+        "dariusiii/laravel-smarty": 20,
+        "joshpinkney/tv-maze-php-api": 20,
+        "mayconbordin/l5-fixtures": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
