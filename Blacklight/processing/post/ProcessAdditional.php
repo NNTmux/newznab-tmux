@@ -39,7 +39,7 @@ class ProcessAdditional
      *
      * @var int
      */
-    public const maxCompressedFilesToCheck = 20;
+    public const maxCompressedFilesToCheck = 10;
 
     /**
      * @var \PDO
