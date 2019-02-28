@@ -1,4 +1,6 @@
 2019-02-28 DariusIII
+	* Chg: Update spatie/laravel-directory-cleanup (1.2.3 => 1.2.4)
+	* Chg: Update voku/simple_html_dom (4.2.1 => 4.3.1)
 	* Chg: Update all the regexes to work with php7.3
 2019-02-27 DariusIII
 	* Chg: Update spatie/laravel-fractal (5.4.4 => 5.5.0)

@@ -5930,27 +5930,27 @@
         },
         {
             "name": "spatie/laravel-directory-cleanup",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-directory-cleanup.git",
-                "reference": "ef3c21c3ca0e1980c96d8203f3d9462306efbc26"
+                "reference": "e13f1a0879f6186d77c4853440b26159f28b5c9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/ef3c21c3ca0e1980c96d8203f3d9462306efbc26",
-                "reference": "ef3c21c3ca0e1980c96d8203f3d9462306efbc26",
+                "url": "https://api.github.com/repos/spatie/laravel-directory-cleanup/zipball/e13f1a0879f6186d77c4853440b26159f28b5c9d",
+                "reference": "e13f1a0879f6186d77c4853440b26159f28b5c9d",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0",
-                "nesbot/carbon": "^1.0",
+                "illuminate/support": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+                "nesbot/carbon": "^1.0|^2.0",
                 "php": "^7.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.1",
-                "orchestra/testbench": "~3.3.0|~3.4.0|~3.5.0|~3.6.0|~3.7.0",
-                "phpunit/phpunit": "^5.0|^6.0|^7.0"
+                "orchestra/testbench": "~3.3.0|~3.4.0|~3.5.0|~3.6.0|~3.7.0|~3.8.0",
+                "phpunit/phpunit": "^5.0|^6.0|^7.0|^8.0"
             },
             "type": "library",
             "extra": {
@@ -5989,7 +5989,7 @@
                 "laravel-directory-cleanup",
                 "spatie"
             ],
-            "time": "2019-01-18T16:32:41+00:00"
+            "time": "2019-02-27T22:23:12+00:00"
         },
         {
             "name": "spatie/laravel-fractal",
@@ -7889,16 +7889,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.2.1",
+            "version": "4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "73f2f5f90bb2452ff98c5cb7035c75e1cd6da9f9"
+                "reference": "fc06c3547a59be66bda4feadf7465081462ef71c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/73f2f5f90bb2452ff98c5cb7035c75e1cd6da9f9",
-                "reference": "73f2f5f90bb2452ff98c5cb7035c75e1cd6da9f9",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/fc06c3547a59be66bda4feadf7465081462ef71c",
+                "reference": "fc06c3547a59be66bda4feadf7465081462ef71c",
                 "shasum": ""
             },
             "require": {
@@ -7944,7 +7944,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-01-06T07:50:30+00:00"
+            "time": "2019-02-28T07:36:20+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
