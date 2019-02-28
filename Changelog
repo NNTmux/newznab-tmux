@@ -1,4 +1,5 @@
 2019-02-28 DariusIII
+	* Chg: Update laravel/framework to 5.8.2, use forks of packages used untill they add support for laravel 5.8
 	* Chg: Update spatie/laravel-directory-cleanup (1.2.3 => 1.2.4)
 	* Chg: Update voku/simple_html_dom (4.2.1 => 4.3.1)
 	* Chg: Update all the regexes to work with php7.3
