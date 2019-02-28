@@ -2051,7 +2051,7 @@ class NameFixer
                 case preg_match('/^(.+?IMAGESET.+?)\\\\.+/i', $release->textstring, $result):
                     $this->updateRelease($release, $result['1'], 'fileCheck: XXX Imagesets', $echo, $type, $nameStatus, $show);
                     break;
-                case preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $release->textstring, $result):
+                case preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $release->textstring, $result):
                     $this->updateRelease($release, $result['1'].' XXX DVDRIP XviD-VIDEOOT', 'fileCheck: XXX XviD VIDEOOT', $echo, $type, $nameStatus, $show);
                     break;
                 case preg_match('/^.+?SDPORN/i', $release->textstring, $result):
