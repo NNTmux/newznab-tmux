@@ -1,4 +1,5 @@
 2019-03-01 DariusIII
+	* Chg: Update spatie/laravel-permission (2.34.0 => 2.35.0)
 	* Chg: Update PPA class
 	* Chg: Remove unused parts of fixtures and seeders
 	* Chg: Update nesbot/carbon (2.14.1 => 2.14.2)
