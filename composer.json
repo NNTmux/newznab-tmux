@@ -67,10 +67,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/DariusIII/laravel-user-verification"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/DariusIII/laravel"
         },
         {
@@ -116,7 +112,7 @@
     "dariusiii/laravel": "dev-master",
     "dariusiii/laravel-database-trigger": "dev-master",
     "dariusiii/laravel-smarty": "dev-master",
-    "dariusiii/laravel-user-verification": "^8.0",
+    "jrean/laravel-user-verification": "^7.0",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "^1.0",

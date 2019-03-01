@@ -1,3 +1,5 @@
+2019-03-01 DariusIII
+	* Chg: Add back jrean/laravel-user-verification and remove customized fork
 2019-02-28 DariusIII
 	* Chg: Update laravel/horizon (v2.2.2 => v3.0.0)
 	* Chg: Add package to support postmark to send emails
