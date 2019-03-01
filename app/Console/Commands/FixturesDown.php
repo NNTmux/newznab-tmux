@@ -20,7 +20,6 @@ class FixturesDown extends Command
         'menu',
         'release_naming_regexes',
         'settings',
-        'tmux',
     ];
     /**
      * The name and signature of the console command.

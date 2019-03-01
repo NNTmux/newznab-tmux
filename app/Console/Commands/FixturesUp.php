@@ -19,7 +19,6 @@ class FixturesUp extends Command
       'usenet_groups',
       'release_naming_regexes',
       'settings',
-      'tmux',
     ];
     /**
      * The name and signature of the console command.
