@@ -1,4 +1,5 @@
 2019-03-02 DariusIII
+	* Chg: Update package.json
 	* Chg: Once again use original ytake/laravel-smarty and laravelcollective/html packages
 2019-03-01 DariusIII
 	* Chg: Update spatie/laravel-permission (2.34.0 => 2.35.0)

@@ -18,7 +18,7 @@
         "lodash": "^4.17.11",
         "popper.js": "^1.14.7",
         "prettier": "^1.16.4",
-        "vue": "^2.6.7"
+        "vue": "^2.6.8"
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.6",
