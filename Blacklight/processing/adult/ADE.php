@@ -3,7 +3,7 @@
 namespace Blacklight\processing\adult;
 
 /**
- * Class ADE
+ * Class ADE.
  */
 class ADE extends AdultMovies
 {
