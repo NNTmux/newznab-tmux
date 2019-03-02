@@ -159,9 +159,9 @@ class TraktTv extends TV
                         if ($episode === false && $lookupSetting) {
                             // Send the request for the episode to TRAKT
                             $traktEpisode = $this->getEpisodeInfo(
-                                    $traktid,
-                                    $seasonNo,
-                                    $episodeNo
+                                $traktid,
+                                $seasonNo,
+                                $episodeNo
                             );
 
                             if ($traktEpisode) {

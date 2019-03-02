@@ -63,7 +63,7 @@ class TVDB extends TV
             $this->local = true;
         }
 
-        if (\strlen($this->token) > 0) {
+        if ($this->token !== '') {
             $this->client->setToken($this->token);
         }
     }
@@ -128,7 +128,7 @@ class TVDB extends TV
 
                     // Check if we have a valid country and set it in the array
                     $country = (
-                            isset($release['country']) && \strlen($release['country']) === 2
+                        isset($release['country']) && \strlen($release['country']) === 2
                             ? (string) $release['country']
                             : ''
                         );
@@ -182,10 +182,10 @@ class TVDB extends TV
                     if ($episode === false && $lookupSetting) {
                         // Send the request for the episode to TVDB
                         $tvdbEpisode = $this->getEpisodeInfo(
-                                $tvDbId,
-                                $seasonNo,
-                                $episodeNo,
-                                $release['airdate']
+                            $tvDbId,
+                            $seasonNo,
+                            $episodeNo,
+                            $release['airdate']
                             );
 
                         if ($tvdbEpisode) {
