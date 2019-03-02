@@ -63,15 +63,7 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/DariusIII/html"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/DariusIII/laravel"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/Laravel.Smarty"
         }
     ],
   "require": {
@@ -108,10 +100,10 @@
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "chumper/zipper": "^1.0",
     "czproject/git-php": "^3.14",
-    "dariusiii/html": "^5.7",
+    "laravelcollective/html": "^5.7",
     "dariusiii/laravel": "dev-master",
     "dariusiii/laravel-database-trigger": "dev-master",
-    "dariusiii/laravel-smarty": "dev-master",
+    "ytake/laravel-smarty": "^2.5",
     "jrean/laravel-user-verification": "^7.0",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
