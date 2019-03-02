@@ -1,4 +1,5 @@
 2019-03-02 DariusIII
+	* Chg: Update code style of adult processing classes
 	* Chg: Update code style of tv processing classes
 	* Chg: Update package.json
 	* Chg: Once again use original ytake/laravel-smarty and laravelcollective/html packages

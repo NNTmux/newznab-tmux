@@ -3,7 +3,7 @@
 namespace Blacklight\processing\adult;
 
 /**
- * Class adultdvdempire.
+ * Class ADE
  */
 class ADE extends AdultMovies
 {
@@ -22,7 +22,7 @@ class ADE extends AdultMovies
     /**
      * Define ADE Url here.
      */
-    const ADE = 'http://www.adultdvdempire.com';
+    private const ADE = 'http://www.adultdvdempire.com';
 
     /**
      * Direct Url returned in getAll method.
@@ -51,14 +51,6 @@ class ADE extends AdultMovies
     protected $_res = [];
     protected $_tmpResponse;
     protected $_ch;
-
-    /**
-     * ADE constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Gets Trailer Movies.

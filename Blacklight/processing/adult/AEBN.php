@@ -16,10 +16,9 @@ class AEBN extends AdultMovies
     /**
      * Url Constants used within this class.
      */
-    const AEBNSURL = 'http://straight.theater.aebn.net';
-    const IF18 = 'http://straight.theater.aebn.net/dispatcher/frontDoor?genreId=101&theaterId=13992&locale=en&refid=AEBN-000001';
-    const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
-    const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
+    private const AEBNSURL = 'http://straight.theater.aebn.net';
+    private const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
+    private const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
 
     /**
      * Direct Url in getAll method.
@@ -60,18 +59,6 @@ class AEBN extends AdultMovies
      * @var string
      */
     protected $_title = '';
-
-    /**
-     * Sets the variables that used throughout the class.
-     *
-     * @param array $options
-     *
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Gets Trailer URL .. will be processed in XXX insertswf.
