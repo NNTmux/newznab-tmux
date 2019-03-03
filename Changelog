@@ -1,4 +1,5 @@
 2019-03-03 DariusIII
+	* Chg: Update symfony components remove unused trait
 	* Chg: Update console commands
 2019-03-02 DariusIII
 	* Chg: Update code style on AniDB processing class
