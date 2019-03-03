@@ -73,9 +73,9 @@ class InstallNntmux extends Command
                 }
                 $this->info('Migrating tables and seeding them with initial data');
                 if (config('app.env') !== 'production') {
-                    $this->call('migrate:fresh', ['--seed' => true]);
+                    $this->call('migrate:fresh --seed');
                 } else {
-                    $this->call('migrate:fresh', ['--force' => true, '--seed' => true]);
+                    $this->call('migrate:fresh --force --seed');
                 }
 
                 $paths = $this->updatePaths();
@@ -93,7 +93,7 @@ class InstallNntmux extends Command
                 if (! $error && $this->addAdminUser()) {
                     File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
-                    $this->call('key:generate', ['--force' => true]);
+                    $this->call('key:generate --force');
                     $this->info('NNTmux installation completed successfully');
                     exit();
                 }
@@ -166,7 +166,7 @@ class InstallNntmux extends Command
         $this->info('Adding admin user to database');
         try {
             User::add(config('nntmux.admin_username'), config('nntmux.admin_password'), config('nntmux.admin_email'), 2, '', '', '', '');
-            User::where('username', config('nntmux.admin_username'))->update(['verified' => 1]);
+            User::where('username', config('nntmux.admin_username'))->update(['verified' => 1, 'email_verified_at' => now()]);
         } catch (\Throwable $e) {
             echo $e->getMessage();
             $this->error('Unable to add admin user!');

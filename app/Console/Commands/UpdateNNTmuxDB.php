@@ -35,7 +35,7 @@ class UpdateNNTmuxDB extends Command
         if (config('app.env') !== 'production') {
             $this->call('migrate');
         } else {
-            $this->call('migrate', ['--force' => true]);
+            $this->call('migrate --force=true');
         }
     }
 }

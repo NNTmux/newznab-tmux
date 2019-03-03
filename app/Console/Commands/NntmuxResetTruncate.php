@@ -14,15 +14,14 @@ class NntmuxResetTruncate extends Command
      *
      * @var string
      */
-    protected $signature = 'nntmux:reset-truncate {type}';
+    protected $signature = 'nntmux:reset-truncate';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'This command removes releases with no NZBs, resets all groups, truncates or drops(tpg)
-        article tables. All other releases are left alone.';
+    protected $description = 'This command removes releases with no NZBs, resets all groups, truncates article tables. All other releases are left alone.';
 
     /**
      * Create a new command instance.
