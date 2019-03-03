@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
 use Ytake\LaravelSmarty\Smarty;
-use Illuminate\Support\Facades\App;
 
 class UpdateNNTmux extends Command
 {
