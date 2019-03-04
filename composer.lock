@@ -7590,16 +7590,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.3.2",
+            "version": "4.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "546be663c73807a503b462074d917af370f3fe66"
+                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/546be663c73807a503b462074d917af370f3fe66",
-                "reference": "546be663c73807a503b462074d917af370f3fe66",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/3084547002a84268033f2a1d1414c8cde0c388d7",
+                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7",
                 "shasum": ""
             },
             "require": {
@@ -7645,7 +7645,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-03-03T22:12:08+00:00"
+            "time": "2019-03-04T08:10:15+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",

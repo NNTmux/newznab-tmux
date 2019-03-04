@@ -1,4 +1,5 @@
 2019-03-04 DariusIII
+	* Chg: Update voku/simple_html_dom (4.3.2 => 4.3.3)
 	* Chg: Revert changes in calling artisan commands
 	* Chg: Update mysql database connection in config/database.php
 	* Fix: Fix maintenance mode check in UpdateNNTmux console command
