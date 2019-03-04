@@ -1,3 +1,5 @@
+2019-03-04 DariusIII
+	* Chg: Update voku/simple_html_dom (4.3.1 => 4.3.2)
 2019-03-03 DariusIII
 	* Chg: Update symfony components remove unused trait
 	* Chg: Update console commands
