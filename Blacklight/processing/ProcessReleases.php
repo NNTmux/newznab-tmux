@@ -360,7 +360,7 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary($totalTime.Str::plural(' second', $totalTime), true);
             }
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -453,7 +453,7 @@ class ProcessReleases
                     if ($this->echoCLI) {
                         $this->colorCli->primary('Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.$minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.' with less files than site/group settings in: '.$totalTime.Str::plural(' second', $totalTime), true);
                     }
-                }, 10);
+                }, 3);
             }
         }
     }
@@ -572,7 +572,7 @@ class ProcessReleases
                                 $collection->id
                             )
                         );
-                    }, 10);
+                    }, 3);
 
                     // Add the id of regex that matched the collection and release name to release_regexes table
                     ReleaseRegex::insertIgnore([
@@ -987,7 +987,7 @@ class ProcessReleases
                     true
                 );
             }
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -1379,7 +1379,7 @@ class ProcessReleases
                     self::COLLFC_COMPCOLL
                 )
             );
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -1418,7 +1418,7 @@ class ProcessReleases
                     self::COLLFC_ZEROPART
                 )
             );
-        }, 10);
+        }, 3);
 
         DB::transaction(function () use ($where) {
             DB::update(
@@ -1432,7 +1432,7 @@ class ProcessReleases
                     $where
                 )
             );
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -1468,7 +1468,7 @@ class ProcessReleases
                 self::FILE_COMPLETE
             )
         );
-        }, 10);
+        }, 3);
 
         DB::transaction(function () use ($where) {
             DB::update(
@@ -1492,7 +1492,7 @@ class ProcessReleases
                     self::FILE_COMPLETE
                 )
             );
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -1523,7 +1523,7 @@ class ProcessReleases
                     self::COLLFC_COMPPART
                 )
             );
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -1550,7 +1550,7 @@ class ProcessReleases
                     $where
                 )
             );
-        }, 10);
+        }, 3);
     }
 
     /**
@@ -1570,7 +1570,7 @@ class ProcessReleases
                     "
 				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
-				AND c.filecheck IN (%d, %d, 10) %s",
+				AND c.filecheck IN (%d, %d, 3) %s",
                     self::COLLFC_COMPPART,
                     $this->collectionDelayTime,
                     self::COLLFC_DEFAULT,
@@ -1578,7 +1578,7 @@ class ProcessReleases
                     $where
                 )
             );
-        }, 10);
+        }, 3);
     }
 
     /**
