@@ -51,10 +51,10 @@ return [
             'collation'   => 'utf8_unicode_ci',
             'strict'      => false,
             'engine'      => 'InnoDB ROW_FORMAT=DYNAMIC',
-            'options' => array_filter([
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 PDO::MYSQL_ATTR_LOCAL_INFILE => true,
-            ]),
+            ]) : [],
         ],
 
         'pgsql' => [
