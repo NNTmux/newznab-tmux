@@ -1004,7 +1004,7 @@ class ProcessAdditional
 
             // Download the article(s) from usenet.
             $fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mID, $this->_alternateNNTP);
-            if ($this->_nntp->isError($fetchedBinary)) {
+            if ($this->_nntp::isError($fetchedBinary)) {
                 $fetchedBinary = false;
             }
 
@@ -1391,7 +1391,7 @@ class ProcessAdditional
 
                 // Download it from usenet.
                 $sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp->isError($sampleBinary)) {
+                if ($this->_nntp::isError($sampleBinary)) {
                     $sampleBinary = false;
                 }
 
@@ -1437,7 +1437,7 @@ class ProcessAdditional
 
                 // Try to download it from usenet.
                 $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp->isError($mediaBinary)) {
+                if ($this->_nntp::isError($mediaBinary)) {
                     // If error set it to false.
                     $mediaBinary = false;
                 }
@@ -1488,7 +1488,7 @@ class ProcessAdditional
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp->isError($audioBinary)) {
+                if ($this->_nntp::isError($audioBinary)) {
                     $audioBinary = false;
                 }
 
@@ -1523,7 +1523,7 @@ class ProcessAdditional
 
             // Try to download it.
             $jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs, $this->_alternateNNTP);
-            if ($this->_nntp->isError($jpgBinary)) {
+            if ($this->_nntp::isError($jpgBinary)) {
                 $jpgBinary = false;
             }
 
@@ -1537,7 +1537,7 @@ class ProcessAdditional
 
                 // Try to resize and move it.
                 $this->_foundJPGSample = (
-                $this->_releaseImage->saveImage(
+                    $this->_releaseImage->saveImage(
                     $this->_release->guid.'_thumb',
                     $this->tmpPath.'samplepicture.jpg',
                     $this->_releaseImage->jpgSavePath,
@@ -1689,14 +1689,14 @@ class ProcessAdditional
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
-                sprintf(
+            sprintf(
                     '/%d\d{3}|%d|%d|%d/',
                     $musicParent[0],
                     Category::OTHER_MISC,
                     Category::MOVIE_OTHER,
                     Category::TV_OTHER
                 ),
-                $rQuery->id
+            $rQuery->id
             )
         ) {
             return false;
@@ -1736,7 +1736,7 @@ class ProcessAdditional
                                 $newTitle = escapeString(substr($newName, 0, 255));
                                 // Update the search name.
                                 DB::update(
-                                        sprintf(
+                                    sprintf(
                                             '
 											UPDATE releases
 											SET searchname = %s, categories_id = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
@@ -1753,7 +1753,7 @@ class ProcessAdditional
                                 // Echo the changed name.
                                 if ($this->_echoCLI) {
                                     NameFixer::echoChangedReleaseName(
-                                            [
+                                        [
                                                 'new_name' => $newName,
                                                 'old_name' => $rQuery->searchname,
                                                 'new_category' => $newCat,
@@ -1847,7 +1847,7 @@ class ProcessAdditional
     {
         // Try to resize/move the image.
         $this->_foundJPGSample = (
-        $this->_releaseImage->saveImage(
+            $this->_releaseImage->saveImage(
             $this->_release->guid.'_thumb',
             $fileLocation,
             $this->_releaseImage->jpgSavePath,
@@ -2246,8 +2246,8 @@ class ProcessAdditional
     {
         $pos = 0;
         $af = $bf = false;
-        $a = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $a['title']);
-        $b = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $b['title']);
+        $a = preg_replace('/\d+[ ._-]?(\/|\||[o0]f)[ ._-]?\d+?(?![ ._-]\d)/i', ' ', $a['title']);
+        $b = preg_replace('/\d+[ ._-]?(\/|\||[o0]f)[ ._-]?\d+?(?![ ._-]\d)/i', ' ', $b['title']);
 
         if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
             $af = true;
