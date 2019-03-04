@@ -13,7 +13,6 @@ use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
@@ -21,6 +20,7 @@ use Blacklight\ReleaseImage;
 use App\Models\ReleasesGroups;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcessReleases
 {
