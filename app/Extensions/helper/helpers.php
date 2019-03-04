@@ -31,10 +31,14 @@ if (! function_exists('getRawHtml')) {
         try {
             $response = $client->get($url)->getBody()->getContents();
         } catch (RequestException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         } catch (\RuntimeException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         }
 
