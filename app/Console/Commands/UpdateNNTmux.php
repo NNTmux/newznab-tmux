@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
@@ -89,7 +90,7 @@ class UpdateNNTmux extends Command
      */
     private function appDown(): bool
     {
-        if ($this->appDown() === false) {
+        if (App::isDownForMaintenance() === false) {
             $this->call('down');
 
             return true;
