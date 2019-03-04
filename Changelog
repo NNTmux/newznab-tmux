@@ -1,4 +1,5 @@
 2019-03-04 DariusIII
+	* Chg: Update regexes for php7.3
 	* Chg: Update Forking class
 	* Chg: Update switch.php
 	* Chg: Reduce number of retries for transactions in ProcessReleases from 10 to 3

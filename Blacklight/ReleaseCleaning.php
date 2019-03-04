@@ -18,7 +18,7 @@ class ReleaseCleaning
      * @const
      * @string
      */
-    private const REGEX_END = '[- ]{0,3}yEnc$/u';
+    private const REGEX_END = '[ -]{0,3}yEnc$/u';
 
     /**
      * Used for matching file extension endings in article subjects.
@@ -33,7 +33,7 @@ class ReleaseCleaning
      * @const
      * @string
      */
-    private const REGEX_SUBJECT_SIZE = '[- ]{0,3}\d+([.,]\d+)? [kKmMgG][bB][- ]{0,3}';
+    private const REGEX_SUBJECT_SIZE = '[ -]{0,3}\d+([.,]\d+)? [kKmMgG][bB][ -]{0,3}';
 
     /**
      * @var string
@@ -408,7 +408,7 @@ class ReleaseCleaning
     {
         // This regex gets almost all of the predb release names also keep in mind that not every subject ends with yEnc, some are truncated, because of the 255 character limit and some have extra charaters tacked onto the end, like (5/10).
         if (preg_match(
-            '/^\[\d+\][\-_\s]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}\[[- #@\.\w]+\][\-_\s]{0,3}|\[[- #@\.\w]+\][\-_\s]{0,3}\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}|\[.+?efnet\][\-_\s]{0,3}|\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3})(\[FULL\])?[\-_\s]{0,3}(\[ )?(\[)? ?(\/sz\/)?(F: - )?(?P<title>[- _!@\.\'\w\(\)~]{10,}) ?(\])?[\-_\s]{0,3}(\[)? ?(REPOST|REPACK|SCENE|EXTRA PARS|REAL)? ?(\])?[\-_\s]{0,3}?(\[\d+[-\/~]\d+\])?[\-_\s]{0,3}["|#34;]*.+["|#34;]* ?[yEnc]{0,4}/i',
+            '/^\[\d+\][\-_\s]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}\[[\- #@\.\w]+\][\-_\s]{0,3}|\[[\- #@\.\w]+\][\-_\s]{0,3}\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}|\[.+?efnet\][\-_\s]{0,3}|\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3})(\[FULL\])?[\-_\s]{0,3}(\[ )?(\[)? ?(\/sz\/)?(F: - )?(?P<title>[\- _!@\.\'\w\(\)~]{10,}) ?(\])?[\-_\s]{0,3}(\[)? ?(REPOST|REPACK|SCENE|EXTRA PARS|REAL)? ?(\])?[\-_\s]{0,3}?(\[\d+[\-\/~]\d+\])?[\-_\s]{0,3}["|#34;]*.+["|#34;]* ?[yEnc]{0,4}/i',
             $this->subject,
             $match
         )

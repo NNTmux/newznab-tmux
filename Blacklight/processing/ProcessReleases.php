@@ -13,6 +13,7 @@ use Blacklight\ColorCLI;
 use Blacklight\Releases;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
@@ -555,6 +556,7 @@ class ProcessReleases
                     $release = Release::find($releaseID);
                     $release->retag($determinedCategory['tags']);
                 } catch (\Throwable $e) {
+                    Log::debug($e->getTraceAsString());
                     //Just pass this part, tag is not created for some reason, exception is thrown and blocks release creation
                 }
 
