@@ -105,7 +105,7 @@ class UpdateNNTmux extends Command
     private function stopTmux(): bool
     {
         if ((new Tmux())->isRunning() === true) {
-            $this->call('tmux-ui:stop --kill');
+            $this->call('tmux-ui:stop', ['kill' => true]);
 
             return true;
         }

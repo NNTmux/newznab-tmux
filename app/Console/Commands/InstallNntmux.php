@@ -73,9 +73,9 @@ class InstallNntmux extends Command
                 }
                 $this->info('Migrating tables and seeding them with initial data');
                 if (config('app.env') !== 'production') {
-                    $this->call('migrate:fresh --seed');
+                    $this->call('migrate:fresh', ['seed' => true]);
                 } else {
-                    $this->call('migrate:fresh --force --seed');
+                    $this->call('migrate:fresh', ['force' => true, 'seed' => true]);
                 }
 
                 $paths = $this->updatePaths();
@@ -93,7 +93,7 @@ class InstallNntmux extends Command
                 if (! $error && $this->addAdminUser()) {
                     File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
                     $this->info('Generating application key');
-                    $this->call('key:generate --force');
+                    $this->call('key:generate', ['force' => true]);
                     $this->info('NNTmux installation completed successfully');
                     exit();
                 }

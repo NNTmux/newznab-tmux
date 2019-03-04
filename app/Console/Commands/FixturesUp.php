@@ -42,8 +42,7 @@ class FixturesUp extends Command
     content
     usenet_groups
     release_naming_regexes
-    settings
-    tmux';
+    settings';
 
     /**
      * Create a new command instance.
