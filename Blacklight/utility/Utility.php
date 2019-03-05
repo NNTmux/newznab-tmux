@@ -335,105 +335,6 @@ class Utility
     }
 
     /**
-     * Use cURL To download a web page into a string.
-     *
-     * @param array $options See details below.
-     *
-     * @return bool|mixed
-     * @static
-     */
-    public static function getUrl(array $options = [])
-    {
-        $defaults = [
-            'url'            => '',    // String ; The URL to download.
-            'method'         => 'get', // String ; Http method, get/post/etc..
-            'postdata'       => '',    // String ; Data to send on post method.
-            'language'       => '',    // String ; Language in request header string.
-            'debug'          => false, // Bool   ; Show curl debug information.
-            'useragent'      => '',    // String ; User agent string.
-            'cookie'         => '',    // String ; Cookie string.
-            'requestheaders' => [],    // Array  ; List of request headers.
-            //          Example: ["Content-Type: application/json", "DNT: 1"]
-            'verifycert'     => true,  // Bool   ; Verify certificate authenticity?
-            //          Since curl does not have a verify self signed certs option,
-            //          you should use this instead if your cert is self signed.
-        ];
-
-        $options += $defaults;
-
-        if (! $options['url']) {
-            return false;
-        }
-
-        switch ($options['language']) {
-            case 'fr':
-            case 'fr-fr':
-                $options['language'] = 'fr-fr';
-                break;
-            case 'de':
-            case 'de-de':
-                $options['language'] = 'de-de';
-                break;
-            case 'en-us':
-                $options['language'] = 'en-us';
-                break;
-            case 'en-gb':
-                $options['language'] = 'en-gb';
-                break;
-            case '':
-            case 'en':
-            default:
-                $options['language'] = 'en';
-        }
-        $header[] = 'Accept-Language: '.$options['language'];
-        if (\is_array($options['requestheaders'])) {
-            $header += $options['requestheaders'];
-        }
-
-        $ch = curl_init();
-
-        $context = [
-            CURLOPT_URL            => $options['url'],
-            CURLOPT_HTTPHEADER     => $header,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_FOLLOWLOCATION => 1,
-            CURLOPT_TIMEOUT        => 15,
-        ];
-        $context += self::curlSslContextOptions($options['verifycert']);
-        if (! empty($options['useragent'])) {
-            $context += [CURLOPT_USERAGENT => $options['useragent']];
-        }
-        if (! empty($options['cookie'])) {
-            $context += [CURLOPT_COOKIE => $options['cookie']];
-        }
-        if ($options['method'] === 'post') {
-            $context += [
-                CURLOPT_POST       => 1,
-                CURLOPT_POSTFIELDS => $options['postdata'],
-            ];
-        }
-        if ($options['debug']) {
-            $context += [
-                CURLOPT_HEADER      => true,
-                CURLINFO_HEADER_OUT => true,
-                CURLOPT_NOPROGRESS  => false,
-                CURLOPT_VERBOSE     => true,
-            ];
-        }
-        curl_setopt_array($ch, $context);
-
-        $buffer = curl_exec($ch);
-        $err = curl_errno($ch);
-        curl_close($ch);
-
-        if ($err !== 0) {
-            return false;
-        }
-
-        return $buffer;
-    }
-
-    /**
      * @param array $options
      *
      * @return string
@@ -451,7 +352,7 @@ class Utility
 
         if (! empty($options['id']) && \in_array(
             $options['type'],
-                ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'],
+            ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'],
             false
             )
         ) {
@@ -614,9 +515,9 @@ class Utility
      */
     public static function imdb_trailers($imdbID): string
     {
-        $xml = self::getUrl(['url' => 'http://api.traileraddict.com/?imdb='.$imdbID]);
+        $xml = getRawHtml('https://api.traileraddict.com/?imdb='.$imdbID);
         if ($xml !== false && preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
-            return 'https://'.$html[1];
+            return $html[1];
         }
 
         return '';
