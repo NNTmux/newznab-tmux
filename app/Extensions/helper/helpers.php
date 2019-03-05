@@ -34,7 +34,6 @@ if (! function_exists('getRawHtml')) {
             if (json_last_error() === JSON_ERROR_NONE) {
                 $response = $jsonResponse;
             }
-
         } catch (RequestException $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
