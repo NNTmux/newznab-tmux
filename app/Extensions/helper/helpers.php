@@ -15,12 +15,10 @@ use GuzzleHttp\Exception\RequestException;
 if (! function_exists('getRawHtml')) {
 
     /**
-     * @param             $url
-     * @param bool|string $cookie
+     * @param      $url
+     * @param bool $cookie
      *
-     * @return bool|string
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @return bool|mixed|string
      */
     function getRawHtml($url, $cookie = false)
     {
@@ -58,7 +56,7 @@ if (! function_exists('getRawHtmlThroughCF')) {
     /**
      * @param $url
      *
-     * @return bool|string
+     * @return bool|mixed|string
      */
     function getRawHtmlThroughCF($url)
     {
