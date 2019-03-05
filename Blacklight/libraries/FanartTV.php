@@ -88,8 +88,6 @@ class FanartTV
     {
         $url = $this->server.'/'.$path.'?api_key='.$this->apiKey;
 
-        $response = getRawHtml($url);
-
-        return $response !== false ? json_decode($response, true) : false;
+        return getRawHtml($url);
     }
 }

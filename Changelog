@@ -1,4 +1,5 @@
 2019-03-05 DariusIII
+	* Chg: Update usage of getRawHtml as it returns json decoded data if response is valid json
 	* Chg: Remove getUrl function from Utility class, function is not used anywhere anymore, getRawHtml replaced it
 	* Chg: Update tinyMCE to version 5.0.2
 	* Chg: Update package.json with new version of tinyMCE

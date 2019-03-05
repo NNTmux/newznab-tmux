@@ -15,10 +15,12 @@ use GuzzleHttp\Exception\RequestException;
 if (! function_exists('getRawHtml')) {
 
     /**
-     * @param      $url
+     * @param             $url
      * @param bool|string $cookie
      *
      * @return bool|string
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     function getRawHtml($url, $cookie = false)
     {
@@ -30,6 +32,11 @@ if (! function_exists('getRawHtml')) {
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
+            $jsonResponse = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $response = $jsonResponse;
+            }
+
         } catch (RequestException $e) {
             if (config('app.debug') === true) {
                 Log::error($e->getMessage());
@@ -60,11 +67,19 @@ if (! function_exists('getRawHtmlThroughCF')) {
 
         try {
             $response = $client->get($url)->getBody()->getContents();
+            $jsonResponse = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $response = $jsonResponse;
+            }
         } catch (RequestException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         } catch (\RuntimeException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         }
 
