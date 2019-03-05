@@ -203,7 +203,7 @@ class ReleaseCleaning
     public function teevee(): array
     {
         //[140022]-[04] - [01/40] - "140022-04.nfo" yEnc
-        if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+-.+" yEnc/', $this->subject)) {
+        if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+\-.+" yEnc/', $this->subject)) {
             return [
                 'cleansubject' => $this->subject,
                 'properlynamed' => false,
@@ -429,7 +429,7 @@ class ReleaseCleaning
      */
     public function releaseCleanerHelper($subject): string
     {
-        $cleanerName = preg_replace('/(- )?yEnc$/', '', $subject);
+        $cleanerName = preg_replace('/(\- )?yEnc$/', '', $subject);
 
         return trim(preg_replace('/\s\s+/', ' ', $cleanerName));
     }
