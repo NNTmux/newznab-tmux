@@ -517,7 +517,7 @@ class Utility
     {
         $xml = getRawHtml('https://api.traileraddict.com/?imdb='.$imdbID);
         if ($xml !== false && preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
-            return $html[1];
+            return 'https://'.$html[1];
         }
 
         return '';
