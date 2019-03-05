@@ -1,4 +1,5 @@
 2019-03-05 DariusIII
+	* Chg: Update tinyMCE to version 5.0.2
 	* Chg: Update package.json with new version of tinyMCE
 2019-03-04 DariusIII
 	* Chg: Update spatie/laravel-permission (2.35.0 => 2.36.0)

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.1 (2019-02-21)
+ * Version: 5.0.2 (2019-03-05)
  */
 (function () {
 var mobile = (function (exports, domGlobals) {
@@ -7136,7 +7136,7 @@ var mobile = (function (exports, domGlobals) {
     var dom$2 = function (detail) {
       return {
         tag: detail.tag,
-        attributes: __assign({ type: 'input' }, detail.inputAttributes),
+        attributes: __assign({ type: 'text' }, detail.inputAttributes),
         styles: detail.inputStyles,
         classes: detail.inputClasses
       };
@@ -10844,7 +10844,7 @@ var mobile = (function (exports, domGlobals) {
     var attr = 'data-ephox-mobile-fullscreen-style';
     var siblingStyles = 'display:none!important;';
     var ancestorPosition = 'position:absolute!important;';
-    var ancestorStyles = 'top:0!important;left:0!important;margin:0' + '!important;padding:0!important;width:100%!important;';
+    var ancestorStyles = 'top:0!important;left:0!important;margin:0!important;padding:0!important;width:100%!important;height:100%!important;overflow:visible!important;';
     var bgFallback = 'background-color:rgb(255,255,255)!important;';
     var isAndroid = PlatformDetection$1.detect().os.isAndroid();
     var matchColor = function (editorBody) {
@@ -11920,7 +11920,7 @@ var mobile = (function (exports, domGlobals) {
       };
       var unregister = function (component) {
         read$2(component.element()).each(function (tagId) {
-          components[tagId] = undefined;
+          delete components[tagId];
           events.unregisterId(tagId);
         });
       };

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.1 (2019-02-21)
+ * Version: 5.0.2 (2019-03-05)
  */
 (function () {
 var silver = (function (domGlobals) {
@@ -1818,6 +1818,7 @@ var silver = (function (domGlobals) {
     var strict = adt.strict;
     var asOption = adt.asOption;
     var defaultedThunk = adt.defaultedThunk;
+    var asDefaultedOptionThunk = adt.asDefaultedOptionThunk;
     var mergeWithThunk = adt.mergeWithThunk;
 
     var SimpleResultType;
@@ -9333,7 +9334,7 @@ var silver = (function (domGlobals) {
     var renderIcon = function (iconHtml) {
       return {
         dom: {
-          tag: 'span',
+          tag: 'div',
           classes: [iconClass],
           innerHtml: iconHtml
         }
@@ -9342,7 +9343,7 @@ var silver = (function (domGlobals) {
     var renderText = function (text$1) {
       return {
         dom: {
-          tag: 'span',
+          tag: 'div',
           classes: [textClass]
         },
         components: [text(global$2.translate(text$1))]
@@ -9351,7 +9352,7 @@ var silver = (function (domGlobals) {
     var renderStyledText = function (style, text$1) {
       return {
         dom: {
-          tag: 'span',
+          tag: 'div',
           classes: [textClass]
         },
         components: [{
@@ -9366,7 +9367,7 @@ var silver = (function (domGlobals) {
     var renderShortcut = function (shortcut) {
       return {
         dom: {
-          tag: 'span',
+          tag: 'div',
           classes: [accessoryClass],
           innerHtml: ConvertShortcut.convertText(shortcut)
         }
@@ -9375,7 +9376,7 @@ var silver = (function (domGlobals) {
     var renderCheckmark = function (icons) {
       return {
         dom: {
-          tag: 'span',
+          tag: 'div',
           classes: [
             iconClass,
             checkmarkClass
@@ -9387,7 +9388,7 @@ var silver = (function (domGlobals) {
     var renderSubmenuCaret = function (icons) {
       return {
         dom: {
-          tag: 'span',
+          tag: 'div',
           classes: [caretClass],
           innerHtml: get$c('chevron-right', icons)
         }
@@ -10946,7 +10947,7 @@ var silver = (function (domGlobals) {
       };
       var unregister = function (component) {
         read$1(component.element()).each(function (tagId) {
-          components[tagId] = undefined;
+          delete components[tagId];
           events.unregisterId(tagId);
         });
       };
@@ -11216,8 +11217,29 @@ var silver = (function (domGlobals) {
       });
       return toolbarArray.length > 0 ? Option.some(toolbarArray) : Option.none();
     };
-    var isSplitToolbar = function (editor) {
-      return editor.getParam('toolbar_drawer', false, 'boolean');
+    var ToolbarDrawer;
+    (function (ToolbarDrawer) {
+      ToolbarDrawer['default'] = '';
+      ToolbarDrawer['floating'] = 'floating';
+      ToolbarDrawer['sliding'] = 'sliding';
+    }(ToolbarDrawer || (ToolbarDrawer = {})));
+    var getToolbarDrawer = function (editor) {
+      return editor.getParam('toolbar_drawer', '', 'string');
+    };
+    var fixedContainerSelector = function (editor) {
+      return editor.getParam('fixed_toolbar_container', '', 'string');
+    };
+    var fixedContainerElement = function (editor) {
+      var selector = fixedContainerSelector(editor);
+      var isInline = editor.getParam('inline', false, 'boolean');
+      return selector.length > 0 && isInline ? descendant$1(body(), selector) : Option.none();
+    };
+    var useFixedContainer = function (editor) {
+      return editor.getParam('inline', false, 'boolean') && fixedContainerElement(editor).isSome();
+    };
+    var getUiContainer = function (editor) {
+      var fixedContainer = fixedContainerElement(editor);
+      return fixedContainer.getOr(body());
     };
 
     var formChangeEvent = generate$1('form-component-change');
@@ -11897,7 +11919,7 @@ var silver = (function (domGlobals) {
     var dom$2 = function (detail) {
       return {
         tag: detail.tag,
-        attributes: __assign({ type: 'input' }, detail.inputAttributes),
+        attributes: __assign({ type: 'text' }, detail.inputAttributes),
         styles: detail.inputStyles,
         classes: detail.inputClasses
       };
@@ -15286,7 +15308,7 @@ var silver = (function (domGlobals) {
       var isSandbox = platformNeedsSandboxing && spec.sandboxed;
       var attributes = __assign({}, spec.label.map(function (title) {
         return { title: title };
-      }).getOr({}), isSandbox ? { sandbox: 'allow-scripts' } : {});
+      }).getOr({}), isSandbox ? { sandbox: 'allow-scripts allow-same-origin' } : {});
       var sourcing = getDynamicSource(isSandbox);
       var pLabel = spec.label.map(function (label) {
         return renderLabel(label, providersBackstage);
@@ -19546,16 +19568,26 @@ var silver = (function (domGlobals) {
     };
 
     var renderHtmlPanel = function (spec) {
-      return Container.sketch({
-        dom: {
-          tag: 'div',
-          innerHtml: spec.html
-        },
-        containerBehaviours: derive$1([
-          Tabstopping.config({}),
-          Focusing.config({})
-        ])
-      });
+      if (spec.presets === 'presentation') {
+        return Container.sketch({
+          dom: {
+            tag: 'div',
+            innerHtml: spec.html
+          }
+        });
+      } else {
+        return Container.sketch({
+          dom: {
+            tag: 'div',
+            innerHtml: spec.html,
+            attributes: { role: 'document' }
+          },
+          containerBehaviours: derive$1([
+            Tabstopping.config({}),
+            Focusing.config({})
+          ])
+        });
+      }
     };
 
     var renderListbox = function (spec, providersBackstage) {
@@ -19614,10 +19646,10 @@ var silver = (function (domGlobals) {
       var setContents = function (comp, items) {
         var htmlLines = map(items, function (item) {
           var textContent = spec.columns === 1 ? item.text.map(function (text) {
-            return '<span class="tox-collection__item-label">' + text + '</span>';
+            return '<div class="tox-collection__item-label">' + text + '</div>';
           }).getOr('') : '';
           var iconContent = item.icon.map(function (icon) {
-            return '<span class="tox-collection__item-icon">' + icon + '</span>';
+            return '<div class="tox-collection__item-icon">' + icon + '</div>';
           }).getOr('');
           var mapItemName = {
             '_': ' ',
@@ -19856,6 +19888,156 @@ var silver = (function (domGlobals) {
       var parts = noFormParts;
       return interpretParts(parts, spec, backstage);
     };
+
+    var westEdgeX$1 = function (anchor) {
+      return anchor.x();
+    };
+    var middleX$1 = function (anchor, element) {
+      return anchor.x() + anchor.width() / 2 - element.width() / 2;
+    };
+    var eastEdgeX$1 = function (anchor, element) {
+      return anchor.x() + anchor.width() - element.width();
+    };
+    var northY$2 = function (anchor) {
+      return anchor.y();
+    };
+    var northeast$3 = function (anchor, element, bubbles) {
+      return nu$8(westEdgeX$1(anchor), northY$2(anchor), bubbles.northeast(), northeast(), 'layout-ne');
+    };
+    var northwest$3 = function (anchor, element, bubbles) {
+      return nu$8(eastEdgeX$1(anchor, element), northY$2(anchor), bubbles.northwest(), northwest(), 'layout-nw');
+    };
+    var north$3 = function (anchor, element, bubbles) {
+      return nu$8(middleX$1(anchor, element), northY$2(anchor), bubbles.north(), north(), 'layout-n');
+    };
+
+    var bubbleAlignments = {
+      valignCentre: [],
+      alignCentre: [],
+      alignLeft: [],
+      alignRight: [],
+      right: [],
+      left: [],
+      bottom: [],
+      top: []
+    };
+    var getToolbarAnchor = function (bodyElement, lazyAnchorbar, useFixedToolbarContainer) {
+      var fixedToolbarAnchor = function () {
+        return {
+          anchor: 'node',
+          root: bodyElement(),
+          node: Option.from(bodyElement()),
+          bubble: nu$7(-12, -12, bubbleAlignments),
+          layouts: {
+            onRtl: function () {
+              return [northeast$3];
+            },
+            onLtr: function () {
+              return [northwest$3];
+            }
+          }
+        };
+      };
+      var standardAnchor = function () {
+        return {
+          anchor: 'hotspot',
+          hotspot: lazyAnchorbar(),
+          bubble: nu$7(-12, 12, bubbleAlignments),
+          layouts: {
+            onRtl: function () {
+              return [southeast$1];
+            },
+            onLtr: function () {
+              return [southwest$1];
+            }
+          }
+        };
+      };
+      return useFixedToolbarContainer ? fixedToolbarAnchor : standardAnchor;
+    };
+    var getBannerAnchor = function (bodyElement, lazyAnchorbar, useFixedToolbarContainer) {
+      var fixedToolbarAnchor = function () {
+        return {
+          anchor: 'node',
+          root: bodyElement(),
+          node: Option.from(bodyElement()),
+          layouts: {
+            onRtl: function () {
+              return [north$3];
+            },
+            onLtr: function () {
+              return [north$3];
+            }
+          }
+        };
+      };
+      var standardAnchor = function () {
+        return {
+          anchor: 'hotspot',
+          hotspot: lazyAnchorbar(),
+          layouts: {
+            onRtl: function () {
+              return [south$1];
+            },
+            onLtr: function () {
+              return [south$1];
+            }
+          }
+        };
+      };
+      return useFixedToolbarContainer ? fixedToolbarAnchor : standardAnchor;
+    };
+    var getToolbarOverflowAnchor = function (lazyMoreButton) {
+      return function () {
+        return {
+          anchor: 'hotspot',
+          hotspot: lazyMoreButton(),
+          layouts: {
+            onRtl: function () {
+              return [southeast$1];
+            },
+            onLtr: function () {
+              return [southwest$1];
+            }
+          }
+        };
+      };
+    };
+    var getCursorAnchor = function (editor, bodyElement) {
+      return function () {
+        return {
+          anchor: 'selection',
+          root: bodyElement(),
+          getSelection: function () {
+            var rng = editor.selection.getRng();
+            return Option.some(range(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset));
+          }
+        };
+      };
+    };
+    var getNodeAnchor = function (bodyElement) {
+      return function (element) {
+        return {
+          anchor: 'node',
+          root: bodyElement(),
+          node: element
+        };
+      };
+    };
+    var getAnchors = function (editor, lazyAnchorbar, lazyMoreButton) {
+      var useFixedToolbarContainer = useFixedContainer(editor);
+      var bodyElement = function () {
+        return Element.fromDom(editor.getBody());
+      };
+      return {
+        toolbar: getToolbarAnchor(bodyElement, lazyAnchorbar, useFixedToolbarContainer),
+        toolbarOverflow: getToolbarOverflowAnchor(lazyMoreButton),
+        banner: getBannerAnchor(bodyElement, lazyAnchorbar, lazyMoreButton),
+        cursor: getCursorAnchor(editor, bodyElement),
+        node: getNodeAnchor(bodyElement)
+      };
+    };
+    var Anchors = { getAnchors: getAnchors };
 
     var colorPicker = function (editor) {
       return function (callback, value) {
@@ -20405,17 +20587,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var bubbleAlignments = {
-      valignCentre: [],
-      alignCentre: [],
-      alignLeft: [],
-      alignRight: [],
-      right: [],
-      left: [],
-      bottom: [],
-      top: []
-    };
-    var init$9 = function (sink, editor, lazyAnchorbar) {
+    var init$9 = function (sink, editor, lazyAnchorbar, lazyMoreButton) {
       var backstage = {
         shared: {
           providers: {
@@ -20430,54 +20602,7 @@ var silver = (function (domGlobals) {
           interpreter: function (s) {
             return interpretWithoutForm(s, backstage);
           },
-          anchors: {
-            toolbar: function () {
-              return {
-                anchor: 'hotspot',
-                hotspot: lazyAnchorbar(),
-                bubble: nu$7(-12, 12, bubbleAlignments),
-                layouts: {
-                  onRtl: function () {
-                    return [southeast$1];
-                  },
-                  onLtr: function () {
-                    return [southwest$1];
-                  }
-                }
-              };
-            },
-            banner: function () {
-              return {
-                anchor: 'hotspot',
-                hotspot: lazyAnchorbar(),
-                layouts: {
-                  onRtl: function () {
-                    return [south$1];
-                  },
-                  onLtr: function () {
-                    return [south$1];
-                  }
-                }
-              };
-            },
-            cursor: function () {
-              return {
-                anchor: 'selection',
-                root: Element.fromDom(editor.getBody()),
-                getSelection: function () {
-                  var rng = editor.selection.getRng();
-                  return Option.some(range(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset));
-                }
-              };
-            },
-            node: function (element) {
-              return {
-                anchor: 'node',
-                root: Element.fromDom(editor.getBody()),
-                node: element
-              };
-            }
-          },
+          anchors: Anchors.getAnchors(editor, lazyAnchorbar, lazyMoreButton),
           getSink: function () {
             return Result.value(sink);
           }
@@ -20858,16 +20983,26 @@ var silver = (function (domGlobals) {
       field$1('splitToolbarBehaviours', []),
       state$1('builtGroups', function () {
         return Cell([]);
-      })
+      }),
+      defaulted$1('overflow', function (toolbar) {
+        return Option.none();
+      }),
+      defaultedBoolean('floating', false)
     ]);
-    var toolbarSchema = [strict$1('dom')];
+    var toolbarSchema = [
+      strict$1('dom'),
+      defaulted$1('overflow', function (toolbar) {
+        return Option.none();
+      }),
+      defaultedBoolean('floating', false)
+    ];
     var parts$8 = constant([
       required({
         factory: Toolbar,
         schema: toolbarSchema,
         name: 'primary'
       }),
-      required({
+      optional({
         factory: Toolbar,
         schema: toolbarSchema,
         name: 'overflow',
@@ -20932,20 +21067,26 @@ var silver = (function (domGlobals) {
       });
       Toolbar.setGroups(bar, bGroups);
     };
-    var refresh$1 = function (toolbar, detail, externals) {
-      var ps = getPartsOrDie(toolbar, detail, [
-        'primary',
-        'overflow'
-      ]);
-      var primary = ps.primary();
-      var overflow = ps.overflow();
+    var refresh$1 = function (toolbar, detail, externals, toolbarToggleEvent) {
+      var primary = getPartOrDie(toolbar, detail, 'primary');
+      var overflow = getPart(toolbar, detail, 'overflow').orThunk(function () {
+        return detail.overflow(toolbar);
+      });
       set$2(primary.element(), 'visibility', 'hidden');
-      Toolbar.setGroups(overflow, []);
+      overflow.each(function (overf) {
+        Toolbar.setGroups(overf, []);
+      });
       var groups = detail.builtGroups.get();
       var overflowGroupSpec = ToolbarGroup.sketch(__assign({}, externals['overflow-group'](), {
         items: [Button.sketch(__assign({}, externals['overflow-button'](), {
             action: function (button) {
-              Sliding.toggleGrow(ps.overflow());
+              if (detail.floating === true) {
+                emit(toolbar, toolbarToggleEvent);
+              } else {
+                overflow.each(function (overf) {
+                  Sliding.toggleGrow(overf);
+                });
+              }
             }
           }))]
       }));
@@ -20957,26 +21098,47 @@ var silver = (function (domGlobals) {
       }, overflowGroup);
       if (overflows.extra().length === 0) {
         Replacing.remove(primary, overflowGroup);
-        Toolbar.setGroups(overflow, []);
+        overflow.each(function (overf) {
+          Toolbar.setGroups(overf, []);
+        });
       } else {
         setStoredGroups(primary, overflows.within());
-        setStoredGroups(overflow, overflows.extra());
+        overflow.each(function (overf) {
+          setStoredGroups(overf, overflows.extra());
+        });
       }
       remove$6(primary.element(), 'visibility');
       reflow(primary.element());
-      Sliding.refresh(overflow);
-      getPart(toolbar, detail, 'overflow-button').each(function (moreButton) {
-        Toggling.set(moreButton, Sliding.hasGrown(overflow));
+      overflow.each(function (overf) {
+        if (!detail.floating) {
+          Sliding.refresh(overf);
+        }
+        getPart(toolbar, detail, 'overflow-button').each(function (moreButton) {
+          if (detail.floating) {
+            Toggling.set(moreButton, overf.getSystem().isConnected());
+          } else {
+            Toggling.set(moreButton, Sliding.hasGrown(overf));
+          }
+        });
       });
     };
     var factory$b = function (detail, components, spec, externals) {
+      var toolbarToggleEvent = 'alloy.toolbar.toggle';
       var doSetGroups = function (toolbar, groups) {
         var built = map(groups, toolbar.getSystem().build);
         detail.builtGroups.set(built);
       };
       var setGroups = function (toolbar, groups) {
         doSetGroups(toolbar, groups);
-        refresh$1(toolbar, detail, externals);
+        refresh$1(toolbar, detail, externals, toolbarToggleEvent);
+      };
+      var getMoreButton = function (toolbar) {
+        return getPart(toolbar, detail, 'overflow-button');
+      };
+      var getOverflow = function (toolbar) {
+        return getPart(toolbar, detail, 'overflow').orThunk(function () {
+          return detail.overflow(toolbar);
+        });
       };
       return {
         uid: detail.uid,
@@ -20986,7 +21148,13 @@ var silver = (function (domGlobals) {
         apis: {
           setGroups: setGroups,
           refresh: function (toolbar) {
-            refresh$1(toolbar, detail, externals);
+            refresh$1(toolbar, detail, externals, toolbarToggleEvent);
+          },
+          getMoreButton: function (toolbar) {
+            return getMoreButton(toolbar);
+          },
+          getOverflow: function (toolbar) {
+            return getOverflow(toolbar);
           }
         },
         domModification: { attributes: { role: 'group' } }
@@ -21003,6 +21171,12 @@ var silver = (function (domGlobals) {
         },
         refresh: function (apis, toolbar) {
           apis.refresh(toolbar);
+        },
+        getMoreButton: function (apis, toolbar) {
+          return apis.getMoreButton(toolbar);
+        },
+        getOverflow: function (apis, toolbar) {
+          return apis.getOverflow(toolbar);
         }
       }
     });
@@ -21030,27 +21204,84 @@ var silver = (function (domGlobals) {
     var renderToolbarGroup = function (foo) {
       return ToolbarGroup.sketch(renderToolbarGroupCommon(foo));
     };
-    var getToolbarbehaviours = function (foo, modeName) {
+    var getToolbarbehaviours = function (foo, modeName, overflowOpt) {
+      var onAttached = runOnAttached(function (component) {
+        var groups = map(foo.initGroups, renderToolbarGroup);
+        Toolbar.setGroups(component, groups);
+      });
+      var eventBehaviours = overflowOpt.fold(function () {
+        return [onAttached];
+      }, function (memOverflow) {
+        return [
+          onAttached,
+          run('alloy.toolbar.toggle', function (toolbar, se) {
+            foo.getSink().toOption().each(function (sink) {
+              memOverflow.getOpt(sink).fold(function () {
+                var builtoverFlow = build$1(memOverflow.asSpec());
+                attach(sink, builtoverFlow);
+                Positioning.position(sink, foo.backstage.shared.anchors.toolbarOverflow(), builtoverFlow);
+                SplitToolbar.refresh(toolbar);
+              }, function (builtOverflow) {
+                detach(builtOverflow);
+              });
+            });
+          })
+        ];
+      });
       return derive$1([
         Keying.config({
           mode: modeName,
           onEscape: foo.onEscape,
           selector: '.tox-toolbar__group'
         }),
-        config('toolbar-events', [runOnAttached(function (component) {
-            var groups = map(foo.initGroups, renderToolbarGroup);
-            Toolbar.setGroups(component, groups);
-          })])
+        config('toolbar-events', eventBehaviours)
       ]);
     };
     var renderMoreToolbar = function (foo) {
       var modeName = foo.cyclicKeying ? 'cyclic' : 'acyclic';
+      var memOverflow = record(Toolbar.sketch({
+        dom: {
+          tag: 'div',
+          classes: ['tox-toolbar__overflow']
+        }
+      }));
+      var getOverflow = function (toolbar) {
+        return foo.getSink().toOption().bind(function (sink) {
+          return memOverflow.getOpt(sink).bind(function (overflow) {
+            return SplitToolbar.getMoreButton(toolbar).bind(function (_moreButton) {
+              if (overflow.getSystem().isConnected()) {
+                Positioning.position(sink, foo.backstage.shared.anchors.toolbarOverflow(), overflow);
+                return Option.some(overflow);
+              } else {
+                return Option.none();
+              }
+            });
+          });
+        });
+      };
+      var primary = SplitToolbar.parts().primary({
+        dom: {
+          tag: 'div',
+          classes: ['tox-toolbar__primary']
+        }
+      });
+      var splitToolbarComponents = foo.floating ? [primary] : [
+        primary,
+        SplitToolbar.parts().overflow({
+          dom: {
+            tag: 'div',
+            classes: ['tox-toolbar__overflow']
+          }
+        })
+      ];
       return SplitToolbar.sketch({
         uid: foo.uid,
         dom: {
           tag: 'div',
           classes: ['tox-toolbar-overlord']
         },
+        floating: foo.floating,
+        overflow: getOverflow,
         parts: {
           'overflow-group': renderToolbarGroupCommon({
             title: Option.none(),
@@ -21063,20 +21294,7 @@ var silver = (function (domGlobals) {
             tooltip: Option.some('More...')
           }, Option.none(), foo.backstage.shared.providers)
         },
-        components: [
-          SplitToolbar.parts().primary({
-            dom: {
-              tag: 'div',
-              classes: ['tox-toolbar__primary']
-            }
-          }),
-          SplitToolbar.parts().overflow({
-            dom: {
-              tag: 'div',
-              classes: ['tox-toolbar__overflow']
-            }
-          })
-        ],
+        components: splitToolbarComponents,
         markers: {
           openClass: 'tox-toolbar__overflow--open',
           closedClass: 'tox-toolbar__overflow--closed',
@@ -21084,7 +21302,7 @@ var silver = (function (domGlobals) {
           shrinkingClass: 'tox-toolbar__overflow--shrinking',
           overflowToggledClass: 'tox-tbtn--enabled'
         },
-        splitToolbarBehaviours: getToolbarbehaviours(foo, modeName)
+        splitToolbarBehaviours: getToolbarbehaviours(foo, modeName, Option.some(memOverflow))
       });
     };
     var renderToolbar = function (foo) {
@@ -21096,7 +21314,7 @@ var silver = (function (domGlobals) {
           classes: ['tox-toolbar']
         },
         components: [Toolbar.parts().groups({})],
-        toolbarBehaviours: getToolbarbehaviours(foo, modeName)
+        toolbarBehaviours: getToolbarbehaviours(foo, modeName, Option.none())
       });
     };
 
@@ -21858,7 +22076,11 @@ var silver = (function (domGlobals) {
         ],
         onEscape: Option.none,
         cyclicKeying: true,
-        backstage: backstage
+        backstage: backstage,
+        floating: false,
+        getSink: function () {
+          return Result.error('');
+        }
       });
     };
     var ContextForm = { renderContextForm: renderContextForm };
@@ -22220,24 +22442,30 @@ var silver = (function (domGlobals) {
     };
     var createSelectButton = function (editor, backstage, dataset, spec) {
       var _a = createMenuItems(editor, backstage, dataset, spec), items = _a.items, getStyleItems = _a.getStyleItems;
+      var onDestroyCell = Cell(undefined);
+      var onAttach = spec.nodeChangeHandler.map(function (f) {
+        return function (comp) {
+          var handler = f(comp);
+          onDestroyCell.set(handler);
+          editor.on('nodeChange', handler);
+        };
+      }).getOr(noop);
+      var onDetach = spec.nodeChangeHandler.map(function (_f) {
+        return function (_comp) {
+          var onDestroy = onDestroyCell.get();
+          if (onDestroy !== undefined) {
+            editor.off('nodeChange', onDestroy);
+          }
+        };
+      }).getOr(noop);
       return renderCommonDropdown({
         text: spec.icon.isSome() ? Option.none() : Option.some(''),
         icon: spec.icon,
         tooltip: Option.from(spec.tooltip),
         role: Option.none(),
         fetch: items.getFetch(backstage, getStyleItems),
-        onAttach: spec.nodeChangeHandler.map(function (f) {
-          return function (comp) {
-            return editor.on('nodeChange', f(comp));
-          };
-        }).getOr(function () {
-        }),
-        onDetach: spec.nodeChangeHandler.map(function (f) {
-          return function (comp) {
-            return editor.off('nodeChange', f(comp));
-          };
-        }).getOr(function () {
-        }),
+        onAttach: onAttach,
+        onDetach: onDetach,
         columns: 1,
         presets: 'normal',
         classes: spec.icon.isSome() ? [] : ['bespoke']
@@ -22929,7 +23157,7 @@ var silver = (function (domGlobals) {
       }
     };
     var extractFrom$1 = function (spec, extras) {
-      return readOptFrom$1(types, spec.type).fold(function () {
+      return get(types, spec.type).fold(function () {
         console.error('skipping button defined by', spec);
         return Option.none();
       }, function (render) {
@@ -22976,19 +23204,28 @@ var silver = (function (domGlobals) {
         return toolbarConfig.toolbar;
       }
     };
-    var identifyButtons = function (editor, toolbarConfig, extras) {
+    var lookupButton = function (editor, buttons, toolbarItem, extras, prefixes) {
+      return get(buttons, toolbarItem.toLowerCase()).orThunk(function () {
+        return prefixes.bind(function (ps) {
+          return findMap(ps, function (prefix) {
+            return get(buttons, prefix + toolbarItem.toLowerCase());
+          });
+        });
+      }).fold(function () {
+        return get(bespokeButtons, toolbarItem.toLowerCase()).map(function (r) {
+          return r(editor, extras);
+        }).orThunk(function () {
+          return Option.none();
+        });
+      }, function (spec) {
+        return extractFrom$1(spec, extras);
+      });
+    };
+    var identifyButtons = function (editor, toolbarConfig, extras, prefixes) {
       var toolbarGroups = createToolbar(toolbarConfig);
       var groups = map(toolbarGroups, function (group) {
         var items = bind(group.items, function (toolbarItem) {
-          return toolbarItem.trim().length === 0 ? [] : readOptFrom$1(toolbarConfig.buttons, toolbarItem.toLowerCase()).fold(function () {
-            return readOptFrom$1(bespokeButtons, toolbarItem.toLowerCase()).map(function (r) {
-              return r(editor, extras);
-            }).orThunk(function () {
-              return Option.none();
-            });
-          }, function (spec) {
-            return extractFrom$1(spec, extras);
-          }).toArray();
+          return toolbarItem.trim().length === 0 ? [] : lookupButton(editor, toolbarConfig.buttons, toolbarItem, extras, prefixes).toArray();
         });
         return {
           title: Option.from(editor.translate(group.name)),
@@ -23071,13 +23308,17 @@ var silver = (function (domGlobals) {
           var initGroups = identifyButtons(editor, {
             buttons: allButtons,
             toolbar: ctx.items
-          }, extras);
+          }, extras, Option.some(['form:']));
           return renderToolbar({
             uid: generate$1('context-toolbar'),
             initGroups: initGroups,
             onEscape: Option.none,
             cyclicKeying: true,
-            backstage: extras.backstage
+            backstage: extras.backstage,
+            floating: false,
+            getSink: function () {
+              return Result.error('');
+            }
           });
         }() : function () {
           return ContextForm.renderContextForm(ctx, extras.backstage);
@@ -23731,6 +23972,12 @@ var silver = (function (domGlobals) {
             Toolbar.setGroups(toolbar, groups);
           });
         },
+        getMoreButton: function (comp) {
+          var toolbar = parts$b.getPart(comp, detail, 'toolbar');
+          return toolbar.bind(function (toolbar) {
+            return SplitToolbar.getMoreButton(toolbar);
+          });
+        },
         focusToolbar: function (comp) {
           parts$b.getPart(comp, detail, 'toolbar').each(function (toolbar) {
             Keying.focusIn(toolbar);
@@ -23766,7 +24013,7 @@ var silver = (function (domGlobals) {
     var partToolbar = partType$1.optional({
       factory: {
         sketch: function (spec) {
-          var renderer = spec.split ? renderMoreToolbar : renderToolbar;
+          var renderer = spec.split === ToolbarDrawer.sliding || spec.split === ToolbarDrawer.floating ? renderMoreToolbar : renderToolbar;
           return renderer({
             uid: spec.uid,
             onEscape: function () {
@@ -23775,14 +24022,17 @@ var silver = (function (domGlobals) {
             },
             cyclicKeying: false,
             initGroups: [],
-            backstage: spec.backstage
+            getSink: spec.getSink,
+            backstage: spec.backstage,
+            floating: spec.split === ToolbarDrawer.floating
           });
         }
       },
       name: 'toolbar',
       schema: [
         strict$1('dom'),
-        strict$1('onEscape')
+        strict$1('onEscape'),
+        strict$1('getSink')
       ]
     });
     var partSocket = partType$1.optional({
@@ -23828,6 +24078,9 @@ var silver = (function (domGlobals) {
             return renderToolbarGroup(grp);
           });
           apis.setToolbar(comp, groups);
+        },
+        getMoreButton: function (apis, comp) {
+          return apis.getMoreButton(comp);
         },
         setMenubar: function (apis, comp, menus) {
           apis.setMenubar(comp, menus);
@@ -23913,7 +24166,7 @@ var silver = (function (domGlobals) {
       attachSystemAfter(Element.fromDom(args.targetNode), uiComponents.mothership);
       attachSystem(body(), uiComponents.uiMothership);
       editor.on('init', function () {
-        OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }));
+        OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }, Option.none()));
         OuterContainer.setMenubar(uiComponents.outerContainer, identifyMenus(editor, rawUiConfig));
         OuterContainer.setSidebar(uiComponents.outerContainer, rawUiConfig.sidebar);
         if (editor.readonly) {
@@ -23947,14 +24200,14 @@ var silver = (function (domGlobals) {
       editor.addQueryValueHandler('ToggleSidebar', function () {
         return OuterContainer.whichSidebar(uiComponents.outerContainer);
       });
-      var split = isSplitToolbar(editor);
-      var refreshMore = function () {
-        if (split) {
-          var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
-          toolbar.each(SplitToolbar.refresh);
-        }
+      var drawer = getToolbarDrawer(editor);
+      var refreshDrawer = function () {
+        var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
+        toolbar.each(SplitToolbar.refresh);
       };
-      editor.on('ResizeContent', refreshMore);
+      if (drawer === ToolbarDrawer.sliding || drawer === ToolbarDrawer.floating) {
+        editor.on('ResizeContent', refreshDrawer);
+      }
       return {
         iframeContainer: socket.element().dom(),
         editorContainer: uiComponents.outerContainer.element().dom()
@@ -24220,8 +24473,11 @@ var silver = (function (domGlobals) {
     var render$1 = function (editor, uiComponents, rawUiConfig, backstage, args) {
       var floatContainer;
       var DOM = global$4.DOM;
+      var useFixedToolbarContainer = useFixedContainer(editor);
+      var splitSetting = getToolbarDrawer(editor);
+      var split = splitSetting === ToolbarDrawer.sliding || splitSetting === ToolbarDrawer.floating;
+      var floating = splitSetting === ToolbarDrawer.floating;
       inline(editor);
-      var split = isSplitToolbar(editor);
       var calcPosition = function (offset) {
         if (offset === void 0) {
           offset = 0;
@@ -24232,32 +24488,51 @@ var silver = (function (domGlobals) {
           left: Math.round(location.left()) + 'px'
         };
       };
-      var setPosition = function () {
+      var setChromePosition = function (toolbar) {
+        var offset = split ? toolbar.fold(function () {
+          return 0;
+        }, function (tbar) {
+          return tbar.components().length > 1 ? get$8(tbar.components()[1].element()) : 0;
+        }) : 0;
+        setAll$1(floatContainer.element(), calcPosition(offset));
+        Docking.refresh(floatContainer);
+      };
+      var updateChromeUi = function () {
         var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
         if (split) {
           toolbar.each(SplitToolbar.refresh);
         }
-        var isDocked = getRaw(floatContainer.element(), 'position').is('fixed');
-        if (!isDocked) {
-          var offset = split ? toolbar.fold(function () {
-            return 0;
-          }, function (tbar) {
-            return get$8(tbar.components()[1].element());
-          }) : 0;
-          setAll$1(floatContainer.element(), calcPosition(offset));
+        if (!useFixedToolbarContainer) {
+          setChromePosition(toolbar);
         }
-        Docking.refresh(floatContainer);
       };
       var show = function () {
         set$2(uiComponents.outerContainer.element(), 'display', 'flex');
         DOM.addClass(editor.getBody(), 'mce-edit-focus');
-        setPosition();
-        Docking.refresh(floatContainer);
+        updateChromeUi();
+        if (floating) {
+          var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
+          toolbar.each(function (tb) {
+            var overflow = SplitToolbar.getOverflow(tb);
+            overflow.each(function (overf) {
+              remove$4(overf.element(), 'tox-toolbar__overflow--closed');
+            });
+          });
+        }
       };
       var hide = function () {
         if (uiComponents.outerContainer) {
           set$2(uiComponents.outerContainer.element(), 'display', 'none');
           DOM.removeClass(editor.getBody(), 'mce-edit-focus');
+          if (floating) {
+            var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
+            toolbar.each(function (tb) {
+              var overflow = SplitToolbar.getOverflow(tb);
+              overflow.each(function (overf) {
+                add$2(overf.element(), 'tox-toolbar__overflow--closed');
+              });
+            });
+          }
         }
       };
       var render = function () {
@@ -24266,14 +24541,17 @@ var silver = (function (domGlobals) {
           return;
         }
         floatContainer = uiComponents.outerContainer;
-        attachSystem(body(), uiComponents.mothership);
-        attachSystem(body(), uiComponents.uiMothership);
-        OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }));
+        var uiContainer = getUiContainer(editor);
+        attachSystem(uiContainer, uiComponents.mothership);
+        attachSystem(uiContainer, uiComponents.uiMothership);
+        OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }, Option.none()));
         OuterContainer.setMenubar(uiComponents.outerContainer, identifyMenus(editor, rawUiConfig));
-        set$2(floatContainer.element(), 'position', 'absolute');
-        setPosition();
+        if (!useFixedToolbarContainer) {
+          set$2(floatContainer.element(), 'position', 'absolute');
+        }
+        updateChromeUi();
         show();
-        editor.on('nodeChange ResizeWindow', setPosition);
+        editor.on('nodeChange ResizeWindow', updateChromeUi);
         editor.on('activate', show);
         editor.on('deactivate', hide);
         editor.nodeChanged();
@@ -24288,7 +24566,7 @@ var silver = (function (domGlobals) {
       return { editorContainer: uiComponents.outerContainer.element().dom() };
     };
     var getBehaviours$2 = function (editor) {
-      return [
+      return useFixedContainer(editor) ? [] : [
         Docking.config({
           leftAttr: 'data-dock-left',
           topAttr: 'data-dock-top',
@@ -24348,7 +24626,7 @@ var silver = (function (domGlobals) {
         root: Element.fromDom(editor.selection.getNode())
       };
     };
-    var getNodeAnchor = function (editor) {
+    var getNodeAnchor$1 = function (editor) {
       return {
         anchor: 'node',
         node: Option.some(Element.fromDom(editor.selection.getNode())),
@@ -24470,7 +24748,7 @@ var silver = (function (domGlobals) {
             return;
           }
           var isTriggeredByKeyboardEvent = e.button !== 2 || e.target === editor.getBody();
-          var anchorSpec = isTriggeredByKeyboardEvent ? getNodeAnchor(editor) : getPointAnchor(editor, e);
+          var anchorSpec = isTriggeredByKeyboardEvent ? getNodeAnchor$1(editor) : getPointAnchor(editor, e);
           var registry = editor.ui.registry.getAll();
           var menuConfig = Settings$1.getContextMenu(editor);
           var selectedElement = isTriggeredByKeyboardEvent ? editor.selection.getStart(true) : e.target;
@@ -25147,9 +25425,14 @@ var silver = (function (domGlobals) {
       var lazyAnchorBar = function () {
         return lazyOuterContainer.bind(function (container) {
           return memAnchorBar.getOpt(container);
-        }).getOrDie('Could not find a toolbar element');
+        }).getOrDie('Could not find a anchor bar element');
       };
-      var backstage = init$9(sink, editor, lazyAnchorBar);
+      var lazyMoreButton = function () {
+        return lazyOuterContainer.bind(function (container) {
+          return OuterContainer.getMoreButton(container);
+        }).getOrDie('Could not find more button element');
+      };
+      var backstage = init$9(sink, editor, lazyAnchorBar, lazyMoreButton);
       var lazySink = function () {
         return Result.value(sink);
       };
@@ -25174,7 +25457,7 @@ var silver = (function (domGlobals) {
         onEscape: function () {
           editor.focus();
         },
-        split: isSplitToolbar(editor)
+        split: getToolbarDrawer(editor)
       });
       var partSocket = OuterContainer.parts().socket({
         dom: {
@@ -25204,7 +25487,7 @@ var silver = (function (domGlobals) {
       var editorComponents = flatten([
         hasMenubar ? [partMenubar] : [],
         hasToolbar ? [partToolbar] : [],
-        [memAnchorBar.asSpec()],
+        useFixedContainer(editor) ? [] : [memAnchorBar.asSpec()],
         isInline ? [] : [socketSidebarContainer]
       ]);
       var editorContainer = {
@@ -25322,6 +25605,23 @@ var silver = (function (domGlobals) {
     };
     var Render = { setup: setup$6 };
 
+    var onSetupFormatToggle = function (editor, name) {
+      return function (api) {
+        var unbindCell = Cell(Option.none());
+        var init = function () {
+          api.setActive(editor.formatter.match(name));
+          var unbind = editor.formatter.formatChanged(name, api.setActive).unbind;
+          unbindCell.set(Option.some(unbind));
+        };
+        editor.initialized ? init() : editor.on('init', init);
+        return function () {
+          return unbindCell.get().each(function (unbind) {
+            return unbind();
+          });
+        };
+      };
+    };
+
     var register$5 = function (editor) {
       var alignToolbarButtons = [
         {
@@ -25349,24 +25649,6 @@ var silver = (function (domGlobals) {
           icon: 'align-justify'
         }
       ];
-      var onSetupToggleButton = function (item) {
-        return function (api) {
-          var handler = function (state) {
-            api.setActive(state);
-          };
-          if (editor.formatter) {
-            api.setActive(editor.formatter.match(item.name));
-            editor.formatter.formatChanged(item.name, handler);
-          } else {
-            editor.on('init', function () {
-              api.setActive(editor.formatter.match(item.name));
-              editor.formatter.formatChanged(item.name, handler);
-            });
-          }
-          return function () {
-          };
-        };
-      };
       global$a.each(alignToolbarButtons, function (item) {
         editor.ui.registry.addToggleButton(item.name, {
           tooltip: item.text,
@@ -25374,7 +25656,7 @@ var silver = (function (domGlobals) {
             return editor.execCommand(item.cmd);
           },
           icon: item.icon,
-          onSetup: onSetupToggleButton(item)
+          onSetup: onSetupFormatToggle(editor, item.name)
         });
       });
       var alignNoneToolbarButton = {
@@ -25396,24 +25678,6 @@ var silver = (function (domGlobals) {
     var toggleFormat = function (editor, fmt) {
       return function () {
         editor.execCommand('mceToggleFormat', false, fmt);
-      };
-    };
-    var onSetupFormatToggle = function (editor, name) {
-      return function (api) {
-        var handler = function (state) {
-          api.setActive(state);
-        };
-        if (editor.formatter) {
-          api.setActive(editor.formatter.match(name));
-          editor.formatter.formatChanged(name, handler);
-        } else {
-          editor.on('init', function () {
-            api.setActive(editor.formatter.match(name));
-            editor.formatter.formatChanged(name, handler);
-          });
-        }
-        return function () {
-        };
       };
     };
     var registerFormatButtons = function (editor) {
@@ -26872,7 +27136,7 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var renderBody = function (foo, backstage) {
+    var renderBody = function (foo, id, backstage, ariaAttrs) {
       var renderComponents = function (incoming) {
         switch (incoming.body.type) {
         case 'tabpanel': {
@@ -26890,10 +27154,14 @@ var silver = (function (domGlobals) {
           }
         });
       };
+      var ariaAttributes = { 'aria-live': 'polite' };
       return {
         dom: {
           tag: 'div',
-          classes: ['tox-dialog__content-js']
+          classes: ['tox-dialog__content-js'],
+          attributes: __assign({}, id.map(function (x) {
+            return { id: x };
+          }).getOr({}), ariaAttrs ? ariaAttributes : {})
         },
         components: [],
         behaviours: derive$1([
@@ -26907,11 +27175,11 @@ var silver = (function (domGlobals) {
         ])
       };
     };
-    var renderInlineBody = function (foo, backstage) {
-      return renderBody(foo, backstage);
+    var renderInlineBody = function (foo, contentId, backstage, ariaAttrs) {
+      return renderBody(foo, Option.some(contentId), backstage, ariaAttrs);
     };
     var renderModalBody = function (foo, backstage) {
-      return ModalDialog.parts().body(renderBody(foo, backstage));
+      return ModalDialog.parts().body(renderBody(foo, Option.none(), backstage, false));
     };
 
     var init$e = function (getInstanceApi, extras) {
@@ -27356,9 +27624,10 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var renderInlineDialog = function (dialogInit, extra, backstage) {
+    var renderInlineDialog = function (dialogInit, extra, backstage, ariaAttrs) {
       var _a, _b;
       var dialogLabelId = generate$1('dialog-label');
+      var dialogContentId = generate$1('dialog-content');
       var updateState = function (_comp, incoming) {
         return Option.some(incoming);
       };
@@ -27366,7 +27635,7 @@ var silver = (function (domGlobals) {
         title: dialogInit.internalDialog.title,
         draggable: true
       }, dialogLabelId, backstage.shared.providers));
-      var memBody = record(renderInlineBody({ body: dialogInit.internalDialog.body }, backstage));
+      var memBody = record(renderInlineBody({ body: dialogInit.internalDialog.body }, dialogContentId, backstage, ariaAttrs));
       var memFooter = record(renderInlineFooter({ buttons: dialogInit.internalDialog.buttons }, backstage.shared.providers));
       var dialogEvents = SilverDialogEvents.init(function () {
         return instanceApi;
@@ -27383,7 +27652,7 @@ var silver = (function (domGlobals) {
         dom: {
           tag: 'div',
           classes: ['tox-dialog'],
-          attributes: (_a = { role: 'dialog' }, _a['aria-labelledby'] = dialogLabelId, _a)
+          attributes: (_a = { role: 'dialog' }, _a['aria-labelledby'] = dialogLabelId, _a['aria-describedby'] = '' + dialogContentId, _a)
         },
         eventOrder: (_b = {}, _b[receive()] = [
           Reflecting.name(),
@@ -27647,9 +27916,9 @@ var silver = (function (domGlobals) {
       var confirmDialog = setup$9(extras);
       var open = function (config, params, closeWindow) {
         if (params !== undefined && params.inline === 'toolbar') {
-          return openInlineDialog(config, extras.backstage.shared.anchors.toolbar(), closeWindow);
+          return openInlineDialog(config, extras.backstage.shared.anchors.toolbar(), closeWindow, params.ariaAttrs);
         } else if (params !== undefined && params.inline === 'cursor') {
-          return openInlineDialog(config, extras.backstage.shared.anchors.cursor(), closeWindow);
+          return openInlineDialog(config, extras.backstage.shared.anchors.cursor(), closeWindow, params.ariaAttrs);
         } else {
           return openModalDialog(config, closeWindow);
         }
@@ -27675,7 +27944,7 @@ var silver = (function (domGlobals) {
         };
         return DialogManager.open(factory, config);
       };
-      var openInlineDialog = function (config$1, anchor, closeWindow) {
+      var openInlineDialog = function (config$1, anchor, closeWindow, ariaAttrs) {
         var factory = function (contents, internalInitialData, dataValidator) {
           var initialData = validateData$1(internalInitialData, dataValidator);
           var dialogInit = {
@@ -27689,7 +27958,7 @@ var silver = (function (domGlobals) {
               InlineView.hide(inlineDialog);
               closeWindow(dialogUi.instanceApi);
             }
-          }, extras.backstage);
+          }, extras.backstage, ariaAttrs);
           var inlineDialog = build$1(InlineView.sketch({
             lazySink: extras.backstage.shared.getSink,
             dom: {
