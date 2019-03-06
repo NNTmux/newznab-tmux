@@ -184,9 +184,9 @@ class ProcessReleases
             return 0;
         }
 
-        $this->processIncompleteCollections();
-        $this->processCollectionSizes();
-        $this->deleteUnwantedCollections();
+        $this->processIncompleteCollections($groupID);
+        $this->processCollectionSizes($groupID);
+        $this->deleteUnwantedCollections($groupID);
 
         $totalReleasesAdded = 0;
         do {
@@ -282,7 +282,7 @@ class ProcessReleases
      * @throws \Exception
      * @throws \Throwable
      */
-    public function processIncompleteCollections(): void
+    public function processIncompleteCollections($groupID): void
     {
         $startTime = now();
 
@@ -316,9 +316,9 @@ class ProcessReleases
 
             $this->colorCli->primary(
                 ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    $totalTime.Str::plural(' second', $totalTime),
+                $totalTime.Str::plural(' second', $totalTime),
                 true
-                );
+            );
         }
     }
 
@@ -362,7 +362,7 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary($totalTime.Str::plural(' second', $totalTime), true);
             }
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -455,7 +455,7 @@ class ProcessReleases
                     if ($this->echoCLI) {
                         $this->colorCli->primary('Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).' collections: '.PHP_EOL.$minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.' with less files than site/group settings in: '.$totalTime.Str::plural(' second', $totalTime), true);
                     }
-                }, 3);
+                }, 10);
             }
         }
     }
@@ -500,21 +500,21 @@ class ProcessReleases
             $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
             $fromName = utf8_encode(
                 trim($collection->fromname, "'")
-                );
+            );
 
             // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
             // A 1% variance in size is considered the same size when the subject and poster are the same
             $dupeCheck = Release::query()
-                    ->where(['name' => $cleanRelName, 'fromname' => $fromName])
-                    ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
-                    ->first(['id']);
+                ->where(['name' => $cleanRelName, 'fromname' => $fromName])
+                ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
+                ->first(['id']);
 
             if ($dupeCheck === null) {
                 $cleanedName = $this->releaseCleaning->releaseCleaner(
                     $collection->subject,
                     $collection->fromname,
                     $collection->gname
-                    );
+                );
 
                 if (\is_array($cleanedName)) {
                     $properName = $cleanedName['properlynamed'];
@@ -539,20 +539,20 @@ class ProcessReleases
 
                 $releaseID = Release::insertRelease(
                     [
-                            'name' => $cleanRelName,
-                            'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
-                            'totalpart' => $collection->totalfiles,
-                            'groups_id' => $collection->groups_id,
-                            'guid' => createGUID(),
-                            'postdate' => $collection->date,
-                            'fromname' => $fromName,
-                            'size' => $collection->filesize,
-                            'categories_id' => $determinedCategory['categories_id'],
-                            'isrenamed' => $properName === true ? 1 : 0,
-                            'predb_id' => $preID === false ? 0 : $preID,
-                            'nzbstatus' => NZB::NZB_NONE,
-                        ]
-                    );
+                        'name' => $cleanRelName,
+                        'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
+                        'totalpart' => $collection->totalfiles,
+                        'groups_id' => $collection->groups_id,
+                        'guid' => createGUID(),
+                        'postdate' => $collection->date,
+                        'fromname' => $fromName,
+                        'size' => $collection->filesize,
+                        'categories_id' => $determinedCategory['categories_id'],
+                        'isrenamed' => $properName === true ? 1 : 0,
+                        'predb_id' => $preID === false ? 0 : $preID,
+                        'nzbstatus' => NZB::NZB_NONE,
+                    ]
+                );
                 try {
                     $release = Release::find($releaseID);
                     $release->retag($determinedCategory['tags']);
@@ -565,14 +565,14 @@ class ProcessReleases
                     // Update collections table to say we inserted the release.
                     DB::transaction(function () use ($collection, $releaseID) {
                         Collection::query()->where('id', $collection->id)->update(['filecheck' => self::COLLFC_INSERTED, 'releases_id' => $releaseID]);
-                    }, 3);
+                    }, 10);
 
                     // Add the id of regex that matched the collection and release name to release_regexes table
                     ReleaseRegex::insertIgnore([
-                            'releases_id'            => $releaseID,
-                            'collection_regex_id'    => $collection->collection_regexes_id,
-                            'naming_regex_id'        => $cleanedName['id'] ?? 0,
-                        ]);
+                        'releases_id'            => $releaseID,
+                        'collection_regex_id'    => $collection->collection_regexes_id,
+                        'naming_regex_id'        => $cleanedName['id'] ?? 0,
+                    ]);
 
                     if (preg_match_all('#(\S+):\S+#', $collection->xref, $matches)) {
                         foreach ($matches[1] as $grp) {
@@ -584,33 +584,33 @@ class ProcessReleases
                                 if ($xrefGrpID === '') {
                                     $xrefGrpID = UsenetGroup::addGroup(
                                         [
-                                                'name'                  => $grpTmp,
-                                                'description'           => 'Added by Release processing',
-                                                'backfill_target'       => 1,
-                                                'first_record'          => 0,
-                                                'last_record'           => 0,
-                                                'active'                => 0,
-                                                'backfill'              => 0,
-                                                'minfilestoformrelease' => '',
-                                                'minsizetoformrelease'  => '',
-                                            ]
-                                        );
+                                            'name'                  => $grpTmp,
+                                            'description'           => 'Added by Release processing',
+                                            'backfill_target'       => 1,
+                                            'first_record'          => 0,
+                                            'last_record'           => 0,
+                                            'active'                => 0,
+                                            'backfill'              => 0,
+                                            'minfilestoformrelease' => '',
+                                            'minsizetoformrelease'  => '',
+                                        ]
+                                    );
                                 }
 
                                 $relGroupsChk = ReleasesGroups::query()->where(
                                     [
-                                            ['releases_id', '=', $releaseID],
-                                            ['groups_id', '=', $xrefGrpID],
-                                        ]
-                                    )->first();
+                                        ['releases_id', '=', $releaseID],
+                                        ['groups_id', '=', $xrefGrpID],
+                                    ]
+                                )->first();
 
                                 if ($relGroupsChk === null) {
                                     ReleasesGroups::query()->insert(
                                         [
-                                                'releases_id' => $releaseID,
-                                                'groups_id'   => $xrefGrpID,
-                                            ]
-                                        );
+                                            'releases_id' => $releaseID,
+                                            'groups_id'   => $xrefGrpID,
+                                        ]
+                                    );
                                 }
                             }
                         }
@@ -626,7 +626,7 @@ class ProcessReleases
                 // The release was already in the DB, so delete the collection.
                 DB::transaction(function () use ($collection) {
                     Collection::query()->where('collectionhash', $collection->collectionhash)->delete();
-                }, 3);
+                }, 10);
 
                 $duplicate++;
             }
@@ -637,13 +637,13 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 PHP_EOL.
-                    number_format($returnCount).
-                    ' Releases added and '.
-                    number_format($duplicate).
-                    ' duplicate collections deleted in '.
-                    $totalTime.Str::plural(' second', $totalTime),
+                number_format($returnCount).
+                ' Releases added and '.
+                number_format($duplicate).
+                ' duplicate collections deleted in '.
+                $totalTime.Str::plural(' second', $totalTime),
                 true
-                );
+            );
         }
 
         return ['added' => $returnCount, 'dupes' => $duplicate];
@@ -700,8 +700,8 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 number_format($nzbCount).' NZBs created/Collections deleted in '.
-                    $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
-                    'Total time: '.$totalTime.Str::plural(' second', $totalTime),
+                $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
+                'Total time: '.$totalTime.Str::plural(' second', $totalTime),
                 true
             );
         }
@@ -764,8 +764,8 @@ class ProcessReleases
         } elseif ($this->echoCLI) {
             $this->colorCli->info(
                 'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
-                    'If you are using tmux or screen they might have their own scripts running Post-processing.'
-                );
+                'If you are using tmux or screen they might have their own scripts running Post-processing.'
+            );
         }
     }
 
@@ -855,7 +855,7 @@ class ProcessReleases
             if ($this->echoCLI) {
                 $this->colorCli->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);
             }
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -932,8 +932,8 @@ class ProcessReleases
                         $grpID['id'],
                         $minFilesSetting,
                         $minFilesSetting
-                     )
-                 );
+                    )
+                );
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $minFilesDeleted++;
@@ -946,12 +946,12 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
-                    ' releases: '.PHP_EOL.
-                    $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
-                    ' with less files than site/groups setting in: '.
-                    $totalTime.Str::plural(' second', $totalTime),
+                ' releases: '.PHP_EOL.
+                $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
+                ' with less files than site/groups setting in: '.
+                $totalTime.Str::plural(' second', $totalTime),
                 true
-                );
+            );
         }
     }
 
@@ -1076,8 +1076,8 @@ class ProcessReleases
 							LIMIT 1000',
                         (int) $category->id,
                         (int) $category->minsize
-                        )
-                    );
+                    )
+                );
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $categoryMinSizeDeleted++;
@@ -1151,29 +1151,29 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Removed releases: '.
-                    number_format($retentionDeleted).
-                    ' past retention, '.
-                    number_format($passwordDeleted).
-                    ' passworded, '.
-                    number_format($duplicateDeleted).
-                    ' crossposted, '.
-                    number_format($disabledCategoryDeleted).
-                    ' from disabled categories, '.
-                    number_format($categoryMinSizeDeleted).
-                    ' smaller than category settings, '.
-                    number_format($disabledGenreDeleted).
-                    ' from disabled music genres, '.
-                    number_format($miscRetentionDeleted).
-                    ' from misc->other '.
-                    number_format($miscHashedDeleted).
-                    ' from misc->hashed'.
-                    (
-                        $this->completion > 0
-                        ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
-                        : '.'
-                    ),
+                number_format($retentionDeleted).
+                ' past retention, '.
+                number_format($passwordDeleted).
+                ' passworded, '.
+                number_format($duplicateDeleted).
+                ' crossposted, '.
+                number_format($disabledCategoryDeleted).
+                ' from disabled categories, '.
+                number_format($categoryMinSizeDeleted).
+                ' smaller than category settings, '.
+                number_format($disabledGenreDeleted).
+                ' from disabled music genres, '.
+                number_format($miscRetentionDeleted).
+                ' from misc->other '.
+                number_format($miscHashedDeleted).
+                ' from misc->hashed'.
+                (
+                $this->completion > 0
+                    ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
+                    : '.'
+                ),
                 true
-                );
+            );
 
             $totalDeleted = (
                 $retentionDeleted + $passwordDeleted + $duplicateDeleted + $disabledCategoryDeleted +
@@ -1184,9 +1184,9 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary(
                     'Removed '.number_format($totalDeleted).' releases in '.
-                        $totalTime.Str::plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                     true
-                    );
+                );
             }
         }
     }
@@ -1225,7 +1225,7 @@ class ProcessReleases
                     self::COLLFC_COMPCOLL
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1264,7 +1264,7 @@ class ProcessReleases
                     self::COLLFC_ZEROPART
                 )
             );
-        }, 3);
+        }, 10);
 
         DB::transaction(function () use ($where) {
             DB::update(
@@ -1278,7 +1278,7 @@ class ProcessReleases
                     $where
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1312,9 +1312,9 @@ class ProcessReleases
                     self::FILE_INCOMPLETE,
                     $where,
                     self::FILE_COMPLETE
-            )
-        );
-        }, 3);
+                )
+            );
+        }, 10);
 
         DB::transaction(function () use ($where) {
             DB::update(
@@ -1338,7 +1338,7 @@ class ProcessReleases
                     self::FILE_COMPLETE
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1369,7 +1369,7 @@ class ProcessReleases
                     self::COLLFC_COMPPART
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1396,7 +1396,7 @@ class ProcessReleases
                     $where
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1416,7 +1416,7 @@ class ProcessReleases
                     "
 				UPDATE collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM binaries b WHERE b.collections_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
-				AND c.filecheck IN (%d, %d, 3) %s",
+				AND c.filecheck IN (%d, %d, 10) %s",
                     self::COLLFC_COMPPART,
                     $this->collectionDelayTime,
                     self::COLLFC_DEFAULT,
@@ -1424,7 +1424,7 @@ class ProcessReleases
                     $where
                 )
             );
-        }, 3);
+        }, 10);
     }
 
     /**
@@ -1457,6 +1457,6 @@ class ProcessReleases
             if ($this->echoCLI && $obj > 0) {
                 $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.', true);
             }
-        }, 3);
+        }, 10);
     }
 }
