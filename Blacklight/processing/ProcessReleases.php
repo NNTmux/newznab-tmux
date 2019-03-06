@@ -277,7 +277,6 @@ class ProcessReleases
     }
 
     /**
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -359,7 +358,6 @@ class ProcessReleases
     }
 
     /**
-     *
      * @throws \Exception
      * @throws \Throwable
      */
@@ -450,7 +448,6 @@ class ProcessReleases
     }
 
     /**
-     *
      * @return array
      * @throws \Throwable
      */
