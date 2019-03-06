@@ -1,4 +1,5 @@
 2019-03-06 DariusIII
+	* Chg: Update switch.php and ProcessReleases, remove processing of releases and collectgions per group
 	* Chg: Update ProcessReleases class collections cleaning and deletion
 2019-03-05 DariusIII
 	* Chg: Update spatie/laravel-permission (2.36.0 => 2.36.1)
