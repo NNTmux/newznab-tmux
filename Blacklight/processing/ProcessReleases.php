@@ -231,26 +231,21 @@ class ProcessReleases
     /**
      * Categorizes releases.
      *
-     * @param string $type  name or searchname | Categorize using the search name or subject.
-     * @param string $where Optional "where" query parameter.
-     *
+     * @param string $type name or searchname | Categorize using the search name or subject.
+     * @param $groupId
      * @return int Quantity of categorized releases.
      * @throws \Exception
      */
-    public function categorizeRelease($type, $where = ''): int
+    public function categorizeRelease($type, $groupId): int
     {
         $cat = new Categorize();
         $categorized = $total = 0;
-        $releases = Release::fromQuery(
-            sprintf(
-                '
-				SELECT id, fromname, %s, groups_id
-				FROM releases %s',
-                $type,
-                $where
-            )
-        );
-        if (\count($releases) > 0) {
+        $releasesQuery = Release::query()->where(['categories_id' => Category::OTHER_MISC, 'iscategorized' => 0]);
+        if (! empty($groupId)) {
+            $releasesQuery->where('groups_id', $groupId);
+        }
+        $releases = $releasesQuery->select(['id', 'fromname', 'groups_id', $type])->get();
+        if ($releases->count() > 0) {
             $total = \count($releases);
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
@@ -301,21 +296,17 @@ class ProcessReleases
         $this->collectionFileCheckStage6($where);
 
         if ($this->echoCLI) {
-            $count = DB::selectOne(
-                sprintf(
-                    '
-					SELECT COUNT(c.id) AS complete
-					FROM collections c
-					WHERE c.filecheck = %d %s',
-                    self::COLLFC_COMPPART,
-                    $where
-                )
-            );
+            $countQuery = Collection::query()->where('filecheck', self::COLLFC_COMPPART);
+
+            if (! empty($groupID)) {
+                $countQuery->where('groups_id', $groupID);
+            }
+            $count = $countQuery->count('id');
 
             $totalTime = now()->diffInSeconds($startTime);
 
             $this->colorCli->primary(
-                ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
+                ($count ?? 0).' collections were found to be complete. Time: '.
                 $totalTime.Str::plural(' second', $totalTime),
                 true
             );
@@ -326,6 +317,7 @@ class ProcessReleases
      * @param $groupID
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function processCollectionSizes($groupID): void
     {
@@ -730,16 +722,11 @@ class ProcessReleases
                 break;
             case 1:
             default:
-
                 $type = 'name';
                 break;
         }
         $this->categorizeRelease(
-            $type,
-            (! empty($groupID)
-                ? 'WHERE categories_id = '.Category::OTHER_MISC.' AND iscategorized = 0 AND groups_id = '.$groupID
-                : 'WHERE categories_id = '.Category::OTHER_MISC.' AND iscategorized = 0')
-        );
+            $type, $groupID);
 
         $totalTime = now()->diffInSeconds($startTime);
 

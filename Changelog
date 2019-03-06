@@ -1,4 +1,5 @@
 2019-03-06 DariusIII
+	* Chg: Replace couple of raw sql queries with query builder
 	* Chg: Partially revert switch.php and ProcessReleases class
 	* Chg: Update laravel/telescope (v2.0.1 => v2.0.2)
 	* Chg: Add false to Collection model timestamps
