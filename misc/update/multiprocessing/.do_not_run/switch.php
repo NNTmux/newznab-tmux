@@ -384,24 +384,25 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
+ * @param                 $groupID
  * @param ProcessReleases $releases
- * @param int $groupID
+ *
  * @throws \Throwable
  */
 function processReleases($releases, $groupID)
 {
     $releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
-    $releases->processIncompleteCollections();
-    $releases->processCollectionSizes();
-    $releases->deleteUnwantedCollections();
+    $releases->processIncompleteCollections($groupID);
+    $releases->processCollectionSizes($groupID);
+    $releases->deleteUnwantedCollections($groupID);
 
     do {
-        $releasesCount = $releases->createReleases();
-        $nzbFilesAdded = $releases->createNZBs();
+        $releasesCount = $releases->createReleases($groupID);
+        $nzbFilesAdded = $releases->createNZBs($groupID);
 
         // This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
     } while ($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
-    $releases->deleteCollections();
+    $releases->deleteCollections($groupID);
 }
 
 /**
