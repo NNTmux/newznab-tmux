@@ -2,6 +2,7 @@
 
 namespace Blacklight\processing;
 
+use App\Models\Collection;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
@@ -810,15 +811,9 @@ class ProcessReleases
 
         DB::transaction(function () use ($deletedCount, $startTime) {
             $deleted = 0;
-            $deleteQuery = DB::delete(
-                sprintf(
-                    '
-				DELETE c
-				FROM collections c
-				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
-                    Settings::settingValue('..partretentionhours')
-                )
-            );
+            $deleteQuery = Collection::query()
+                ->where('dateadded', '<', now()->subHours(Settings::settingValue('..partretentionhours')))
+                ->delete();
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
                 $deletedCount += $deleted;
@@ -840,138 +835,35 @@ class ProcessReleases
             if (random_int(0, 200) <= 1) {
                 // CBP collection orphaned with no binaries or parts.
                 if ($this->echoCLI) {
-                    echo
-                        $this->colorCli->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
-                        $this->colorCli->primary('Deleting orphaned collections.');
+                    echo $this->colorCli->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).$this->colorCli->primary('Deleting orphaned collections.');
                 }
 
                 $deleted = 0;
-                $deleteQuery =
-                    DB::delete(
-                        '
-					DELETE c, b, p
-					FROM collections c
-					LEFT JOIN binaries b ON c.id = b.collections_id
-					LEFT JOIN parts p ON b.id = p.binaries_id
-					WHERE (b.id IS NULL OR p.binaries_id IS NULL)'
-                    );
+                $deleteQuery = Collection::query()->whereNull('binaries.id')->orWhereNull('parts.binaries_id')->leftJoin('binaries', 'collections.id', '=', 'binaries.collections_id')->leftJoin('parts', 'binaries.id', '=', 'parts.binaries_id')->delete();
 
                 if ($deleteQuery > 0) {
                     $deleted = $deleteQuery;
                     $deletedCount += $deleted;
                 }
 
-                $secondQuery = now();
-                $totalTime = $secondQuery->diffInSeconds($firstQuery);
+                $totalTime = now()->diffInSeconds($firstQuery);
 
                 if ($this->echoCLI) {
-                    $this->colorCli->primary(
-                        'Finished deleting '.$deleted.' orphaned collections in '.
-                        $totalTime.Str::plural(' second', $totalTime),
-                        true
-                    );
+                    $this->colorCli->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
                 }
-
-                // orphaned binaries - binaries with no parts or binaries with no collection
-                // Don't delete currently inserting binaries by checking the max id.
-                if ($this->echoCLI) {
-                    $this->colorCli->primary('Deleting orphaned binaries/parts with no collection.', true);
-                }
-
-                $deleted = 0;
-                $deleteQuery =
-                    DB::delete(
-                        sprintf(
-                            'DELETE b, p FROM binaries b
-					LEFT JOIN parts p ON b.id = p.binaries_id
-					LEFT JOIN collections c ON b.collections_id = c.id
-					WHERE (p.binaries_id IS NULL OR c.id IS NULL)
-					AND b.id < %d',
-                            $this->maxQueryFormulator('binaries', 20000)
-                        )
-                    );
-
-                if ($deleteQuery > 0) {
-                    $deleted = $deleteQuery;
-                    $deletedCount += $deleted;
-                }
-
-                $thirdQuery = now();
-
-                $totalTime = $thirdQuery->diffInSeconds($secondQuery);
-
-                if ($this->echoCLI) {
-                    $this->colorCli->primary(
-                        'Finished deleting '.$deleted.' binaries with no collections or parts in '.$totalTime.Str::plural(' second', $totalTime),
-                        true
-                    );
-                }
-
-                // orphaned parts - parts with no binary
-                // Don't delete currently inserting parts by checking the max id.
-                if ($this->echoCLI) {
-                    $this->colorCli->primary('Deleting orphaned parts with no binaries.', true);
-                }
-                $deleted = 0;
-                $deleteQuery =
-                    DB::delete(
-                        sprintf(
-                            '
-					DELETE p
-					FROM parts p
-					LEFT JOIN binaries b ON p.binaries_id = b.id
-					WHERE b.id IS NULL
-					AND p.binaries_id < %d',
-                            $this->maxQueryFormulator('binaries', 20000)
-                        )
-                    );
-
-                if ($deleteQuery > 0) {
-                    $deleted = $deleteQuery;
-                    $deletedCount += $deleted;
-                }
-
-                $fourthQuery = now();
-
-                $totalTime = $fourthQuery->diffInSeconds($thirdQuery);
-
-                if ($this->echoCLI) {
-                    $this->colorCli->primary(
-                        'Finished deleting '.$deleted.' parts with no binaries in '.
-                        $totalTime.Str::plural(' second', $totalTime),
-                        true
-                    );
-                }
-            } // done cleaning up Binaries/Parts orphans
+            }
 
             if ($this->echoCLI) {
-                $this->colorCli->primary(
-                    'Deleting collections that were missed after NZB creation.',
-                    true
-                );
+                $this->colorCli->primary('Deleting collections that were missed after NZB creation.', true);
             }
 
             $deleted = 0;
             // Collections that were missing on NZB creation.
-            $collections = DB::select(
-                '
-				SELECT SQL_NO_CACHE c.id
-				FROM collections c
-				INNER JOIN releases r ON r.id = c.releases_id
-				WHERE r.nzbstatus = 1'
-            );
+            $collections = Collection::query()->where('releases.nzbstatus', '=', 1)->leftJoin('releases', 'releases.id', '=', 'collections.releases_id')->select('collections.id')->get();
 
             foreach ($collections as $collection) {
                 $deleted++;
-                DB::delete(
-                    sprintf(
-                        '
-						DELETE c
-						FROM collections c
-						WHERE c.id = %d',
-                        $collection->id
-                    )
-                );
+                Collection::query()->where('id', $collection->id)->delete();
             }
             $deletedCount += $deleted;
 
@@ -979,15 +871,7 @@ class ProcessReleases
             $totalTime = $fourthQuery->diffInSeconds($startTime);
 
             if ($this->echoCLI) {
-                $this->colorCli->primary(
-                    'Finished deleting '.$deleted.' collections missed after NZB creation in '.
-                    $colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.
-                    'Removed '.
-                    number_format($deletedCount).
-                    ' parts/binaries/collection rows in '.
-                    $totalTime.Str::plural(' second', $totalTime),
-                    true
-                );
+                $this->colorCli->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);
             }
         }, 3);
     }
@@ -1056,16 +940,16 @@ class ProcessReleases
             if ($minFilesSetting > 0) {
                 $releases = Release::fromQuery(
                     sprintf(
-                         '
+                        '
 				SELECT SQL_NO_CACHE r.id, r.guid
 				FROM releases r
 				INNER JOIN usenet_groups g ON g.id = r.groups_id
 				WHERE r.groups_id = %d
 				AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 				AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
-                         $grpID['id'],
-                         $minFilesSetting,
-                         $minFilesSetting
+                        $grpID['id'],
+                        $minFilesSetting,
+                        $minFilesSetting
                      )
                  );
                 foreach ($releases as $release) {
@@ -1202,14 +1086,14 @@ class ProcessReleases
             if ((int) $category->minsize > 0) {
                 $releases = Release::fromQuery(
                     sprintf(
-                            '
+                        '
 							SELECT id, guid
 							FROM releases
 							WHERE categories_id = %d
 							AND size < %d
 							LIMIT 1000',
-                            (int) $category->id,
-                            (int) $category->minsize
+                        (int) $category->id,
+                        (int) $category->minsize
                         )
                     );
                 foreach ($releases as $release) {
@@ -1451,7 +1335,7 @@ class ProcessReleases
         DB::transaction(function () use ($where) {
             DB::update(
                 sprintf(
-                '
+                    '
 				UPDATE binaries b
 				INNER JOIN
 				(
@@ -1464,10 +1348,10 @@ class ProcessReleases
 					GROUP BY b.id, b.totalparts
 				) r ON b.id = r.id
 				SET b.partcheck = %d',
-                self::COLLFC_TEMPCOMP,
-                self::FILE_INCOMPLETE,
-                $where,
-                self::FILE_COMPLETE
+                    self::COLLFC_TEMPCOMP,
+                    self::FILE_INCOMPLETE,
+                    $where,
+                    self::FILE_COMPLETE
             )
         );
         }, 3);
