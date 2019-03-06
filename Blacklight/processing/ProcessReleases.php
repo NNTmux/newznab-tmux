@@ -2,7 +2,6 @@
 
 namespace Blacklight\processing;
 
-use App\Models\Collection;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
@@ -12,6 +11,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
+use App\Models\Collection;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
