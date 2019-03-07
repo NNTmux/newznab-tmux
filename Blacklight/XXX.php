@@ -697,7 +697,7 @@ class XXX
     protected function parseXXXSearchName($releaseName): bool
     {
         $name = '';
-        $followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
+        $followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[ ._-]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
 
         if (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $matches)) {
             $name = $matches['name'];
@@ -709,7 +709,7 @@ class XXX
             // If we still have any of the words in $followingList, remove them.
             $name = preg_replace('/'.$followingList.'/i', ' ', $name);
             // Remove periods, underscored, anything between parenthesis.
-            $name = preg_replace('/\(.*?\)|[-._]/i', ' ', $name);
+            $name = preg_replace('/\(.*?\)|[._-]/i', ' ', $name);
             // Finally remove multiple spaces and trim leading spaces.
             $name = trim(preg_replace('/\s{2,}/', ' ', $name));
             // Remove Private Movies {d} from name better matching.

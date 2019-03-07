@@ -203,7 +203,7 @@ class ADE extends AdultMovies
                 foreach ($res as $ret) {
                     $title = $ret->title;
                     $title = str_replace('/XXX/', '', $title);
-                    $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
+                    $title = preg_replace('/\(.*?\)|[._-]/', ' ', $title);
                     $url = trim($ret->href);
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {

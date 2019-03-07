@@ -220,7 +220,7 @@ class Hotmovies extends AdultMovies
                     $ret = $ret->findOne('a[title]');
                     $title = trim($ret->title);
                     $title = str_replace('/XXX/', '', $title);
-                    $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
+                    $title = preg_replace('/\(.*?\)|[._-]/', ' ', $title);
                     if (! empty($title)) {
                         similar_text($movie, $title, $p);
                         if ($p >= 90) {

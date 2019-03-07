@@ -213,7 +213,7 @@ class AEBN extends AdultMovies
                 $string = 'a#FTSMovieSearch_link_title_detail_'.$i;
                 if ($ret = $mov->findOne($string)) {
                     $title = str_replace('/XXX/', '', $ret->title);
-                    $title = trim(preg_replace('/\(.*?\)|[-._]/', ' ', $title));
+                    $title = trim(preg_replace('/\(.*?\)|[._-]/', ' ', $title));
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {
                         $this->_title = trim($ret->title);
