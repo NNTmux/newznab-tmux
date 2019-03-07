@@ -1,4 +1,5 @@
 2019-03-07 DariusIII
+	* Fix: Fix one more release cleaning regex range
 	* Fix: Fix more regex ranges in Blacklight namespace
 	* Fix: Add back missing $groupID in ProcessReleases class
 	* Chg: Fix ranges in collection and release naming regexes

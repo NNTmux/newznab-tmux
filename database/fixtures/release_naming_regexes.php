@@ -316,7 +316,7 @@ return [
     39 => [
         'id' => 40,
         'group_regex' => '^alt\\.binaries\\.ath$',
-        'regex' => '/^.+http:\\/\\/you-need-all\\.tk.+\\[\\d+\\/\\d+\\][\\s-_]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+http:\\/\\/you-need-all\\.tk.+\\[\\d+\\/\\d+\\][\\s_-]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//<->http://you-need-all.tk<-> - [28/32] - "Dirty Minded W',
         'ordinal' => 25,
