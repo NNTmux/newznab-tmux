@@ -164,7 +164,7 @@ class CollectionsCleaning
         // Multi spaces.
         $cleanSubject = utf8_encode(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)));
         // If the subject is too similar to another because it is so short, try to extract info from the subject.
-        if (\strlen($cleanSubject) <= 10 || preg_match('/^[-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
+        if (\strlen($cleanSubject) <= 10 || preg_match('/^[\-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
             $x = '';
             if (preg_match('/.*("[A-Z0-9]+).*?"/i', $this->subject, $match)) {
                 $x = $match[1];
