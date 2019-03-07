@@ -649,7 +649,7 @@ class ProcessAdditional
         if (! empty($guidChar)) {
             $releasesQuery->where('releases.leftguid', $guidChar);
         }
-        $releasesQuery->select(['releases.id as releases_id', 'releases.guid', 'releases.name', 'releases.size', 'releases.groups_id', 'releases.nfostatus', 'releases.fromname', 'releases.completion', 'releases.categories_id', 'releases.searchname', 'releases.predb_id', 'categories.disablepreview'])
+        $releasesQuery->select(['releases.id', 'releases.id as releases_id', 'releases.guid', 'releases.name', 'releases.size', 'releases.groups_id', 'releases.nfostatus', 'releases.fromname', 'releases.completion', 'releases.categories_id', 'releases.searchname', 'releases.predb_id', 'categories.disablepreview'])
             ->leftJoin('categories', 'categories.id', '=', 'releases.categories_id')
             ->orderBy('releases.passwordstatus')
             ->orderByDesc('releases.postdate')
