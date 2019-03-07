@@ -19,7 +19,7 @@ class CollectionRegexesTableSeeder extends Seeder
             [
                 'id' => 1,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/(?P<match1>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match2>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/i',
+            'regex' => '/(?P<match1>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match2>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/i',
                 'status' => 1,
                 'description' => '[278997]-[FULL]-[#a.b.erotica]-[ chi-the.walking.dead.xxx ]-[06/51] - "chi-the.walking.dead.xxx-s.mp4" yEnc ::: [######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc ::: Re: [147053]-[FULL]-[#a.b.teevee]-[ Top_Gear.20x04.HDTV_x264-FoV ]-[11/59] - "top_gear.20x04.hdtv_x264-fov.r00" yEnc',
                 'ordinal' => 0,
@@ -1180,7 +1180,7 @@ class CollectionRegexesTableSeeder extends Seeder
             [
                 'id' => 130,
                 'group_regex' => '^alt\\.binaries\\.cd\\.image$',
-            'regex' => '/^(?P<match0>\\[(\\d+|redump)?\\]-+\\[.+?\\]-\\[.+?\\]-)(\\s?\\[\\d+\\/\\d+\\])?(\\s?\\[.+?\\])?[- ]{0,3}".+?"( - \\d+[,.]\\d+ [mMkKgG][bB] -)? yEnc$/i',
+            'regex' => '/^(?P<match0>\\[(\\d+|redump)?\\]-+\\[.+?\\]-\\[.+?\\]-)(\\s?\\[\\d+\\/\\d+\\])?(\\s?\\[.+?\\])?[ -]{0,3}".+?"( - \\d+[,.]\\d+ [mMkKgG][bB] -)? yEnc$/i',
                 'status' => 1,
                 'description' => '//[27849]-[altbinEFNet]-[Full]- "ppt-sogz.001" - 7,62 GB - yEnc ::: //[27925]--[altbinEFNet]-[Full]- "unl_p2rd.par2" yEnc ::: //[27608]-[FULL]-[#altbin@EFNet]-[007/136] "27608-1.005" yEnc ::: //[30605]-[altbinEFNet]-[FULL]- [10/165] - "plaza-the.witcher.3.wild.hunt.r09" yEnc ::: //[]-[#altbin@EFNet]-[Full]-[ACE.LIGHTNING.PLUS.6.TRAINER-DEViANCE]-[0/8] - "deviance.nfo" yEnc',
                 'ordinal' => 5,
@@ -1261,7 +1261,7 @@ class CollectionRegexesTableSeeder extends Seeder
             [
                 'id' => 139,
                 'group_regex' => '^alt\\.binaries\\.cd\\.image$',
-            'regex' => '/^(?P<match0>Uploader.Presents)[- ](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
+            'regex' => '/^(?P<match0>Uploader.Presents)[ -](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
                 'status' => 1,
                 'description' => '//Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc',
                 'ordinal' => 50,
@@ -2476,7 +2476,7 @@ class CollectionRegexesTableSeeder extends Seeder
             [
                 'id' => 274,
                 'group_regex' => '^alt\\.binaries\\.erotica$',
-            'regex' => '/(?P<match0>\\[[\\d]+\\]-\\[FULL\\]-\\[#a\\.b\\.erotica@EFNet\\]-\\[) \\d{2,3}_.+? \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+            'regex' => '/(?P<match0>\\[[\\d]+\\]-\\[FULL\\]-\\[#a\\.b\\.erotica@EFNet\\]-\\[) \\d{2,3}_.+? \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
                 'status' => 1,
                 'description' => '// SPECIAL CASE FOR XXX PACKS ::: //[398342]-[FULL]-[#a.b.erotica@EFNet]-[ 02_18onlygirls.com.a.golden.lady..12.10.12.stephanie ]-[04/16] - "02_18onlygirls.com.a.golden.lady..12.10.12.stephanie.part03.rar" yEnc',
                 'ordinal' => 5,
@@ -2503,7 +2503,7 @@ class CollectionRegexesTableSeeder extends Seeder
             [
                 'id' => 277,
                 'group_regex' => '^alt\\.binaries\\.erotica$',
-            'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+            'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
                 'status' => 1,
             'description' => '//[278997]-[FULL]-[#a.b.erotica]-[ chi-the.walking.dead.xxx ]-[06/51] - "chi-the.walking.dead.xxx-s.mp4" yEnc ::: //[######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc ::: //Re: [147053]-[FULL]-[#a.b.teevee]-[ Top_Gear.20x04.HDTV_x264-FoV ]-[11/59] - "top_gear.20x04.hdtv_x264-fov.r00" yEnc (01/20)',
                 'ordinal' => 20,
@@ -2656,7 +2656,7 @@ class CollectionRegexesTableSeeder extends Seeder
                 [
                     'id' => 294,
                     'group_regex' => '^alt\\.binaries\\.game$',
-                'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+                'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
                     'status' => 1,
                 'description' => '//[192474]-[MP3]-[a.b.inner-sanctumEFNET]-[ Newbie_Nerdz_-_I_Cant_Forget_that_Girl_EP-(IM005)-WEB-2012-YOU ] [17/17] - "newbie_nerdz_-_i_cant_forget_that_girl_ep-(im005)-web-2012-you.nfo" yEnc',
                     'ordinal' => 5,
@@ -2710,7 +2710,7 @@ class CollectionRegexesTableSeeder extends Seeder
                 [
                     'id' => 300,
                     'group_regex' => '^alt\\.binaries\\.games$',
-                'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+                'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
                     'status' => 1,
                     'description' => '//[162198]-[FULL]-[a.b.teevee]-[ MasterChef.Junior.S01E07.720p.HDTV.X264-DIMENSION ]-[09/54] - "masterchef.junior.107.720p-dimension.nfo" yEnc',
                     'ordinal' => 30,
@@ -2872,7 +2872,7 @@ class CollectionRegexesTableSeeder extends Seeder
                     [
                         'id' => 318,
                         'group_regex' => '^alt\\.binaries\\.games$',
-                    'regex' => '/^(?P<match0>Uploader.Presents)[- ](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
+                    'regex' => '/^(?P<match0>Uploader.Presents)[ -](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
                         'status' => 1,
                         'description' => '//Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc',
                         'ordinal' => 120,
@@ -2890,7 +2890,7 @@ class CollectionRegexesTableSeeder extends Seeder
                     [
                         'id' => 320,
                         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-                    'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+                    'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
                         'status' => 1,
                         'description' => '//[142961]-[MP3]-[a.b.inner-sanctumEFNET]-[ Pascal_and_Pearce-Passport-CDJUST477-2CD-2011-1REAL ] [28/36] - "Pascal_and_Pearce-Passport-CDJUST477-2CD-2011-1REAL.par2" yEnc',
                         'ordinal' => 5,
@@ -2989,7 +2989,7 @@ class CollectionRegexesTableSeeder extends Seeder
                     [
                         'id' => 331,
                         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-                    'regex' => '/^(?P<match0>Uploader.Presents)[- ](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
+                    'regex' => '/^(?P<match0>Uploader.Presents)[ -](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
                         'status' => 1,
                         'description' => '//Uploader.Presents-Injustice.Gods.Among.Us.Ultimate.Edition.XBOX360-COMPLEX(02/92]"complex-injustice.ultimate.nfo" yEnc ::: //Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc',
                             'ordinal' => 5,
@@ -3853,7 +3853,7 @@ class CollectionRegexesTableSeeder extends Seeder
                         [
                             'id' => 428,
                             'group_regex' => '^alt\\.binaries\\.movies$',
-                        'regex' => '/^- Description - "(?P<match0>[\\w. -]{8,}?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(?P<match1>[\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])[- ]{0,4}yEnc$/i',
+                        'regex' => '/^- Description - "(?P<match0>[\\w. -]{8,}?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(?P<match1>[\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])[ -]{0,4}yEnc$/i',
                             'status' => 1,
                             'description' => '//- Description - "The.Legend.of.Hercules.2014.720p.BluRay.x264.Y',
                             'ordinal' => 55,

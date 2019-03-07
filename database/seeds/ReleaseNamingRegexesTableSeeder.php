@@ -19,7 +19,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 1,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/\\[\\d+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+\\.S\\d\\dE\\d\\d\\..+?) \\][- ]\\[\\d+\\/\\d+\\][ -]{0,3}"[\\w\\säöüÄÖÜß+¤¶!.,&_()\\[\\]\\\'\\`{}-]{8,}?\\b.?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
+            'regex' => '/\\[\\d+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+\\.S\\d\\dE\\d\\d\\..+?) \\][ -]\\[\\d+\\/\\d+\\][ -]{0,3}"[\\w\\säöüÄÖÜß+¤¶!.,&_()\\[\\]\\\'\\`{}-]{8,}?\\b.?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
                 'status' => 1,
                 'description' => 'rename these teevee releases as the requestid is for the full season ::: [169018]-[FULL]-[a.b.teevee]-[ House.of.Lies.S01E01.720p.WEB-DL.DD5.1.H.264-BS ]-[04/32] - "House.of.Lies.S01E01.The.Gods.of.Dangerous.Financial.Instruments.720p.WEB-DL.DD5.1.H.264-BS.part03.rar" yEnc',
                 'ordinal' => 5,
@@ -28,7 +28,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 2,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/\\[\\d+\\]-\\[.+?\\]-\\[.+?\\]-\\[ .+\\.S\\d\\d\\..+? \\][- ]\\[\\d+\\/\\d+\\][ -]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_()[]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
+            'regex' => '/\\[\\d+\\]-\\[.+?\\]-\\[.+?\\]-\\[ .+\\.S\\d\\d\\..+? \\][ -]\\[\\d+\\/\\d+\\][ -]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_()[]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
                 'status' => 1,
                 'description' => 'Season only in 4th block so take filename ::: [169019]-[FULL]-[a.b.teevee]-[ House.of.Lies.S02.720p.WEB-DL.DD5.1.H.264-BS ]-[24/32] - "House.of.Lies.S02E02.When.Dinosaurs.Ruled.the.Planet.720p.WEB-DL.DD5.1.H.264-BS.vol000+01.par2" yEnc',
                 'ordinal' => 10,
@@ -37,7 +37,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 3,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?("|#34;) yEnc$/ ',
+            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?("|#34;) yEnc$/ ',
                 'status' => 1,
                 'description' => '[######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc',
                 'ordinal' => 15,
@@ -46,7 +46,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 4,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[(?P<match1>.+?)\\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
+            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[(?P<match1>.+?)\\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
                 'status' => 1,
                 'description' => '[34148]-[FULL]-[#a.b.teevee@EFNet]-[Batman.The.Animated.Series.S04E01.DVDRiP.XviD-PyRo]-[00/35] "Batman.The.Animated.Series.S04E01.DVDRiP.XviD-PyRo.nzb" yEnc',
                 'ordinal' => 20,
@@ -55,7 +55,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 5,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
+            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
                 'status' => 1,
                 'description' => '[38722]-[#a.b.foreign@EFNet]-[ Game.Of.Thrones.S01E01.Der.Winter.Naht.GERMAN.DL.WS.1080p.HDTV.x264-MiSFiTS ]-[01/37] - "misfits-gameofthrones1080-s01e01-sample-sample.par2" yEnc',
                 'ordinal' => 25,
@@ -64,7 +64,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 6,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?("|#34;) yEnc$/',
+            'regex' => '/^\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?("|#34;) yEnc$/',
                 'status' => 1,
                 'description' => '[#a.b.teevee] Parks.and.Recreation.S01E01.720p.WEB-DL.DD5.1.H.264-CtrlHD - [01/24] - "Parks.and.Recreation.S01E01.720p.WEB-DL.DD5.1.H.264-CtrlHD.nfo" yEnc',
                 'ordinal' => 30,
@@ -73,7 +73,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 7,
                 'group_regex' => '^alt\\.binaries\\.teevee$',
-            'regex' => '/\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ ?(?P<match1>.+?) ?\\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?("|#34;) \\(\\d+\\/\\d+\\) \\(\\d+\\/\\d+$/',
+            'regex' => '/\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ ?(?P<match1>.+?) ?\\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?("|#34;) \\(\\d+\\/\\d+\\) \\(\\d+\\/\\d+$/',
                 'status' => 1,
             'description' => '[17319]-[FULL]-[#a.b.teevee@EFNet]-[ CSI.New.York.S05E22.720p.HDTV.X264-DIMENSION ]-[01/34] "csi.new.york.522.720p-dimension.nfo" (1/1) (1/1',
                 'ordinal' => 35,
@@ -478,7 +478,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 52,
                 'group_regex' => '^alt\\.binaries\\.ath$',
-            'regex' => '/^(?P<match0>[^.]{8,})([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev|\\.vol.+?|\\.[A-Za-z0-9]{2,4})[- ]{0,3}yEnc$/u',
+            'regex' => '/^(?P<match0>[^.]{8,})([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev|\\.vol.+?|\\.[A-Za-z0-9]{2,4})[ -]{0,3}yEnc$/u',
                 'status' => 1,
                 'description' => '//A7Soft ExamXML v4.37.rar  yEnc',
                 'ordinal' => 85,
@@ -3367,7 +3367,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                 [
                     'id' => 373,
                     'group_regex' => '^alt\\.binaries\\.e-book\\.flood$',
-                'regex' => '/^Re: Attn Reg143- (?P<match0>[^.]{8,})\\.[A-Za-z0-9]{2,4}[\-_\\s]{0,3}\\[\\d+\\/\\d+\\][- ]{0,4}yEnc$/',
+                'regex' => '/^Re: Attn Reg143- (?P<match0>[^.]{8,})\\.[A-Za-z0-9]{2,4}[\-_\\s]{0,3}\\[\\d+\\/\\d+\\][ -]{0,4}yEnc$/',
                     'status' => 1,
                 'description' => '//Re: Attn Reg143- (Morse 7) The Secret of Annexe 3 - Colin Dexter.mobi [11/14] -  yEnc',
                     'ordinal' => 135,
@@ -3385,7 +3385,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                 [
                     'id' => 375,
                     'group_regex' => '^alt\\.binaries\\.e-book\\.flood$',
-                'regex' => '/^Re: Request[- ]{0,4}\\d+[\-_\\s]{0,3}(?P<match0>[^.]{8,})([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev|\\.vol.+?|\\.[A-Za-z0-9]{2,4})[\-_\\s]{0,3}\\[\\d+\\/\\d+\\][- ]{0,4}yEnc$/',
+                'regex' => '/^Re: Request[ -]{0,4}\\d+[\-_\\s]{0,3}(?P<match0>[^.]{8,})([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev|\\.vol.+?|\\.[A-Za-z0-9]{2,4})[\-_\\s]{0,3}\\[\\d+\\/\\d+\\][ -]{0,4}yEnc$/',
                     'status' => 1,
                     'description' => '//Re: Request  - 05 L. E. Modesitt - Princeps.mobi [5/7] -  yEnc',
                     'ordinal' => 145,
@@ -3673,7 +3673,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                 [
                     'id' => 407,
                     'group_regex' => '^alt\\.binaries\\.erotica$',
-                'regex' => '/\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][- ]\\[\\d+\\/\\d+\\] - "([\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+                'regex' => '/\\[#+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][ -]\\[\\d+\\/\\d+\\] - "([\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
                     'status' => 1,
                     'description' => '//[######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc',
                     'ordinal' => 5,
@@ -4249,7 +4249,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                             [
                                 'id' => 471,
                                 'group_regex' => '^alt\\.binaries\\.game$',
-                            'regex' => '/(\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-)\\[ (?P<match0>.+?) \\][- ]\\[\\d+\\/\\d+\\] - "(.+?)" yEnc$/',
+                            'regex' => '/(\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-)\\[ (?P<match0>.+?) \\][ -]\\[\\d+\\/\\d+\\] - "(.+?)" yEnc$/',
                                 'status' => 1,
                             'description' => '//[192474]-[MP3]-[a.b.inner-sanctumEFNET]-[ Newbie_Nerdz_-_I_Cant_Forget_that_Girl_EP-(IM005)-WEB-2012-YOU ] [17/17] - "newbie_nerdz_-_i_cant_forget_that_girl_ep-(im005)-web-2012-you.nfo" yEnc',
                                 'ordinal' => 5,
@@ -4294,7 +4294,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                             [
                                 'id' => 476,
                                 'group_regex' => '^alt\\.binaries\\.games$',
-                            'regex' => '/\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][- ]\\[\\d+\\/(\\d+\\])[\-_\\s]{0,3}("|#34;).+?/',
+                            'regex' => '/\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][ -]\\[\\d+\\/(\\d+\\])[\-_\\s]{0,3}("|#34;).+?/',
                                 'status' => 1,
                                 'description' => '//[162198]-[FULL]-[a.b.teevee]-[ MasterChef.Junior.S01E07.720p.HDTV.X264-DIMENSION ]-[09/54] - "masterchef.junior.107.720p-dimension.nfo" yEnc',
                                 'ordinal' => 25,
@@ -4501,7 +4501,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                                     [
                                         'id' => 499,
                                         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-                                    'regex' => '/(\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-)\\[ (?P<match0>.+?) \\][- ]\\[\\d+\\/\\d+\\] - "(.+?)" yEnc$/',
+                                    'regex' => '/(\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-)\\[ (?P<match0>.+?) \\][ -]\\[\\d+\\/\\d+\\] - "(.+?)" yEnc$/',
                                         'status' => 1,
                                         'description' => '//[142961]-[MP3]-[a.b.inner-sanctumEFNET]-[ Pascal_and_Pearce-Passport-CDJUST477-2CD-2011-1REAL ] [28/36] - "Pascal_and_Pearce-Passport-CDJUST477-2CD-2011-1REAL.par2" yEnc',
                                         'ordinal' => 5,
@@ -4665,7 +4665,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 517,
                 'group_regex' => '^alt\\.binaries\\.games\\.wii$',
-            'regex' => '/\\[[\\d#]+\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
+            'regex' => '/\\[[\\d#]+\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
                 'status' => 1,
                 'description' => '//[11614]-[#a.b.g.wii@efnet]-[ EA.Sports.Active.NFL.Training.Camp.USA.WII-ProCiSiON ]-[01/95] - "xxx-nflt.nfo" yEnc',
                 'ordinal' => 40,
@@ -4674,7 +4674,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             [
                 'id' => 518,
                 'group_regex' => '^alt\\.binaries\\.games\\.wii$',
-            'regex' => '/\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[(?P<match0>.+?)\\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
+            'regex' => '/\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[(?P<match0>.+?)\\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?" yEnc$/',
                 'status' => 1,
                 'description' => '//[8524]-[#a.b.g.wii@EFNet]-[FULL]-[Fantastic_Four_Rise_Of_The_Silver_Surfer_NTSC_Wii-VORTEX]-[001/104] - "vortex-ffrotss.wii.nfo" yEnc',
                 'ordinal' => 45,
@@ -5115,7 +5115,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                 [
                     'id' => 567,
                     'group_regex' => '^alt\\.binaries\\.hdtv$',
-                'regex' => '/^(?P<match0>.+?)[\-_\\s]{0,3}\\(?[Pp]ostet +by +\\(?Edition50\\)?[- ]{0,4}\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|").+yEnc$/',
+                'regex' => '/^(?P<match0>.+?)[\-_\\s]{0,3}\\(?[Pp]ostet +by +\\(?Edition50\\)?[ -]{0,4}\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|").+yEnc$/',
                     'status' => 1,
                 'description' => '//Elysium  (AVCHD)  2013  (720p)  Untouched  (Postet by Edition50)    [01/169] - "file.xyz" yEnc ::: //Frozen Ground  (AVCHD)  2013  (720p)  postet by Edition50 - [01/158] - "file.xyz" yEnc - [000/158] - "FROZEN GROUND  (AVCHD)  2013  (720p)  Untouched.nzb" yEnc ::: //Cabin in the Woods  (AVCHD)  2013  (720p)  Postet by (Edition50) [01/159] - "file.xyz" yEnc',
                     'ordinal' => 90,
@@ -5160,7 +5160,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                 [
                     'id' => 572,
                     'group_regex' => '^alt\\.binaries\\.hdtv\\.x264$',
-                'regex' => '/^[A-Z][a-zA-Z0-9 ]+ [- ] "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
+                'regex' => '/^[A-Z][a-zA-Z0-9 ]+ [ -] "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
                     'status' => 1,
                     'description' => '//Season of the Witch 2011 - "Season.of.the.Witch.2011.1080p.BluRay.DTS.x264-CyTSuNee.part005.rar" yEnc ::: //Film - "Alien Antology DC Special Edition 1979-1997 1080p GER HUN HighCode.part001.rar" yEnc ::: //Austex Memorandum   "Austex Memorandum 700877270640835.z17" yEnc',
                     'ordinal' => 20,
@@ -6078,7 +6078,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                     [
                         'id' => 674,
                         'group_regex' => '^alt\\.binaries\\.movies$',
-                    'regex' => '/^- Description - "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")([\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])[- ]{0,4}yEnc$/',
+                    'regex' => '/^- Description - "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")([\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])[ -]{0,4}yEnc$/',
                         'status' => 1,
                         'description' => '//- Description - "The.Legend.of.Hercules.2014.720p.BluRay.x264.Y',
                         'ordinal' => 50,
@@ -6150,7 +6150,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                     [
                         'id' => 682,
                         'group_regex' => '^alt\\.binaries\\.movies\\.divx$',
-                    'regex' => '/\\[#]+\\]-\\[.+\\]-\\[.+\\]-\\[(?P<match0>.+)\\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+" yEnc$/',
+                    'regex' => '/\\[#]+\\]-\\[.+\\]-\\[.+\\]-\\[(?P<match0>.+)\\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}".+" yEnc$/',
                         'status' => 1,
                         'description' => '//[######]-[FULL]-[#hdtv@LinkNet]-[Sesame.Street.S41E03.1080i.HDTV.DD5.1.MPEG2-TrollHD]-[00/51] - "Sesame Street S41E03 Chicken When It Comes to Thunderstorms 1080i HDTV DD5.1 MPEG2-TrollHD.nzb" yEnc',
                         'ordinal' => 25,
@@ -6708,7 +6708,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                             [
                                 'id' => 744,
                                 'group_regex' => '^alt\\.binaries\\.multimedia$',
-                            'regex' => '/\\[[#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>[\\w.,& \\()\\[\\]\\\'\\`-]{8,}?) \\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?/',
+                            'regex' => '/\\[[#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>[\\w.,& \\()\\[\\]\\\'\\`-]{8,}?) \\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?/',
                                 'status' => 1,
                                 'description' => '//[####]-[FULL]-[#a.b.teevee@EFNet]-[ Tosh.0.S02E14.720p.HDTV.x264-aAF ]-[10/21] - "aaf-tosh.0.s02e14.720p.r07" yEnc',
                                 'ordinal' => 10,
@@ -7104,7 +7104,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                             [
                                 'id' => 788,
                                 'group_regex' => '^alt\\.binaries\\.music$',
-                            'regex' => '/^\\[\\d+\\/\\d+\\] - "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[- ]{0,4}ShapterV yEnc$/',
+                            'regex' => '/^\\[\\d+\\/\\d+\\] - "(?P<match0>[\\w\\säöüÄÖÜß+¤¶!.,&_\\()\\[\\]\\\'\\`{}#-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[ -]{0,4}ShapterV yEnc$/',
                                 'status' => 1,
                             'description' => '//[1/8] - "Nightwish - Storytime (Retail-Single 2011).sfv" -  ShapterV yEnc',
                                 'ordinal' => 190,
@@ -7527,7 +7527,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                             [
                                 'id' => 835,
                                 'group_regex' => '^alt\\.binaries\\.sound\\.mp3$',
-                            'regex' => '/^\\[\\d+\\/\\d+\\][\-_\\s]{0,3}(\\()?(Album|Single) Top \\d+ ([- ]{0,2}\\d+)?(\\))? - "(\\[.+?\\] )?(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|") {1,4}yEnc$/i',
+                            'regex' => '/^\\[\\d+\\/\\d+\\][\-_\\s]{0,3}(\\()?(Album|Single) Top \\d+ ([ -]{0,2}\\d+)?(\\))? - "(\\[.+?\\] )?(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|") {1,4}yEnc$/i',
                                 'status' => 1,
                             'description' => '//[1/1] - (Album Top 100) - "[Dance] David Guetta - One Love (2010) .rar"  yEnc ::: //[1/1] - (Album Top 100) - "Aerosmith - Music From Another Dimension.rar"  yEnc ::: //[1/1] - Album Top 100 - "ACDC - Live At River Plate.rar"  yEnc ::: //[1/1] (Album Top 100 - 2012) - "Alicia Keys - Girl On Fire.rar"  yEnc ::: //[1/1] (Album Top 100 2012) - "Asaf Avidan And The Mojos - One Day.rar"  yEnc',
                                 'ordinal' => 45,
@@ -8643,7 +8643,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                                     [
                                         'id' => 959,
                                         'group_regex' => '^alt\\.binaries\\.teevee$',
-                                    'regex' => '/^\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][- ]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?/',
+                                    'regex' => '/^\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\]-\\[ (?P<match0>.+?) \\][ -]\\[\\d+\\/\\d+\\][\-_\\s]{0,3}("|#34;).+?/',
                                         'status' => 1,
                                         'description' => '//[84491]-[FULL]-[#a.b.teevee@EFNet]-[ Tennis.Australian.Open.2012.Mens.1st.Round.Lleyton.Hewitt.vs.Cedrik-Marcel.Stebe.720p.HDTV.x264-LMAO ]-[04/97] - "tennis.australian.open.2012.mens.1st.round.lleyton.hewitt.vs.cedrik-marcel.stebe.720p.hdtv.x264-lmao.r01',
                                         'ordinal' => 210,
@@ -9842,7 +9842,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
                 [
                     'id' => 1092,
                     'group_regex' => '^alt\\.binaries\\.worms$',
-                'regex' => '/^(\\[(Request|Repost)\\])?\\[Macguffin Proudly Presents\\][\-_\\s]{0,3}\\(\\d+\\/\\d+\\)[\-_\\s]{0,3}(?P<match0>.+?) MacGuffin[\-_\\s]{0,3}".+([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[- ]{0,4}\\d+[.,]\\d+ [kKmMgG][bB][\-_\\s]{0,3}yEnc$/i',
+                'regex' => '/^(\\[(Request|Repost)\\])?\\[Macguffin Proudly Presents\\][\-_\\s]{0,3}\\(\\d+\\/\\d+\\)[\-_\\s]{0,3}(?P<match0>.+?) MacGuffin[\-_\\s]{0,3}".+([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol.+?"|\\.[A-Za-z0-9]{2,4}"|")[ -]{0,4}\\d+[.,]\\d+ [kKmMgG][bB][\-_\\s]{0,3}yEnc$/i',
                     'status' => 1,
                 'description' => '//[Macguffin Proudly Presents] (33/75) -Reservoir Dogs 1992 720p BDRip AC3 x264 MacGuffin - "macguffin-redog720p.r30"  - 3.06 GB - yEnc ::: //[Request][MacGuffin Proudly Presents](056/229) - LOTR The Trilogy EXTENDED REPOST 720p BRRip AC3 x264 MacGuffin - "macguffin-tfotr720p.r53" - 18.54 GB - yEnc ::: //[REPOST][MacGuffin Proudly Presents](44/54) - Flight 2012 720p BRRip REPOST AC3 x264 MacGuffin - "macguffin-flit720p.rar" - 4.09 GB - yEnc',
                     'ordinal' => 25,
