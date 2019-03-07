@@ -20,6 +20,7 @@ use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
 use FFMpeg\Format\Video\Ogg;
+use Illuminate\Support\Carbon;
 use Mhor\MediaInfo\MediaInfo;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
@@ -1736,18 +1737,8 @@ class ProcessAdditional
 
                                 $newTitle = escapeString(substr($newName, 0, 255));
                                 // Update the search name.
-                                DB::update(
-                                    sprintf(
-                                            '
-											UPDATE releases
-											SET searchname = %s, categories_id = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
-											WHERE id = %d',
-                                            $newTitle,
-                                            $newCat['categories_id'],
-                                            $this->_release->id
-                                        )
-                                    );
-                                $release = Release::find($this->_release->id);
+                                $release = Release::whereId($this->_release->id);
+                                $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'],  'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
                                 $release->retag($newCat['tags']);
                                 $this->sphinx->updateRelease($this->_release->id);
 
@@ -2130,20 +2121,13 @@ class ProcessAdditional
         if ($this->_par2Info->error) {
             return;
         }
-
-        $releaseInfo = DB::selectOne(
-            sprintf(
-                '
-				SELECT UNIX_TIMESTAMP(postdate) AS postdate, proc_pp
-				FROM releases
-				WHERE id = %d',
-                $this->_release->id
-            )
-        );
+        $releaseInfo = Release::query()->where('id', $this->_release->id)->select(['postdate', 'proc_pp'])->first();
 
         if ($releaseInfo === null) {
             return;
         }
+
+        $postDate = Carbon::createFromFormat('Y-m-d H:i:s', $releaseInfo->postdate)->getTimestamp();
 
         // Only get a new name if the category is OTHER.
         $foundName = true;
@@ -2176,7 +2160,7 @@ class ProcessAdditional
                 ) {
 
                     // Try to add the files to the DB.
-                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $releaseInfo->postdate, 0, $file['hash_16K'])) {
+                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $postDate, 0, $file['hash_16K'])) {
                         $filesAdded++;
                     }
                 }
