@@ -632,30 +632,31 @@ class ProcessAdditional
      */
     protected function _fetchReleases($groupID, &$guidChar): void
     {
-        $this->_releases = DB::select(
-            sprintf(
-                '
-				SELECT r.id, r.id AS releases_id, r.guid, r.name, r.size, r.groups_id, r.nfostatus,
-					r.fromname, r.completion, r.categories_id, r.searchname, r.predb_id,
-					c.disablepreview
-				FROM releases r
-				LEFT JOIN categories c ON c.id = r.categories_id
-				WHERE r.nzbstatus = 1
-				%s %s %s %s
-				AND r.passwordstatus BETWEEN -6 AND -1
-				AND r.haspreview = -1
-				AND c.disablepreview = 0
-				ORDER BY r.passwordstatus ASC, r.postdate DESC
-				LIMIT %d',
-                $this->_maxSize,
-                $this->_minSize,
-                ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID),
-                ($guidChar === '' ? '' : 'AND r.leftguid = '.escapeString($guidChar)),
-                $this->_queryLimit
-            )
-        );
+        $releasesQuery = Release::query()
+            ->where('releases.nzbstatus', '=', 1)
+            ->whereBetween('releases.passwordstatus', [-6, -1])
+            ->where('releases.haspreview', '=', -1)
+            ->where('categories.disablepreview', '=', 0);
+        if ($this->_maxSize > 0) {
+            $releasesQuery->where('releases.size', '<', $this->_maxSize * 1073741824);
+        }
+        if ($this->_minSize > 0) {
+            $releasesQuery->where('releases.size', '>', $this->_minSize * 1048576);
+        }
+        if (! empty($groupID)) {
+            $releasesQuery->where('releases.groups_id', $groupID);
+        }
+        if (! empty($guidChar)) {
+            $releasesQuery->where('releases.leftguid', $guidChar);
+        }
+        $releasesQuery->select(['releases.id as releases_id', 'releases.guid', 'releases.name', 'releases.size', 'releases.groups_id', 'releases.nfostatus', 'releases.fromname', 'releases.completion', 'releases.categories_id', 'releases.searchname', 'releases.predb_id', 'categories.disablepreview'])
+            ->leftJoin('categories', 'categories.id', '=', 'releases.categories_id')
+            ->orderBy('releases.passwordstatus')
+            ->orderByDesc('releases.postdate')
+            ->limit($this->_queryLimit);
 
-        $this->_totalReleases = \count($this->_releases);
+        $this->_releases = $releasesQuery->get();
+        $this->_totalReleases = $this->_releases->count();
     }
 
     /**
