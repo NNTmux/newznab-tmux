@@ -1,4 +1,5 @@
 2019-03-07 DariusIII
+	* Fix: Add back missing $groupID in ProcessReleases class
 	* Chg: Fix ranges in collection and release naming regexes
 2019-03-06 DariusIII
 	* Chg: Replace couple of raw sql queries with query builder

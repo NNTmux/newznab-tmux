@@ -190,14 +190,14 @@ class ProcessReleases
 
         $totalReleasesAdded = 0;
         do {
-            $releasesCount = $this->createReleases();
+            $releasesCount = $this->createReleases($groupID);
             $totalReleasesAdded += $releasesCount['added'];
 
-            $nzbFilesAdded = $this->createNZBs();
+            $nzbFilesAdded = $this->createNZBs($groupID);
 
             $this->categorizeReleases($categorize, $groupID);
             $this->postProcessReleases($postProcess, $nntp);
-            $this->deleteCollections();
+            $this->deleteCollections($groupID);
 
             // This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
         } while (
