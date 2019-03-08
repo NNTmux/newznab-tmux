@@ -1,3 +1,5 @@
+2019-03-08 DariusIII
+	* Chg: Start replacing raw SQL queries with query builder in ProcessReleases class
 2019-03-07 DariusIII
 	* Chg: Update vlucas/phpdotenv (v3.3.2 => v3.3.3)
 	* Chg: Use query builder in PPA class _fetchReleases function

@@ -14,6 +14,7 @@ use Blacklight\Releases;
 use App\Models\Collection;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
@@ -287,7 +288,7 @@ class ProcessReleases
 
         $where = (! empty($groupID) ? ' AND c.groups_id = '.$groupID.' ' : ' ');
 
-        $this->processStuckCollections($where);
+        $this->processStuckCollections($groupID);
         $this->collectionFileCheckStage1($where);
         $this->collectionFileCheckStage2($where);
         $this->collectionFileCheckStage3($where);
@@ -408,22 +409,21 @@ class ProcessReleases
                     $minFilesDeleted,
                     $startTime
                 ) {
-                    $deleteQuery = DB::delete(sprintf('
-						DELETE c FROM collections c
-						WHERE c.filecheck = %d
-						AND c.filesize > 0
-						AND GREATEST(%d, %d) > 0
-						AND c.filesize < GREATEST(%d, %d)', self::COLLFC_SIZED, $groupMinSizeSetting, $minSizeSetting, $groupMinSizeSetting, $minSizeSetting));
+                    $deleteQuery = Collection::query()
+                        ->where('filecheck', self::COLLFC_SIZED)
+                        ->where('filesize', '>', 0)
+                        ->whereRaw('GREATEST(?, ?) > 0 AND filesize < GREATEST(?, ?)', [$groupMinSizeSetting, $minSizeSetting, $groupMinSizeSetting, $minSizeSetting])
+                        ->delete();
 
                     if ($deleteQuery > 0) {
                         $minSizeDeleted += $deleteQuery;
                     }
 
                     if ($maxSizeSetting > 0) {
-                        $deleteQuery = DB::delete(sprintf('
-							DELETE c FROM collections c
-							WHERE c.filecheck = %d
-							AND c.filesize > %d', self::COLLFC_SIZED, $maxSizeSetting));
+                        $deleteQuery = Collection::query()
+                            ->where('filecheck', '=', self::COLLFC_SIZED)
+                            ->where('filesize', '>', $maxSizeSetting)
+                            ->delete();
 
                         if ($deleteQuery > 0) {
                             $maxSizeDeleted += $deleteQuery;
@@ -431,11 +431,11 @@ class ProcessReleases
                     }
 
                     if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
-                        $deleteQuery = DB::delete(sprintf('
-						DELETE c FROM collections c
-						WHERE c.filecheck = %d
-						AND GREATEST(%d, %d) > 0
-						AND c.totalfiles < GREATEST(%d, %d)', self::COLLFC_SIZED, $groupMinFilesSetting, $minFilesSetting, $groupMinFilesSetting, $minFilesSetting));
+                        $deleteQuery = Collection::query()
+                            ->where('filecheck', self::COLLFC_SIZED)
+                            ->where('filesize', '>', 0)
+                            ->whereRaw('GREATEST(?, ?) > 0 AND totalfiles < GREATEST(?, ?)', [$groupMinFilesSetting, $minFilesSetting, $groupMinFilesSetting, $minFilesSetting])
+                            ->delete();
 
                         if ($deleteQuery > 0) {
                             $minFilesDeleted += $deleteQuery;
@@ -468,23 +468,17 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->header('Process Releases -> Create releases from complete collections.');
         }
-
-        $collections = DB::select(
-            sprintf(
-                '
-				SELECT SQL_NO_CACHE c.*, g.name AS gname
-				FROM collections c
-				INNER JOIN usenet_groups g ON c.groups_id = g.id
-				WHERE %s c.filecheck = %d
-				AND c.filesize > 0
-				LIMIT %d',
-                (! empty($groupID) ? ' c.groups_id = '.$groupID.' AND ' : ' '),
-                self::COLLFC_SIZED,
-                $this->releaseCreationLimit
-            )
-        );
-
-        if ($this->echoCLI && \count($collections) > 0) {
+        $collectionsQuery = Collection::query()
+            ->where('collections.filecheck', self::COLLFC_SIZED)
+            ->where('collections.filesize', '>', 0);
+        if (! empty($groupID)) {
+            $collectionsQuery->where('collections.groups_id', $groupID);
+        }
+        $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
+            ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
+            ->limit($this->releaseCreationLimit);
+        $collections = $collectionsQuery->get();
+        if ($this->echoCLI && $collections->count() > 0) {
             $this->colorCli->primary(\count($collections).' Collections ready to be converted to releases.', true);
         }
 
@@ -1417,30 +1411,23 @@ class ProcessReleases
     /**
      * If a collection has been stuck for $this->collectionTimeout hours, delete it, it's bad.
      *
-     * @param string $where
+     * @param int $groupID
      *
      * @void
      * @throws \Exception
      * @throws \Throwable
      */
-    private function processStuckCollections($where): void
+    private function processStuckCollections($groupID): void
     {
         $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 
-        DB::transaction(function () use ($where, $lastRun) {
-            $obj = DB::delete(
-                sprintf(
-                    '
-                DELETE c FROM collections c
-                WHERE
-                    c.added <
-                    DATE_SUB(%s, INTERVAL %d HOUR)
-                %s',
-                    escapeString($lastRun),
-                    $this->collectionTimeout,
-                    $where
-                )
-            );
+        DB::transaction(function () use ($groupID, $lastRun) {
+            $objQuery = Collection::query()
+                ->where('added', '<', Carbon::createFromFormat('Y-m-d H:i:s', $lastRun)->subHours($this->collectionTimeout));
+            if (! empty($groupID)) {
+                $objQuery->where('groups_id', $groupID);
+            }
+            $obj = $objQuery->delete();
             if ($this->echoCLI && $obj > 0) {
                 $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.', true);
             }
