@@ -1188,7 +1188,7 @@ class ProcessReleases
     private function collectionFileCheckStage1($groupID): void
     {
         DB::transaction(function () use ($groupID) {
-            $collectionsCheck = Collection::query()->select('collections.id')
+            $collectionsCheck = Collection::query()->select(['collections.id'])
                 ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
                 ->where('collections.totalfiles', '>', 0)
                 ->where('collections.filecheck', '=', self::COLLFC_DEFAULT);
@@ -1220,7 +1220,7 @@ class ProcessReleases
     private function collectionFileCheckStage2($groupID): void
     {
         DB::transaction(function () use ($groupID) {
-            $collectionsCheck = Collection::query()->select('collections.id')
+            $collectionsCheck = Collection::query()->select(['collections.id'])
                 ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
                 ->where('binaries.filenumber', '=', 0)
                 ->where('collections.totalfiles', '>', 0)
