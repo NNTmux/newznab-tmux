@@ -14,6 +14,7 @@ use Blacklight\Releases;
 use App\Models\Collection;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
@@ -290,7 +291,7 @@ class ProcessReleases
 
         $this->processStuckCollections($groupID);
         $this->collectionFileCheckStage1($where);
-        $this->collectionFileCheckStage2($where);
+        $this->collectionFileCheckStage2($groupID);
         $this->collectionFileCheckStage3($where);
         $this->collectionFileCheckStage4($where);
         $this->collectionFileCheckStage5($where);
@@ -720,7 +721,9 @@ class ProcessReleases
                 break;
         }
         $this->categorizeRelease(
-            $type, $groupID);
+            $type,
+            $groupID
+        );
 
         $totalTime = now()->diffInSeconds($startTime);
 
@@ -1149,7 +1152,7 @@ class ProcessReleases
                 number_format($miscHashedDeleted).
                 ' from misc->hashed'.
                 (
-                $this->completion > 0
+                    $this->completion > 0
                     ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
                     : '.'
                 ),
@@ -1217,48 +1220,35 @@ class ProcessReleases
      * at 0 then you would never get a complete collection if it starts with 1 and if it starts, you can end up creating
      * a incomplete collection, since you assumed it was complete.
      *
-     * @param string $where
+     * @param int $groupID
      *
      * @void
      * @throws \Throwable
      */
-    private function collectionFileCheckStage2(&$where): void
+    private function collectionFileCheckStage2($groupID): void
     {
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				INNER JOIN
-				(
-					SELECT c.id
-					FROM collections c
-					INNER JOIN binaries b ON b.collections_id = c.id
-					WHERE b.filenumber = 0
-					AND c.totalfiles > 0
-					AND c.filecheck = %d %s
-					GROUP BY c.id
-				) r ON c.id = r.id
-				SET c.filecheck = %d',
-                    self::COLLFC_COMPCOLL,
-                    $where,
-                    self::COLLFC_ZEROPART
-                )
-            );
+        DB::transaction(function () use ($groupID) {
+            $collectionsCheck = Collection::query()->select('collections.id')
+                ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
+                ->where('binaries.filenumber', '=', 0)
+                ->where('collections.totalfiles', '>', 0)
+                ->where('collections.filecheck', '=', self::COLLFC_COMPCOLL);
+            if (! empty($groupID)) {
+                $collectionsCheck->where('collections.groups_id', $groupID);
+            }
+            $collectionsCheck->groupBy('collections.id');
+
+            Collection::query()->joinSub($collectionsCheck, 'r', function ($join) {
+                $join->on('collections.id', '=', 'r.id');
+            })->update(['collections.filecheck' => self::COLLFC_ZEROPART]);
         }, 10);
 
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				SET filecheck = %d
-				WHERE filecheck = %d %s',
-                    self::COLLFC_TEMPCOMP,
-                    self::COLLFC_COMPCOLL,
-                    $where
-                )
-            );
+        DB::transaction(function () use ($groupID) {
+            $collectionQuery = Collection::query()->where('filecheck', '=', self::COLLFC_COMPCOLL);
+            if (! empty($groupID)) {
+                $collectionQuery->where('groups_id', $groupID);
+            }
+            $collectionQuery->update(['filecheck' => self::COLLFC_TEMPCOMP]);
         }, 10);
     }
 
