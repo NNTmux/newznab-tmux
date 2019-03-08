@@ -1180,34 +1180,27 @@ class ProcessReleases
      * This means the the binary table has the same count as the file count in the subject, but
      * the collection might not be complete yet since we might not have all the articles in the parts table.
      *
-     * @param string $where
+     * @param int $groupID
      *
      * @void
      * @throws \Throwable
      */
-    private function collectionFileCheckStage1(&$where): void
+    private function collectionFileCheckStage1($groupID): void
     {
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				INNER JOIN
-				(
-					SELECT c.id
-					FROM collections c
-					INNER JOIN binaries b ON b.collections_id = c.id
-					WHERE c.totalfiles > 0
-					AND c.filecheck = %d %s
-					GROUP BY b.collections_id, c.totalfiles, c.id
-					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
-				) r ON c.id = r.id
-				SET filecheck = %d',
-                    self::COLLFC_DEFAULT,
-                    $where,
-                    self::COLLFC_COMPCOLL
-                )
-            );
+        DB::transaction(function () use ($groupID) {
+            $collectionsCheck = Collection::query()->select('collections.id')
+                ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
+                ->where('collections.totalfiles', '>', 0)
+                ->where('collections.filecheck', '=', self::COLLFC_DEFAULT);
+            if (! empty($groupID)) {
+                $collectionsCheck->where('collections.groups_id', $groupID);
+            }
+            $collectionsCheck->groupBy('binaries.collections_id', 'collections.totalfiles', 'collections.id')
+                ->havingRaw('COUNT(binaries.id) IN (collections.totalfiles, collections.totalfiles+1)');
+
+            Collection::query()->joinSub($collectionsCheck, 'r', function ($join) {
+                $join->on('collections.id', '=', 'r.id');
+            })->update(['collections.filecheck' => self::COLLFC_COMPCOLL]);
         }, 10);
     }
 

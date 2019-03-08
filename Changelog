@@ -1,5 +1,6 @@
 2019-03-08 DariusIII
-	* Chg: Replace raw queries in collectionFileCheckStage2 function with query builder counterparts
+	* Chg: Replace raw queries in collectionFileCheckStage1 function with query builder counterpart
+	* Chg: Replace raw queries in collectionFileCheckStage2 function with query builder counterpart
 	* Chg: Start replacing raw SQL queries with query builder in ProcessReleases class
 2019-03-07 DariusIII
 	* Chg: Update vlucas/phpdotenv (v3.3.2 => v3.3.3)
