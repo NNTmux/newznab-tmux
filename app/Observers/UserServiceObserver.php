@@ -4,6 +4,9 @@ namespace App\Observers;
 
 use App\Models\User;
 use App\Jobs\SendWelcomeEmail;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Jobs\SendNewRegisteredAccountMail;
@@ -21,13 +24,24 @@ class UserServiceObserver
      */
     public function created(User $user)
     {
-        $roleName = Role::query()->where('id', $user->roles_id)->value('name');
+        $roleData = Role::query()->where('id', $user->roles_id);
+        $rateLimit = $roleData->value('rate_limit');
+        $roleName = $roleData->value('name');
         $user->assignRole($roleName);
-        SendNewRegisteredAccountMail::dispatch($user);
-        SendWelcomeEmail::dispatch($user);
-        UserVerification::generate($user);
+        $user->update(
+            [
+                'api_token' => md5(Password::getRepository()->createNewToken()),
+                'userseed' => md5(Str::uuid()->toString()),
+                'rate_limit' => $rateLimit,
+            ]
+        );
+        if (File::isFile(base_path().'/_install/install.lock')) {
+            SendNewRegisteredAccountMail::dispatch($user);
+            SendWelcomeEmail::dispatch($user);
+            UserVerification::generate($user);
 
-        UserVerification::send($user, 'User email verification required');
+            UserVerification::send($user, 'User email verification required');
+        }
     }
 
     /**

@@ -1,4 +1,5 @@
 2019-03-08 DariusIII
+	* Fux: Add check if _install/install.lock exists before sending registration related emails. Fixes issue #928
 	* Chg: Replace raw queries in collectionFileCheckStage1 function with query builder counterpart
 	* Chg: Replace raw queries in collectionFileCheckStage2 function with query builder counterpart
 	* Chg: Start replacing raw SQL queries with query builder in ProcessReleases class
