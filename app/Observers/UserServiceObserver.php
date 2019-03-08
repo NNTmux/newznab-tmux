@@ -3,12 +3,12 @@
 namespace App\Observers;
 
 use App\Models\User;
-use App\Jobs\SendWelcomeEmail;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use App\Jobs\SendWelcomeEmail;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\File;
 use App\Jobs\SendAccountDeletedEmail;
+use Illuminate\Support\Facades\Password;
 use App\Jobs\SendNewRegisteredAccountMail;
 use Jrean\UserVerification\Facades\UserVerification;
 
