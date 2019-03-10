@@ -1,4 +1,5 @@
 2019-03-10 DariusIII
+	* Chg: Use query builder in collectionFileCheckStage5
 	* Chg: Update swiftmailer/swiftmailer (v6.1.3 => v6.2.0)
 2019-03-08 DariusIII
 	* Fux: Add check if _install/install.lock exists before sending registration related emails. Fixes issue #928

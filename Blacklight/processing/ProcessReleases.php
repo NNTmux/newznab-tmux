@@ -293,7 +293,7 @@ class ProcessReleases
         $this->collectionFileCheckStage2($groupID);
         $this->collectionFileCheckStage3($where);
         $this->collectionFileCheckStage4($where);
-        $this->collectionFileCheckStage5($where);
+        $this->collectionFileCheckStage5($groupID);
         $this->collectionFileCheckStage6($where);
 
         if ($this->echoCLI) {
@@ -393,11 +393,7 @@ class ProcessReleases
                 }
             }
 
-            if (DB::selectOne(sprintf('
-						SELECT SQL_NO_CACHE id
-						FROM collections c
-						WHERE c.filecheck = %d
-						AND c.filesize > 0', self::COLLFC_SIZED)) !== null) {
+            if (Collection::query()->where('filecheck', self::COLLFC_SIZED)->where('filesize', '>', 0)->first() !== null) {
                 DB::transaction(function () use (
                     $groupMinSizeSetting,
                     $minSizeSetting,
@@ -1339,26 +1335,19 @@ class ProcessReleases
      * If not all files (binaries table) had their parts on the previous stage,
      * reset the collection filecheck column to COLLFC_COMPCOLL so we reprocess them next time.
      *
-     * @param string $where
+     * @param int $groupId
      *
      * @void
      * @throws \Throwable
      */
-    private function collectionFileCheckStage5(&$where): void
+    private function collectionFileCheckStage5($groupId): void
     {
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				SET filecheck = %d
-				WHERE filecheck IN (%d, %d) %s',
-                    self::COLLFC_COMPCOLL,
-                    self::COLLFC_TEMPCOMP,
-                    self::COLLFC_ZEROPART,
-                    $where
-                )
-            );
+        DB::transaction(function () use ($groupId) {
+            $collectionQuery = Collection::query()->whereIn('filecheck', [self::COLLFC_TEMPCOMP, self::COLLFC_ZEROPART]);
+            if (! empty($groupId)) {
+                $collectionQuery->where('groups_id', $groupId);
+            }
+            $collectionQuery->update('filecheck', '=', self::COLLFC_COMPCOLL);
         }, 10);
     }
 
