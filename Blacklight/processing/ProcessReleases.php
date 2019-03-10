@@ -1347,7 +1347,7 @@ class ProcessReleases
             if (! empty($groupId)) {
                 $collectionQuery->where('groups_id', $groupId);
             }
-            $collectionQuery->update('filecheck', '=', self::COLLFC_COMPCOLL);
+            $collectionQuery->update(['filecheck' => self::COLLFC_COMPCOLL]);
         }, 10);
     }
 
