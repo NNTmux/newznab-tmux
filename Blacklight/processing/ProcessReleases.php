@@ -329,24 +329,14 @@ class ProcessReleases
         }
         // Get the total size in bytes of the collection for collections where filecheck = 2.
         DB::transaction(function () use ($groupId, $startTime) {
-            $checked = DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				SET c.filesize =
-				(
-					SELECT COALESCE(SUM(b.partsize), 0)
-					FROM binaries b
-					WHERE b.collections_id = c.id
-				),
-				c.filecheck = %d
-				WHERE c.filecheck = %d
-				AND c.filesize = 0 %s',
-                    self::COLLFC_SIZED,
-                    self::COLLFC_COMPPART,
-                    (! empty($groupId) ? ' AND c.groups_id = '.$groupId : ' ')
-                )
-            );
+            $checkedQuery = Collection::query()
+                ->select([DB::raw('COALESCE(SUM(binaries.partsize), 0) FROM binaries WHERE binaries.collections_id = collections.id as binpartsize')])
+                ->where('collections.filecheck', '=', self::COLLFC_COMPPART)
+                ->where('collections.filesize', '=', 0);
+            if (! empty($groupId)) {
+                $checkedQuery->where('collections.groups_id', $groupId);
+            }
+            $checked = $checkedQuery->update(['collections.filesize' => 'binpartsize', 'collections.filecheck' => self::COLLFC_SIZED]);
             if ($checked > 0 && $this->echoCLI) {
                 $this->colorCli->primary(
                     $checked.' collections set to filecheck = 3(size calculated)',
