@@ -2,10 +2,10 @@
 
 namespace Blacklight\processing;
 
-use App\Models\Binary;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
+use App\Models\Binary;
 use Blacklight\Genres;
 use App\Models\Release;
 use App\Models\Category;
@@ -15,7 +15,6 @@ use Blacklight\Releases;
 use App\Models\Collection;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
@@ -1297,10 +1296,9 @@ class ProcessReleases
     private function collectionFileCheckStage4($groupId): void
     {
         DB::transaction(function () use ($groupId) {
-
             $collectionsCheck = Collection::query()->select(['collections.id'])->join('binaries', 'binaries.collections_id', '=', 'collections.id')->where('binaries.partcheck', '=', 1)->whereIn('collections.filecheck', [
                     self::COLLFC_TEMPCOMP,
-                    self::COLLFC_ZEROPART
+                    self::COLLFC_ZEROPART,
                 ]);
             if (! empty($groupId)) {
                 $collectionsCheck->where('collections.groups_id', $groupId);
