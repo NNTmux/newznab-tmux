@@ -2,7 +2,6 @@
 
 namespace Blacklight\processing;
 
-use App\Models\MusicInfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
@@ -12,6 +11,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
+use App\Models\MusicInfo;
 use App\Models\Collection;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
@@ -863,7 +863,7 @@ class ProcessReleases
         $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
-            $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 AND releases.size < greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?)', [$minSizeSetting,$minSizeSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->select(['releases.id', 'releases.guid'])->get();
+            $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 AND releases.size < greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?)', [$minSizeSetting, $minSizeSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->select(['releases.id', 'releases.guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $minSizeDeleted++;
