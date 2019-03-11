@@ -2,6 +2,7 @@
 
 namespace Blacklight\processing;
 
+use App\Models\MusicInfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
@@ -862,57 +863,21 @@ class ProcessReleases
         $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    '
-					SELECT SQL_NO_CACHE r.guid, r.id
-					FROM releases r
-					INNER JOIN usenet_groups g ON g.id = r.groups_id
-					WHERE r.groups_id = %d
-					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
-					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)',
-                    $grpID['id'],
-                    $minSizeSetting,
-                    $minSizeSetting
-                )
-            );
+            $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 AND releases.size < greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?)', [$minSizeSetting,$minSizeSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->select(['releases.id', 'releases.guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $minSizeDeleted++;
             }
 
             if ($maxSizeSetting > 0) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                        '
-						SELECT SQL_NO_CACHE id, guid
-						FROM releases
-						WHERE groups_id = %d
-						AND size > %d',
-                        $grpID['id'],
-                        $maxSizeSetting
-                    )
-                );
+                $releases = Release::query()->where('groups_id', $grpID['id'])->where('size', '>', $maxSizeSetting)->select(['id', 'guid'])->get();
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $maxSizeDeleted++;
                 }
             }
             if ($minFilesSetting > 0) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                        '
-				SELECT SQL_NO_CACHE r.id, r.guid
-				FROM releases r
-				INNER JOIN usenet_groups g ON g.id = r.groups_id
-				WHERE r.groups_id = %d
-				AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
-				AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
-                        $grpID['id'],
-                        $minFilesSetting,
-                        $minFilesSetting
-                    )
-                );
+                $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minfilestoformrelease, 0), ?) > 0 AND releases.totalpart < greatest(IFNULL(usenet_groups.minfilestoformrelease, 0), ?)', [$minFilesSetting, $minFilesSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->get();
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $minFilesDeleted++;
@@ -955,12 +920,7 @@ class ProcessReleases
 
         // Releases past retention.
         if ((int) Settings::settingValue('..releaseretentiondays') !== 0) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-                    (int) Settings::settingValue('..releaseretentiondays')
-                )
-            );
+            $releases = Release::query()->where('postdate', '<', now()->subDays((int) Settings::settingValue('..releaseretentiondays')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $retentionDeleted++;
@@ -969,12 +929,7 @@ class ProcessReleases
 
         // Passworded releases.
         if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE passwordstatus = %d',
-                    Releases::PASSWD_RAR
-                )
-            );
+            $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_RAR)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $passwordDeleted++;
@@ -983,12 +938,7 @@ class ProcessReleases
 
         // Possibly passworded releases.
         if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE passwordstatus = %d',
-                    Releases::PASSWD_POTENTIAL
-                )
-            );
+            $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_POTENTIAL)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $passwordDeleted++;
@@ -997,12 +947,7 @@ class ProcessReleases
 
         if ((int) $this->crossPostTime !== 0) {
             // Crossposted releases.
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
-                    $this->crossPostTime
-                )
-            );
+            $releases = Release::query()->where('adddate', '>', now()->subHours($this->crossPostTime))->havingRaw('COUNT(name) > 1')->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $duplicateDeleted++;
@@ -1010,9 +955,7 @@ class ProcessReleases
         }
 
         if ($this->completion > 0) {
-            $releases = Release::fromQuery(
-                sprintf('SELECT id, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
-            );
+            $releases = Release::query()->where('completion', '<', $this->completion)->where('completion', '>', 0)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $completionDeleted++;
@@ -1023,9 +966,7 @@ class ProcessReleases
         $disabledCategories = Category::getDisabledIDs();
         if (\count($disabledCategories) > 0) {
             foreach ($disabledCategories as $disabledCategory) {
-                $releases = Release::fromQuery(
-                    sprintf('SELECT id, guid FROM releases WHERE categories_id = %d', (int) $disabledCategory['id'])
-                );
+                $releases = Release::query()->where('categories_id', (int) $disabledCategory['id'])->select(['id', 'guid'])->get();
                 foreach ($releases as $release) {
                     $disabledCategoryDeleted++;
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
@@ -1045,18 +986,7 @@ class ProcessReleases
 
         foreach ($categories as $category) {
             if ((int) $category->minsize > 0) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                        '
-							SELECT id, guid
-							FROM releases
-							WHERE categories_id = %d
-							AND size < %d
-							LIMIT 1000',
-                        (int) $category->id,
-                        (int) $category->minsize
-                    )
-                );
+                $releases = Release::query()->where('categories_id', (int) $category->id)->where('size', '<', (int) $category->minsize)->select(['id', 'guid'])->limit(1000)->get();
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $categoryMinSizeDeleted++;
@@ -1068,20 +998,13 @@ class ProcessReleases
         $genrelist = $genres->getDisabledIDs();
         if (\count($genrelist) > 0) {
             foreach ($genrelist as $genre) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                        '
-						SELECT id, guid
-						FROM releases r
-						INNER JOIN
-						(
-							SELECT id AS mid
-							FROM musicinfo
-							WHERE musicinfo.genre_id = %d
-						) mi ON musicinfo_id = mi.mid',
-                        (int) $genre['id']
-                    )
-                );
+                $musicInfoQuery = MusicInfo::query()->where('genre_id', (int) $genre['id'])->select(['id']);
+                $releases = Release::query()
+                    ->joinSub($musicInfoQuery, 'mi', function ($join) {
+                        $join->on('releases.musicinfo_id', '=', 'mi.id');
+                    })
+                    ->select(['releases.id', 'releases.guid'])
+                    ->get();
                 foreach ($releases as $release) {
                     $disabledGenreDeleted++;
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
@@ -1091,17 +1014,7 @@ class ProcessReleases
 
         // Misc other.
         if (Settings::settingValue('..miscotherretentionhours') > 0) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    '
-					SELECT SQL_NO_CACHE id, guid
-					FROM releases
-					WHERE categories_id = %d
-					AND adddate <= NOW() - INTERVAL %d HOUR',
-                    Category::OTHER_MISC,
-                    (int) Settings::settingValue('..miscotherretentionhours')
-                )
-            );
+            $releases = Release::query()->where('categories_id', Category::OTHER_MISC)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('..miscotherretentionhours')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $miscRetentionDeleted++;
@@ -1110,17 +1023,7 @@ class ProcessReleases
 
         // Misc hashed.
         if ((int) Settings::settingValue('..mischashedretentionhours') > 0) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    '
-					SELECT SQL_NO_CACHE id, guid
-					FROM releases
-					WHERE categories_id = %d
-					AND adddate <= NOW() - INTERVAL %d HOUR',
-                    Category::OTHER_HASHED,
-                    (int) Settings::settingValue('..mischashedretentionhours')
-                )
-            );
+            $releases = Release::query()->where('categories_id', Category::OTHER_HASHED)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('..mischashedretentionhours')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $miscHashedDeleted++;
@@ -1147,7 +1050,7 @@ class ProcessReleases
                 number_format($miscHashedDeleted).
                 ' from misc->hashed'.
                 (
-                $this->completion > 0
+                    $this->completion > 0
                     ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
                     : '.'
                 ),
