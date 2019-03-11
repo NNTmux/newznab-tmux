@@ -41,6 +41,7 @@
         "multiselect": "^0.9.12",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
+        "npm-check-updates": "^3.0.4",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0-beta.2",
         "tinymce": "^5.0.2"

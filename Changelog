@@ -1,4 +1,5 @@
 2019-03-11 DariusIII
+	* Chg: Update package.json
 	* Chg: Update last used raw query to query builder in ProcessReleases
 	* Chg: Use query builder in all collectionFileChackStage functions
 2019-03-10 DariusIII
