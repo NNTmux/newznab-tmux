@@ -15,17 +15,6 @@ class CategoriesTableSeeder extends Seeder
         \DB::table('categories')->delete();
 
         \DB::table('categories')->insert([
-            0 =>
-            [
-                'id' => 1,
-                'title' => 'Other',
-                'parentid' => null,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
             1 =>
             [
                 'id' => 10,
@@ -42,17 +31,6 @@ class CategoriesTableSeeder extends Seeder
                 'id' => 20,
                 'title' => 'Hashed',
                 'parentid' => 1,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            3 =>
-            [
-                'id' => 1000,
-                'title' => 'Console',
-                'parentid' => null,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -213,17 +191,6 @@ class CategoriesTableSeeder extends Seeder
                 'minsizetoformrelease' => 0,
                 'maxsizetoformrelease' => 0,
             ],
-            18 =>
-            [
-                'id' => 2000,
-                'title' => 'Movies',
-                'parentid' => null,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
             19 =>
             [
                 'id' => 2010,
@@ -323,17 +290,6 @@ class CategoriesTableSeeder extends Seeder
                 'minsizetoformrelease' => 0,
                 'maxsizetoformrelease' => 0,
             ],
-            28 =>
-            [
-                'id' => 3000,
-                'title' => 'Audio',
-                'parentid' => null,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
             29 =>
             [
                 'id' => 3010,
@@ -394,17 +350,6 @@ class CategoriesTableSeeder extends Seeder
                 'id' => 3999,
                 'title' => 'Other',
                 'parentid' => 3000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            35 =>
-            [
-                'id' => 4000,
-                'title' => 'PC',
-                'parentid' => null,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -482,17 +427,6 @@ class CategoriesTableSeeder extends Seeder
                 'id' => 4999,
                 'title' => 'Phone-Other',
                 'parentid' => 4000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            43 =>
-            [
-                'id' => 5000,
-                'title' => 'TV',
-                'parentid' => null,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -592,17 +526,6 @@ class CategoriesTableSeeder extends Seeder
                 'id' => 5999,
                 'title' => 'Other',
                 'parentid' => 5000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            53 =>
-            [
-                'id' => 6000,
-                'title' => 'XXX',
-                'parentid' => null,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -735,17 +658,6 @@ class CategoriesTableSeeder extends Seeder
                 'id' => 6999,
                 'title' => 'Other',
                 'parentid' => 6000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            66 =>
-            [
-                'id' => 7000,
-                'title' => 'Books',
-                'parentid' => null,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
