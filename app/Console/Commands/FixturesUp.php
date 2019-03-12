@@ -12,6 +12,7 @@ class FixturesUp extends Command
      */
     private static $allowedTables = [
       'binaryblacklist',
+      'root_categories',
       'categories',
       'category_regexes',
       'collection_regexes',
@@ -36,6 +37,7 @@ class FixturesUp extends Command
     Tables that are supported are :
     no argument <= Populates all the tables listed below
     binaryblacklist
+    root_categories
     categories
     category_regexes
     collection_regexes

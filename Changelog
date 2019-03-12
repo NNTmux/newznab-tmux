@@ -1,4 +1,5 @@
 2019-03-12 DariusIII
+	* Chg: Update fixtures and fix migration files
 	* Chg: Add more migrations and changes to categories tables
 2019-03-11 DariusIII
 	* Chg: Use query builder in more functions of ProcessReleases class
