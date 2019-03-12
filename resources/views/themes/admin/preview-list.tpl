@@ -7,7 +7,7 @@
 			{foreach from=$catlist item=parentcat}
 				<option {if $previewcat==$parentcat.id}selected="selected"{/if} class="grouping"
 						value="{$parentcat.id}">{$parentcat.title}</option>
-				{foreach $parentcat.subcatlist as $subcat}
+				{foreach $parentcat.categories as $subcat}
 					<option {if $previewcat==$subcat.id}selected="selected"{/if} value="{$subcat.id}">
 						&nbsp;&nbsp;{$subcat.title}</option>
 				{/foreach}
