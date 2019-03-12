@@ -521,6 +521,7 @@ class Category extends Model
                 unset($ret[$key]);
             }
         }
+
         return $ret;
     }
 
@@ -548,7 +549,7 @@ class Category extends Model
             $temp_array[-1] = '--Please Select--';
         }
         foreach ($categories as $category) {
-            $temp_array[$category->id] = $category->parent->title. ' > '.$category->title;
+            $temp_array[$category->id] = $category->parent->title.' > '.$category->title;
         }
 
         return $temp_array;

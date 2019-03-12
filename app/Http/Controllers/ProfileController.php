@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
-use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use Illuminate\Support\Arr;
