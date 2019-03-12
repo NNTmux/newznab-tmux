@@ -86,7 +86,7 @@ class Releases extends Release
 				ORDER BY %s %s %s
 			) r
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
@@ -263,7 +263,7 @@ class Releases extends Release
             ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'r.groups_id');
 
         if ($groupID !== '') {
@@ -398,7 +398,7 @@ class Releases extends Release
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN categories cp ON cp.id = c.parentid
+				LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE %s %s
 				AND r.nzbstatus = %d
@@ -658,7 +658,7 @@ class Releases extends Release
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
@@ -741,7 +741,7 @@ class Releases extends Release
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
@@ -889,7 +889,7 @@ class Releases extends Release
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
@@ -1030,7 +1030,7 @@ class Releases extends Release
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
@@ -1102,7 +1102,7 @@ class Releases extends Release
 				re.releases_id AS reid
 			FROM releases r
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
@@ -1182,7 +1182,7 @@ class Releases extends Release
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),

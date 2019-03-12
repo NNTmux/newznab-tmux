@@ -453,7 +453,7 @@ class Release extends Model
                 ]
             )
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->orderByDesc('releases.postdate')
             ->paginate(config('nntmux.items_per_page'));
     }
@@ -499,7 +499,7 @@ class Release extends Model
             )
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->leftJoin('videos as v', 'v.id', '=', 'releases.videos_id')
             ->leftJoin('tv_info as tvi', 'tvi.videos_id', '=', 'releases.videos_id')
             ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'releases.tv_episodes_id')
@@ -532,7 +532,7 @@ class Release extends Model
             ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', 'cp.title as parent_category', 'c.title as sub_category', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
             ->rightJoin('dnzb_failures', 'dnzb_failures.release_id', '=', 'releases.id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->orderBy('postdate', 'desc');
 
         return $failedList->paginate(config('nntmux.items_per_page'));
