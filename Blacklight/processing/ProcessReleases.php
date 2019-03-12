@@ -648,28 +648,20 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
         }
 
-        $releases = Release::fromQuery(
-            sprintf(
-                "
-				SELECT SQL_NO_CACHE
-					CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
-					r.name, r.id, r.guid
-				FROM releases r
-				INNER JOIN categories c ON r.categories_id = c.id
-				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE %s nzbstatus = 0",
-                ! empty($groupID) ? ' r.groups_id = '.$groupID.' AND ' : ' '
-            )
-        );
+        $releasesQuery = Release::query()->with('category')->where('nzbstatus', '=', 0);
+        if (! empty($groupID)) {
+            $releasesQuery->where('releases.groups_id', $groupID);
+        }
+        $releases = $releasesQuery->select(['id', 'guid', 'name', 'categories_id'])->get();
 
         $nzbCount = 0;
 
-        if (\count($releases) > 0) {
-            $total = \count($releases);
+        if ($releases->count() > 0) {
+            $total = $releases->count();
             // Init vars for writing the NZB's.
             $this->nzb->initiateForWrite();
             foreach ($releases as $release) {
-                if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title)) {
+                if ($this->nzb->writeNzbForReleaseId($release)) {
                     $nzbCount++;
                     if ($this->echoCLI) {
                         echo "Creating NZBs and deleting Collections: $nzbCount/$total.\r";

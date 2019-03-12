@@ -2,6 +2,8 @@
 
 namespace Blacklight;
 
+use App\Models\Collection;
+use App\Models\Release;
 use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -133,7 +135,7 @@ class NZB
 				g.name AS groupname
 			FROM collections c
 			INNER JOIN usenet_groups g ON c.groups_id = g.id
-			WHERE c.releases_id = ';
+			WHERE c.releases_id = %d ';
         $this->_binariesQuery = '
 			SELECT b.id, b.name, b.totalparts
 			FROM binaries b
@@ -149,17 +151,16 @@ class NZB
     /**
      * Write an NZB to the hard drive for a single release.
      *
-     * @param int    $relID   The ID of the release in the DB.
-     * @param string $relGuid The guid of the release.
-     * @param string $name    The name of the release.
-     * @param string $cTitle  The name of the category this release is in.
      *
-     * @return bool Have we successfully written the NZB to the hard drive?
+     *
+     * @param \App\Models\Release $release
+     *
+     * @return bool
      * @throws \Throwable
      */
-    public function writeNzbForReleaseId($relID, $relGuid, $name, $cTitle): bool
+    public function writeNzbForReleaseId(Release $release): bool
     {
-        $collections = DB::select($this->_collectionsQuery.$relID);
+        $collections = DB::select($this->_collectionsQuery.$release->id);
 
         if (empty($collections)) {
             return false;
@@ -182,11 +183,11 @@ class NZB
         $XMLWriter->startElement('head');
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'category');
-        $XMLWriter->text($cTitle);
+        $XMLWriter->text($release->category->parent->title.' >'.$release->category->title);
         $XMLWriter->endElement();
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'name');
-        $XMLWriter->text($name);
+        $XMLWriter->text($release->name);
         $XMLWriter->endElement();
         $XMLWriter->endElement(); //head
 
@@ -242,7 +243,7 @@ class NZB
         $XMLWriter->writeComment($this->_siteCommentString);
         $XMLWriter->endElement(); //nzb
         $XMLWriter->endDocument();
-        $path = ($this->buildNZBPath($relGuid, $this->nzbSplitLevel, true).$relGuid.'.nzb.gz');
+        $path = ($this->buildNZBPath($release->guid, $this->nzbSplitLevel, true).$release->guid.'.nzb.gz');
         $fp = gzopen($path, 'wb7');
         if (! $fp) {
             return false;
@@ -256,27 +257,16 @@ class NZB
             return false;
         }
         // Mark release as having NZB.
-        DB::transaction(function () use ($relID, $nzb_guid) {
-            DB::update(
-            sprintf(
-                '
-				UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
-                self::NZB_ADDED,
-                $nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.escapeString(md5($nzb_guid)).' )',
-                $relID
-            )
-        );
+        DB::transaction(function () use ($release, $nzb_guid) {
+            $release->update(['nzbstatus' => self::NZB_ADDED]);
+            if (! empty($nzb_guid)) {
+                $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5($nzb_guid)).' )')]);
+            }
         }, 3);
 
         // Delete CBP for release that has its NZB created.
-        DB::transaction(function () use ($relID) {
-            DB::delete(
-            sprintf(
-                '
-				DELETE c, b, p FROM collections c JOIN binaries b ON(c.id=b.collections_id) STRAIGHT_JOIN parts p ON(b.id=p.binaries_id) WHERE c.releases_id = %d',
-                $relID
-            )
-        );
+        DB::transaction(function () use ($release) {
+            Collection::query()->where('collections.releases_id', $release->id)->delete();
         }, 3);
         // Chmod to fix issues some users have with file permissions.
         chmod($path, 0777);
