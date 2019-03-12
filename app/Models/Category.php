@@ -264,7 +264,7 @@ class Category extends Model
      */
     public function parent()
     {
-        return $this->belongsTo(static::class, 'parentid');
+        return $this->belongsTo(RootCategory::class, 'root_categories_id');
     }
 
     /**
