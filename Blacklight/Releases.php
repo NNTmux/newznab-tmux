@@ -356,10 +356,10 @@ class Releases extends Release
         if ($this->concatenatedCategoryIDsCache === null) {
             $result = Category::query()
                 ->remember(config('nntmux.cache_expiry_long'))
-                ->whereNotNull('categories.parentid')
+                ->whereNotNull('categories.categories')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
-                ->leftJoin('categories as cp', 'cp.id', '=', 'categories.parentid')
+                ->leftJoin('categories as cp', 'cp.id', '=', 'categories.categories')
                 ->get();
             if (isset($result[0]['category_ids'])) {
                 $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
