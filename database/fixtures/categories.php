@@ -591,16 +591,6 @@ return [
         'minsizetoformrelease' => 0,
         'maxsizetoformrelease' => 0,
     ],
-    66 => [
-        'id' => 7000,
-        'title' => 'Books',
-        'root_categories_id' => null,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
     68 => [
         'id' => 7020,
         'title' => 'Comics',
