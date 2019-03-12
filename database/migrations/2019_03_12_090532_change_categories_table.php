@@ -14,8 +14,7 @@ class ChangeCategoriesTable extends Migration
     public function up()
     {
         Schema::table('categories', function (Blueprint $table) {
-            $table->renameColumn('parentid', 'root_categories_id');
-            $table->foreign(['root_categories_id'], 'fk_root_categories_id')->references('id')->on('root_categories')->onDelete('cascade');
+            $table->bigInteger('parentid')->unsigned()->change();
         });
     }
 
@@ -27,7 +26,7 @@ class ChangeCategoriesTable extends Migration
     public function down()
     {
         Schema::table('categories', function (Blueprint $table) {
-            //
+            $table->integer('parentid');
         });
     }
 }

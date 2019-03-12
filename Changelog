@@ -1,3 +1,5 @@
+2019-03-12 DariusIII
+	* Chg: Add more migrations and changes to categories tables
 2019-03-11 DariusIII
 	* Chg: Use query builder in more functions of ProcessReleases class
 	* Chg: Update package.json
