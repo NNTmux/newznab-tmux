@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\Collection;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Models\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
