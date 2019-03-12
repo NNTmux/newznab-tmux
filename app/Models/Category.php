@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\RootCategory;
+use Illuminate\Support\Arr;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -496,7 +497,9 @@ class Category extends Model
         }])->select(['id', 'title'])->get()->toArray();
 
         foreach ($categoriesArray as $category) {
-            $categoriesResult[] = $category;
+            if (! empty($category['categories'])) {
+                $categoriesResult[] = $category;
+            }
         }
 
         return $categoriesResult;
