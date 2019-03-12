@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\RootCategory;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -304,7 +305,7 @@ class Category extends Model
         }
         foreach ($cat as $category) {
             if ($category !== -1 && self::isParent($category)) {
-                foreach (RootCategory::find($category)->category as $child) {
+                foreach (RootCategory::find($category)->categories as $child) {
                     $categories[] = $child['id'];
                 }
             } elseif ($category > 0) {
@@ -385,7 +386,7 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        return RootCategory::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->category;
+        return RootCategory::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->categories;
     }
 
     /**
@@ -486,43 +487,19 @@ class Category extends Model
      */
     public static function getForMenu(array $excludedCats = []): array
     {
-        $ret = [];
-        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->select(['id', 'title', 'parentid', 'description']);
-        if (! empty($excludedCats)) {
-            $sql->whereNotIn('id', $excludedCats);
-        }
-        $arr = $sql->get()->toArray();
-        foreach ($arr as $key => $val) {
-            if ($val['id'] === self::OTHER_ROOT) {
-                $item = $arr[$key];
-                unset($arr[$key]);
-                $arr[] = $item;
-                break;
+        $categoriesResult = [];
+        $categoriesArray = RootCategory::query()->with(['categories' =>function ($query) use ($excludedCats) {
+            if (! empty($excludedCats)) {
+                $query->whereNotIn('id', $excludedCats);
             }
-        }
-        foreach ($arr as $a) {
-            if (empty($a['parentid'])) {
-                $ret[] = $a;
-            }
-        }
-        foreach ($ret as $key => $parent) {
-            $subcatlist = [];
-            $subcatnames = [];
-            foreach ($arr as $a) {
-                if ($a['parentid'] === $parent['id']) {
-                    $subcatlist[] = $a;
-                    $subcatnames[] = $a['title'];
-                }
-            }
-            if (\count($subcatlist) > 0) {
-                array_multisort($subcatnames, SORT_ASC, $subcatlist);
-                $ret[$key]['subcatlist'] = $subcatlist;
-            } else {
-                unset($ret[$key]);
-            }
+            $query->select(['id', 'title', 'root_categories_id', 'description']);
+        }])->select(['id', 'title'])->get()->toArray();
+
+        foreach ($categoriesArray as $category) {
+            $categoriesResult[] = $category;
         }
 
-        return $ret;
+        return $categoriesResult;
     }
 
     /**
