@@ -36,7 +36,7 @@ class MusicController extends BasePageController
         if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
-                ->where('parentid', '=', Category::MUSIC_ROOT)
+                ->where('root_categories_id', '=', Category::MUSIC_ROOT)
                 ->first(['id']);
             $category = $cat !== null ? $cat['id'] : Category::MUSIC_ROOT;
         }

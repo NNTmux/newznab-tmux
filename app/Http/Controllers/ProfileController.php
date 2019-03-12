@@ -333,8 +333,6 @@ class ProfileController extends BasePageController
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
 
-        $this->smarty->assign('catlist', Category::getForSelect(false));
-
         $content = $this->smarty->fetch('profileedit.tpl');
 
         $this->smarty->assign(compact('content', 'meta_title', 'meta_keywords', 'meta_description'));

@@ -63,7 +63,7 @@ class BrowseController extends BasePageController
 
         $query = Category::query();
         if ($id !== 'All') {
-            $query->where('title', $id)->where('parentid', $parentId['id']);
+            $query->where('title', $id)->where('root_categories_id', $parentId['id']);
         } else {
             $query->where('id', $parentId['id']);
         }
@@ -107,17 +107,17 @@ class BrowseController extends BasePageController
         } elseif ($category !== -1 && $grp === -1) {
             $cdata = Category::find($category['id']);
             if ($cdata !== null) {
-                if ($cdata->parentid === Category::GAME_ROOT || $cdata->id === Category::GAME_ROOT) {
+                if ($cdata->root_categories_id === Category::GAME_ROOT || $cdata->id === Category::GAME_ROOT) {
                     $covgroup = 'console';
-                } elseif ($cdata->parentid === Category::MOVIE_ROOT || $cdata->id === Category::MOVIE_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::MOVIE_ROOT || $cdata->id === Category::MOVIE_ROOT) {
                     $covgroup = 'movies';
-                } elseif ($cdata->parentid === Category::XXX_ROOT || $cdata->id === Category::XXX_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::XXX_ROOT || $cdata->id === Category::XXX_ROOT) {
                     $covgroup = 'xxx';
-                } elseif ($cdata->parentid === Category::PC_ROOT || $cdata->id === Category::PC_GAMES) {
+                } elseif ($cdata->root_categories_id === Category::PC_ROOT || $cdata->id === Category::PC_GAMES) {
                     $covgroup = 'games';
-                } elseif ($cdata->parentid === Category::MUSIC_ROOT || $cdata->id === Category::MUSIC_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::MUSIC_ROOT || $cdata->id === Category::MUSIC_ROOT) {
                     $covgroup = 'music';
-                } elseif ($cdata->parentid === Category::BOOKS_ROOT || $cdata->id === Category::BOOKS_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::BOOKS_ROOT || $cdata->id === Category::BOOKS_ROOT) {
                     $covgroup = 'books';
                 }
             }

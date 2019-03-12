@@ -33,7 +33,7 @@ class AdultController extends BasePageController
         if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
-                ->where('parentid', '=', Category::XXX_ROOT)
+                ->where('root_categories_id', '=', Category::XXX_ROOT)
                 ->first(['id']);
             $category = $cat !== null ? $cat['id'] : Category::XXX_ROOT;
         }
