@@ -967,14 +967,7 @@ class ProcessReleases
         }
 
         // Delete smaller than category minimum sizes.
-        $categories = Category::fromQuery(
-            '
-			SELECT SQL_NO_CACHE c.id AS id,
-			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
-			FROM categories c
-			INNER JOIN root_categories cp ON cp.id = c.root_categories_id
-			WHERE c.root_categories_id IS NOT NULL'
-        );
+        $categories = Category::query()->select(['id', 'minsizetoformrelease as minsize'])->get();
 
         foreach ($categories as $category) {
             if ((int) $category->minsize > 0) {
