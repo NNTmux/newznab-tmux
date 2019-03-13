@@ -359,7 +359,7 @@ class Releases extends Release
                 ->whereNotNull('categories.root_categories_id')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
-                ->leftJoin('categories as cp', 'cp.id', '=', 'categories.root_categories_id')
+                ->leftJoin('root_categories as cp', 'cp.id', '=', 'categories.root_categories_id')
                 ->get();
             if (isset($result[0]['category_ids'])) {
                 $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
