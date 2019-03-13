@@ -1,4 +1,5 @@
 2019-03-13 DariusIII
+	* Fix: Fix column name in Releases class
 	* Fix: Fix releases browsing
 2019-03-12 DariusIII
 	* Chg: Update CategoryTransformer
