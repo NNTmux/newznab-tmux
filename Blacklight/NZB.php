@@ -135,7 +135,7 @@ class NZB
 				g.name AS groupname
 			FROM collections c
 			INNER JOIN usenet_groups g ON c.groups_id = g.id
-			WHERE c.releases_id = %d ';
+			WHERE c.releases_id = ';
         $this->_binariesQuery = '
 			SELECT b.id, b.name, b.totalparts
 			FROM binaries b
