@@ -15,22 +15,11 @@ class CategoriesTableSeeder extends Seeder
         \DB::table('categories')->delete();
 
         \DB::table('categories')->insert([
-            0 =>
-            [
-                'id' => 1,
-                'title' => 'Other',
-                'parentid' => null,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
             1 =>
             [
                 'id' => 10,
                 'title' => 'Misc',
-                'parentid' => 1,
+                'root_categories_id' => 1,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -41,18 +30,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 20,
                 'title' => 'Hashed',
-                'parentid' => 1,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            3 =>
-            [
-                'id' => 1000,
-                'title' => 'Console',
-                'parentid' => null,
+                'root_categories_id' => 1,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -63,7 +41,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1010,
                 'title' => 'NDS',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -74,7 +52,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1020,
                 'title' => 'PSP',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -85,7 +63,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1030,
                 'title' => 'Wii',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -96,7 +74,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1040,
                 'title' => 'Xbox',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -107,7 +85,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1050,
                 'title' => 'Xbox 360',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -118,7 +96,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1060,
                 'title' => 'WiiWare VC',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -129,7 +107,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1070,
                 'title' => 'Xbox 360 DLC',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -140,7 +118,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1080,
                 'title' => 'PS3',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -151,7 +129,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1110,
                 'title' => '3DS',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -162,7 +140,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1120,
                 'title' => 'PS Vita',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -173,7 +151,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1130,
                 'title' => 'WiiU',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -184,7 +162,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1140,
                 'title' => 'Xbox One',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -195,7 +173,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1180,
                 'title' => 'PS4',
-                'parentid' => 1000,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -206,18 +184,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 1999,
                 'title' => 'Other',
-                'parentid' => 1000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            18 =>
-            [
-                'id' => 2000,
-                'title' => 'Movies',
-                'parentid' => null,
+                'root_categories_id' => 1000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -228,7 +195,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2010,
                 'title' => 'Foreign',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -239,7 +206,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2030,
                 'title' => 'SD',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -250,7 +217,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2040,
                 'title' => 'HD',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -261,7 +228,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2045,
                 'title' => 'UHD',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -272,7 +239,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2050,
                 'title' => '3D',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -283,7 +250,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2060,
                 'title' => 'BluRay',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -294,7 +261,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2070,
                 'title' => 'DVD',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -305,7 +272,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2080,
                 'title' => 'WEBDL',
-                'parentid' => 2000,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -316,18 +283,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 2999,
                 'title' => 'Other',
-                'parentid' => 2000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            28 =>
-            [
-                'id' => 3000,
-                'title' => 'Audio',
-                'parentid' => null,
+                'root_categories_id' => 2000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -338,7 +294,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 3010,
                 'title' => 'MP3',
-                'parentid' => 3000,
+                'root_categories_id' => 3000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -349,7 +305,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 3020,
                 'title' => 'Video',
-                'parentid' => 3000,
+                'root_categories_id' => 3000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -360,7 +316,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 3030,
                 'title' => 'Audiobook',
-                'parentid' => 3000,
+                'root_categories_id' => 3000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -371,7 +327,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 3040,
                 'title' => 'Lossless',
-                'parentid' => 3000,
+                'root_categories_id' => 3000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -382,7 +338,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 3060,
                 'title' => 'Foreign',
-                'parentid' => 3000,
+                'root_categories_id' => 3000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -393,18 +349,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 3999,
                 'title' => 'Other',
-                'parentid' => 3000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            35 =>
-            [
-                'id' => 4000,
-                'title' => 'PC',
-                'parentid' => null,
+                'root_categories_id' => 3000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -415,7 +360,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4010,
                 'title' => '0day',
-                'parentid' => 4000,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -426,7 +371,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4020,
                 'title' => 'ISO',
-                'parentid' => 4000,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -437,7 +382,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4030,
                 'title' => 'Mac',
-                'parentid' => 4000,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -448,7 +393,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4050,
                 'title' => 'Games',
-                'parentid' => 4000,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -459,7 +404,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4060,
                 'title' => 'Phone-IOS',
-                'parentid' => 4000,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -470,7 +415,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4070,
                 'title' => 'Phone-Android',
-                'parentid' => 4000,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -481,18 +426,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 4999,
                 'title' => 'Phone-Other',
-                'parentid' => 4000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            43 =>
-            [
-                'id' => 5000,
-                'title' => 'TV',
-                'parentid' => null,
+                'root_categories_id' => 4000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -503,7 +437,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5010,
                 'title' => 'WEB-DL',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -514,7 +448,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5020,
                 'title' => 'Foreign',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -525,7 +459,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5030,
                 'title' => 'SD',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -536,7 +470,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5040,
                 'title' => 'HD',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -547,7 +481,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5045,
                 'title' => 'UHD',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -558,7 +492,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5060,
                 'title' => 'Sport',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -569,7 +503,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5070,
                 'title' => 'Anime',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -580,7 +514,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5080,
                 'title' => 'Documentary',
-                'parentid' => 5000,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -591,18 +525,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 5999,
                 'title' => 'Other',
-                'parentid' => 5000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            53 =>
-            [
-                'id' => 6000,
-                'title' => 'XXX',
-                'parentid' => null,
+                'root_categories_id' => 5000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -613,7 +536,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6010,
                 'title' => 'DVD',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -624,7 +547,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6020,
                 'title' => 'WMV',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -635,7 +558,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6030,
                 'title' => 'XviD',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -646,7 +569,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6040,
                 'title' => 'x264',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -657,7 +580,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6041,
                 'title' => 'HD Clips',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -668,7 +591,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6042,
                 'title' => 'SD Clips',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -679,7 +602,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6045,
                 'title' => 'UHD',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -690,7 +613,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6060,
                 'title' => 'Imageset',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -701,7 +624,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6070,
                 'title' => 'Packs',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -712,7 +635,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6080,
                 'title' => 'SD',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -723,7 +646,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6090,
                 'title' => 'WEBDL',
-                'parentid' => 6000,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -734,18 +657,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 6999,
                 'title' => 'Other',
-                'parentid' => 6000,
-                'status' => 1,
-                'description' => null,
-                'disablepreview' => 0,
-                'minsizetoformrelease' => 0,
-                'maxsizetoformrelease' => 0,
-            ],
-            66 =>
-            [
-                'id' => 7000,
-                'title' => 'Books',
-                'parentid' => null,
+                'root_categories_id' => 6000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -756,7 +668,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 7010,
                 'title' => 'Ebook',
-                'parentid' => 7000,
+                'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -767,7 +679,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 7020,
                 'title' => 'Comics',
-                'parentid' => 7000,
+                'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -778,7 +690,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 7030,
                 'title' => 'Magazines',
-                'parentid' => 7000,
+                'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -789,7 +701,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 7040,
                 'title' => 'Technical',
-                'parentid' => 7000,
+                'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -800,7 +712,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 7060,
                 'title' => 'Foreign',
-                'parentid' => 7000,
+                'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -811,7 +723,7 @@ class CategoriesTableSeeder extends Seeder
             [
                 'id' => 7999,
                 'title' => 'Other',
-                'parentid' => 7000,
+                'root_categories_id' => 7000,
                 'status' => 1,
                 'description' => null,
                 'disablepreview' => 0,
@@ -822,7 +734,7 @@ class CategoriesTableSeeder extends Seeder
                 [
                     'id' => 2090,
                     'title' => 'X265',
-                    'parentid' => 2000,
+                    'root_categories_id' => 2000,
                     'status' => 1,
                     'description' => null,
                     'disablepreview' => 0,
@@ -833,7 +745,7 @@ class CategoriesTableSeeder extends Seeder
                 [
                     'id' => 5090,
                     'title' => 'X265',
-                    'parentid' => 5000,
+                    'root_categories_id' => 5000,
                     'status' => 1,
                     'description' => null,
                     'disablepreview' => 0,

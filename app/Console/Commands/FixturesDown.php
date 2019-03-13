@@ -12,6 +12,7 @@ class FixturesDown extends Command
      */
     private static $allowedTables = [
         'binaryblacklist',
+        'root_categories',
         'categories',
         'category_regexes',
         'collection_regexes',
@@ -37,6 +38,7 @@ class FixturesDown extends Command
     Tables that are supported are :
     no option argument <= Truncates all the tables listed below
     binaryblacklist
+    root_categories
     categories
     category_regexes
     collection_regexes

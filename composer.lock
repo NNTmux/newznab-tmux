@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86469173fb2a149fd98305a6a8791cd8",
+    "content-hash": "f972a81f35fdb3373daa1f2c3cd2cee5",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -9136,6 +9136,57 @@
             "time": "2019-01-14T23:55:14+00:00"
         },
         {
+            "name": "laracasts/generators",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laracasts/Laravel-5-Generators-Extended.git",
+                "reference": "9c6066252b9181b61e0ab6f5361fbf508bc78313"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laracasts/Laravel-5-Generators-Extended/zipball/9c6066252b9181b61e0ab6f5361fbf508bc78313",
+                "reference": "9c6066252b9181b61e0ab6f5361fbf508bc78313",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "~2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laracasts\\Generators\\GeneratorsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laracasts\\Generators\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeffrey Way",
+                    "email": "jeffrey@laracasts.com"
+                }
+            ],
+            "description": "Extend Laravel 5's generators.",
+            "keywords": [
+                "generators",
+                "laravel"
+            ],
+            "time": "2018-05-07T06:29:34+00:00"
+        },
+        {
             "name": "maximebf/debugbar",
             "version": "v1.15.0",
             "source": {
@@ -11858,7 +11909,8 @@
         "dariusiii/laravel": 20,
         "dariusiii/laravel-database-trigger": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "mayconbordin/l5-fixtures": 20
+        "mayconbordin/l5-fixtures": 20,
+        "laracasts/generators": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

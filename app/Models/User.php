@@ -825,7 +825,7 @@ class User extends Authenticatable
             }
         }
 
-        $exclusion = Category::query()->whereIn('parentid', $ret)->pluck('id')->toArray();
+        $exclusion = Category::query()->whereIn('root_categories_id', $ret)->pluck('id')->toArray();
 
         return $exclusion;
     }

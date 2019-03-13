@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Blacklight\Releases;
+use App\Models\RootCategory;
 use Illuminate\Http\Request;
 
 class BrowseController extends BasePageController
@@ -59,15 +60,15 @@ class BrowseController extends BasePageController
         $this->setPrefs();
         $releases = new Releases();
 
-        $parentId = Category::query()->where('title', $parentCategory)->first(['id']);
+        $parentId = RootCategory::query()->where('title', $parentCategory)->first();
 
         $query = Category::query();
         if ($id !== 'All') {
-            $query->where('title', $id)->where('parentid', $parentId['id']);
+            $query->where('title', $id)->where('root_categories_id', $parentId->id);
+            $category = $query->first(['id']) ?? -1;
         } else {
-            $query->where('id', $parentId['id']);
+            $category = $parentId ?? -1;
         }
-        $category = $query->first(['id']) ?? -1;
 
         $grp = -1;
 
@@ -107,17 +108,17 @@ class BrowseController extends BasePageController
         } elseif ($category !== -1 && $grp === -1) {
             $cdata = Category::find($category['id']);
             if ($cdata !== null) {
-                if ($cdata->parentid === Category::GAME_ROOT || $cdata->id === Category::GAME_ROOT) {
+                if ($cdata->root_categories_id === Category::GAME_ROOT || $cdata->id === Category::GAME_ROOT) {
                     $covgroup = 'console';
-                } elseif ($cdata->parentid === Category::MOVIE_ROOT || $cdata->id === Category::MOVIE_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::MOVIE_ROOT || $cdata->id === Category::MOVIE_ROOT) {
                     $covgroup = 'movies';
-                } elseif ($cdata->parentid === Category::XXX_ROOT || $cdata->id === Category::XXX_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::XXX_ROOT || $cdata->id === Category::XXX_ROOT) {
                     $covgroup = 'xxx';
-                } elseif ($cdata->parentid === Category::PC_ROOT || $cdata->id === Category::PC_GAMES) {
+                } elseif ($cdata->root_categories_id === Category::PC_ROOT || $cdata->id === Category::PC_GAMES) {
                     $covgroup = 'games';
-                } elseif ($cdata->parentid === Category::MUSIC_ROOT || $cdata->id === Category::MUSIC_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::MUSIC_ROOT || $cdata->id === Category::MUSIC_ROOT) {
                     $covgroup = 'music';
-                } elseif ($cdata->parentid === Category::BOOKS_ROOT || $cdata->id === Category::BOOKS_ROOT) {
+                } elseif ($cdata->root_categories_id === Category::BOOKS_ROOT || $cdata->id === Category::BOOKS_ROOT) {
                     $covgroup = 'books';
                 }
             }

@@ -84,7 +84,7 @@ class RSS extends Capabilities
 					%s AS category_ids
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
+				INNER JOIN root_categories cp ON cp.id = c.root_categories_id
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
 				LEFT OUTER JOIN genres mug ON mug.id = mu.genres_id
@@ -139,7 +139,7 @@ class RSS extends Capabilities
 					COALESCE(cp.id,0) AS parentid
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
+				INNER JOIN root_categories cp ON cp.id = c.root_categories_id
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN videos v ON v.id = r.videos_id
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
@@ -203,7 +203,7 @@ class RSS extends Capabilities
 					COALESCE(cp.id,0) AS parentid
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
+				INNER JOIN root_categories cp ON cp.id = c.root_categories_id
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT JOIN movieinfo mi ON mi.id = r.movieinfo_id
 				WHERE %s %s

@@ -192,7 +192,7 @@ class XXX
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
+			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.id IN (%s)
