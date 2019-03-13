@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\RootCategory;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
@@ -59,15 +60,17 @@ class BrowseController extends BasePageController
         $this->setPrefs();
         $releases = new Releases();
 
-        $parentId = Category::query()->where('title', $parentCategory)->first(['id']);
+        $parentId = RootCategory::query()->where('title', $parentCategory)->first();
 
         $query = Category::query();
         if ($id !== 'All') {
-            $query->where('title', $id)->where('root_categories_id', $parentId['id']);
+            $query->where('title', $id)->where('root_categories_id', $parentId->id);
+            $category = $query->first(['id']) ?? -1;
         } else {
-            $query->where('id', $parentId['id']);
+            $category = $parentId ?? -1;
         }
-        $category = $query->first(['id']) ?? -1;
+
+        dump($category);
 
         $grp = -1;
 
