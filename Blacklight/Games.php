@@ -501,7 +501,7 @@ class Games
             }
         }
 
-        if ($this->publicKey !== '') {
+        if (! empty($this->publicKey)) {
             if ($steamGameID === false || $this->_gameResults === false) {
                 $bestMatch = false;
                 $this->_classUsed = 'GiantBomb';
