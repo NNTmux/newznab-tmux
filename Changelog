@@ -1,4 +1,5 @@
 2019-03-13 DariusIII
+	* Chg: Select only needed columns from releases table
 	* Chg: Update deleteReleases function query in ProcessReleases class
 	* Chg: Change check for giantbomb key
 	* Chg: Change IGDB API to v3 url

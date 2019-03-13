@@ -66,7 +66,7 @@ class Releases extends Release
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
-            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				df.failed AS failed,
@@ -76,7 +76,7 @@ class Releases extends Release
 				tve.title, tve.firstaired
 			FROM
 			(
-				SELECT r.*, g.name AS group_name
+				SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, g.name AS group_name
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				%s
@@ -385,7 +385,7 @@ class Releases extends Release
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
-            "SELECT r.*,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
 					usenet_groups.name AS group_name,
@@ -1094,7 +1094,7 @@ class Releases extends Release
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
