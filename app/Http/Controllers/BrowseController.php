@@ -70,8 +70,6 @@ class BrowseController extends BasePageController
             $category = $parentId ?? -1;
         }
 
-        dump($category);
-
         $grp = -1;
 
         $catarray = [];
