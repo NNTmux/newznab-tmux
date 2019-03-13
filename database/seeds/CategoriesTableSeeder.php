@@ -12,6 +12,8 @@ class CategoriesTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         \DB::table('categories')->delete();
 
         \DB::table('categories')->insert([
@@ -753,5 +755,7 @@ class CategoriesTableSeeder extends Seeder
                     'maxsizetoformrelease' => 0,
                 ],
         ]);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }
