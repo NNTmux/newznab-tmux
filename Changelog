@@ -1,4 +1,6 @@
 2019-03-13 DariusIII
+	* Chg: Update nesbot/carbon (2.14.2 => 2.16.0)
+	* Chg: Update laravel/framework (v5.8.3 => v5.8.4)
 	* Fix: Fix getConcatenatedCategoryIds function query
 	* Fix: Fix column name in Releases class
 	* Fix: Fix releases browsing
