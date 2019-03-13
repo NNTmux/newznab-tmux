@@ -1,4 +1,5 @@
 2019-03-12 DariusIII
+	* Chg: Update CategoryTransformer
 	* Chg: Update queries to use root_categories table
 	* Chg: Update nzb creation process
 	* Chg: Update fixtures and fix migration files
