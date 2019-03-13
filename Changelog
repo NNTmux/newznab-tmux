@@ -1,4 +1,5 @@
 2019-03-13 DariusIII
+	* Chg: Change IGDB API to v3 url
 	* Fix: Fix NZB class setQuery function
 	* Chg: Update @fancyapps/fancybox to latest version
 	* Fix: Fix root categories seeding
