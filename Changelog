@@ -1,4 +1,5 @@
 2019-03-13 DariusIII
+	* Chg: Update messed up browsing
 	* Chg: Select only needed columns from releases table
 	* Chg: Update deleteReleases function query in ProcessReleases class
 	* Chg: Change check for giantbomb key

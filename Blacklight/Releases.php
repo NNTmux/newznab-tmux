@@ -66,7 +66,7 @@ class Releases extends Release
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				df.failed AS failed,
@@ -76,7 +76,7 @@ class Releases extends Release
 				tve.title, tve.firstaired
 			FROM
 			(
-				SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, g.name AS group_name
+				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, g.name AS group_name
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				%s
@@ -385,16 +385,16 @@ class Releases extends Release
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
-					usenet_groups.name AS group_name,
+					g.name AS group_name,
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					df.failed AS failed
 				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				LEFT JOIN usenet_groups ON usenet_groups.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				LEFT JOIN categories c ON c.id = r.categories_id
@@ -641,7 +641,7 @@ class Releases extends Release
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -728,7 +728,7 @@ class Releases extends Release
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -874,7 +874,7 @@ class Releases extends Release
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview,
 				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
 					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,
@@ -1019,7 +1019,7 @@ class Releases extends Release
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id, r.haspreview,
 				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
 				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
@@ -1094,7 +1094,7 @@ class Releases extends Release
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1173,7 +1173,7 @@ class Releases extends Release
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				concat(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
