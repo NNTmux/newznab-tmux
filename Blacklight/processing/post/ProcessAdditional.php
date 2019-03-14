@@ -809,14 +809,14 @@ class ProcessAdditional
     {
         $nzbPath = $this->_nzb->NZBPath($this->_release->guid);
         if ($nzbPath === false) {
-            $this->_echo('NZB not found for GUID: '.$this->_release->guid . ', deleting the release.', 'warning');
+            $this->_echo('NZB not found for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
             Release::query()->where('guid', $this->_release->guid)->delete();
         }
 
         $nzbContents = Utility::unzipGzipFile($nzbPath);
         if (! $nzbContents) {
-            $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid. ', deleting the release.', 'warning');
+            $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
             Release::query()->where('guid', $this->_release->guid)->delete();
         }
@@ -824,7 +824,7 @@ class ProcessAdditional
         // Get a list of files in the nzb.
         $this->_nzbContents = $this->_nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
         if (\count($this->_nzbContents) === 0) {
-            $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid .'deleting the release.', 'warning');
+            $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid.'deleting the release.', 'warning');
 
             Release::query()->where('guid', $this->_release->guid)->delete();
         }
