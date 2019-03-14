@@ -256,7 +256,7 @@ class Movie
                 $this->getBrowseBy(),
                 (! empty($catsrch) ? $catsrch : ''),
                 (
-                $maxAge > 0
+                    $maxAge > 0
                     ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                     : ''
                 ),
@@ -899,6 +899,10 @@ class Movie
      */
     public function fetchIMDBProperties($imdbId)
     {
+        $resultQuery = (new Title($imdbId, $this->config))->real_id();
+        if (! empty($resultQuery)) {
+            $imdbId = 'tt'.$resultQuery;
+        }
         $result = new Title($imdbId, $this->config);
         if (! empty($result->orig_title())) {
             similar_text($this->currentTitle, $result->orig_title(), $percent);
@@ -906,16 +910,16 @@ class Movie
                 similar_text($this->currentYear, $result->year(), $percent);
                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                     $ret = [
-                        'title' => $result->orig_title(),
-                        'tagline' => $result->tagline(),
-                        'plot' => Arr::get($result->plot_split(), '0.plot'),
-                        'rating' => ! empty($result->rating()) ? $result->rating() : '',
-                        'year' => $result->year(),
-                        'cover' => $result->photo(),
-                        'genre' => $result->genre(),
-                        'language' => $result->language(),
-                        'type' => $result->movietype(),
-                    ];
+                            'title' => $result->orig_title(),
+                            'tagline' => $result->tagline(),
+                            'plot' => Arr::get($result->plot_split(), '0.plot'),
+                            'rating' => ! empty($result->rating()) ? $result->rating() : '',
+                            'year' => $result->year(),
+                            'cover' => $result->photo(),
+                            'genre' => $result->genre(),
+                            'language' => $result->language(),
+                            'type' => $result->movietype(),
+                        ];
 
                     if ($this->echooutput && Utility::isCLI()) {
                         $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($result->orig_title()).PHP_EOL;
