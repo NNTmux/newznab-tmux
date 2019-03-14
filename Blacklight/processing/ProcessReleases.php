@@ -648,7 +648,7 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
         }
 
-        $releasesQuery = Release::query()->with('category')->where('nzbstatus', '=', 0);
+        $releasesQuery = Release::query()->with('category.parent')->where('nzbstatus', '=', 0);
         if (! empty($groupID)) {
             $releasesQuery->where('releases.groups_id', $groupID);
         }

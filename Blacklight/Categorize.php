@@ -2015,7 +2015,7 @@ class Categorize
      */
     public function isBookOther(): bool
     {
-        if (preg_match('/"\d\d-\d\d-20\d\d\./i', $this->releaseName)) {
+        if (preg_match('/"\d\d-\d\d-20\d\d\./', $this->releaseName)) {
             $this->tmpCat = Category::BOOKS_UNKNOWN;
             $this->tmpTag[] = Category::TAG_BOOKS_UNKNOWN;
 

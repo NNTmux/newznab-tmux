@@ -1,4 +1,5 @@
 2019-03-14 DariusIII
+	* Chg: Load category and parent relations when querying db
 	* Chg: Update fetchIMDBProperties function to use real id to fetch movie data
 	* Chg: Update imdbphp/imdbphp (v6.1.3 => v6.2.0)
 	* Chg: Update spatie/laravel-fractal (5.5.0 => 5.5.1)
