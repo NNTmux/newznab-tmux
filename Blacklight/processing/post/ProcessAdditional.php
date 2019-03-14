@@ -804,6 +804,7 @@ class ProcessAdditional
      * Get list of contents inside a release's NZB file.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function _getNZBContents(): bool
     {
@@ -811,14 +812,14 @@ class ProcessAdditional
         if ($nzbPath === false) {
             $this->_echo('NZB not found for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
-            Release::query()->where('guid', $this->_release->guid)->delete();
+            $this->_deleteRelease();
         }
 
         $nzbContents = Utility::unzipGzipFile($nzbPath);
         if (! $nzbContents) {
             $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
-            Release::query()->where('guid', $this->_release->guid)->delete();
+            $this->_deleteRelease();
         }
 
         // Get a list of files in the nzb.
@@ -826,7 +827,7 @@ class ProcessAdditional
         if (\count($this->_nzbContents) === 0) {
             $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
-            Release::query()->where('guid', $this->_release->guid)->delete();
+            $this->_deleteRelease();
         }
         // Sort keys.
         ksort($this->_nzbContents, SORT_NATURAL);
@@ -842,6 +843,17 @@ class ProcessAdditional
     protected function _decrementPasswordStatus(): bool
     {
         Release::whereId($this->_release->id)->decrement('passwordstatus');
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    protected function _deleteRelease(): bool
+    {
+        Release::whereId($this->_release->id)->delete();
 
         return false;
     }
