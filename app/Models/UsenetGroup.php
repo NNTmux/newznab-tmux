@@ -287,7 +287,7 @@ class UsenetGroup extends Model
      */
     public static function isValidGroup($groupName)
     {
-        if (preg_match('/^([\w-]+\.)+[\w-]+$/i', $groupName)) {
+        if (preg_match('/^([\w\-]+\.)+[\w\-]+$/i', $groupName)) {
             return preg_replace('/^a\.b\./i', 'alt.binaries.', $groupName, 1);
         }
 
@@ -348,12 +348,6 @@ class UsenetGroup extends Model
     {
         // Remove rows from part repair.
         MissedPart::query()->where('groups_id', $id)->delete();
-
-        foreach (self::$cbpm as $tablePrefix) {
-            DB::statement(
-                "DROP TABLE IF EXISTS {$tablePrefix}"
-            );
-        }
 
         // Reset the group stats.
         return self::query()->where('id', $id)->update(

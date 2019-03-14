@@ -1,4 +1,5 @@
 2019-03-14 DariusIII
+	* Fix: Fix resetting groups in admin area
 	* Chg: Update package.json
 	* Chg: Load category and parent relations when querying db
 	* Chg: Update fetchIMDBProperties function to use real id to fetch movie data
