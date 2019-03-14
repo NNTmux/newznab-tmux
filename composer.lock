@@ -1919,16 +1919,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.1.3",
+            "version": "v6.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "00c06221226087f28e7d9bc9ba5d3039ced28c9f"
+                "reference": "4735d2791328b07956277cfa2931d93219a51800"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/00c06221226087f28e7d9bc9ba5d3039ced28c9f",
-                "reference": "00c06221226087f28e7d9bc9ba5d3039ced28c9f",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/4735d2791328b07956277cfa2931d93219a51800",
+                "reference": "4735d2791328b07956277cfa2931d93219a51800",
                 "shasum": ""
             },
             "require": {
@@ -1955,7 +1955,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-12-25T14:17:22+00:00"
+            "time": "2019-03-11T23:41:47+00:00"
         },
         {
             "name": "intervention/image",
@@ -4059,16 +4059,16 @@
         },
         {
             "name": "pear/pear",
-            "version": "v1.10.8",
+            "version": "v1.10.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core.git",
-                "reference": "f287dd85d11d7336489d7d742c6452922f39340f"
+                "reference": "82be5c2eed1dde9def0a84cc3420778b8b0ab9b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core/zipball/f287dd85d11d7336489d7d742c6452922f39340f",
-                "reference": "f287dd85d11d7336489d7d742c6452922f39340f",
+                "url": "https://api.github.com/repos/pear/pear-core/zipball/82be5c2eed1dde9def0a84cc3420778b8b0ab9b8",
+                "reference": "82be5c2eed1dde9def0a84cc3420778b8b0ab9b8",
                 "shasum": ""
             },
             "require": {
@@ -4150,7 +4150,7 @@
                 }
             ],
             "description": "This is the definitive source of PEAR's core files.",
-            "time": "2019-02-07T18:59:54+00:00"
+            "time": "2019-03-13T17:59:48+00:00"
         },
         {
             "name": "pear/structures_graph",
@@ -5693,16 +5693,16 @@
         },
         {
             "name": "spatie/laravel-fractal",
-            "version": "5.5.0",
+            "version": "5.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-fractal.git",
-                "reference": "c79bf1581e9961ed2420b5573b1aaf9f71fd2308"
+                "reference": "d5061c2463379aeda7c83cb3960981b519eb9e3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/c79bf1581e9961ed2420b5573b1aaf9f71fd2308",
-                "reference": "c79bf1581e9961ed2420b5573b1aaf9f71fd2308",
+                "url": "https://api.github.com/repos/spatie/laravel-fractal/zipball/d5061c2463379aeda7c83cb3960981b519eb9e3c",
+                "reference": "d5061c2463379aeda7c83cb3960981b519eb9e3c",
                 "shasum": ""
             },
             "require": {
@@ -5758,7 +5758,7 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2019-02-27T10:49:15+00:00"
+            "time": "2019-03-13T14:18:31+00:00"
         },
         {
             "name": "spatie/laravel-permission",

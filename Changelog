@@ -1,3 +1,6 @@
+2019-03-14 DariusIII
+	* Chg: Update imdbphp/imdbphp (v6.1.3 => v6.2.0)
+	* Chg: Update spatie/laravel-fractal (5.5.0 => 5.5.1)
 2019-03-13 DariusIII
 	* Chg: Update messed up browsing
 	* Chg: Select only needed columns from releases table
