@@ -1,4 +1,5 @@
 2019-03-15 DariusIII
+	* Fix: Update addAlternateNfo function, fixes issue #941
 	* Fix: Fix missed renames for root_categories table
 	* Chg: Update phpstan/phpstan (0.11.3 => 0.11.4)
 2019-03-14 DariusIII

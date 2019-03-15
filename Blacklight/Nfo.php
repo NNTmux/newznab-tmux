@@ -190,7 +190,7 @@ class Nfo
      * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
      *
      * @param string $nfo     The nfo.
-     * @param array  $release The SQL row for this release.
+     * @param $release
      * @param NNTP   $nntp    Instance of class NNTP.
      *
      * @return bool           True on success, False on failure.
@@ -198,20 +198,20 @@ class Nfo
      */
     public function addAlternateNfo(&$nfo, $release, $nntp): bool
     {
-        if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
-            $check = ReleaseNfo::whereReleasesId($release['id'])->first(['releases_id']);
+        if ($release->id > 0 && $this->isNFO($nfo, $release->guid)) {
+            $check = ReleaseNfo::whereReleasesId($release->id)->first(['releases_id']);
 
             if ($check === null) {
-                ReleaseNfo::query()->insert(['releases_id' => $release['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($nfo)]);
+                ReleaseNfo::query()->insert(['releases_id' => $release->id, 'nfo' => "\x1f\x8b\x08\x00".gzcompress($nfo)]);
             }
 
-            Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FOUND]);
+            Release::whereId($release->id)->update(['nfostatus' => self::NFO_FOUND]);
 
-            if (! isset($release['completion'])) {
-                $release['completion'] = 0;
+            if (! isset($release->completion)) {
+                $release->completion = 0;
             }
 
-            if ($release['completion'] === 0) {
+            if ($release->completion === 0) {
                 $nzbContents = new NZBContents(
                     [
                         'Echo' => $this->echo,
@@ -221,7 +221,7 @@ class Nfo
                         'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
                     ]
                 );
-                $nzbContents->parseNZB($release['guid'], $release['id'], $release['groups_id']);
+                $nzbContents->parseNZB($release->guid, $release->id, $release->guid);
             }
 
             return true;
@@ -275,7 +275,7 @@ class Nfo
 
         if ($nfoCount > 0) {
             $this->colorCli->primary(
-                    PHP_EOL.
+                PHP_EOL.
                     ($guidChar === '' ? '' : '['.$guidChar.'] ').
                     ($groupID === '' ? '' : '['.$groupID.'] ').
                     'Processing '.$nfoCount.
