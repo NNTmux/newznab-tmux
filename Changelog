@@ -1,3 +1,5 @@
+2019-03-15 DariusIII
+	* Chg: Update phpstan/phpstan (0.11.3 => 0.11.4)
 2019-03-14 DariusIII
 	* Chg: Use function to delete releases with bad or missing nzbs
 	* Chg: Delete releases that report missing, broken or empty nzbs on PPA stage
