@@ -107,7 +107,7 @@ class CategoryRegexesController extends BasePageController
         $categories_db = Category::query()
             ->select(['c.id', 'c.title', 'cp.title as parent_title'])
             ->from('categories as c')
-            ->join('categories as cp', 'c.root_categories_id', '=', 'cp.id')
+            ->join('root_categories as cp', 'c.root_categories_id', '=', 'cp.id')
             ->whereNotNull('c.root_categories_id')
             ->orderBy('c.id')
             ->get();

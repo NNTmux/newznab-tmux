@@ -263,7 +263,7 @@ class Releases extends Release
             ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.root_categories_id')
+            ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'r.groups_id');
 
         if ($groupID !== '') {
