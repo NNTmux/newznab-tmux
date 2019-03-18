@@ -1099,33 +1099,33 @@ class ProcessAdditional
         }
 
         switch ($dataSummary['main_type']) {
-                case ArchiveInfo::TYPE_RAR:
-                    if ($this->_echoCLI) {
-                        $this->_echo('r', 'primaryOver');
-                    }
+            case ArchiveInfo::TYPE_RAR:
+                if ($this->_echoCLI) {
+                    $this->_echo('r', 'primaryOver');
+                }
 
-                    if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
-                        $fileName = $this->tmpPath.uniqid('', true).'.rar';
-                        File::put($fileName, $compressedData);
-                        runCmd($this->_killString.$this->_unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$this->tmpPath.'unrar/"');
-                        File::delete($fileName);
-                    }
-                    break;
-                case ArchiveInfo::TYPE_ZIP:
-                    if ($this->_echoCLI) {
-                        $this->_echo('z', 'primaryOver');
-                    }
+                if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
+                    $fileName = $this->tmpPath.uniqid('', true).'.rar';
+                    File::put($fileName, $compressedData);
+                    runCmd($this->_killString.$this->_unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$this->tmpPath.'unrar/"');
+                    File::delete($fileName);
+                }
+                break;
+            case ArchiveInfo::TYPE_ZIP:
+                if ($this->_echoCLI) {
+                    $this->_echo('z', 'primaryOver');
+                }
 
-                    if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
-                        $fileName = $this->tmpPath.uniqid('', true).'.zip';
-                        File::put($fileName, $compressedData);
-                        runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
-                        File::delete($fileName);
-                    }
-                    break;
-                default:
-                    return false;
-            }
+                if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
+                    $fileName = $this->tmpPath.uniqid('', true).'.zip';
+                    File::put($fileName, $compressedData);
+                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    File::delete($fileName);
+                }
+                break;
+            default:
+                return false;
+        }
 
         return $this->_processCompressedFileList();
     }
@@ -1305,7 +1305,7 @@ class ProcessAdditional
 
             if (File::isFile($file)) {
 
-                    // Process PAR2 files.
+                // Process PAR2 files.
                 if (! $this->_foundPAR2Info && preg_match('/\.par2$/', $file)) {
                     $this->_siftPAR2Info($file);
                 } // Process NFO files.
@@ -1313,9 +1313,9 @@ class ProcessAdditional
                     $this->_processNfoFile($file);
                 } // Process audio files.
                 elseif (
-                        (! $this->_foundAudioInfo || ! $this->_foundAudioSample) &&
-                        preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
-                    ) {
+                    (! $this->_foundAudioInfo || ! $this->_foundAudioSample) &&
+                    preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
+                ) {
                     // Try to get audio sample/audio media info.
                     File::move($file, $this->tmpPath.'audiofile.'.$fileType[2]);
                     $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
@@ -1326,8 +1326,8 @@ class ProcessAdditional
                     File::delete($file);
                 } // Video sample // video clip // video media info.
                 elseif ((! $this->_foundSample || ! $this->_foundVideo || ! $this->_foundMediaInfo) &&
-                        preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
-                    ) {
+                    preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
+                ) {
                     $this->_processVideoFile($file);
                 }
 
@@ -1337,40 +1337,40 @@ class ProcessAdditional
                     if (! empty($output)) {
                         switch (true) {
 
-                                case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
-                                    $this->_getJPGSample($file);
-                                    File::delete($file);
-                                    break;
+                            case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
+                                $this->_getJPGSample($file);
+                                File::delete($file);
+                                break;
 
-                                case
-                                    (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo)
-                                    && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
-                                    $this->_processVideoFile($file);
-                                    break;
+                            case
+                                (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo)
+                                && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
+                                $this->_processVideoFile($file);
+                                break;
 
-                                case
-                                    (! $this->_foundAudioSample || ! $this->_foundAudioInfo) &&
-                                    preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
-                                    switch ($fileType[0]) {
-                                        case 'FLAC':
-                                            $fileType = 'FLAC';
-                                            break;
-                                        case 'layer III':
-                                            $fileType = 'MP3';
-                                            break;
-                                        case 'Vorbis audio':
-                                            $fileType = 'OGG';
-                                            break;
-                                    }
-                                    File::move($file, $this->tmpPath.'audiofile.'.$fileType);
-                                    $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
-                                    File::delete($this->tmpPath.'audiofile.'.$fileType);
-                                    break;
+                            case
+                                (! $this->_foundAudioSample || ! $this->_foundAudioInfo) &&
+                                preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
+                                switch ($fileType[0]) {
+                                    case 'FLAC':
+                                        $fileType = 'FLAC';
+                                        break;
+                                    case 'layer III':
+                                        $fileType = 'MP3';
+                                        break;
+                                    case 'Vorbis audio':
+                                        $fileType = 'OGG';
+                                        break;
+                                }
+                                File::move($file, $this->tmpPath.'audiofile.'.$fileType);
+                                $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
+                                File::delete($this->tmpPath.'audiofile.'.$fileType);
+                                break;
 
-                                case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
-                                    $this->_siftPAR2Info($file);
-                                    break;
-                            }
+                            case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
+                                $this->_siftPAR2Info($file);
+                                break;
+                        }
                     }
                 }
             }
@@ -1552,12 +1552,12 @@ class ProcessAdditional
                 // Try to resize and move it.
                 $this->_foundJPGSample = (
                     $this->_releaseImage->saveImage(
-                    $this->_release->guid.'_thumb',
-                    $this->tmpPath.'samplepicture.jpg',
-                    $this->_releaseImage->jpgSavePath,
-                    650,
-                    650
-                ) === 1
+                        $this->_release->guid.'_thumb',
+                        $this->tmpPath.'samplepicture.jpg',
+                        $this->_releaseImage->jpgSavePath,
+                        650,
+                        650
+                    ) === 1
                 );
 
                 if ($this->_foundJPGSample) {
@@ -1703,14 +1703,14 @@ class ProcessAdditional
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
-            sprintf(
+                sprintf(
                     '/%d\d{3}|%d|%d|%d/',
                     $musicParent[0],
                     Category::OTHER_MISC,
                     Category::MOVIE_OTHER,
                     Category::TV_OTHER
                 ),
-            $rQuery->id
+                $rQuery->id
             )
         ) {
             return false;
@@ -1758,15 +1758,15 @@ class ProcessAdditional
                                 if ($this->_echoCLI) {
                                     NameFixer::echoChangedReleaseName(
                                         [
-                                                'new_name' => $newName,
-                                                'old_name' => $rQuery->searchname,
-                                                'new_category' => $newCat,
-                                                'old_category' => $rQuery->id,
-                                                'group' => $rQuery->groups_id,
-                                                'releases_id' => $this->_release->id,
-                                                'method' => 'ProcessAdditional->_getAudioInfo',
-                                            ]
-                                        );
+                                            'new_name' => $newName,
+                                            'old_name' => $rQuery->searchname,
+                                            'new_category' => $newCat,
+                                            'old_category' => $rQuery->id,
+                                            'group' => $rQuery->groups_id,
+                                            'releases_id' => $this->_release->id,
+                                            'method' => 'ProcessAdditional->_getAudioInfo',
+                                        ]
+                                    );
                                 }
                             }
 
@@ -1852,12 +1852,12 @@ class ProcessAdditional
         // Try to resize/move the image.
         $this->_foundJPGSample = (
             $this->_releaseImage->saveImage(
-            $this->_release->guid.'_thumb',
-            $fileLocation,
-            $this->_releaseImage->jpgSavePath,
-            650,
-            650
-        ) === 1
+                $this->_release->guid.'_thumb',
+                $fileLocation,
+                $this->_releaseImage->jpgSavePath,
+                650,
+                650
+            ) === 1
         );
 
         // If it's successful, tell the DB.
