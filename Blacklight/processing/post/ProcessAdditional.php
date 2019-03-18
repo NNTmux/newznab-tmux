@@ -2201,7 +2201,7 @@ class ProcessAdditional
     protected function _processNfoFile($fileLocation): void
     {
         $data = @File::get($fileLocation);
-        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp)) {
+        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp)) {
             $this->_releaseHasNoNFO = false;
         }
     }
