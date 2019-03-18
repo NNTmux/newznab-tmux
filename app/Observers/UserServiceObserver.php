@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Jobs\SendWelcomeEmail;
@@ -35,7 +36,7 @@ class UserServiceObserver
                 'rate_limit' => $rateLimit,
             ]
         );
-        if (File::isFile(base_path().'/_install/install.lock')) {
+        if (! empty(Settings::settingValue('site.main.email') && File::isFile(base_path().'/_install/install.lock'))) {
             SendNewRegisteredAccountMail::dispatch($user);
             SendWelcomeEmail::dispatch($user);
             UserVerification::generate($user);
