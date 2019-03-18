@@ -1,5 +1,4 @@
 2019-03-18 DariusIII
-	* Chg: Update code style of PPA class
 	* Chg: Update package.json
 	* Chg: Remove casting $this->_release into array on line 2204 of PPA class
 	* Chg: Don't send activation emails if site email is not set
