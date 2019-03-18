@@ -14,7 +14,7 @@
         "axios": "^0.18",
         "cross-env": "^5.2.0",
         "jquery": "^3.3",
-        "laravel-mix": "^4.0.14",
+        "laravel-mix": "^4.0.15",
         "lodash": "^4.17.11",
         "popper.js": "^1.14.7",
         "prettier": "^1.16.4",
@@ -41,7 +41,7 @@
         "multiselect": "^0.9.12",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
-        "npm-check-updates": "^3.0.8",
+        "npm-check-updates": "^3.1.0",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0-beta.2",
         "tinymce": "^5.0.2"
