@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\Settings;
 use App\Models\User;
+use App\Models\Settings;
 use Illuminate\Support\Str;
 use App\Jobs\SendWelcomeEmail;
 use Spatie\Permission\Models\Role;
