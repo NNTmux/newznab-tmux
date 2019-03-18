@@ -123,7 +123,7 @@
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.8.*",
     "laravel/horizon": "^2.0",
-    "laravel/scout": "^6.0",
+    "laravel/scout": "^7.0",
     "laravel/telescope": "^2.0",
     "laravel/tinker": "~1.0",
     "league/climate": "^3.4",

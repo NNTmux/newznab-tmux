@@ -1,3 +1,5 @@
+2019-03-18 DariusIII
+	* CHg: Update used libraries to their latest versions
 2019-03-15 DariusIII
 	* Fix: Update addAlternateNfo function, fixes issue #941
 	* Fix: Fix missed renames for root_categories table
