@@ -2,6 +2,8 @@
 
 namespace Blacklight;
 
+use App\Models\Binary;
+use App\Models\Part;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\Collection;
@@ -118,37 +120,6 @@ class NZB
     }
 
     /**
-     * Initiate class vars when writing NZBs.
-     */
-    public function initiateForWrite()
-    {
-        $this->setQueries();
-    }
-
-    /**
-     *  Generate queries for collections, binaries and parts.
-     */
-    protected function setQueries(): void
-    {
-        $this->_collectionsQuery = '
-			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
-				g.name AS groupname
-			FROM collections c
-			INNER JOIN usenet_groups g ON c.groups_id = g.id
-			WHERE c.releases_id = ';
-        $this->_binariesQuery = '
-			SELECT b.id, b.name, b.totalparts
-			FROM binaries b
-			WHERE b.collections_id = %d
-			ORDER BY b.name ASC';
-        $this->_partsQuery = '
-			SELECT DISTINCT(p.messageid), p.size, p.partnumber
-			FROM parts p
-			WHERE p.binaries_id = %d
-			ORDER BY p.partnumber ASC';
-    }
-
-    /**
      * Write an NZB to the hard drive for a single release.
      *
      *
@@ -160,7 +131,10 @@ class NZB
      */
     public function writeNzbForReleaseId(Release $release): bool
     {
-        $collections = DB::select($this->_collectionsQuery.$release->id);
+        $collections = Collection::whereReleasesId($release->id)
+            ->join('usenet_groups', 'collections.groups_id', '=', 'usenet_groups.id')
+            ->select(['collections.*', DB::raw('UNIX_TIMESTAMP(collections.date) AS udate'), 'usenet_groups.name as groupname'])
+            ->get();
 
         if (empty($collections)) {
             return false;
@@ -192,7 +166,7 @@ class NZB
         $XMLWriter->endElement(); //head
 
         foreach ($collections as $collection) {
-            $binaries = DB::select(sprintf($this->_binariesQuery, $collection->id));
+            $binaries = Binary::whereCollectionsId($collection->id)->select(['id', 'name', 'totalparts'])->orderBy('name')->get();
             if (empty($binaries)) {
                 return false;
             }
@@ -200,7 +174,7 @@ class NZB
             $poster = $collection->fromname;
 
             foreach ($binaries as $binary) {
-                $parts = DB::select(sprintf($this->_partsQuery, $binary->id));
+                $parts = Part::whereBinariesId($binary->id)->distinct()->select(['messageid', 'size', 'partnumber'])->orderBy('partnumber')->get();
                 if (empty($parts)) {
                     return false;
                 }
