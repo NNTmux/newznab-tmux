@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use App\Models\Binary;
 use App\Models\Part;
+use App\Models\Binary;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\Collection;
