@@ -658,8 +658,6 @@ class ProcessReleases
 
         if ($releases->count() > 0) {
             $total = $releases->count();
-            // Init vars for writing the NZB's.
-            $this->nzb->initiateForWrite();
             foreach ($releases as $release) {
                 if ($this->nzb->writeNzbForReleaseId($release)) {
                     $nzbCount++;
