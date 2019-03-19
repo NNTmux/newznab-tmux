@@ -44,6 +44,6 @@
         "npm-check-updates": "^3.1.0",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0-beta.2",
-        "tinymce": "^5.0.2"
+        "tinymce": "^5.0.3"
     }
 }

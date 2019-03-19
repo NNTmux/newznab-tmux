@@ -15,7 +15,7 @@ table {
 table th,
 table td {
   border: 1px solid #ccc;
-  padding: .4rem;
+  padding: 0.4rem;
 }
 blockquote {
   border-left: 2px solid #ccc;
@@ -29,7 +29,7 @@ figure {
 figure figcaption {
   color: #999;
   display: block;
-  margin-top: .25rem;
+  margin-top: 0.25rem;
   text-align: center;
 }
 hr {
@@ -40,5 +40,5 @@ hr {
 code {
   background-color: #e8e8e8;
   border-radius: 3px;
-  padding: .1rem .2rem;
+  padding: 0.1rem 0.2rem;
 }
