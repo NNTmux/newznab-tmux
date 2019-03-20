@@ -5364,28 +5364,28 @@
         },
         {
             "name": "rtconner/laravel-tagging",
-            "version": "3.0.0",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtconner/laravel-tagging.git",
-                "reference": "6f58920a2146d520de34d858ad93fe9af2012256"
+                "reference": "f2eb740509f65e6dbdb2ee372df130564dd7c914"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/6f58920a2146d520de34d858ad93fe9af2012256",
-                "reference": "6f58920a2146d520de34d858ad93fe9af2012256",
+                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/f2eb740509f65e6dbdb2ee372df130564dd7c914",
+                "reference": "f2eb740509f65e6dbdb2ee372df130564dd7c914",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": ">= 5.0",
-                "illuminate/support": ">= 5.0",
-                "php": ">=5.5.0"
+                "illuminate/database": "^5.0",
+                "illuminate/support": "^5.0",
+                "php": ">= 7.0"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "orchestra/testbench": "~3.0",
-                "phpunit/phpunit": "~4.0",
-                "vlucas/phpdotenv": "~2.0"
+                "mockery/mockery": "~1.2",
+                "orchestra/testbench": "~3.8",
+                "phpunit/phpunit": "7.5.*",
+                "vlucas/phpdotenv": "~3.3"
             },
             "type": "library",
             "extra": {
@@ -5407,7 +5407,7 @@
             "authors": [
                 {
                     "name": "Robert Conner",
-                    "email": "rtconner@smarter.bz"
+                    "email": "rtconner+gh@smarter.bz"
                 }
             ],
             "description": "Use PHP traits to extend Laravel Eloquent Models to allow Tags. Models can be marked as Taggable.",
@@ -5422,7 +5422,7 @@
                 "tagging",
                 "tags"
             ],
-            "time": "2018-08-13T16:25:54+00:00"
+            "time": "2019-03-20T03:27:08+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
@@ -8484,16 +8484,16 @@
         },
         {
             "name": "composer/semver",
-            "version": "1.4.2",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "c7cb9a2095a074d131b65a8a0cd294479d785573"
+                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/c7cb9a2095a074d131b65a8a0cd294479d785573",
-                "reference": "c7cb9a2095a074d131b65a8a0cd294479d785573",
+                "url": "https://api.github.com/repos/composer/semver/zipball/46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
+                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
                 "shasum": ""
             },
             "require": {
@@ -8542,7 +8542,7 @@
                 "validation",
                 "versioning"
             ],
-            "time": "2016-08-30T16:08:34+00:00"
+            "time": "2019-03-19T17:25:45+00:00"
         },
         {
             "name": "composer/spdx-licenses",
