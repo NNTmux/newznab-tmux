@@ -28,7 +28,6 @@ use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use FFMpeg\Filters\Video\ResizeFilter;
@@ -41,11 +40,6 @@ class ProcessAdditional
      * @var int
      */
     public const maxCompressedFilesToCheck = 10;
-
-    /**
-     * @var \PDO
-     */
-    public $pdo;
 
     /**
      * @var bool
@@ -450,12 +444,12 @@ class ProcessAdditional
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
         if (Settings::settingValue('apps..unrarpath') !== '') {
-            $clients += [ArchiveInfo::TYPE_RAR => Settings::settingValue('apps..unrarpath')];
             $this->_unrarPath = Settings::settingValue('apps..unrarpath');
+            $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
         }
         if (Settings::settingValue('apps..zippath') !== '') {
-            $clients += [ArchiveInfo::TYPE_ZIP => Settings::settingValue('apps..zippath')];
             $this->_7zipPath = Settings::settingValue('apps..zippath');
+            $clients += [ArchiveInfo::TYPE_ZIP => $this->_7zipPath];
         }
         $this->_archiveInfo->setExternalClients($clients);
 
@@ -1116,7 +1110,7 @@ class ProcessAdditional
                     $this->_echo('z', 'primaryOver');
                 }
 
-                if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
+                if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
                     $fileName = $this->tmpPath.uniqid('', true).'.zip';
                     File::put($fileName, $compressedData);
                     runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
@@ -1703,14 +1697,14 @@ class ProcessAdditional
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
-                sprintf(
+            sprintf(
                     '/%d\d{3}|%d|%d|%d/',
                     $musicParent[0],
                     Category::OTHER_MISC,
                     Category::MOVIE_OTHER,
                     Category::TV_OTHER
                 ),
-                $rQuery->id
+            $rQuery->id
             )
         ) {
             return false;
