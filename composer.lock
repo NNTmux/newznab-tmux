@@ -802,16 +802,16 @@
         },
         {
             "name": "dariusiii/rarinfo",
-            "version": "v2.7.4",
+            "version": "v2.7.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "bd03efd506daf7dbdb6d57b4ed7d78c812ccf8af"
+                "reference": "37f18f0cd5da625cbcb399bfcf49238b34fffa68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/bd03efd506daf7dbdb6d57b4ed7d78c812ccf8af",
-                "reference": "bd03efd506daf7dbdb6d57b4ed7d78c812ccf8af",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/37f18f0cd5da625cbcb399bfcf49238b34fffa68",
+                "reference": "37f18f0cd5da625cbcb399bfcf49238b34fffa68",
                 "shasum": ""
             },
             "require": {
@@ -845,7 +845,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2019-03-20T10:29:15+00:00"
+            "time": "2019-03-20T11:22:25+00:00"
         },
         {
             "name": "dborsatto/php-giantbomb",
