@@ -89,7 +89,7 @@ class ADM extends AdultMovies
      *
      * @return array
      */
-    protected function synopsis()
+    protected function synopsis(): array
     {
         $this->_res['synopsis'] = 'N/A';
         foreach ($this->_html->find('h3') as $heading) {
@@ -109,7 +109,7 @@ class ADM extends AdultMovies
      *
      * @return array
      */
-    protected function productInfo($extras = false)
+    protected function productInfo($extras = false): array
     {
         foreach ($this->_html->find('ul.list-unstyled li') as $li) {
             $category = explode(':', $li->plaintext);
@@ -132,7 +132,7 @@ class ADM extends AdultMovies
      * Gets the cast members.
      * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = [];
         foreach ($this->_html->find('h3') as $heading) {
@@ -156,7 +156,7 @@ class ADM extends AdultMovies
      * Gets categories.
      * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         $genres = [];
         foreach ($this->_html->find('ul.list-unstyled') as $li) {
@@ -179,7 +179,7 @@ class ADM extends AdultMovies
      *
      * @return bool - true if search = 100%
      */
-    public function processSite($movie)
+    public function processSite($movie): bool
     {
         $result = false;
         if (! empty($movie)) {

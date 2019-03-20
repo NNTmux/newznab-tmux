@@ -60,7 +60,7 @@ class ADE extends AdultMovies
     {
         $this->_response = getRawHtml(self::ADE.$this->_trailers.$this->_directUrl);
         $this->_html->loadHtml($this->_response);
-        if (preg_match("/(\"|')(?P<swf>[^\"']+.swf)(\"|')/i", $this->_response, $matches)) {
+        if (preg_match("/([\"|'])(?P<swf>[^\"']+.swf)([\"|'])/i", $this->_response, $matches)) {
             $this->_res['trailers']['url'] = self::ADE.trim(trim($matches['swf']), '"');
             if (preg_match(
                 '#(?:streamID:\s\")(?P<streamid>[0-9A-Z]+)(?:\")#',

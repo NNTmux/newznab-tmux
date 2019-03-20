@@ -145,7 +145,7 @@ class Hotmovies extends AdultMovies
      *
      * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = [];
         if ($this->_html->find('.stars bottom_margin')) {
@@ -165,7 +165,7 @@ class Hotmovies extends AdultMovies
      *
      * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         $genres = [];
         if ($ret = $this->_html->findOne('div.categories')) {

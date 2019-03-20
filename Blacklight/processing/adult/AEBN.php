@@ -82,7 +82,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function covers()
+    protected function covers(): array
     {
         $ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1);
         if ($ret !== false) {
@@ -102,7 +102,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         if ($ret = $this->_html->findOne('div.md-detailsCategories')) {
             foreach ($ret->find('a[itemprop=genre]') as $genre) {
@@ -121,7 +121,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $this->_res = false;
         $ret = $this->_html->findOne('div.starsFull');
@@ -150,7 +150,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function productInfo($extras = false)
+    protected function productInfo($extras = false): array
     {
         if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
             foreach ($ret->find('div') as $div) {
@@ -178,7 +178,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function synopsis()
+    protected function synopsis(): array
     {
         if ($ret = $this->_html->findOne('span[itemprop=about]')) {
             if ($ret === null) {
