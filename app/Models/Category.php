@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -276,8 +277,7 @@ class Category extends Model
             ->with('parent')
             ->remember(config('nntmux.cache_expiry_long'))
             ->where('r.adddate', '>', now()->subWeek())
-            ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
-            ->selectRaw('COUNT(r.id) as count')
+            ->select(['root_categories_id', DB::raw('COUNT(r.id) as count'), 'title'])
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
             ->groupBy('title')
             ->orderBy('count', 'desc')

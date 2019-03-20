@@ -1,4 +1,5 @@
 2019-03-20 DariusIII
+	* Fix: Fix site stats admin page
 	* Chg: Update return type declarations on adult postprocessing classes
 	* Chg: Update dariusiii/rarinfo (v2.7.4 => v2.7.4.1)
 	* Chg: Update dariusiii/rarinfo (v2.7.3 => v2.7.4)
