@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\UsersRelease;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,12 +41,15 @@ class CartController extends BasePageController
 
         $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
 
-        if (! empty($data)) {
+        if (empty($data)) {
             return redirect('/cart/index');
         }
 
         foreach ($data as $d) {
-            UsersRelease::addCart($this->userdata->id, $d['id']);
+            $check = UsersRelease::whereReleasesId($d['id'])->first();
+            if (empty($check)) {
+                UsersRelease::addCart($this->userdata->id, $d['id']);
+            }
         }
         return redirect('/cart/index');
     }
