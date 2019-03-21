@@ -51,6 +51,7 @@ class CartController extends BasePageController
                 UsersRelease::addCart($this->userdata->id, $d['id']);
             }
         }
+
         return redirect('/cart/index');
     }
 
