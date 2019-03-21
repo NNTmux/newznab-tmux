@@ -5364,16 +5364,16 @@
         },
         {
             "name": "rtconner/laravel-tagging",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtconner/laravel-tagging.git",
-                "reference": "f2eb740509f65e6dbdb2ee372df130564dd7c914"
+                "reference": "2b151ba2962b6ae6cc1499b5983b95c5174787d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/f2eb740509f65e6dbdb2ee372df130564dd7c914",
-                "reference": "f2eb740509f65e6dbdb2ee372df130564dd7c914",
+                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/2b151ba2962b6ae6cc1499b5983b95c5174787d9",
+                "reference": "2b151ba2962b6ae6cc1499b5983b95c5174787d9",
                 "shasum": ""
             },
             "require": {
@@ -5422,7 +5422,7 @@
                 "tagging",
                 "tags"
             ],
-            "time": "2019-03-20T03:27:08+00:00"
+            "time": "2019-03-21T01:31:09+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
@@ -7938,16 +7938,16 @@
         },
         {
             "name": "wildbit/swiftmailer-postmark",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wildbit/swiftmailer-postmark.git",
-                "reference": "1cf0fd1aa6cbacd5ca6ff87425c02f0e17bb7519"
+                "reference": "0c13c26e8453fe84954f12c3765c681f6fc2c965"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wildbit/swiftmailer-postmark/zipball/1cf0fd1aa6cbacd5ca6ff87425c02f0e17bb7519",
-                "reference": "1cf0fd1aa6cbacd5ca6ff87425c02f0e17bb7519",
+                "url": "https://api.github.com/repos/wildbit/swiftmailer-postmark/zipball/0c13c26e8453fe84954f12c3765c681f6fc2c965",
+                "reference": "0c13c26e8453fe84954f12c3765c681f6fc2c965",
                 "shasum": ""
             },
             "require": {
@@ -7974,7 +7974,7 @@
                 }
             ],
             "description": "A Swiftmailer Transport for Postmark.",
-            "time": "2018-07-20T15:34:31+00:00"
+            "time": "2019-03-01T17:25:04+00:00"
         },
         {
             "name": "yab/laravel-scout-mysql-driver",
