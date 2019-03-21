@@ -1,3 +1,5 @@
+2019-03-21 DariusIII
+	* Chg: Adjust return values of cast function in adult postprocessing
 2019-03-20 DariusIII
 	* Fix: Fix site stats admin page
 	* Chg: Update return type declarations on adult postprocessing classes

@@ -123,7 +123,7 @@ class AEBN extends AdultMovies
      */
     protected function cast(): array
     {
-        $this->_res = false;
+        $this->_res = [];
         $ret = $this->_html->findOne('div.starsFull');
         if (! $ret instanceof SimpleHtmlDomNodeBlank) {
             foreach ($ret->find('span[itemprop=name]') as $star) {

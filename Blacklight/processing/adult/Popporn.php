@@ -189,9 +189,9 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @return array|mixed
+     * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = false;
         $director = false;
@@ -210,12 +210,10 @@ class Popporn extends AdultMovies
                         $e = null;
                     }
 
-                    if ($director === true) {
-                        if (! empty($e)) {
-                            $this->_res['director'] = $e;
-                            $director = false;
-                            $e = null;
-                        }
+                    if (($director === true) && ! empty($e)) {
+                        $this->_res['director'] = $e;
+                        $director = false;
+                        $e = null;
                     }
                     if (stripos($e, 'Country:') === false) {
                         if (! empty($e)) {

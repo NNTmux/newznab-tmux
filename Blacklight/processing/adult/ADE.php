@@ -118,7 +118,7 @@ class ADE extends AdultMovies
      *
      * @return array - cast, awards
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = [];
         foreach ($this->_html->find('h3') as $a) {
