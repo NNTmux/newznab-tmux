@@ -38,15 +38,16 @@ class CartController extends BasePageController
         $this->setPrefs();
         $guids = explode(',', $request->input('id'));
 
-        $data = Release::getByGuid($guids);
+        $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
 
-        if (! $data) {
+        if (! empty($data)) {
             return redirect('/cart/index');
         }
 
         foreach ($data as $d) {
             UsersRelease::addCart($this->userdata->id, $d['id']);
         }
+        return redirect('/cart/index');
     }
 
     /**

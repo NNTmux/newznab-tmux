@@ -1,4 +1,5 @@
 2019-03-21 DariusIII
+	* Chg: Use separate query to add releases to cart as we only need the id, so no need to use heavier getByGuid function
 	* Chg: Update font-awesome to latest version
 	* Chg: Update rtconner/laravel-tagging (3.1.0 => 3.1.1), wildbit/swiftmailer-postmark (3.0.1 => 3.0.2)
 	* Chg: Adjust return values of cast function in adult postprocessing
