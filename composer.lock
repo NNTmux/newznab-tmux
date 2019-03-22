@@ -2513,16 +2513,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.8.5",
+            "version": "v5.8.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "791992e20efdf043ac3c2d989025d48d648821de"
+                "reference": "f12c7baf9ceee80b131e06a01d3221d9a2488670"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/791992e20efdf043ac3c2d989025d48d648821de",
-                "reference": "791992e20efdf043ac3c2d989025d48d648821de",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/f12c7baf9ceee80b131e06a01d3221d9a2488670",
+                "reference": "f12c7baf9ceee80b131e06a01d3221d9a2488670",
                 "shasum": ""
             },
             "require": {
@@ -2656,7 +2656,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-03-19T14:20:36+00:00"
+            "time": "2019-03-21T16:54:38+00:00"
         },
         {
             "name": "laravel/horizon",

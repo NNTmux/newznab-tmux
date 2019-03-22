@@ -1,3 +1,5 @@
+2019-03-22 DariusIII
+	* Chg: Update laravel/framework (v5.8.5 => v5.8.7)
 2019-03-21 DariusIII
 	* Fix: Fix logic and add check for duplicated data
 	* Chg: Use separate query to add releases to cart as we only need the id, so no need to use heavier getByGuid function
