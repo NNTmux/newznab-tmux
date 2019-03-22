@@ -746,16 +746,12 @@ class User extends Authenticatable
      * @return bool|int
      * @throws \Exception
      */
-    public static function add($userName, $password, $email, $role, $notes, $host, $invites = Invitation::DEFAULT_INVITES, $invitedBy = 0)
+    public static function add($userName, $password, $email, $role, $notes = '', $host = '', $invites = Invitation::DEFAULT_INVITES, $invitedBy = 0)
     {
         $password = self::hashPassword($password);
         if (! $password) {
             return false;
         }
-
-        $roleData = Role::query()->where('id', $role);
-        $rateLimit = $roleData->value('rate_limit');
-        $roleName = $roleData->value('name');
 
         $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
 
@@ -766,16 +762,11 @@ class User extends Authenticatable
                 'email' => $email,
                 'host' => $storeips,
                 'roles_id' => $role,
-                'api_token' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
                 'invitedby' => (int) $invitedBy === 0 ? null : $invitedBy,
-                'userseed' => md5(Str::uuid()->toString()),
                 'notes' => $notes,
-                'rate_limit' => $rateLimit,
             ]
         );
-
-        $user->assignRole($roleName);
 
         return $user->id;
     }
@@ -834,7 +825,7 @@ class User extends Authenticatable
             }
         }
 
-        $exclusion = Category::query()->whereIn('parentid', $ret)->pluck('id')->toArray();
+        $exclusion = Category::query()->whereIn('root_categories_id', $ret)->pluck('id')->toArray();
 
         return $exclusion;
     }

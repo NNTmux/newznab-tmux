@@ -19,7 +19,7 @@ body {
     box-sizing: border-box;
     margin: 1rem auto 0;
     max-width: 820px;
-    min-height: calc(99vh);
+    min-height: calc(100vh - 1rem);
     padding: 4rem 6rem 6rem 6rem;
   }
 }
@@ -29,7 +29,7 @@ table {
 table th,
 table td {
   border: 1px solid #ccc;
-  padding: .4rem;
+  padding: 0.4rem;
 }
 blockquote {
   border-left: 2px solid #ccc;
@@ -38,7 +38,7 @@ blockquote {
 }
 figure figcaption {
   color: #999;
-  margin-top: .25rem;
+  margin-top: 0.25rem;
   text-align: center;
 }
 hr {

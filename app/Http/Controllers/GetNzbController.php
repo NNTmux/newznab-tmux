@@ -64,7 +64,7 @@ class GetNzbController extends BasePageController
         // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
         $request->merge(['id' => str_ireplace('.nzb', '', $request->input('id'))]);
 
-        $rel = new Releases(['Settings' => $this->settings]);
+        $rel = new Releases();
         // User requested a zip of guid,guid,guid releases.
         if ($request->has('zip') && $request->input('zip') === '1') {
             $guids = explode(',', $request->input('id'));

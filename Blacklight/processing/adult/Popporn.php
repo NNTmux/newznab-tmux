@@ -23,9 +23,9 @@ class Popporn extends AdultMovies
      * Define PopPorn url
      * Needed Search Queries Constant.
      */
-    protected const IF18 = 'https://www.popporn.com/popporn/4';
-    protected const POPURL = 'https://www.popporn.com';
-    protected const TRAILINGSEARCH = '/search&q=';
+    private const IF18 = 'https://www.popporn.com/popporn/4';
+    private const POPURL = 'https://www.popporn.com';
+    private const TRAILINGSEARCH = '/search&q=';
 
     /**
      * Sets the directurl for the return results array.
@@ -60,13 +60,7 @@ class Popporn extends AdultMovies
      */
     protected $_trailUrl = '';
 
-    /**
-     * Popporn constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private $_postParams;
 
     /**
      * Get Box Cover Images.
@@ -126,7 +120,7 @@ class Popporn extends AdultMovies
             $ret->value = str_replace('..', '', $ret->value);
             $tmprsp = $this->_response;
             $this->_trailUrl = $ret->value;
-            if (preg_match_all('/productID="\+(?<id>[0-9]+),/', $this->_response, $matches)) {
+            if (preg_match_all('/productID="\+(?<id>\d+),/', $this->_response, $matches)) {
                 $productid = $matches['id'][0];
                 $random = ((float) mt_rand() / (float) mt_getrandmax()) * 5400000000000000;
                 $this->_trailUrl = '/com/tlavideo/vod/FlvAjaxSupportService.cfc?random='.$random;
@@ -195,9 +189,9 @@ class Popporn extends AdultMovies
     }
 
     /**
-     * @return array|mixed
+     * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = false;
         $director = false;
@@ -216,12 +210,10 @@ class Popporn extends AdultMovies
                         $e = null;
                     }
 
-                    if ($director === true) {
-                        if (! empty($e)) {
-                            $this->_res['director'] = $e;
-                            $director = false;
-                            $e = null;
-                        }
+                    if (($director === true) && ! empty($e)) {
+                        $this->_res['director'] = $e;
+                        $director = false;
+                        $e = null;
                     }
                     if (stripos($e, 'Country:') === false) {
                         if (! empty($e)) {
@@ -272,7 +264,7 @@ class Popporn extends AdultMovies
                 if ($ret = $this->_html->loadHtml($this->_response)->find('div.product-info, div.title', 1)) {
                     $this->_title = trim($ret->plaintext);
                     $title = str_replace('XXX', '', $ret->plaintext);
-                    $title = trim(preg_replace('/\(.*?\)|[-._]/i', ' ', $title));
+                    $title = trim(preg_replace('/\(.*?\)|[._-]/i', ' ', $title));
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {
                         if ($ret = $ret->findOne('a')) {

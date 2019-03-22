@@ -165,8 +165,8 @@ class InstallNntmux extends Command
 
         $this->info('Adding admin user to database');
         try {
-            User::add(config('nntmux.admin_username'), config('nntmux.admin_password'), config('nntmux.admin_email'), 2, '', '', '', '');
-            User::where('username', config('nntmux.admin_username'))->update(['verified' => 1]);
+            User::add(config('nntmux.admin_username'), config('nntmux.admin_password'), config('nntmux.admin_email'), 2);
+            User::where('username', config('nntmux.admin_username'))->update(['verified' => 1, 'email_verified_at' => now()]);
         } catch (\Throwable $e) {
             echo $e->getMessage();
             $this->error('Unable to add admin user!');

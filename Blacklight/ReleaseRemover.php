@@ -123,7 +123,7 @@ class ReleaseRemover
         $options += $defaults;
 
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => null]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->colorCli = new ColorCLI();

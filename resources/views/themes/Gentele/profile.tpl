@@ -141,7 +141,7 @@
                                                         <tr>
                                                             <th title="Not public">API/RSS Key</th>
                                                             <td>
-                                                                <a href="{$smarty.const.WWW_TOP}rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.api_token}">{$user.api_token}</a>
+                                                                <a href="{$smarty.const.WWW_TOP}rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}">{$user.api_token}</a>
                                                                 <a href="{$smarty.const.WWW_TOP}profileedit?action=newapikey"
                                                                    class="badge badge-danger">GENERATE NEW
                                                                     KEY</a>

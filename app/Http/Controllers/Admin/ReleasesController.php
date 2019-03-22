@@ -90,11 +90,10 @@ class ReleasesController extends BasePageController
 
     /**
      * @param $id
-     *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id)
     {
         if ($id) {
             $releases = new Releases();

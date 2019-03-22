@@ -15,14 +15,14 @@ class CollectionsCleaning
      * @const
      * @string
      */
-    public const REGEX_END = '[-_\s]{0,3}yEnc$/ui';
+    public const REGEX_END = '[\-_\s]{0,3}yEnc$/ui';
 
     /**
      * Used for matching file extension endings in article subjects.
      * @const
      * @string
      */
-    public const REGEX_FILE_EXTENSIONS = '([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol\d+\+\d+.+?"|\.[A-Za-z0-9]{2,4}"|")';
+    public const REGEX_FILE_EXTENSIONS = '([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol\d+\+\d+.+?"|\.[A-Za-z0-9]{2,4}"|")';
 
     /**
      * Used for matching size strings in article subjects.
@@ -30,7 +30,7 @@ class CollectionsCleaning
      * @const
      * @string
      */
-    public const REGEX_SUBJECT_SIZE = '[-_\s]{0,3}\d+([.,]\d+)? [kKmMgG][bB][-_\s]{0,3}';
+    public const REGEX_SUBJECT_SIZE = '[\-_\s]{0,3}\d+([.,]\d+)? [kKmMgG][bB][\-_\s]{0,3}';
 
     /**
      * Collection subject failed to match any regular expression.
@@ -164,7 +164,7 @@ class CollectionsCleaning
         // Multi spaces.
         $cleanSubject = utf8_encode(trim(preg_replace('/\s\s+/i', ' ', $cleanSubject)));
         // If the subject is too similar to another because it is so short, try to extract info from the subject.
-        if (\strlen($cleanSubject) <= 10 || preg_match('/^[-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
+        if (\strlen($cleanSubject) <= 10 || preg_match('/^[\-a-z0-9$ ]{1,7}yEnc$/i', $cleanSubject)) {
             $x = '';
             if (preg_match('/.*("[A-Z0-9]+).*?"/i', $this->subject, $match)) {
                 $x = $match[1];

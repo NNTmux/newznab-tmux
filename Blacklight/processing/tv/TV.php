@@ -314,7 +314,7 @@ abstract class TV extends Videos
         $ifStringInfo = "IF(%s = '', %s, %s)";
 
         DB::update(
-                sprintf(
+            sprintf(
                     '
 				UPDATE videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
@@ -322,17 +322,17 @@ abstract class TV extends Videos
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-                        sprintf($ifStringInfo, 'v.countries_id', escapeString($show['country']), 'v.countries_id'),
-                        sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
-                        sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
-                        sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
-                        sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
-                        sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
-                        sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-                        sprintf($ifStringInfo, 'tvi.summary', escapeString($show['summary']), 'tvi.summary'),
-                        sprintf($ifStringInfo, 'tvi.publisher', escapeString($show['publisher']), 'tvi.publisher'),
-                        sprintf($ifStringInfo, 'tvi.localzone', escapeString($show['localzone']), 'tvi.localzone'),
-                        $videoId
+                    sprintf($ifStringInfo, 'v.countries_id', escapeString($show['country']), 'v.countries_id'),
+                    sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
+                    sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
+                    sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
+                    sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
+                    sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
+                    sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
+                    sprintf($ifStringInfo, 'tvi.summary', escapeString($show['summary']), 'tvi.summary'),
+                    sprintf($ifStringInfo, 'tvi.publisher', escapeString($show['publisher']), 'tvi.publisher'),
+                    sprintf($ifStringInfo, 'tvi.localzone', escapeString($show['localzone']), 'tvi.localzone'),
+                    $videoId
                 )
         );
         if (! empty($show['aliases'])) {
@@ -507,8 +507,8 @@ abstract class TV extends Videos
         $showName = '';
 
         $following = '[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d'.
-                '|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|'.
-                'S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
+                '|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][\-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|'.
+                'S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[\-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
         // For names that don't start with the title.
         if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $matches)) {

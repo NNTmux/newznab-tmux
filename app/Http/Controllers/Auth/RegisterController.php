@@ -69,10 +69,6 @@ class RegisterController extends Controller
             'userseed' => md5(Str::uuid()->toString()),
         ]);
 
-        $roleName = Role::query()->where('id', $data['roles_id'])->value('name');
-
-        $user->assignRole($roleName);
-
         return $user;
     }
 

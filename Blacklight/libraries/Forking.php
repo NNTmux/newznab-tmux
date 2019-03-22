@@ -202,7 +202,7 @@ class Forking extends \fork_daemon
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                    'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
+                'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
                 );
         }
@@ -294,7 +294,7 @@ class Forking extends \fork_daemon
         if ($this->_workCount > 0) {
             if (config('nntmux.echocli') === true) {
                 $this->colorCli->header(
-                        'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
+                    'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
                         ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
                     );
             }
@@ -1087,7 +1087,7 @@ class Forking extends \fork_daemon
     {
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                    'Process ID #'.$pid.' has completed.'.PHP_EOL.
+                'Process ID #'.$pid.' has completed.'.PHP_EOL.
                     'There are '.($this->forked_children_count - 1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.',
                 true

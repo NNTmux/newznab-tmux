@@ -26,8 +26,7 @@ class CommentsController extends BasePageController
 
     /**
      * @param $id
-     *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function destroy($id)
     {

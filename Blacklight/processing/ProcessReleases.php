@@ -11,6 +11,8 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
+use App\Models\MusicInfo;
+use App\Models\Collection;
 use Blacklight\Categorize;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
@@ -18,8 +20,10 @@ use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
 use Blacklight\ReleaseImage;
 use App\Models\ReleasesGroups;
+use Illuminate\Support\Carbon;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcessReleases
 {
@@ -127,7 +131,7 @@ class ProcessReleases
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning());
-        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Groups' => null]));
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases());
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->colorCli = new ColorCLI();
 
@@ -229,26 +233,21 @@ class ProcessReleases
     /**
      * Categorizes releases.
      *
-     * @param string $type  name or searchname | Categorize using the search name or subject.
-     * @param string $where Optional "where" query parameter.
-     *
+     * @param string $type name or searchname | Categorize using the search name or subject.
+     * @param $groupId
      * @return int Quantity of categorized releases.
      * @throws \Exception
      */
-    public function categorizeRelease($type, $where = ''): int
+    public function categorizeRelease($type, $groupId): int
     {
         $cat = new Categorize();
         $categorized = $total = 0;
-        $releases = Release::fromQuery(
-            sprintf(
-                '
-				SELECT id, fromname, %s, groups_id
-				FROM releases %s',
-                $type,
-                $where
-            )
-        );
-        if (\count($releases) > 0) {
+        $releasesQuery = Release::query()->where(['categories_id' => Category::OTHER_MISC, 'iscategorized' => 0]);
+        if (! empty($groupId)) {
+            $releasesQuery->where('groups_id', $groupId);
+        }
+        $releases = $releasesQuery->select(['id', 'fromname', 'groups_id', $type])->get();
+        if ($releases->count() > 0) {
             $total = \count($releases);
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release->groups_id, $release->{$type}, $release->fromname);
@@ -290,33 +289,29 @@ class ProcessReleases
 
         $where = (! empty($groupID) ? ' AND c.groups_id = '.$groupID.' ' : ' ');
 
-        $this->processStuckCollections($where);
-        $this->collectionFileCheckStage1($where);
-        $this->collectionFileCheckStage2($where);
+        $this->processStuckCollections($groupID);
+        $this->collectionFileCheckStage1($groupID);
+        $this->collectionFileCheckStage2($groupID);
         $this->collectionFileCheckStage3($where);
         $this->collectionFileCheckStage4($where);
-        $this->collectionFileCheckStage5($where);
+        $this->collectionFileCheckStage5($groupID);
         $this->collectionFileCheckStage6($where);
 
         if ($this->echoCLI) {
-            $count = DB::selectOne(
-                sprintf(
-                    '
-					SELECT COUNT(c.id) AS complete
-					FROM collections c
-					WHERE c.filecheck = %d %s',
-                    self::COLLFC_COMPPART,
-                    $where
-                )
-            );
+            $countQuery = Collection::query()->where('filecheck', self::COLLFC_COMPPART);
+
+            if (! empty($groupID)) {
+                $countQuery->where('groups_id', $groupID);
+            }
+            $count = $countQuery->count('id');
 
             $totalTime = now()->diffInSeconds($startTime);
 
             $this->colorCli->primary(
-                ($count === null ? 0 : $count->complete).' collections were found to be complete. Time: '.
-                    $totalTime.Str::plural(' second', $totalTime),
+                ($count ?? 0).' collections were found to be complete. Time: '.
+                $totalTime.Str::plural(' second', $totalTime),
                 true
-                );
+            );
         }
     }
 
@@ -324,6 +319,7 @@ class ProcessReleases
      * @param $groupID
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function processCollectionSizes($groupID): void
     {
@@ -398,11 +394,7 @@ class ProcessReleases
                 }
             }
 
-            if (DB::selectOne(sprintf('
-						SELECT SQL_NO_CACHE id
-						FROM collections c
-						WHERE c.filecheck = %d
-						AND c.filesize > 0', self::COLLFC_SIZED)) !== null) {
+            if (Collection::query()->where('filecheck', self::COLLFC_SIZED)->where('filesize', '>', 0)->first() !== null) {
                 DB::transaction(function () use (
                     $groupMinSizeSetting,
                     $minSizeSetting,
@@ -414,22 +406,21 @@ class ProcessReleases
                     $minFilesDeleted,
                     $startTime
                 ) {
-                    $deleteQuery = DB::delete(sprintf('
-						DELETE c FROM collections c
-						WHERE c.filecheck = %d
-						AND c.filesize > 0
-						AND GREATEST(%d, %d) > 0
-						AND c.filesize < GREATEST(%d, %d)', self::COLLFC_SIZED, $groupMinSizeSetting, $minSizeSetting, $groupMinSizeSetting, $minSizeSetting));
+                    $deleteQuery = Collection::query()
+                        ->where('filecheck', self::COLLFC_SIZED)
+                        ->where('filesize', '>', 0)
+                        ->whereRaw('GREATEST(?, ?) > 0 AND filesize < GREATEST(?, ?)', [$groupMinSizeSetting, $minSizeSetting, $groupMinSizeSetting, $minSizeSetting])
+                        ->delete();
 
                     if ($deleteQuery > 0) {
                         $minSizeDeleted += $deleteQuery;
                     }
 
                     if ($maxSizeSetting > 0) {
-                        $deleteQuery = DB::delete(sprintf('
-							DELETE c FROM collections c
-							WHERE c.filecheck = %d
-							AND c.filesize > %d', self::COLLFC_SIZED, $maxSizeSetting));
+                        $deleteQuery = Collection::query()
+                            ->where('filecheck', '=', self::COLLFC_SIZED)
+                            ->where('filesize', '>', $maxSizeSetting)
+                            ->delete();
 
                         if ($deleteQuery > 0) {
                             $maxSizeDeleted += $deleteQuery;
@@ -437,11 +428,11 @@ class ProcessReleases
                     }
 
                     if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
-                        $deleteQuery = DB::delete(sprintf('
-						DELETE c FROM collections c
-						WHERE c.filecheck = %d
-						AND GREATEST(%d, %d) > 0
-						AND c.totalfiles < GREATEST(%d, %d)', self::COLLFC_SIZED, $groupMinFilesSetting, $minFilesSetting, $groupMinFilesSetting, $minFilesSetting));
+                        $deleteQuery = Collection::query()
+                            ->where('filecheck', self::COLLFC_SIZED)
+                            ->where('filesize', '>', 0)
+                            ->whereRaw('GREATEST(?, ?) > 0 AND totalfiles < GREATEST(?, ?)', [$groupMinFilesSetting, $minFilesSetting, $groupMinFilesSetting, $minFilesSetting])
+                            ->delete();
 
                         if ($deleteQuery > 0) {
                             $minFilesDeleted += $deleteQuery;
@@ -474,23 +465,17 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->header('Process Releases -> Create releases from complete collections.');
         }
-
-        $collections = DB::select(
-            sprintf(
-                '
-				SELECT SQL_NO_CACHE c.*, g.name AS gname
-				FROM collections c
-				INNER JOIN usenet_groups g ON c.groups_id = g.id
-				WHERE %s c.filecheck = %d
-				AND c.filesize > 0
-				LIMIT %d',
-                (! empty($groupID) ? ' c.groups_id = '.$groupID.' AND ' : ' '),
-                self::COLLFC_SIZED,
-                $this->releaseCreationLimit
-            )
-        );
-
-        if ($this->echoCLI && \count($collections) > 0) {
+        $collectionsQuery = Collection::query()
+            ->where('collections.filecheck', self::COLLFC_SIZED)
+            ->where('collections.filesize', '>', 0);
+        if (! empty($groupID)) {
+            $collectionsQuery->where('collections.groups_id', $groupID);
+        }
+        $collectionsQuery->select(['collections.*', 'usenet_groups.name as gname'])
+            ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
+            ->limit($this->releaseCreationLimit);
+        $collections = $collectionsQuery->get();
+        if ($this->echoCLI && $collections->count() > 0) {
             $this->colorCli->primary(\count($collections).' Collections ready to be converted to releases.', true);
         }
 
@@ -498,21 +483,21 @@ class ProcessReleases
             $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
             $fromName = utf8_encode(
                 trim($collection->fromname, "'")
-                );
+            );
 
             // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
             // A 1% variance in size is considered the same size when the subject and poster are the same
             $dupeCheck = Release::query()
-                    ->where(['name' => $cleanRelName, 'fromname' => $fromName])
-                    ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
-                    ->first(['id']);
+                ->where(['name' => $cleanRelName, 'fromname' => $fromName])
+                ->whereBetween('size', [$collection->filesize * .99, $collection->filesize * 1.01])
+                ->first(['id']);
 
             if ($dupeCheck === null) {
                 $cleanedName = $this->releaseCleaning->releaseCleaner(
                     $collection->subject,
                     $collection->fromname,
                     $collection->gname
-                    );
+                );
 
                 if (\is_array($cleanedName)) {
                     $properName = $cleanedName['properlynamed'];
@@ -537,49 +522,40 @@ class ProcessReleases
 
                 $releaseID = Release::insertRelease(
                     [
-                            'name' => $cleanRelName,
-                            'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
-                            'totalpart' => $collection->totalfiles,
-                            'groups_id' => $collection->groups_id,
-                            'guid' => createGUID(),
-                            'postdate' => $collection->date,
-                            'fromname' => $fromName,
-                            'size' => $collection->filesize,
-                            'categories_id' => $determinedCategory['categories_id'],
-                            'isrenamed' => $properName === true ? 1 : 0,
-                            'predb_id' => $preID === false ? 0 : $preID,
-                            'nzbstatus' => NZB::NZB_NONE,
-                        ]
-                    );
+                        'name' => $cleanRelName,
+                        'searchname' => ! empty($cleanedName) ? utf8_encode($cleanedName) : $cleanRelName,
+                        'totalpart' => $collection->totalfiles,
+                        'groups_id' => $collection->groups_id,
+                        'guid' => createGUID(),
+                        'postdate' => $collection->date,
+                        'fromname' => $fromName,
+                        'size' => $collection->filesize,
+                        'categories_id' => $determinedCategory['categories_id'],
+                        'isrenamed' => $properName === true ? 1 : 0,
+                        'predb_id' => $preID === false ? 0 : $preID,
+                        'nzbstatus' => NZB::NZB_NONE,
+                    ]
+                );
                 try {
                     $release = Release::find($releaseID);
                     $release->retag($determinedCategory['tags']);
                 } catch (\Throwable $e) {
+                    Log::debug($e->getTraceAsString());
                     //Just pass this part, tag is not created for some reason, exception is thrown and blocks release creation
                 }
 
                 if ($releaseID !== null) {
                     // Update collections table to say we inserted the release.
                     DB::transaction(function () use ($collection, $releaseID) {
-                        DB::update(
-                            sprintf(
-                                '
-								UPDATE collections
-								SET filecheck = %d, releases_id = %d
-								WHERE id = %d',
-                                self::COLLFC_INSERTED,
-                                $releaseID,
-                                $collection->id
-                            )
-                        );
+                        Collection::query()->where('id', $collection->id)->update(['filecheck' => self::COLLFC_INSERTED, 'releases_id' => $releaseID]);
                     }, 10);
 
                     // Add the id of regex that matched the collection and release name to release_regexes table
                     ReleaseRegex::insertIgnore([
-                            'releases_id'            => $releaseID,
-                            'collection_regex_id'    => $collection->collection_regexes_id,
-                            'naming_regex_id'        => $cleanedName['id'] ?? 0,
-                        ]);
+                        'releases_id'            => $releaseID,
+                        'collection_regex_id'    => $collection->collection_regexes_id,
+                        'naming_regex_id'        => $cleanedName['id'] ?? 0,
+                    ]);
 
                     if (preg_match_all('#(\S+):\S+#', $collection->xref, $matches)) {
                         foreach ($matches[1] as $grp) {
@@ -591,33 +567,33 @@ class ProcessReleases
                                 if ($xrefGrpID === '') {
                                     $xrefGrpID = UsenetGroup::addGroup(
                                         [
-                                                'name'                  => $grpTmp,
-                                                'description'           => 'Added by Release processing',
-                                                'backfill_target'       => 1,
-                                                'first_record'          => 0,
-                                                'last_record'           => 0,
-                                                'active'                => 0,
-                                                'backfill'              => 0,
-                                                'minfilestoformrelease' => '',
-                                                'minsizetoformrelease'  => '',
-                                            ]
-                                        );
+                                            'name'                  => $grpTmp,
+                                            'description'           => 'Added by Release processing',
+                                            'backfill_target'       => 1,
+                                            'first_record'          => 0,
+                                            'last_record'           => 0,
+                                            'active'                => 0,
+                                            'backfill'              => 0,
+                                            'minfilestoformrelease' => '',
+                                            'minsizetoformrelease'  => '',
+                                        ]
+                                    );
                                 }
 
                                 $relGroupsChk = ReleasesGroups::query()->where(
                                     [
-                                            ['releases_id', '=', $releaseID],
-                                            ['groups_id', '=', $xrefGrpID],
-                                        ]
-                                    )->first();
+                                        ['releases_id', '=', $releaseID],
+                                        ['groups_id', '=', $xrefGrpID],
+                                    ]
+                                )->first();
 
                                 if ($relGroupsChk === null) {
                                     ReleasesGroups::query()->insert(
                                         [
-                                                'releases_id' => $releaseID,
-                                                'groups_id'   => $xrefGrpID,
-                                            ]
-                                        );
+                                            'releases_id' => $releaseID,
+                                            'groups_id'   => $xrefGrpID,
+                                        ]
+                                    );
                                 }
                             }
                         }
@@ -632,16 +608,8 @@ class ProcessReleases
             } else {
                 // The release was already in the DB, so delete the collection.
                 DB::transaction(function () use ($collection) {
-                    DB::delete(
-                        sprintf(
-                            '
-							DELETE c
-							FROM collections c
-							WHERE c.collectionhash = %s',
-                            escapeString($collection->collectionhash)
-                        )
-                    );
-                }, 3);
+                    Collection::query()->where('collectionhash', $collection->collectionhash)->delete();
+                }, 10);
 
                 $duplicate++;
             }
@@ -652,13 +620,13 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 PHP_EOL.
-                    number_format($returnCount).
-                    ' Releases added and '.
-                    number_format($duplicate).
-                    ' duplicate collections deleted in '.
-                    $totalTime.Str::plural(' second', $totalTime),
+                number_format($returnCount).
+                ' Releases added and '.
+                number_format($duplicate).
+                ' duplicate collections deleted in '.
+                $totalTime.Str::plural(' second', $totalTime),
                 true
-                );
+            );
         }
 
         return ['added' => $returnCount, 'dupes' => $duplicate];
@@ -680,28 +648,18 @@ class ProcessReleases
             $this->colorCli->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
         }
 
-        $releases = Release::fromQuery(
-            sprintf(
-                "
-				SELECT SQL_NO_CACHE
-					CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
-					r.name, r.id, r.guid
-				FROM releases r
-				INNER JOIN categories c ON r.categories_id = c.id
-				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE %s nzbstatus = 0",
-                ! empty($groupID) ? ' r.groups_id = '.$groupID.' AND ' : ' '
-            )
-        );
+        $releasesQuery = Release::query()->with('category.parent')->where('nzbstatus', '=', 0);
+        if (! empty($groupID)) {
+            $releasesQuery->where('releases.groups_id', $groupID);
+        }
+        $releases = $releasesQuery->select(['id', 'guid', 'name', 'categories_id'])->get();
 
         $nzbCount = 0;
 
-        if (\count($releases) > 0) {
-            $total = \count($releases);
-            // Init vars for writing the NZB's.
-            $this->nzb->initiateForWrite();
+        if ($releases->count() > 0) {
+            $total = $releases->count();
             foreach ($releases as $release) {
-                if ($this->nzb->writeNzbForReleaseId($release->id, $release->guid, $release->name, $release->title)) {
+                if ($this->nzb->writeNzbForReleaseId($release)) {
                     $nzbCount++;
                     if ($this->echoCLI) {
                         echo "Creating NZBs and deleting Collections: $nzbCount/$total.\r";
@@ -715,8 +673,8 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 number_format($nzbCount).' NZBs created/Collections deleted in '.
-                    $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
-                    'Total time: '.$totalTime.Str::plural(' second', $totalTime),
+                $totalTime.Str::plural(' second', $totalTime).PHP_EOL.
+                'Total time: '.$totalTime.Str::plural(' second', $totalTime),
                 true
             );
         }
@@ -745,15 +703,12 @@ class ProcessReleases
                 break;
             case 1:
             default:
-
                 $type = 'name';
                 break;
         }
         $this->categorizeRelease(
             $type,
-            (! empty($groupID)
-                ? 'WHERE categories_id = '.Category::OTHER_MISC.' AND iscategorized = 0 AND groups_id = '.$groupID
-                : 'WHERE categories_id = '.Category::OTHER_MISC.' AND iscategorized = 0')
+            $groupID
         );
 
         $totalTime = now()->diffInSeconds($startTime);
@@ -779,8 +734,8 @@ class ProcessReleases
         } elseif ($this->echoCLI) {
             $this->colorCli->info(
                 'Post-processing is not running inside the Process Releases class.'.PHP_EOL.
-                    'If you are using tmux or screen they might have their own scripts running Post-processing.'
-                );
+                'If you are using tmux or screen they might have their own scripts running Post-processing.'
+            );
         }
     }
 
@@ -808,15 +763,9 @@ class ProcessReleases
 
         DB::transaction(function () use ($deletedCount, $startTime) {
             $deleted = 0;
-            $deleteQuery = DB::delete(
-                sprintf(
-                    '
-				DELETE c
-				FROM collections c
-				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
-                    Settings::settingValue('..partretentionhours')
-                )
-            );
+            $deleteQuery = Collection::query()
+                ->where('dateadded', '<', now()->subHours(Settings::settingValue('..partretentionhours')))
+                ->delete();
             if ($deleteQuery > 0) {
                 $deleted = $deleteQuery;
                 $deletedCount += $deleted;
@@ -838,138 +787,35 @@ class ProcessReleases
             if (random_int(0, 200) <= 1) {
                 // CBP collection orphaned with no binaries or parts.
                 if ($this->echoCLI) {
-                    echo
-                        $this->colorCli->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
-                        $this->colorCli->primary('Deleting orphaned collections.');
+                    echo $this->colorCli->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).$this->colorCli->primary('Deleting orphaned collections.');
                 }
 
                 $deleted = 0;
-                $deleteQuery =
-                    DB::delete(
-                        '
-					DELETE c, b, p
-					FROM collections c
-					LEFT JOIN binaries b ON c.id = b.collections_id
-					LEFT JOIN parts p ON b.id = p.binaries_id
-					WHERE (b.id IS NULL OR p.binaries_id IS NULL)'
-                    );
+                $deleteQuery = Collection::query()->whereNull('binaries.id')->orWhereNull('parts.binaries_id')->leftJoin('binaries', 'collections.id', '=', 'binaries.collections_id')->leftJoin('parts', 'binaries.id', '=', 'parts.binaries_id')->delete();
 
                 if ($deleteQuery > 0) {
                     $deleted = $deleteQuery;
                     $deletedCount += $deleted;
                 }
 
-                $secondQuery = now();
-                $totalTime = $secondQuery->diffInSeconds($firstQuery);
+                $totalTime = now()->diffInSeconds($firstQuery);
 
                 if ($this->echoCLI) {
-                    $this->colorCli->primary(
-                        'Finished deleting '.$deleted.' orphaned collections in '.
-                        $totalTime.Str::plural(' second', $totalTime),
-                        true
-                    );
+                    $this->colorCli->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
                 }
-
-                // orphaned binaries - binaries with no parts or binaries with no collection
-                // Don't delete currently inserting binaries by checking the max id.
-                if ($this->echoCLI) {
-                    $this->colorCli->primary('Deleting orphaned binaries/parts with no collection.', true);
-                }
-
-                $deleted = 0;
-                $deleteQuery =
-                    DB::delete(
-                        sprintf(
-                            'DELETE b, p FROM binaries b
-					LEFT JOIN parts p ON b.id = p.binaries_id
-					LEFT JOIN collections c ON b.collections_id = c.id
-					WHERE (p.binaries_id IS NULL OR c.id IS NULL)
-					AND b.id < %d',
-                            $this->maxQueryFormulator('binaries', 20000)
-                        )
-                    );
-
-                if ($deleteQuery > 0) {
-                    $deleted = $deleteQuery;
-                    $deletedCount += $deleted;
-                }
-
-                $thirdQuery = now();
-
-                $totalTime = $thirdQuery->diffInSeconds($secondQuery);
-
-                if ($this->echoCLI) {
-                    $this->colorCli->primary(
-                        'Finished deleting '.$deleted.' binaries with no collections or parts in '.$totalTime.Str::plural(' second', $totalTime),
-                        true
-                    );
-                }
-
-                // orphaned parts - parts with no binary
-                // Don't delete currently inserting parts by checking the max id.
-                if ($this->echoCLI) {
-                    $this->colorCli->primary('Deleting orphaned parts with no binaries.', true);
-                }
-                $deleted = 0;
-                $deleteQuery =
-                    DB::delete(
-                        sprintf(
-                            '
-					DELETE p
-					FROM parts p
-					LEFT JOIN binaries b ON p.binaries_id = b.id
-					WHERE b.id IS NULL
-					AND p.binaries_id < %d',
-                            $this->maxQueryFormulator('binaries', 20000)
-                        )
-                    );
-
-                if ($deleteQuery > 0) {
-                    $deleted = $deleteQuery;
-                    $deletedCount += $deleted;
-                }
-
-                $fourthQuery = now();
-
-                $totalTime = $fourthQuery->diffInSeconds($thirdQuery);
-
-                if ($this->echoCLI) {
-                    $this->colorCli->primary(
-                        'Finished deleting '.$deleted.' parts with no binaries in '.
-                        $totalTime.Str::plural(' second', $totalTime),
-                        true
-                    );
-                }
-            } // done cleaning up Binaries/Parts orphans
+            }
 
             if ($this->echoCLI) {
-                $this->colorCli->primary(
-                    'Deleting collections that were missed after NZB creation.',
-                    true
-                );
+                $this->colorCli->primary('Deleting collections that were missed after NZB creation.', true);
             }
 
             $deleted = 0;
             // Collections that were missing on NZB creation.
-            $collections = DB::select(
-                '
-				SELECT SQL_NO_CACHE c.id
-				FROM collections c
-				INNER JOIN releases r ON r.id = c.releases_id
-				WHERE r.nzbstatus = 1'
-            );
+            $collections = Collection::query()->where('releases.nzbstatus', '=', 1)->leftJoin('releases', 'releases.id', '=', 'collections.releases_id')->select('collections.id')->get();
 
             foreach ($collections as $collection) {
                 $deleted++;
-                DB::delete(
-                    sprintf(
-                        '
-						DELETE c
-						FROM collections c
-						WHERE c.id = %d',
-                        $collection->id
-                    )
-                );
+                Collection::query()->where('id', $collection->id)->delete();
             }
             $deletedCount += $deleted;
 
@@ -977,15 +823,7 @@ class ProcessReleases
             $totalTime = $fourthQuery->diffInSeconds($startTime);
 
             if ($this->echoCLI) {
-                $this->colorCli->primary(
-                    'Finished deleting '.$deleted.' collections missed after NZB creation in '.
-                    $colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.
-                    'Removed '.
-                    number_format($deletedCount).
-                    ' parts/binaries/collection rows in '.
-                    $totalTime.Str::plural(' second', $totalTime),
-                    true
-                );
+                $this->colorCli->primary('Finished deleting '.$deleted.' collections missed after NZB creation in '.$colDelTime.Str::plural(' second', $colDelTime).PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime), true);
             }
         }, 10);
     }
@@ -1015,57 +853,21 @@ class ProcessReleases
         $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    '
-					SELECT SQL_NO_CACHE r.guid, r.id
-					FROM releases r
-					INNER JOIN usenet_groups g ON g.id = r.groups_id
-					WHERE r.groups_id = %d
-					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
-					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)',
-                    $grpID['id'],
-                    $minSizeSetting,
-                    $minSizeSetting
-                )
-            );
+            $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 AND releases.size < greatest(IFNULL(usenet_groups.minsizetoformrelease, 0), ?)', [$minSizeSetting, $minSizeSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->select(['releases.id', 'releases.guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $minSizeDeleted++;
             }
 
             if ($maxSizeSetting > 0) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                        '
-						SELECT SQL_NO_CACHE id, guid
-						FROM releases
-						WHERE groups_id = %d
-						AND size > %d',
-                        $grpID['id'],
-                        $maxSizeSetting
-                    )
-                );
+                $releases = Release::query()->where('groups_id', $grpID['id'])->where('size', '>', $maxSizeSetting)->select(['id', 'guid'])->get();
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $maxSizeDeleted++;
                 }
             }
             if ($minFilesSetting > 0) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                         '
-				SELECT SQL_NO_CACHE r.id, r.guid
-				FROM releases r
-				INNER JOIN usenet_groups g ON g.id = r.groups_id
-				WHERE r.groups_id = %d
-				AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
-				AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
-                         $grpID['id'],
-                         $minFilesSetting,
-                         $minFilesSetting
-                     )
-                 );
+                $releases = Release::query()->where('releases.groups_id', $grpID['id'])->whereRaw('greatest(IFNULL(usenet_groups.minfilestoformrelease, 0), ?) > 0 AND releases.totalpart < greatest(IFNULL(usenet_groups.minfilestoformrelease, 0), ?)', [$minFilesSetting, $minFilesSetting])->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')->get();
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $minFilesDeleted++;
@@ -1078,12 +880,12 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Deleted '.($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted).
-                    ' releases: '.PHP_EOL.
-                    $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
-                    ' with less files than site/groups setting in: '.
-                    $totalTime.Str::plural(' second', $totalTime),
+                ' releases: '.PHP_EOL.
+                $minSizeDeleted.' smaller than, '.$maxSizeDeleted.' bigger than, '.$minFilesDeleted.
+                ' with less files than site/groups setting in: '.
+                $totalTime.Str::plural(' second', $totalTime),
                 true
-                );
+            );
         }
     }
 
@@ -1108,12 +910,7 @@ class ProcessReleases
 
         // Releases past retention.
         if ((int) Settings::settingValue('..releaseretentiondays') !== 0) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-                    (int) Settings::settingValue('..releaseretentiondays')
-                )
-            );
+            $releases = Release::query()->where('postdate', '<', now()->subDays((int) Settings::settingValue('..releaseretentiondays')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $retentionDeleted++;
@@ -1122,12 +919,7 @@ class ProcessReleases
 
         // Passworded releases.
         if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE passwordstatus = %d',
-                    Releases::PASSWD_RAR
-                )
-            );
+            $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_RAR)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $passwordDeleted++;
@@ -1136,12 +928,7 @@ class ProcessReleases
 
         // Possibly passworded releases.
         if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE passwordstatus = %d',
-                    Releases::PASSWD_POTENTIAL
-                )
-            );
+            $releases = Release::query()->where('passwordstatus', '=', Releases::PASSWD_POTENTIAL)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $passwordDeleted++;
@@ -1150,12 +937,7 @@ class ProcessReleases
 
         if ((int) $this->crossPostTime !== 0) {
             // Crossposted releases.
-            $releases = Release::fromQuery(
-                sprintf(
-                    'SELECT id, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
-                    $this->crossPostTime
-                )
-            );
+            $releases = Release::query()->where('adddate', '>', now()->subHours($this->crossPostTime))->havingRaw('COUNT(name) > 1')->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $duplicateDeleted++;
@@ -1163,9 +945,7 @@ class ProcessReleases
         }
 
         if ($this->completion > 0) {
-            $releases = Release::fromQuery(
-                sprintf('SELECT id, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
-            );
+            $releases = Release::query()->where('completion', '<', $this->completion)->where('completion', '>', 0)->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $completionDeleted++;
@@ -1176,9 +956,7 @@ class ProcessReleases
         $disabledCategories = Category::getDisabledIDs();
         if (\count($disabledCategories) > 0) {
             foreach ($disabledCategories as $disabledCategory) {
-                $releases = Release::fromQuery(
-                    sprintf('SELECT id, guid FROM releases WHERE categories_id = %d', (int) $disabledCategory['id'])
-                );
+                $releases = Release::query()->where('categories_id', (int) $disabledCategory['id'])->select(['id', 'guid'])->get();
                 foreach ($releases as $release) {
                     $disabledCategoryDeleted++;
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
@@ -1187,29 +965,11 @@ class ProcessReleases
         }
 
         // Delete smaller than category minimum sizes.
-        $categories = Category::fromQuery(
-            '
-			SELECT SQL_NO_CACHE c.id AS id,
-			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
-			FROM categories c
-			INNER JOIN categories cp ON cp.id = c.parentid
-			WHERE c.parentid IS NOT NULL'
-        );
+        $categories = Category::query()->select(['id', 'minsizetoformrelease as minsize'])->get();
 
         foreach ($categories as $category) {
             if ((int) $category->minsize > 0) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                            '
-							SELECT id, guid
-							FROM releases
-							WHERE categories_id = %d
-							AND size < %d
-							LIMIT 1000',
-                            (int) $category->id,
-                            (int) $category->minsize
-                        )
-                    );
+                $releases = Release::query()->where('categories_id', (int) $category->id)->where('size', '<', (int) $category->minsize)->select(['id', 'guid'])->limit(1000)->get();
                 foreach ($releases as $release) {
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                     $categoryMinSizeDeleted++;
@@ -1221,20 +981,13 @@ class ProcessReleases
         $genrelist = $genres->getDisabledIDs();
         if (\count($genrelist) > 0) {
             foreach ($genrelist as $genre) {
-                $releases = Release::fromQuery(
-                    sprintf(
-                        '
-						SELECT id, guid
-						FROM releases r
-						INNER JOIN
-						(
-							SELECT id AS mid
-							FROM musicinfo
-							WHERE musicinfo.genre_id = %d
-						) mi ON musicinfo_id = mi.mid',
-                        (int) $genre['id']
-                    )
-                );
+                $musicInfoQuery = MusicInfo::query()->where('genre_id', (int) $genre['id'])->select(['id']);
+                $releases = Release::query()
+                    ->joinSub($musicInfoQuery, 'mi', function ($join) {
+                        $join->on('releases.musicinfo_id', '=', 'mi.id');
+                    })
+                    ->select(['releases.id', 'releases.guid'])
+                    ->get();
                 foreach ($releases as $release) {
                     $disabledGenreDeleted++;
                     $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
@@ -1244,17 +997,7 @@ class ProcessReleases
 
         // Misc other.
         if (Settings::settingValue('..miscotherretentionhours') > 0) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    '
-					SELECT SQL_NO_CACHE id, guid
-					FROM releases
-					WHERE categories_id = %d
-					AND adddate <= NOW() - INTERVAL %d HOUR',
-                    Category::OTHER_MISC,
-                    (int) Settings::settingValue('..miscotherretentionhours')
-                )
-            );
+            $releases = Release::query()->where('categories_id', Category::OTHER_MISC)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('..miscotherretentionhours')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $miscRetentionDeleted++;
@@ -1263,17 +1006,7 @@ class ProcessReleases
 
         // Misc hashed.
         if ((int) Settings::settingValue('..mischashedretentionhours') > 0) {
-            $releases = Release::fromQuery(
-                sprintf(
-                    '
-					SELECT SQL_NO_CACHE id, guid
-					FROM releases
-					WHERE categories_id = %d
-					AND adddate <= NOW() - INTERVAL %d HOUR',
-                    Category::OTHER_HASHED,
-                    (int) Settings::settingValue('..mischashedretentionhours')
-                )
-            );
+            $releases = Release::query()->where('categories_id', Category::OTHER_HASHED)->where('adddate', '<=', now()->subHours((int) Settings::settingValue('..mischashedretentionhours')))->select(['id', 'guid'])->get();
             foreach ($releases as $release) {
                 $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 $miscHashedDeleted++;
@@ -1283,29 +1016,29 @@ class ProcessReleases
         if ($this->echoCLI) {
             $this->colorCli->primary(
                 'Removed releases: '.
-                    number_format($retentionDeleted).
-                    ' past retention, '.
-                    number_format($passwordDeleted).
-                    ' passworded, '.
-                    number_format($duplicateDeleted).
-                    ' crossposted, '.
-                    number_format($disabledCategoryDeleted).
-                    ' from disabled categories, '.
-                    number_format($categoryMinSizeDeleted).
-                    ' smaller than category settings, '.
-                    number_format($disabledGenreDeleted).
-                    ' from disabled music genres, '.
-                    number_format($miscRetentionDeleted).
-                    ' from misc->other '.
-                    number_format($miscHashedDeleted).
-                    ' from misc->hashed'.
-                    (
-                        $this->completion > 0
-                        ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
-                        : '.'
-                    ),
+                number_format($retentionDeleted).
+                ' past retention, '.
+                number_format($passwordDeleted).
+                ' passworded, '.
+                number_format($duplicateDeleted).
+                ' crossposted, '.
+                number_format($disabledCategoryDeleted).
+                ' from disabled categories, '.
+                number_format($categoryMinSizeDeleted).
+                ' smaller than category settings, '.
+                number_format($disabledGenreDeleted).
+                ' from disabled music genres, '.
+                number_format($miscRetentionDeleted).
+                ' from misc->other '.
+                number_format($miscHashedDeleted).
+                ' from misc->hashed'.
+                (
+                    $this->completion > 0
+                    ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
+                    : '.'
+                ),
                 true
-                );
+            );
 
             $totalDeleted = (
                 $retentionDeleted + $passwordDeleted + $duplicateDeleted + $disabledCategoryDeleted +
@@ -1316,33 +1049,11 @@ class ProcessReleases
                 $totalTime = now()->diffInSeconds($startTime);
                 $this->colorCli->primary(
                     'Removed '.number_format($totalDeleted).' releases in '.
-                        $totalTime.Str::plural(' second', $totalTime),
+                    $totalTime.Str::plural(' second', $totalTime),
                     true
-                    );
+                );
             }
         }
-    }
-
-    /**
-     * Formulate part of a query to prevent deletion of currently inserting parts / binaries / collections.
-     *
-     * @param string $groupName
-     * @param int    $difference
-     *
-     * @return string
-     */
-    private function maxQueryFormulator($groupName, $difference): string
-    {
-        $maxID = DB::selectOne(
-            sprintf(
-                '
-				SELECT IFNULL(MAX(id),0) AS max
-				FROM %s',
-                $groupName
-            )
-        );
-
-        return empty($maxID->max) || $maxID->max < $difference ? 0 : $maxID->max - $difference;
     }
 
     /**
@@ -1351,34 +1062,27 @@ class ProcessReleases
      * This means the the binary table has the same count as the file count in the subject, but
      * the collection might not be complete yet since we might not have all the articles in the parts table.
      *
-     * @param string $where
+     * @param int $groupID
      *
      * @void
      * @throws \Throwable
      */
-    private function collectionFileCheckStage1(&$where): void
+    private function collectionFileCheckStage1($groupID): void
     {
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				INNER JOIN
-				(
-					SELECT c.id
-					FROM collections c
-					INNER JOIN binaries b ON b.collections_id = c.id
-					WHERE c.totalfiles > 0
-					AND c.filecheck = %d %s
-					GROUP BY b.collections_id, c.totalfiles, c.id
-					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
-				) r ON c.id = r.id
-				SET filecheck = %d',
-                    self::COLLFC_DEFAULT,
-                    $where,
-                    self::COLLFC_COMPCOLL
-                )
-            );
+        DB::transaction(function () use ($groupID) {
+            $collectionsCheck = Collection::query()->select(['collections.id'])
+                ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
+                ->where('collections.totalfiles', '>', 0)
+                ->where('collections.filecheck', '=', self::COLLFC_DEFAULT);
+            if (! empty($groupID)) {
+                $collectionsCheck->where('collections.groups_id', $groupID);
+            }
+            $collectionsCheck->groupBy('binaries.collections_id', 'collections.totalfiles', 'collections.id')
+                ->havingRaw('COUNT(binaries.id) IN (collections.totalfiles, collections.totalfiles+1)');
+
+            Collection::query()->joinSub($collectionsCheck, 'r', function ($join) {
+                $join->on('collections.id', '=', 'r.id');
+            })->update(['collections.filecheck' => self::COLLFC_COMPCOLL]);
         }, 10);
     }
 
@@ -1390,48 +1094,35 @@ class ProcessReleases
      * at 0 then you would never get a complete collection if it starts with 1 and if it starts, you can end up creating
      * a incomplete collection, since you assumed it was complete.
      *
-     * @param string $where
+     * @param int $groupID
      *
      * @void
      * @throws \Throwable
      */
-    private function collectionFileCheckStage2(&$where): void
+    private function collectionFileCheckStage2($groupID): void
     {
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				INNER JOIN
-				(
-					SELECT c.id
-					FROM collections c
-					INNER JOIN binaries b ON b.collections_id = c.id
-					WHERE b.filenumber = 0
-					AND c.totalfiles > 0
-					AND c.filecheck = %d %s
-					GROUP BY c.id
-				) r ON c.id = r.id
-				SET c.filecheck = %d',
-                    self::COLLFC_COMPCOLL,
-                    $where,
-                    self::COLLFC_ZEROPART
-                )
-            );
+        DB::transaction(function () use ($groupID) {
+            $collectionsCheck = Collection::query()->select(['collections.id'])
+                ->join('binaries', 'binaries.collections_id', '=', 'collections.id')
+                ->where('binaries.filenumber', '=', 0)
+                ->where('collections.totalfiles', '>', 0)
+                ->where('collections.filecheck', '=', self::COLLFC_COMPCOLL);
+            if (! empty($groupID)) {
+                $collectionsCheck->where('collections.groups_id', $groupID);
+            }
+            $collectionsCheck->groupBy('collections.id');
+
+            Collection::query()->joinSub($collectionsCheck, 'r', function ($join) {
+                $join->on('collections.id', '=', 'r.id');
+            })->update(['collections.filecheck' => self::COLLFC_ZEROPART]);
         }, 10);
 
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				SET filecheck = %d
-				WHERE filecheck = %d %s',
-                    self::COLLFC_TEMPCOMP,
-                    self::COLLFC_COMPCOLL,
-                    $where
-                )
-            );
+        DB::transaction(function () use ($groupID) {
+            $collectionQuery = Collection::query()->where('filecheck', '=', self::COLLFC_COMPCOLL);
+            if (! empty($groupID)) {
+                $collectionQuery->where('groups_id', $groupID);
+            }
+            $collectionQuery->update(['filecheck' => self::COLLFC_TEMPCOMP]);
         }, 10);
     }
 
@@ -1449,7 +1140,7 @@ class ProcessReleases
         DB::transaction(function () use ($where) {
             DB::update(
                 sprintf(
-                '
+                    '
 				UPDATE binaries b
 				INNER JOIN
 				(
@@ -1462,12 +1153,12 @@ class ProcessReleases
 					GROUP BY b.id, b.totalparts
 				) r ON b.id = r.id
 				SET b.partcheck = %d',
-                self::COLLFC_TEMPCOMP,
-                self::FILE_INCOMPLETE,
-                $where,
-                self::FILE_COMPLETE
-            )
-        );
+                    self::COLLFC_TEMPCOMP,
+                    self::FILE_INCOMPLETE,
+                    $where,
+                    self::FILE_COMPLETE
+                )
+            );
         }, 10);
 
         DB::transaction(function () use ($where) {
@@ -1530,26 +1221,19 @@ class ProcessReleases
      * If not all files (binaries table) had their parts on the previous stage,
      * reset the collection filecheck column to COLLFC_COMPCOLL so we reprocess them next time.
      *
-     * @param string $where
+     * @param int $groupId
      *
      * @void
      * @throws \Throwable
      */
-    private function collectionFileCheckStage5(&$where): void
+    private function collectionFileCheckStage5($groupId): void
     {
-        DB::transaction(function () use ($where) {
-            DB::update(
-                sprintf(
-                    '
-				UPDATE collections c
-				SET filecheck = %d
-				WHERE filecheck IN (%d, %d) %s',
-                    self::COLLFC_COMPCOLL,
-                    self::COLLFC_TEMPCOMP,
-                    self::COLLFC_ZEROPART,
-                    $where
-                )
-            );
+        DB::transaction(function () use ($groupId) {
+            $collectionQuery = Collection::query()->whereIn('filecheck', [self::COLLFC_TEMPCOMP, self::COLLFC_ZEROPART]);
+            if (! empty($groupId)) {
+                $collectionQuery->where('groups_id', $groupId);
+            }
+            $collectionQuery->update(['filecheck' => self::COLLFC_COMPCOLL]);
         }, 10);
     }
 
@@ -1584,33 +1268,26 @@ class ProcessReleases
     /**
      * If a collection has been stuck for $this->collectionTimeout hours, delete it, it's bad.
      *
-     * @param string $where
+     * @param int $groupID
      *
      * @void
      * @throws \Exception
      * @throws \Throwable
      */
-    private function processStuckCollections($where): void
+    private function processStuckCollections($groupID): void
     {
         $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 
-        DB::transaction(function () use ($where, $lastRun) {
-            $obj = DB::delete(
-                sprintf(
-                    '
-                DELETE c FROM collections c
-                WHERE
-                    c.added <
-                    DATE_SUB(%s, INTERVAL %d HOUR)
-                %s',
-                    escapeString($lastRun),
-                    $this->collectionTimeout,
-                    $where
-                )
-            );
+        DB::transaction(function () use ($groupID, $lastRun) {
+            $objQuery = Collection::query()
+                ->where('added', '<', Carbon::createFromFormat('Y-m-d H:i:s', $lastRun)->subHours($this->collectionTimeout));
+            if (! empty($groupID)) {
+                $objQuery->where('groups_id', $groupID);
+            }
+            $obj = $objQuery->delete();
             if ($this->echoCLI && $obj > 0) {
                 $this->colorCli->primary('Deleted '.$obj.' broken/stuck collections.', true);
             }
-        }, 3);
+        }, 10);
     }
 }

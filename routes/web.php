@@ -38,7 +38,7 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
     Route::group(['prefix' => 'browse'], function () {
         Route::get('tags', 'BrowseController@tags');
         Route::get('group', 'BrowseController@group');
-        Route::get('all', 'BrowseController@index');
+        Route::get('All', 'BrowseController@index');
         Route::get('{parentCategory}/{id?}', 'BrowseController@show')->middleware('clearance');
     });
 
@@ -57,9 +57,8 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
     Route::get('getnzb', 'GetNzbController@getNzb');
     Route::post('getnzb', 'GetNzbController@getNzb');
 
-    Route::get('rss', 'RssController@rss');
-
-    Route::post('rss', 'RssController@rss');
+    Route::get('rsshelp', 'RssController@showRssDesc');
+    Route::post('rsshelp', 'RssController@showRssDesc');
 
     Route::get('profile', 'ProfileController@show');
 
@@ -301,12 +300,6 @@ Route::group(['middleware' => ['role:Admin'], 'prefix' => 'admin', 'namespace' =
     Route::post('game-list', 'GameController@index');
     Route::get('game-edit', 'GameController@edit');
     Route::post('game-edit', 'GameController@edit');
-    Route::get('menu-list', 'MenuController@index');
-    Route::post('menu-list', 'MenuController@index');
-    Route::get('menu-edit', 'MenuController@edit');
-    Route::post('menu-edit', 'MenuController@edit');
-    Route::get('menu-delete/{id}', 'MenuController@destroy');
-    Route::post('menu-delete/{id}', 'MenuController@destroy');
     Route::get('movie-list', 'MovieController@index');
     Route::post('movie-list', 'MovieController@index');
     Route::get('movie-edit', 'MovieController@edit');

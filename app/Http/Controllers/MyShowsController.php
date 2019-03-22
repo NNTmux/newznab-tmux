@@ -13,7 +13,7 @@ class MyShowsController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function show(Request $request)
@@ -177,7 +177,7 @@ class MyShowsController extends BasePageController
 
         $shows = UserSerie::getShows($this->userdata->id);
 
-        $releases = new Releases(['Settings' => $this->settings]);
+        $releases = new Releases();
 
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');

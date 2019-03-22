@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Settings;
 use App\Models\Collection;
+use App\Models\MissedPart;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -570,13 +571,7 @@ class Binaries
 
             // Increment if part repair and return false.
             if ($partRepair) {
-                DB::update(
-                    sprintf(
-                        'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
-                        $this->groupMySQL['id'],
-                        ((int) $this->first === (int) $this->last ? '= '.$this->first : 'IN ('.implode(',', range($this->first, $this->last)).')')
-                    )
-                );
+                MissedPart::query()->where('groups_id', $this->groupMySQL['id'])->where('numberid', ((int) $this->first === (int) $this->last ? '= '.$this->first : 'IN ('.implode(',', range($this->first, $this->last)).')'))->increment('attempts', 1);
 
                 return $returnArray;
             }

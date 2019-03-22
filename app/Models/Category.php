@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -264,15 +265,7 @@ class Category extends Model
      */
     public function parent()
     {
-        return $this->belongsTo(static::class, 'parentid');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function children()
-    {
-        return $this->hasMany(static::class, 'parentid');
+        return $this->belongsTo(RootCategory::class, 'root_categories_id');
     }
 
     /**
@@ -281,11 +274,10 @@ class Category extends Model
     public static function getRecentlyAdded()
     {
         return self::query()
+            ->with('parent')
             ->remember(config('nntmux.cache_expiry_long'))
             ->where('r.adddate', '>', now()->subWeek())
-            ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
-            ->selectRaw('COUNT(r.id) as count')
-            ->join('categories as cp', 'cp.id', '=', 'categories.parentid')
+            ->select(['root_categories_id', DB::raw('COUNT(r.id) as count'), 'title'])
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
             ->groupBy('title')
             ->orderBy('count', 'desc')
@@ -312,7 +304,7 @@ class Category extends Model
         }
         foreach ($cat as $category) {
             if ($category !== -1 && self::isParent($category)) {
-                foreach (self::getChildren($category) as $child) {
+                foreach (RootCategory::find($category)->categories as $child) {
                     $categories[] = $child['id'];
                 }
             } elseif ($category > 0) {
@@ -371,7 +363,7 @@ class Category extends Model
      */
     public static function isParent($cid): bool
     {
-        $ret = self::query()->where(['id' => $cid, 'parentid' => null])->first();
+        $ret = RootCategory::query()->where(['id' => $cid])->first();
 
         return $ret !== null;
     }
@@ -393,7 +385,7 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        return self::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->children;
+        return RootCategory::remember(config('nntmux.cache_expiry_long'))->find($categoryId)->categories;
     }
 
     /**
@@ -403,9 +395,7 @@ class Category extends Model
      */
     public static function getEnabledParentNames()
     {
-        return self::query()
-            ->where(['parentid' => null, 'status' => 1])
-            ->get(['title']);
+        return RootCategory::query()->where('status', '=', 1)->get(['title']);
     }
 
     /**
@@ -418,7 +408,6 @@ class Category extends Model
     {
         return self::query()
             ->where('status', '=', 2)
-            ->orWhere(['status' => 2, 'parentid' => null])
             ->get(['id']);
     }
 
@@ -497,50 +486,21 @@ class Category extends Model
      */
     public static function getForMenu(array $excludedCats = []): array
     {
-        $ret = [];
+        $categoriesResult = [];
+        $categoriesArray = RootCategory::query()->with(['categories' =>function ($query) use ($excludedCats) {
+            if (! empty($excludedCats)) {
+                $query->whereNotIn('id', $excludedCats);
+            }
+            $query->select(['id', 'title', 'root_categories_id', 'description']);
+        }])->select(['id', 'title'])->get()->toArray();
 
-        $sql = self::query()->remember(config('nntmux.cache_expiry_long'))->where('status', '=', self::STATUS_ACTIVE)->select(['id', 'title', 'parentid', 'description']);
-
-        if (! empty($excludedCats)) {
-            $sql->whereNotIn('id', $excludedCats);
-        }
-
-        $arr = $sql->get()->toArray();
-
-        foreach ($arr as $key => $val) {
-            if ($val['id'] === self::OTHER_ROOT) {
-                $item = $arr[$key];
-                unset($arr[$key]);
-                $arr[] = $item;
-                break;
+        foreach ($categoriesArray as $category) {
+            if (! empty($category['categories'])) {
+                $categoriesResult[] = $category;
             }
         }
 
-        foreach ($arr as $a) {
-            if (empty($a['parentid'])) {
-                $ret[] = $a;
-            }
-        }
-
-        foreach ($ret as $key => $parent) {
-            $subcatlist = [];
-            $subcatnames = [];
-            foreach ($arr as $a) {
-                if ($a['parentid'] === $parent['id']) {
-                    $subcatlist[] = $a;
-                    $subcatnames[] = $a['title'];
-                }
-            }
-
-            if (\count($subcatlist) > 0) {
-                array_multisort($subcatnames, SORT_ASC, $subcatlist);
-                $ret[$key]['subcatlist'] = $subcatlist;
-            } else {
-                unset($ret[$key]);
-            }
-        }
-
-        return $ret;
+        return $categoriesResult;
     }
 
     /**
@@ -548,7 +508,7 @@ class Category extends Model
      */
     public static function getForApi()
     {
-        return self::query()->remember(config('nntmux.cache_expiry_long'))->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->whereNull('parentid')->get();
+        return RootCategory::query()->remember(config('nntmux.cache_expiry_long'))->select(['id', 'title'])->where('status', '=', self::STATUS_ACTIVE)->get();
     }
 
     /**
@@ -566,9 +526,8 @@ class Category extends Model
         if ($blnIncludeNoneSelected) {
             $temp_array[-1] = '--Please Select--';
         }
-
         foreach ($categories as $category) {
-            $temp_array[$category['id']] = $category['title'];
+            $temp_array[$category->id] = $category->parent->title.' > '.$category->title;
         }
 
         return $temp_array;
@@ -582,19 +541,18 @@ class Category extends Model
     public static function getCategories($activeOnly = false, array $excludedCats = [])
     {
         $sql = self::query()
-            ->select(['categories.id', 'cp.id as parentid', 'categories.status'])
-            ->selectRaw("CONCAT(cp.title, ' > ',categories.title) AS title")
-            ->leftJoin('categories as cp', 'cp.id', '=', 'categories.parentid')
-            ->orderBy('categories.id');
+            ->with('parent')
+            ->select(['id', 'status', 'title', 'root_categories_id'])
+            ->orderBy('id');
 
         if ($activeOnly) {
-            $sql->where('categories.status', '=', self::STATUS_ACTIVE);
+            $sql->where('status', '=', self::STATUS_ACTIVE);
         }
 
         if (\count($excludedCats) > 0) {
-            $sql->whereNotIn('categories.id', $excludedCats);
+            $sql->whereNotIn('id', $excludedCats);
         }
 
-        return $sql->get()->toArray();
+        return $sql->get();
     }
 }

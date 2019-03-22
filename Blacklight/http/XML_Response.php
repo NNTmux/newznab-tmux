@@ -245,7 +245,7 @@ class XML_Response
             if (! empty($this->parameters['description'])) {
                 $this->xml->writeAttribute('description', html_entity_decode($this->parameters['description']));
             }
-            foreach ($this->parameters['subcatlist'] as $c) {
+            foreach ($this->parameters['categories'] as $c) {
                 $this->xml->startElement('subcat');
                 $this->xml->writeAttribute('id', $c['id']);
                 $this->xml->writeAttribute('name', html_entity_decode($c['title']));

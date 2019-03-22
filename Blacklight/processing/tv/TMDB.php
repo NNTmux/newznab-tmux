@@ -187,10 +187,10 @@ class TMDB extends TV
                         if ($episode === false) {
                             // Send the request for the episode to TMDB
                             $tmdbEpisode = $this->getEpisodeInfo(
-                                    $tmdbid,
-                                    $seasonNo,
-                                    $episodeNo,
-                                    $release['airdate']
+                                $tmdbid,
+                                $seasonNo,
+                                $episodeNo,
+                                $release['airdate']
                             );
 
                             if ($tmdbEpisode) {

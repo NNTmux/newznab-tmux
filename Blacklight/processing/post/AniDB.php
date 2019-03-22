@@ -12,10 +12,8 @@ use Blacklight\db\populate\AniDB as PaDb;
 
 class AniDB
 {
-    protected const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
-    protected const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
-
-    protected const REGEX_NOFORN = 'English|Japanese|German|Danish|Flemish|Dutch|French|Swe(dish|sub)|Deutsch|Norwegian';
+    private const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
+    private const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
 
     /**
      * @var bool Whether or not to echo messages to CLI
@@ -163,7 +161,7 @@ class AniDB
         $cleanName = str_replace('_', ' ', $cleanName);
 
         if (preg_match(
-            '/(^|.*\")(\[[a-zA-Z\.\!?-]+\][\s_]*)?(\[BD\][\s_]*)?(\[\d{3,4}[ip]\][\s_]*)?(?P<title>[\w\s_.+!?\'-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?([ _]-[ _]|([ ._-]Epi?(sode)?[ ._-]?0?)?[ ._-]?|[ ._-]Vol\.|[ ._-]E)(?P<epno>\d{1,3}|Movie|OVA|Complete Series)(v\d|-\d+)?[-_. ].*[\[\(\"]/i',
+            '/(^|.*\")(\[[a-zA-Z\.\!?-]+\][\s_]*)?(\[BD\][\s_]*)?(\[\d{3,4}[ip]\][\s_]*)?(?P<title>[\w\s_.+!?\'\-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?([ _]\-[ _]|([ ._-]Epi?(sode)?[ ._-]?0?)?[ ._-]?|[ ._-]Vol\.|[ ._-]E)(?P<epno>\d{1,3}|Movie|OVA|Complete Series)(v\d|-\d+)?[\-_. ].*[\[\(\"]/i',
             $cleanName,
             $matches
         )
@@ -173,7 +171,7 @@ class AniDB
                 $matches['epno'] = 1;
             }
         } elseif (preg_match(
-            '/^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(\[BD\])?(\[\d{3,4}[ip]\])?(?P<title>[\w\s_.+!?\'-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?\s*[\(\[](BD|\d{3,4}[ipx])/i',
+            '/^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(\[BD\])?(\[\d{3,4}[ip]\])?(?P<title>[\w\s_.+!?\'\-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?\s*[\(\[](BD|\d{3,4}[ipx])/i',
             $cleanName,
             $matches
         )

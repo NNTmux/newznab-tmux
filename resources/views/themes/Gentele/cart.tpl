@@ -11,7 +11,7 @@
 	<div class="alert alert-info" role="alert">
 		<strong>RSS Feed</strong> <br/>
 		Your download basket can also be accessed via an <a
-				href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}&amp;del=1">RSS
+				href="{$smarty.const.WWW_TOP}/rss/cart?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}&amp;del=1">RSS
 			feed</a>. Some NZB downloaders can read this feed and automatically start downloading.
 	</div>
 	{if $results|@count > 0}

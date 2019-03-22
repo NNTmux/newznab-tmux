@@ -97,7 +97,7 @@ class ApiController extends BasePageController
             }
         }
 
-        $releases = new Releases(['Settings' => $this->settings]);
+        $releases = new Releases();
         $api = new API(['Settings' => $this->settings, 'Request' => $request]);
 
         // Set Query Parameters based on Request objects

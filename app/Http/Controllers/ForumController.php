@@ -149,12 +149,7 @@ class ForumController extends BasePageController
 
         $content = $this->smarty->fetch('post_edit.tpl');
         $this->smarty->assign(
-            [
-                'content' => $content,
-                'meta_title' => $meta_title,
-                'meta_keywords' => $meta_keywords,
-                'meta_description' => $meta_description,
-            ]
+            compact('content', 'meta_title', 'meta_keywords', 'meta_description')
         );
         $this->pagerender();
     }
@@ -162,7 +157,7 @@ class ForumController extends BasePageController
     /**
      * @param $id
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function destroy($id)

@@ -29,7 +29,7 @@ class DetailsController extends BasePageController
     /**
      * @param $guid
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function show($guid)
@@ -37,7 +37,7 @@ class DetailsController extends BasePageController
         $this->setPrefs();
 
         if ($guid !== null) {
-            $releases = new Releases(['Settings' => $this->settings]);
+            $releases = new Releases();
             $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
             $user = User::find(Auth::id());

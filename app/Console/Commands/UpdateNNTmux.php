@@ -44,7 +44,7 @@ class UpdateNNTmux extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $maintenance = $this->appDown();
         $running = $this->stopTmux();
@@ -78,7 +78,7 @@ class UpdateNNTmux extends Command
         }
 
         if ($maintenance === true) {
-            $this->appUp();
+            $this->call('up');
         }
         if ($running === true) {
             $this->startTmux();
@@ -88,7 +88,7 @@ class UpdateNNTmux extends Command
     /**
      * @return bool
      */
-    private function appDown()
+    private function appDown(): bool
     {
         if (App::isDownForMaintenance() === false) {
             $this->call('down');
@@ -99,15 +99,10 @@ class UpdateNNTmux extends Command
         return false;
     }
 
-    private function appUp()
-    {
-        $this->call('up');
-    }
-
     /**
      * @return bool
      */
-    private function stopTmux()
+    private function stopTmux(): bool
     {
         if ((new Tmux())->isRunning() === true) {
             $this->call('tmux-ui:stop', ['--kill' => true]);
@@ -118,7 +113,7 @@ class UpdateNNTmux extends Command
         return false;
     }
 
-    private function startTmux()
+    private function startTmux(): void
     {
         $this->call('tmux-ui:start');
     }

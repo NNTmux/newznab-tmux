@@ -112,7 +112,7 @@
 									   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$s.tmdb}">TMDB</a>
 								{/if}
 								<a title="RSS Feed for {$s.title|escape:"htmlall"}"
-								   href="{$smarty.const.WWW_TOP}/rss?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}"><i
+								   href="{$smarty.const.WWW_TOP}/rss/full-feed?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}"><i
 											class="fa fa-rss"></i></a>
 							{/if}
 						</td>

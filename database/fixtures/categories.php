@@ -2,19 +2,9 @@
 
 return [
     0 => [
-        'id' => 1,
-        'title' => 'Other',
-        'parentid' => null,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    1 => [
         'id' => 10,
         'title' => 'Misc',
-        'parentid' => 1,
+        'root_categories_id' => 1,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -24,17 +14,7 @@ return [
     2 => [
         'id' => 20,
         'title' => 'Hashed',
-        'parentid' => 1,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    3 => [
-        'id' => 1000,
-        'title' => 'Console',
-        'parentid' => null,
+        'root_categories_id' => 1,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -44,7 +24,7 @@ return [
     4 => [
         'id' => 1010,
         'title' => 'NDS',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -54,7 +34,7 @@ return [
     5 => [
         'id' => 1020,
         'title' => 'PSP',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -64,7 +44,7 @@ return [
     6 => [
         'id' => 1030,
         'title' => 'Wii',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -74,7 +54,7 @@ return [
     7 => [
         'id' => 1040,
         'title' => 'Xbox',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -84,7 +64,7 @@ return [
     8 => [
         'id' => 1050,
         'title' => 'Xbox 360',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -94,7 +74,7 @@ return [
     9 => [
         'id' => 1060,
         'title' => 'WiiWare/VC',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -104,7 +84,7 @@ return [
     10 => [
         'id' => 1070,
         'title' => 'Xbox 360 DLC',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -114,7 +94,7 @@ return [
     11 => [
         'id' => 1080,
         'title' => 'PS3',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -124,7 +104,7 @@ return [
     12 => [
         'id' => 1110,
         'title' => '3DS',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -134,7 +114,7 @@ return [
     13 => [
         'id' => 1120,
         'title' => 'PS Vita',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -144,7 +124,7 @@ return [
     14 => [
         'id' => 1130,
         'title' => 'WiiU',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -154,7 +134,7 @@ return [
     15 => [
         'id' => 1140,
         'title' => 'Xbox One',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -164,7 +144,7 @@ return [
     16 => [
         'id' => 1180,
         'title' => 'PS4',
-        'parentid' => 1000,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -174,17 +154,7 @@ return [
     17 => [
         'id' => 1999,
         'title' => 'Other',
-        'parentid' => 1000,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    18 => [
-        'id' => 2000,
-        'title' => 'Movies',
-        'parentid' => null,
+        'root_categories_id' => 1000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -194,7 +164,7 @@ return [
     19 => [
         'id' => 2010,
         'title' => 'Foreign',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -204,7 +174,7 @@ return [
     20 => [
         'id' => 2030,
         'title' => 'SD',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -214,7 +184,7 @@ return [
     21 => [
         'id' => 2040,
         'title' => 'HD',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -224,7 +194,7 @@ return [
     22 => [
         'id' => 2045,
         'title' => 'UHD',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -234,7 +204,7 @@ return [
     23 => [
         'id' => 2050,
         'title' => '3D',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -244,7 +214,7 @@ return [
     24 => [
         'id' => 2060,
         'title' => 'BluRay',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -254,7 +224,7 @@ return [
     25 => [
         'id' => 2070,
         'title' => 'DVD',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -264,7 +234,7 @@ return [
     26 => [
         'id' => 2080,
         'title' => 'WEBDL',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -274,17 +244,7 @@ return [
     27 => [
         'id' => 2999,
         'title' => 'Other',
-        'parentid' => 2000,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    28 => [
-        'id' => 3000,
-        'title' => 'Audio',
-        'parentid' => null,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -294,7 +254,7 @@ return [
     29 => [
         'id' => 3010,
         'title' => 'MP3',
-        'parentid' => 3000,
+        'root_categories_id' => 3000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -304,7 +264,7 @@ return [
     30 => [
         'id' => 3020,
         'title' => 'Video',
-        'parentid' => 3000,
+        'root_categories_id' => 3000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -314,7 +274,7 @@ return [
     31 => [
         'id' => 3030,
         'title' => 'Audiobook',
-        'parentid' => 3000,
+        'root_categories_id' => 3000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -324,7 +284,7 @@ return [
     32 => [
         'id' => 3040,
         'title' => 'Lossless',
-        'parentid' => 3000,
+        'root_categories_id' => 3000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -334,7 +294,7 @@ return [
     33 => [
         'id' => 3060,
         'title' => 'Foreign',
-        'parentid' => 3000,
+        'root_categories_id' => 3000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -344,17 +304,7 @@ return [
     34 => [
         'id' => 3999,
         'title' => 'Other',
-        'parentid' => 3000,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    35 => [
-        'id' => 4000,
-        'title' => 'PC',
-        'parentid' => null,
+        'root_categories_id' => 3000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -364,7 +314,7 @@ return [
     36 => [
         'id' => 4010,
         'title' => '0day',
-        'parentid' => 4000,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -374,7 +324,7 @@ return [
     37 => [
         'id' => 4020,
         'title' => 'ISO',
-        'parentid' => 4000,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -384,7 +334,7 @@ return [
     38 => [
         'id' => 4030,
         'title' => 'Mac',
-        'parentid' => 4000,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -394,7 +344,7 @@ return [
     39 => [
         'id' => 4050,
         'title' => 'Games',
-        'parentid' => 4000,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -404,7 +354,7 @@ return [
     40 => [
         'id' => 4060,
         'title' => 'Phone-IOS',
-        'parentid' => 4000,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -414,7 +364,7 @@ return [
     41 => [
         'id' => 4070,
         'title' => 'Phone-Android',
-        'parentid' => 4000,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -424,17 +374,7 @@ return [
     42 => [
         'id' => 4999,
         'title' => 'Phone-Other',
-        'parentid' => 4000,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    43 => [
-        'id' => 5000,
-        'title' => 'TV',
-        'parentid' => null,
+        'root_categories_id' => 4000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -444,7 +384,7 @@ return [
     44 => [
         'id' => 5010,
         'title' => 'WEB-DL',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -454,7 +394,7 @@ return [
     45 => [
         'id' => 5020,
         'title' => 'Foreign',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -464,7 +404,7 @@ return [
     46 => [
         'id' => 5030,
         'title' => 'SD',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -474,7 +414,7 @@ return [
     47 => [
         'id' => 5040,
         'title' => 'HD',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -484,7 +424,7 @@ return [
     48 => [
         'id' => 5045,
         'title' => 'UHD',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -494,7 +434,7 @@ return [
     49 => [
         'id' => 5060,
         'title' => 'Sport',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -504,7 +444,7 @@ return [
     50 => [
         'id' => 5070,
         'title' => 'Anime',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -514,7 +454,7 @@ return [
     51 => [
         'id' => 5080,
         'title' => 'Documentary',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -524,17 +464,7 @@ return [
     52 => [
         'id' => 5999,
         'title' => 'Other',
-        'parentid' => 5000,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    53 => [
-        'id' => 6000,
-        'title' => 'XXX',
-        'parentid' => null,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -544,7 +474,7 @@ return [
     54 => [
         'id' => 6010,
         'title' => 'DVD',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -554,7 +484,7 @@ return [
     55 => [
         'id' => 6020,
         'title' => 'WMV',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -564,7 +494,7 @@ return [
     56 => [
         'id' => 6030,
         'title' => 'XviD',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -574,7 +504,7 @@ return [
     57 => [
         'id' => 6040,
         'title' => 'x264',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -584,7 +514,7 @@ return [
     58 => [
         'id' => 6041,
         'title' => 'HD Clips',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -594,7 +524,7 @@ return [
     59 => [
         'id' => 6042,
         'title' => 'SD Clips',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -604,7 +534,7 @@ return [
     60 => [
         'id' => 6045,
         'title' => 'UHD',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -614,7 +544,7 @@ return [
     61 => [
         'id' => 6060,
         'title' => 'Imageset',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -624,7 +554,7 @@ return [
     62 => [
         'id' => 6070,
         'title' => 'Packs',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -634,7 +564,7 @@ return [
     63 => [
         'id' => 6080,
         'title' => 'SD',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -644,7 +574,7 @@ return [
     64 => [
         'id' => 6090,
         'title' => 'WEBDL',
-        'parentid' => 6000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -654,27 +584,7 @@ return [
     65 => [
         'id' => 6999,
         'title' => 'Other',
-        'parentid' => 6000,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    66 => [
-        'id' => 7000,
-        'title' => 'Books',
-        'parentid' => null,
-        'status' => 1,
-        'description' => null,
-        'disablepreview' => 0,
-        'minsizetoformrelease' => 0,
-        'maxsizetoformrelease' => 0,
-    ],
-    67 => [
-        'id' => 7010,
-        'title' => 'Ebook',
-        'parentid' => 7000,
+        'root_categories_id' => 6000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -684,7 +594,7 @@ return [
     68 => [
         'id' => 7020,
         'title' => 'Comics',
-        'parentid' => 7000,
+        'root_categories_id' => 7000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -694,7 +604,7 @@ return [
     69 => [
         'id' => 7030,
         'title' => 'Magazines',
-        'parentid' => 7000,
+        'root_categories_id' => 7000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -704,7 +614,7 @@ return [
     70 => [
         'id' => 7040,
         'title' => 'Technical',
-        'parentid' => 7000,
+        'root_categories_id' => 7000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -714,7 +624,7 @@ return [
     71 => [
         'id' => 7060,
         'title' => 'Foreign',
-        'parentid' => 7000,
+        'root_categories_id' => 7000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -724,7 +634,7 @@ return [
     72 => [
         'id' => 7999,
         'title' => 'Other',
-        'parentid' => 7000,
+        'root_categories_id' => 7000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -734,7 +644,7 @@ return [
     73 => [
         'id' => 2090,
         'title' => 'X265',
-        'parentid' => 2000,
+        'root_categories_id' => 2000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,
@@ -744,7 +654,7 @@ return [
     74 => [
         'id' => 5090,
         'title' => 'X265',
-        'parentid' => 5000,
+        'root_categories_id' => 5000,
         'status' => 1,
         'description' => null,
         'disablepreview' => 0,

@@ -16,9 +16,9 @@ if (! function_exists('getRawHtml')) {
 
     /**
      * @param      $url
-     * @param bool|string $cookie
+     * @param bool $cookie
      *
-     * @return bool|string
+     * @return bool|mixed|string
      */
     function getRawHtml($url, $cookie = false)
     {
@@ -30,11 +30,19 @@ if (! function_exists('getRawHtml')) {
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
+            $jsonResponse = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $response = $jsonResponse;
+            }
         } catch (RequestException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         } catch (\RuntimeException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         }
 
@@ -47,7 +55,7 @@ if (! function_exists('getRawHtmlThroughCF')) {
     /**
      * @param $url
      *
-     * @return bool|string
+     * @return bool|mixed|string
      */
     function getRawHtmlThroughCF($url)
     {
@@ -56,11 +64,19 @@ if (! function_exists('getRawHtmlThroughCF')) {
 
         try {
             $response = $client->get($url)->getBody()->getContents();
+            $jsonResponse = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $response = $jsonResponse;
+            }
         } catch (RequestException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         } catch (\RuntimeException $e) {
-            Log::error($e->getMessage());
+            if (config('app.debug') === true) {
+                Log::error($e->getMessage());
+            }
             $response = false;
         }
 

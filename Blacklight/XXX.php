@@ -192,7 +192,7 @@ class XXX
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
+			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.id IN (%s)
@@ -697,7 +697,7 @@ class XXX
     protected function parseXXXSearchName($releaseName): bool
     {
         $name = '';
-        $followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
+        $followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[ ._-]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
 
         if (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $matches)) {
             $name = $matches['name'];
@@ -709,7 +709,7 @@ class XXX
             // If we still have any of the words in $followingList, remove them.
             $name = preg_replace('/'.$followingList.'/i', ' ', $name);
             // Remove periods, underscored, anything between parenthesis.
-            $name = preg_replace('/\(.*?\)|[-._]/i', ' ', $name);
+            $name = preg_replace('/\(.*?\)|[._-]/i', ' ', $name);
             // Finally remove multiple spaces and trim leading spaces.
             $name = trim(preg_replace('/\s{2,}/', ' ', $name));
             // Remove Private Movies {d} from name better matching.

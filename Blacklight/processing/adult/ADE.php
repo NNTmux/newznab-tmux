@@ -3,7 +3,7 @@
 namespace Blacklight\processing\adult;
 
 /**
- * Class adultdvdempire.
+ * Class ADE.
  */
 class ADE extends AdultMovies
 {
@@ -22,7 +22,7 @@ class ADE extends AdultMovies
     /**
      * Define ADE Url here.
      */
-    const ADE = 'http://www.adultdvdempire.com';
+    private const ADE = 'http://www.adultdvdempire.com';
 
     /**
      * Direct Url returned in getAll method.
@@ -53,14 +53,6 @@ class ADE extends AdultMovies
     protected $_ch;
 
     /**
-     * ADE constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Gets Trailer Movies.
      * @return array - url, streamid, basestreamingurl
      */
@@ -68,7 +60,7 @@ class ADE extends AdultMovies
     {
         $this->_response = getRawHtml(self::ADE.$this->_trailers.$this->_directUrl);
         $this->_html->loadHtml($this->_response);
-        if (preg_match("/(\"|')(?P<swf>[^\"']+.swf)(\"|')/i", $this->_response, $matches)) {
+        if (preg_match("/([\"|'])(?P<swf>[^\"']+.swf)([\"|'])/i", $this->_response, $matches)) {
             $this->_res['trailers']['url'] = self::ADE.trim(trim($matches['swf']), '"');
             if (preg_match(
                 '#(?:streamID:\s\")(?P<streamid>[0-9A-Z]+)(?:\")#',
@@ -126,7 +118,7 @@ class ADE extends AdultMovies
      *
      * @return array - cast, awards
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = [];
         foreach ($this->_html->find('h3') as $a) {
@@ -211,7 +203,7 @@ class ADE extends AdultMovies
                 foreach ($res as $ret) {
                     $title = $ret->title;
                     $title = str_replace('/XXX/', '', $title);
-                    $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
+                    $title = preg_replace('/\(.*?\)|[._-]/', ' ', $title);
                     $url = trim($ret->href);
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {

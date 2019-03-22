@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
-use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use Illuminate\Support\Arr;
@@ -332,8 +331,6 @@ class ProfileController extends BasePageController
         $this->smarty->assign('cp_api_selected', $data['cp_api']);
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
-
-        $this->smarty->assign('catlist', Category::getForSelect(false));
 
         $content = $this->smarty->fetch('profileedit.tpl');
 

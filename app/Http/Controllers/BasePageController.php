@@ -83,7 +83,7 @@ class BasePageController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth')->except('api', 'rss', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'search', 'tv', 'details', 'failed');
+        $this->middleware(['auth', 'web'])->except('api', 'contact', 'showContactForm', 'callback', 'getNzb', 'terms', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss');
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->smarty = app('smarty.view');

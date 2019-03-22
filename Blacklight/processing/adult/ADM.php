@@ -11,9 +11,8 @@ class ADM extends AdultMovies
      * Define Adult DVD Marketplace url
      * Needed Search Queries Constant.
      */
-    protected const ADMURL = 'http://www.adultdvdmarketplace.com';
-    protected const IF18 = 'http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=';
-    protected const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
+    private const ADMURL = 'http://www.adultdvdmarketplace.com';
+    private const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
 
     /**
      * Define a cookie file location for curl.
@@ -65,14 +64,6 @@ class ADM extends AdultMovies
     protected $_title = '';
 
     /**
-     * ADM constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Get Box Cover Images.
      * @return array - boxcover,backcover
      */
@@ -80,12 +71,12 @@ class ADM extends AdultMovies
     {
         $baseUrl = 'http://www.adultdvdmarketplace.com/';
         if ($ret = $this->_html->find('a[rel=fancybox-button]', 0)) {
-            if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg/i', $ret->href, $matches)) {
+            if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->href, $matches)) {
                 $this->_res['boxcover'] = $baseUrl.$matches[0];
                 $this->_res['backcover'] = $baseUrl.str_ireplace('/front/i', 'back', $matches[0]);
             }
         } elseif ($ret = $this->_html->find('img[rel=license]', 0)) {
-            if (preg_match('/images\/.*[\d]+\.jpg/i', $ret->src, $matches)) {
+            if (preg_match('/images\/.*[\d]+\.jpg$/i', $ret->src, $matches)) {
                 $this->_res['boxcover'] = $baseUrl.$matches[0];
             }
         }
@@ -98,7 +89,7 @@ class ADM extends AdultMovies
      *
      * @return array
      */
-    protected function synopsis()
+    protected function synopsis(): array
     {
         $this->_res['synopsis'] = 'N/A';
         foreach ($this->_html->find('h3') as $heading) {
@@ -118,7 +109,7 @@ class ADM extends AdultMovies
      *
      * @return array
      */
-    protected function productInfo($extras = false)
+    protected function productInfo($extras = false): array
     {
         foreach ($this->_html->find('ul.list-unstyled li') as $li) {
             $category = explode(':', $li->plaintext);
@@ -141,7 +132,7 @@ class ADM extends AdultMovies
      * Gets the cast members.
      * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = [];
         foreach ($this->_html->find('h3') as $heading) {
@@ -165,7 +156,7 @@ class ADM extends AdultMovies
      * Gets categories.
      * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         $genres = [];
         foreach ($this->_html->find('ul.list-unstyled') as $li) {
@@ -188,7 +179,7 @@ class ADM extends AdultMovies
      *
      * @return bool - true if search = 100%
      */
-    public function processSite($movie)
+    public function processSite($movie): bool
     {
         $result = false;
         if (! empty($movie)) {
@@ -204,7 +195,7 @@ class ADM extends AdultMovies
                             $comparetitle = preg_replace('/[\W]/', '', $title);
                             $comparesearch = preg_replace('/[\W]/', '', $movie);
                             similar_text($comparetitle, $comparesearch, $p);
-                            if ($p >= 90 && preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
+                            if ($p >= 90 && preg_match('/\/(?<sku>\d+)\.jpg$/i', $ret->src, $matches)) {
                                 $this->_title = trim($title);
                                 $this->_trailUrl = '/dvd_view_'.$matches['sku'].'.html';
                                 $this->_directUrl = self::ADMURL.$this->_trailUrl;

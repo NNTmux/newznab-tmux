@@ -16,10 +16,9 @@ class AEBN extends AdultMovies
     /**
      * Url Constants used within this class.
      */
-    const AEBNSURL = 'http://straight.theater.aebn.net';
-    const IF18 = 'http://straight.theater.aebn.net/dispatcher/frontDoor?genreId=101&theaterId=13992&locale=en&refid=AEBN-000001';
-    const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
-    const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
+    private const AEBNSURL = 'http://straight.theater.aebn.net';
+    private const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
+    private const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
 
     /**
      * Direct Url in getAll method.
@@ -62,18 +61,6 @@ class AEBN extends AdultMovies
     protected $_title = '';
 
     /**
-     * Sets the variables that used throughout the class.
-     *
-     * @param array $options
-     *
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Gets Trailer URL .. will be processed in XXX insertswf.
      *
      *
@@ -95,7 +82,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function covers()
+    protected function covers(): array
     {
         $ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1);
         if ($ret !== false) {
@@ -115,7 +102,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         if ($ret = $this->_html->findOne('div.md-detailsCategories')) {
             foreach ($ret->find('a[itemprop=genre]') as $genre) {
@@ -134,9 +121,9 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
-        $this->_res = false;
+        $this->_res = [];
         $ret = $this->_html->findOne('div.starsFull');
         if (! $ret instanceof SimpleHtmlDomNodeBlank) {
             foreach ($ret->find('span[itemprop=name]') as $star) {
@@ -163,7 +150,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function productInfo($extras = false)
+    protected function productInfo($extras = false): array
     {
         if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
             foreach ($ret->find('div') as $div) {
@@ -191,7 +178,7 @@ class AEBN extends AdultMovies
      *
      * @return array
      */
-    protected function synopsis()
+    protected function synopsis(): array
     {
         if ($ret = $this->_html->findOne('span[itemprop=about]')) {
             if ($ret === null) {
@@ -226,7 +213,7 @@ class AEBN extends AdultMovies
                 $string = 'a#FTSMovieSearch_link_title_detail_'.$i;
                 if ($ret = $mov->findOne($string)) {
                     $title = str_replace('/XXX/', '', $ret->title);
-                    $title = trim(preg_replace('/\(.*?\)|[-._]/', ' ', $title));
+                    $title = trim(preg_replace('/\(.*?\)|[._-]/', ' ', $title));
                     similar_text(strtolower($movie), strtolower($title), $p);
                     if ($p >= 90) {
                         $this->_title = trim($ret->title);

@@ -33,13 +33,13 @@ switch ($options[1]) {
             if ($value !== null) {
                 try {
                     $nntp = nntp();
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     Log::error($e->getTraceAsString());
                     echo $e->getMessage();
                 }
                 try {
                     (new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     Log::error($e->getTraceAsString());
                     echo $e->getMessage();
                 }
@@ -55,13 +55,13 @@ switch ($options[1]) {
     case 'backfill_all_quantity':
         try {
             $nntp = nntp();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             (new Backfill())->backfillAllGroups($options[2], $options[3]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
@@ -72,13 +72,13 @@ switch ($options[1]) {
     case 'backfill_all_quick':
         try {
             $nntp = nntp();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             (new Backfill())->backfillAllGroups($options[2], 10000, 'normal');
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
@@ -95,27 +95,27 @@ switch ($options[1]) {
     case 'get_range':
         try {
             $nntp = nntp();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         $groupMySQL = UsenetGroup::getByName($options[3])->toArray();
         try {
-            if ($nntp->isError($nntp->selectGroup($groupMySQL['name'])) && $nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
+            if ($nntp::isError($nntp->selectGroup($groupMySQL['name'])) && $nntp::isError($nntp->dataError($nntp, $groupMySQL['name']))) {
                 return;
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
         try {
             $return = $binaries->scan($groupMySQL, $options[4], $options[5], ((int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill'));
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getTraceAsString());
             echo $e->getMessage();
         }
@@ -174,25 +174,25 @@ switch ($options[1]) {
         $groupMySQL = UsenetGroup::getByName($options[2])->toArray();
         try {
             $nntp = nntp();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         // Select group, here, only once
         try {
             $data = $nntp->selectGroup($groupMySQL['name']);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         try {
-            if ($nntp->isError($data) && $nntp->dataError($nntp, $groupMySQL['name']) === false) {
+            if ($nntp::isError($data) && $nntp->dataError($nntp, $groupMySQL['name']) === false) {
                 exit();
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         try {
             (new Binaries(['NNTP' => $nntp]))->partRepair($groupMySQL);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         break;
@@ -202,7 +202,7 @@ switch ($options[1]) {
     case 'releases':
         try {
             $releases = new ProcessReleases();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
 
@@ -210,13 +210,13 @@ switch ($options[1]) {
         if (is_numeric($options[2])) {
             try {
                 processReleases($releases, $options[2]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         } else {
             try {
                 processReleases($releases, '');
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
             // Run functions that run on releases table after all others completed.
@@ -226,19 +226,19 @@ switch ($options[1]) {
             }
             try {
                 $releases->deletedReleasesByGroup();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
             try {
                 $releases->deleteReleases();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
             //$releases->processRequestIDs('', (5000 * $groupCount), true);
             //$releases->processRequestIDs('', (1000 * $groupCount), false);
             try {
                 $releases->categorizeReleases(2);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         }
@@ -251,13 +251,13 @@ switch ($options[1]) {
     case 'update_group_headers':
         try {
             $nntp = nntp();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         $groupMySQL = UsenetGroup::getByName($options[2])->toArray();
         try {
             (new Binaries(['NNTP' => $nntp]))->updateGroup($groupMySQL);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             echo $e->getMessage();
         }
         break;
@@ -277,45 +277,45 @@ switch ($options[1]) {
             // Connect to NNTP.
             try {
                 $nntp = nntp();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
             try {
                 $backFill = new Backfill();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
 
             // Update the group for new binaries.
             try {
                 (new Binaries())->updateGroup($groupMySQL);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
 
             // BackFill the group with 20k articles.
             try {
                 $backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
 
             // Create releases.
             try {
                 processReleases(new ProcessReleases(), $options[2]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
 
             // Post process the releases.
             try {
                 (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start($options[2]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
             try {
                 (new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         }
@@ -330,20 +330,20 @@ switch ($options[1]) {
             // Create the connection here and pass, this is for post processing, so check for alternate.
             try {
                 $nntp = nntp(true);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
 
             if ($options[1] === 'pp_nfo') {
                 try {
                     (new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     echo $e->getMessage();
                 }
             } else {
                 try {
                     (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start('', $options[2]);
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     echo $e->getMessage();
                 }
             }
@@ -359,7 +359,7 @@ switch ($options[1]) {
         if (charCheck($options[2])) {
             try {
                 (new PostProcess())->processMovies('', $options[2], $options[3] ?? '');
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         }
@@ -374,7 +374,7 @@ switch ($options[1]) {
         if (charCheck($options[2])) {
             try {
                 (new PostProcess())->processTv('', $options[2], $options[3] ?? '');
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 echo $e->getMessage();
             }
         }
@@ -384,8 +384,9 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
+ * @param                 $groupID
  * @param ProcessReleases $releases
- * @param int $groupID
+ *
  * @throws \Throwable
  */
 function processReleases($releases, $groupID)

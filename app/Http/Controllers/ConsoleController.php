@@ -39,7 +39,7 @@ class ConsoleController extends BasePageController
         if ($id && \in_array($id, Arr::pluck($ctmp, 'title'), false)) {
             $cat = Category::query()
                 ->where('title', $id)
-                ->where('parentid', '=', Category::GAME_ROOT)
+                ->where('root_categories_id', '=', Category::GAME_ROOT)
                 ->first(['id']);
             $category = $cat !== null ? $cat['id'] : Category::GAME_ROOT;
         }

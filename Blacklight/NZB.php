@@ -2,7 +2,11 @@
 
 namespace Blacklight;
 
+use App\Models\Part;
+use App\Models\Binary;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -116,50 +120,21 @@ class NZB
     }
 
     /**
-     * Initiate class vars when writing NZBs.
-     */
-    public function initiateForWrite()
-    {
-        $this->setQueries();
-    }
-
-    /**
-     *  Generate queries for collections, binaries and parts.
-     */
-    protected function setQueries(): void
-    {
-        $this->_collectionsQuery = '
-			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
-				g.name AS groupname
-			FROM collections c
-			INNER JOIN usenet_groups g ON c.groups_id = g.id
-			WHERE c.releases_id = ';
-        $this->_binariesQuery = '
-			SELECT b.id, b.name, b.totalparts
-			FROM binaries b
-			WHERE b.collections_id = %d
-			ORDER BY b.name ASC';
-        $this->_partsQuery = '
-			SELECT DISTINCT(p.messageid), p.size, p.partnumber
-			FROM parts p
-			WHERE p.binaries_id = %d
-			ORDER BY p.partnumber ASC';
-    }
-
-    /**
      * Write an NZB to the hard drive for a single release.
      *
-     * @param int    $relID   The ID of the release in the DB.
-     * @param string $relGuid The guid of the release.
-     * @param string $name    The name of the release.
-     * @param string $cTitle  The name of the category this release is in.
      *
-     * @return bool Have we successfully written the NZB to the hard drive?
+     *
+     * @param \App\Models\Release $release
+     *
+     * @return bool
      * @throws \Throwable
      */
-    public function writeNzbForReleaseId($relID, $relGuid, $name, $cTitle): bool
+    public function writeNzbForReleaseId(Release $release): bool
     {
-        $collections = DB::select($this->_collectionsQuery.$relID);
+        $collections = Collection::whereReleasesId($release->id)
+            ->join('usenet_groups', 'collections.groups_id', '=', 'usenet_groups.id')
+            ->select(['collections.*', DB::raw('UNIX_TIMESTAMP(collections.date) AS udate'), 'usenet_groups.name as groupname'])
+            ->get();
 
         if (empty($collections)) {
             return false;
@@ -182,16 +157,16 @@ class NZB
         $XMLWriter->startElement('head');
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'category');
-        $XMLWriter->text($cTitle);
+        $XMLWriter->text($release->category->parent->title.' >'.$release->category->title);
         $XMLWriter->endElement();
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'name');
-        $XMLWriter->text($name);
+        $XMLWriter->text($release->name);
         $XMLWriter->endElement();
         $XMLWriter->endElement(); //head
 
         foreach ($collections as $collection) {
-            $binaries = DB::select(sprintf($this->_binariesQuery, $collection->id));
+            $binaries = Binary::whereCollectionsId($collection->id)->select(['id', 'name', 'totalparts'])->orderBy('name')->get();
             if (empty($binaries)) {
                 return false;
             }
@@ -199,7 +174,7 @@ class NZB
             $poster = $collection->fromname;
 
             foreach ($binaries as $binary) {
-                $parts = DB::select(sprintf($this->_partsQuery, $binary->id));
+                $parts = Part::whereBinariesId($binary->id)->distinct()->select(['messageid', 'size', 'partnumber'])->orderBy('partnumber')->get();
                 if (empty($parts)) {
                     return false;
                 }
@@ -242,7 +217,7 @@ class NZB
         $XMLWriter->writeComment($this->_siteCommentString);
         $XMLWriter->endElement(); //nzb
         $XMLWriter->endDocument();
-        $path = ($this->buildNZBPath($relGuid, $this->nzbSplitLevel, true).$relGuid.'.nzb.gz');
+        $path = ($this->buildNZBPath($release->guid, $this->nzbSplitLevel, true).$release->guid.'.nzb.gz');
         $fp = gzopen($path, 'wb7');
         if (! $fp) {
             return false;
@@ -256,27 +231,16 @@ class NZB
             return false;
         }
         // Mark release as having NZB.
-        DB::transaction(function () use ($relID, $nzb_guid) {
-            DB::update(
-            sprintf(
-                '
-				UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
-                self::NZB_ADDED,
-                $nzb_guid === '' ? '' : ', nzb_guid = UNHEX( '.escapeString(md5($nzb_guid)).' )',
-                $relID
-            )
-        );
+        DB::transaction(function () use ($release, $nzb_guid) {
+            $release->update(['nzbstatus' => self::NZB_ADDED]);
+            if (! empty($nzb_guid)) {
+                $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5($nzb_guid)).' )')]);
+            }
         }, 3);
 
         // Delete CBP for release that has its NZB created.
-        DB::transaction(function () use ($relID) {
-            DB::delete(
-            sprintf(
-                '
-				DELETE c, b, p FROM collections c JOIN binaries b ON(c.id=b.collections_id) STRAIGHT_JOIN parts p ON(b.id=p.binaries_id) WHERE c.releases_id = %d',
-                $relID
-            )
-        );
+        DB::transaction(function () use ($release) {
+            Collection::query()->where('collections.releases_id', $release->id)->delete();
         }, 3);
         // Chmod to fix issues some users have with file permissions.
         chmod($path, 0777);

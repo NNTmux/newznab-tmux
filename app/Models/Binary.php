@@ -29,5 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Binary extends Model
 {
-    //
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 }

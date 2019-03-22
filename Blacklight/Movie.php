@@ -256,7 +256,7 @@ class Movie
                 $this->getBrowseBy(),
                 (! empty($catsrch) ? $catsrch : ''),
                 (
-                $maxAge > 0
+                    $maxAge > 0
                     ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                     : ''
                 ),
@@ -307,7 +307,7 @@ class Movie
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
+			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
 			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
 			WHERE m.imdbid IN (%s)
 			AND r.id IN (%s) %s
@@ -899,6 +899,10 @@ class Movie
      */
     public function fetchIMDBProperties($imdbId)
     {
+        $resultQuery = (new Title($imdbId, $this->config))->real_id();
+        if (! empty($resultQuery)) {
+            $imdbId = 'tt'.$resultQuery;
+        }
         $result = new Title($imdbId, $this->config);
         if (! empty($result->orig_title())) {
             similar_text($this->currentTitle, $result->orig_title(), $percent);
@@ -906,16 +910,16 @@ class Movie
                 similar_text($this->currentYear, $result->year(), $percent);
                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                     $ret = [
-                        'title' => $result->orig_title(),
-                        'tagline' => $result->tagline(),
-                        'plot' => Arr::get($result->plot_split(), '0.plot'),
-                        'rating' => ! empty($result->rating()) ? $result->rating() : '',
-                        'year' => $result->year(),
-                        'cover' => $result->photo(),
-                        'genre' => $result->genre(),
-                        'language' => $result->language(),
-                        'type' => $result->movietype(),
-                    ];
+                            'title' => $result->orig_title(),
+                            'tagline' => $result->tagline(),
+                            'plot' => Arr::get($result->plot_split(), '0.plot'),
+                            'rating' => ! empty($result->rating()) ? $result->rating() : '',
+                            'year' => $result->year(),
+                            'cover' => $result->photo(),
+                            'genre' => $result->genre(),
+                            'language' => $result->language(),
+                            'type' => $result->movietype(),
+                        ];
 
                     if ($this->echooutput && Utility::isCLI()) {
                         $this->colorCli->headerOver('IMDb Found ').$this->colorCli->primaryOver($result->orig_title()).PHP_EOL;
@@ -1302,7 +1306,7 @@ class Movie
     protected function parseMovieSearchName($releaseName): bool
     {
         $name = $year = '';
-        $followingList = '[^\w]((1080|480|720)p|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid)[^\w]';
+        $followingList = '[^\w]((1080|480|720)p|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[ ._-]?264|xvid)[^\w]';
 
         /* Initial scan of getting a year/name.
          * [\w. -]+ Gets 0-9a-z. - characters, most scene movie titles contain these chars.

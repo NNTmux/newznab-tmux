@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * Class Releases.
  */
-class Releases
+class Releases extends Release
 {
     // RAR/ZIP Passworded indicator.
     public const PASSWD_NONE = 0; // No password.
@@ -38,14 +38,9 @@ class Releases
      * @var array Class instances.
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-            'Groups'   => null,
-        ];
-        $options += $defaults;
-
+        parent::__construct();
         $this->sphinxSearch = new SphinxSearch();
     }
 
@@ -71,7 +66,7 @@ class Releases
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
-            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				df.failed AS failed,
@@ -81,7 +76,7 @@ class Releases
 				tve.title, tve.firstaired
 			FROM
 			(
-				SELECT r.*, g.name AS group_name
+				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, g.name AS group_name
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				%s
@@ -91,7 +86,7 @@ class Releases
 				ORDER BY %s %s %s
 			) r
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
@@ -117,7 +112,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $sql = Release::fromQuery($qry);
+        $sql = self::fromQuery($qry);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName, $tags);
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
@@ -164,7 +159,7 @@ class Releases
         if ($count !== null) {
             return $count;
         }
-        $count = Release::fromQuery($sql);
+        $count = self::fromQuery($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 
@@ -263,12 +258,12 @@ class Releases
      */
     public function getForExport($postFrom = '', $postTo = '', $groupID = '')
     {
-        $query = Release::query()
+        $query = self::query()
             ->where('r.nzbstatus', NZB::NZB_ADDED)
             ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->leftJoin('root_categories as cp', 'cp.id', '=', 'c.root_categories_id')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'r.groups_id');
 
         if ($groupID !== '') {
@@ -300,7 +295,7 @@ class Releases
      */
     public function getEarliestUsenetPostDate()
     {
-        $row = Release::query()->selectRaw("DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate")->first();
+        $row = self::query()->selectRaw("DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate")->first();
 
         return $row === null ? '01/01/2014' : $row['postdate'];
     }
@@ -313,7 +308,7 @@ class Releases
      */
     public function getLatestUsenetPostDate()
     {
-        $row = Release::query()->selectRaw("DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate")->first();
+        $row = self::query()->selectRaw("DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate")->first();
 
         return $row === null ? '01/01/2014' : $row['postdate'];
     }
@@ -328,7 +323,7 @@ class Releases
      */
     public function getReleasedGroupsForSelect($blnIncludeAll = true): array
     {
-        $groups = Release::query()
+        $groups = self::query()
             ->selectRaw('DISTINCT g.id, g.name')
             ->leftJoin('usenet_groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
@@ -361,10 +356,10 @@ class Releases
         if ($this->concatenatedCategoryIDsCache === null) {
             $result = Category::query()
                 ->remember(config('nntmux.cache_expiry_long'))
-                ->whereNotNull('categories.parentid')
+                ->whereNotNull('categories.root_categories_id')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
-                ->leftJoin('categories as cp', 'cp.id', '=', 'categories.parentid')
+                ->leftJoin('root_categories as cp', 'cp.id', '=', 'categories.root_categories_id')
                 ->get();
             if (isset($result[0]['category_ids'])) {
                 $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
@@ -390,20 +385,20 @@ class Releases
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
-                "SELECT r.*,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
-					usenet_groups.name AS group_name,
+					g.name AS group_name,
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					df.failed AS failed
 				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				LEFT JOIN usenet_groups ON usenet_groups.id = r.groups_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN categories cp ON cp.id = c.parentid
+				LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE %s %s
 				AND r.nzbstatus = %d
@@ -412,17 +407,17 @@ class Releases
 				%s
 				GROUP BY r.id
 				ORDER BY %s %s %s",
-                $this->getConcatenatedCategoryIDs(),
-                $this->uSQL($userShows, 'videos_id'),
-                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                NZB::NZB_ADDED,
-                Category::TV_ROOT,
-                Category::TV_OTHER,
-                $this->showPasswords(),
-                ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-                $orderBy[0],
-                $orderBy[1],
-                ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
+            $this->getConcatenatedCategoryIDs(),
+            $this->uSQL($userShows, 'videos_id'),
+            (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            NZB::NZB_ADDED,
+            Category::TV_ROOT,
+            Category::TV_OTHER,
+            $this->showPasswords(),
+            ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
+            $orderBy[0],
+            $orderBy[1],
+            ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -431,7 +426,7 @@ class Releases
             return $result;
         }
 
-        $result = Release::fromQuery($sql);
+        $result = self::fromQuery($sql);
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
@@ -511,7 +506,7 @@ class Releases
         $this->sphinxSearch->deleteRelease($identifiers);
 
         // Delete from DB.
-        Release::whereGuid($identifiers['g'])->delete();
+        self::whereGuid($identifiers['g'])->delete();
     }
 
     /**
@@ -539,7 +534,7 @@ class Releases
             'imdbid'         => $imdbId,
         ];
 
-        return Release::query()->whereIn('guid', $guids)->update($update);
+        return self::query()->whereIn('guid', $guids)->update($update);
     }
 
     /**
@@ -646,7 +641,7 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -663,7 +658,7 @@ class Releases
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
@@ -686,7 +681,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = ! empty($searchResult) ? Release::fromQuery($sql) : collect();
+        $releases = ! empty($searchResult) ? self::fromQuery($sql) : collect();
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -733,7 +728,7 @@ class Releases
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -746,7 +741,7 @@ class Releases
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
             ! empty($tags) ? ' LEFT JOIN tagging_tagged tt ON tt.taggable_id = r.id' : '',
@@ -767,11 +762,11 @@ class Releases
             return $releases;
         }
         if ($searchName !== -1 && ! empty($searchResult)) {
-            $releases = Release::fromQuery($sql);
+            $releases = self::fromQuery($sql);
         } elseif ($searchName !== -1 && empty($searchResult)) {
             $releases = collect();
         } else {
-            $releases = Release::fromQuery($sql);
+            $releases = self::fromQuery($sql);
         }
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
@@ -828,7 +823,7 @@ class Releases
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = Release::fromQuery($showQry);
+            $show = self::fromQuery($showQry);
 
             if (! empty($show[0])) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes !== '') {
@@ -879,7 +874,7 @@ class Releases
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview,
 				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
 					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,
@@ -894,7 +889,7 @@ class Releases
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
@@ -915,7 +910,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = Release::fromQuery($sql) : [];
+        ((! empty($name) && ! empty($searchResult)) || empty($name)) ? $releases = self::fromQuery($sql) : [];
         if (! empty($releases) && $releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -973,7 +968,7 @@ class Releases
                 ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airdate)) : '')
             );
-            $show = Release::fromQuery($showQry);
+            $show = self::fromQuery($showQry);
 
             if ($show->isNotEmpty()) {
                 if ((! empty($series) || ! empty($episode) || ! empty($airdate)) && $show[0]->episodes != '') {
@@ -1024,7 +1019,7 @@ class Releases
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id,
+            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.tv_episodes_id, r.haspreview,
 				v.title, v.type, v.tvdb, v.trakt,v.imdb, v.tmdb, v.tvmaze, v.tvrage,
 				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
@@ -1035,7 +1030,7 @@ class Releases
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
@@ -1054,7 +1049,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -1099,7 +1094,7 @@ class Releases
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
         $baseSql = sprintf(
-            "SELECT r.*, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.haspreview, cp.title AS parent_category, c.title AS sub_category,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1107,7 +1102,7 @@ class Releases
 				re.releases_id AS reid
 			FROM releases r
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
@@ -1127,7 +1122,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1178,7 +1173,7 @@ class Releases
             $minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''
         );
         $baseSql = sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.imdbid, r.videos_id, r.tv_episodes_id, r.haspreview, m.imdbid, m.tmdbid, m.traktid, cp.title AS parent_category, c.title AS sub_category,
 				concat(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1187,7 +1182,7 @@ class Releases
 			LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
 			LEFT JOIN usenet_groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			%s %s",
             $this->getConcatenatedCategoryIDs(),
@@ -1207,7 +1202,7 @@ class Releases
         if ($releases !== null) {
             return $releases;
         }
-        $releases = Release::fromQuery($sql);
+        $releases = self::fromQuery($sql);
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
@@ -1227,10 +1222,10 @@ class Releases
     {
         // Get the category for the parent of this release.
         $ret = false;
-        $currRow = Release::getCatByRelId($currentID);
+        $currRow = self::getCatByRelId($currentID);
         if ($currRow !== null) {
             $catRow = Category::find($currRow['categories_id']);
-            $parentCat = $catRow['parentid'];
+            $parentCat = $catRow['root_categories_id'];
 
             $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, [$parentCat]);
             if (! $results) {
@@ -1269,7 +1264,7 @@ class Releases
 
                 if ($nzbContents) {
                     $filename = $guid;
-                    $r = Release::getByGuid($guid);
+                    $r = self::getByGuid($guid);
                     if ($r) {
                         $filename = $r['searchname'];
                     }
@@ -1302,7 +1297,7 @@ class Releases
         if ($count !== null) {
             return $count;
         }
-        $count = Release::fromQuery($sql);
+        $count = self::fromQuery($sql);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]->count, $expiresAt);
 

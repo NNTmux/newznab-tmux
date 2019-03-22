@@ -674,7 +674,7 @@ class SettingsTableSeeder extends Seeder
                 'section' => '',
                 'subsection' => '',
                 'name' => 'request_url',
-                'value' => 'http://reqid.newznab-tmux.pw/index.php',
+                'value' => '',
                 'hint' => 'Optional URL to lookup Request IDs.',
                 'setting' => 'request_url',
             ],

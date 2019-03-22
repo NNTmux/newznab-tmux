@@ -7,7 +7,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'app/Extensions/util/PhpYenc.p
 
 use Dotenv\Dotenv;
 
-$dotenv = new Dotenv(dirname(__DIR__, 1));
+$dotenv = Dotenv::create(dirname(__DIR__, 1));
 $dotenv->load();
 
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();

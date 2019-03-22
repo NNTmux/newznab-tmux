@@ -21,13 +21,13 @@ use Blacklight\ReleaseImage;
 use Blacklight\SphinxSearch;
 use FFMpeg\Format\Video\Ogg;
 use Mhor\MediaInfo\MediaInfo;
+use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Coordinate\Dimension;
 use dariusiii\rarinfo\ArchiveInfo;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use FFMpeg\Filters\Video\ResizeFilter;
@@ -39,12 +39,7 @@ class ProcessAdditional
      *
      * @var int
      */
-    public const maxCompressedFilesToCheck = 20;
-
-    /**
-     * @var \PDO
-     */
-    public $pdo;
+    public const maxCompressedFilesToCheck = 10;
 
     /**
      * @var bool
@@ -421,17 +416,17 @@ class ProcessAdditional
 
         $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli') && (strtolower(PHP_SAPI) === 'cli'));
 
-        $this->_nntp = $options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI]);
+        $this->_nntp = $options['NNTP'] ?? new NNTP(['Echo' => $this->_echoCLI]);
 
-        $this->_nzb = $options['NZB'] instanceof NZB ? $options['NZB'] : new NZB();
+        $this->_nzb = $options['NZB'] ?? new NZB();
         $this->_archiveInfo = new ArchiveInfo();
-        $this->_categorize = $options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize();
-        $this->_nameFixer = $options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Categorize' => $this->_categorize]);
-        $this->_releaseExtra = $options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra();
-        $this->_releaseImage = $options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage();
+        $this->_categorize = $options['Categorize'] ?? new Categorize();
+        $this->_nameFixer = $options['NameFixer'] ?? new NameFixer(['Echo' =>$this->_echoCLI, 'Categorize' => $this->_categorize]);
+        $this->_releaseExtra = $options['ReleaseExtra'] ?? new ReleaseExtra();
+        $this->_releaseImage = $options['ReleaseImage'] ?? new ReleaseImage();
         $this->_par2Info = new Par2Info();
-        $this->_nfo = $options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo();
-        $this->sphinx = $options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch();
+        $this->_nfo = $options['Nfo'] ?? new Nfo();
+        $this->sphinx = $options['SphinxSearch'] ?? new SphinxSearch();
         $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('..timeoutseconds')]);
         $this->ffprobe = FFProbe::create();
         $this->mediaInfo = new MediaInfo();
@@ -449,12 +444,12 @@ class ProcessAdditional
         // Pass the binary extractors to ArchiveInfo.
         $clients = [];
         if (Settings::settingValue('apps..unrarpath') !== '') {
-            $clients += [ArchiveInfo::TYPE_RAR => Settings::settingValue('apps..unrarpath')];
             $this->_unrarPath = Settings::settingValue('apps..unrarpath');
+            $clients += [ArchiveInfo::TYPE_RAR => $this->_unrarPath];
         }
         if (Settings::settingValue('apps..zippath') !== '') {
-            $clients += [ArchiveInfo::TYPE_ZIP => Settings::settingValue('apps..zippath')];
             $this->_7zipPath = Settings::settingValue('apps..zippath');
+            $clients += [ArchiveInfo::TYPE_ZIP => $this->_7zipPath];
         }
         $this->_archiveInfo->setExternalClients($clients);
 
@@ -632,30 +627,31 @@ class ProcessAdditional
      */
     protected function _fetchReleases($groupID, &$guidChar): void
     {
-        $this->_releases = DB::select(
-            sprintf(
-                '
-				SELECT r.id, r.id AS releases_id, r.guid, r.name, r.size, r.groups_id, r.nfostatus,
-					r.fromname, r.completion, r.categories_id, r.searchname, r.predb_id,
-					c.disablepreview
-				FROM releases r
-				LEFT JOIN categories c ON c.id = r.categories_id
-				WHERE r.nzbstatus = 1
-				%s %s %s %s
-				AND r.passwordstatus BETWEEN -6 AND -1
-				AND r.haspreview = -1
-				AND c.disablepreview = 0
-				ORDER BY r.passwordstatus ASC, r.postdate DESC
-				LIMIT %d',
-                $this->_maxSize,
-                $this->_minSize,
-                ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID),
-                ($guidChar === '' ? '' : 'AND r.leftguid = '.escapeString($guidChar)),
-                $this->_queryLimit
-            )
-        );
+        $releasesQuery = Release::query()
+            ->where('releases.nzbstatus', '=', 1)
+            ->whereBetween('releases.passwordstatus', [-6, -1])
+            ->where('releases.haspreview', '=', -1)
+            ->where('categories.disablepreview', '=', 0);
+        if ($this->_maxSize > 0) {
+            $releasesQuery->where('releases.size', '<', $this->_maxSize * 1073741824);
+        }
+        if ($this->_minSize > 0) {
+            $releasesQuery->where('releases.size', '>', $this->_minSize * 1048576);
+        }
+        if (! empty($groupID)) {
+            $releasesQuery->where('releases.groups_id', $groupID);
+        }
+        if (! empty($guidChar)) {
+            $releasesQuery->where('releases.leftguid', $guidChar);
+        }
+        $releasesQuery->select(['releases.id', 'releases.id as releases_id', 'releases.guid', 'releases.name', 'releases.size', 'releases.groups_id', 'releases.nfostatus', 'releases.fromname', 'releases.completion', 'releases.categories_id', 'releases.searchname', 'releases.predb_id', 'categories.disablepreview'])
+            ->leftJoin('categories', 'categories.id', '=', 'releases.categories_id')
+            ->orderBy('releases.passwordstatus')
+            ->orderByDesc('releases.postdate')
+            ->limit($this->_queryLimit);
 
-        $this->_totalReleases = \count($this->_releases);
+        $this->_releases = $releasesQuery->get();
+        $this->_totalReleases = $this->_releases->count();
     }
 
     /**
@@ -802,29 +798,30 @@ class ProcessAdditional
      * Get list of contents inside a release's NZB file.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function _getNZBContents(): bool
     {
         $nzbPath = $this->_nzb->NZBPath($this->_release->guid);
         if ($nzbPath === false) {
-            $this->_echo('NZB not found for GUID: '.$this->_release->guid, 'warning');
+            $this->_echo('NZB not found for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
-            return $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
 
         $nzbContents = Utility::unzipGzipFile($nzbPath);
         if (! $nzbContents) {
-            $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid, 'warning');
+            $this->_echo('NZB is empty or broken for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
-            return $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
 
         // Get a list of files in the nzb.
         $this->_nzbContents = $this->_nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
         if (\count($this->_nzbContents) === 0) {
-            $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid, 'warning');
+            $this->_echo('NZB is potentially broken for GUID: '.$this->_release->guid.', deleting the release.', 'warning');
 
-            return $this->_decrementPasswordStatus();
+            $this->_deleteRelease();
         }
         // Sort keys.
         ksort($this->_nzbContents, SORT_NATURAL);
@@ -840,6 +837,17 @@ class ProcessAdditional
     protected function _decrementPasswordStatus(): bool
     {
         Release::whereId($this->_release->id)->decrement('passwordstatus');
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    protected function _deleteRelease(): bool
+    {
+        Release::whereId($this->_release->id)->delete();
 
         return false;
     }
@@ -1004,7 +1012,7 @@ class ProcessAdditional
 
             // Download the article(s) from usenet.
             $fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mID, $this->_alternateNNTP);
-            if ($this->_nntp->isError($fetchedBinary)) {
+            if ($this->_nntp::isError($fetchedBinary)) {
                 $fetchedBinary = false;
             }
 
@@ -1085,33 +1093,33 @@ class ProcessAdditional
         }
 
         switch ($dataSummary['main_type']) {
-                case ArchiveInfo::TYPE_RAR:
-                    if ($this->_echoCLI) {
-                        $this->_echo('r', 'primaryOver');
-                    }
+            case ArchiveInfo::TYPE_RAR:
+                if ($this->_echoCLI) {
+                    $this->_echo('r', 'primaryOver');
+                }
 
-                    if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
-                        $fileName = $this->tmpPath.uniqid('', true).'.rar';
-                        File::put($fileName, $compressedData);
-                        runCmd($this->_killString.$this->_unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$this->tmpPath.'unrar/"');
-                        File::delete($fileName);
-                    }
-                    break;
-                case ArchiveInfo::TYPE_ZIP:
-                    if ($this->_echoCLI) {
-                        $this->_echo('z', 'primaryOver');
-                    }
+                if (! $this->_extractUsingRarInfo && $this->_unrarPath !== false) {
+                    $fileName = $this->tmpPath.uniqid('', true).'.rar';
+                    File::put($fileName, $compressedData);
+                    runCmd($this->_killString.$this->_unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$this->tmpPath.'unrar/"');
+                    File::delete($fileName);
+                }
+                break;
+            case ArchiveInfo::TYPE_ZIP:
+                if ($this->_echoCLI) {
+                    $this->_echo('z', 'primaryOver');
+                }
 
-                    if (! $this->_extractUsingRarInfo && $this->_7zipPath !== false) {
-                        $fileName = $this->tmpPath.uniqid('', true).'.zip';
-                        File::put($fileName, $compressedData);
-                        runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
-                        File::delete($fileName);
-                    }
-                    break;
-                default:
-                    return false;
-            }
+                if (! $this->_extractUsingRarInfo && ! empty($this->_7zipPath)) {
+                    $fileName = $this->tmpPath.uniqid('', true).'.zip';
+                    File::put($fileName, $compressedData);
+                    runCmd($this->_killString.$this->_7zipPath.'" x "'.$fileName.'" -bd -y -o"'.$this->tmpPath.'unzip/"');
+                    File::delete($fileName);
+                }
+                break;
+            default:
+                return false;
+        }
 
         return $this->_processCompressedFileList();
     }
@@ -1291,7 +1299,7 @@ class ProcessAdditional
 
             if (File::isFile($file)) {
 
-                    // Process PAR2 files.
+                // Process PAR2 files.
                 if (! $this->_foundPAR2Info && preg_match('/\.par2$/', $file)) {
                     $this->_siftPAR2Info($file);
                 } // Process NFO files.
@@ -1299,9 +1307,9 @@ class ProcessAdditional
                     $this->_processNfoFile($file);
                 } // Process audio files.
                 elseif (
-                        (! $this->_foundAudioInfo || ! $this->_foundAudioSample) &&
-                        preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
-                    ) {
+                    (! $this->_foundAudioInfo || ! $this->_foundAudioSample) &&
+                    preg_match('/(.*)'.$this->_audioFileRegex.'$/i', $file, $fileType)
+                ) {
                     // Try to get audio sample/audio media info.
                     File::move($file, $this->tmpPath.'audiofile.'.$fileType[2]);
                     $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType[2], $fileType[2]);
@@ -1312,8 +1320,8 @@ class ProcessAdditional
                     File::delete($file);
                 } // Video sample // video clip // video media info.
                 elseif ((! $this->_foundSample || ! $this->_foundVideo || ! $this->_foundMediaInfo) &&
-                        preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
-                    ) {
+                    preg_match('/(.*)'.$this->_videoFileRegex.'$/i', $file)
+                ) {
                     $this->_processVideoFile($file);
                 }
 
@@ -1323,40 +1331,40 @@ class ProcessAdditional
                     if (! empty($output)) {
                         switch (true) {
 
-                                case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
-                                    $this->_getJPGSample($file);
-                                    File::delete($file);
-                                    break;
+                            case ! $this->_foundJPGSample && preg_match('/^JPE?G/i', $output):
+                                $this->_getJPGSample($file);
+                                File::delete($file);
+                                break;
 
-                                case
-                                    (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo)
-                                    && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
-                                    $this->_processVideoFile($file);
-                                    break;
+                            case
+                                (! $this->_foundMediaInfo || ! $this->_foundSample || ! $this->_foundVideo)
+                                && preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output):
+                                $this->_processVideoFile($file);
+                                break;
 
-                                case
-                                    (! $this->_foundAudioSample || ! $this->_foundAudioInfo) &&
-                                    preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
-                                    switch ($fileType[0]) {
-                                        case 'FLAC':
-                                            $fileType = 'FLAC';
-                                            break;
-                                        case 'layer III':
-                                            $fileType = 'MP3';
-                                            break;
-                                        case 'Vorbis audio':
-                                            $fileType = 'OGG';
-                                            break;
-                                    }
-                                    File::move($file, $this->tmpPath.'audiofile.'.$fileType);
-                                    $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
-                                    File::delete($this->tmpPath.'audiofile.'.$fileType);
-                                    break;
+                            case
+                                (! $this->_foundAudioSample || ! $this->_foundAudioInfo) &&
+                                preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType):
+                                switch ($fileType[0]) {
+                                    case 'FLAC':
+                                        $fileType = 'FLAC';
+                                        break;
+                                    case 'layer III':
+                                        $fileType = 'MP3';
+                                        break;
+                                    case 'Vorbis audio':
+                                        $fileType = 'OGG';
+                                        break;
+                                }
+                                File::move($file, $this->tmpPath.'audiofile.'.$fileType);
+                                $this->_getAudioInfo($this->tmpPath.'audiofile.'.$fileType, $fileType);
+                                File::delete($this->tmpPath.'audiofile.'.$fileType);
+                                break;
 
-                                case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
-                                    $this->_siftPAR2Info($file);
-                                    break;
-                            }
+                            case ! $this->_foundPAR2Info && stripos($output, 'Parity') === 0:
+                                $this->_siftPAR2Info($file);
+                                break;
+                        }
                     }
                 }
             }
@@ -1391,7 +1399,7 @@ class ProcessAdditional
 
                 // Download it from usenet.
                 $sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp->isError($sampleBinary)) {
+                if ($this->_nntp::isError($sampleBinary)) {
                     $sampleBinary = false;
                 }
 
@@ -1437,7 +1445,7 @@ class ProcessAdditional
 
                 // Try to download it from usenet.
                 $mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp->isError($mediaBinary)) {
+                if ($this->_nntp::isError($mediaBinary)) {
                     // If error set it to false.
                     $mediaBinary = false;
                 }
@@ -1488,7 +1496,7 @@ class ProcessAdditional
             if (! empty($this->_AudioInfoMessageIDs)) {
                 // Try to download it from usenet.
                 $audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
-                if ($this->_nntp->isError($audioBinary)) {
+                if ($this->_nntp::isError($audioBinary)) {
                     $audioBinary = false;
                 }
 
@@ -1523,7 +1531,7 @@ class ProcessAdditional
 
             // Try to download it.
             $jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs, $this->_alternateNNTP);
-            if ($this->_nntp->isError($jpgBinary)) {
+            if ($this->_nntp::isError($jpgBinary)) {
                 $jpgBinary = false;
             }
 
@@ -1537,13 +1545,13 @@ class ProcessAdditional
 
                 // Try to resize and move it.
                 $this->_foundJPGSample = (
-                $this->_releaseImage->saveImage(
-                    $this->_release->guid.'_thumb',
-                    $this->tmpPath.'samplepicture.jpg',
-                    $this->_releaseImage->jpgSavePath,
-                    650,
-                    650
-                ) === 1
+                    $this->_releaseImage->saveImage(
+                        $this->_release->guid.'_thumb',
+                        $this->tmpPath.'samplepicture.jpg',
+                        $this->_releaseImage->jpgSavePath,
+                        650,
+                        650
+                    ) === 1
                 );
 
                 if ($this->_foundJPGSample) {
@@ -1689,14 +1697,14 @@ class ProcessAdditional
 
         $musicParent = (string) Category::MUSIC_ROOT;
         if ($rQuery === null || ! preg_match(
-                sprintf(
+            sprintf(
                     '/%d\d{3}|%d|%d|%d/',
                     $musicParent[0],
                     Category::OTHER_MISC,
                     Category::MOVIE_OTHER,
                     Category::TV_OTHER
                 ),
-                $rQuery->id
+            $rQuery->id
             )
         ) {
             return false;
@@ -1735,34 +1743,24 @@ class ProcessAdditional
 
                                 $newTitle = escapeString(substr($newName, 0, 255));
                                 // Update the search name.
-                                DB::update(
-                                        sprintf(
-                                            '
-											UPDATE releases
-											SET searchname = %s, categories_id = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
-											WHERE id = %d',
-                                            $newTitle,
-                                            $newCat['categories_id'],
-                                            $this->_release->id
-                                        )
-                                    );
-                                $release = Release::find($this->_release->id);
+                                $release = Release::whereId($this->_release->id);
+                                $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'],  'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
                                 $release->retag($newCat['tags']);
                                 $this->sphinx->updateRelease($this->_release->id);
 
                                 // Echo the changed name.
                                 if ($this->_echoCLI) {
                                     NameFixer::echoChangedReleaseName(
-                                            [
-                                                'new_name' => $newName,
-                                                'old_name' => $rQuery->searchname,
-                                                'new_category' => $newCat,
-                                                'old_category' => $rQuery->id,
-                                                'group' => $rQuery->groups_id,
-                                                'releases_id' => $this->_release->id,
-                                                'method' => 'ProcessAdditional->_getAudioInfo',
-                                            ]
-                                        );
+                                        [
+                                            'new_name' => $newName,
+                                            'old_name' => $rQuery->searchname,
+                                            'new_category' => $newCat,
+                                            'old_category' => $rQuery->id,
+                                            'group' => $rQuery->groups_id,
+                                            'releases_id' => $this->_release->id,
+                                            'method' => 'ProcessAdditional->_getAudioInfo',
+                                        ]
+                                    );
                                 }
                             }
 
@@ -1847,13 +1845,13 @@ class ProcessAdditional
     {
         // Try to resize/move the image.
         $this->_foundJPGSample = (
-        $this->_releaseImage->saveImage(
-            $this->_release->guid.'_thumb',
-            $fileLocation,
-            $this->_releaseImage->jpgSavePath,
-            650,
-            650
-        ) === 1
+            $this->_releaseImage->saveImage(
+                $this->_release->guid.'_thumb',
+                $fileLocation,
+                $this->_releaseImage->jpgSavePath,
+                650,
+                650
+            ) === 1
         );
 
         // If it's successful, tell the DB.
@@ -2129,20 +2127,13 @@ class ProcessAdditional
         if ($this->_par2Info->error) {
             return;
         }
-
-        $releaseInfo = DB::selectOne(
-            sprintf(
-                '
-				SELECT UNIX_TIMESTAMP(postdate) AS postdate, proc_pp
-				FROM releases
-				WHERE id = %d',
-                $this->_release->id
-            )
-        );
+        $releaseInfo = Release::query()->where('id', $this->_release->id)->select(['postdate', 'proc_pp'])->first();
 
         if ($releaseInfo === null) {
             return;
         }
+
+        $postDate = Carbon::createFromFormat('Y-m-d H:i:s', $releaseInfo->postdate)->getTimestamp();
 
         // Only get a new name if the category is OTHER.
         $foundName = true;
@@ -2175,7 +2166,7 @@ class ProcessAdditional
                 ) {
 
                     // Try to add the files to the DB.
-                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $releaseInfo->postdate, 0, $file['hash_16K'])) {
+                    if (ReleaseFile::addReleaseFiles($this->_release->id, $file['name'], $file['size'], $postDate, 0, $file['hash_16K'])) {
                         $filesAdded++;
                     }
                 }
@@ -2204,7 +2195,7 @@ class ProcessAdditional
     protected function _processNfoFile($fileLocation): void
     {
         $data = @File::get($fileLocation);
-        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, (array) $this->_release, $this->_nntp)) {
+        if ($data !== false && $this->_nfo->isNFO($data, $this->_release->guid) && $this->_nfo->addAlternateNfo($data, $this->_release, $this->_nntp)) {
             $this->_releaseHasNoNFO = false;
         }
     }
@@ -2246,8 +2237,8 @@ class ProcessAdditional
     {
         $pos = 0;
         $af = $bf = false;
-        $a = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $a['title']);
-        $b = preg_replace('/\d+[- ._]?(\/|\||[o0]f)[- ._]?\d+?(?![- ._]\d)/i', ' ', $b['title']);
+        $a = preg_replace('/\d+[ ._-]?(\/|\||[o0]f)[ ._-]?\d+?(?![ ._-]\d)/i', ' ', $a['title']);
+        $b = preg_replace('/\d+[ ._-]?(\/|\||[o0]f)[ ._-]?\d+?(?![ ._-]\d)/i', ' ', $b['title']);
 
         if (preg_match('/\.(part\d+|[r|z]\d+)(\s*\.rar)*($|[ ")\]-])/i', $a)) {
             $af = true;

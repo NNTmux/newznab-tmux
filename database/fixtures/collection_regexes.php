@@ -4,7 +4,7 @@ return [
     0 => [
         'id' => 1,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/(?P<match1>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match2>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/i',
+        'regex' => '/(?P<match1>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match2>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/i',
         'status' => 1,
         'description' => '[278997]-[FULL]-[#a.b.erotica]-[ chi-the.walking.dead.xxx ]-[06/51] - "chi-the.walking.dead.xxx-s.mp4" yEnc ::: [######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc ::: Re: [147053]-[FULL]-[#a.b.teevee]-[ Top_Gear.20x04.HDTV_x264-FoV ]-[11/59] - "top_gear.20x04.hdtv_x264-fov.r00" yEnc',
         'ordinal' => 0,
@@ -84,7 +84,7 @@ return [
     10 => [
         'id' => 11,
         'group_regex' => '^alt\\.binaries\\.3d$',
-        'regex' => '/^(?P<match0>.+)File \\d+ (?P<match1>of \\d+): ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>.+)File \\d+ (?P<match1>of \\d+): ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//ugMBqtZw3vFnmrmr16EQhaAz9mMri9mD - File 01 of 98: "1vJ7wswi9ZG6YrzE5OGBFPKeuRv9X86xgYdK.par2" yEnc',
         'ordinal' => 5,
@@ -92,7 +92,7 @@ return [
     11 => [
         'id' => 12,
         'group_regex' => '^alt\\.binaries\\.3d$',
-        'regex' => '/^(?P<match0>.+)\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>.+)\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//999XL[074/103] - "LLKJ678CCDE1223ss.part073.rar" yEnc',
         'ordinal' => 10,
@@ -100,7 +100,7 @@ return [
     12 => [
         'id' => 13,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\(\\?+\\) \\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\?+\\) \\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(???) [1/1] - "Asimov, Isaac - [Foundation 01] - De Foundation_v2.rar" yEnc',
         'ordinal' => 5,
@@ -108,7 +108,7 @@ return [
     13 => [
         'id' => 14,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\([\\w!.,&_ \\()\\[\\]\\\'\\`-]{8,}\\)[-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\([\\w!.,&_ \\()\\[\\]\\\'\\`-]{8,}\\)[\-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Ass Backwards (2013) WEBrip XviD AC3 (english subs)) [18/35] - "Ass Backwards (2013) WEBrip XviD AC3 (english subs).part17.rar" yEnc',
         'ordinal' => 10,
@@ -116,7 +116,7 @@ return [
     14 => [
         'id' => 15,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\w+[-_ ]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](?P<match1>proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\d+(\\/\\d+)[-_\\s]{0,3}yEnc$/i',
+        'regex' => '/^\\w+[\-_ ]{0,3}"(?P<match0>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](?P<match1>proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\d+(\\/\\d+)[\-_\\s]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//05VANmA80DckBho "05VANmA80DckBho.part07.rar"08/94 yEnc',
         'ordinal' => 15,
@@ -124,7 +124,7 @@ return [
     15 => [
         'id' => 16,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\(Angels4Always\\)[-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(Angels4Always\\)[\-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Angels4Always) [1/1] - "Vermeulen, John - De tweelingparadox.rar" yEnc',
         'ordinal' => 20,
@@ -132,7 +132,7 @@ return [
     16 => [
         'id' => 17,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^www\\.wolfsteamers\\.info[-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^www\\.wolfsteamers\\.info[\-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//www.wolfsteamers.info [1/6] - "Wohnen Bauen Leben - Sommer 2014.par2" - 16,46 MB yEnc',
         'ordinal' => 25,
@@ -140,7 +140,7 @@ return [
     17 => [
         'id' => 18,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^[\\w!.,&_ \\()\\[\\]\\\'\\`-]{8,}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\w!.,&_ \\()\\[\\]\\\'\\`-]{8,}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Heaven_en_Fayth Presenteren Diana Gabaldon - Reiziger Cyclus 01 - De Reiziger[0/3] - "Diana Gabaldon - Reiziger Cyclus 01 - De Reiziger.nzb" yEnc',
         'ordinal' => 30,
@@ -148,7 +148,7 @@ return [
     18 => [
         'id' => 19,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\w+[-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\w+[\-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//096XZFUPQ0PxH4441H14fU8V - [34/99] - "096XZFUPQ0PxH4441H14fU8V.part033.rar" yEnc',
         'ordinal' => 35,
@@ -156,7 +156,7 @@ return [
     19 => [
         'id' => 20,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\(.+the-ultimate-force\\.org\\.ua\\/\\)[-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(.+the-ultimate-force\\.org\\.ua\\/\\)[\-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Slaapkop post voor http://the-ultimate-force.org.ua/) [0/7] - "Wham - I\'m Your Man (1985).nzb" yEnc',
         'ordinal' => 40,
@@ -164,7 +164,7 @@ return [
     20 => [
         'id' => 21,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\)) - P2H - "(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}\\w+[-_\\s]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\)) - P2H - "(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}\\w+[\-_\\s]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(001/101) - P2H - "L62WD8P4U539A7.par2" - 4,66 GB - Z9F6KN7SXRCY845 yEnc',
         'ordinal' => 45,
@@ -172,7 +172,7 @@ return [
     21 => [
         'id' => 22,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\))([-_ ]{0,4}(Description|FTTEAM\\.INFO))?[-_ ]{0,4}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\))([\-_ ]{0,4}(Description|FTTEAM\\.INFO))?[\-_ ]{0,4}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(001/101)  "654258ItB1418pBRDNS264159.par2" - 9,74 GB - yEnc ::: //(001/105) - Description - "oH291TB0bPxf3lqm1P7QQ.par2" - 4,56 GB - yEnc ::: //(03/43) - FTTEAM.INFO - "JDSJ2J4ENASJCKR-FTTEAM.INFO.part02.rar" - 2,04 GB - yEnc',
         'ordinal' => 50,
@@ -180,7 +180,7 @@ return [
     22 => [
         'id' => 23,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^[-_ .]{0,4}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\-_ .]{0,4}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//- - [001/242] - "C65JuogI92CwfMo2TiX59.par2" yEnc',
         'ordinal' => 55,
@@ -188,7 +188,7 @@ return [
     23 => [
         'id' => 24,
         'group_regex' => '^alt\\.binaries\\.amazing$',
-        'regex' => '/^[-_ ]{0,4}\\[\\d+\\/\\d+\\][-_ ]{0,3}".+" yEnc[-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\-_ ]{0,4}\\[\\d+\\/\\d+\\][\-_ ]{0,3}".+" yEnc[\-_ ]{0,3}\\[\\d+(?P<match0>\\/\\d+\\])[\-_ ]{0,3}"(?P<match1>[\\w\\säöüÄÖÜß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//- [01/10] - "file.xyz" yEnc - [001/107] - "86u1Qr8mm56jGiW7nUPTM.par2" yEnc',
         'ordinal' => 60,
@@ -244,7 +244,7 @@ return [
     30 => [
         'id' => 31,
         'group_regex' => '^alt\\.binaries\\.anime$',
-        'regex' => '/^<TOWN> www\\.town\\.ag > sponsored by www\\.ssl-news\\.info > \\(\\d+(?P<match0>\\/\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^<TOWN> www\\.town\\.ag > sponsored by www\\.ssl-news\\.info > \\(\\d+(?P<match0>\\/\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//<TOWN> www.town.ag > sponsored by www.ssl-news.info > (1/3) "HolzWerken_40.par2" - 43,89 MB - yEnc ::: //<TOWN> www.town.ag > sponsored by www.ssl-news.info > (1/5) "[HorribleSubs]_Aku_no_Hana_-_01_[480p].par2" - 157,13 MB - yEnc',
         'ordinal' => 35,
@@ -324,7 +324,7 @@ return [
     40 => [
         'id' => 41,
         'group_regex' => '^alt\\.binaries\\.ath$',
-        'regex' => '/^(?P<match0>>+Hell-of-Usenet(\\.org)?>+(?P<match1> -)? \\[)\\d+\\/\\d+\\] - "(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+[.,]\\d+ [kKmMgG][bB])? yEnc$/i',
+        'regex' => '/^(?P<match0>>+Hell-of-Usenet(\\.org)?>+(?P<match1> -)? \\[)\\d+\\/\\d+\\] - "(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+[.,]\\d+ [kKmMgG][bB])? yEnc$/i',
         'status' => 1,
         'description' => '//>>>>>Hell-of-Usenet>>>>> - [01/33] - "Cassadaga Hier lebt der Teufel 2011 German AC3 DVDRip XViD iNTERNAL-VhV.par2" yEnc',
         'ordinal' => 25,
@@ -364,7 +364,7 @@ return [
     45 => [
         'id' => 46,
         'group_regex' => '^alt\\.binaries\\.ath$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB].+UpperTeam.+ Secretusenet\\.com.+yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB].+UpperTeam.+ Secretusenet\\.com.+yEnc$/i',
         'status' => 1,
         'description' => '//[28/55] - "XzrgzBWoRqtcuBF.part27.rar" - 4,78 GB >>>UpperTeam for Usenet-Space-Cowboys.info and Secretusenet.com<<< yEnc',
         'ordinal' => 50,
@@ -404,7 +404,7 @@ return [
     50 => [
         'id' => 51,
         'group_regex' => '^alt\\.binaries\\.audio\\.warez$',
-        'regex' => '/^(?P<match0>\\(\\?{4}\\) \\[)\\d+(?P<match1>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\(\\?{4}\\) \\[)\\d+(?P<match1>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [1/1] - "Dust in the Wind - the Violin Solo.rar" yEnc',
         'ordinal' => 25,
@@ -436,7 +436,7 @@ return [
     54 => [
         'id' => 55,
         'group_regex' => '^alt\\.binaries\\.b4e$',
-        'regex' => '/^(?P<match0>- "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>- "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//- "as-jew3.vol03+3.PAR2" - yEnc',
         'ordinal' => 15,
@@ -468,7 +468,7 @@ return [
     58 => [
         'id' => 59,
         'group_regex' => '^alt\\.binaries\\.barbarella$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) - .+? - "(.+?))( \\(\\d+\\))?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) - .+? - "(.+?))( \\(\\d+\\))?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(004/114) - Description - "Pluralsight.net XAML Patterns (10).rar" - 532,92 MB - yEnc',
         'ordinal' => 20,
@@ -484,7 +484,7 @@ return [
     60 => [
         'id' => 61,
         'group_regex' => '^alt\\.binaries\\.barbarella$',
-        'regex' => '/^(?P<match0>>>> www\\.lords-of-usenet\\.org <<<.+? "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\[\\d+\\/\\d+\\] - .+? yEnc$/i',
+        'regex' => '/^(?P<match0>>>> www\\.lords-of-usenet\\.org <<<.+? "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\[\\d+\\/\\d+\\] - .+? yEnc$/i',
         'status' => 1,
         'description' => '//>>> www.lords-of-usenet.org <<<  "Der Schuh Des Manitu.par2" DVD5  [001/158] - 4,29 GB yEnc',
         'ordinal' => 30,
@@ -492,7 +492,7 @@ return [
     61 => [
         'id' => 62,
         'group_regex' => '^alt\\.binaries\\.barbarella$',
-        'regex' => '/^.+? (-|\\(PW\\))\\s+\\[.+? -\\] \\[\\d+[,.]\\d+ [mMkKgG][bB]\\] \\[\\d+(?P<match0>\\/\\d+\\] "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+? (-|\\(PW\\))\\s+\\[.+? -\\] \\[\\d+[,.]\\d+ [mMkKgG][bB]\\] \\[\\d+(?P<match0>\\/\\d+\\] "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//NEUES 4y - [@ usenet-4all.info - powered by ssl.news -] [5,58 GB] [002/120] "DovakinPack.part002.rar" yEnc ::: //NEUES 4y (PW)  [@ usenet-4all.info - powered by ssl.news -] [7,05 GB] [014/152] "EngelsGleich.part014.rar" yEnc',
         'ordinal' => 35,
@@ -508,7 +508,7 @@ return [
     63 => [
         'id' => 64,
         'group_regex' => '^alt\\.binaries\\.barbarella$',
-        'regex' => '/^.+?\\s{2,}\\d+[,.]\\d+ [mMkKgG][bB]\\s{2,}"(?P<match0>.+?_)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\s{2,}(\\d+ B|\\d+[,.]\\d+ [mMkKgG][bB]) yEnc$/i',
+        'regex' => '/^.+?\\s{2,}\\d+[,.]\\d+ [mMkKgG][bB]\\s{2,}"(?P<match0>.+?_)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\s{2,}(\\d+ B|\\d+[,.]\\d+ [mMkKgG][bB]) yEnc$/i',
         'status' => 1,
         'description' => '//>>>  20,36 MB   "Winamp.Pro.v5.70.3392.Incl.Keygen-FFF.par2"   552 B yEnc ::: //..:[DoAsYouLike]:..    9,64 MB    "Snooper 1.39.5.par2"    468 B yEnc',
         'ordinal' => 45,
@@ -516,7 +516,7 @@ return [
     64 => [
         'id' => 65,
         'group_regex' => '^alt\\.binaries\\.barbarella$',
-        'regex' => '/^(?P<match0>\\(.+?\\) - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\(.+?\\) - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(MKV - DVD - Rip - German - English - Italiano) - "CALIGULA (1982) UNCUT.sfv" yEnc',
         'ordinal' => 50,
@@ -524,7 +524,7 @@ return [
     65 => [
         'id' => 66,
         'group_regex' => '^alt\\.binaries\\.barbarella$',
-        'regex' => '/^"(?P<match0>[a-z0-9]+)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^"(?P<match0>[a-z0-9]+)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"sre56565ztrtzuzi8inzufft.par2" yEnc',
         'ordinal' => 55,
@@ -548,7 +548,7 @@ return [
     68 => [
         'id' => 69,
         'group_regex' => '^alt\\.binaries\\.big$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(08/22) - "538D7B021B362A4300D1C0D84DD17E6D.r06" yEnc',
         'ordinal' => 15,
@@ -556,7 +556,7 @@ return [
     69 => [
         'id' => 70,
         'group_regex' => '^alt\\.binaries\\.big$',
-        'regex' => '/^(?P<match0>\\(\\?{4}\\) \\[)\\d+(?P<match1>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\(\\?{4}\\) \\[)\\d+(?P<match1>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [02/71] - "Lasting Weep (1969-1971).part.par2" yEnc',
         'ordinal' => 20,
@@ -564,7 +564,7 @@ return [
     70 => [
         'id' => 71,
         'group_regex' => '^alt\\.binaries\\.big$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] -(re)? yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] -(re)? yEnc$/i',
         'status' => 1,
         'description' => '//(01/59) "ThienSuChungQuy_II_E16.avi.001" - 1,49 GB - yEnc ::: //(058/183) "LS_HoangChui_2xdvd5.part057.rar" - 8,36 GB -re yEnc',
         'ordinal' => 25,
@@ -580,7 +580,7 @@ return [
     72 => [
         'id' => 73,
         'group_regex' => '^alt\\.binaries\\.big$',
-        'regex' => '/^\\([a-z]+\\) \\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\([a-z]+\\) \\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(nate) [01/27] - "nate_light_13.05.23.par2" yEnc',
         'ordinal' => 35,
@@ -588,7 +588,7 @@ return [
     73 => [
         'id' => 74,
         'group_regex' => '^alt\\.binaries\\.big$',
-        'regex' => '/^(?P<match0>""(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")" yEnc$/i',
+        'regex' => '/^(?P<match0>""(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")" yEnc$/i',
         'status' => 1,
         'description' => '//""Absolute Database Component for BCBuilder 4-6 MultiUser Edit 4.85.rar"" yEnc',
         'ordinal' => 40,
@@ -612,7 +612,7 @@ return [
     76 => [
         'id' => 77,
         'group_regex' => '^alt\\.binaries\\.bloaf$',
-        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] .+? usenet-space.+?yEnc$/i',
+        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] .+? usenet-space.+?yEnc$/i',
         'status' => 1,
         'description' => '//[10/17] - "EGk13kQ1c8.part09.rar" - 372.48 MB <-> usenet-space-cowboys.info <-> powered by secretusenet.com <-> yEnc',
         'ordinal' => 10,
@@ -628,7 +628,7 @@ return [
     78 => [
         'id' => 79,
         'group_regex' => '^alt\\.binaries\\.bloaf$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(2/8) "Mike.und.Molly.S01E22.Maennergespraeche.GERMAN.DL.DUBBED.720p.BluRay.x264-TVP.part1.rar" - 1023,92 MB - yEnc',
         'ordinal' => 20,
@@ -636,7 +636,7 @@ return [
     79 => [
         'id' => 80,
         'group_regex' => '^alt\\.binaries\\.bloaf$',
-        'regex' => '/^.+? (-|\\(PW\\))\\s+\\[.+? -\\] \\[\\d+[,.]\\d+ [mMkKgG][bB]\\] \\[\\d+(?P<match0>\\/\\d+\\] "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+? (-|\\(PW\\))\\s+\\[.+? -\\] \\[\\d+[,.]\\d+ [mMkKgG][bB]\\] \\[\\d+(?P<match0>\\/\\d+\\] "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//4y (PW)   [@ usenet-4all.info - powered by ssl.news -] [27,35 GB] [001/118] "1f8867bb6f89491793d3.part001.rar" yEnc',
         'ordinal' => 25,
@@ -724,7 +724,7 @@ return [
     90 => [
         'id' => 91,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^.+?<<\\d+\\/\\d+>> "(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
+        'regex' => '/^.+?<<\\d+\\/\\d+>> "(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//<<OBLIVION - Untouched>><<TLR for usenet-4all.info>><<www.ssl-news.info>><<13/14>> "xxtxxlxxrxxbdxx05.vol421+98.par2" - 2,54 GB - yEnc',
         'ordinal' => 80,
@@ -732,7 +732,7 @@ return [
     91 => [
         'id' => 92,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^\\((?P<match0>\\w+)\\)[-_\\s]{0,3}\\[\\d+\\/\\d+\\][-_\\s]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>\\w+)\\)[\-_\\s]{0,3}\\[\\d+\\/\\d+\\][\-_\\s]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(wtnybhd7i3g6p1kuj3dffhnqyrx) [27/31] - "wtnybhd7i3g6p1kuj3dffhnqyrx.vol224+8.par2" yEnc',
         'ordinal' => 85,
@@ -740,7 +740,7 @@ return [
     92 => [
         'id' => 93,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^(?P<match0>\\w+)[-_\\s]{0,3}File \\d+ of (?P<match1>\\d+):[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\w+)[\-_\\s]{0,3}File \\d+ of (?P<match1>\\d+):[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//nS9XNOrMzD7FNniVfWUswrGmq8hQPMBqMSuQcMty - File 91 of 98: "aWYt0MpWaY6bmDp0d8hOdvBgz6.par2" yEnc',
         'ordinal' => 90,
@@ -748,7 +748,7 @@ return [
     93 => [
         'id' => 94,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^"(?P<match0>.+?)(?P<match1>[-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\(\\d+\\/(\\d+)\\)[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^"(?P<match0>.+?)(?P<match1>[\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\(\\d+\\/(\\d+)\\)[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"t46e6mopz864y82-Pittis ZusatzTon.English.dtsHDma.vol168+67.PAR2" (46/46) yEnc',
         'ordinal' => 95,
@@ -756,7 +756,7 @@ return [
     94 => [
         'id' => 95,
         'group_regex' => '^alt\\.binaries\\.blu-ray$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+)\\)[-_\\s]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+)\\)[\-_\\s]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(190/201)  "Kreatur by Eisenschrott & Gollum.vol1781+137.PAR2" - 9,46 GB - yEnc',
         'ordinal' => 100,
@@ -772,7 +772,7 @@ return [
     96 => [
         'id' => 97,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[\-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//( Overlord II RELOADED ) - [013/112] - "rld-olii.part001.rar" yEnc',
         'ordinal' => 10,
@@ -812,7 +812,7 @@ return [
     101 => [
         'id' => 102,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^(?P<match0>[\\w. &\\()\\[\\]\\\'-]{8,}?\\b.?)\\.[A-Za-z0-9]{2,4}[-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[\\w. &\\()\\[\\]\\\'-]{8,}?\\b.?)\\.[A-Za-z0-9]{2,4}[\-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//A.Fantastic.Fear.of.Everything.2012.AC3.BDRiP.XviD-IJf.nfo [01/63] - "A.Fantastic.Fear.of.Everything.2012.AC3.BDRiP.XviD-IJf.nfo" yEnc',
         'ordinal' => 35,
@@ -836,7 +836,7 @@ return [
     104 => [
         'id' => 105,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^(?P<match0>([A-Za-z0-9].+?) \\((19|20)\\d\\d\\) ")\\d{2}\\. .+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>([A-Za-z0-9].+?) \\((19|20)\\d\\d\\) ")\\d{2}\\. .+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Tarja - Colours In The Dark (2013) "00. Tarja-Colours In The Dark.m3u" yEnc',
         'ordinal' => 50,
@@ -844,7 +844,7 @@ return [
     105 => [
         'id' => 106,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^"(?P<match0>[a-zA-Z0-9]+)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\(\\d+\\/\\d+\\) - yEnc$/i',
+        'regex' => '/^"(?P<match0>[a-zA-Z0-9]+)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\(\\d+\\/\\d+\\) - yEnc$/i',
         'status' => 1,
         'description' => '//"BB636.part14.rar" - (15/39) - yEnc',
         'ordinal' => 55,
@@ -852,7 +852,7 @@ return [
     106 => [
         'id' => 107,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^[-a-zA-Z0-9 ]+ \\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[-a-zA-Z0-9 ]+ \\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Lutheria - FC Twente TV Special - Ze wilde op voetbal [16/49] - "Lutheria - FC Twente TV Special - Ze wilde op voetbal.part16.rar" yEnc ::: // panter - [001/101] - "74518-The Hunters (2011).par2" yEnc',
         'ordinal' => 60,
@@ -860,7 +860,7 @@ return [
     107 => [
         'id' => 108,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^(?P<match0>[-a-zA-Z0-9 ]+ - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[-a-zA-Z0-9 ]+ - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Pee Mak Prakanong - 2013 - Thailand - ENG Subs - "Pee Mak Prakanong.2013.part22.rar" yEnc ::: //P2H - "AMHZQHPHDUZZJSFZ.vol181+33.par2" yEnc',
         'ordinal' => 65,
@@ -868,7 +868,7 @@ return [
     108 => [
         'id' => 109,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^\\((?P<match0>\\?{4}|[a-zA-Z]+)\\) \\[\\d+(?P<match1>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>\\?{4}|[a-zA-Z]+)\\) \\[\\d+(?P<match1>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [011/161] - "flynns-image-redux.part010.rar" yEnc ::: //(Dgpc) [000/110] - "Teen Wolf - Seizoen.3 - Dvd.2 (NLsub).nzb" yEnc',
         'ordinal' => 70,
@@ -884,7 +884,7 @@ return [
     110 => [
         'id' => 111,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"par.4kW9beE.1.vol122+21.par2" yEnc',
         'ordinal' => 80,
@@ -892,7 +892,7 @@ return [
     111 => [
         'id' => 112,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^(?P<match0>.+?\\.(info|org)>+ - \\[)\\d+\\/\\d+\\] - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>.+?\\.(info|org)>+ - \\[)\\d+\\/\\d+\\] - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//brothers-of-usenet.info/.net <<<Partner von SSL-News.info>>> - [01/19] - "Age.of.Dinosaurs.German.AC3.HDRip.x264-FuN.par2" yEnc ::: //>>>>>Hell-of-Usenet.org>>>>> - [01/35] - "Female.Agents.German.2008.AC3.DVDRip.XviD.iNTERNAL-VideoStar.par2" yEnc',
         'ordinal' => 85,
@@ -900,7 +900,7 @@ return [
     112 => [
         'id' => 113,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[010/101] - "Bf56a8aR-20743f8D-Vf7a11fD-d7c6c0.part09.rar" yEnc ::: //[1/9] - "fdbvgdfbdfb.part.par2" yEnc',
         'ordinal' => 90,
@@ -908,7 +908,7 @@ return [
     113 => [
         'id' => 114,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^(?P<match0>\\[[A-Z]+\\] - \\[)\\d+\\/\\d+\\] - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\[[A-Z]+\\] - \\[)\\d+\\/\\d+\\] - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[LB] - [063/112] - "RVL-GISSFBD.part063.rar" yEnc',
         'ordinal' => 95,
@@ -916,7 +916,7 @@ return [
     114 => [
         'id' => 115,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^\\(.+?\\(PWP\\).+?\\) \\(\\d+(?P<match0>\\/\\d+\\) "(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\d+[,.]\\d+ [mMkKgG][bB] .+ yEnc$/i',
+        'regex' => '/^\\(.+?\\(PWP\\).+?\\) \\(\\d+(?P<match0>\\/\\d+\\) "(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\d+[,.]\\d+ [mMkKgG][bB] .+ yEnc$/i',
         'status' => 1,
         'description' => '//(¯`*.¸(PWP).*´¯) (071/100) "JUST4US_025.part070.rar" - 22,50 GB  yEnc',
         'ordinal' => 100,
@@ -948,7 +948,7 @@ return [
     118 => [
         'id' => 119,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^Doobz (?P<match0>[a-zA-z-_]+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^Doobz (?P<match0>[a-zA-z-_]+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Doobz Europa_Universalis_IV_Conquest_of_Paradise-FLT [10/54] - "flt-eucp.001" yEnc',
         'ordinal' => 120,
@@ -956,7 +956,7 @@ return [
     119 => [
         'id' => 120,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^(?P<match0>[\\w. -]{8,}) - \\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[\\w. -]{8,}) - \\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Outlast.Whistleblower-RELOADED - [014/119] - "rld-outwhistle.part001.rar" yEnc',
         'ordinal' => 125,
@@ -964,7 +964,7 @@ return [
     120 => [
         'id' => 121,
         'group_regex' => '^alt\\.binaries\\.boneless$',
-        'regex' => '/^.+\\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+\\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Charlies.Angels.2000.iNTERNAL.DVDRip.XviD-Vmr.part44.rar [46/66] - "Charlies.Angels.2000.iNTERNAL.DVDRip.XviD-Vmr.part44.rar" yEnc',
         'ordinal' => 130,
@@ -988,7 +988,7 @@ return [
     123 => [
         'id' => 124,
         'group_regex' => '^alt\\.binaries\\.british\\.drama$',
-        'regex' => '/^.+?\\[\\d+\\/(?P<match0>\\d+\\][-_ ]{0,3}.+?)[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/',
+        'regex' => '/^.+?\\[\\d+\\/(?P<match0>\\d+\\][\-_ ]{0,3}.+?)[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Wizards Vs Aliens - 1x06 - Rebel Magic, Part Two [XviD][00/27] - "wizards.vs.aliens.106.rebel.magic.part.two.[ws.pdtv].nzb" yEnc',
         'ordinal' => 15,
@@ -1012,7 +1012,7 @@ return [
     126 => [
         'id' => 127,
         'group_regex' => '^alt\\.binaries\\.cbt$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9-\\.\\&_ ]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9-\\.\\&_ ]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(WinEdt.v8.0.Build.20130513.Cracked-EAT) [01/10] - "eatwedt8.nfo" yEnc',
         'ordinal' => 5,
@@ -1020,7 +1020,7 @@ return [
     127 => [
         'id' => 128,
         'group_regex' => '^alt\\.binaries\\.cbt$',
-        'regex' => '/^\\[ (?P<match0>[a-zA-Z0-9-\\.\\&\\\\(\\)\\,_ ]+) \\] [a-zA-Z0-9]{3,4}\\.[a-zA-Z0-9]{3,4} \\(\\d+\\/(?P<match1>\\d+\\)) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[ (?P<match0>[a-zA-Z0-9-\\.\\&\\\\(\\)\\,_ ]+) \\] [a-zA-Z0-9]{3,4}\\.[a-zA-Z0-9]{3,4} \\(\\d+\\/(?P<match1>\\d+\\)) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ ABCAsiaPacific.com - Study English IELTS Preparation (2006) ] AVI.PDF (17/34) - "abcap-senglishielts.r16" yEnc',
         'ordinal' => 10,
@@ -1036,7 +1036,7 @@ return [
     129 => [
         'id' => 130,
         'group_regex' => '^alt\\.binaries\\.cd\\.image$',
-        'regex' => '/^(?P<match0>\\[(\\d+|redump)?\\]-+\\[.+?\\]-\\[.+?\\]-)(\\s?\\[\\d+\\/\\d+\\])?(\\s?\\[.+?\\])?[- ]{0,3}".+?"( - \\d+[,.]\\d+ [mMkKgG][bB] -)? yEnc$/i',
+        'regex' => '/^(?P<match0>\\[(\\d+|redump)?\\]-+\\[.+?\\]-\\[.+?\\]-)(\\s?\\[\\d+\\/\\d+\\])?(\\s?\\[.+?\\])?[ -]{0,3}".+?"( - \\d+[,.]\\d+ [mMkKgG][bB] -)? yEnc$/i',
         'status' => 1,
         'description' => '//[27849]-[altbinEFNet]-[Full]- "ppt-sogz.001" - 7,62 GB - yEnc ::: //[27925]--[altbinEFNet]-[Full]- "unl_p2rd.par2" yEnc ::: //[27608]-[FULL]-[#altbin@EFNet]-[007/136] "27608-1.005" yEnc ::: //[30605]-[altbinEFNet]-[FULL]- [10/165] - "plaza-the.witcher.3.wild.hunt.r09" yEnc ::: //[]-[#altbin@EFNet]-[Full]-[ACE.LIGHTNING.PLUS.6.TRAINER-DEViANCE]-[0/8] - "deviance.nfo" yEnc',
         'ordinal' => 5,
@@ -1108,7 +1108,7 @@ return [
     138 => [
         'id' => 139,
         'group_regex' => '^alt\\.binaries\\.cd\\.image$',
-        'regex' => '/^(?P<match0>Uploader.Presents)[- ](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
+        'regex' => '/^(?P<match0>Uploader.Presents)[ -](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
         'status' => 1,
         'description' => '//Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc',
         'ordinal' => 50,
@@ -1156,7 +1156,7 @@ return [
     144 => [
         'id' => 145,
         'group_regex' => '^alt\\.binaries\\.cd\\.lossless$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(28/55) "Ivan Neville - If My Ancestors Could See Me Now.par2" - 624,44 MB - yEnc',
         'ordinal' => 30,
@@ -1188,7 +1188,7 @@ return [
     148 => [
         'id' => 149,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^(?P<match0>Re: REQ: .+? - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>Re: REQ: .+? - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Re: REQ: All In The Family - "Archie Bunkers Place 1x01 Archies New Partner part 1.nzb" yEnc',
         'ordinal' => 5,
@@ -1196,7 +1196,7 @@ return [
     149 => [
         'id' => 150,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^(?P<match0>Per REQ - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\[\\d+\\/\\d+\\] yEnc$/i',
+        'regex' => '/^(?P<match0>Per REQ - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\[\\d+\\/\\d+\\] yEnc$/i',
         'status' => 1,
         'description' => '//Per REQ - "The.Wild.Wild.West.S03E11.The.Night.of.the.Cut-Throats.DVDRip.XVID-tz.par2" 512x384 [01/40] yEnc',
         'ordinal' => 10,
@@ -1204,7 +1204,7 @@ return [
     150 => [
         'id' => 151,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^(?P<match0>By req: ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>By req: ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//By req: "Dennis The Menace - 4x25 - Dennis and the Homing Pigeons.part05.rar" yEnc',
         'ordinal' => 15,
@@ -1212,7 +1212,7 @@ return [
     151 => [
         'id' => 152,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^(?P<match0>[a-zA-Z ]+HQ DVDRips ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\[\\d+\\/\\d+\\] yEnc$/i',
+        'regex' => '/^(?P<match0>[a-zA-Z ]+HQ DVDRips ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\[\\d+\\/\\d+\\] yEnc$/i',
         'status' => 1,
         'description' => '//I Spy HQ DVDRips "I Spy - 3x26 Pinwheel.part10.rar" [13/22] yEnc',
         'ordinal' => 20,
@@ -1260,7 +1260,7 @@ return [
     157 => [
         'id' => 158,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.:]+) - \\d+(?P<match1> of \\d+)[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") (\\(\\d+\\/\\d+\\) )?(yEnc)?$/i',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.:]+) - \\d+(?P<match1> of \\d+)[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") (\\(\\d+\\/\\d+\\) )?(yEnc)?$/i',
         'status' => 1,
         'description' => '//\'Mission: Impossible\' - 1x09 - NTSC - DivX - 28 of 48 - "MI-S01E09.r23" yEnc ::: //\'Mission: Impossible\' - 1x09 - NTSC - DivX - 01 of 48 - "MI-S01E09.nfo" (1/1)',
         'ordinal' => 50,
@@ -1268,7 +1268,7 @@ return [
     158 => [
         'id' => 159,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(yEnc)?( )?$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(yEnc)?( )?$/i',
         'status' => 1,
         'description' => '//"Batman - S2E58-Ice Spy.par2"yEnc ::: //"Black Sheep Squadron 1x03 Best Three Out of Five.par2"',
         'ordinal' => 55,
@@ -1276,7 +1276,7 @@ return [
     159 => [
         'id' => 160,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\(Not My Rip\\).+ \\d+ (?P<match1>- \\d+) .+ yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\(Not My Rip\\).+ \\d+ (?P<match1>- \\d+) .+ yEnc$/i',
         'status' => 1,
         'description' => '//"Guns of Will Sonnett - 1x04.mp4" (Not My Rip)Guns Of Will Sonnett Season 1 1 - 26 Mp4 With Pars yEnc',
         'ordinal' => 60,
@@ -1284,7 +1284,7 @@ return [
     160 => [
         'id' => 161,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(01/10) "Watch_With_Mother-Bill_And_Ben-1953_02_12-Scarecrow-VHSRip-XviD.avi" - 162.20 MB - yEnc',
         'ordinal' => 65,
@@ -1292,7 +1292,7 @@ return [
     161 => [
         'id' => 162,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^\\(.+\\)  "(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\[\\d+\\/(?P<match1>\\d+\\]) (Last One I Have! )?yEnc$/i',
+        'regex' => '/^\\(.+\\)  "(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\[\\d+\\/(?P<match1>\\d+\\]) (Last One I Have! )?yEnc$/i',
         'status' => 1,
         'description' => '//(Our Gang - Little Rascals  DVDRips)  "Our Gang -  The Lucky Corner (1936).part0.sfv" [01/19] yEnc ::: //(Our Gang - Little Rascals  DVDRips)  "Our Gang -  Wild Poses (1933).part.par" [02/20] Last One I Have! yEnc',
         'ordinal' => 70,
@@ -1300,7 +1300,7 @@ return [
     162 => [
         'id' => 163,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^.+ Usenet Past .+\\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+ Usenet Past .+\\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[EnJoY] =>A Blast from Usenet Past (1/3)<= [00/14] - "Mcdonalds Training Film - 1972 (Vhs-Mpg).part.nzb" yEnc',
         'ordinal' => 75,
@@ -1308,7 +1308,7 @@ return [
     163 => [
         'id' => 164,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^<OPA_TV> \\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^<OPA_TV> \\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//<OPA_TV> [01/12] - "Yancy Derringer - 03 - Geheime Fracht.par2" yEnc',
         'ordinal' => 80,
@@ -1316,7 +1316,7 @@ return [
     164 => [
         'id' => 165,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^.+ [\\[\\(]\\d+( of |\\/)(?P<match0>\\d+[\\]\\)])[-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+ [\\[\\(]\\d+( of |\\/)(?P<match0>\\d+[\\]\\)])[\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//77 Sunset Strip 409 [1 of 23] "77 Sunset Strip 409 The Missing Daddy Caper.avi.vol63+34.par2" yEnc ::: //Barney.Miller.NZBs [001/170] - "Barney.Miller.S01E01.Ramon.nzb" yEnc',
         'ordinal' => 85,
@@ -1324,7 +1324,7 @@ return [
     165 => [
         'id' => 166,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^.+[-_ ]{0,3}"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") [\\[\\(]\\d+\\/(?P<match1>\\d+[\\]\\)]) yEnc$/i',
+        'regex' => '/^.+[\-_ ]{0,3}"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") [\\[\\(]\\d+\\/(?P<match1>\\d+[\\]\\)]) yEnc$/i',
         'status' => 1,
         'description' => '//All in the Family - missing eps - DVDRips  "All in the Family - 6x23 Gloria & Mike\'s House Guests.part5.rar" [08/16] yEnc ::: //Amos \'n\' Andy - more shows---read info.txt  "Amos \'n\' Andy S01E00 Introduction of the Cast.mkv.001" (002/773) yEnc',
         'ordinal' => 90,
@@ -1332,7 +1332,7 @@ return [
     166 => [
         'id' => 167,
         'group_regex' => '^alt\\.binaries\\.classic\\.tv\\.shows$',
-        'regex' => '/^(?P<match0>.+\\d+x\\d+.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})( yEnc)?( (Series|Season) Finale)?$/',
+        'regex' => '/^(?P<match0>.+\\d+x\\d+.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})( yEnc)?( (Series|Season) Finale)?$/',
         'status' => 1,
         'description' => '//Andy Griffith Show,The   1x05....Irresistible Andy - (DVD).part04.rar',
         'ordinal' => 95,
@@ -1364,7 +1364,7 @@ return [
     170 => [
         'id' => 171,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^Film - \\[\\d+\\/(?P<match0>\\d+\\] - )?"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^Film - \\[\\d+\\/(?P<match0>\\d+\\] - )?"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Film - [13/59] - "Jerry Maguire (1996) 1080p DTS multisub HUN HighCode-PHD.part13.rar" yEnc ::: //Film - "Phone.booth.2003.RERIP.Bluray.1080p.DTS-HD.x264-Grym.part001.rar" yEnc',
         'ordinal' => 5,
@@ -1372,7 +1372,7 @@ return [
     171 => [
         'id' => 172,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^\\[Art-Of-Use\\.Net\\] :: \\[.+?\\] :: - \\[\\d+\\/(?P<match0>\\d+\\][-_ ]{0,3}"(.+?))([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[Art-Of-Use\\.Net\\] :: \\[.+?\\] :: - \\[\\d+\\/(?P<match0>\\d+\\][\-_ ]{0,3}"(.+?))([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[Art-Of-Use.Net] :: [AUTO] :: - [34/36] - "ImmoralLive.13.11.10.Immoral.Orgies.Rikki.Six.Carmen.Callaway.And.Amanda.Tate.XXX.1080p.MP4-KTR.vol15+16.par2" yEnc',
         'ordinal' => 10,
@@ -1380,7 +1380,7 @@ return [
     172 => [
         'id' => 173,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^brothers-of-usenet\\.info\\.net.+SSL-News\\.info-----(?P<match0>.+) - "(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^brothers-of-usenet\\.info\\.net.+SSL-News\\.info-----(?P<match0>.+) - "(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//brothers-of-usenet.info.net Partner von---- SSL-News.info-----  brothers-of-usenet.info.net Partner von---- SSL-News.info-----AVG.Internet.Security.2014.Build.4335.x86.x64 - "AVG.Internet.Security.2014.Build.4335.vol00+01.PAR2" - 315,68 MB - yEnc',
         'ordinal' => 15,
@@ -1396,7 +1396,7 @@ return [
     174 => [
         'id' => 175,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^<<<usenet-space-cowboys\\.info.+secretusenet\\.com>>> \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^<<<usenet-space-cowboys\\.info.+secretusenet\\.com>>> \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//<<<usenet-space-cowboys.info>>> USC <<<Powered by https://secretusenet.com>>> [22/26] - "Zombie.Tycoon.2.Brainhovs.Revenge-SKIDROW.vol00+1.par2" - 1,85 GB yEnc',
         'ordinal' => 25,
@@ -1404,7 +1404,7 @@ return [
     175 => [
         'id' => 176,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^[a-zA-Z0-9]+ post voor u op www\\..+? - \\[\\d+\\/\\d+\\] - "(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[a-zA-Z0-9]+ post voor u op www\\..+? - \\[\\d+\\/\\d+\\] - "(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Jipejans post voor u op www.Dreamplace.biz - [010/568] - "Alien-Antology-DC-Special-Edition-1979-1997-1080p-GER-HUN-HighCode.part009.rar" yEnc ::: //Egbert47 post voor u op www.nzbworld.me - [01/21] - "100 Hits - Lady Sings The Blues 2006 (5cd\'s).par2" yEnc',
         'ordinal' => 30,
@@ -1412,7 +1412,7 @@ return [
     176 => [
         'id' => 177,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^>+ .+?\\.info [<>+]+ .+?\\.com <+ "(?P<match0>.+?)\\s+- .*?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - .+? yEnc$/i',
+        'regex' => '/^>+ .+?\\.info [<>+]+ .+?\\.com <+ "(?P<match0>.+?)\\s+- .*?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - .+? yEnc$/i',
         'status' => 1,
         'description' => '//>>> usenet4ever.info <<<+>>> secretusenet.com <<< "Weltnaturerbe USA Grand Canyon Nationalpark 2012 3D Blu-ray untouched  - DarKneSS.part039.rar" - DarKneSS yEnc',
         'ordinal' => 35,
@@ -1428,7 +1428,7 @@ return [
     178 => [
         'id' => 179,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^[A-Za-z]+ - \\[\\d+\\/\\d+\\] - "\\d+-(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[A-Za-z]+ - \\[\\d+\\/\\d+\\] - "\\d+-(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//panter - [46/60] - "68645-Busty Beauties Car Wash XXX 3D BD26.part45.rar" yEnc ::: //Wildrose - [01/57] - "49567-Kleine Rode Tractor Buitenpret.par2" yEnc',
         'ordinal' => 45,
@@ -1436,7 +1436,7 @@ return [
     179 => [
         'id' => 180,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\][ _-]{0,3}\\[ .* \\] \\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}("|#34;).+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\][ _-]{0,3}\\[ .* \\] \\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}("|#34;).+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[ TOWN ]-[ www.town.ag ]-[ partner of www.ssl-news.info ]-[ MOVIE ] [14/19] - "Night.Vision.2011.DVDRip.x264-IGUANA.part12.rar" - 660,80 MB yEnc',
         'ordinal' => 50,
@@ -1444,7 +1444,7 @@ return [
     180 => [
         'id' => 181,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\] \\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}("|#34;).+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\] \\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}("|#34;).+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[ TOWN ]-[ www.town.ag ]-[ partner of www.ssl-news.info ] [01/28] - "Shadowrun_Returns_MULTi4-iNLAWS.par2" - 1,11 GB yEnc',
         'ordinal' => 55,
@@ -1460,7 +1460,7 @@ return [
     182 => [
         'id' => 183,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})[-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
+        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})[\-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
         'status' => 1,
         'description' => '//[ TOWN ]-[ www.town.ag ]-[ partner of www.ssl-news.info ] [26/26] - "Legally.Brown.S01E06.HDTV.x264-BWB.vol7+4.par2" - 332,80 MB yEnc',
         'ordinal' => 65,
@@ -1468,7 +1468,7 @@ return [
     183 => [
         'id' => 184,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^Doobz (?P<match0>[a-zA-z-_]+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^Doobz (?P<match0>[a-zA-z-_]+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Doobz Europa_Universalis_IV_Conquest_of_Paradise-FLT [10/54] - "flt-eucp.001" yEnc',
         'ordinal' => 70,
@@ -1476,7 +1476,7 @@ return [
     184 => [
         'id' => 185,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+yEnc$/i',
         'status' => 1,
         'description' => '//[01/10] - "Wondershare.Video.Converter.Ultimate.v6.7.1.0.Multilanguage.par2" - 45,44 MB yEnc',
         'ordinal' => 75,
@@ -1572,7 +1572,7 @@ return [
     196 => [
         'id' => 197,
         'group_regex' => '^alt\\.binaries\\.country\\.mp3$',
-        'regex' => '/^(?P<match0>\\]"[\\w-]{10,}?)-[a-zA-Z0-9]+\\.[a-zA-Z0-9]{2,4}" yEnc$/',
+        'regex' => '/^(?P<match0>\\]"[\\w\-]{10,}?)-[a-zA-Z0-9]+\\.[a-zA-Z0-9]{2,4}" yEnc$/',
         'status' => 1,
         'description' => '//]"Heather_Myles_-_Highways_And_Honky_Tonks-back.jpg" yEnc',
         'ordinal' => 25,
@@ -1596,7 +1596,7 @@ return [
     199 => [
         'id' => 200,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/^(?P<match0>#sterntuary - .+? - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>#sterntuary - .+? - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//#sterntuary - Alex Jones Radio Show - "05-03-2009_INFO_BAK_ALJ.nfo" yEnc',
         'ordinal' => 5,
@@ -1612,7 +1612,7 @@ return [
     201 => [
         'id' => 202,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/^.+?\\[\\d+\\/(?P<match0>\\d+\\][-_ ]{0,3}.+?)[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/',
+        'regex' => '/^.+?\\[\\d+\\/(?P<match0>\\d+\\][\-_ ]{0,3}.+?)[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//(World Air Routes - WESTJET - B737-700) [028/109] - "World Air Routes - WESTJET - B737-700.part027.rar" yEnc',
         'ordinal' => 15,
@@ -1620,7 +1620,7 @@ return [
     202 => [
         'id' => 203,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
+        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
         'status' => 1,
         'description' => '//Beyond Vanilla (2010) Documentary DVDrip XviD-Uncut - (02/22) "Beyond.Vanilla.2010.Documentary.DVDrip.XviD-Uncut.par2" - yenc yEnc',
         'ordinal' => 20,
@@ -1628,7 +1628,7 @@ return [
     203 => [
         'id' => 204,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/.*[\\(\\[]\\d+-(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}("|#34;)).+?yEnc$/i',
+        'regex' => '/.*[\\(\\[]\\d+-(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}("|#34;)).+?yEnc$/i',
         'status' => 1,
         'description' => '//Rough Cut - Woodworking with Tommy Mac - Pilgrim Blanket Chest (1600s) DVDrip DivX - (02-17) "Rough.Cut-Woodworking.with.Tommy.Mac-Pilgrim.Blanket.Chest.1600s-DVDrip.DivX.2010.par2" - yEnc yEnc',
         'ordinal' => 25,
@@ -1636,7 +1636,7 @@ return [
     204 => [
         'id' => 205,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/(?P<match0>.+) - [\\(\\[]\\d+(?P<match1>\\|\\d+[\\)\\]])[-_ ]{0,3}("|#34;).+?(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}("|#34;)).+?yEnc$/i',
+        'regex' => '/(?P<match0>.+) - [\\(\\[]\\d+(?P<match1>\\|\\d+[\\)\\]])[\-_ ]{0,3}("|#34;).+?(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}("|#34;)).+?yEnc$/i',
         'status' => 1,
         'description' => '//Asia This Week (NHK World, 19 & 20 July 2013) - \'Malala\'s movement for girls\' education + Japan seeks imports from Southeast Asia - soccer players\' - (02|14) - "ATW-2013-07-20.par2" yEnc ::: //Asia Biz Forecast (NHK World, 6 & 7 July 2013) - \'China: limits of growth + Japan: remote access\' - (05|14) - "ABF-2013-07-07.part3.rar" yEnc',
         'ordinal' => 30,
@@ -1644,7 +1644,7 @@ return [
     205 => [
         'id' => 206,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/(?P<match0>.+) - File \\d+ of (?P<match1>\\d+)[-_ ]{0,3}.+?(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}).+?yEnc$/i',
+        'regex' => '/(?P<match0>.+) - File \\d+ of (?P<match1>\\d+)[\-_ ]{0,3}.+?(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}).+?yEnc$/i',
         'status' => 1,
         'description' => '//Asia Biz Forecast (NHK World, 16-17 June 2012) - "Japan seeks energy options" - File 01 of 14  - ABF-2012-06-16.nfo  (yEnc',
         'ordinal' => 35,
@@ -1660,7 +1660,7 @@ return [
     207 => [
         'id' => 208,
         'group_regex' => '^alt\\.binaries\\.documentaries$',
-        'regex' => '/\\(\\d+\\/(?P<match0>\\d+\\) - .+) - "(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
+        'regex' => '/\\(\\d+\\/(?P<match0>\\d+\\) - .+) - "(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(35/45) - Keating Pt4 - "Keating Pt4.part34.rar" - 1.77 GB - yEnc',
         'ordinal' => 45,
@@ -1708,7 +1708,7 @@ return [
     213 => [
         'id' => 214,
         'group_regex' => '^alt\\.binaries\\.ebook$',
-        'regex' => '/www.nzbworld.me - \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") yEnc/i',
+        'regex' => '/www.nzbworld.me - \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") yEnc/i',
         'status' => 1,
         'description' => '//(Nora Roberts)"Black Rose - Nora Roberts.epub" yEnc ::: //Rowwendees post voor u op www.nzbworld.me - [0/6] - "Animaniacs - Lights, Camera, Action!.nzb" yEnc (1/1)',
         'ordinal' => 10,
@@ -1716,7 +1716,7 @@ return [
     214 => [
         'id' => 215,
         'group_regex' => '^alt\\.binaries\\.ebook$',
-        'regex' => '/town\\.ag.+?(download all our files with|partner of).+?www\\..+?\\.info.+? \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
+        'regex' => '/town\\.ag.+?(download all our files with|partner of).+?www\\..+?\\.info.+? \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
         'status' => 1,
         'description' => '//<TOWN><www.town.ag > <download all our files with>>>  www.ssl-news.info <<< > [02/19] - "2013.AUG.non-fiction.NEW.releases.part.1.(PDF)-MiMESiS.part01.rar" - 1,31 GB yEnc ::: //<TOWN><www.town.ag > <partner of www.ssl-news.info > [3/3] - "Career.Secrets.Exposed.by.Gavin.F..Redelman_.RedStarResume.vol0+1.par2" - 8,16 MB yEnc',
         'ordinal' => 15,
@@ -1764,7 +1764,7 @@ return [
     220 => [
         'id' => 221,
         'group_regex' => '^alt\\.binaries\\.ebook$',
-        'regex' => '/(?P<match0>.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]][-_ ]{0,3}".+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/(?P<match0>.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]][\-_ ]{0,3}".+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(NordicAlbino) [01/10] - "SWHQ_NA_675qe0033102suSmzSE.sfv" yEnc ::: //365 Sex Positions A New Way Every Day for a Steamy Erotic Year [eBook] - (1/5) "365.Sex.Positions.A.New.Way.Every.Day.for.a.Steamy.Erotic.Year.eBook.nfo" - yenc yEnc',
         'ordinal' => 45,
@@ -1796,7 +1796,7 @@ return [
     224 => [
         'id' => 225,
         'group_regex' => '^alt\\.binaries\\.ebook$',
-        'regex' => '/^(?P<match0>Attn:|Re:|REQ:|New Scan).+?[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
+        'regex' => '/^(?P<match0>Attn:|Re:|REQ:|New Scan).+?[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
         'status' => 1,
         'description' => '//Re: REQ: Jay Lake\'s Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc ::: //Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc ::: //New Scan "Herbert, James - Sepulchre (html).rar" yEnc',
         'ordinal' => 65,
@@ -1812,7 +1812,7 @@ return [
     226 => [
         'id' => 227,
         'group_regex' => '^alt\\.binaries\\.ebook$',
-        'regex' => '/(?P<match0>.+?)[-_ ]{0,3}\\d+\\/(?P<match1>\\d+[-_ ]{0,3}".+?)\\.(txt|pdf|mobi|epub|azw)"( \\(\\d+\\/\\d+\\))?( )?$/',
+        'regex' => '/(?P<match0>.+?)[\-_ ]{0,3}\\d+\\/(?P<match1>\\d+[\-_ ]{0,3}".+?)\\.(txt|pdf|mobi|epub|azw)"( \\(\\d+\\/\\d+\\))?( )?$/',
         'status' => 1,
         'description' => '//Patterson flood - Mobi -  15/45  "James Patterson - AC 13 - Double Cross.mobi"',
         'ordinal' => 75,
@@ -1836,7 +1836,7 @@ return [
     229 => [
         'id' => 230,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/town\\.ag.+?download all our files with.+?www\\..+?\\.info.+? \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)(-sample)?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
+        'regex' => '/town\\.ag.+?download all our files with.+?www\\..+?\\.info.+? \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)(-sample)?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
         'status' => 1,
         'description' => '//<TOWN><www.town.ag > <download all our files with>>>  www.ssl-news.info <<< > [02/19] - "2013.AUG.non-fiction.NEW.releases.part.1.(PDF)-MiMESiS.part01.rar" - 1,31 GB yEnc',
         'ordinal' => 90,
@@ -1844,7 +1844,7 @@ return [
     230 => [
         'id' => 231,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^Doctor Who - Target Books \\[\\d+\\/(?P<match0>\\d+\\]) - "DW[0-9]{0,3}[-_ ]{0,3}(?P<match1>.+?)\\.(txt|pdf|mobi|epub|azw)" yEnc$/',
+        'regex' => '/^Doctor Who - Target Books \\[\\d+\\/(?P<match0>\\d+\\]) - "DW[0-9]{0,3}[\-_ ]{0,3}(?P<match1>.+?)\\.(txt|pdf|mobi|epub|azw)" yEnc$/',
         'status' => 1,
         'description' => '//Doctor Who - Target Books [128/175] - "DW125_ Terror of the Vervoids - Pip Baker.mobi" yEnc',
         'ordinal' => 95,
@@ -1852,7 +1852,7 @@ return [
     231 => [
         'id' => 232,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9 -]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9 -]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(American Curves - Summer 2012) [01/10] - "AMECURSUM12.par2" yEnc',
         'ordinal' => 100,
@@ -1860,7 +1860,7 @@ return [
     232 => [
         'id' => 233,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/(?P<match0>.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]][-_ ]{0,3}".+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}").+?yEnc$/i',
+        'regex' => '/(?P<match0>.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]][\-_ ]{0,3}".+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}").+?yEnc$/i',
         'status' => 1,
         'description' => '//(NordicAlbino) [01/10] - "SWHQ_NA_675qe0033102suSmzSE.sfv" yEnc ::: //365 Sex Positions A New Way Every Day for a Steamy Erotic Year [eBook] - (1/5) "365.Sex.Positions.A.New.Way.Every.Day.for.a.Steamy.Erotic.Year.eBook.nfo" - yenc yEnc',
         'ordinal' => 105,
@@ -1868,7 +1868,7 @@ return [
     233 => [
         'id' => 234,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][-_ ]{0,3}".+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}")([-_ ]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])?[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][\-_ ]{0,3}".+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}")([\-_ ]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])?[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[1/8] - "Robin Lane Fox - Travelling heroes.epub" yEnc ::: //(1/1) "Unintended Consequences - John Ross.nzb" - 8.67 kB - yEnc',
         'ordinal' => 110,
@@ -1876,7 +1876,7 @@ return [
     234 => [
         'id' => 235,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^[\\(\\[] .+? [\\)\\][-_ ]{0,3}"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}yEnc$/',
+        'regex' => '/^[\\(\\[] .+? [\\)\\][\-_ ]{0,3}"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//[ Mega Dating and Sex Advice Ebooks - Tips and Tricks for Men PDF ] - "Vatsyayana - The Kama Sutra.pdf.rar" - (54/58) yEnc',
         'ordinal' => 115,
@@ -1884,7 +1884,7 @@ return [
     235 => [
         'id' => 236,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^(?P<match0>WWII in Photos)[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}yEnc$/',
+        'regex' => '/^(?P<match0>WWII in Photos)[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//WWII in Photos - "WWII in Photos_05_Conflict Spreads Around the Globe - The Atlantic.epub" yEnc',
         'ordinal' => 120,
@@ -1892,7 +1892,7 @@ return [
     236 => [
         'id' => 237,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^.+?"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}\\[\\d+ of (?P<match1>\\d+\\])[-_ ]{0,3}yEnc$/',
+        'regex' => '/^.+?"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}\\[\\d+ of (?P<match1>\\d+\\])[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Various ebooks on History pdf format  "Chelsea House Publishing Discovering U.S. History Vol. 8, World War I and the Roaring Twenties - 1914-1928 (2010).pdf"  [1 of 1] yEnc',
         'ordinal' => 125,
@@ -1916,7 +1916,7 @@ return [
     239 => [
         'id' => 240,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^.+?[-_ ]{0,3}"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}") [\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]) ([-_ ]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])?[-_ ]{0,3}yEnc$/',
+        'regex' => '/^.+?[\-_ ]{0,3}"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}") [\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]) ([\-_ ]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])?[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Pottermore UK retail - "Harry Potter and the Goblet of Fire - J.K. Rowling.epub" (05/14) - 907.57 kB - yEnc',
         'ordinal' => 140,
@@ -1948,7 +1948,7 @@ return [
     243 => [
         'id' => 244,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^(?P<match0>Attn:|Re:|REQ:|New Scan).+?[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
+        'regex' => '/^(?P<match0>Attn:|Re:|REQ:|New Scan).+?[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
         'status' => 1,
         'description' => '//Re: REQ: Jay Lake\'s Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc ::: //Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc ::: //New Scan "Herbert, James - Sepulchre (html).rar" yEnc',
         'ordinal' => 160,
@@ -1964,7 +1964,7 @@ return [
     245 => [
         'id' => 246,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/(?P<match0>.+?)[-_ ]{0,3}\\d+\\/(?P<match1>\\d+[-_ ]{0,3}".+?)\\.(txt|pdf|mobi|epub|azw)"( \\(\\d+\\/\\d+\\))?( )?$/',
+        'regex' => '/(?P<match0>.+?)[\-_ ]{0,3}\\d+\\/(?P<match1>\\d+[\-_ ]{0,3}".+?)\\.(txt|pdf|mobi|epub|azw)"( \\(\\d+\\/\\d+\\))?( )?$/',
         'status' => 1,
         'description' => '//Patterson flood - Mobi -  15/45  "James Patterson - AC 13 - Double Cross.mobi"',
         'ordinal' => 170,
@@ -1972,7 +1972,7 @@ return [
     246 => [
         'id' => 247,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/\\d+\\/(?P<match0>\\d+[-_ ]{0,3}.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})[-_ ]{0,3}yEnc$/i',
+        'regex' => '/\\d+\\/(?P<match0>\\d+[\-_ ]{0,3}.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//04/63  Brave New World Revisited - Aldous Huxley.mobi  yEnc',
         'ordinal' => 175,
@@ -1980,7 +1980,7 @@ return [
     247 => [
         'id' => 248,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^- (?P<match0>.+?)\\.(par|vol|rar|nfo)[-_ ]{0,3}(?P<match1>.+)/',
+        'regex' => '/^- (?P<match0>.+?)\\.(par|vol|rar|nfo)[\-_ ]{0,3}(?P<match1>.+)/',
         'status' => 1,
         'description' => '//- Campbell, F.E. - Susan - HIT 125.rar  BDSM Themed Adult Erotica - M/F F/F - Rtf & Pdf',
         'ordinal' => 180,
@@ -2004,7 +2004,7 @@ return [
     250 => [
         'id' => 251,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^\\[\\d*+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4} "|") yEnc$/i',
+        'regex' => '/^\\[\\d*+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4} "|") yEnc$/i',
         'status' => 1,
         'description' => '//[01/19] - "13_X_Panzer_Tracts_EBook.nfo " yEnc',
         'ordinal' => 195,
@@ -2028,7 +2028,7 @@ return [
     253 => [
         'id' => 254,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^\\d+\\/(?P<match0>\\d+)[-_ ]{0,3}(?P<match1>.+?)\\.(txt|pdf|mobi|epub|azw|lit|rar|nfo|par)$/',
+        'regex' => '/^\\d+\\/(?P<match0>\\d+)[\-_ ]{0,3}(?P<match1>.+?)\\.(txt|pdf|mobi|epub|azw|lit|rar|nfo|par)$/',
         'status' => 1,
         'description' => '//002/240  Swordships.of.Scorpio.(Dray.Prescot).-.Alan.Burt.Akers.epub',
         'ordinal' => 210,
@@ -2036,7 +2036,7 @@ return [
     254 => [
         'id' => 255,
         'group_regex' => '^alt\\.binaries\\.e-book$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9. ].+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|) yEnc$/i',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9. ].+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|) yEnc$/i',
         'status' => 1,
         'description' => '//Akers Alan Burt - Dray Prescot Saga 14 - Krozair von Kregen.rar yEnc',
         'ordinal' => 215,
@@ -2052,7 +2052,7 @@ return [
     256 => [
         'id' => 257,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/town\\.ag.+?download all our files with.+?www\\..+?\\.info.+? \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)(-sample)?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
+        'regex' => '/town\\.ag.+?download all our files with.+?www\\..+?\\.info.+? \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)(-sample)?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
         'status' => 1,
         'description' => '//<TOWN><www.town.ag > <download all our files with>>>  www.ssl-news.info <<< > [02/19] - "2013.AUG.non-fiction.NEW.releases.part.1.(PDF)-MiMESiS.part01.rar" - 1,31 GB yEnc',
         'ordinal' => 225,
@@ -2060,7 +2060,7 @@ return [
     257 => [
         'id' => 258,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^[A-Za-z ]+[-_ ]{0,3}"(?P<match0>.+?)\\.(txt|pdf|mobi|epub|azw)"[-_ ]{0,3}yEnc$/',
+        'regex' => '/^[A-Za-z ]+[\-_ ]{0,3}"(?P<match0>.+?)\\.(txt|pdf|mobi|epub|azw)"[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//World War II History - "Spies of the Balkans - Alan Furst.mobi" yEnc ::: //True Crime  "T. J. English - Havana Nocturne (v5.0).mobi" yEnc ::: //E C Tubb Flood - "E C Tubb - Dumarest 31 The Temple of Truth.epub" - yEnc',
         'ordinal' => 230,
@@ -2076,7 +2076,7 @@ return [
     259 => [
         'id' => 260,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9 -]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9 -]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(American Curves - Summer 2012) [01/10] - "AMECURSUM12.par2" yEnc',
         'ordinal' => 240,
@@ -2084,7 +2084,7 @@ return [
     260 => [
         'id' => 261,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/(?P<match0>.+?)[-_ ]{0,3}\\d+\\/(?P<match1>\\d+[-_ ]{0,3}".+?)\\.(txt|pdf|mobi|epub|azw)"( \\(\\d+\\/\\d+\\))?( )?$/',
+        'regex' => '/(?P<match0>.+?)[\-_ ]{0,3}\\d+\\/(?P<match1>\\d+[\-_ ]{0,3}".+?)\\.(txt|pdf|mobi|epub|azw)"( \\(\\d+\\/\\d+\\))?( )?$/',
         'status' => 1,
         'description' => '//Patterson flood - Mobi -  15/45  "James Patterson - AC 13 - Double Cross.mobi"',
         'ordinal' => 245,
@@ -2116,7 +2116,7 @@ return [
     264 => [
         'id' => 265,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^(?P<match0>Attn:|Re:|REQ:|New Scan).+?[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
+        'regex' => '/^(?P<match0>Attn:|Re:|REQ:|New Scan).+?[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}(\\d+[.,]\\d+ [kKmMgG][bB](ytes)?)? yEnc$/i',
         'status' => 1,
         'description' => '//Re: REQ: Jay Lake\'s Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc ::: //Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc ::: //New Scan "Herbert, James - Sepulchre (html).rar" yEnc',
         'ordinal' => 265,
@@ -2124,7 +2124,7 @@ return [
     265 => [
         'id' => 266,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^\\*(FULL )?REPOST\\* New eBooks.+[-_ ]{0,3}"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}")$/i',
+        'regex' => '/^\\*(FULL )?REPOST\\* New eBooks.+[\-_ ]{0,3}"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}")$/i',
         'status' => 1,
         'description' => '//*FULL REPOST* New eBooks 26 Nov 2012 & 20% PAR2 Set -  "Elisabeth Kyle - The Captain\'s House (siPDF).rar" ::: //*REPOST* New eBooks 23 Nov 2012 -  "Charles Culver - [The 11th Floor 02] - Awakening (mobi).rar"',
         'ordinal' => 270,
@@ -2132,7 +2132,7 @@ return [
     266 => [
         'id' => 267,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^.+?Search (for|4) (number|Numeric String) at end of (title|Subject)[-_ ]{0,3}(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4})[-\\=_ ]{0,3}\\d+[-_ ]{0,3}.+?yEnc$/i',
+        'regex' => '/^.+?Search (for|4) (number|Numeric String) at end of (title|Subject)[\-_ ]{0,3}(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4})[-\\=_ ]{0,3}\\d+[\-_ ]{0,3}.+?yEnc$/i',
         'status' => 1,
         'description' => '//1 - 5 July 2013 - Search for number at end of title - Bevin Alexander - How Hitler Could Have Won World War II- The Fatal Errors That Lead to Nazi Defeat (epub).rar - 14418-25255-6053.rar.txt yEnc ::: //10 July 2013 - Search 4 Numeric String at End of Subject - Andew Hodges - Alan Turing- The Enigma (Centenary Edition) (kf8 mobi).rar = 21317-25234-21710.rar.txt yEnc',
         'ordinal' => 275,
@@ -2148,7 +2148,7 @@ return [
     268 => [
         'id' => 269,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}\\d+[kKmMgG]$/i',
+        'regex' => '/^"(?P<match0>.+)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}\\d+[kKmMgG]$/i',
         'status' => 1,
         'description' => '//"Back to Pakistan_ A Fifty-Year Journey - Leslie Noyes Mass.pdf"  2778K',
         'ordinal' => 285,
@@ -2156,7 +2156,7 @@ return [
     269 => [
         'id' => 270,
         'group_regex' => '^alt\\.binaries\\.e-book.flood$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][-_ ]{0,3}.+)\\.(txt|pdf|mobi|epub|azw)[-_ ]{0,3}.+flood( )?$/',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][\-_ ]{0,3}.+)\\.(txt|pdf|mobi|epub|azw)[\-_ ]{0,3}.+flood( )?$/',
         'status' => 1,
         'description' => '//[002/182] A. E. Van Vogt - The Anarchistic Colossus.mobi  mobi flood ::: //[002/115] Alan Dean Foster - Alien.mobi  sf single author flood',
         'ordinal' => 290,
@@ -2188,7 +2188,7 @@ return [
     273 => [
         'id' => 274,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/(?P<match0>\\[[\\d]+\\]-\\[FULL\\]-\\[#a\\.b\\.erotica@EFNet\\]-\\[) \\d{2,3}_.+? \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+        'regex' => '/(?P<match0>\\[[\\d]+\\]-\\[FULL\\]-\\[#a\\.b\\.erotica@EFNet\\]-\\[) \\d{2,3}_.+? \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
         'status' => 1,
         'description' => '// SPECIAL CASE FOR XXX PACKS ::: //[398342]-[FULL]-[#a.b.erotica@EFNet]-[ 02_18onlygirls.com.a.golden.lady..12.10.12.stephanie ]-[04/16] - "02_18onlygirls.com.a.golden.lady..12.10.12.stephanie.part03.rar" yEnc',
         'ordinal' => 5,
@@ -2196,7 +2196,7 @@ return [
     274 => [
         'id' => 275,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/\\[(?P<match0>[a-fA-F0-9]+)][-_ ]{0,3}.+?[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}") yEnc$/',
+        'regex' => '/\\[(?P<match0>[a-fA-F0-9]+)][\-_ ]{0,3}.+?[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}") yEnc$/',
         'status' => 1,
         'description' => '//[f3a543495657d38c361dbe767a8506df] - sandramilka01-casting [10/25] - "sandramilka01-casting.part08.rar" yEnc',
         'ordinal' => 10,
@@ -2212,7 +2212,7 @@ return [
     276 => [
         'id' => 277,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
         'status' => 1,
         'description' => '//[278997]-[FULL]-[#a.b.erotica]-[ chi-the.walking.dead.xxx ]-[06/51] - "chi-the.walking.dead.xxx-s.mp4" yEnc ::: //[######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc ::: //Re: [147053]-[FULL]-[#a.b.teevee]-[ Top_Gear.20x04.HDTV_x264-FoV ]-[11/59] - "top_gear.20x04.hdtv_x264-fov.r00" yEnc (01/20)',
         'ordinal' => 20,
@@ -2236,7 +2236,7 @@ return [
     279 => [
         'id' => 280,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/^<TOWN><www\\.town\\.ag > <download all our files with>>> www\\.ssl-news\\.info <<< > \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - /i',
+        'regex' => '/^<TOWN><www\\.town\\.ag > <download all our files with>>> www\\.ssl-news\\.info <<< > \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - /i',
         'status' => 1,
         'description' => '//<TOWN><www.town.ag > <download all our files with>>> www.ssl-news.info <<< > [01/28] - "TayTO-heyzo_hd_0317_full.par2" - 2,17 GB yEnc',
         'ordinal' => 35,
@@ -2252,7 +2252,7 @@ return [
     281 => [
         'id' => 282,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9._-]+)[-_ ]{0,3}[\\(\\[]\\d+ of (?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9._-]+)[\-_ ]{0,3}[\\(\\[]\\d+ of (?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//Brazilian.Transsexuals.SR.UD.12.28.13.HD.720p.HDL [19 of 24] "JhoanyWilkerXmasLD_1_hdmp4.mp4.vol00+1.par2" yEnc',
         'ordinal' => 45,
@@ -2260,7 +2260,7 @@ return [
     282 => [
         'id' => 283,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/^(?P<match0>".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"Lesbian seductions 26.part.nzb" yEnc',
         'ordinal' => 50,
@@ -2268,7 +2268,7 @@ return [
     283 => [
         'id' => 284,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/(.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][-_ ]{0,3}("|#34;).+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
+        'regex' => '/(.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][\-_ ]{0,3}("|#34;).+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
         'status' => 1,
         'description' => '//..::kleverig.eu::.. [001/141] - "ZYGBUTD5TPgMdjjxnvrl.par2" - 13,28 GB yEnc',
         'ordinal' => 55,
@@ -2292,7 +2292,7 @@ return [
     286 => [
         'id' => 287,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/^(?P<match0>.+?usenet-space.+?Powered by.+? ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+? \\d+\\/(\\d+.+?)$/i',
+        'regex' => '/^(?P<match0>.+?usenet-space.+?Powered by.+? ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+? \\d+\\/(\\d+.+?)$/i',
         'status' => 1,
         'description' => '//<<<>>CowboyUp2012 XXX><<<Is.Not.Force.It.My.Younger.SOE-806.Jav.Censored.DVDRip.XviD-MotTto>>>usenet-space-cowboys.info<<<Powered by https://secretusenet.com>< "Is.Not.Force.It.My.Younger.SOE-806.Jav.Censored.DVDRip.XviD-MotTto.part01.rar" >< 01/15 (1,39',
         'ordinal' => 70,
@@ -2300,7 +2300,7 @@ return [
     287 => [
         'id' => 288,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(?P<match1>_SpotBots)[-_\\s]{0,3}yEnc$/iu',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(?P<match1>_SpotBots)[\-_\\s]{0,3}yEnc$/iu',
         'status' => 1,
         'description' => '//"HD_1110.part01.rar"_SpotBots yEnc',
         'ordinal' => 75,
@@ -2308,7 +2308,7 @@ return [
     288 => [
         'id' => 289,
         'group_regex' => '^alt\\.binaries\\.erotica$',
-        'regex' => '/\\((?P<match0>[\\w\\s-]{8,})\\)[-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+)\\][-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/\\((?P<match0>[\\w\\s-]{8,})\\)[\-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+)\\][\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Czech Amateurs 01) [30/43] - "CZEAMA01.part29.rar" yEnc',
         'ordinal' => 80,
@@ -2316,7 +2316,7 @@ return [
     289 => [
         'id' => 290,
         'group_regex' => '^alt\\.binaries\\.etc$',
-        'regex' => '/^(?P<match0>\\d+ - \\[)\\d+\\/\\d+\\] - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\d+ - \\[)\\d+\\/\\d+\\] - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//7000999555666777123754 - [334/389] - "The Secret of Bible & Jesus. Beyond The Da Vinci Code - YouTube.3gp" yEnc',
         'ordinal' => 5,
@@ -2348,7 +2348,7 @@ return [
     293 => [
         'id' => 294,
         'group_regex' => '^alt\\.binaries\\.game$',
-        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
         'status' => 1,
         'description' => '//[192474]-[MP3]-[a.b.inner-sanctumEFNET]-[ Newbie_Nerdz_-_I_Cant_Forget_that_Girl_EP-(IM005)-WEB-2012-YOU ] [17/17] - "newbie_nerdz_-_i_cant_forget_that_girl_ep-(im005)-web-2012-you.nfo" yEnc',
         'ordinal' => 5,
@@ -2364,7 +2364,7 @@ return [
     295 => [
         'id' => 296,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[\-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//( Overlord II RELOADED ) - [013/112] - "rld-olii.part001.rar" yEnc',
         'ordinal' => 10,
@@ -2388,7 +2388,7 @@ return [
     298 => [
         'id' => 299,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/\\.net <<<Partner von SSL-News\\.info>>> - \\[\\d+\\/\\d+\\] - "(?P<match0>.+?)(?P<match1>[-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/\\.net <<<Partner von SSL-News\\.info>>> - \\[\\d+\\/\\d+\\] - "(?P<match0>.+?)(?P<match1>[\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//brothers-of-usenet.info/.net <<<Partner von SSL-News.info>>> - [11/17] - "Reload.Outdoor.Action.Target.Down.GERMAN-0x0007.vol003+004.PAR2" yEnc',
         'ordinal' => 25,
@@ -2396,7 +2396,7 @@ return [
     299 => [
         'id' => 300,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
         'status' => 1,
         'description' => '//[162198]-[FULL]-[a.b.teevee]-[ MasterChef.Junior.S01E07.720p.HDTV.X264-DIMENSION ]-[09/54] - "masterchef.junior.107.720p-dimension.nfo" yEnc',
         'ordinal' => 30,
@@ -2412,7 +2412,7 @@ return [
     301 => [
         'id' => 302,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"Mad.Men.S06E11.HDTV.x264-2HD.par2" yEnc',
         'ordinal' => 40,
@@ -2420,7 +2420,7 @@ return [
     302 => [
         'id' => 303,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[ _-]{0,3}yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//"Marvels.Agents.of.S.H.I.E.L.D.S01E07.HDTV.XviD-FUM.avi.nfo" [09/16] yEnc',
         'ordinal' => 45,
@@ -2428,7 +2428,7 @@ return [
     303 => [
         'id' => 304,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\(\\?+\\) \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\?+\\) \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [03/20] - "Weblinger - The.Haunted.House.Mysteries.v1.0-ZEKE.part01.rar" yEnc',
         'ordinal' => 50,
@@ -2436,7 +2436,7 @@ return [
     304 => [
         'id' => 305,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\(\\d+\\/\\d+\\)(?P<match0> - Description)?[-_ ]{0,5}"(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+([.,]\\d+ [kKmMgG])?[bB])? - \\d+([.,]\\d+ [kKmMgG])?[bB][-_ ]{0,3}(\\[REPOST\\] )?yEnc$/i',
+        'regex' => '/^\\(\\d+\\/\\d+\\)(?P<match0> - Description)?[\-_ ]{0,5}"(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+([.,]\\d+ [kKmMgG])?[bB])? - \\d+([.,]\\d+ [kKmMgG])?[bB][\-_ ]{0,3}(\\[REPOST\\] )?yEnc$/i',
         'status' => 1,
         'description' => '//(001/132) "Harry.Potter.And.The.Goblet.Of.Fire.2005.810p.BluRay.x264.DTS.PRoDJi.nfo" - 8,71 GB - yEnc ::: //(01/11) - Description - "ba588f108dbd068dc93e4b0182de652d.par2" - 696,63 MB - yEnc ::: //(01/11) "Microsoft Games for Windows 8 v1.2.par2" - 189,87 MB - [REPOST] yEnc ::: //(01/24) "ExBrULlNjyRPMdxqSlJKEtAYSncStZs3.nfo" - 3.96 kB - 404.55 MB - yEnc ::: //(01/44) - - "Wii_2688_R_Knorloading.par2" - 1,81 GB - yEnc',
         'ordinal' => 55,
@@ -2444,7 +2444,7 @@ return [
     305 => [
         'id' => 306,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) - \\[Lords-of-Usenet\\] presents (?P<match1>.+?)[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) - \\[Lords-of-Usenet\\] presents (?P<match1>.+?)[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - yEnc$/i',
         'status' => 1,
         'description' => '//(01/59) - [Lords-of-Usenet] presents Sins.of.a.Solar.Empire.Rebellion.Forbidden.Worlds-RELOADED - "rld-soaserfw.nfo" - yEnc',
         'ordinal' => 60,
@@ -2452,7 +2452,7 @@ return [
     306 => [
         'id' => 307,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+([.,]\\d+ [kKmMgG])?[bB] -(?P<match1>[a-zA-Z0-9-_\\.]+) yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+([.,]\\d+ [kKmMgG])?[bB] -(?P<match1>[a-zA-Z0-9-_\\.]+) yEnc$/i',
         'status' => 1,
         'description' => '//(19/28) "sr-joedanger.rar" - 816,05 MB -Joe.Danger-SKIDROW yEnc ::: //(39/40) "flt-ts31554.vol061+57.PAR2" - 1,43 GB -The_Sims_3_v1.55.4-FLTDOX yEnc',
         'ordinal' => 65,
@@ -2460,7 +2460,7 @@ return [
     307 => [
         'id' => 308,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][-_ ]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][\-_ ]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[02/17] - "Castle.Of.Illusion.Starring.Mickey.Mouse.PSN.PS3-DUPLEX.nfo" yEnc',
         'ordinal' => 70,
@@ -2468,7 +2468,7 @@ return [
     308 => [
         'id' => 309,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\[PROPER\\] (?P<match0>[a-zA-Z0-9-_\\.]+) [\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[PROPER\\] (?P<match0>[a-zA-Z0-9-_\\.]+) [\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[PROPER] F',
         'ordinal' => 75,
@@ -2476,7 +2476,7 @@ return [
     309 => [
         'id' => 310,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^<<<< (?P<match0>[a-zA-Z0-9-_ ]+) >>>> < USC> <".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")>\\[\\d+\\/(?P<match1>\\d+\\]) \\d+([.,]\\d+ [kKmMgG])?[bB] yEnc$/i',
+        'regex' => '/^<<<< (?P<match0>[a-zA-Z0-9-_ ]+) >>>> < USC> <".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")>\\[\\d+\\/(?P<match1>\\d+\\]) \\d+([.,]\\d+ [kKmMgG])?[bB] yEnc$/i',
         'status' => 1,
         'description' => '//<<<< Alien Zombie Death v2 EUR PSN PSP-PLAYASiA >>>> < USC> <"Alien Zombie Death v2 EUR PSN PSP-PLAYASiA.part4.rar">[06/16] 153,78 MB yEnc',
         'ordinal' => 80,
@@ -2484,7 +2484,7 @@ return [
     310 => [
         'id' => 311,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^<<<.+\\.info>>> fuzzy <<<Powered by .+secretusenet\\.com><(?P<match0>[a-zA-Z0-9-_ ]+)>< ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") >< \\d+\\/(?P<match1>\\d+) \\(\\d+([.,]\\d+ [kKmMgG])?[bB]\\) >< \\d+([.,]\\d+ [kKmMgG])?[bB] > yEnc$/i',
+        'regex' => '/^<<<.+\\.info>>> fuzzy <<<Powered by .+secretusenet\\.com><(?P<match0>[a-zA-Z0-9-_ ]+)>< ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") >< \\d+\\/(?P<match1>\\d+) \\(\\d+([.,]\\d+ [kKmMgG])?[bB]\\) >< \\d+([.,]\\d+ [kKmMgG])?[bB] > yEnc$/i',
         'status' => 1,
         'description' => '//<<<usenet-space-cowboys.info>>> fuzzy <<<Powered by https://secretusenet.com><Adventures To Go EUR PSP-ZER0>< "Adventures To Go EUR PSP-ZER0.nfo" >< 2/6 (195,70 MB) >< 10,70 kB > yEnc',
         'ordinal' => 85,
@@ -2492,7 +2492,7 @@ return [
     311 => [
         'id' => 312,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -\\._]+) - \\[\\d+\\/(?P<match1>\\d+\\])[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -\\._]+) - \\[\\d+\\/(?P<match1>\\d+\\])[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Baku.No.JAP.Working.PSP-PaL - [1/7] - "Baku.No.JAP.Working.PSP-PaL.rar" yEnc',
         'ordinal' => 90,
@@ -2500,7 +2500,7 @@ return [
     312 => [
         'id' => 313,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^<TOWN>.+?town\\.ag.+?(www\\..+?|news)\\.[iI]nfo.+? \\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)(-sample)?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB]? - yEnc$/i',
+        'regex' => '/^<TOWN>.+?town\\.ag.+?(www\\..+?|news)\\.[iI]nfo.+? \\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)(-sample)?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB]? - yEnc$/i',
         'status' => 1,
         'description' => '//<TOWN> www.town.ag > sponsored by www.ssl-news.info > (53/86) "Afro_Samurai_NTSC_PROPER_XBOX360-GameStop.part51.rar" - 7.74 GB - yEnc',
         'ordinal' => 95,
@@ -2508,7 +2508,7 @@ return [
     313 => [
         'id' => 314,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^FTDWORLD\\.NET\\| (?P<match0>[a-zA-Z0-9 -_\\.]+) \\[\\d+\\/(?P<match1>\\d+\\])- ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^FTDWORLD\\.NET\\| (?P<match0>[a-zA-Z0-9 -_\\.]+) \\[\\d+\\/(?P<match1>\\d+\\])- ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//FTDWORLD.NET| Grand.Theft.Auto.V.XBOX360-QUACK [020/195]- "gtavdisc1.r17" yEnc',
         'ordinal' => 100,
@@ -2516,7 +2516,7 @@ return [
     314 => [
         'id' => 315,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9 -_\\.]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9 -_\\.]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(F',
         'ordinal' => 105,
@@ -2524,7 +2524,7 @@ return [
     315 => [
         'id' => 316,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\])  \\((?P<match1>[a-zA-Z0-9 -_\\.]+)\\) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\])  \\((?P<match1>[a-zA-Z0-9 -_\\.]+)\\) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[16/62]  (CastleStorm.XBLA.XBOX360-MoNGoLS) - "mgl-cast.part15.rar" yEnc',
         'ordinal' => 110,
@@ -2532,7 +2532,7 @@ return [
     316 => [
         'id' => 317,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^GOGDump (?P<match0>.+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^GOGDump (?P<match0>.+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//GOGDump Wing Commander - Privateer (1993) [GOG] [03/14] - "Wing Commander - Privateer (1993) [GOG].part2.rar" yEnc',
         'ordinal' => 115,
@@ -2540,7 +2540,7 @@ return [
     317 => [
         'id' => 318,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^(?P<match0>Uploader.Presents)[- ](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
+        'regex' => '/^(?P<match0>Uploader.Presents)[ -](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
         'status' => 1,
         'description' => '//Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc',
         'ordinal' => 120,
@@ -2548,7 +2548,7 @@ return [
     318 => [
         'id' => 319,
         'group_regex' => '^alt\\.binaries\\.games$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[-_ ]{0,3}Description[-_ ]{0,3}"\\w+(?P<match1>[-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[\-_ ]{0,3}Description[\-_ ]{0,3}"\\w+(?P<match1>[\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '// ',
         'ordinal' => 0,
@@ -2556,7 +2556,7 @@ return [
     319 => [
         'id' => 320,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][- ]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
+        'regex' => '/(?P<match0>\\[[\\d#]+\\]-\\[.+?\\]-\\[.+?\\])-\\[ (?P<match1>.+?) \\][ -]\\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
         'status' => 1,
         'description' => '//[142961]-[MP3]-[a.b.inner-sanctumEFNET]-[ Pascal_and_Pearce-Passport-CDJUST477-2CD-2011-1REAL ] [28/36] - "Pascal_and_Pearce-Passport-CDJUST477-2CD-2011-1REAL.par2" yEnc',
         'ordinal' => 5,
@@ -2564,7 +2564,7 @@ return [
     320 => [
         'id' => 321,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[NEW DOX\\][ _-]{0,3}(?P<match0>.+?)[ _-]{0,3}\\[\\d+\\/\\d+\\][ _-]{0,3}"(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^\\[NEW DOX\\][ _-]{0,3}(?P<match0>.+?)[ _-]{0,3}\\[\\d+\\/\\d+\\][ _-]{0,3}"(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[NEW DOX] The.King.of.Fighters.XIII.Update.v1.1c-RELOADED [1/6] - "The.King.of.Fighters.XIII.Update.v1.1c-RELOADED.par2" yEnc ::: //[NEW DOX] Crysis.3.Crackfix.3.INTERNAL-RELOADED [00/12] ".nzb"  yEnc',
         'ordinal' => 10,
@@ -2572,7 +2572,7 @@ return [
     321 => [
         'id' => 322,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[NEW DOX\\][ _-]{0,3}(?P<match0>.+?)[ _-]{0,3}"(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^\\[NEW DOX\\][ _-]{0,3}(?P<match0>.+?)[ _-]{0,3}"(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '// for some reason the nzb is posted separately with d',
         'ordinal' => 15,
@@ -2580,7 +2580,7 @@ return [
     322 => [
         'id' => 323,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[ (?P<match0>[a-zA-Z0-9-\\._ ]+)  \\d+\\/(?P<match1>\\d+ \\]) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[ (?P<match0>[a-zA-Z0-9-\\._ ]+)  \\d+\\/(?P<match1>\\d+ \\]) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ Assassins.Creed.3.UPDATE 1.01.CRACK.READNFO-P2P  00/17 ] "Assassins.Creed.3.UPDATE 1.01.nzb" yEnc',
         'ordinal' => 20,
@@ -2588,7 +2588,7 @@ return [
     323 => [
         'id' => 324,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\]) - (?P<match1>[a-zA-Z0-9-\\.\\&_ ]+) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - PC)? - yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\]) - (?P<match1>[a-zA-Z0-9-\\.\\&_ ]+) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - PC)? - yEnc$/i',
         'status' => 1,
         'description' => '//[01/16] - GRID.2.Update.v1.0.83.1050.Incl.DLC-RELOADED - "reloaded.nfo" - yEnc ::: //[12/17] - Call.of.Juarez.Gunslinger.Update.v1.03-FTS - "fts-cojgsu103.vol00+01.PAR2" - PC - yEnc ::: //[4/5] - Dungeons.&.Dragons.HD.Chronicles.of.Mystara.Update.2-FTS - "fts-ddcomu2.vol0+1.PAR2" - PC - yEnc',
         'ordinal' => 25,
@@ -2596,7 +2596,7 @@ return [
     324 => [
         'id' => 325,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\]) (?P<match1>[a-zA-Z0-9-\\._ ]+) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\]) (?P<match1>[a-zA-Z0-9-\\._ ]+) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[36/48] NASCAR.The.Game.2013.Update.2-SKIDROW - "sr-nascarthegame2013u2.r33" yEnc',
         'ordinal' => 30,
@@ -2604,7 +2604,7 @@ return [
     325 => [
         'id' => 326,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[(?P<match0>[a-zA-Z0-9-\\._ ]+)\\]- ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[(?P<match0>[a-zA-Z0-9-\\._ ]+)\\]- ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[Grand_Theft_Auto_Vice_City_1.1_Blood_NoCD_Patch-gimpsRus]- "grugtavc11bcd.nfo" yEnc',
         'ordinal' => 35,
@@ -2612,7 +2612,7 @@ return [
     326 => [
         'id' => 327,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\[OLD DOX\\][ _-]{0,3}\\(\\d+\\/(?P<match0>\\d+\\)[ _-]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_ ]{0,3}\\d+[,.]\\d+ [mMkKgG][bB][-_ ]{0,3}yEnc$/i',
+        'regex' => '/^\\[OLD DOX\\][ _-]{0,3}\\(\\d+\\/(?P<match0>\\d+\\)[ _-]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_ ]{0,3}\\d+[,.]\\d+ [mMkKgG][bB][\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[OLD DOX] (0001/2018) - "18.Wheels.of.Steel.American.Long.Haul.CHEAT.CODES-RETARDS.7z" - 1,44 GB - yEnc',
         'ordinal' => 40,
@@ -2620,7 +2620,7 @@ return [
     327 => [
         'id' => 328,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9-\\._ ]+) - \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|"){0,3}yEnc$/i',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9-\\._ ]+) - \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|"){0,3}yEnc$/i',
         'status' => 1,
         'description' => '//Endless.Space.Disharmony.v1.1.1.Update-SKIDROW - [1/6] - "Endless.Space.Disharmony.v1.1.1.Update-SKIDROW.nfo" - yEnc',
         'ordinal' => 45,
@@ -2628,7 +2628,7 @@ return [
     328 => [
         'id' => 329,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9-\\._ ]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|"){0,3}yEnc$/i',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9-\\._ ]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|"){0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(F.E.A.R.3.Update.1-SKIDROW) [01/12] - "F.E.A.R.3.Update.1-SKIDROW.par2" yEnc',
         'ordinal' => 50,
@@ -2636,7 +2636,7 @@ return [
     329 => [
         'id' => 330,
         'group_regex' => '^alt\\.binaries\\.games\\.dox$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9-\\._ ]+)\\) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9-\\._ ]+)\\) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Company.of.Heroes.2.Update.v3.0.0.9704.Incl.DLC.GERMAN-0x0007) - "0x0007.nfo" yEnc',
         'ordinal' => 55,
@@ -2644,7 +2644,7 @@ return [
     330 => [
         'id' => 331,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^(?P<match0>Uploader.Presents)[- ](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
+        'regex' => '/^(?P<match0>Uploader.Presents)[ -](?P<match1>.+?)[\\(\\[]\\d+\\/\\d+\\]".+?" yEnc$/',
         'status' => 1,
         'description' => '//Uploader.Presents-Injustice.Gods.Among.Us.Ultimate.Edition.XBOX360-COMPLEX(02/92]"complex-injustice.ultimate.nfo" yEnc ::: //Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc',
         'ordinal' => 5,
@@ -2668,7 +2668,7 @@ return [
     333 => [
         'id' => 334,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^[\\[\\(]\\d+\\/(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^[\\[\\(]\\d+\\/(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(01/15) "Mass.Effect.3.Collectors.Edition.DLC.JTAG-XPG.par2" - 747.42 MB - yEnc',
         'ordinal' => 20,
@@ -2676,7 +2676,7 @@ return [
     334 => [
         'id' => 335,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\(.+\\)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^\\(.+\\)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(????) [00/28] - "Farming.Simulator.XBOX360.JTAG.RGH.nzb" yEnc',
         'ordinal' => 25,
@@ -2684,7 +2684,7 @@ return [
     335 => [
         'id' => 336,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\(\\d+\\)[-_ ]{0,3}(?P<match0>.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^\\(\\d+\\)[\-_ ]{0,3}(?P<match0>.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(14227) BloodRayne_Betrayal_XBLA_XBOX360-XBLAplus [01/25] - "xp-blobe.nfo" yEnc',
         'ordinal' => 30,
@@ -2692,7 +2692,7 @@ return [
     336 => [
         'id' => 337,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^(?P<match0>\\(\\d+\\))[-_ ]{0,3}\\[.+EFNet\\][-_ ]{0,3}\\[(?P<match1>.+)\\][-_ ]{0,3}\\[\\][-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^(?P<match0>\\(\\d+\\))[\-_ ]{0,3}\\[.+EFNet\\][\-_ ]{0,3}\\[(?P<match1>.+)\\][\-_ ]{0,3}\\[\\][\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(14811) [#alt.binaries.games.xbox360@EFNet]-[AMY_XBLA_XBOX360-XBLAplus]-[]-  "xp-amyxb.nfo"  yEnc',
         'ordinal' => 35,
@@ -2700,7 +2700,7 @@ return [
     337 => [
         'id' => 338,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^(?P<match0>\\(\\d+\\))[-_ ]{0,3}\\[.+EFNet\\][-_ ]{0,3}\\[(?P<match1>.+)\\][-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^(?P<match0>\\(\\d+\\))[\-_ ]{0,3}\\[.+EFNet\\][\-_ ]{0,3}\\[(?P<match1>.+)\\][\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(14872) [#alt.binaries.games.xbox360@EFNet]-[BlazBlue_CS_System_Version_Data_Pack_1.03-DLC_XBOX360]-  "xp-bbcssvdp103.nfo"  yEnc',
         'ordinal' => 40,
@@ -2708,7 +2708,7 @@ return [
     338 => [
         'id' => 339,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[-_ ]{0,3}(?P<match1>.+?)[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[\-_ ]{0,3}(?P<match1>.+?)[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//(44/82) - Fuzion_Frenzy_2_REPACK-USA-XBOX360-DAGGER - "ff2r-dgr.041" - 6.84 GB - yEnc',
         'ordinal' => 45,
@@ -2716,7 +2716,7 @@ return [
     339 => [
         'id' => 340,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\[[-_ ]{0,3}(?P<match0>\\d+)[-_ ]{0,3}\\][-_ ]{0,3}\\[ ABGX.+\\][-_ ]{0,3}\\[[-_ ]{0,3}(?P<match1>.+)[-_ ]{0,4}\\][-_ ]{0,4}\\(\\d+\\/\\d+\\)[-_ ]{0,3}"(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+\\(\\d+\\\\d+\\)"|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}\\d+[,.]\\d+ [mMkKgG][bB][-_ ]{0,3}yEnc$/i',
+        'regex' => '/^\\[[\-_ ]{0,3}(?P<match0>\\d+)[\-_ ]{0,3}\\][\-_ ]{0,3}\\[ ABGX.+\\][\-_ ]{0,3}\\[[\-_ ]{0,3}(?P<match1>.+)[\-_ ]{0,4}\\][\-_ ]{0,4}\\(\\d+\\/\\d+\\)[\-_ ]{0,3}"(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+\\(\\d+\\\\d+\\)"|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}\\d+[,.]\\d+ [mMkKgG][bB][\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[  14047  ] - [ ABGX@EFNET ] - [  Rock.Band.Pearl.Jam.Ten.DLC.XBOX360-FYK ALL DLC    ] -  (01/46) "rbpjtdlc-fyk.nfo" - 526,92 MB - yEnc ::: //[  14046  ] - [ ABGX@EFNET ] - [  Rock_Band-2011-07-19-DLC_XBOX360-XBLAplus ALL   ] -  (01/12) "xp-rb-2011-07-19.nfo" - 198,70 MB - yEnc ::: //[ 14102 ] -[ ABGX.NET ] - [ F1.2010.XBOX360-COMPLEX NTSC DVD9  ] -  (01/79) "cpx-f12010.nfo" - 6,57 GB - yEnc',
         'ordinal' => 50,
@@ -2724,7 +2724,7 @@ return [
     340 => [
         'id' => 341,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\[[-_ ]{0,3}(?P<match0>\\d+)[-_ ]{0,3}\\][-_ ]{0,3}\\[FULL\\][-_ ]{0,3}\\[ (abgx360EFNet|#abgx360@EFNet) \\][-_ ]{0,3}\\[[-_ ]{0,3}(?P<match1>.+)[-_ ]{0,3}\\][-_ ]{0,3}\\[\\d+\\/\\d+\\][-_ ]{0,3}"(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+\\(\\d+\\\\d+\\)"|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^\\[[\-_ ]{0,3}(?P<match0>\\d+)[\-_ ]{0,3}\\][\-_ ]{0,3}\\[FULL\\][\-_ ]{0,3}\\[ (abgx360EFNet|#abgx360@EFNet) \\][\-_ ]{0,3}\\[[\-_ ]{0,3}(?P<match1>.+)[\-_ ]{0,3}\\][\-_ ]{0,3}\\[\\d+\\/\\d+\\][\-_ ]{0,3}"(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+\\(\\d+\\\\d+\\)"|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[ 17956]-[FULL]-[ abgx360EFNet ]-[ F1_2012_JPN_XBOX360-Caravan ]-[78/99] - "cvn-f12012j.r75" yEnc ::: //[ 17827]-[FULL]-[ #abgx360@EFNet ]-[ Capcom_Arcade_Cabinet_XBLA_XBOX360-XBLAplus ]-[01/34] - "xp-capac.nfo" yEnc',
         'ordinal' => 55,
@@ -2732,7 +2732,7 @@ return [
     341 => [
         'id' => 342,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\[(?P<match0>\\d+)\\][-_ ]{0,3}\\[FULL\\][-_ ]{0,3}\\[(abgx360EFNet|#abgx360@EFNet)\\][-_ ]{0,3}\\[\\d+\\/\\d+\\][-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/i',
+        'regex' => '/^\\[(?P<match0>\\d+)\\][\-_ ]{0,3}\\[FULL\\][\-_ ]{0,3}\\[(abgx360EFNet|#abgx360@EFNet)\\][\-_ ]{0,3}\\[\\d+\\/\\d+\\][\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[19672]-[FULL]-[abgx360EFNet]-[01/29] "mgl-cont.par2" yEnc',
         'ordinal' => 60,
@@ -2740,7 +2740,7 @@ return [
     342 => [
         'id' => 343,
         'group_regex' => '^alt\\.binaries\\.games\\.xbox360$',
-        'regex' => '/^\\[[-_ ]{0,3}GAMERZZ[-_ ]{0,3}\\][-_ ]{0,3}\\[[-_ ]{0,3}(?P<match0>.+)[-_ ]{0,3}\\][-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[-_ ]{0,3}"(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+\\(\\d+\\\\d+\\)"|\\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^\\[[\-_ ]{0,3}GAMERZZ[\-_ ]{0,3}\\][\-_ ]{0,3}\\[[\-_ ]{0,3}(?P<match0>.+)[\-_ ]{0,3}\\][\-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[\-_ ]{0,3}"(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+\\(\\d+\\\\d+\\)"|\\.[A-Za-z0-9]{2,4}")[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[ GAMERZZ ] - [ Grand.Theft.Auto.V.XBOX360-COMPLEX ] [159/170] - "complex-gta5.vol000+18.par2" yEnc',
         'ordinal' => 65,
@@ -2764,7 +2764,7 @@ return [
     345 => [
         'id' => 346,
         'group_regex' => '^alt\\.binaries\\.german\\.movies$',
-        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[\-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//( Overlord II RELOADED ) - [013/112] - "rld-olii.part001.rar" yEnc',
         'ordinal' => 10,
@@ -2796,7 +2796,7 @@ return [
     349 => [
         'id' => 350,
         'group_regex' => '^alt\\.binaries\\.hdtv$',
-        'regex' => '/^(\\[ TrollHD \\] - )?[\\[\\(][-_ ]{0,3}\\d+\\/(?P<match0>\\d+[-_ ]{0,3}[\\)\\]]) - "(?P<match1>.+?) MPEG2-(DON|TrollHD)\\..+?" yEnc$/',
+        'regex' => '/^(\\[ TrollHD \\] - )?[\\[\\(][\-_ ]{0,3}\\d+\\/(?P<match0>\\d+[\-_ ]{0,3}[\\)\\]]) - "(?P<match1>.+?) MPEG2-(DON|TrollHD)\\..+?" yEnc$/',
         'status' => 1,
         'description' => '//[ TrollHD ] - [ 0270/2688 ] - "Tour De France 2013 1080i HDTV MPA 2.0 MPEG2-TrollHD.part0269.rar" yEnc ::: //[17/48] - "Oprah\'s Next Chapter S02E37 Lindsay Lohan 1080i HDTV DD5.1 MPEG2-TrollHD.part16.rar" yEnc ::: //[02/29] - "Fox Sports 1 on 1 - Tom Brady 720p HDTV DD5.1 MPEG2-DON.part01.rar" yEnc',
         'ordinal' => 5,
@@ -2828,7 +2828,7 @@ return [
     353 => [
         'id' => 354,
         'group_regex' => '^alt\\.binaries\\.hdtv\\.x264$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(23/36) "Love.Is.In.The.Meadow.S08E08.HDTV.720p.x264.ac3.part22.rar" - 2,80 GB - yEnc',
         'ordinal' => 10,
@@ -2836,7 +2836,7 @@ return [
     354 => [
         'id' => 355,
         'group_regex' => '^alt\\.binaries\\.hdtv\\.x264$',
-        'regex' => '/^\\[ (?P<match0>.+) \\][-_ ]{0,3}\\[\\d+(?P<match1>\\/\\d+)\\][-_ ]{0,3}".+?" yEnc$/',
+        'regex' => '/^\\[ (?P<match0>.+) \\][\-_ ]{0,3}\\[\\d+(?P<match1>\\/\\d+)\\][\-_ ]{0,3}".+?" yEnc$/',
         'status' => 1,
         'description' => '//[ House.of.Lies.S03E05.1080p.WEB-DL.DD5.1.H.264-NTb ] - [01/35] - "House.of.Lies.S03E05.Soldiers.1080p.WEB-DL.DD5.1.H.264-NTb.nfo" yEnc',
         'ordinal' => 15,
@@ -2884,7 +2884,7 @@ return [
     360 => [
         'id' => 361,
         'group_regex' => '^alt\\.binaries\\.hdtv\\.x264$',
-        'regex' => '/^.+?\\[(?P<match0>\\d+[.,]\\d+ [kKmMgG][bB])\\] \\[\\d+\\/(?P<match1>\\d+\\][-_ ]{0,3}.+?)[-_ ]{0,3}"(?P<match2>.+?)(\\.part\\d*|\\.rar|\\.pdf)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") yEnc$/i',
+        'regex' => '/^.+?\\[(?P<match0>\\d+[.,]\\d+ [kKmMgG][bB])\\] \\[\\d+\\/(?P<match1>\\d+\\][\-_ ]{0,3}.+?)[\-_ ]{0,3}"(?P<match2>.+?)(\\.part\\d*|\\.rar|\\.pdf)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") yEnc$/i',
         'status' => 1,
         'description' => '//-4y (PW)   [ usenet-4all.info - powered by ssl.news -] [12,40 GB] [49/57] "43842168c542ed3.vol000+01.par2" yEnc',
         'ordinal' => 45,
@@ -2892,7 +2892,7 @@ return [
     361 => [
         'id' => 362,
         'group_regex' => '^alt\\.binaries\\.hdtv\\.x264$',
-        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
+        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
         'status' => 1,
         'description' => '//!MR [01/49] - "Persuasion 2007.par2" EN MKV yEnc',
         'ordinal' => 50,
@@ -2932,7 +2932,7 @@ return [
     366 => [
         'id' => 367,
         'group_regex' => '^alt\\.binaries\\.highspeed$',
-        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//[03/61] - "www.realmom.info - xvid - xf-fatalmovecd1.r00" - 773,34 MB - yEnc',
         'ordinal' => 10,
@@ -2940,7 +2940,7 @@ return [
     367 => [
         'id' => 368,
         'group_regex' => '^alt\\.binaries\\.highspeed$',
-        'regex' => '/^www\\..+? \\[Sponsored.+?\\] \\(\\d+(?P<match0>\\/\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^www\\..+? \\[Sponsored.+?\\] \\(\\d+(?P<match0>\\/\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//www.usenet-town.com [Sponsored by Astinews] (103/103) "Intimate.Enemies.German.2007.AC3.[passwort protect].vol60+21.PAR2" yEnc',
         'ordinal' => 15,
@@ -2956,7 +2956,7 @@ return [
     369 => [
         'id' => 370,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/\\[ (?P<match0>.+) \\][-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/\\[ (?P<match0>.+) \\][\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//[ 9970e7535ccc06155129f5971ff575e2 ] [23/30] - "19-sub6_-_blox_loggers_(mr.what_remix)-psycz_int.mp3" yEnc',
         'ordinal' => 25,
@@ -2964,7 +2964,7 @@ return [
     370 => [
         'id' => 371,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/(?P<match0>.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/(?P<match0>.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '////ea17079f47de702eead5114038355a70 [1/9] - "00-da_morty_-_boondock_sampler_02-(tbr002)-web-2013-srg.m3u" yEnc',
         'ordinal' => 30,
@@ -2972,7 +2972,7 @@ return [
     371 => [
         'id' => 372,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^\\[ (?P<match0>[a-fA-F0-9]+) \\] \\[\\d+\\/\\d+\\] - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[ (?P<match0>[a-fA-F0-9]+) \\] \\[\\d+\\/\\d+\\] - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ 9970e7535ccc06155129f5971ff575e2 ] [23/30] - "19-sub6_-_blox_loggers_(mr.what_remix)-psycz_int.mp3" yEnc',
         'ordinal' => 35,
@@ -2988,7 +2988,7 @@ return [
     373 => [
         'id' => 374,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^\\[ nEwZ\\[NZB\\]\\.iNFO( \\])?[-_ ]{0,3}\\[ (?P<match0>.+?) \\][-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?(yEnc)?$/',
+        'regex' => '/^\\[ nEwZ\\[NZB\\]\\.iNFO( \\])?[\-_ ]{0,3}\\[ (?P<match0>.+?) \\][\-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?(yEnc)?$/',
         'status' => 1,
         'description' => '//[ nEwZ[NZB].iNFO - [ Zed--The_Invitation-WEB-2010-WUS ] - File [12/13]: "08-zed--the_river.mp3" yEnc',
         'ordinal' => 45,
@@ -2996,7 +2996,7 @@ return [
     374 => [
         'id' => 375,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^nEwZ\\[NZB\\]\\.iNFO[-_ ]{0,3} (?P<match0>.+?) [-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")$/',
+        'regex' => '/^nEwZ\\[NZB\\]\\.iNFO[\-_ ]{0,3} (?P<match0>.+?) [\-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")$/',
         'status' => 1,
         'description' => '//nEwZ[NZB].iNFO - VA-Universal_Music_Sampler_07_February-PROMO-CDR-FLAC-2013-WRE - File [6/9]: "01-alesso-years_(hard_rock_sofa_remix).flac"',
         'ordinal' => 50,
@@ -3004,7 +3004,7 @@ return [
     375 => [
         'id' => 376,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/.+[DoAsYouLike\\].?[ _-]{0,3}\\d+[,.]\\d+ [mMkKgG][bB][-_ ]{0,3}"(?P<match0>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[ _-]{0,3}\\d+([,.]\\d+ [mMkKgG])? [bB][-_ ]{0,3}yEnc$/',
+        'regex' => '/.+[DoAsYouLike\\].?[ _-]{0,3}\\d+[,.]\\d+ [mMkKgG][bB][\-_ ]{0,3}"(?P<match0>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")[ _-]{0,3}\\d+([,.]\\d+ [mMkKgG])? [bB][\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//..:[DoAsYouLike]:..   1,11 GB   "KGMmDSSHBWnxV4g7Vbq5.part01.rar"   47,68 MB yEnc',
         'ordinal' => 55,
@@ -3012,7 +3012,7 @@ return [
     376 => [
         'id' => 378,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))( - Description -)? "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+[,.]\\d+ [mMkKgG][bB])? - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))( - Description -)? "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+[,.]\\d+ [mMkKgG][bB])? - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(01/10) "LeeDrOiD HD V3.3.2-Port-R4-A2SD.par2" - 357.92 MB - yEnc',
         'ordinal' => 65,
@@ -3020,7 +3020,7 @@ return [
     377 => [
         'id' => 379,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^\\((?P<match0>[a-zA-Z0-9._-]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") yEnc$/i',
+        'regex' => '/^\\((?P<match0>[a-zA-Z0-9._-]+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") yEnc$/i',
         'status' => 1,
         'description' => '//(VA-I_Love_Yaiza_Vol.1-WEB-2012-ServerLab) [01/11] - ".sfv" yEnc',
         'ordinal' => 70,
@@ -3028,7 +3028,7 @@ return [
     378 => [
         'id' => 380,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^[\\[\\(]\\d+( of |\\/)(?P<match0>\\d+[\\]\\)])[-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\\[\\(]\\d+( of |\\/)(?P<match0>\\d+[\\]\\)])[\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(17/41) - "3-8139g0m530.017" yEnc',
         'ordinal' => 75,
@@ -3036,7 +3036,7 @@ return [
     379 => [
         'id' => 381,
         'group_regex' => '^alt\\.binaries\\.inner-sanctum$',
-        'regex' => '/^\\[\\d+\\]-\\[.+?\\]-\\[(?P<match0>.+?)\\][-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - .+? yEnc$/',
+        'regex' => '/^\\[\\d+\\]-\\[.+?\\]-\\[(?P<match0>.+?)\\][\-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - .+? yEnc$/',
         'status' => 1,
         'description' => '//[153618]-[#a.b.inner-sanctum@EFNET]-[MetaProducts.DiskWatchman.v2.0.240.Incl.Keygen.And.Patch.REPACK-Lz0]-[0/6] - MetaProducts.DiskWatchman.v2.0.240.Incl.Keygen.And.Patch.REPACK-Lz0.nzb yEnc',
         'ordinal' => 80,
@@ -3052,7 +3052,7 @@ return [
     381 => [
         'id' => 383,
         'group_regex' => '^alt\\.binaries\\.mojo$',
-        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
+        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//[17/61] - "www.realmom.info - xvid - xf-devilstomb.r14" - 773,11 MB - yEnc',
         'ordinal' => 5,
@@ -3076,7 +3076,7 @@ return [
     384 => [
         'id' => 386,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/(?P<match0>.+?\\.net <<<Partner von SSL-News\\.info>>> - \\[)\\d+(?P<match1>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/(?P<match0>.+?\\.net <<<Partner von SSL-News\\.info>>> - \\[)\\d+(?P<match1>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//brothers-of-usenet.info/.net <<<Partner von SSL-News.info>>> - [01/26] - "Be.Cool.German.AC3.HDRip.x264-FuN.par2" yEnc',
         'ordinal' => 10,
@@ -3084,7 +3084,7 @@ return [
     385 => [
         'id' => 387,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^(?P<match0>\\d+-\\d)\\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}"\\d+-\\d.+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\d+-\\d)\\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}"\\d+-\\d.+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//62544-8[30/78] - "62544-0.35" yEnc',
         'ordinal' => 15,
@@ -3092,7 +3092,7 @@ return [
     386 => [
         'id' => 388,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\[Art-of-Usenet\\] ([a-fA-F0-9]+) \\[\\d+\\/(?P<match0>\\d+\\][-_ ]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[Art-of-Usenet\\] ([a-fA-F0-9]+) \\[\\d+\\/(?P<match0>\\d+\\][\-_ ]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[Art-of-Usenet] dea75eb65e65c56197d749d57919806d [01/19] - "dea75eb65e65c56197d749d57919806d.par2" yEnc',
         'ordinal' => 20,
@@ -3124,7 +3124,7 @@ return [
     390 => [
         'id' => 392,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\][ _-]{0,3}\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\][ _-]{0,3}\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[ TOWN ]-[ www.town.ag ]-[ partner of www.ssl-news.info ]-[ MOVIE ] [14/19] - "Night.Vision.2011.DVDRip.x264-IGUANA.part12.rar" - 660,80 MB yEnc',
         'ordinal' => 40,
@@ -3132,7 +3132,7 @@ return [
     391 => [
         'id' => 393,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\[(?P<match0>.+?)\\][ _-]{0,3}\\[www\\.usenet4ever\\.info by Secretusenet][ _-]{0,3} ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[(?P<match0>.+?)\\][ _-]{0,3}\\[www\\.usenet4ever\\.info by Secretusenet][ _-]{0,3} ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[A_New_Found_Glory-Its_All_About_The_Girls-Reissue-CDEP-FLAC-2003-JLM] [www.usenet4ever.info by Secretusenet] -  "00-a_new_found_glory-its_all_about_the_girls-reissue-cdep-flac-2003.jpg" yEnc',
         'ordinal' => 45,
@@ -3140,7 +3140,7 @@ return [
     392 => [
         'id' => 394,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^(Mom\\d+[ _-]{0,3})?"(?P<match0>.+?)__www\\.realmom\\.info__([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]) \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
+        'regex' => '/^(Mom\\d+[ _-]{0,3})?"(?P<match0>.+?)__www\\.realmom\\.info__([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]) \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
         'status' => 1,
         'description' => '//MoM100060 - "Florian_Arndt-Trix-(BBM36)-WEB-2012-UKHx__www.realmom.info__.nfo" [2/7] 29,04 MB yEnc ::: //"Alan.Wake.v1.02.16.4261.Update-SKIDROW__www.realmom.info__.nfo" (02/17) 138,07 MB yEnc',
         'ordinal' => 50,
@@ -3148,7 +3148,7 @@ return [
     393 => [
         'id' => 395,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^"(?P<match0>.+?)"\\(\\d+\\/(?P<match1>\\d+\\))[ _-]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)"\\(\\d+\\/(?P<match1>\\d+\\))[ _-]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
         'status' => 1,
         'description' => '//"The.Draughtsmans.Contract.1982.576p.BluRay.DD2.0.x264-EA"(15/56) "The.Draughtsmans.Contract.1982.576p.BluRay.DD2.0.x264-EA.part13.rar" - 2.37 GB yEnc',
         'ordinal' => 55,
@@ -3156,7 +3156,7 @@ return [
     394 => [
         'id' => 396,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}Description[ _-]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}Description[ _-]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(01/29) - Description - "Revolution.2012.S01E06.HDTV.x264-LOL.nfo" - 317.24 MB - yEnc',
         'ordinal' => 60,
@@ -3164,7 +3164,7 @@ return [
     395 => [
         'id' => 397,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}\\[Lords-of-Usenet\\][ _-]{0,3}<<Partner of SSL-News\\.info>>[ _-]{0,3}(?P<match1>.+?)[ _-]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}\\[Lords-of-Usenet\\][ _-]{0,3}<<Partner of SSL-News\\.info>>[ _-]{0,3}(?P<match1>.+?)[ _-]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(02/17) - [Lords-of-Usenet] <<Partner of SSL-News.info>> i8dewFjzft94BW71EI0s -"19913.r00" - 928,75 MB - yEnc',
         'ordinal' => 65,
@@ -3172,7 +3172,7 @@ return [
     396 => [
         'id' => 398,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[002/161] - "Rayman_Legends_USA_PS3-CLANDESTiNE.nfo" yEnc',
         'ordinal' => 70,
@@ -3180,7 +3180,7 @@ return [
     397 => [
         'id' => 399,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\((?P<match0>\\w+?)\\d{3}\\.[A-Za-z0-9]{3,4}\\)[-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>\\w+?)\\d{3}\\.[A-Za-z0-9]{3,4}\\)[\-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(4n4o8xq59kxq40bk8ukf3o4d163.163) [162/282] - "4n4o8xq59kxq40bk8ukf3o4d163.163" yEnc',
         'ordinal' => 75,
@@ -3188,7 +3188,7 @@ return [
     398 => [
         'id' => 400,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^<-{Retrouvez-nous sur NextDownload}-> > >"(?P<match0>\\w+)"\\[\\d+\\/(?P<match1>\\d+\\])[ _-]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^<-{Retrouvez-nous sur NextDownload}-> > >"(?P<match0>\\w+)"\\[\\d+\\/(?P<match1>\\d+\\])[ _-]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//<-{Retrouvez-nous sur NextDownload}-> > >"Next1023"[15/24] - "Next1023.9.vol001+001.par2" yEnc',
         'ordinal' => 80,
@@ -3196,7 +3196,7 @@ return [
     399 => [
         'id' => 401,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB].+UpperTeam.+ Secretusenet\\.com.+yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB].+UpperTeam.+ Secretusenet\\.com.+yEnc$/i',
         'status' => 1,
         'description' => '//[28/55] - "XzrgzBWoRqtcuBF.part27.rar" - 4,78 GB >>>UpperTeam for Usenet-Space-Cowboys.info and Secretusenet.com<<< yEnc',
         'ordinal' => 85,
@@ -3204,7 +3204,7 @@ return [
     400 => [
         'id' => 402,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\))[-_\\s]{0,3}[|][-_\\s]{0,3}"(?P<match1>[\\w\\säöüÄÖÜ¤ß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}[|] yEnc$/iu',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\))[\-_\\s]{0,3}[|][\-_\\s]{0,3}"(?P<match1>[\\w\\säöüÄÖÜ¤ß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}[|] yEnc$/iu',
         'status' => 1,
         'description' => '//(38/55)  | "Apocalypse.La.premiere.guerre.mondiale.e02.Peur.HDTV.1080p-STL.7z.037" | yEnc',
         'ordinal' => 90,
@@ -3212,7 +3212,7 @@ return [
     401 => [
         'id' => 403,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/NextDownload.+"\\w+"\\[\\d+\\/(?P<match0>\\d+)\\][-_\\s]{0,3}"(?P<match1>[\\w\\säöüÄÖÜ¤ß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/NextDownload.+"\\w+"\\[\\d+\\/(?P<match0>\\d+)\\][\-_\\s]{0,3}"(?P<match1>[\\w\\säöüÄÖÜ¤ß¶!.,&_\\()\\[\\]\\\'\\`-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//<-{NextDownload}->"Next2163"[21/22] - "Next2163.6.vol127+128.par2" yEnc',
         'ordinal' => 95,
@@ -3220,7 +3220,7 @@ return [
     402 => [
         'id' => 404,
         'group_regex' => '^alt\\.binaries\\.mom$',
-        'regex' => '/^(?P<match0>SecretUsenet\\.com.+)[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>SecretUsenet\\.com.+)[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//SecretUsenet.com _98iu89iujh_4312 225bea29_87db55d2_b9f1844e_7842adb-u4e - "225bea29_87db55d2_b9f1844e_7842adb-u4e.par2" yEnc',
         'ordinal' => 100,
@@ -3236,7 +3236,7 @@ return [
     404 => [
         'id' => 406,
         'group_regex' => '^alt\\.binaries\\.moovee$',
-        'regex' => '/^(?P<match0>\\[\\d+\\]-\\[.+?\\]-\\[.+?\\]- ").+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\[\\d+\\]-\\[.+?\\]-\\[.+?\\]- ").+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[42788]-[#altbin@EFNet]-[Full]- "margin-themasterb-xvid.par2" yEnc',
         'ordinal' => 10,
@@ -3252,7 +3252,7 @@ return [
     406 => [
         'id' => 408,
         'group_regex' => '^alt\\.binaries\\.moovee$',
-        'regex' => '/^\\(\\?{4}\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\?{4}\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [0/1] - "A.Good.Day.to.Die.Hard.2013.nzb" yEnc',
         'ordinal' => 20,
@@ -3260,7 +3260,7 @@ return [
     407 => [
         'id' => 409,
         'group_regex' => '^alt\\.binaries\\.moovee$',
-        'regex' => '/^\\[x+\\]-\\[.+?\\]-\\[ x+ \\]-\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[x+\\]-\\[.+?\\]-\\[ x+ \\]-\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[xxxxx]-[#a.b.moovee@EFNet]-[ xxxxx ]-[02/66] - "tulob88.part01.rar" yEnc',
         'ordinal' => 25,
@@ -3292,7 +3292,7 @@ return [
     411 => [
         'id' => 413,
         'group_regex' => '^alt\\.binaries\\.moovee$',
-        'regex' => '/^\\[\\d+\\]-\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|subs|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\]-\\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|subs|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[134517]-[01/76] - "Lara Croft Tomb Raider 2001 720p BluRay DTS x264-RightSiZE.nfo" yEnc',
         'ordinal' => 45,
@@ -3324,7 +3324,7 @@ return [
     415 => [
         'id' => 417,
         'group_regex' => '^alt\\.binaries\\.moovee$',
-        'regex' => '/^\\((?P<match0>[\\w.-]+)\\)\\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>[\\w.-]+)\\)\\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Ringside.The.Best.of.Mike.Tyson.DVDRip.x264.AC3-FCZ)[01/68] - "Ringside.The.Best.of.Mike.Tyson.DVDRip.1.of.2.x264.AC3-FCZ.nfo" yEnc',
         'ordinal' => 65,
@@ -3372,7 +3372,7 @@ return [
     421 => [
         'id' => 423,
         'group_regex' => '^alt\\.binaries\\.movies$',
-        'regex' => '/^\\(\\?+\\) \\[\\d+\\/(?P<match0>\\d+\\])[-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\?+\\) \\[\\d+\\/(?P<match0>\\d+\\])[\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [1/1] - "The Secret L',
         'ordinal' => 30,
@@ -3380,7 +3380,7 @@ return [
     422 => [
         'id' => 424,
         'group_regex' => '^alt\\.binaries\\.movies$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[-_ ]{0,3}Description[-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[\-_ ]{0,3}Description[\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(001/114) - Description - "The.Chronicles.of.Riddick.2004.DC.BluRay.1080p.DTS.par2" - 10,50 GB - yEnc',
         'ordinal' => 35,
@@ -3388,7 +3388,7 @@ return [
     423 => [
         'id' => 425,
         'group_regex' => '^alt\\.binaries\\.movies$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\])[-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\])[\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[00/56] - "The.Last.Days.On.Mars.720p.BluRay.x264-DR.nzb" yEnc',
         'ordinal' => 40,
@@ -3396,7 +3396,7 @@ return [
     424 => [
         'id' => 426,
         'group_regex' => '^alt\\.binaries\\.movies$',
-        'regex' => '/^\\[REUP\\]( )?(?P<match0>.+?) - \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[REUP\\]( )?(?P<match0>.+?) - \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[REUP] 6.Degress.of.Hell.2012.1080p.BluRay.DTS-HD.x264-BARC0DE - [03/50] - "BARC0DE.vol00+1.PAR2" yEnc ::: //[REUP]Home.Of.The.Brave.2006.1080p.BluRay.DTS-HD.x264-BARC0DE - [03/38] - "BARC0DE.vol00+1.PAR2" yEnc',
         'ordinal' => 45,
@@ -3404,7 +3404,7 @@ return [
     425 => [
         'id' => 427,
         'group_regex' => '^alt\\.binaries\\.movies$',
-        'regex' => '/^.+\\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+\\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//22.Jump.Street.2014.720p.BluRay.x264-tpU.vol000+01.PAR2 [73/84] - "22.Jump.Street.2014.720p.BluRay.x264-tpU.vol000+01.PAR2" yEnc',
         'ordinal' => 50,
@@ -3412,7 +3412,7 @@ return [
     426 => [
         'id' => 428,
         'group_regex' => '^alt\\.binaries\\.movies$',
-        'regex' => '/^- Description - "(?P<match0>[\\w. -]{8,}?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(?P<match1>[-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])[- ]{0,4}yEnc$/i',
+        'regex' => '/^- Description - "(?P<match0>[\\w. -]{8,}?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")(?P<match1>[\-_\\s]{0,3}\\d+[.,]\\d+ [kKmMgG][bB])[ -]{0,4}yEnc$/i',
         'status' => 1,
         'description' => '//- Description - "The.Legend.of.Hercules.2014.720p.BluRay.x264.Y',
         'ordinal' => 55,
@@ -3420,7 +3420,7 @@ return [
     427 => [
         'id' => 429,
         'group_regex' => '^alt\\.binaries\\.movies\\.divx$',
-        'regex' => '/^(?P<match0>\\(www\\.Thunder-News\\.org\\) .+? - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\(www\\.Thunder-News\\.org\\) .+? - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(www.Thunder-News.org) >CD2< <Sponsored by Secretusenet> - "exvid-emma-cd2.par2" yEnc',
         'ordinal' => 5,
@@ -3428,7 +3428,7 @@ return [
     428 => [
         'id' => 430,
         'group_regex' => '^alt\\.binaries\\.movies\\.divx$',
-        'regex' => '/^(?P<match0>[a-zA-Z ]+Post Voor FTN - \\[\\d+\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z ]+Post Voor FTN - \\[\\d+\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Movieland Post Voor FTN - [01/43] - "movieland0560.par2" yEnc',
         'ordinal' => 10,
@@ -3436,7 +3436,7 @@ return [
     429 => [
         'id' => 431,
         'group_regex' => '^alt\\.binaries\\.movies\\.divx$',
-        'regex' => '/(?P<match0>.+?by mayhem masta".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/(?P<match0>.+?by mayhem masta".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Disney short films collection by mayhem masta"1923 - Alice\'s Wonderland.vol15+7.par2" yEnc',
         'ordinal' => 15,
@@ -3468,7 +3468,7 @@ return [
     433 => [
         'id' => 435,
         'group_regex' => '^alt\\.binaries\\.movies\\.x264$',
-        'regex' => '/("|#34;)(?P<match0>.+)("|#34;)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}("|#34;).+?(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)[-_ ]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][-_ ]{0,3}yEnc$/i',
+        'regex' => '/("|#34;)(?P<match0>.+)("|#34;)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}("|#34;).+?(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)[\-_ ]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//"The.Hudsucker.Proxy.1994.1080p.Blu-ray.Remux.AVC.DTS.HD.MA.2.0-KRaLiMaRKo"(127/132) "The.Hudsucker.Proxy.1994.1080p.Blu-ray.Remux.AVC.DTS.HD.MA.2.0-KRaLiMaRKo.vol379+20.par2" - 24.61 GB - yEnc',
         'ordinal' => 20,
@@ -3476,7 +3476,7 @@ return [
     434 => [
         'id' => 436,
         'group_regex' => '^alt\\.binaries\\.movies\\.x264$',
-        'regex' => '/^(?P<match0>[\\w.-]+)[-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[\\w.-]+)[\-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Fly.With.The.Gold.2012.720p.BluRay.x264-WiKi [03/73] - "wiki-fwtg.par2" yEnc',
         'ordinal' => 25,
@@ -3484,7 +3484,7 @@ return [
     435 => [
         'id' => 437,
         'group_regex' => '^alt\\.binaries\\.mp3$',
-        'regex' => '/"(?P<match0>.+)"[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/"(?P<match0>.+)"[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//"The Absence - Riders Of The Plague" [00/14] - "the_absence-riders_of_the_plague.nzb" yEnc',
         'ordinal' => 5,
@@ -3492,7 +3492,7 @@ return [
     436 => [
         'id' => 438,
         'group_regex' => '^alt\\.binaries\\.mp3$',
-        'regex' => '/(?P<match0>.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/(?P<match0>.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//( Albert Cummings Albums 6x By Dready Niek (1999-2012) )  ( ** By Dready Niek ** ) [11/20] - "Albert Cummings Albums 6x By Dready Niek (1999-2012).part10.rar" yEnc ::: //( Fat Freddy\'s Drop - Blackbird (2013) -- By Dready Niek ) -- By Dready Niek ) [01/15] - "Fat Freddy\'s Drop - Blackbird (2013) -- By Dready Niek.par2" yEnc',
         'ordinal' => 10,
@@ -3500,7 +3500,7 @@ return [
     437 => [
         'id' => 439,
         'group_regex' => '^alt\\.binaries\\.mp3$',
-        'regex' => '/^(?P<match0>.+?)[-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/',
+        'regex' => '/^(?P<match0>.+?)[\-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Metallica - Ride The Lightning    "01 - Fight Fire With Fire.mp3" yEnc',
         'ordinal' => 15,
@@ -3516,7 +3516,7 @@ return [
     439 => [
         'id' => 441,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}\\[Lords-of-usenet\\][ _-]{0,3}<<Partner of SSL-News.info>>[ _-]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}\\[Lords-of-usenet\\][ _-]{0,3}<<Partner of SSL-News.info>>[ _-]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(05/10) - [Lords-of-usenet] <<Partner of SSL-News.info>>  "Wynardtage Praise The Fallen(2007).vol00+01.PAR2" - 132,64 MB - yEnc',
         'ordinal' => 10,
@@ -3524,7 +3524,7 @@ return [
     440 => [
         'id' => 442,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}<www\\.lords-of-usenet\\.org><by Nerts>[ _-]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}<www\\.lords-of-usenet\\.org><by Nerts>[ _-]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(06/11) - <www.lords-of-usenet.org><by Nerts> - "Diens - Schwarzmale.vol00+01.PAR2" - 141,07 MB - yEnc',
         'ordinal' => 15,
@@ -3532,7 +3532,7 @@ return [
     441 => [
         'id' => 443,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^<www\\.lords-of-usenet\\.org><by Nerts>[ _-]{0,3}\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^<www\\.lords-of-usenet\\.org><by Nerts>[ _-]{0,3}\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//<www.Lords-Of-Usenet.org><by Nerts> (09/18) - "Mantus - Fatum (2013) [2CD].FH.vol00+2.PAR2" - 336,39 MB - yEnc',
         'ordinal' => 20,
@@ -3540,7 +3540,7 @@ return [
     442 => [
         'id' => 444,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ _-]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(08/15) "Noemi-Red.(Unreleased).2006.by.NYCrules.vol000+01.PAR2" - 179,66 MB - yEnc',
         'ordinal' => 25,
@@ -3548,7 +3548,7 @@ return [
     443 => [
         'id' => 445,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^\\[(?P<match0>[a-zA-Z0-9-_\\\\(\\)\\.]+)\\] \\[www\\.usenet4ever\\.info by Secretusenet\\] -  "(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[(?P<match0>[a-zA-Z0-9-_\\\\(\\)\\.]+)\\] \\[www\\.usenet4ever\\.info by Secretusenet\\] -  "(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[16_Bit_Lolitas-Warung_Brazil_002-2CD-2012-iHF] [www.usenet4ever.info by Secretusenet] -  "000-16_bit_lolitas-warung_brazil_002-2cd-2012-ihf.sfv" yEnc ::: //[3RD_Prototype_-_On_My_Way-(TB7368)-WEB-2013-FMC] [www.usenet4ever.info by Secretusenet] -  "01-3rd_prototype_-_deafback-when_you_are_in_the_dark_(deafback_remix).mp3" yEnc ::: //[Armin_Van_Buuren_Feat._Fiora-Waiting_For_The_Night-(ARMD1140)-WEB-2013-UKHx] [www.usenet4ever.info by Secretusenet] -  "00-armin_van_buuren_feat._fiora-waiting_for_the_night-(armd1140)-web-2013-ukhx.m3u" yEnc',
         'ordinal' => 30,
@@ -3556,7 +3556,7 @@ return [
     444 => [
         'id' => 446,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^>ghost-of-usenet\\.org<< (?P<match0>[a-zA-Z0-9-_\\\\(\\)\\.]+) >>www\\.SSL-News\\.info> -  "(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^>ghost-of-usenet\\.org<< (?P<match0>[a-zA-Z0-9-_\\\\(\\)\\.]+) >>www\\.SSL-News\\.info> -  "(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//>ghost-of-usenet.org<< 16_Bit_Lolitas-Warung_Brazil_002-2CD-2012-iHF >>www.SSL-News.info> -  "101-16_bit_lolitas-warung_brazil_002_cd1.mp3" yEnc',
         'ordinal' => 35,
@@ -3564,7 +3564,7 @@ return [
     445 => [
         'id' => 447,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\\\(\\)\\.]+) \\[\\d+(\\/| of )(?P<match1>\\d+\\])[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\\\(\\)\\.]+) \\[\\d+(\\/| of )(?P<match1>\\d+\\])[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Blok_B-Bienvenue_Dans_Mon_Blok_Vol.1-2005-BZ_INT [20 of 27] "01-gangsta.mp3" yEnc ::: //DJ Neev - HedKandi_2013-06-08 (Ministry of Sound Radio) [01/13] - "DJ Neev - HedKandi_2013-06-08 (Ministry of Sound Radio).par2" yEnc',
         'ordinal' => 40,
@@ -3572,7 +3572,7 @@ return [
     446 => [
         'id' => 448,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^\\(www\\.Thunder-News\\.org\\) >(?P<match0>.+?)< <Sponsored by Secretusenet> - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(www\\.Thunder-News\\.org\\) >(?P<match0>.+?)< <Sponsored by Secretusenet> - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(www.Thunder-News.org) >Dee_And_Crane-Let_The_Music_Play-WEB-2012-UKHx< <Sponsored by Secretusenet> - "05-dee_and_crane-let_the_music_play_(jay_frogs_keep_the_groove_remix_edit).mp3" yEnc',
         'ordinal' => 45,
@@ -3580,7 +3580,7 @@ return [
     447 => [
         'id' => 449,
         'group_regex' => '^alt\\.binaries\\.mp3\\.complete_cd$',
-        'regex' => '/^.+\\[\\d+\\/(?P<match0>\\d+\\].+)"(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
+        'regex' => '/^.+\\[\\d+\\/(?P<match0>\\d+\\].+)"(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
         'status' => 1,
         'description' => '//VA 200 NRJ 2014 CD2 mp3_320kbps[18/27]VA 200 NRJ 2014 CD2 mp3_320kbps"(217) [Capital Cities] Safe And Sound.mp3"  yEnc',
         'ordinal' => 50,
@@ -3588,7 +3588,7 @@ return [
     448 => [
         'id' => 450,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\. - \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\. - \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//. - [05/10] - "Blues \'N Trouble - With Friends Like These [1989].vol00+01.par2" yEnc',
         'ordinal' => 5,
@@ -3596,7 +3596,7 @@ return [
     449 => [
         'id' => 451,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "\\[www\\.Lords-of-Usenet\\.org\\]_\\[Partner von SSL-News\\]_(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "\\[www\\.Lords-of-Usenet\\.org\\]_\\[Partner von SSL-News\\]_(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(001/122) "[www.Lords-of-Usenet.org]_[Partner von SSL-News]_Blind_Guardian-Discographie.par2" - 2,20 GB - yEnc',
         'ordinal' => 10,
@@ -3604,7 +3604,7 @@ return [
     450 => [
         'id' => 452,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,4}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}.+?yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,4}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}.+?yEnc$/i',
         'status' => 1,
         'description' => '//(06/10) "Pink Floyd - Dark Side Of The Moon [MFSL UDCD 517].vol00+01.PAR2"- - 67,88 MB - Pink Floyd - Dark Side Of The Moon [MFSL UDCD 517] yEnc ::: //(07/11) "VA - Twilight - New Moon - Ost.vol00+01.PAR2"- - 93,69 MB - VA - Twilight - New Moon - Ost yEnc',
         'ordinal' => 15,
@@ -3612,7 +3612,7 @@ return [
     451 => [
         'id' => 453,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\(.+\\) \\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4}) . http:\\/\\/usenet4ever\\.info_Sponsored by www\\.Secretusenet\\.com  " yEnc$/',
+        'regex' => '/^\\(.+\\) \\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4}) . http:\\/\\/usenet4ever\\.info_Sponsored by www\\.Secretusenet\\.com  " yEnc$/',
         'status' => 1,
         'description' => '//(Kitty Samtpfote) [01/12] - "Electronic Music of the 80s.Michael Garrison - In The Regions Of Sunreturn and beyond 1991.par2 . http://usenet4ever.info_Sponsored by www.Secretusenet.com  " yEnc',
         'ordinal' => 20,
@@ -3620,7 +3620,7 @@ return [
     452 => [
         'id' => 454,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\(.+\\) >(?P<match0>.+?)< <Sponsored by AstiNews> - \\(\\d+\\/(?P<match1>\\d+\\)) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(.+\\) >(?P<match0>.+?)< <Sponsored by AstiNews> - \\(\\d+\\/(?P<match1>\\d+\\)) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(www.Thunder-News.org) >Boehse Onkelz - Discography< <Sponsored by AstiNews> - (113/145) - "Boehse Onkelz - Discography.s10" yEnc',
         'ordinal' => 25,
@@ -3628,7 +3628,7 @@ return [
     453 => [
         'id' => 455,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\[(?P<match0>\\d+\\]-\\[".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\[ yEnc$/i',
+        'regex' => '/^\\[(?P<match0>\\d+\\]-\\[".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\[ yEnc$/i',
         'status' => 1,
         'description' => '//[00021]-["1999 Alphaville - Dreamscapes.part069.rar"[ yEnc',
         'ordinal' => 30,
@@ -3636,7 +3636,7 @@ return [
     454 => [
         'id' => 456,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\(.+\\) \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(.+\\) \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(nzbDMZ) [0/2] - "Miles Crossing - Miles Crossing (2011).nzb" yEnc',
         'ordinal' => 35,
@@ -3644,7 +3644,7 @@ return [
     455 => [
         'id' => 457,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[06/10] - "Jeff Healey - Legacy Volume One [The Singles].vol00+01.PAR2" yEnc',
         'ordinal' => 40,
@@ -3652,7 +3652,7 @@ return [
     456 => [
         'id' => 458,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^(?P<match0>\\d+ ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\d+ ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//00008 "2003 Camouflage - Sensor.par2" yEnc',
         'ordinal' => 45,
@@ -3660,7 +3660,7 @@ return [
     457 => [
         'id' => 459,
         'group_regex' => '^alt\\.binaries\\.mp3\\.full_albums$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\\\(\\)\\.]+) \\[\\d+(\\/| of )(?P<match1>\\d+\\])[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\\\(\\)\\.]+) \\[\\d+(\\/| of )(?P<match1>\\d+\\])[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Alex Oriental Experience_-_Live II (Live II) [1/9] - "01_Red_Dress.mp3" yEnc',
         'ordinal' => 50,
@@ -3700,7 +3700,7 @@ return [
     462 => [
         'id' => 464,
         'group_regex' => '^alt\\.binaries\\.multimedia\\.anime$',
-        'regex' => '/(?P<match0>.+? \\((360|480|720|1080)p\\|.+? ~bY .+? \\[)\\d+\\/\\d+\\] - ".+?\\[[A-F0-9]+\\].+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/(?P<match0>.+? \\((360|480|720|1080)p\\|.+? ~bY .+? \\[)\\d+\\/\\d+\\] - ".+?\\[[A-F0-9]+\\].+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//High School DxD New 01 (480p|.avi|xvid|mp3) ~bY Hatsuyuki [01/18] - "[Hatsuyuki]_High_School_DxD_New_01_[848x480][76B2BB8C].avi.001" yEnc',
         'ordinal' => 5,
@@ -3708,7 +3708,7 @@ return [
     463 => [
         'id' => 465,
         'group_regex' => '^alt\\.binaries\\.multimedia\\.anime$',
-        'regex' => '#\\[(?P<match0>[\\w-]+\\][\\w-]+_\\d+_\\[\\d{3,4}[ip])\\]\\s*\\[([0-9A-Fa-f]{8})\\]\\s*\\[\\d+/(\\d+)\\].*#i',
+        'regex' => '#\\[(?P<match0>[\\w\-]+\\][\\w\-]+_\\d+_\\[\\d{3,4}[ip])\\]\\s*\\[([0-9A-Fa-f]{8})\\]\\s*\\[\\d+/(\\d+)\\].*#i',
         'status' => 1,
         'description' => '//[Hatsuyuki]_Seirei_Tsukai_no_Blade_Dance_-_03_[720p] [E18FCA59] [01/18]',
         'ordinal' => 10,
@@ -3716,7 +3716,7 @@ return [
     464 => [
         'id' => 466,
         'group_regex' => '^alt\\.binaries\\.multimedia\\.anime\\.highspeed$',
-        'regex' => '/(.+? \\((?P<match0>360|480|720|1080)p\\|.+?\\s*~bY\\s*.+?\\s*\\[)\\d+\\/\\d+\\]\\s*-\\s*".+?\\[[A-Z0-9\\[\\]\\.]+.*([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/(.+? \\((?P<match0>360|480|720|1080)p\\|.+?\\s*~bY\\s*.+?\\s*\\[)\\d+\\/\\d+\\]\\s*-\\s*".+?\\[[A-Z0-9\\[\\]\\.]+.*([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//High School DxD New 01 (480p|.avi|xvid|mp3) ~bY Hatsuyuki [01/18] - "[Hatsuyuki]_High_School_DxD_New_01_[848x480][76B2BB8C].avi.001" yEnc',
         'ordinal' => 5,
@@ -3724,7 +3724,7 @@ return [
     465 => [
         'id' => 467,
         'group_regex' => '^alt\\.binaries\\.multimedia\\.documentaries$',
-        'regex' => '/^(?P<match0>".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\[\\d+ of \\d+ - \\d+ [kKmMgG][bB]\\] yEnc$/i',
+        'regex' => '/^(?P<match0>".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\[\\d+ of \\d+ - \\d+ [kKmMgG][bB]\\] yEnc$/i',
         'status' => 1,
         'description' => '//"Universe S4E08.part40.rar" - [41 of 76 - 10013 kb] yEnc',
         'ordinal' => 5,
@@ -3732,7 +3732,7 @@ return [
     466 => [
         'id' => 468,
         'group_regex' => '^alt\\.binaries\\.multimedia\\.scifi$',
-        'regex' => '/^(?P<match0>some m4vs - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>some m4vs - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//some m4vs - "SilverHawks_v1eps01_The Origin Story.par2" yEnc',
         'ordinal' => 5,
@@ -3740,7 +3740,7 @@ return [
     467 => [
         'id' => 469,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\][ _-]{0,3}\\[ .* \\] \\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}("|#34;).+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^\\[ TOWN \\][ _-]{0,3}\\[ www\\.town\\.ag \\][ _-]{0,3}\\[ partner of www\\.ssl-news\\.info \\][ _-]{0,3}\\[ .* \\] \\[\\d+\\/(?P<match0>\\d+\\][ _-]{0,3}("|#34;).+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//[ TOWN ]-[ www.town.ag ]-[ partner of www.ssl-news.info ]-[ MOVIE ] [14/19] - "Night.Vision.2011.DVDRip.x264-IGUANA.part12.rar" - 660,80 MB yEnc',
         'ordinal' => 5,
@@ -3748,7 +3748,7 @@ return [
     468 => [
         'id' => 470,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^.+By Dready Niek \\) \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.+By Dready Niek \\) \\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//( 80\'s Giga Hits Collection (32 CDs) By Dready Niek )  By Dready Niek ) [44/54] - "80\'s Giga Hits Collection (32 CDs) By Dready Niek.part43.rar" yEnc',
         'ordinal' => 10,
@@ -3756,7 +3756,7 @@ return [
     469 => [
         'id' => 471,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\]  .+?) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - nightsteff  yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\]  .+?) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - nightsteff  yEnc$/i',
         'status' => 1,
         'description' => '//(00/24]  Marco Mengoni - Prontoacorrere (2013) "Marco Mengoni - Prontoacorrere (2013).nzb" - nightsteff  yEnc',
         'ordinal' => 15,
@@ -3764,7 +3764,7 @@ return [
     470 => [
         'id' => 472,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - \\[".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\] yEnc$/i',
+        'regex' => '/^\\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - \\[".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")\\] yEnc$/i',
         'status' => 1,
         'description' => '//(80\'s Disco-Soul-Funk) [136/426] - ["Level 42 - Lessons In Love.mp3"] yEnc',
         'ordinal' => 20,
@@ -3772,7 +3772,7 @@ return [
     471 => [
         'id' => 473,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Jungle Fever Tapepacks) [67/79] - "Jungle Fever Tapepacks.part65.rar" yEnc',
         'ordinal' => 25,
@@ -3780,7 +3780,7 @@ return [
     472 => [
         'id' => 474,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[1/8] - "Black Market Flowers - Bind (1993).sfv" yEnc',
         'ordinal' => 30,
@@ -3788,7 +3788,7 @@ return [
     473 => [
         'id' => 475,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\[DreamPieter\\] \\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[DreamPieter\\] \\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[DreamPieter] (Glen Tipton - Two solo albums) [04/23] - "Glenn Tipton - Baptizm of Fire - 04 - Fuel Me Up.mp3" yEnc',
         'ordinal' => 35,
@@ -3796,7 +3796,7 @@ return [
     474 => [
         'id' => 476,
         'group_regex' => '^alt\\.binaries\\.music$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)[ -]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)[ -]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(01/10) "MylÃ¨ne Farmer - Monkey me (2012 Bluray Audio).rar" - 1,56 GB - yEnc',
         'ordinal' => 40,
@@ -3804,7 +3804,7 @@ return [
     475 => [
         'id' => 477,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\]\\)][ -]{0,3}.+) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ -]{0,3}nightsteff  yEnc$/i',
+        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\]\\)][ -]{0,3}.+) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ -]{0,3}nightsteff  yEnc$/i',
         'status' => 1,
         'description' => '//(00/20]  Nomadi - Terzo Tempo (2012) "Nomadi - Terzo Tempo (2012).nzb" - nightsteff  yEnc',
         'ordinal' => 5,
@@ -3812,7 +3812,7 @@ return [
     476 => [
         'id' => 478,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\(\\?+\\) \\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}.+)  ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\?+\\) \\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}.+)  ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(????) [19/22] - C.K.N. Demo 85  "19-rotten system.mp3" yEnc',
         'ordinal' => 10,
@@ -3820,7 +3820,7 @@ return [
     477 => [
         'id' => 479,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\])[ -]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\((?P<match0>.+)\\) \\[\\d+\\/(?P<match1>\\d+\\])[ -]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(BierbauchFreddy Quwinn seine grÃ¶Ãten Coversongs Vol2) [22/60] - "040c - Freddy Quinn - Don\'t Forbid Me (1957) (NH 22 639, EPH 20 575).mp3" yEnc',
         'ordinal' => 15,
@@ -3828,7 +3828,7 @@ return [
     478 => [
         'id' => 480,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\[ (?P<match0>.+) \\] - \\[\\d+\\] - \\[\\d+ Kbps MP3\\] \\[\\d+ of (?P<match1>\\d+\\]) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[ (?P<match0>.+) \\] - \\[\\d+\\] - \\[\\d+ Kbps MP3\\] \\[\\d+ of (?P<match1>\\d+\\]) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ Spectrum (ft. Matthew Koma) (Extended Mix) - Zedd ] - [2012] - [256 Kbps MP3] [1 of 7] "Spectrum (ft. Matthew Koma) [Extended Mix].mp3" yEnc',
         'ordinal' => 20,
@@ -3836,7 +3836,7 @@ return [
     479 => [
         'id' => 481,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}\\(((Top)?\\d+ )?(MP3 )?(Album )?Charts\\)[ -]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}\\(((Top)?\\d+ )?(MP3 )?(Album )?Charts\\)[ -]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
         'status' => 1,
         'description' => '//[1/1] - (150 MP3 Album Charts) - "Atlantean Kodex - The White Goddess.rar"  yEnc ::: //[1/1] - (MP3 Album Charts) - "Black Sabbath - 13.rar"  yEnc ::: //[1/1] - (Top100 Album Charts) - "Bastille - Pompeii.rar"  yEnc ::: //[1/1] - (Top100 Charts) - "Beatrice Egli - Gluecksgefuehle.rar"  yEnc',
         'ordinal' => 25,
@@ -3844,7 +3844,7 @@ return [
     480 => [
         'id' => 482,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}(Album )?Top \\d+( Album Charts \\d+)?[ -]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}(Album )?Top \\d+( Album Charts \\d+)?[ -]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
         'status' => 1,
         'description' => '//[1/1] - Album Top 100 - "Amy MacDonald - L',
         'ordinal' => 30,
@@ -3852,7 +3852,7 @@ return [
     481 => [
         'id' => 483,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}\\(Album Top \\d+(( -)? \\d+)?\\)[ -]{0,3}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\][ -]{0,3}\\(Album Top \\d+(( -)? \\d+)?\\)[ -]{0,3}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")  yEnc$/i',
         'status' => 1,
         'description' => '//[1/1] (Album Top 100 - 2012) - "Cro - Einmal Um Die Welt.rar"  yEnc ::: //[1/1] (Album Top 100 2012) - "Cro - Einmal Um Die Welt.rar"  yEnc ::: //[1/1] (Album Top 100) - "Cro - Raop.rar"  yEnc',
         'ordinal' => 35,
@@ -3860,7 +3860,7 @@ return [
     482 => [
         'id' => 484,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^\\[ech0park\\]-\\[spotnet\\]-\\[(?P<match0>.+?)\\] \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[ech0park\\]-\\[spotnet\\]-\\[(?P<match0>.+?)\\] \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ech0park]-[spotnet]-[Snow Patrol 2012 Tour Sampler - 2012-iND] [02/20] - "02-snow_patrol-ill_never_let_go.mp3" yEnc',
         'ordinal' => 40,
@@ -3868,7 +3868,7 @@ return [
     483 => [
         'id' => 485,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^(?P<match0>.+?)[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\[\\d+\\/ (?P<match1>\\d+\\]) nightsteff[-_\\s]{0,3}yEnc$/i',
+        'regex' => '/^(?P<match0>.+?)[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\[\\d+\\/ (?P<match1>\\d+\\]) nightsteff[\-_\\s]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//40 Italo Dance Tunes (2CD) - "00. 40 Italo Dance Tunes 2011.nfo" [02/ 50] nightsteff  yEnc',
         'ordinal' => 45,
@@ -3876,7 +3876,7 @@ return [
     484 => [
         'id' => 486,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^(?P<match0>.+?) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ -]{0,3}nightsteff  yEnc$/i',
+        'regex' => '/^(?P<match0>.+?) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ -]{0,3}nightsteff  yEnc$/i',
         'status' => 1,
         'description' => '//Bud Spencer & Terence Hill - Greatest Hits Vol 1 (1995) "04 - Just A Good Boy.mp3" nightsteff  yEnc',
         'ordinal' => 50,
@@ -3884,7 +3884,7 @@ return [
     485 => [
         'id' => 487,
         'group_regex' => '^alt\\.binaries\\.music\\.mp3$',
-        'regex' => '/^Attn: \\w+ - (?P<match0>.+?)\\[\\d+\\/(?P<match1>\\d+\\]) - .+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[-_\\s]{0,3}\\d+[.,]\\d+[kKmMgG][bB][-_\\s]{0,3}yEnc$/',
+        'regex' => '/^Attn: \\w+ - (?P<match0>.+?)\\[\\d+\\/(?P<match1>\\d+\\]) - .+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[\-_\\s]{0,3}\\d+[.,]\\d+[kKmMgG][bB][\-_\\s]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Attn: bearcat - Avenged Sevenfold - Avenged Sevenfold 320[17/18] - .vol15+16.par2 5.9Mb yEnc',
         'ordinal' => 55,
@@ -3900,7 +3900,7 @@ return [
     487 => [
         'id' => 489,
         'group_regex' => '^alt\\.binaries\\.nl$',
-        'regex' => '/^\\w+[-_ ]{0,3}[\\[\\(]\\d+\\/(?P<match0>\\d+[\\]\\)])[-_ ]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\w+[\-_ ]{0,3}[\\[\\(]\\d+\\/(?P<match0>\\d+[\\]\\)])[\-_ ]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//JN - [1/3] - "Operatie Teheran-Joel C Rosenberg JN.par2" yEnc',
         'ordinal' => 10,
@@ -3908,7 +3908,7 @@ return [
     488 => [
         'id' => 490,
         'group_regex' => '^alt\\.binaries\\.nl$',
-        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\( (?P<match0>[\\w. -]{8,}) \\)[\-_ ]{0,3}\\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//( Overlord II RELOADED ) - [013/112] - "rld-olii.part001.rar" yEnc',
         'ordinal' => 15,
@@ -3916,7 +3916,7 @@ return [
     489 => [
         'id' => 491,
         'group_regex' => '^alt\\.binaries\\.nl$',
-        'regex' => '/^(?P<match0>[\\w. &\\()-]{8,}?\\b)[-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[-_\\s]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[\\w. &\\()-]{8,}?\\b)[\-_\\s]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[\-_\\s]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Batman.Arkham-Origins.Initiation-RELOADED - [006/296] - "r.vol010+08.PAR2" yEnc',
         'ordinal' => 20,
@@ -3924,7 +3924,7 @@ return [
     490 => [
         'id' => 492,
         'group_regex' => '^alt\\.binaries\\.ps3$',
-        'regex' => '/^\\[\\d+\\] \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+\\] \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[4197] [036/103] - "ant-mgstlcd2.r34" yEnc',
         'ordinal' => 5,
@@ -3932,7 +3932,7 @@ return [
     491 => [
         'id' => 493,
         'group_regex' => '^alt\\.binaries\\.pwp$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)[-_ ]{0,4}"Giggi.+)[A-Z]\\d([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)[\-_ ]{0,4}"Giggi.+)[A-Z]\\d([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(620/899) -  "Giggi_9M05YD32TO4.part147.rar" - 252,53 GB - yEnc',
         'ordinal' => 5,
@@ -3940,7 +3940,7 @@ return [
     492 => [
         'id' => 494,
         'group_regex' => '^alt\\.binaries\\.pwp$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)[-_ ]{0,4}".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)[\-_ ]{0,4}".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(300/454) "James_Bond_You_Only_Live_Twice_bd25.part300.rar" - 22,22 GB - yEnc',
         'ordinal' => 10,
@@ -3948,7 +3948,7 @@ return [
     493 => [
         'id' => 495,
         'group_regex' => '^alt\\.binaries\\.series\\.tv\\.french$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB]( -)? yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB]( -)? yEnc$/i',
         'status' => 1,
         'description' => '//(01/34) "Merlin.2008.1x04.la.vengeance.de.nimue.par2" - 388,38 MB - yEnc',
         'ordinal' => 5,
@@ -3956,7 +3956,7 @@ return [
     494 => [
         'id' => 496,
         'group_regex' => '^alt\\.binaries\\.series\\.tv\\.french$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9._-]+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9._-]+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//Breaking.Bad.S02.MULTi.720p.BluRay.AC3.x264-BoO [749/883] - "212ACS3517.part01.rar" yEnc',
         'ordinal' => 10,
@@ -3964,7 +3964,7 @@ return [
     495 => [
         'id' => 497,
         'group_regex' => '^alt\\.binaries\\.series\\.tv\\.french$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9._-]+)[-_ ]{0,3}[\\(\\[]\\d+ of (?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9._-]+)[\-_ ]{0,3}[\\(\\[]\\d+ of (?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//Dawson.Saison2.DVDRIP.x264.FRENCH [111 of 196] "Dawson.S2.E22.Tout feu, tout flambe.m4v.003" yEnc',
         'ordinal' => 15,
@@ -3972,7 +3972,7 @@ return [
     496 => [
         'id' => 498,
         'group_regex' => '^alt\\.binaries\\.series\\.tv\\.french$',
-        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]])[\-_ ]{0,3}"(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//[01/22] - "Unnatural.History.1x03.Espion.En.Sommeil.FR.LD.par2" yEnc',
         'ordinal' => 20,
@@ -3980,7 +3980,7 @@ return [
     497 => [
         'id' => 499,
         'group_regex' => '^alt\\.binaries\\.series\\.tv\\.french$',
-        'regex' => '/^\\[(?P<match0>.+?)\\][-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^\\[(?P<match0>.+?)\\][\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}"(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//[MagNeum 3.14 S1 D.V.D + par2][1148/1167] - "ZDFRIKK8470DO776.D7P" yEnc',
         'ordinal' => 25,
@@ -3988,7 +3988,7 @@ return [
     498 => [
         'id' => 500,
         'group_regex' => '^alt\\.binaries\\.sony\\.psp$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+([.,]\\d+ [kKmMgG])?[bB] yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+([.,]\\d+ [kKmMgG])?[bB] yEnc$/i',
         'status' => 1,
         'description' => '//(01/10) "Assassins Creed - Bloodlines [EUR].par2" - 408,46 MB yEnc',
         'ordinal' => 5,
@@ -3996,7 +3996,7 @@ return [
     499 => [
         'id' => 501,
         'group_regex' => '^alt\\.binaries\\.sony\\.psp$',
-        'regex' => '/^\\(\\d+\\) (?P<match0>[a-zA-Z0-9 -_\\.]+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\) (?P<match0>[a-zA-Z0-9 -_\\.]+) \\[\\d+\\/(?P<match1>\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(20444) F',
         'ordinal' => 10,
@@ -4004,7 +4004,7 @@ return [
     500 => [
         'id' => 502,
         'group_regex' => '^alt\\.binaries\\.sound\\.mp3$',
-        'regex' => '/.+[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][-_ ]{0,3}".+)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/.+[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][\-_ ]{0,3}".+)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//- codari_4_usenetrevolution.info-Partner of SSL-News UK.Single.Charts.Top.40  [01/25] - "UK.Single.Charts.Top.40.par2" - 301,70 MB - yEnc',
         'ordinal' => 5,
@@ -4012,7 +4012,7 @@ return [
     501 => [
         'id' => 503,
         'group_regex' => '^alt\\.binaries\\.sound\\.mp3$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}\\(\\d+\\/(?P<match1>\\d+\\))[ _-]{0,3}yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}\\(\\d+\\/(?P<match1>\\d+\\))[ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//"Terraplane Sun - Funnel of Love.mp3" - 21.55 MB - (1/6) - yEnc',
         'ordinal' => 10,
@@ -4020,7 +4020,7 @@ return [
     502 => [
         'id' => 504,
         'group_regex' => '^alt\\.binaries\\.sound\\.mp3$',
-        'regex' => '/^(?P<match0>.+? meil29) ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>.+? meil29) ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//jean ferrat  annÃ©e 1967 Ã  1969  meil29 "17 Rien Ã  voir.mp3" yEnc',
         'ordinal' => 15,
@@ -4036,7 +4036,7 @@ return [
     504 => [
         'id' => 506,
         'group_regex' => '^alt\\.binaries\\.sounds\\.lossless$',
-        'regex' => '/^http:\\/\\/dream-of-usenet\\.org .+? - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^http:\\/\\/dream-of-usenet\\.org .+? - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//http://dream-of-usenet.org empfehlen newsconnection.eu - [02/32] - "Adam_Ant-Manners_and_Physique-(MCAD-6315)-CD-FLAC-1989-2Eleven.par2" yEnc',
         'ordinal' => 5,
@@ -4060,7 +4060,7 @@ return [
     507 => [
         'id' => 509,
         'group_regex' => '^alt\\.binaries\\.sounds\\.lossless$',
-        'regex' => '/^\\([A-Z0-9][a-zA-Z0-9 ]+\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\([A-Z0-9][a-zA-Z0-9 ]+\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(Rolling Stones) [01/28] - "Bell Center, Montreal, QC - 09-06-2013 (alt source sb remaster).par2" yEnc',
         'ordinal' => 20,
@@ -4068,7 +4068,7 @@ return [
     508 => [
         'id' => 510,
         'group_regex' => '^alt\\.binaries\\.sounds\\.lossless$',
-        'regex' => '/^.:[-_ ]{0,3}(?P<match0>.+?)[-_ ]{0,3}:..+?thunder-news\\.org.+?secretusenet\\.com:. - "(.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^.:[\-_ ]{0,3}(?P<match0>.+?)[\-_ ]{0,3}:..+?thunder-news\\.org.+?secretusenet\\.com:. - "(.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//.: VA-Liquid_Music-The_Future_House_Compilation-CD-FLAC-1993-WRS :. - .:www.thunder-news.org:. - .:sponsored by secretusenet.com:. - "00-va-liquid_music-the_future_house_compilation-cd-flac-1993-wrs.nfo" yEnc ::: //.:Bruce_BecVar-Arriba-CD-FLAC-1993-JLM:. - .:thunder-news.org:. - .:sponsored by secretusenet.com:. - "00-bruce_becvar-arriba-cd-flac-1993.m3u" yEnc',
         'ordinal' => 25,
@@ -4076,7 +4076,7 @@ return [
     509 => [
         'id' => 511,
         'group_regex' => '^alt\\.binaries\\.sounds\\.lossless$',
-        'regex' => '/^[-_ ]{0,3}"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[\-_ ]{0,3}"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//_ "CARUSO & GIGLI - O Sole Mio - The  Unknown.nzb" yEnc',
         'ordinal' => 30,
@@ -4084,7 +4084,7 @@ return [
     510 => [
         'id' => 512,
         'group_regex' => '^alt\\.binaries\\.sounds\\.lossless$',
-        'regex' => '/^[-_ ]{0,3}"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_ ]{0,3}\\d+ (?P<match1>of \\d+)( \\(\\d+\\/\\d+\\)){1,2} (yEnc)?$/i',
+        'regex' => '/^[\-_ ]{0,3}"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_ ]{0,3}\\d+ (?P<match1>of \\d+)( \\(\\d+\\/\\d+\\)){1,2} (yEnc)?$/i',
         'status' => 1,
         'description' => '//"Art Tatum - The Complete Trio Sessions with Tiny Grimes & Slam Stewart - Vol 1.NFO" - 1 of 6 (1/1) ::: //"Galen Jeter and the Dallas Jazz Orchestra - Thank You, Leon.NFO" - 1 of 5 (1/1) (1/1)',
         'ordinal' => 35,
@@ -4092,7 +4092,7 @@ return [
     511 => [
         'id' => 513,
         'group_regex' => '^alt\\.binaries\\.sounds\\.lossless$',
-        'regex' => '/^[-_ ]{0,3}"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
+        'regex' => '/^[\-_ ]{0,3}"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\d+[.,]\\d+ [kKmMgG][bB][ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//"Doc Watson - 1973 - The Essential Doc Watson - 01 - Tom Dooley.flac" - 406.64 MB - yEnc',
         'ordinal' => 40,
@@ -4100,7 +4100,7 @@ return [
     512 => [
         'id' => 514,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.audiobooks$',
-        'regex' => '/^\\(dream-of-usenet\\.info\\) - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(dream-of-usenet\\.info\\) - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '// currently these are teh same as mp3, but in the future these should be mod',
         'ordinal' => 5,
@@ -4108,7 +4108,7 @@ return [
     513 => [
         'id' => 515,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.audiobooks$',
-        'regex' => '/^http:\\/\\/dream-of-usenet\\.org .+? - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^http:\\/\\/dream-of-usenet\\.org .+? - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//http://dream-of-usenet.org empfehlen newsconnection.eu - [02/32] - "Adam_Ant-Manners_and_Physique-(MCAD-6315)-CD-FLAC-1989-2Eleven.par2" yEnc',
         'ordinal' => 10,
@@ -4124,7 +4124,7 @@ return [
     515 => [
         'id' => 517,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.audiobooks$',
-        'regex' => '/^(?P<match0>.+?usenet-space.+?Powered by.+? ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+? \\d+\\/\\d+ \\(\\d+[.,]\\d+ [kKmMgG][bB]\\) .+? \\d+[.,]\\d+ [kKmMgG][bB] .+?yEnc$/i',
+        'regex' => '/^(?P<match0>.+?usenet-space.+?Powered by.+? ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+? \\d+\\/\\d+ \\(\\d+[.,]\\d+ [kKmMgG][bB]\\) .+? \\d+[.,]\\d+ [kKmMgG][bB] .+?yEnc$/i',
         'status' => 1,
         'description' => '//<<<usenet-space-cowboys.info>>>  <<<Powered by https://secretusenet.com>< "Justin_Bieber-Believe_Acoustic-2013-pLAN9_usenet-space-cowbys.info.rar" >< 4/6 (78.65 MB) >< 60.84 MB > yEnc',
         'ordinal' => 20,
@@ -4132,7 +4132,7 @@ return [
     516 => [
         'id' => 518,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/^\\(dream-of-usenet\\.info\\) - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(dream-of-usenet\\.info\\) - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(dream-of-usenet.info) - [04/15] - "Enya-And_Winter_Came...-2008.part2.rar" yEnc',
         'ordinal' => 5,
@@ -4140,7 +4140,7 @@ return [
     517 => [
         'id' => 519,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/^http:\\/\\/dream-of-usenet\\.org .+? - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^http:\\/\\/dream-of-usenet\\.org .+? - \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//http://dream-of-usenet.org empfehlen newsconnection.eu - [02/32] - "Adam_Ant-Manners_and_Physique-(MCAD-6315)-CD-FLAC-1989-2Eleven.par2" yEnc',
         'ordinal' => 10,
@@ -4156,7 +4156,7 @@ return [
     519 => [
         'id' => 521,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/^(?P<match0>.+?usenet-space.+?Powered by.+? ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+? \\d+\\/\\d+ \\(\\d+[.,]\\d+ [kKmMgG][bB]\\) .+? \\d+[.,]\\d+ [kKmMgG][bB] .+?yEnc$/i',
+        'regex' => '/^(?P<match0>.+?usenet-space.+?Powered by.+? ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|").+? \\d+\\/\\d+ \\(\\d+[.,]\\d+ [kKmMgG][bB]\\) .+? \\d+[.,]\\d+ [kKmMgG][bB] .+?yEnc$/i',
         'status' => 1,
         'description' => '//<<<usenet-space-cowboys.info>>>  <<<Powered by https://secretusenet.com>< "Justin_Bieber-Believe_Acoustic-2013-pLAN9_usenet-space-cowbys.info.rar" >< 4/6 (78.65 MB) >< 60.84 MB > yEnc',
         'ordinal' => 20,
@@ -4164,7 +4164,7 @@ return [
     520 => [
         'id' => 522,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/"(?P<match0>.+)"[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/"(?P<match0>.+)"[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//"The Absence - Riders Of The Plague" [00/14] - "the_absence-riders_of_the_plague.nzb" yEnc',
         'ordinal' => 25,
@@ -4172,7 +4172,7 @@ return [
     521 => [
         'id' => 523,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/\\( (?P<match0>.+?)\\)[-_ ]{0,3}( |\\().+\\)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/\\( (?P<match0>.+?)\\)[\-_ ]{0,3}( |\\().+\\)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//( Albert Cummings Albums 6x By Dready Niek (1999-2012) )  ( ** By Dready Niek ** ) [11/20] - "Albert Cummings Albums 6x By Dready Niek (1999-2012).part10.rar" yEnc ::: //( Fat Freddy\'s Drop - Blackbird (2013) -- By Dready Niek ) -- By Dready Niek ) [01/15] - "Fat Freddy\'s Drop - Blackbird (2013) -- By Dready Niek.par2" yEnc',
         'ordinal' => 30,
@@ -4180,7 +4180,7 @@ return [
     522 => [
         'id' => 524,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/\\( (?P<match0>.+?) \\)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/\\( (?P<match0>.+?) \\)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]])[\-_ ]{0,3}".+(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//( Addison_Road-Addison_Road-2008 ) [01/10] - "01. Addison Road - This Could Be Our Day.mp3" yEnc',
         'ordinal' => 35,
@@ -4188,7 +4188,7 @@ return [
     523 => [
         'id' => 525,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3$',
-        'regex' => '/^.+?\\[\\d+\\/(?P<match0>\\d+\\][-_ ]{0,3}.+?)[-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/',
+        'regex' => '/^.+?\\[\\d+\\/(?P<match0>\\d+\\][\-_ ]{0,3}.+?)[\-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//(????) [0/8] - Crionics Post - Alice In Chains - Dirt REPOST"Alice In Chains - Dirt.nzb" yEnc',
         'ordinal' => 40,
@@ -4196,7 +4196,7 @@ return [
     524 => [
         'id' => 526,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.complete_cd$',
-        'regex' => '/(?P<match0>.+)[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]][-_ ]{0,3}".+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/(?P<match0>.+)[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]][\-_ ]{0,3}".+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//The Refreshments - [1/9] - "The Refreshments - RockÂ´n Roll Christmas [2003].par2" yEnc',
         'ordinal' => 5,
@@ -4204,7 +4204,7 @@ return [
     525 => [
         'id' => 527,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.complete_cd$',
-        'regex' => '/^\\[(?P<match0>.+?)\\][-_ ]{0,3}\\[(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}\\])[-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match2>\\d+[\\)\\]])[-_ ]{0,3}yEnc$/',
+        'regex' => '/^\\[(?P<match0>.+?)\\][\-_ ]{0,3}\\[(?P<match1>.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}\\])[\-_ ]{0,3}[\\(\\[]\\d+\\/(?P<match2>\\d+[\\)\\]])[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//[BFMP3] [Barrelhouse_Time Frames.nzb] [00/18] yEnc',
         'ordinal' => 10,
@@ -4212,7 +4212,7 @@ return [
     526 => [
         'id' => 528,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.complete_cd$',
-        'regex' => '/^(?P<match0>.+?)[-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/',
+        'regex' => '/^(?P<match0>.+?)[\-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Metallica - Ride The Lightning    "01 - Fight Fire With Fire.mp3" yEnc',
         'ordinal' => 15,
@@ -4220,7 +4220,7 @@ return [
     527 => [
         'id' => 529,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.complete_cd$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?) www\\.brothers-of-usenet\\.org - empfehlen - Newsconnection(\\.eu)?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?) www\\.brothers-of-usenet\\.org - empfehlen - Newsconnection(\\.eu)?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(01/11) "Der Kleine Vampir Komplett - Folge 01 bis 18 www.brothers-of-usenet.org - empfehlen - Newsconnection.eu.nfo" yEnc',
         'ordinal' => 20,
@@ -4228,7 +4228,7 @@ return [
     528 => [
         'id' => 530,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.complete_cd$',
-        'regex' => '/^\\(D(\\))? (?P<match0>.+) {1,2}\\[\\d+\\/(?P<match1>\\d+\\]) - .+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4}) {1,2}yEnc$/',
+        'regex' => '/^\\(D(\\))? (?P<match0>.+) {1,2}\\[\\d+\\/(?P<match1>\\d+\\]) - .+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4}) {1,2}yEnc$/',
         'status' => 1,
         'description' => '//(D The Best Of Leon Russell [23/28] - The Best Of Leon Russell.vol00+01.PAR2  yEnc',
         'ordinal' => 25,
@@ -4236,7 +4236,7 @@ return [
     529 => [
         'id' => 531,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.dance$',
-        'regex' => '/^\\[\\d+\\](?P<match0>.+?)[-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/',
+        'regex' => '/^\\[\\d+\\](?P<match0>.+?)[\-_ ]{0,3}("|#34;)(.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//[2707]Solarstone-Solarstone_Collected_Vol_1-ARDI3177-WEB-2012-TraX "02-solarstone_feat_kym_marsh-day_by_day_(red_jerry_smackthe_bigot_up_remix).mp3" - yEnc',
         'ordinal' => 5,
@@ -4244,7 +4244,7 @@ return [
     530 => [
         'id' => 532,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.electronic$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ -]{0,3}"(?P<match1>[\\w. &\\()\\[\\]\\\'-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ -]{0,3}"(?P<match1>[\\w. &\\()\\[\\]\\\'-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(03/10) "Washing Machines - Planet-E CH-Basel Ultimate Hardcore - 4.9.1993.vol00+01.PAR2" - 232.39 MB - yEnc',
         'ordinal' => 5,
@@ -4252,7 +4252,7 @@ return [
     531 => [
         'id' => 533,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.electronic$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ -]{0,3}"(?P<match1>[\\w. &\\()\\[\\]\\\'-]{8,}?\\b.?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+ [bB][-_\\s]{0,3}yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\))[ -]{0,3}"(?P<match1>[\\w. &\\()\\[\\]\\\'-]{8,}?\\b.?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+ [bB][\-_\\s]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(2/7) "Cosmic Baby live at Energy 1995.vol00+01.PAR2" - 0 B - yEnc',
         'ordinal' => 10,
@@ -4276,7 +4276,7 @@ return [
     534 => [
         'id' => 536,
         'group_regex' => '^alt\\.binaries\\.sounds\\.mp3\\.electronic$',
-        'regex' => '/^(?P<match0>[\\w. &\\()\\[\\]\\\'-]{8,}?)[ -]{0,3}\\d+[ -]{0,3}[\\w., &\\()\\[\\]\\\'-]{8,}?\\b.?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[ -]{0,3}yEnc$/',
+        'regex' => '/^(?P<match0>[\\w. &\\()\\[\\]\\\'-]{8,}?)[ -]{0,3}\\d+[ -]{0,3}[\\w., &\\()\\[\\]\\\'-]{8,}?\\b.?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[ -]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Alec Empire - Low On Ice  06 - Untitled.mp3  yEnc',
         'ordinal' => 25,
@@ -4284,7 +4284,7 @@ return [
     535 => [
         'id' => 537,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d.+?B - (\\d.+?B -)? yEnc$/i',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d.+?B - (\\d.+?B -)? yEnc$/i',
         'status' => 1,
         'description' => '//(01/37) "Entourage S08E08.part01.rar" - 349,20 MB - yEnc ::: //(01/24) "EGtnu7OrLNQMO2pDbgpDrBL8SnjZDpab.nfo" - 686 B - 338.74 MB - yEnc (1/1)',
         'ordinal' => 30,
@@ -4292,7 +4292,7 @@ return [
     536 => [
         'id' => 538,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - "[A-Za-z0-9.-]+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[\\d+(?P<match0>\\/\\d+\\] - "[A-Za-z0-9.-]+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[01/42] - "King.And.Maxwell.S01E08.1080p.WEB-DL.DD5.1.H264-Abjex.par2" yEnc',
         'ordinal' => 35,
@@ -4300,7 +4300,7 @@ return [
     537 => [
         'id' => 539,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 ]+ \\()\\d+(?P<match1>\\/\\d+\\) - ?".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 ]+ \\()\\d+(?P<match1>\\/\\d+\\) - ?".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Divers (12/42) -"Juste.Pour.Rire.2013.Gala.JF.Mercier.FRENCH.720p.HDTV.x264-QuebecRules.part11.rar" yEnc ::: //Par le chapeau (06/43) - "8C7D59F472E03.part04.rar" yEnc',
         'ordinal' => 40,
@@ -4316,7 +4316,7 @@ return [
     539 => [
         'id' => 541,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^\\[ (?P<match0>.+?) \\] .+ \\(\\d+\\/(?P<match1>\\d+\\)) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\[ (?P<match0>.+?) \\] .+ \\(\\d+\\/(?P<match1>\\d+\\)) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ Anthony.Bourdain.Parts.Unknown.S01.480p.HDTV.x264-mSD ] MKV.h264 (03/17) - "Anthony.Bourdain.Parts.Unknown.S01E01.480p.HDTV.x264-mSD.mkv" yEnc',
         'ordinal' => 50,
@@ -4332,7 +4332,7 @@ return [
     541 => [
         'id' => 543,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^\\(bf1\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(bf1\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(bf1) [03/31] - "The.Block.AU.Sky.High.S07E61.WS.PDTV.XviD.BF1.part01.sfv" yEnc (1/1)',
         'ordinal' => 60,
@@ -4340,7 +4340,7 @@ return [
     542 => [
         'id' => 544,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^(?P<match0>\\[ [A-Za-z]+ \\] - (\\[\\d+\\/\\d+\\] - )?".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\[ [A-Za-z]+ \\] - (\\[\\d+\\/\\d+\\] - )?".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//[ TVPower ] - "Dexter.S07E10.720p.HDTV.x264-NLsubs.par2" yEnc ::: //[ TVPower ] - [010/101] - "Desperate.Housewives.S08Disc2.NLsubs.part009.rar" yEnc',
         'ordinal' => 65,
@@ -4356,7 +4356,7 @@ return [
     544 => [
         'id' => 546,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^(?P<match0>\\(www\\..+?\\) .+? <Sponsored.+?> - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>\\(www\\..+?\\) .+? <Sponsored.+?> - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(www.Thunder-News.org) >CD1< <Sponsored by Secretusenet> - "moovee-fastest.cda.par2" yEnc',
         'ordinal' => 75,
@@ -4364,7 +4364,7 @@ return [
     545 => [
         'id' => 547,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/(?P<match0>\\.info .+?Powered by .+?\\.com ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\d+\\/\\d+ \\(\\d+[,.]\\d+ [mMkKgG][bB]\\) .+? yEnc$/i',
+        'regex' => '/(?P<match0>\\.info .+?Powered by .+?\\.com ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") .+? \\d+\\/\\d+ \\(\\d+[,.]\\d+ [mMkKgG][bB]\\) .+? yEnc$/i',
         'status' => 1,
         'description' => '//<<<Pitbull>>> usenet-space-cowboys.info <<<Powered by https://secretusenet.com>< "S05E03 Pack die Badehose ein_usenet-space-cowbys.info.par2" >< 01/10 (411,16 MB) >< 3,48 kB > yEnc',
         'ordinal' => 80,
@@ -4380,7 +4380,7 @@ return [
     547 => [
         'id' => 549,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"Mad.Men.S06E11.HDTV.x264-2HD.par2" yEnc',
         'ordinal' => 90,
@@ -4388,7 +4388,7 @@ return [
     548 => [
         'id' => 550,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[ _-]{0,3}yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[ _-]{0,3}\\[\\d+\\/(?P<match1>\\d+\\])[ _-]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//"Marvels.Agents.of.S.H.I.E.L.D.S01E07.HDTV.XviD-FUM.avi.nfo" [09/16] yEnc',
         'ordinal' => 95,
@@ -4404,7 +4404,7 @@ return [
     550 => [
         'id' => 552,
         'group_regex' => '^alt\\.binaries\\.teevee$',
-        'regex' => '/^\\.\\.[-_\\s]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[-_\\s]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\.\\.[\-_\\s]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[\-_\\s]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//.. - [01/42] - "Under.the.Dome.S01E04.Outbreak.1080p.WEB-DL.DD5.1.H.264-NTb.par2" yEnc',
         'ordinal' => 105,
@@ -4412,7 +4412,7 @@ return [
     551 => [
         'id' => 553,
         'group_regex' => '^alt\\.binaries\\.town$',
-        'regex' => '/town\\.ag.+?download all our files with.+?www\\..+?\\.info.+? \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)(-sample)?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
+        'regex' => '/town\\.ag.+?download all our files with.+?www\\..+?\\.info.+? \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)(-sample)?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] yEnc$/i',
         'status' => 1,
         'description' => '//<TOWN><www.town.ag > <download all our files with>>> www.ssl-news.info <<< > [05/87] - "Deep.Black.Ass.5.XXX.1080p.WEBRip.x264-TBP.part03.rar" - 7,87 GB yEnc',
         'ordinal' => 5,
@@ -4436,7 +4436,7 @@ return [
     554 => [
         'id' => 556,
         'group_regex' => '^alt\\.binaries\\.tun$',
-        'regex' => '/^\\[ nEwZ\\[NZB\\]\\.iNFO( \\])?[-_ ]{0,3}\\[ (?P<match0>.+?) \\][-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
+        'regex' => '/^\\[ nEwZ\\[NZB\\]\\.iNFO( \\])?[\-_ ]{0,3}\\[ (?P<match0>.+?) \\][\-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}").+?yEnc$/',
         'status' => 1,
         'description' => '//[ nEwZ[NZB].iNFO - [ Zed--The_Invitation-WEB-2010-WUS ] - File [12/13]: "08-zed--the_river.mp3" yEnc',
         'ordinal' => 10,
@@ -4444,7 +4444,7 @@ return [
     555 => [
         'id' => 557,
         'group_regex' => '^alt\\.binaries\\.tun$',
-        'regex' => '/^nEwZ\\[NZB\\]\\.iNFO[-_ ]{0,3} (?P<match0>.+?) [-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")$/',
+        'regex' => '/^nEwZ\\[NZB\\]\\.iNFO[\-_ ]{0,3} (?P<match0>.+?) [\-_ ]{0,3}(File )?[\\(\\[]\\d+\\/(?P<match1>\\d+[\\)\\]]): "(.+)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}")$/',
         'status' => 1,
         'description' => '//nEwZ[NZB].iNFO - VA-Universal_Music_Sampler_07_February-PROMO-CDR-FLAC-2013-WRE - File [6/9]: "01-alesso-years_(hard_rock_sofa_remix).flac"',
         'ordinal' => 15,
@@ -4460,7 +4460,7 @@ return [
     557 => [
         'id' => 559,
         'group_regex' => '^alt\\.binaries\\.tv$',
-        'regex' => '/^\\(bf1\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(bf1\\) \\[\\d+(?P<match0>\\/\\d+\\] - ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(bf1) [03/31] - "The.Block.AU.Sky.High.S07E56.WS.PDTV.XviD.BF1.part01.sfv" yEnc',
         'ordinal' => 10,
@@ -4468,7 +4468,7 @@ return [
     558 => [
         'id' => 560,
         'group_regex' => '^alt\\.binaries\\.tv$',
-        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\])[-_\\s]{0,3}(?P<match1>[\\w.\\() -]{8,}?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[-_\\s]{0,3}yEnc$/',
+        'regex' => '/^\\[\\d+\\/(?P<match0>\\d+\\])[\-_\\s]{0,3}(?P<match1>[\\w.\\() -]{8,}?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[\-_\\s]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//[014/144] - The Bible (2013) - S1E01 - In the Beginning AVC 480p.vol31+27.PAR2  yEnc',
         'ordinal' => 15,
@@ -4476,7 +4476,7 @@ return [
     559 => [
         'id' => 561,
         'group_regex' => '^alt\\.binaries\\.tv$',
-        'regex' => '/^Saturday Morning Classic (?P<match0>[\\w. -]{8,}?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[-_\\s]{0,3}yEnc$/',
+        'regex' => '/^Saturday Morning Classic (?P<match0>[\\w. -]{8,}?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar)?(\\d{1,3}\\.rev|\\.vol\\d+\\+\\d+\\.par2|\\.[A-Za-z0-9]{2,4})[\-_\\s]{0,3}yEnc$/',
         'status' => 1,
         'description' => '//Saturday Morning Classic Return-to-the-Planet-of-the-Apes-S01E03 - Lagoon of Peril.avi.001  yEnc',
         'ordinal' => 20,
@@ -4484,7 +4484,7 @@ return [
     560 => [
         'id' => 562,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+([.,]\\d+ [kKmMgG])?[bB])? - \\d+([.,]\\d+ [kKmMgG])?[bB] - yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")( - \\d+([.,]\\d+ [kKmMgG])?[bB])? - \\d+([.,]\\d+ [kKmMgG])?[bB] - yEnc$/i',
         'status' => 1,
         'description' => '//"Forbrydelsen.II.S01E03.2009.DVDRip.MULTi.DD5.1.x264.nzb" - 213.54 kB - yEnc ::: //"Futurama S07E01 The Bots And The Bees.vol26+23.PAR2" - 8.49 MB - 193.51 MB - yEnc',
         'ordinal' => 5,
@@ -4492,7 +4492,7 @@ return [
     561 => [
         'id' => 563,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\[\\d+\\/(?P<match1>\\d+\\]) - yEnc$/i',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\[\\d+\\/(?P<match1>\\d+\\]) - yEnc$/i',
         'status' => 1,
         'description' => '//"Rijdende.Rechter.-.19x01.-.Huisbiggen.1080p.MKV-BNABOYZ.part38.rar" - [40/56] - yEnc',
         'ordinal' => 10,
@@ -4500,7 +4500,7 @@ return [
     562 => [
         'id' => 564,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\) ".+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[.,]\\d+ [kKmMgG][bB] - yEnc$/i',
         'status' => 1,
         'description' => '//(003/104) "blackcave1001.part002.rar" - 4,83 GB - yEnc',
         'ordinal' => 15,
@@ -4508,7 +4508,7 @@ return [
     563 => [
         'id' => 565,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^[a-zA-Z0-9 -_\\.]+ \\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^[a-zA-Z0-9 -_\\.]+ \\[\\d+\\/(?P<match0>\\d+\\]) - "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//X-Men Evolution - 2000 -  [01/20] - "X-Men Evolution - 3x03 - Mainstream.par2" yEnc',
         'ordinal' => 20,
@@ -4516,7 +4516,7 @@ return [
     564 => [
         'id' => 566,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.]+) (RETRY)?[-_ ]{0,3}".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\d+(?P<match1>\\/\\d+)( {0,2}yEnc)?$/i',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.]+) (RETRY)?[\-_ ]{0,3}".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") \\d+(?P<match1>\\/\\d+)( {0,2}yEnc)?$/i',
         'status' => 1,
         'description' => '//\'X-Files\' Season 1 XviD RETRY  "Files101.par2" 004/387 ::: //\'X-Files\' Season 5 XviD "Files502.par2" 018/321 yEnc ::: //\'X-Files\' Season 2 XviD  "Files223.part2.rar" 356/401  yEnc',
         'ordinal' => 25,
@@ -4524,7 +4524,7 @@ return [
     565 => [
         'id' => 567,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^"(?P<match0>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^"(?P<match0>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//"the.tudors.s03e03.nfo" yEnc',
         'ordinal' => 30,
@@ -4540,7 +4540,7 @@ return [
     567 => [
         'id' => 569,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.]+) \\(\\d+(?P<match1>\\/\\d+\\)) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.]+) \\(\\d+(?P<match1>\\/\\d+\\)) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//Chuck - Season2 (015/164) - "2x04.par2" yEnc',
         'ordinal' => 40,
@@ -4548,7 +4548,7 @@ return [
     568 => [
         'id' => 570,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.]+) - \\[\\d+(?P<match1>\\/\\d+\\]) - ".+?([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^(?P<match0>[a-zA-Z0-9 -_\\.]+) - \\[\\d+(?P<match1>\\/\\d+\\]) - ".+?([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//FIRST.WAVE.NTSC.DVD.DD2.0 - [121/512] - "FIRST_WAVE_SEASON_1_DVD2.r26" - 44,33 GB - yEnc',
         'ordinal' => 45,
@@ -4556,7 +4556,7 @@ return [
     569 => [
         'id' => 571,
         'group_regex' => '^alt\\.binaries\\.tvseries$',
-        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\)) "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][-_\\s]{0,3}[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/^\\(\\d+(?P<match0>\\/\\d+\\)) "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}\\d+([.,]\\d+)? [kKmMgG][bB][\-_\\s]{0,3}[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//(03/19) "Damages S04E02 FR.avi" - 5,49 GB yEnc',
         'ordinal' => 50,
@@ -4564,7 +4564,7 @@ return [
     570 => [
         'id' => 572,
         'group_regex' => '^alt\\.binaries\\.u-4all$',
-        'regex' => '/\\[ usenet-4all\\.info - powered by ssl\\.news -\\][-_\\s]{0,3}\\[\\d+([.,]\\d+)? [kKmMgG][bB]\\][-_\\s]{0,3}\\[\\d+\\/(?P<match0>\\d+)\\][-_\\s]{0,3}"(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[-_\\s]{0,3}yEnc$/ui',
+        'regex' => '/\\[ usenet-4all\\.info - powered by ssl\\.news -\\][\-_\\s]{0,3}\\[\\d+([.,]\\d+)? [kKmMgG][bB]\\][\-_\\s]{0,3}\\[\\d+\\/(?P<match0>\\d+)\\][\-_\\s]{0,3}"(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|")[\-_\\s]{0,3}yEnc$/ui',
         'status' => 1,
         'description' => '//-4y (PW)   [ usenet-4all.info - powered by ssl.news -] [1,44 GB] [08/14] "71cc4edc6R08eb7.vol00+01.PAR2" yEnc',
         'ordinal' => 55,
@@ -4572,7 +4572,7 @@ return [
     571 => [
         'id' => 573,
         'group_regex' => '^alt\\.binaries\\.warez$',
-        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][-_ ]{0,3}("|#34;).+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
+        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][\-_ ]{0,3}("|#34;).+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
         'status' => 1,
         'description' => '//-Panzer.Command.Kharkov-SKIDROW - [1/7] - "-Panzer.Command.Kharkov-SKIDROW.rar" yEnc ::: //-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS - [1/7] - #34;-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS.rar#34; yEnc',
         'ordinal' => 5,
@@ -4596,7 +4596,7 @@ return [
     574 => [
         'id' => 576,
         'group_regex' => '^alt\\.binaries\\.warez\\.0-day$',
-        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][-_ ]{0,3}("|#34;).+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
+        'regex' => '/.*[\\(\\[]\\d+\\/(?P<match0>\\d+[\\)\\]][\-_ ]{0,3}("|#34;).+?)(\\.part\\d*|\\.rar)?(\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/i',
         'status' => 1,
         'description' => '//-Panzer.Command.Kharkov-SKIDROW - [1/7] - "-Panzer.Command.Kharkov-SKIDROW.rar" yEnc ::: //-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS - [1/7] - #34;-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS.rar#34; yEnc',
         'ordinal' => 5,
@@ -4652,7 +4652,7 @@ return [
     581 => [
         'id' => 583,
         'group_regex' => '^alt\\.binaries\\.x264$',
-        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)([-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB]( -)? yEnc$/i',
+        'regex' => '/^\\(\\d+\\/(?P<match0>\\d+\\)) "(?P<match1>.+?)([\-_](proof|sample|thumbs?))*(\\.part\\d*(\\.rar)?|\\.rar|\\.7z)?(\\d{1,3}\\.rev"|\\.vol\\d+\\+\\d+\\.par2"|\\.[A-Za-z0-9]{2,4}"|") - \\d+[,.]\\d+ [mMkKgG][bB]( -)? yEnc$/i',
         'status' => 1,
         'description' => '//(001/108) "Wizards.of.Waverly.Place.720p.S04E01.by.sugarr.par2" - 5,15 GB - yEnc',
         'ordinal' => 10,
@@ -4676,7 +4676,7 @@ return [
     584 => [
         'id' => 586,
         'group_regex' => '^alt\\.binaries\\.sounds\\.(flac|lossless)$',
-        'regex' => '/^.+dream-of-usenet.+[-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ (\\d+\\/\\d+) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^.+dream-of-usenet.+[\-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ (\\d+\\/\\d+) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//(dream-of-usenet.info) - [01/21] - "A_Perfect_Circle-aMOTION-CD-FLAC-2004-SCORN.nfo" yEnc',
         'ordinal' => 5,
@@ -4684,7 +4684,7 @@ return [
     585 => [
         'id' => 587,
         'group_regex' => '^alt\\.binaries\\.sounds\\.flac$',
-        'regex' => '/^.+www\\.EliteNZB\\.net.+[-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ (\\d+\\/\\d+) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^.+www\\.EliteNZB\\.net.+[\-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ (\\d+\\/\\d+) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//The Elite Team Presents www.EliteNZB.net, Powered by 4UX.NL, Only The Best 4 You!!!! [01/19] - "Habariyaasubuhi_12352_TvPYrS1128.par2" yEnc',
         'ordinal' => 15,
@@ -4692,7 +4692,7 @@ return [
     586 => [
         'id' => 588,
         'group_regex' => '^alt\\.binaries\\.sounds\\.flac$',
-        'regex' => '/^("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\]).+www\\.EliteNZB\\.net.+[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ \\(\\d+\\/\\d+\\) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\]).+www\\.EliteNZB\\.net.+[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//"Jinsi_12187_v807.par2" [01/13] - The Elite Team Presents www.EliteNZB.net, Powered by 4UX.NL, Only The Best 4 You!!!! yEnc',
         'ordinal' => 20,
@@ -4700,7 +4700,7 @@ return [
     587 => [
         'id' => 589,
         'group_regex' => '^alt\\.binaries\\.mp3(\\.full_albums)?$',
-        'regex' => '/^JN Dutplanet.+[-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ (\\d+\\/\\d+) "|\\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/i',
+        'regex' => '/^JN Dutplanet.+[\-_ ]{0,3}\\[\\d+\\/(?P<match0>\\d+\\])[\-_ ]{0,3}("|#34;)(?P<match1>.+?)(\\.part\\d*|\\.rar)?(\\.vol.+ (\\d+\\/\\d+) "|\\.[A-Za-z0-9]{2,4}("|#34;))[\-_ ]{0,3}yEnc$/i',
         'status' => 1,
         'description' => '//JN Dutplanet.net - [02/16] - "JN Dutplanet.net Foreigner - I Want To Know What Love Is - The Ballads [2014]FLAC.part1.rar" yEnc',
         'ordinal' => 5,

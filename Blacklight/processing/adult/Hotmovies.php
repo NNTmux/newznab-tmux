@@ -8,10 +8,9 @@ class Hotmovies extends AdultMovies
      * Constant Urls used within this class
      * Needed Search Queries Variables.
      */
-    const EXTRASEARCH = '&complete=on&search_in=video_title';
-    const HMURL = 'http://www.hotmovies.com';
-    const IF18 = true;
-    const TRAILINGSEARCH = '/search.php?words=';
+    private const EXTRASEARCH = '&complete=on&search_in=video_title';
+    private const HMURL = 'http://www.hotmovies.com';
+    private const TRAILINGSEARCH = '/search.php?words=';
     /**
      * Keyword Search.
      *
@@ -69,14 +68,6 @@ class Hotmovies extends AdultMovies
      * @var string
      */
     protected $_title = '';
-
-    /**
-     * Hotmovies constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     protected function trailers()
     {
@@ -154,7 +145,7 @@ class Hotmovies extends AdultMovies
      *
      * @return array
      */
-    protected function cast()
+    protected function cast(): array
     {
         $cast = [];
         if ($this->_html->find('.stars bottom_margin')) {
@@ -174,7 +165,7 @@ class Hotmovies extends AdultMovies
      *
      * @return array
      */
-    protected function genres()
+    protected function genres(): array
     {
         $genres = [];
         if ($ret = $this->_html->findOne('div.categories')) {
@@ -229,7 +220,7 @@ class Hotmovies extends AdultMovies
                     $ret = $ret->findOne('a[title]');
                     $title = trim($ret->title);
                     $title = str_replace('/XXX/', '', $title);
-                    $title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
+                    $title = preg_replace('/\(.*?\)|[._-]/', ' ', $title);
                     if (! empty($title)) {
                         similar_text($movie, $title, $p);
                         if ($p >= 90) {

@@ -101,8 +101,8 @@ class API extends Capabilities
         if (request()->has('cat')) {
             $categoryIDs = urldecode(request()->input('cat'));
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
-            if (strpos($categoryIDs, Category::TV_HD) !== false &&
-                strpos($categoryIDs, Category::TV_WEBDL) === false) {
+            if (strpos($categoryIDs, (string) Category::TV_HD) !== false &&
+                strpos($categoryIDs, (string) Category::TV_WEBDL) === false) {
                 $categoryIDs .= (','.Category::TV_WEBDL);
             }
             $categoryID = explode(',', $categoryIDs);

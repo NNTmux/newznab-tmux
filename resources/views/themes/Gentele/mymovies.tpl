@@ -11,7 +11,7 @@
 	<div class="alert alert-info">
 		Using 'My Movies' you can search for movies, and add them to a wishlist. If the movie
 		becomes available it will be added to an <strong><a
-					href="{$smarty.const.WWW_TOP}/rss?t=-4&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.api_token}">RSS
+					href="{$smarty.const.WWW_TOP}/rss/mymovies?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">RSS
 				Feed</a></strong> you can use to automatically download. You can <strong><a
 					href="{$smarty.const.WWW_TOP}/mymovies">Manage Your Movie
 				List</a></strong> or to remove old items.

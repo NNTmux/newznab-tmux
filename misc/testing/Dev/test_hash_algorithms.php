@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
+
 use Illuminate\Support\Facades\File;
 
 if (! isset($argv[1]) || ! isset($argv[2])) {

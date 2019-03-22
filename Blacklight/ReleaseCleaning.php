@@ -18,14 +18,14 @@ class ReleaseCleaning
      * @const
      * @string
      */
-    private const REGEX_END = '[- ]{0,3}yEnc$/u';
+    private const REGEX_END = '[ -]{0,3}yEnc$/u';
 
     /**
      * Used for matching file extension endings in article subjects.
      * @const
      * @string
      */
-    private const REGEX_FILE_EXTENSIONS = '([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}"|")';
+    private const REGEX_FILE_EXTENSIONS = '([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}"|")';
 
     /**
      * Used for matching size strings in article subjects.
@@ -33,7 +33,7 @@ class ReleaseCleaning
      * @const
      * @string
      */
-    private const REGEX_SUBJECT_SIZE = '[- ]{0,3}\d+([.,]\d+)? [kKmMgG][bB][- ]{0,3}';
+    private const REGEX_SUBJECT_SIZE = '[ -]{0,3}\d+([.,]\d+)? [kKmMgG][bB][ -]{0,3}';
 
     /**
      * @var string
@@ -203,7 +203,7 @@ class ReleaseCleaning
     public function teevee(): array
     {
         //[140022]-[04] - [01/40] - "140022-04.nfo" yEnc
-        if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+-.+" yEnc/', $this->subject)) {
+        if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+\-.+" yEnc/', $this->subject)) {
             return [
                 'cleansubject' => $this->subject,
                 'properlynamed' => false,
@@ -228,7 +228,7 @@ class ReleaseCleaning
         if (preg_match('/^<TOWN>.+?town\.ag.+?(www\..+?|News)\.[iI]nfo.+? \[\d+\/\d+\]( -)? "(.+?)(-sample)?'.$this->e0.' - \d+[.,]\d+ [kKmMgG][bB]M? yEnc$/', $this->subject, $match)) {
             return $match[3];
         } //[ TOWN ]-[ www.town.ag ]-[ partner of www.ssl-news.info ]-[ 1080p ] - [320/352] - "Gq7YGEWLy8wAA2NhbZx5LukEa.vol000+5.par2" - 17.09 GB yEnc
-        if (preg_match('/^\[\s*TOWN\s*\][-_\s]{0,3}\[\s*www\.town\.ag\s*\][-_\s]{0,3}\[\s*partner of www\.ssl-news\.info\s*\][-_\s]{0,3}\[\s* .*\s*\][-_\s]{0,3}\[\d+\/\d+\][-_\s]{0,4}"([\w\säöüÄÖÜß+¤¶!.,&_()\[\]\'\`{}#-]{8,}?\b.?)'.$this->e2, $this->subject, $match)) {
+        if (preg_match('/^\[\s*TOWN\s*\][\-_\s]{0,3}\[\s*www\.town\.ag\s*\][\-_\s]{0,3}\[\s*partner of www\.ssl-news\.info\s*\][\-_\s]{0,3}\[\s* .*\s*\][\-_\s]{0,3}\[\d+\/\d+\][\-_\s]{0,4}"([\w\säöüÄÖÜß+¤¶!.,&_()\[\]\'\`{}#-]{8,}?\b.?)'.$this->e2, $this->subject, $match)) {
             return $match[1];
         } //<TOWN><www.town.ag > <download all our files with>>> www.ssl-news.info <<< >IP Scanner Pro 3.21-Sebaro - [1/3] - "IP Scanner Pro 3.21-Sebaro.rar" yEnc
         if (preg_match(
@@ -408,7 +408,7 @@ class ReleaseCleaning
     {
         // This regex gets almost all of the predb release names also keep in mind that not every subject ends with yEnc, some are truncated, because of the 255 character limit and some have extra charaters tacked onto the end, like (5/10).
         if (preg_match(
-            '/^\[\d+\][-_\s]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[-_\s]{0,3}\[[- #@\.\w]+\][-_\s]{0,3}|\[[- #@\.\w]+\][-_\s]{0,3}\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[-_\s]{0,3}|\[.+?efnet\][-_\s]{0,3}|\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[-_\s]{0,3})(\[FULL\])?[-_\s]{0,3}(\[ )?(\[)? ?(\/sz\/)?(F: - )?(?P<title>[- _!@\.\'\w\(\)~]{10,}) ?(\])?[-_\s]{0,3}(\[)? ?(REPOST|REPACK|SCENE|EXTRA PARS|REAL)? ?(\])?[-_\s]{0,3}?(\[\d+[-\/~]\d+\])?[-_\s]{0,3}["|#34;]*.+["|#34;]* ?[yEnc]{0,4}/i',
+            '/^\[\d+\][\-_\s]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}\[[\- #@\.\w]+\][\-_\s]{0,3}|\[[\- #@\.\w]+\][\-_\s]{0,3}\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3}|\[.+?efnet\][\-_\s]{0,3}|\[(reup|full|repost.+?|part|re-repost|xtr|sample)(\])?[\-_\s]{0,3})(\[FULL\])?[\-_\s]{0,3}(\[ )?(\[)? ?(\/sz\/)?(F: - )?(?P<title>[\- _!@\.\'\w\(\)~]{10,}) ?(\])?[\-_\s]{0,3}(\[)? ?(REPOST|REPACK|SCENE|EXTRA PARS|REAL)? ?(\])?[\-_\s]{0,3}?(\[\d+[\-\/~]\d+\])?[\-_\s]{0,3}["|#34;]*.+["|#34;]* ?[yEnc]{0,4}/i',
             $this->subject,
             $match
         )
@@ -429,7 +429,7 @@ class ReleaseCleaning
      */
     public function releaseCleanerHelper($subject): string
     {
-        $cleanerName = preg_replace('/(- )?yEnc$/', '', $subject);
+        $cleanerName = preg_replace('/(\- )?yEnc$/', '', $subject);
 
         return trim(preg_replace('/\s\s+/', ' ', $cleanerName));
     }
@@ -445,7 +445,7 @@ class ReleaseCleaning
     {
         //Extensions.
         $cleanerName = preg_replace(
-            '/([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}$|$)/i',
+            '/([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}$|$)/i',
             ' ',
             $name
         );

@@ -1,4 +1,172 @@
+2019-03-22 DariusIII
+	* Chg: Update laravel/framework (v5.8.5 => v5.8.7)
+2019-03-21 DariusIII
+	* Fix: Fix logic and add check for duplicated data
+	* Chg: Use separate query to add releases to cart as we only need the id, so no need to use heavier getByGuid function
+	* Chg: Update font-awesome to latest version
+	* Chg: Update rtconner/laravel-tagging (3.1.0 => 3.1.1), wildbit/swiftmailer-postmark (3.0.1 => 3.0.2)
+	* Chg: Adjust return values of cast function in adult postprocessing
+2019-03-20 DariusIII
+	* Fix: Fix site stats admin page
+	* Chg: Update return type declarations on adult postprocessing classes
+	* Chg: Update dariusiii/rarinfo (v2.7.4 => v2.7.4.1)
+	* Chg: Update dariusiii/rarinfo (v2.7.3 => v2.7.4)
+	* Chg: Update PPA class, simplify unrar location setting load
+	* Chg: Update rtconner/laravel-tagging (3.0.0 => 3.1.0)
+2019-03-19 DariusIII
+	* Chg: Update laravel/framework to version 5.8.5
+	* Chg: Use query builder to fetch collections/binaries and parts when creating nzbs, drop initiateforwrite and setQueries functions
+	* Chg: Update tinyMCE to version 5.0.3
+	* Chg: Update pragmarx/firewall (v2.2.1 => v2.2.2)
+2019-03-18 DariusIII
+	* Chg: Update nunomaduro/collision (v2.1.1 => v3.0.1)
+	* Chg: Update package.json
+	* Chg: Remove casting $this->_release into array on line 2204 of PPA class
+	* Chg: Don't send activation emails if site email is not set
+	* CHg: Update used libraries to their latest versions
+2019-03-15 DariusIII
+	* Fix: Update addAlternateNfo function, fixes issue #941
+	* Fix: Fix missed renames for root_categories table
+	* Chg: Update phpstan/phpstan (0.11.3 => 0.11.4)
+2019-03-14 DariusIII
+	* Chg: Use function to delete releases with bad or missing nzbs
+	* Chg: Delete releases that report missing, broken or empty nzbs on PPA stage
+	* Fix: Fix resetting groups in admin area
+	* Chg: Update package.json
+	* Chg: Load category and parent relations when querying db
+	* Chg: Update fetchIMDBProperties function to use real id to fetch movie data
+	* Chg: Update imdbphp/imdbphp (v6.1.3 => v6.2.0)
+	* Chg: Update spatie/laravel-fractal (5.5.0 => 5.5.1)
+2019-03-13 DariusIII
+	* Chg: Update messed up browsing
+	* Chg: Select only needed columns from releases table
+	* Chg: Update deleteReleases function query in ProcessReleases class
+	* Chg: Change check for giantbomb key
+	* Chg: Change IGDB API to v3 url
+	* Fix: Fix NZB class setQuery function
+	* Chg: Update @fancyapps/fancybox to latest version
+	* Fix: Fix root categories seeding
+	* Chg: Update nesbot/carbon (2.14.2 => 2.16.0)
+	* Chg: Update laravel/framework (v5.8.3 => v5.8.4)
+	* Fix: Fix getConcatenatedCategoryIds function query
+	* Fix: Fix column name in Releases class
+	* Fix: Fix releases browsing
+2019-03-12 DariusIII
+	* Chg: Update CategoryTransformer
+	* Chg: Update queries to use root_categories table
+	* Chg: Update nzb creation process
+	* Chg: Update fixtures and fix migration files
+	* Chg: Add more migrations and changes to categories tables
+2019-03-11 DariusIII
+	* Chg: Use query builder in more functions of ProcessReleases class
+	* Chg: Update package.json
+	* Chg: Update last used raw query to query builder in ProcessReleases
+	* Chg: Use query builder in all collectionFileChackStage functions
+2019-03-10 DariusIII
+	* Chg: Use query builder in collectionFileCheckStage5
+	* Chg: Update swiftmailer/swiftmailer (v6.1.3 => v6.2.0)
+2019-03-08 DariusIII
+	* Fux: Add check if _install/install.lock exists before sending registration related emails. Fixes issue #928
+	* Chg: Replace raw queries in collectionFileCheckStage1 function with query builder counterpart
+	* Chg: Replace raw queries in collectionFileCheckStage2 function with query builder counterpart
+	* Chg: Start replacing raw SQL queries with query builder in ProcessReleases class
+2019-03-07 DariusIII
+	* Chg: Update vlucas/phpdotenv (v3.3.2 => v3.3.3)
+	* Chg: Use query builder in PPA class _fetchReleases function
+	* Fix: Fix one more release cleaning regex range
+	* Fix: Fix more regex ranges in Blacklight namespace
+	* Fix: Add back missing $groupID in ProcessReleases class
+	* Chg: Fix ranges in collection and release naming regexes
+2019-03-06 DariusIII
+	* Chg: Replace couple of raw sql queries with query builder
+	* Chg: Partially revert switch.php and ProcessReleases class
+	* Chg: Update laravel/telescope (v2.0.1 => v2.0.2)
+	* Chg: Add false to Collection model timestamps
+	* Chg: Update switch.php and ProcessReleases, remove processing of releases and collectgions per group
+	* Chg: Update ProcessReleases class collections cleaning and deletion
+2019-03-05 DariusIII
+	* Chg: Update spatie/laravel-permission (2.36.0 => 2.36.1)
+	* Chg: Update laravel/framework (v5.8.2 => v5.8.3)
+	* Chg: Update laravel/telescope (v2.0 => v2.0.1)
+	* Chg: Update barryvdh/laravel-ide-helper (v2.6.0 => v2.6.1)
+	* Chg: Update usage of getRawHtml as it returns json decoded data if response is valid json
+	* Chg: Remove getUrl function from Utility class, function is not used anywhere anymore, getRawHtml replaced it
+	* Chg: Update tinyMCE to version 5.0.2
+	* Chg: Update package.json with new version of tinyMCE
+2019-03-04 DariusIII
+	* Chg: Update spatie/laravel-permission (2.35.0 => 2.36.0)
+	* Chg: Fix regex in sortNZB function of PPA class
+	* Chg: Log errors in getRawHtml function only if debug is enabled
+	* Chg: Update dariusiii/rarinfo (v2.7.2 => v2.7.3)
+	* Chg: Update regexes for php7.3
+	* Chg: Update Forking class
+	* Chg: Update switch.php
+	* Chg: Reduce number of retries for transactions in ProcessReleases from 10 to 3
+	* Chg: Update voku/simple_html_dom (4.3.2 => 4.3.3)
+	* Chg: Revert changes in calling artisan commands
+	* Chg: Update mysql database connection in config/database.php
+	* Fix: Fix maintenance mode check in UpdateNNTmux console command
+	* Chg: Update voku/simple_html_dom (4.3.1 => 4.3.2)
+2019-03-03 DariusIII
+	* Chg: Update symfony components remove unused trait
+	* Chg: Update console commands
+2019-03-02 DariusIII
+	* Chg: Update code style on AniDB processing class
+	* Chg: Update code style of adult processing classes
+	* Chg: Update code style of tv processing classes
+	* Chg: Update package.json
+	* Chg: Once again use original ytake/laravel-smarty and laravelcollective/html packages
+2019-03-01 DariusIII
+	* Chg: Update spatie/laravel-permission (2.34.0 => 2.35.0)
+	* Chg: Update PPA class
+	* Chg: Remove unused parts of fixtures and seeders
+	* Chg: Update nesbot/carbon (2.14.1 => 2.14.2)
+	* Chg: Add back jrean/laravel-user-verification and remove customized fork
+2019-02-28 DariusIII
+	* Chg: Update laravel/horizon (v2.2.2 => v3.0.0)
+	* Chg: Add package to support postmark to send emails
+	* Chg: Reduce maximum number of compressed files checked in PPA to 10
+	* Fix: Cast Category constants to string in Blacklight/http/API.php to prevent strpos errors
+	* Chg: Update laravel/framework to 5.8.2, use forks of packages used untill they add support for laravel 5.8
+	* Chg: Update spatie/laravel-directory-cleanup (1.2.3 => 1.2.4)
+	* Chg: Update voku/simple_html_dom (4.2.1 => 4.3.1)
+	* Chg: Update all the regexes to work with php7.3
+2019-02-27 DariusIII
+	* Chg: Update spatie/laravel-fractal (5.4.4 => 5.5.0)
+	* Chg: Update laravel/telescope (v1.0.13 => v1.1)
+	* Chg: Use compact where possible in ForumController
+	* Chg: Add tmux-ui:restart command to restart tmux scripts
+	* Chg: Remove now unused libraries
+	* Chg: Update used libraries to their latest versions
+2019-02-26 DariusIII
+	* Chg: Update config files for laravel 5.8 changes
+	* Chg: Fix return declarations in multiple controllers
+	* Chg: Update used libraries to their latest versions
+	* Chg: Update isPcGame function categorization regex
+2019-02-25 DariusIII
+	* Fix: Fix Releases class instantiation
+	* Chg: Releases class now extends Release model
+	* Fix: Fix RSS feed URLs in template files
+	* Fix: Properly handle rss feeds
+	* Fix: Fix rss routing, remove dead routes from web.php
+	* Chg: Update canihavesomecoffee/thetvdbapi (1.0.9 => 1.1.0)
+2019-02-24 DariusIII
+	* Chg: Refactor RSS feeds
+	* Chg: Move rss routes to their own route file
+	* Chg: Move RSS route out of authentification
+	* Chg: Change routes handling for api and rss
+2019-02-22 DariusIII
+	* Chg: Update middleware in routes/web.php
+	* Chg: Update opis/closure (3.1.5 => 3.1.6)
+	* Chg: Update package.json with new version of Vue
+	* Chg: Update laravel/horizon (v2.2.1 => v2.2.2)
+	* Chg: Update inactive account removal code
 2019-02-21 DariusIII
+	* Chg: Move user role assignment on registration to UserServiceObserver
+	* Chg: Update ocramius/package-versions to version 1.4.0
+	* Chg: Update tinymce to version 5.0.1
+	* Chg: Purge accounts that have not logged in and don't have api access for more than 6 months, daily
+	* Fix: Fix getAlternate function error when there is no similar release match
 	* Chg: Add switch to enable full telescope reporting in production
 	* Chg: Update admin menu with link to laravel horizon
 	* Chg: Add laravel telescope migration

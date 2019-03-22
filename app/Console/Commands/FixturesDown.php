@@ -12,6 +12,7 @@ class FixturesDown extends Command
      */
     private static $allowedTables = [
         'binaryblacklist',
+        'root_categories',
         'categories',
         'category_regexes',
         'collection_regexes',
@@ -20,7 +21,6 @@ class FixturesDown extends Command
         'menu',
         'release_naming_regexes',
         'settings',
-        'tmux',
     ];
     /**
      * The name and signature of the console command.
@@ -38,14 +38,14 @@ class FixturesDown extends Command
     Tables that are supported are :
     no option argument <= Truncates all the tables listed below
     binaryblacklist
+    root_categories
     categories
     category_regexes
     collection_regexes
     content
     usenet_groups
     release_naming_regexes
-    settings
-    tmux';
+    settings';
 
     /**
      * Create a new command instance.
