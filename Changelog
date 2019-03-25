@@ -1,3 +1,5 @@
+2019-03-25 DariusIII
+	* Chg: Update Forking class to use spatie/async
 2019-03-22 DariusIII
 	* Chg: Add spatie/async
 	* Chg: Update symfony components
