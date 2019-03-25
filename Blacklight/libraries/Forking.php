@@ -159,7 +159,6 @@ class Forking
         // Get work to fork.
         $this->getWork();
 
-
         // Process extra work that should not be forked and done after.
         $this->processEndWork();
 
@@ -924,7 +923,7 @@ class Forking
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Execute a shell command
+     * Execute a shell command.
      *
      * @param string $command
      */
@@ -955,7 +954,7 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.(- 1).' process(es) still active with '.
+                    'There are '.(-1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.',
                 true
                 );
