@@ -42,7 +42,7 @@ class ForkingImportNZB extends Forking
     public function __construct()
     {
         parent::__construct();
-        $this->importPath = (PHP_BINARY.' '.NN_MISC.'testing'.DS.'nzb-import.php ');
+        $this->importPath = 'php misc/testing/nzb-import.php ';
     }
 
     /**
@@ -77,25 +77,18 @@ class ForkingImportNZB extends Forking
         $this->useFileName = $useFileName;
         $this->maxPerProcess = $maxPerProcess;
 
-        $this->max_children_set($maxProcesses);
-        $this->register_child_run([0 => $this, 1 => 'importChildWorker']);
-        $this->child_max_run_time_set(86400);
-        $this->addwork($directories);
-        $this->process_work(true);
-
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                    'Multi-processing for import finished in '.(now()->timestamp - $startTime).
-                    ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
+                'Multi-processing for import finished in '.(now()->timestamp - $startTime).
+                    ' seconds at '.now()->toDayDateTimeString().'.'.PHP_EOL
                 );
         }
     }
 
     /**
-     * @param        $directories
-     * @param string $identifier
+     * @param $directories
      */
-    public function importChildWorker($directories, $identifier = '')
+    public function importChildWorker($directories)
     {
         foreach ($directories as $directory) {
             $this->_executeCommand(

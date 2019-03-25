@@ -115,38 +115,16 @@ class Forking
     private $processTV = false; // Should we process TV?
 
     /**
-     * @var \Spatie\Async\Pool
-     */
-    private $pool;
-
-    /**
      * Setup required parent / self vars.
      *
      * @throws \Exception
      */
     public function __construct()
     {
+        \Opis\Closure\SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI();
 
-        if (\defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
-            switch (NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE) {
-                case 0:
-                    $this->outputType = self::OUTPUT_NONE;
-                    break;
-                case 1:
-                    $this->outputType = self::OUTPUT_REALTIME;
-                    break;
-                case 2:
-                    $this->outputType = self::OUTPUT_SERIALLY;
-                    break;
-                default:
-                    $this->outputType = self::OUTPUT_REALTIME;
-            }
-        } else {
-            $this->outputType = self::OUTPUT_REALTIME;
-        }
-
-        $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run/switch.php "php  ';
+        $this->dnr_path = 'php misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -175,11 +153,12 @@ class Forking
         // Process extra work that should not be forked and done before forking.
         $this->processStartWork();
 
+        // Process the work we got.
+        $this->processWork();
+
         // Get work to fork.
         $this->getWork();
 
-        // Process the work we got.
-        $this->processWork();
 
         // Process extra work that should not be forked and done after.
         $this->processEndWork();
@@ -187,7 +166,7 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
-                    ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
+                    ' seconds at '.now()->toDayDateTimeString().'.'.PHP_EOL
                 );
         }
     }
@@ -294,9 +273,7 @@ class Forking
         switch ($this->workType) {
             case 'safe_backfill':
             case 'safe_binaries':
-                $this->_executeCommand(
-                    PHP_BINARY.' '.NN_UPDATE.'tmux/bin/update_groups.php'
-                );
+                    $this->_executeCommand('php misc/update/tmux/bin/update_groups.php');
                 break;
         }
     }
@@ -308,14 +285,13 @@ class Forking
     {
         switch ($this->workType) {
             case 'releases':
-                $this->_executeCommand(
-                    $this->dnr_path.'releases  '.\count($this->work).'_"'
-                );
+
+                $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
+
                 break;
             case 'update_per_group':
-                $this->_executeCommand(
-                    $this->dnr_path.'releases  '.\count($this->work).'_"'
-                );
+                $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
+
                 break;
         }
     }
@@ -337,16 +313,18 @@ class Forking
             )
         );
 
-        $pool = Pool::create();
-        $pool->concurrency((int) Settings::settingValue('..backfillthreads'));
+        $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'));
 
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand(PHP_BINARY.' '.NN_UPDATE.'backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
+                $this->_executeCommand('php misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
+            })->then(function () use ($pool) {
+                echo $pool->notify();
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
         }
+        $pool->wait();
     }
 
 
@@ -427,19 +405,19 @@ class Forking
                 $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
 
-            $pool = Pool::create();
-            $pool->concurrency((int) Settings::settingValue('..backfillthreads'));
+            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->status();
 
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
-                    $this->_executeCommand(
-                        $this->dnr_path.$queue.'"'
-                    );
+                    $this->_executeCommand($this->dnr_path.$queue.'"');
+                })->then(function () use ($pool) {
+                    echo $pool->status();
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
             }
         }
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,18 +436,19 @@ class Forking
             )
         );
 
-        $pool = Pool::create();
-        $pool->concurrency((int) Settings::settingValue('..binarythreads'));
+        $pool = Pool::create()->concurrency((int) Settings::settingValue('..binarythreads'));
 
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand(
-                    PHP_BINARY.' '.NN_UPDATE.'update_binaries.php '.$group->name.' '.$group->max
-                );
-            })->catch(function (Throwable $exception) {
-                // Handle exception
+                $this->_executeCommand('php misc/update/update_binaries.php '.$group->name.' '.$group->max);
+            })->then(function () use ($pool) {
+                echo $pool->status();
+            })->catch(function (\Throwable $exception) {
+                echo $exception->getMessage();
             });
         }
+
+        $pool->wait();
     }
 
     /**
@@ -526,13 +505,15 @@ class Forking
 
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
-                    $this->_executeCommand(
-                        $this->dnr_path.$queue.'"'
-                    );
+                    $this->_executeCommand($this->dnr_path.$queue.'"');
+                })->then(function () use ($pool) {
+                    echo $pool->status();
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
             }
+
+            $pool->wait();
         }
     }
 
@@ -588,13 +569,14 @@ class Forking
 
         foreach ($queues as $queue) {
             $pool->add(function () use ($queue) {
-                $this->_executeCommand(
-                    PHP_BINARY.' '.NN_UPDATE.'tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true'
-                );
+                $this->_executeCommand('php misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
+            })->then(function () use ($pool) {
+                echo $pool->status();
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
         }
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -625,10 +607,14 @@ class Forking
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
+            })->then(function () use ($pool) {
+                echo $pool->status();
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
         }
+
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -659,11 +645,14 @@ class Forking
             if ($type !== '') {
                 $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
+                })->then(function () use ($pool) {
+                    echo $pool->status();
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
             }
         }
+        $pool->wait();
     }
 
     private $ppAddMinSize;
@@ -929,13 +918,15 @@ class Forking
         $pool->concurrency($maxProcess);
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand(
-                        $this->dnr_path.'update_per_group  '.$group->id.'"'
-                    );
+                $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
+            })->then(function () use ($pool) {
+                echo $pool->status();
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
         }
+
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -943,23 +934,13 @@ class Forking
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Execute a shell command, use the appropriate PHP function based on user setting.
+     * Execute a shell command
      *
      * @param string $command
      */
     protected function _executeCommand($command)
     {
-        switch ($this->outputType) {
-            case self::OUTPUT_NONE:
-                exec($command);
-                break;
-            case self::OUTPUT_REALTIME:
-                passthru($command);
-                break;
-            case self::OUTPUT_SERIALLY:
-                echo shell_exec($command);
-                break;
-        }
+        echo shell_exec($command);
     }
 
     /**
@@ -978,14 +959,13 @@ class Forking
      * This method is executed whenever a child is finished doing work.
      *
      * @param string $pid        The PID numbers.
-     * @param string $identifier Optional identifier to give a PID a name.
      */
     public function childExit($pid)
     {
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.($this->forked_children_count - 1).' process(es) still active with '.
+                    'There are '.(- 1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.',
                 true
                 );
