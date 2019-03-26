@@ -2,6 +2,8 @@
 
 namespace Blacklight\libraries;
 
+
+use Spatie\Async\Pool;
 /**
  * Class ForkingImportNZB.
  *
@@ -42,7 +44,7 @@ class ForkingImportNZB extends Forking
     public function __construct()
     {
         parent::__construct();
-        $this->importPath = 'php misc/testing/nzb-import.php ';
+        $this->importPath = 'misc/testing/nzb-import.php ';
     }
 
     /**
