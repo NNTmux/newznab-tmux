@@ -22,7 +22,7 @@
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^5.8.0",
+        "@fortawesome/fontawesome-free": "^5.8.1",
         "animate.css": "^3.7.0",
         "autosize": "^4.0.2",
         "bootstrap": "^4.3.1",
@@ -41,7 +41,7 @@
         "multiselect": "^0.9.12",
         "nonblockjs": "^1.0.8",
         "normalize.css": "^8.0.1",
-        "npm-check-updates": "^3.1.1",
+        "npm-check-updates": "^3.1.2",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0-beta.2",
         "tinymce": "^5.0.3"
