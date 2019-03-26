@@ -2,8 +2,8 @@
 
 namespace Blacklight\libraries;
 
-
 use Spatie\Async\Pool;
+
 /**
  * Class ForkingImportNZB.
  *
