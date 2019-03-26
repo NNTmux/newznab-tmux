@@ -251,13 +251,11 @@ class Forking
     private function processWork()
     {
         $this->_workCount = \count($this->work);
-        if ($this->_workCount > 0) {
-            if (config('nntmux.echocli') === true) {
-                $this->colorCli->header(
-                    'Multi-processing started at '.now()->toDayDateTimeString().' for '.$this->workType.' with '.$this->_workCount.
-                        ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
-                    );
-            }
+        if (($this->_workCount > 0) && config('nntmux.echocli') === true) {
+            $this->colorCli->header(
+                'Multi-processing started at '.now()->toDayDateTimeString().' for '.$this->workType.' with '.$this->_workCount.
+                    ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
+                );
         }
         if (empty($this->_workCount) && config('nntmux.echocli') === true) {
             $this->colorCli->header('No work to do!');
@@ -314,8 +312,8 @@ class Forking
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
-            })->then(function () use ($pool) {
-                echo $pool->notify();
+            })->then(function () use ($group) {
+                $this->colorCli->primary('Finished backfilling group '. $group->name.' in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -400,13 +398,13 @@ class Forking
                 $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
 
-            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->status();
+            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'));
 
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                })->then(function () use ($pool) {
-                    echo $pool->status();
+                })->then(function () use ($data) {
+                    $this->colorCli->primary('Finished backfilling group '. $data[0]->name.' in this cycle');
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -433,8 +431,8 @@ class Forking
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/update_binaries.php '.$group->name.' '.$group->max);
-            })->then(function () use ($pool) {
-                echo $pool->status();
+            })->then(function () use ($group) {
+                $this->colorCli->primary('Finished updating group '. $group->name.' in this cycle');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
@@ -491,14 +489,13 @@ class Forking
                     }
                 }
             }
-            $pool = Pool::create();
-            $pool->concurrency($threads);
+            $pool = Pool::create()->concurrency($threads);
 
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                })->then(function () use ($pool) {
-                    echo $pool->status();
+                })->then(function () use ($group) {
+                    $this->colorCli->primary('Finished updating group '. $group->name.' in this cycle');
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -554,14 +551,13 @@ class Forking
             }
         }
 
-        $pool = Pool::create();
-        $pool->concurrency($threads);
+        $pool = Pool::create()->concurrency($threads);
 
         foreach ($queues as $queue) {
             $pool->add(function () use ($queue) {
                 $this->_executeCommand('php misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
             })->then(function () use ($pool) {
-                echo $pool->status();
+                $this->colorCli->primary('Finished fixing releases names in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -575,13 +571,13 @@ class Forking
 
     private function releases()
     {
-        $this->work = $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = $groups = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
         $uGroups = [];
         foreach ($groups as $group) {
             try {
                 if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
-                    $uGroups[] = ['id' => $group->id];
+                    $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
                 if (config('app.debug' === true)) {
@@ -590,14 +586,13 @@ class Forking
             }
         }
 
-        $pool = Pool::create();
-        $pool->concurrency((int) Settings::settingValue('..releasethreads'));
+        $pool = Pool::create()->concurrency((int) Settings::settingValue('..releasethreads'));
 
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            })->then(function () use ($pool) {
-                echo $pool->status();
+            })->then(function () use ($group) {
+                $this->colorCli->primary('Finished processing releases for group '. $group['name'].' in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -628,14 +623,13 @@ class Forking
         } elseif ($this->processTV) {
             $type = 'pp_tv  ';
         }
-        $pool = Pool::create();
-        $pool->concurrency($maxProcess);
+        $pool = Pool::create()->concurrency($maxProcess);
         foreach ($groups as $group) {
             if ($type !== '') {
                 $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
-                })->then(function () use ($pool) {
-                    echo $pool->status();
+                })->then(function () use ($type) {
+                    $this->colorCli->primary('Finished '.$type.' postprocessing in this cycle');
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -899,17 +893,16 @@ class Forking
      */
     private function updatePerGroup()
     {
-        $this->work = $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = $groups = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
         $maxProcess = (int) Settings::settingValue('..releasethreads');
 
-        $pool = Pool::create();
-        $pool->concurrency($maxProcess);
+        $pool = Pool::create()->concurrency($maxProcess);
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
-            })->then(function () use ($pool) {
-                echo $pool->status();
+            })->then(function () use ($group) {
+                $this->colorCli->primary('Finished updating group '. $group->name.' in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -954,7 +947,7 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.(-1).' process(es) still active with '.
+                    'There are '.($this->maxProcesses -1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.',
                 true
                 );
