@@ -313,7 +313,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished backfilling group '. $group->name.' in this cycle');
+                $this->colorCli->primary('Finished backfilling group '.$group->name.' in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -404,7 +404,7 @@ class Forking
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($data) {
-                    $this->colorCli->primary('Finished backfilling group '. $data[0]->name.' in this cycle');
+                    $this->colorCli->primary('Finished backfilling group '.$data[0]->name.' in this cycle');
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -495,7 +495,7 @@ class Forking
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($group) {
-                    $this->colorCli->primary('Finished updating group '. $group->name.' in this cycle');
+                    $this->colorCli->primary('Finished updating group '.$group->name.' in this cycle');
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -592,7 +592,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished processing releases for group '. $group['name'].' in this cycle');
+                $this->colorCli->primary('Finished processing releases for group '.$group['name'].' in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -902,7 +902,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished updating group '. $group->name.' in this cycle');
+                $this->colorCli->primary('Finished updating group '.$group->name.' in this cycle');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -947,7 +947,7 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.($this->maxProcesses -1).' process(es) still active with '.
+                    'There are '.($this->maxProcesses - 1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.',
                 true
                 );
