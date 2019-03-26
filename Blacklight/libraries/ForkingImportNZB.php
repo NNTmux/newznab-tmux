@@ -67,7 +67,7 @@ class ForkingImportNZB extends Forking
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
+                'Multi-processing started at '.now()->toDayDateTimeString().' with '.$this->_workCount.
                 ' job(s) to do using a max of '.$maxProcesses.' child process(es).'
             );
         }
@@ -77,28 +77,29 @@ class ForkingImportNZB extends Forking
         $this->useFileName = $useFileName;
         $this->maxPerProcess = $maxPerProcess;
 
+        foreach ($directories as $directory) {
+            $pool = Pool::create();
+            $pool->concurrency($maxProcesses);
+            $pool->add(function () use ($directory) {
+                $this->importPath.'"'.
+                        $directory.'" '.
+                        $this->deleteComplete.' '.
+                        $this->deleteFailed.' '.
+                        $this->useFileName.' '.
+                        $this->maxPerProcess;
+            })->then(function () use ($pool) {
+                echo $pool->status();
+            })->catch(function (Throwable $exception) {
+                // Handle exception
+            });
+            $pool->wait();
+        }
+
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Multi-processing for import finished in '.(now()->timestamp - $startTime).
                     ' seconds at '.now()->toDayDateTimeString().'.'.PHP_EOL
                 );
-        }
-    }
-
-    /**
-     * @param $directories
-     */
-    public function importChildWorker($directories)
-    {
-        foreach ($directories as $directory) {
-            $this->_executeCommand(
-                $this->importPath.'"'.
-                $directory.'" '.
-                $this->deleteComplete.' '.
-                $this->deleteFailed.' '.
-                $this->useFileName.' '.
-                $this->maxPerProcess
-            );
         }
     }
 }
