@@ -432,7 +432,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished updating group '. $group->name.' in this cycle');
+                $this->colorCli->primary('Finished updating group '.$group->name ?? ''.' in this cycle');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
