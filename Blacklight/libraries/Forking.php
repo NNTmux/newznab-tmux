@@ -432,7 +432,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished updating group '.$group->name ?? ''.' in this cycle');
+                $this->colorCli->primary('Finished updating group '.$group->name.' in this cycle');
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
@@ -494,8 +494,8 @@ class Forking
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                })->then(function () use ($group) {
-                    $this->colorCli->primary('Finished updating group '.$group->name.' in this cycle');
+                })->then(function () use ($queue) {
+                    $this->colorCli->primary('Finished updating group in this cycle');
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
