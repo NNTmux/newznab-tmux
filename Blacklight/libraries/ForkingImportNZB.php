@@ -44,7 +44,7 @@ class ForkingImportNZB extends Forking
     public function __construct()
     {
         parent::__construct();
-        $this->importPath = 'misc/testing/nzb-import.php ';
+        $this->importPath = 'php misc/testing/nzb-import.php ';
     }
 
     /**
@@ -83,12 +83,14 @@ class ForkingImportNZB extends Forking
             $pool = Pool::create();
             $pool->concurrency($maxProcesses);
             $pool->add(function () use ($directory) {
-                $this->importPath.'"'.
-                        $directory.'" '.
-                        $this->deleteComplete.' '.
-                        $this->deleteFailed.' '.
-                        $this->useFileName.' '.
-                        $this->maxPerProcess;
+                $this->_executeCommand(
+                    $this->importPath.'"'.
+                    $directory.'" '.
+                    $this->deleteComplete.' '.
+                    $this->deleteFailed.' '.
+                    $this->useFileName.' '.
+                    $this->maxPerProcess
+                );
             })->then(function () use ($pool) {
                 echo $pool->status();
             })->catch(function (Throwable $exception) {
