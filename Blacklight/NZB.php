@@ -157,7 +157,7 @@ class NZB
         $XMLWriter->startElement('head');
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'category');
-        $XMLWriter->text($release->category->parent->title.' >'.$release->category->title);
+        $XMLWriter->text(! empty($release->category->parent) ? $release->category->parent->title.' >'.$release->category->title : 'Other > Misc');
         $XMLWriter->endElement();
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'name');
