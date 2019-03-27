@@ -121,7 +121,7 @@ class Forking
         \Opis\Closure\SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI();
 
-        $this->dnr_path = 'php misc/update/multiprocessing/.do_not_run/switch.php "php  ';
+        $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -267,7 +267,7 @@ class Forking
         switch ($this->workType) {
             case 'safe_backfill':
             case 'safe_binaries':
-                    $this->_executeCommand('php misc/update/tmux/bin/update_groups.php');
+                    $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
                 break;
         }
     }
@@ -308,7 +308,7 @@ class Forking
 
         foreach ($groups as $group) {
             $pool->add(function () use ($group) {
-                $this->_executeCommand('php misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
+                $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
             })->then(function () use ($group) {
                 $this->colorCli->primary('Backfilled group '.$group->name);
             })->catch(function (Throwable $exception) {
@@ -427,7 +427,7 @@ class Forking
 
         foreach ($groups as $group) {
             $work = $pool->add(function () use ($group) {
-                $this->_executeCommand('php misc/update/update_binaries.php '.$group->name.' '.$group->max);
+                $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
                 $this->colorCli->primary('Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
@@ -555,7 +555,7 @@ class Forking
 
         foreach ($queues as $queue) {
             $pool->add(function () use ($queue) {
-                $this->_executeCommand('php misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
+                $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
             })->then(function () use ($pool) {
                 $this->colorCli->primary('Finished fixing releases names');
             })->catch(function (Throwable $exception) {

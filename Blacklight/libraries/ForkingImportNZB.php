@@ -44,7 +44,7 @@ class ForkingImportNZB extends Forking
     public function __construct()
     {
         parent::__construct();
-        $this->importPath = 'php misc/testing/nzb-import.php ';
+        $this->importPath = PHP_BINARY.' misc/testing/nzb-import.php ';
     }
 
     /**
