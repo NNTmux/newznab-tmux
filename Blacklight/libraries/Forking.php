@@ -311,7 +311,7 @@ class Forking
                 $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
             })->then(function () use ($group) {
                 $this->colorCli->primary('Backfilled group '.$group->name);
-            })->catch(function (Throwable $exception) {
+            })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
         }
@@ -402,7 +402,7 @@ class Forking
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($data) {
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
-                })->catch(function (Throwable $exception) {
+                })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
             }
@@ -496,7 +496,7 @@ class Forking
                     if (! empty($match)) {
                         $this->colorCli->primary('Updated group '.$match[0]);
                     }
-                })->catch(function (Throwable $exception) {
+                })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
             }
@@ -558,7 +558,7 @@ class Forking
                 $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
             })->then(function () use ($pool) {
                 $this->colorCli->primary('Finished fixing releases names');
-            })->catch(function (Throwable $exception) {
+            })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
         }
@@ -593,7 +593,7 @@ class Forking
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
             })->then(function () use ($group) {
                 $this->colorCli->primary('Finished creating releases, creating nzbs and deleting parts, binaries, collections for group: '.$group['name']);
-            })->catch(function (Throwable $exception) {
+            })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
         }
@@ -635,7 +635,7 @@ class Forking
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
                 })->then(function () use ($desc, $group) {
                     $this->colorCli->primary('['.$group->releaseId.'] Finished '.$desc);
-                })->catch(function (Throwable $exception) {
+                })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
             }
@@ -909,7 +909,7 @@ class Forking
             })->then(function () use ($group) {
                 $name = UsenetGroup::getNameByID($group->id);
                 $this->colorCli->primary('Finished updating, group, releases and additional postprocessing for group:'.$name);
-            })->catch(function (Throwable $exception) {
+            })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
         }
