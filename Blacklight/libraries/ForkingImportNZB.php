@@ -80,8 +80,7 @@ class ForkingImportNZB extends Forking
         $this->maxPerProcess = $maxPerProcess;
 
         foreach ($directories as $directory) {
-            $pool = Pool::create();
-            $pool->concurrency($maxProcesses);
+            $pool = Pool::create()->concurrency($maxProcesses)->timeout(3600);
             $pool->add(function () use ($directory) {
                 $this->_executeCommand(
                     $this->importPath.'"'.
@@ -91,8 +90,8 @@ class ForkingImportNZB extends Forking
                     $this->useFileName.' '.
                     $this->maxPerProcess
                 );
-            })->then(function () use ($pool) {
-                echo $pool->status();
+            })->then(function () {
+                $this->colorCli->header('Finished importing new nzbs', true);
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
