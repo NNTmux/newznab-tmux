@@ -2,6 +2,7 @@
 
 namespace Blacklight\libraries;
 
+use App\Models\UsenetGroup;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
@@ -23,10 +24,6 @@ use Blacklight\processing\PostProcess;
  */
 class Forking
 {
-    private const OUTPUT_NONE = 0; // Don't display child output.
-    private const OUTPUT_REALTIME = 1; // Display child output in real time.
-    private const OUTPUT_SERIALLY = 2; // Display child output when child is done.
-
     /**
      * @var \Blacklight\ColorCLI
      */
@@ -263,7 +260,7 @@ class Forking
     }
 
     /**
-     * Process any work that does not need to be forked, but needs to run at the end.
+     * Process any work that does not need to be forked, but needs to run at the start.
      */
     private function processStartWork()
     {
@@ -313,7 +310,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished backfilling group '.$group->name.' in this cycle');
+                $this->colorCli->primary('Backfilled group '.$group->name);
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -404,7 +401,7 @@ class Forking
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($data) {
-                    $this->colorCli->primary('Finished backfilling group '.$data[0]->name.' in this cycle');
+                    $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -429,10 +426,10 @@ class Forking
         $pool = Pool::create()->concurrency((int) Settings::settingValue('..binarythreads'));
 
         foreach ($groups as $group) {
-            $pool->add(function () use ($group) {
+            $work = $pool->add(function () use ($group) {
                 $this->_executeCommand('php misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished updating group '.$group->name.' in this cycle');
+                $this->colorCli->primary('Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
@@ -492,10 +489,11 @@ class Forking
             $pool = Pool::create()->concurrency($threads);
 
             foreach ($queues as $queue) {
+                preg_match('/alt\..+/i', $queue, $match);
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
-                })->then(function () use ($queue) {
-                    $this->colorCli->primary('Finished updating group in this cycle');
+                })->then(function () use ($match) {
+                    $this->colorCli->primary('Updated group '.$match[0]);
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -557,7 +555,7 @@ class Forking
             $pool->add(function () use ($queue) {
                 $this->_executeCommand('php misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
             })->then(function () use ($pool) {
-                $this->colorCli->primary('Finished fixing releases names in this cycle');
+                $this->colorCli->primary('Finished fixing releases names');
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -592,7 +590,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished processing releases for group '.$group['name'].' in this cycle');
+                $this->colorCli->primary('Finished creating releases, creating nzbs and deleting parts, binaries, collections for group: '.$group['name']);
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -610,26 +608,31 @@ class Forking
      *
      *
      * @param array $groups
+     * @param int   $maxProcess
      */
     public function postProcess($groups, $maxProcess)
     {
-        $type = '';
+        $type = $desc = '';
         if ($this->processAdditional) {
             $type = 'pp_additional  ';
+            $desc = 'additional postprocessing';
         } elseif ($this->processNFO) {
             $type = 'pp_nfo  ';
+            $desc = 'nfo postprocessing';
         } elseif ($this->processMovies) {
             $type = 'pp_movie  ';
+            $desc = 'movies postprocessing';
         } elseif ($this->processTV) {
             $type = 'pp_tv  ';
+            $desc = 'tv postprocessing';
         }
         $pool = Pool::create()->concurrency($maxProcess);
         foreach ($groups as $group) {
             if ($type !== '') {
                 $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
-                })->then(function () use ($type) {
-                    $this->colorCli->primary('Finished '.$type.' postprocessing in this cycle');
+                })->then(function () use ($desc, $group) {
+                    $this->colorCli->primary('['.$group->releaseId.'] Finished '.$desc);
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -678,7 +681,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT leftguid AS id
+					SELECT r.id AS releaseId, r.leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
@@ -686,7 +689,7 @@ class Forking
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					GROUP BY leftguid
+					GROUP BY r.leftguid
 					LIMIT 16',
                     NZB::NZB_ADDED,
                     $this->ppAddMaxSize,
@@ -902,7 +905,8 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
             })->then(function () use ($group) {
-                $this->colorCli->primary('Finished updating group '.$group->name.' in this cycle');
+                $name = UsenetGroup::getNameByID($group->id);
+                $this->colorCli->primary('Finished updating, group, releases and additional postprocessing for group:'.$name);
             })->catch(function (Throwable $exception) {
                 // Handle exception
             });
@@ -942,7 +946,7 @@ class Forking
      *
      * @param string $pid        The PID numbers.
      */
-    public function childExit($pid)
+    public function exit($pid)
     {
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
