@@ -1,4 +1,5 @@
 2019-03-27 DariusIII
+	* Fix: Fix queries for nfo, tv and movies postprocessing
 	* Chg: Update returned messages after thread is finished
 2019-03-26 DariusIII
 	* Chg: Update ForkingImportNZB

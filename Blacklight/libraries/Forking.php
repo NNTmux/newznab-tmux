@@ -732,8 +732,8 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT leftguid AS id
-					FROM releases r
+					SELECT id AS releaseId, leftguid AS id
+					FROM releases
 					WHERE 1=1 %s
 					GROUP BY leftguid
 					LIMIT 16',
@@ -777,7 +777,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT leftguid AS id, %d AS renamed
+					SELECT id AS releaseId, leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE categories_id BETWEEN 5000 AND 5999
 					AND nzbstatus = %d
@@ -830,7 +830,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT leftguid AS id, %d AS renamed
+					SELECT id AS releaseId, leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE categories_id BETWEEN 3000 AND 3999
 					AND nzbstatus = %d
