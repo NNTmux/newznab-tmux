@@ -493,7 +493,9 @@ class Forking
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($match) {
-                    $this->colorCli->primary('Updated group '.$match[0]);
+                    if (! empty($match)) {
+                        $this->colorCli->primary('Updated group '.$match[0]);
+                    }
                 })->catch(function (Throwable $exception) {
                     // Handle exception
                 });
@@ -732,10 +734,10 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT id AS releaseId, leftguid AS id
-					FROM releases
+					SELECT r.id AS releaseId, r.leftguid AS id
+					FROM releases r
 					WHERE 1=1 %s
-					GROUP BY leftguid
+					GROUP BY r.leftguid
 					LIMIT 16',
                     $this->nfoQueryString
                 )

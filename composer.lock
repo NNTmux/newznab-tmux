@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f20db5e7752e093b517a3f941d72279",
+    "content-hash": "81ed623ed34b3238606d6ae04bf4accf",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -207,42 +207,6 @@
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
             "time": "2017-08-27T15:14:06+00:00"
-        },
-        {
-            "name": "barracudanetworks/forkdaemon-php",
-            "version": "v1.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/barracudanetworks/forkdaemon-php.git",
-                "reference": "16c068748ce170ab167f288b116ac0d105f6185d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/16c068748ce170ab167f288b116ac0d105f6185d",
-                "reference": "16c068748ce170ab167f288b116ac0d105f6185d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "fork_daemon.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A library to make setup and management of forking daemons in PHP easy.",
-            "homepage": "https://github.com/barracudanetworks/forkdaemon-php",
-            "keywords": [
-                "daemons",
-                "forking",
-                "php"
-            ],
-            "time": "2018-09-11T14:29:03+00:00"
         },
         {
             "name": "bhuvidya/laravel-countries",
