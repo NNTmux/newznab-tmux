@@ -1,4 +1,5 @@
 2019-03-27 DariusIII
+	* Chg: Remove $groups assignment from queries and use $this->work
 	* Chg: Switch back to using PHP_BINARY in Forking in place of php
 	* Fix: Fix queries for nfo, tv and movies postprocessing
 	* Chg: Update returned messages after thread is finished

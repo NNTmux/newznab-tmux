@@ -248,7 +248,7 @@ class Forking
     private function processWork()
     {
         $this->_workCount = \count($this->work);
-        if (($this->_workCount > 0) && config('nntmux.echocli') === true) {
+        if ($this->_workCount > 0 && config('nntmux.echocli') === true) {
             $this->colorCli->header(
                 'Multi-processing started at '.now()->toDayDateTimeString().' for '.$this->workType.' with '.$this->_workCount.
                     ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
@@ -416,7 +416,7 @@ class Forking
 
     private function binaries()
     {
-        $this->work = $groups = DB::select(
+        $this->work = DB::select(
             sprintf(
                 'SELECT name, %d AS max FROM usenet_groups WHERE active = 1',
                 $this->workTypeOptions[0]
@@ -425,8 +425,8 @@ class Forking
 
         $pool = Pool::create()->concurrency((int) Settings::settingValue('..binarythreads'));
 
-        foreach ($groups as $group) {
-            $work = $pool->add(function () use ($group) {
+        foreach ($this->work as $group) {
+            $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
                 $this->colorCli->primary('Updated group '.$group->name);
@@ -447,7 +447,7 @@ class Forking
         $maxmssgs = (int) Settings::settingValue('..maxmssgs');
         $threads = (int) Settings::settingValue('..binarythreads');
 
-        $this->work = $groups = DB::select(
+        $this->work = DB::select(
             '
 			SELECT g.name AS groupname, g.last_record AS our_last,
 				a.last_record AS their_last
@@ -456,10 +456,10 @@ class Forking
 			ORDER BY a.last_record DESC'
         );
 
-        if (! empty($groups)) {
+        if (! empty($this->work)) {
             $i = 1;
             $queues = [];
-            foreach ($groups as $group) {
+            foreach ($this->work as $group) {
                 if ((int) $group->our_last === 0) {
                     $queues[$i] = sprintf('update_group_headers  %s', $group->groupname);
                     $i++;
@@ -571,16 +571,16 @@ class Forking
 
     private function releases()
     {
-        $this->work = $groups = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
         $uGroups = [];
-        foreach ($groups as $group) {
+        foreach ($this->work as $group) {
             try {
                 if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
                     $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
-                if (config('app.debug' === true)) {
+                if (config('app.debug') === true) {
                     Log::debug($e->getMessage());
                 }
             }
@@ -898,12 +898,12 @@ class Forking
      */
     private function updatePerGroup()
     {
-        $this->work = $groups = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
         $maxProcess = (int) Settings::settingValue('..releasethreads');
 
         $pool = Pool::create()->concurrency($maxProcess);
-        foreach ($groups as $group) {
+        foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
             })->then(function () use ($group) {
