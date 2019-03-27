@@ -150,9 +150,6 @@ class Forking
         // Process extra work that should not be forked and done before forking.
         $this->processStartWork();
 
-        // Process the work we got.
-        $this->processWork();
-
         // Get work to fork.
         $this->getWork();
 
@@ -397,6 +394,7 @@ class Forking
 
             $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'));
 
+            $this->processWork();
             foreach ($queues as $queue) {
                 $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
@@ -425,6 +423,7 @@ class Forking
 
         $pool = Pool::create()->concurrency((int) Settings::settingValue('..binarythreads'));
 
+        $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
@@ -488,6 +487,7 @@ class Forking
             }
             $pool = Pool::create()->concurrency($threads);
 
+            $this->processWork();
             foreach ($queues as $queue) {
                 preg_match('/alt\..+/i', $queue, $match);
                 $pool->add(function () use ($queue) {
@@ -588,6 +588,7 @@ class Forking
 
         $pool = Pool::create()->concurrency((int) Settings::settingValue('..releasethreads'));
 
+        $this->processWork();
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
@@ -629,6 +630,7 @@ class Forking
             $desc = 'tv postprocessing';
         }
         $pool = Pool::create()->concurrency($maxProcess);
+        $this->processWork();
         foreach ($groups as $group) {
             if ($type !== '') {
                 $pool->add(function () use ($group, $type) {
@@ -903,6 +905,7 @@ class Forking
         $maxProcess = (int) Settings::settingValue('..releasethreads');
 
         $pool = Pool::create()->concurrency($maxProcess);
+        $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
