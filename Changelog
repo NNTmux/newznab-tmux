@@ -1,4 +1,5 @@
 2019-03-28 DariusIII
+	* Chg: Separate PPA from rest of the postprocessing
 	* Chg: Adjust output messages for binaries and releases processing
 	* Chg: Revert all but PPA to older behaviour
 2019-03-27 DariusIII

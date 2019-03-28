@@ -646,16 +646,27 @@ class Forking
             $desc = 'tv postprocessing';
         }
         $pool = Pool::create()->concurrency($maxProcess);
+        $count = \count($groups);
         $this->processWork();
         foreach ($groups as $group) {
-            if ($type !== '') {
-                $pid = $pool->add(function () use ($group, $type) {
+            if ($type !== '' && $type !== 'pp_additional  ') {
+                $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
-                })->then(function () use ($desc) {
-                    $this->colorCli->primary('Finished '.$desc);
+                })->then(function () use ($desc, $count) {
+                    $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
+                --$count;
+            } elseif ($type !== '' && $type === 'pp_additional  ') {
+                $pid = $pool->add(function () use ($group, $type) {
+                    $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
+                })->then(function () use ($desc, $count) {
+                    $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
+                })->catch(function (\Throwable $exception) {
+                    // Handle exception
+                });
+                --$count;
                 $this->exit($pid->getPid());
                 $pool->wait();
             }
