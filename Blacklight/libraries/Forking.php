@@ -430,14 +430,13 @@ class Forking
 
         $this->processWork();
         foreach ($this->work as $group) {
-            $pid = $pool->add(function () use ($group) {
+            $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
                 $this->colorCli->primary('Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
-            $this->exit($pid->getPid());
         }
 
         $pool->wait();
@@ -496,7 +495,7 @@ class Forking
             $this->processWork();
             foreach ($queues as $queue) {
                 preg_match('/alt\..+/i', $queue, $match);
-                $pid = $pool->add(function () use ($queue) {
+                $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($match) {
                     if (! empty($match)) {
@@ -505,7 +504,6 @@ class Forking
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
-                $this->exit($pid->getPid());
             }
 
             $pool->wait();
