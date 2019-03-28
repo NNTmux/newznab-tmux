@@ -439,7 +439,6 @@ class Forking
                 echo $exception->getMessage();
             });
             $this->exit($pid->getPid());
-            $pool->wait();
         }
 
         $pool->wait();
@@ -524,10 +523,10 @@ class Forking
         $this->maxProcesses = (int) Settings::settingValue('..fixnamethreads');
         $maxperrun = (int) Settings::settingValue('..fixnamesperrun');
 
-        if ($threads > 16) {
-            $threads = 16;
-        } elseif ($threads === 0) {
-            $threads = 1;
+        if ($this->maxProcesses > 16) {
+            $this->maxProcesses = 16;
+        } elseif ($this->maxProcesses === 0) {
+            $this->maxProcesses = 1;
         }
 
         $leftGuids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
@@ -575,7 +574,6 @@ class Forking
                 // Handle exception
             });
             $this->exit($pid->getPid());
-            $pool->wait();
         }
         $pool->wait();
     }
@@ -606,15 +604,13 @@ class Forking
 
         $this->processWork();
         foreach ($uGroups as $group) {
-            $pid = $pool->add(function () use ($group) {
+            $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            })->then(function () use ($group) {
-                $this->colorCli->primary('Finished creating releases, creating nzbs and deleting parts, binaries, collections for group: '.$group['name']);
+            })->then(function () {
+                $this->colorCli->primary('Finished performing release processing task');
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
-            $this->exit($pid->getPid());
-            $pool->wait();
         }
 
         $pool->wait();
@@ -653,8 +649,8 @@ class Forking
             if ($type !== '') {
                 $pid = $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
-                })->then(function () use ($desc, $group) {
-                    $this->colorCli->primary('['.$group->releaseId.'] Finished '.$desc);
+                })->then(function () use ($desc) {
+                    $this->colorCli->primary('Finished '.$desc);
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
@@ -705,7 +701,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT r.id AS releaseId, r.leftguid AS id
+					SELECT r.leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
@@ -756,7 +752,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT r.id AS releaseId, r.leftguid AS id
+					SELECT r.leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
 					GROUP BY r.leftguid
@@ -801,7 +797,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT id AS releaseId, leftguid AS id, %d AS renamed
+					SELECT leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE categories_id BETWEEN 5000 AND 5999
 					AND nzbstatus = %d
@@ -854,7 +850,7 @@ class Forking
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT id AS releaseId, leftguid AS id, %d AS renamed
+					SELECT leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE categories_id BETWEEN 3000 AND 3999
 					AND nzbstatus = %d
