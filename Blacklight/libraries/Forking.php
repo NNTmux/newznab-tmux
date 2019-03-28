@@ -439,7 +439,7 @@ class Forking
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
-            --$maxWork;
+            $maxWork--;
         }
 
         $pool->wait();
@@ -612,7 +612,7 @@ class Forking
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
-            --$maxWork;
+            $maxWork--;
         }
 
         $pool->wait();
