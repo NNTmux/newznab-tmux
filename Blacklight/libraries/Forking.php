@@ -178,7 +178,7 @@ class Forking
      */
     private function getWork()
     {
-        $maxProcesses = 0;
+        $this->maxProcesses = 0;
 
         switch ($this->workType) {
 
@@ -294,7 +294,7 @@ class Forking
     private function backfill()
     {
         // The option for backFill is for doing up to x articles. Else it's done by date.
-        $groups = DB::select(
+        $this->work = DB::select(
             sprintf(
                 'SELECT name %s FROM usenet_groups WHERE backfill = 1',
                 ($this->workTypeOptions[0] === false ? '' : (', '.$this->workTypeOptions[0].' AS max'))
@@ -302,15 +302,17 @@ class Forking
         );
 
         $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'));
-
-        foreach ($groups as $group) {
-            $pool->add(function () use ($group) {
+        $this->processWork();
+        foreach ($this->work as $group) {
+            $pid = $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
             })->then(function () use ($group) {
                 $this->colorCli->primary('Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
+            $this->exit($pid->getPid());
+            $pool->wait();
         }
         $pool->wait();
     }
@@ -396,13 +398,15 @@ class Forking
 
             $this->processWork();
             foreach ($queues as $queue) {
-                $pool->add(function () use ($queue) {
+                $pid = $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($data) {
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
+                $this->exit($pid->getPid());
+                $pool->wait();
             }
         }
         $pool->wait();
@@ -421,17 +425,21 @@ class Forking
             )
         );
 
-        $pool = Pool::create()->concurrency((int) Settings::settingValue('..binarythreads'));
+        $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
+
+        $pool = Pool::create()->concurrency($this->maxProcesses);
 
         $this->processWork();
         foreach ($this->work as $group) {
-            $pool->add(function () use ($group) {
+            $pid = $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
             })->then(function () use ($group) {
                 $this->colorCli->primary('Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
+            $this->exit($pid->getPid());
+            $pool->wait();
         }
 
         $pool->wait();
@@ -444,7 +452,7 @@ class Forking
     {
         $maxheaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
         $maxmssgs = (int) Settings::settingValue('..maxmssgs');
-        $threads = (int) Settings::settingValue('..binarythreads');
+        $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
 
         $this->work = DB::select(
             '
@@ -485,12 +493,12 @@ class Forking
                     }
                 }
             }
-            $pool = Pool::create()->concurrency($threads);
+            $pool = Pool::create()->concurrency($this->maxProcesses);
 
             $this->processWork();
             foreach ($queues as $queue) {
                 preg_match('/alt\..+/i', $queue, $match);
-                $pool->add(function () use ($queue) {
+                $pid = $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($match) {
                     if (! empty($match)) {
@@ -499,6 +507,8 @@ class Forking
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
+                $this->exit($pid->getPid());
+                $pool->wait();
             }
 
             $pool->wait();
@@ -511,7 +521,7 @@ class Forking
 
     private function fixRelNames()
     {
-        $threads = (int) Settings::settingValue('..fixnamethreads');
+        $this->maxProcesses = (int) Settings::settingValue('..fixnamethreads');
         $maxperrun = (int) Settings::settingValue('..fixnamesperrun');
 
         if ($threads > 16) {
@@ -551,16 +561,21 @@ class Forking
             }
         }
 
-        $pool = Pool::create()->concurrency($threads);
+        $this->work = $queues;
 
-        foreach ($queues as $queue) {
-            $pool->add(function () use ($queue) {
+        $pool = Pool::create()->concurrency($this->maxProcesses);
+
+        $this->processWork();
+        foreach ($this->work as $queue) {
+            $pid = $pool->add(function () use ($queue) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
             })->then(function () use ($pool) {
                 $this->colorCli->primary('Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
+            $this->exit($pid->getPid());
+            $pool->wait();
         }
         $pool->wait();
     }
@@ -572,6 +587,7 @@ class Forking
     private function releases()
     {
         $this->work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
 
         $uGroups = [];
         foreach ($this->work as $group) {
@@ -586,17 +602,19 @@ class Forking
             }
         }
 
-        $pool = Pool::create()->concurrency((int) Settings::settingValue('..releasethreads'));
+        $pool = Pool::create()->concurrency($this->maxProcesses);
 
         $this->processWork();
         foreach ($uGroups as $group) {
-            $pool->add(function () use ($group) {
+            $pid = $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
             })->then(function () use ($group) {
                 $this->colorCli->primary('Finished creating releases, creating nzbs and deleting parts, binaries, collections for group: '.$group['name']);
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
+            $this->exit($pid->getPid());
+            $pool->wait();
         }
 
         $pool->wait();
@@ -633,13 +651,15 @@ class Forking
         $this->processWork();
         foreach ($groups as $group) {
             if ($type !== '') {
-                $pool->add(function () use ($group, $type) {
+                $pid = $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
                 })->then(function () use ($desc, $group) {
                     $this->colorCli->primary('['.$group->releaseId.'] Finished '.$desc);
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
+                $this->exit($pid->getPid());
+                $pool->wait();
             }
         }
         $pool->wait();
@@ -679,7 +699,7 @@ class Forking
      */
     private function postProcessAdd()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessAdditional()) {
             $this->processAdditional = true;
             $this->work = DB::select(
@@ -700,10 +720,10 @@ class Forking
                     $this->ppAddMinSize
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..postthreads');
+            $this->maxProcesses = (int) Settings::settingValue('..postthreads');
         }
 
-        $this->postProcess($this->work, $maxProcesses);
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     private $nfoQueryString = '';
@@ -730,7 +750,7 @@ class Forking
      */
     private function postProcessNfo()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessNfo()) {
             $this->processNFO = true;
             $this->work = DB::select(
@@ -744,10 +764,10 @@ class Forking
                     $this->nfoQueryString
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..nfothreads');
+            $this->maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
 
-        $this->postProcess($this->work, $maxProcesses);
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     /**
@@ -775,7 +795,7 @@ class Forking
      */
     private function postProcessMov()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessMovies()) {
             $this->processMovies = true;
             $this->work = DB::select(
@@ -795,10 +815,10 @@ class Forking
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..postthreadsnon');
+            $this->maxProcesses = (int) Settings::settingValue('..postthreadsnon');
         }
 
-        $this->postProcess($this->work, $maxProcesses);
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     /**
@@ -828,7 +848,7 @@ class Forking
      */
     private function postProcessTv()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessTV()) {
             $this->processTV = true;
             $this->work = DB::select(
@@ -849,10 +869,10 @@ class Forking
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..postthreadsnon');
+            $this->maxProcesses = (int) Settings::settingValue('..postthreadsnon');
         }
 
-        $this->postProcess($this->work, $maxProcesses);
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     /**
@@ -956,7 +976,7 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.($this->maxProcesses - 1).' process(es) still active with '.
+                    'There are '.($this->maxProcesses -1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.',
                 true
                 );
