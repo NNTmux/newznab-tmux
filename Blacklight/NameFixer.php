@@ -931,7 +931,7 @@ class NameFixer
                 $this->fixed++;
 
                 $newName = explode('\\', $newName);
-                $newName = preg_replace(['/^[\-=_\.:\s]+/', '/[\-=_\.:\s]+$/'], '', $newName[0]);
+                $newName = preg_replace(['/^[=_\.:\s-]+/', '/[=_\.:\s-]+$/'], '', $newName[0]);
 
                 if ($this->echooutput && $show) {
                     $groupName = UsenetGroup::getNameByID($release->groups_id);
