@@ -428,15 +428,18 @@ class Forking
 
         $pool = Pool::create()->concurrency($this->maxProcesses);
 
+        $maxWork = \count($this->work);
+
         $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
-            })->then(function () use ($group) {
-                $this->colorCli->primary('Updated group '.$group->name);
+            })->then(function () use ($group, $maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 echo $exception->getMessage();
             });
+            --$maxWork;
         }
 
         $pool->wait();
@@ -596,17 +599,20 @@ class Forking
             }
         }
 
+        $maxWork = \count($this->work);
+
         $pool = Pool::create()->concurrency($this->maxProcesses);
 
         $this->processWork();
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
-            })->then(function () {
-                $this->colorCli->primary('Finished performing release processing task');
+            })->then(function () use ($maxWork) {
+                $this->colorCli->primary('Finished performing release processing task #'.$maxWork);
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
+            --$maxWork;
         }
 
         $pool->wait();
