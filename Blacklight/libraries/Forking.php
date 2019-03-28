@@ -406,7 +406,6 @@ class Forking
                     // Handle exception
                 });
                 $this->exit($pid->getPid());
-                $pool->wait();
             }
         }
         $pool->wait();
@@ -507,7 +506,6 @@ class Forking
                     // Handle exception
                 });
                 $this->exit($pid->getPid());
-                $pool->wait();
             }
 
             $pool->wait();
