@@ -657,7 +657,7 @@ class Forking
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
-                --$count;
+                $count--;
             } elseif ($type !== '' && $type === 'pp_additional  ') {
                 $pid = $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
@@ -666,7 +666,7 @@ class Forking
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
-                --$count;
+                $count--;
                 $this->exit($pid->getPid());
                 $pool->wait();
             }
