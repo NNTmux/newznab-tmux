@@ -646,7 +646,7 @@ class Forking
             $type = 'pp_tv  ';
             $desc = 'tv postprocessing';
         }
-        $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(3600);
         $count = \count($groups);
         $this->processWork();
         foreach ($groups as $group) {
