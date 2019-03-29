@@ -1,3 +1,5 @@
+2019-03-29 DariusIII
+	* Chg: Add timeout to Forking class
 2019-03-28 DariusIII
 	* Chg: Separate PPA from rest of the postprocessing
 	* Chg: Adjust output messages for binaries and releases processing

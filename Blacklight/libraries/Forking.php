@@ -301,18 +301,18 @@ class Forking
             )
         );
 
-        $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'));
+        $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->timeout(1800);
         $this->processWork();
+        $maxWork = \count($this->work);
         foreach ($this->work as $group) {
-            $pid = $pool->add(function () use ($group) {
+            $pool->add(function () use ($group) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
-            })->then(function () use ($group) {
-                $this->colorCli->primary('Backfilled group '.$group->name);
+            })->then(function () use ($group, $maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
-            $this->exit($pid->getPid());
-            $pool->wait();
+            $maxWork--;
         }
         $pool->wait();
     }
@@ -394,21 +394,20 @@ class Forking
                 $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
 
-            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'));
+            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->timeout(1800);
 
             $this->processWork();
             foreach ($queues as $queue) {
-                $pid = $pool->add(function () use ($queue) {
+                $pool->add(function () use ($queue) {
                     $this->_executeCommand($this->dnr_path.$queue.'"');
                 })->then(function () use ($data) {
                     $this->colorCli->primary('Backfilled group '.$data[0]->name);
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
                 });
-                $this->exit($pid->getPid());
             }
+            $pool->wait();
         }
-        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -426,7 +425,7 @@ class Forking
 
         $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
 
-        $pool = Pool::create()->concurrency($this->maxProcesses);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
 
         $maxWork = \count($this->work);
 
@@ -493,7 +492,7 @@ class Forking
                     }
                 }
             }
-            $pool = Pool::create()->concurrency($this->maxProcesses);
+            $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
 
             $this->processWork();
             foreach ($queues as $queue) {
@@ -561,18 +560,20 @@ class Forking
 
         $this->work = $queues;
 
-        $pool = Pool::create()->concurrency($this->maxProcesses);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
+
+        $maxWork = \count($queues);
 
         $this->processWork();
         foreach ($this->work as $queue) {
-            $pid = $pool->add(function () use ($queue) {
+            $pool->add(function () use ($queue) {
                 $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
-            })->then(function () use ($pool) {
-                $this->colorCli->primary('Finished fixing releases names');
+            })->then(function () use ($maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
-            $this->exit($pid->getPid());
+            $maxWork--;
         }
         $pool->wait();
     }
@@ -601,14 +602,14 @@ class Forking
 
         $maxWork = \count($this->work);
 
-        $pool = Pool::create()->concurrency($this->maxProcesses);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
 
         $this->processWork();
         foreach ($uGroups as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
             })->then(function () use ($maxWork) {
-                $this->colorCli->primary('Finished performing release processing task #'.$maxWork);
+                $this->colorCli->primary('Task #'.$maxWork).' Finished performing release processing';
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
@@ -645,11 +646,11 @@ class Forking
             $type = 'pp_tv  ';
             $desc = 'tv postprocessing';
         }
-        $pool = Pool::create()->concurrency($maxProcess);
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
         $count = \count($groups);
         $this->processWork();
         foreach ($groups as $group) {
-            if ($type !== '' && $type !== 'pp_additional  ') {
+            if ($type !== '') {
                 $pool->add(function () use ($group, $type) {
                     $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
                 })->then(function () use ($desc, $count) {
@@ -658,17 +659,6 @@ class Forking
                     // Handle exception
                 });
                 $count--;
-            } elseif ($type !== '' && $type === 'pp_additional  ') {
-                $pid = $pool->add(function () use ($group, $type) {
-                    $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
-                })->then(function () use ($desc, $count) {
-                    $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
-                })->catch(function (\Throwable $exception) {
-                    // Handle exception
-                });
-                $count--;
-                $this->exit($pid->getPid());
-                $pool->wait();
             }
         }
         $pool->wait();
@@ -933,14 +923,14 @@ class Forking
 
         $maxProcess = (int) Settings::settingValue('..releasethreads');
 
-        $pool = Pool::create()->concurrency($maxProcess);
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
         $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
             })->then(function () use ($group) {
                 $name = UsenetGroup::getNameByID($group->id);
-                $this->colorCli->primary('Finished updating, group, releases and additional postprocessing for group:'.$name);
+                $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
