@@ -609,7 +609,7 @@ class Forking
             $pool->add(function () use ($group) {
                 $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
             })->then(function () use ($maxWork) {
-                $this->colorCli->primary('Task #'.$maxWork).' Finished performing release processing';
+                $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
             })->catch(function (\Throwable $exception) {
                 // Handle exception
             });
