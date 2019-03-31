@@ -159,7 +159,7 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
-                    ' seconds at '.now()->toDayDateTimeString().'.'.PHP_EOL
+                    ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
                 );
         }
     }
@@ -247,7 +247,7 @@ class Forking
         $this->_workCount = \count($this->work);
         if ($this->_workCount > 0 && config('nntmux.echocli') === true) {
             $this->colorCli->header(
-                'Multi-processing started at '.now()->toDayDateTimeString().' for '.$this->workType.' with '.$this->_workCount.
+                'Multi-processing started at '.now()->toRfc2822String().' for '.$this->workType.' with '.$this->_workCount.
                     ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
                 );
         }
