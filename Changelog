@@ -1,5 +1,6 @@
 2019-04-01 DariusIII
-	* CHg: Use now() helper in Forking date display
+	* Fix: Fix bad check for debug condition in Forking
+	* Chg: Use now() helper in Forking date display
 	* Chg: Update used libraries to their latest versions
 2019-03-22 DariusIII
 	* Chg: Update symfony components

@@ -667,7 +667,7 @@ class Forking extends \fork_daemon
                     $this->work[] = ['id' => $group->id];
                 }
             } catch (\PDOException $e) {
-                if (config('app.debug' === true)) {
+                if (config('app.debug') === true) {
                     Log::debug($e->getMessage());
                 }
             }
