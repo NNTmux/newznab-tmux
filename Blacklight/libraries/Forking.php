@@ -722,11 +722,10 @@ class Forking extends \fork_daemon
     private $ppAddMaxSize;
 
     /**
-     * Check if we should process Additional's.
-     * @return bool
+     * @return int
      * @throws \Exception
      */
-    private function checkProcessAdditional()
+    private function postProcessAddMainMethod()
     {
         $this->ppAddMinSize =
             Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
@@ -735,31 +734,9 @@ class Forking extends \fork_daemon
             (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
         $this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < '.($this->ppAddMaxSize * 1073741824)) : '');
 
-        return DB::select(sprintf('
-					SELECT r.id
-					FROM releases r
-					LEFT JOIN categories c ON c.id = r.categories_id
-					WHERE r.nzbstatus = %d
-					AND r.passwordstatus BETWEEN -6 AND -1
-					AND r.haspreview = -1
-					AND c.disablepreview = 0
-					%s %s
-					LIMIT 1', NZB::NZB_ADDED, $this->ppAddMaxSize, $this->ppAddMinSize)) > 0;
-    }
-
-    /**
-     * @return int
-     * @throws \Exception
-     */
-    private function postProcessAddMainMethod()
-    {
-        $maxProcesses = 1;
-        if ($this->checkProcessAdditional()) {
-            $this->processAdditional = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = DB::select(
-                sprintf(
-                    '
+        $checkProcessAdditional = DB::select(
+            sprintf(
+                '
 					SELECT leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
@@ -770,11 +747,17 @@ class Forking extends \fork_daemon
 					%s %s
 					GROUP BY leftguid
 					LIMIT 16',
-                    NZB::NZB_ADDED,
-                    $this->ppAddMaxSize,
-                    $this->ppAddMinSize
-                )
-            );
+                NZB::NZB_ADDED,
+                $this->ppAddMaxSize,
+                $this->ppAddMinSize
+            )
+        );
+
+        $maxProcesses = 1;
+        if (\count($checkProcessAdditional) > 0) {
+            $this->processAdditional = true;
+            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
+            $this->work = $checkProcessAdditional;
             $maxProcesses = (int) Settings::settingValue('..postthreads');
         }
 

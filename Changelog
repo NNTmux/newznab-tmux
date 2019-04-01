@@ -1,4 +1,5 @@
 2019-04-01 DariusIII
+	* Chg: Move check for PPA queue inside main PPA function
 	* Chg: Check if title check returns no result in PopPorn class
 	* CHg: Revert to old behavior on bad nzb (decrement password status, do not delete the release)
 	* Fix: Fix bad check for debug condition in Forking
