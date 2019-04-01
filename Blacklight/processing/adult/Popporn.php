@@ -290,6 +290,7 @@ class Popporn extends AdultMovies
                             return true;
                         }
                     }
+
                     return false;
                 }
             } else {
