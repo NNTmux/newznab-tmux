@@ -525,8 +525,7 @@ class Forking extends \fork_daemon
 			SELECT g.name AS groupname, g.last_record AS our_last,
 				a.last_record AS their_last
 			FROM usenet_groups g
-			INNER JOIN short_groups a ON g.ac
-			tive = 1 AND g.name = a.name
+			INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name
 			ORDER BY a.last_record DESC'
         );
 
