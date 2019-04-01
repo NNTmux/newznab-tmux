@@ -67,7 +67,7 @@ class ForkingImportNZB extends Forking
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
+                'Multi-processing started at '.now()->toRfc2822String().' with '.$this->_workCount.
                 ' job(s) to do using a max of '.$maxProcesses.' child process(es).'
             );
         }
@@ -86,7 +86,7 @@ class ForkingImportNZB extends Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                     'Multi-processing for import finished in '.(now()->timestamp - $startTime).
-                    ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
+                    ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
                 );
         }
     }
