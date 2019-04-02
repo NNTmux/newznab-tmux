@@ -82,7 +82,6 @@ class Forking
      * @var string
      */
     private $safeBackfillGroup = '';
-
     /**
      * @var int
      */
@@ -666,46 +665,20 @@ class Forking
         $pool->wait();
     }
 
-    private $ppAddMinSize;
-    private $ppAddMaxSize;
-
-    /**
-     * Check if we should process Additional's.
-     * @return bool
-     * @throws \Exception
-     */
-    private function checkProcessAdditional()
-    {
-        $this->ppAddMinSize =
-            Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
-        $this->ppAddMinSize = ($this->ppAddMinSize > 0 ? ('AND r.size > '.($this->ppAddMinSize * 1048576)) : '');
-        $this->ppAddMaxSize =
-            (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
-        $this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < '.($this->ppAddMaxSize * 1073741824)) : '');
-
-        return DB::select(sprintf('
-					SELECT r.id
-					FROM releases r
-					LEFT JOIN categories c ON c.id = r.categories_id
-					WHERE r.nzbstatus = %d
-					AND r.passwordstatus BETWEEN -6 AND -1
-					AND r.haspreview = -1
-					AND c.disablepreview = 0
-					%s %s
-					LIMIT 1', NZB::NZB_ADDED, $this->ppAddMaxSize, $this->ppAddMinSize)) > 0;
-    }
 
     /**
      * @throws \Exception
      */
     private function postProcessAdd()
     {
+        $ppAddMinSize = Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
+        $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
+        $ppAddMaxSize = (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
+        $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
         $this->maxProcesses = 1;
-        if ($this->checkProcessAdditional()) {
-            $this->processAdditional = true;
-            $this->work = DB::select(
-                sprintf(
-                    '
+        $ppQueue = DB::select(
+            sprintf(
+                '
 					SELECT r.leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
@@ -716,11 +689,14 @@ class Forking
 					%s %s
 					GROUP BY r.leftguid
 					LIMIT 16',
-                    NZB::NZB_ADDED,
-                    $this->ppAddMaxSize,
-                    $this->ppAddMinSize
-                )
-            );
+                NZB::NZB_ADDED,
+                $ppAddMaxSize,
+                $ppAddMinSize
+            )
+        );
+        if (\count($ppQueue) > 0) {
+            $this->processAdditional = true;
+            $this->work = $ppQueue;
             $this->maxProcesses = (int) Settings::settingValue('..postthreads');
         }
 
