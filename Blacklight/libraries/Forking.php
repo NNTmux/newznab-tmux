@@ -646,7 +646,7 @@ class Forking
             $type = 'pp_tv  ';
             $desc = 'tv postprocessing';
         }
-        $pool = Pool::create()->concurrency($maxProcess)->timeout(3600);
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
         $count = \count($groups);
         $this->processWork();
         foreach ($groups as $group) {
@@ -657,6 +657,8 @@ class Forking
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
                     // Handle exception
+                })->timeout(function () use ($count) {
+                    $this->colorCli->notice('Task #'.$count.': Timeout occurred.');
                 });
                 $count--;
             }
