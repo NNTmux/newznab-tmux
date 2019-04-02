@@ -627,10 +627,10 @@ class Forking
      * Only 1 exit method is used for post process, since they are all similar.
      *
      *
-     * @param array $groups
+     * @param array $releases
      * @param int   $maxProcess
      */
-    public function postProcess($groups, $maxProcess)
+    public function postProcess($releases, $maxProcess)
     {
         $type = $desc = '';
         if ($this->processAdditional) {
@@ -647,12 +647,12 @@ class Forking
             $desc = 'tv postprocessing';
         }
         $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
-        $count = \count($groups);
+        $count = \count($releases);
         $this->processWork();
-        foreach ($groups as $group) {
+        foreach ($releases as $release) {
             if ($type !== '') {
-                $pool->add(function () use ($group, $type) {
-                    $this->_executeCommand($this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"');
+                $pool->add(function () use ($release, $type) {
+                    $this->_executeCommand($this->dnr_path.$type.$release->id.(isset($release->renamed) ? ('  '.$release->renamed) : '').'"');
                 })->then(function () use ($desc, $count) {
                     $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
                 })->catch(function (\Throwable $exception) {
