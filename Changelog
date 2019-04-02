@@ -1,21 +1,3 @@
-2019-03-31 DariusIII
-	* Chg: Update Date output
-2019-03-29 DariusIII
-	* Chg: Add timeout to Forking class
-2019-03-28 DariusIII
-	* Chg: Separate PPA from rest of the postprocessing
-	* Chg: Adjust output messages for binaries and releases processing
-	* Chg: Revert all but PPA to older behaviour
-2019-03-27 DariusIII
-	* Chg: Remove $groups assignment from queries and use $this->work
-	* Chg: Switch back to using PHP_BINARY in Forking in place of php
-	* Fix: Fix queries for nfo, tv and movies postprocessing
-	* Chg: Update returned messages after thread is finished
-2019-03-26 DariusIII
-	* Chg: Update ForkingImportNZB
-2019-03-25 DariusIII
-	* Chg: Update multiprocessing scripts
-	* Chg: Update Forking class to use spatie/async
 2019-04-01 DariusIII
 	* Chg: Move check for PPA queue inside main PPA function
 	* Chg: Check if title check returns no result in PopPorn class
@@ -23,6 +5,24 @@
 	* Fix: Fix bad check for debug condition in Forking
 	* Chg: Use now() helper in Forking date display
 	* Chg: Update used libraries to their latest versions
+2019-03-31 DariusIII
+    * Chg: Update Date output
+2019-03-29 DariusIII
+    * Chg: Add timeout to Forking class
+2019-03-28 DariusIII
+    * Chg: Separate PPA from rest of the postprocessing
+    * Chg: Adjust output messages for binaries and releases processing
+    * Chg: Revert all but PPA to older behaviour
+2019-03-27 DariusIII
+    * Chg: Remove $groups assignment from queries and use $this->work
+    * Chg: Switch back to using PHP_BINARY in Forking in place of php
+    * Fix: Fix queries for nfo, tv and movies postprocessing
+    * Chg: Update returned messages after thread is finished
+2019-03-26 DariusIII
+    * Chg: Update ForkingImportNZB
+2019-03-25 DariusIII
+    * Chg: Update multiprocessing scripts
+    * Chg: Update Forking class to use spatie/async
 2019-03-22 DariusIII
 	* Chg: Add spatie/async
 	* Chg: Update symfony components
