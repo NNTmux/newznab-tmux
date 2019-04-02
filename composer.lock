@@ -1296,25 +1296,30 @@
         },
         {
             "name": "dragonmantank/cron-expression",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dragonmantank/cron-expression.git",
-                "reference": "92a2c3768d50e21a1f26a53cb795ce72806266c5"
+                "reference": "72b6fbf76adb3cf5bc0db68559b33d41219aba27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/92a2c3768d50e21a1f26a53cb795ce72806266c5",
-                "reference": "92a2c3768d50e21a1f26a53cb795ce72806266c5",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/72b6fbf76adb3cf5bc0db68559b33d41219aba27",
+                "reference": "72b6fbf76adb3cf5bc0db68559b33d41219aba27",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.0"
+                "php": "^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.4"
+                "phpunit/phpunit": "^6.4|^7.0"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Cron\\": "src/Cron/"
@@ -1341,7 +1346,7 @@
                 "cron",
                 "schedule"
             ],
-            "time": "2018-06-06T03:12:17+00:00"
+            "time": "2019-03-31T00:38:28+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -3068,16 +3073,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.50",
+            "version": "1.0.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "dab4e7624efa543a943be978008f439c333f2249"
+                "reference": "755ba7bf3fb9031e6581d091db84d78275874396"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/dab4e7624efa543a943be978008f439c333f2249",
-                "reference": "dab4e7624efa543a943be978008f439c333f2249",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/755ba7bf3fb9031e6581d091db84d78275874396",
+                "reference": "755ba7bf3fb9031e6581d091db84d78275874396",
                 "shasum": ""
             },
             "require": {
@@ -3148,7 +3153,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2019-02-01T08:50:36+00:00"
+            "time": "2019-03-30T13:22:34+00:00"
         },
         {
             "name": "league/fractal",
@@ -7734,16 +7739,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.3.3",
+            "version": "4.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7"
+                "reference": "809b01f691b6d543aa765d099625ddaea50aa970"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/3084547002a84268033f2a1d1414c8cde0c388d7",
-                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/809b01f691b6d543aa765d099625ddaea50aa970",
+                "reference": "809b01f691b6d543aa765d099625ddaea50aa970",
                 "shasum": ""
             },
             "require": {
@@ -7789,7 +7794,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-03-04T08:10:15+00:00"
+            "time": "2019-03-31T23:23:19+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",
@@ -9921,16 +9926,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.3.15",
+            "version": "v0.3.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "3fb8427cbd4ec886c609e1501923015bcd028324"
+                "reference": "34e4d2189ab05ebbee07f408f6ee890a94f32b9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/3fb8427cbd4ec886c609e1501923015bcd028324",
-                "reference": "3fb8427cbd4ec886c609e1501923015bcd028324",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/34e4d2189ab05ebbee07f408f6ee890a94f32b9f",
+                "reference": "34e4d2189ab05ebbee07f408f6ee890a94f32b9f",
                 "shasum": ""
             },
             "require": {
@@ -9984,7 +9989,7 @@
                 "php",
                 "static analysis"
             ],
-            "time": "2019-01-23T19:51:28+00:00"
+            "time": "2019-03-30T22:44:10+00:00"
         },
         {
             "name": "ocramius/package-versions",

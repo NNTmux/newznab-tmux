@@ -159,8 +159,8 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
-                    ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
-                );
+                ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
+            );
         }
     }
 
@@ -248,8 +248,8 @@ class Forking
         if ($this->_workCount > 0 && config('nntmux.echocli') === true) {
             $this->colorCli->header(
                 'Multi-processing started at '.now()->toRfc2822String().' for '.$this->workType.' with '.$this->_workCount.
-                    ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
-                );
+                ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
+            );
         }
         if (empty($this->_workCount) && config('nntmux.echocli') === true) {
             $this->colorCli->header('No work to do!');
@@ -264,7 +264,7 @@ class Forking
         switch ($this->workType) {
             case 'safe_backfill':
             case 'safe_binaries':
-                    $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
+                $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
                 break;
         }
     }
@@ -975,10 +975,10 @@ class Forking
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.($this->maxProcesses - 1).' process(es) still active with '.
-                    (--$this->_workCount).' job(s) left in the queue.',
+                'There are '.($this->maxProcesses - 1).' process(es) still active with '.
+                (--$this->_workCount).' job(s) left in the queue.',
                 true
-                );
+            );
         }
     }
 }

@@ -16,6 +16,13 @@
 2019-03-25 DariusIII
 	* Chg: Update multiprocessing scripts
 	* Chg: Update Forking class to use spatie/async
+2019-04-01 DariusIII
+	* Chg: Move check for PPA queue inside main PPA function
+	* Chg: Check if title check returns no result in PopPorn class
+	* CHg: Revert to old behavior on bad nzb (decrement password status, do not delete the release)
+	* Fix: Fix bad check for debug condition in Forking
+	* Chg: Use now() helper in Forking date display
+	* Chg: Update used libraries to their latest versions
 2019-03-22 DariusIII
 	* Chg: Add spatie/async
 	* Chg: Update symfony components
