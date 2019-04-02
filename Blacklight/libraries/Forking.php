@@ -665,7 +665,6 @@ class Forking
         $pool->wait();
     }
 
-
     /**
      * @throws \Exception
      */
