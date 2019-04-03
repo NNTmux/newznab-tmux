@@ -126,26 +126,19 @@ class Forking extends \fork_daemon
 
         $this->register_logging(
             [0 => $this, 1 => 'logger'],
-            (\defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
+            config('nntmux.multiprocessing_log_type')
         );
 
-        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
-            $this->max_work_per_child_set(NN_MULTIPROCESSING_MAX_CHILD_WORK);
-        } else {
-            $this->max_work_per_child_set(1);
-        }
+        $this->max_work_per_child_set(config('nntmux.multiprocessing_max_child_work'));
 
-        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
-            $this->child_max_run_time_set(NN_MULTIPROCESSING_MAX_CHILD_TIME);
-        } else {
-            $this->child_max_run_time_set(1800);
-        }
+
+        $this->child_max_run_time_set(config('nntmux.multiprocessing_max_child_time'));
+
 
         // Use a single exit method for all children, makes things easier.
         $this->register_parent_child_exit([0 => $this, 1 => 'childExit']);
 
-        if (\defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
-            switch (NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE) {
+        switch (config('nntmux.multiprocessing_child_output_type')) {
                 case 0:
                     $this->outputType = self::OUTPUT_NONE;
                     break;
@@ -158,9 +151,6 @@ class Forking extends \fork_daemon
                 default:
                     $this->outputType = self::OUTPUT_REALTIME;
             }
-        } else {
-            $this->outputType = self::OUTPUT_REALTIME;
-        }
 
         $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run/switch.php "php  ';
 
@@ -1027,8 +1017,8 @@ class Forking extends \fork_daemon
     private function setMaxProcesses($maxProcesses)
     {
         // Check if override setting is on.
-        if (\defined('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE') && NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE > 0) {
-            $maxProcesses = NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE;
+        if (config('nntmux.multiprocessing_max_children_override') > 0) {
+            $maxProcesses = config('nntmux.multiprocessing_max_children_override');
         }
 
         if (is_numeric($maxProcesses) && $maxProcesses > 0) {

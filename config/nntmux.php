@@ -17,4 +17,9 @@ return [
     'admin_username' => env('ADMIN_USER', 'admin'),
     'admin_password' => env('ADMIN_PASS', 'admin'),
     'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
+    'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
+    'multiprocessing_max_child_work' => env('NN_MULTIPROCESSING_MAX_CHILD_WORK', 1),
+    'multiprocessing_max_children_override' => env('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE', 0),
+    'multiprocessing_log_type' => env('NN_MULTIPROCESSING_LOG_TYPE', 6),
+    'multiprocessing_child_output_type' => env('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE', 1),
 ];

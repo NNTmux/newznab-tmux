@@ -1,4 +1,5 @@
 2019-04-03 DariusIII
+	* Chg: Update env.example with multiprocessing switches and use them in nntmux config and Forking
 	* Chg: Remove deleting of releases by group as non-mgr mode does not exist anymore
 2019-04-02 DariusIII
 	* Chg: Update symfony components to their latest versions and downgrade voku/simple_html_dom
