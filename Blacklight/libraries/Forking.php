@@ -131,9 +131,7 @@ class Forking extends \fork_daemon
 
         $this->max_work_per_child_set(config('nntmux.multiprocessing_max_child_work'));
 
-
         $this->child_max_run_time_set(config('nntmux.multiprocessing_max_child_time'));
-
 
         // Use a single exit method for all children, makes things easier.
         $this->register_parent_child_exit([0 => $this, 1 => 'childExit']);
