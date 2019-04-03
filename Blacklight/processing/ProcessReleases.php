@@ -207,11 +207,7 @@ class ProcessReleases
             || $nzbFilesAdded >= $this->releaseCreationLimit
         );
 
-        // Only run if non-mgr as mgr is not specific to group
-        if ($groupName !== 'mgr') {
-            $this->deletedReleasesByGroup($groupID);
-            $this->deleteReleases();
-        }
+        $this->deleteReleases();
 
         return $totalReleasesAdded;
     }
