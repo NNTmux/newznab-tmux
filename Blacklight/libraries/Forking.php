@@ -24,6 +24,10 @@ use Blacklight\processing\PostProcess;
  */
 class Forking
 {
+    private const OUTPUT_NONE = 0; // Don't display child output.
+    private const OUTPUT_REALTIME = 1; // Display child output in real time.
+    private const OUTPUT_SERIALLY = 2; // Display child output when child is done.
+
     /**
      * @var \Blacklight\ColorCLI
      */
@@ -121,6 +125,22 @@ class Forking
         $this->colorCli = new ColorCLI();
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
+
+        switch (config('nntmux.multiprocessing_child_output_type')) {
+                case 0:
+                    $this->outputType = self::OUTPUT_NONE;
+                    break;
+                case 1:
+                    $this->outputType = self::OUTPUT_REALTIME;
+                    break;
+                case 2:
+                    $this->outputType = self::OUTPUT_SERIALLY;
+                    break;
+                default:
+                    $this->outputType = self::OUTPUT_REALTIME;
+            }
+
+        $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run/switch.php "php  ';
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -350,9 +370,9 @@ class Forking
         $backfilldays = '';
         if ($backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = now()->subDays(Carbon::createFromDate($days));
+            $backfilldays = now()->diffInDays(Carbon::createFromDate($days));
         } elseif ($backfill_days === 2) {
-            $backfilldays = now()->subDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate'))->diffInDays())->format('Y-m-d');
+            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate')));
         }
 
         $data = DB::select(
@@ -927,7 +947,43 @@ class Forking
      */
     protected function _executeCommand($command)
     {
-        echo shell_exec($command);
+        switch ($this->outputType) {
+            case self::OUTPUT_NONE:
+                exec($command);
+                break;
+            case self::OUTPUT_REALTIME:
+                passthru($command);
+                break;
+            case self::OUTPUT_SERIALLY:
+                echo shell_exec($command);
+                break;
+        }
+    }
+
+    /**
+     * Set the amount of max child processes.
+     *
+     * @param int $maxProcesses
+     */
+    private function setMaxProcesses($maxProcesses)
+    {
+        // Check if override setting is on.
+        if (config('nntmux.multiprocessing_max_children_override') > 0) {
+            $maxProcesses = config('nntmux.multiprocessing_max_children_override');
+        }
+
+        if (is_numeric($maxProcesses) && $maxProcesses > 0) {
+            switch ($this->workType) {
+                case 'postProcess_tv':
+                case 'postProcess_mov':
+                case 'postProcess_nfo':
+                case 'postProcess_add':
+                    if ($maxProcesses > 16) {
+                        $maxProcesses = 16;
+                    }
+            }
+            $this->maxProcesses = (int) $maxProcesses;
+        }
     }
 
     /**
