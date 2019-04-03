@@ -320,7 +320,7 @@ class Forking
             )
         );
 
-        $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->timeout(1800);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
         $this->processWork();
         $maxWork = \count($this->work);
         foreach ($this->work as $group) {
@@ -413,7 +413,7 @@ class Forking
                 $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
 
-            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->timeout(1800);
+            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->timeout(config('nntmux.multiprocessing_max_child_time'));
 
             $this->processWork();
             foreach ($queues as $queue) {
@@ -444,7 +444,7 @@ class Forking
 
         $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
 
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
         $maxWork = \count($this->work);
 
@@ -511,7 +511,7 @@ class Forking
                     }
                 }
             }
-            $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
+            $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
             $this->processWork();
             foreach ($queues as $queue) {
@@ -579,7 +579,7 @@ class Forking
 
         $this->work = $queues;
 
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
         $maxWork = \count($queues);
 
@@ -621,7 +621,7 @@ class Forking
 
         $maxWork = \count($this->work);
 
-        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(1800);
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
         $this->processWork();
         foreach ($uGroups as $group) {
@@ -665,7 +665,7 @@ class Forking
             $type = 'pp_tv  ';
             $desc = 'tv postprocessing';
         }
-        $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
         $count = \count($releases);
         $this->processWork();
         foreach ($releases as $release) {
@@ -920,7 +920,7 @@ class Forking
 
         $maxProcess = (int) Settings::settingValue('..releasethreads');
 
-        $pool = Pool::create()->concurrency($maxProcess)->timeout(1800);
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
         $this->processWork();
         foreach ($this->work as $group) {
             $pool->add(function () use ($group) {
@@ -957,32 +957,6 @@ class Forking
             case self::OUTPUT_SERIALLY:
                 echo shell_exec($command);
                 break;
-        }
-    }
-
-    /**
-     * Set the amount of max child processes.
-     *
-     * @param int $maxProcesses
-     */
-    private function setMaxProcesses($maxProcesses)
-    {
-        // Check if override setting is on.
-        if (config('nntmux.multiprocessing_max_children_override') > 0) {
-            $maxProcesses = config('nntmux.multiprocessing_max_children_override');
-        }
-
-        if (is_numeric($maxProcesses) && $maxProcesses > 0) {
-            switch ($this->workType) {
-                case 'postProcess_tv':
-                case 'postProcess_mov':
-                case 'postProcess_nfo':
-                case 'postProcess_add':
-                    if ($maxProcesses > 16) {
-                        $maxProcesses = 16;
-                    }
-            }
-            $this->maxProcesses = (int) $maxProcesses;
         }
     }
 
