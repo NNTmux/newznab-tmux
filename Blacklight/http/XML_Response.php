@@ -479,7 +479,7 @@ class XML_Response
             $this->writeZedAttr('tvmazeid', $this->release->tvmaze);
         }
         if (isset($this->release->imdb) && $this->release->imdb > 0) {
-            $this->writeZedAttr('imdbid', str_pad($this->release->imdb, 7, '0', STR_PAD_LEFT));
+            $this->writeZedAttr('imdbid', str_pad($this->release->imdb, 8, '0', STR_PAD_LEFT));
         }
         if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
             $this->writeZedAttr('tmdbid', $this->release->tmdb);

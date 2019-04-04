@@ -1,4 +1,5 @@
 2019-04-04 DariusIII
+	* Chg: Add migrations and update themes for new imdbid length
 	* Chg: Update releases, movieinfo and user_movies migrations imdbid column definition to be string(varchar in mysql) due to changes in imdbid numbering
 	* Chg: Add nntmux shell command script to shorten typing (ie ./nntmux nntmux:all in place of php artisan nntmux:all command)
 2019-04-03 DariusIII

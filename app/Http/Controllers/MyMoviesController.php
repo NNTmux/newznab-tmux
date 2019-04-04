@@ -59,7 +59,7 @@ class MyMoviesController extends BasePageController
 
                 if ($action === 'doadd') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
-                    UserMovie::addMovie($this->userdata->id, str_pad($imdbid, 7, '0', STR_PAD_LEFT), $category);
+                    UserMovie::addMovie($this->userdata->id, str_pad($imdbid, 8, '0', STR_PAD_LEFT), $category);
                     if ($request->has('from')) {
                         return redirect($request->input('from'));
                     }
