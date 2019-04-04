@@ -16,7 +16,7 @@
 					{if $result->cover == 1}
 						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
-							 src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"/>
+							 src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($result->imdbid, 8, '0', STR_PAD_LEFT)}-cover.jpg"/>
 					{else}
 						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
@@ -24,11 +24,11 @@
 					{/if}
 					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"} ({$result->year})</span>
 					<a class="btn btn-transparent btn-success" target="_blank"
-					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
-					   name="imdb{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View IMDB page">IMDB</a>
+					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{str_pad($result->imdbid, 8, '0', STR_PAD_LEFT)}/"
+					   name="imdb{str_pad($result->imdbid, 8, '0', STR_PAD_LEFT)}" title="View IMDB page">IMDB</a>
 					<a class="btn btn-transparent btn-success" target="_blank"
-					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}/"
-					   name="trakt{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View Trakt page" rel="trakt">TRAKT</a>
+					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{str_pad($result->imdbid, 8, '0', STR_PAD_LEFT)}/"
+					   name="trakt{str_pad($result->imdbid, 8, '0', STR_PAD_LEFT)}" title="View Trakt page" rel="trakt">TRAKT</a>
                     {if (!empty($result->tmdbid))}
                         <a class="btn btn-transparent btn-success" target="_blank"
                             href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$result->tmdbid}"

@@ -19,7 +19,7 @@ class CreateUserMoviesTable extends Migration
             $table->collation = 'utf8_unicode_ci';
             $table->increments('id');
             $table->integer('users_id')->unsigned();
-            $table->integer('imdbid')->unsigned()->nullable();
+            $table->string('imdbid')->nullable();
             $table->string('categories', 64)->nullable()->comment('List of categories for user movies');
             $table->timestamps();
             $table->index(['users_id','imdbid'], 'ix_usermovies_userid');
