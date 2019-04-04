@@ -126,6 +126,7 @@ class Forking
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
+
         switch (config('nntmux.multiprocessing_child_output_type')) {
                 case 0:
                     $this->outputType = self::OUTPUT_NONE;
