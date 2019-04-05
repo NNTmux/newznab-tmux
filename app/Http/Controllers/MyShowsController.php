@@ -139,7 +139,7 @@ class MyShowsController extends BasePageController
                 $results = [];
                 foreach ($shows as $showk => $show) {
                     $showcats = explode('|', $show['categories']);
-                    if (\is_array($showcats) && \count($showcats) > 0) {
+                    if (\is_array($showcats) && ! empty($showcats)) {
                         $catarr = [];
                         foreach ($showcats as $scat) {
                             if (! empty($scat)) {
