@@ -8,7 +8,6 @@ use Blacklight\NNTP;
 use Spatie\Async\Pool;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use App\Models\Collection;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
