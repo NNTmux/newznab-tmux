@@ -2,18 +2,18 @@
 
 namespace Blacklight\libraries;
 
-use App\Models\Collection;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
-use Opis\Closure\SerializableClosure;
 use Spatie\Async\Pool;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use App\Models\Collection;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Opis\Closure\SerializableClosure;
 use Blacklight\processing\PostProcess;
 
 /**
