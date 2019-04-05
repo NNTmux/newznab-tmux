@@ -16,8 +16,6 @@ if (! isset($argv[1]) || ! in_array($argv[1], ['ama', 'add', 'mov', 'nfo', 'sha'
     );
 }
 
-declare(ticks=1);
-
 use Blacklight\libraries\Forking;
 
 try {

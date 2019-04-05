@@ -2,6 +2,8 @@
 
 namespace Blacklight\libraries;
 
+use Spatie\Async\Pool;
+
 /**
  * Class ForkingImportNZB.
  *
@@ -42,7 +44,7 @@ class ForkingImportNZB extends Forking
     public function __construct()
     {
         parent::__construct();
-        $this->importPath = (PHP_BINARY.' '.NN_MISC.'testing'.DS.'nzb-import.php ');
+        $this->importPath = PHP_BINARY.' misc/testing/nzb-import.php ';
     }
 
     /**
@@ -77,35 +79,30 @@ class ForkingImportNZB extends Forking
         $this->useFileName = $useFileName;
         $this->maxPerProcess = $maxPerProcess;
 
-        $this->max_children_set($maxProcesses);
-        $this->register_child_run([0 => $this, 1 => 'importChildWorker']);
-        $this->child_max_run_time_set(86400);
-        $this->addwork($directories);
-        $this->process_work(true);
+        foreach ($directories as $directory) {
+            $pool = Pool::create()->concurrency($maxProcesses)->timeout(3600);
+            $pool->add(function () use ($directory) {
+                $this->_executeCommand(
+                    $this->importPath.'"'.
+                    $directory.'" '.
+                    $this->deleteComplete.' '.
+                    $this->deleteFailed.' '.
+                    $this->useFileName.' '.
+                    $this->maxPerProcess
+                );
+            })->then(function () {
+                $this->colorCli->header('Finished importing new nzbs', true);
+            })->catch(function (\Throwable $exception) {
+                // Handle exception
+            });
+            $pool->wait();
+        }
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
-                    'Multi-processing for import finished in '.(now()->timestamp - $startTime).
+                'Multi-processing for import finished in '.(now()->timestamp - $startTime).
                     ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
                 );
-        }
-    }
-
-    /**
-     * @param        $directories
-     * @param string $identifier
-     */
-    public function importChildWorker($directories, $identifier = '')
-    {
-        foreach ($directories as $directory) {
-            $this->_executeCommand(
-                $this->importPath.'"'.
-                $directory.'" '.
-                $this->deleteComplete.' '.
-                $this->deleteFailed.' '.
-                $this->useFileName.' '.
-                $this->maxPerProcess
-            );
         }
     }
 }

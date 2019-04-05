@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c207fb80104d7be0e7969c5aceff4d66",
+    "content-hash": "ed28488f5844b41b9e1f3dacbe75c147",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -207,42 +207,6 @@
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
             "time": "2017-08-27T15:14:06+00:00"
-        },
-        {
-            "name": "barracudanetworks/forkdaemon-php",
-            "version": "v1.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/barracudanetworks/forkdaemon-php.git",
-                "reference": "16c068748ce170ab167f288b116ac0d105f6185d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/16c068748ce170ab167f288b116ac0d105f6185d",
-                "reference": "16c068748ce170ab167f288b116ac0d105f6185d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "fork_daemon.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A library to make setup and management of forking daemons in PHP easy.",
-            "homepage": "https://github.com/barracudanetworks/forkdaemon-php",
-            "keywords": [
-                "daemons",
-                "forking",
-                "php"
-            ],
-            "time": "2018-09-11T14:29:03+00:00"
         },
         {
             "name": "bhuvidya/laravel-countries",
@@ -5580,6 +5544,63 @@
                 "templating"
             ],
             "time": "2018-09-12T20:54:16+00:00"
+        },
+        {
+            "name": "spatie/async",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/async.git",
+                "reference": "52ca8a6c7127fa78a93285ab2d0a258967a3bfe0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/async/zipball/52ca8a6c7127fa78a93285ab2d0a258967a3bfe0",
+                "reference": "52ca8a6c7127fa78a93285ab2d0a258967a3bfe0",
+                "shasum": ""
+            },
+            "require": {
+                "opis/closure": "^3.0",
+                "php": "^7.1",
+                "symfony/process": "^3.3 || ^4.0"
+            },
+            "require-dev": {
+                "larapack/dd": "^1.1",
+                "phpunit/phpunit": "^6.0",
+                "symfony/stopwatch": "^4.0"
+            },
+            "suggest": {
+                "ext-pcntl": "Required to use async processes",
+                "ext-posix": "Required to use async processes"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Spatie\\Async\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brent Roose",
+                    "email": "brent@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Asynchronous and parallel PHP with the PCNTL extension",
+            "homepage": "https://github.com/spatie/async",
+            "keywords": [
+                "async",
+                "spatie"
+            ],
+            "time": "2019-03-22T08:39:50+00:00"
         },
         {
             "name": "spatie/fractalistic",

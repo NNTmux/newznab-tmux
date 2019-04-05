@@ -1,3 +1,5 @@
+2019-04-05 DariusIII
+	* Chg: Don't use constant for multiprocessing path, use the path directly
 2019-04-04 DariusIII
 	* Chg: Update laravel/framework (v5.8.9 => v5.8.10)
 	* Chg: Add migrations and update themes for new imdbid length
@@ -18,7 +20,26 @@
 	* Fix: Fix bad check for debug condition in Forking
 	* Chg: Use now() helper in Forking date display
 	* Chg: Update used libraries to their latest versions
+2019-03-31 DariusIII
+    * Chg: Update Date output
+2019-03-29 DariusIII
+    * Chg: Add timeout to Forking class
+2019-03-28 DariusIII
+    * Chg: Separate PPA from rest of the postprocessing
+    * Chg: Adjust output messages for binaries and releases processing
+    * Chg: Revert all but PPA to older behaviour
+2019-03-27 DariusIII
+    * Chg: Remove $groups assignment from queries and use $this->work
+    * Chg: Switch back to using PHP_BINARY in Forking in place of php
+    * Fix: Fix queries for nfo, tv and movies postprocessing
+    * Chg: Update returned messages after thread is finished
+2019-03-26 DariusIII
+    * Chg: Update ForkingImportNZB
+2019-03-25 DariusIII
+    * Chg: Update multiprocessing scripts
+    * Chg: Update Forking class to use spatie/async
 2019-03-22 DariusIII
+	* Chg: Add spatie/async
 	* Chg: Update symfony components
 	* Chg: Update doctrine/instantiator (1.1.0 => 1.2.0)
 	* Chg: Update laravel/framework (v5.8.5 => v5.8.7)
