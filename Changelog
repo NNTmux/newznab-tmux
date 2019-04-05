@@ -1,4 +1,5 @@
 2019-04-05 DariusIII
+	* Fix: Update Forking class, fix releases check query
 	* Chg: Use output of userCheck if it passes the json check
 	* Chg: Don't use constant for multiprocessing path, use the path directly
 2019-04-04 DariusIII

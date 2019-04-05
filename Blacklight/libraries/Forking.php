@@ -2,9 +2,11 @@
 
 namespace Blacklight\libraries;
 
+use App\Models\Collection;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
+use Opis\Closure\SerializableClosure;
 use Spatie\Async\Pool;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
@@ -121,7 +123,7 @@ class Forking
      */
     public function __construct()
     {
-        \Opis\Closure\SerializableClosure::removeSecurityProvider();
+        SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI();
 
         $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
@@ -413,7 +415,7 @@ class Forking
                 $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
 
-            $pool = Pool::create()->concurrency((int) Settings::settingValue('..backfillthreads'))->timeout(config('nntmux.multiprocessing_max_child_time'));
+            $pool = Pool::create()->concurrency($threads)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
             $this->processWork();
             foreach ($queues as $queue) {
@@ -603,13 +605,13 @@ class Forking
 
     private function releases()
     {
-        $this->work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = UsenetGroup::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->select(['id', 'name'])->get();
         $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
 
         $uGroups = [];
         foreach ($this->work as $group) {
             try {
-                if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
+                if (! empty(Collection::whereGroupsId($group->id)->select(['id'])->first())) {
                     $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
