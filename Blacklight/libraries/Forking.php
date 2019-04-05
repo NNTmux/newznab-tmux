@@ -604,13 +604,14 @@ class Forking
 
     private function releases()
     {
-        $this->work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
         $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
 
         $uGroups = [];
-        foreach ($this->work as $group) {
+        foreach ($work as $group) {
             try {
-                if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
+                $query = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id));
+                if (! empty($query)) {
                     $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
@@ -621,6 +622,8 @@ class Forking
         }
 
         $maxWork = \count($uGroups);
+
+        $this->work = $uGroups;
 
         $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
