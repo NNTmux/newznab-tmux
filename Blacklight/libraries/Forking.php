@@ -605,13 +605,13 @@ class Forking
 
     private function releases()
     {
-        $this->work = UsenetGroup::query()->where('active', '=', 1)->orWhere('backfill', '=', 1)->select(['id', 'name'])->get();
+        $this->work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
         $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
 
         $uGroups = [];
         foreach ($this->work as $group) {
             try {
-                if (! empty(Collection::whereGroupsId($group->id)->select(['id'])->first())) {
+                if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
                     $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
@@ -621,7 +621,7 @@ class Forking
             }
         }
 
-        $maxWork = \count($this->work);
+        $maxWork = \count($uGroups);
 
         $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
