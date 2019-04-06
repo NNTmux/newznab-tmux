@@ -212,7 +212,7 @@ class Movie
      */
     public function getMovieInfo($imdbId)
     {
-        return MovieInfo::query()->where('imdbid', str_pad($imdbId, 8, '0', STR_PAD_LEFT))->first();
+        return MovieInfo::query()->where('imdbid', $imdbId)->first();
     }
 
     /**
@@ -596,16 +596,16 @@ class Movie
         }
 
         // Check TMDB for IMDB info.
-        $tmdb = $this->fetchTMDBProperties(str_pad($imdbId, 8, '0', STR_PAD_LEFT));
+        $tmdb = $this->fetchTMDBProperties($imdbId);
 
         // Check IMDB for movie info.
-        $imdb = $this->fetchIMDBProperties(str_pad($imdbId, 8, '0', STR_PAD_LEFT));
+        $imdb = $this->fetchIMDBProperties($imdbId);
 
         // Check TRAKT for movie info
-        $trakt = $this->fetchTraktTVProperties(str_pad($imdbId, 8, '0', STR_PAD_LEFT));
+        $trakt = $this->fetchTraktTVProperties($imdbId);
 
         // Check OMDb for movie info
-        $omdb = $this->fetchOmdbAPIProperties(str_pad($imdbId, 8, '0', STR_PAD_LEFT));
+        $omdb = $this->fetchOmdbAPIProperties($imdbId);
 
         // Check iTunes for movie info as last resort (iTunes do not provide all the info we need)
 
@@ -616,40 +616,40 @@ class Movie
         }
 
         // Check FanArt.tv for cover and background images.
-        $fanart = $this->fetchFanartTVProperties(str_pad($imdbId, 8, '0', STR_PAD_LEFT));
+        $fanart = $this->fetchFanartTVProperties($imdbId);
 
         $mov = [];
 
         $mov['cover'] = $mov['backdrop'] = $mov['banner'] = 0;
         $mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
-        $mov['imdbid'] = str_pad($imdbId, 8, '0', STR_PAD_LEFT);
+        $mov['imdbid'] = $imdbId;
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
         $mov['traktid'] = (! isset($trakt['id']) || $trakt['id'] === '') ? 0 : $trakt['id'];
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB,IMDB over OMDB and OMDB over iTunes.
         if (! empty($fanart['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-cover', $fanart['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath);
         } elseif (! empty($tmdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-cover', $tmdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath);
         } elseif (! empty($imdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-cover', $imdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath);
         } elseif (! empty($omdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-cover', $omdb['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath);
         } elseif (! empty($iTunes['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-cover', $iTunes['cover'], $this->imgSavePath);
+            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $iTunes['cover'], $this->imgSavePath);
         }
 
         // Backdrops.
         if (! empty($fanart['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
+            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
         } elseif (! empty($tmdb['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
+            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
         }
 
         // Banner
         if (! empty($fanart['banner'])) {
-            $mov['banner'] = $this->releaseImage->saveImage(str_pad($imdbId, 8, '0', STR_PAD_LEFT).'-banner', $fanart['banner'], $this->imgSavePath);
+            $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
         // RottenTomatoes rating from OmdbAPI
@@ -1100,7 +1100,7 @@ class Movie
 
             $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
 
-            Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 8, '0', STR_PAD_LEFT), 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
+            Release::query()->where('id', $id)->update(['imdbid' =>$imdbID, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
@@ -1112,7 +1112,7 @@ class Movie
                     } elseif ($info === true) {
                         $movieInfoId = MovieInfo::query()->where('imdbid', $imdbID)->first(['id']);
 
-                        Release::query()->where('id', $id)->update(['imdbid' => str_pad($imdbID, 8, '0', STR_PAD_LEFT), 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
+                        Release::query()->where('id', $id)->update(['imdbid' =>$imdbID, 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null]);
                     }
                 }
             }

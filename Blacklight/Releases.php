@@ -1164,7 +1164,7 @@ class Releases extends Release
             $this->showPasswords(),
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($tags) ? " AND tt.tag_name IN ('".implode("','", $tags)."')" : '',
-            ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', str_pad($imDbId, 8, '0', STR_PAD_LEFT)) : '',
+            ($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND m.imdbid = %d ', $imDbId) : '',
             ($tmDbId !== -1 && is_numeric($tmDbId)) ? sprintf(' AND m.tmdbid = %d ', $tmDbId) : '',
             ($traktId !== -1 && is_numeric($traktId)) ? sprintf(' AND m.traktid = %d ', $traktId) : '',
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
