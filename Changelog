@@ -1,3 +1,5 @@
+2019-04-06 DariusIII
+	* Chg: Use our own is_it_json function
 2019-04-05 DariusIII
 	* Fix: Update Forking class, fix releases check query
 	* Chg: Use output of userCheck if it passes the json check
