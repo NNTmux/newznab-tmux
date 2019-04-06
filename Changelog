@@ -1,4 +1,5 @@
 2019-04-06 DariusIII
+	* Chg: Update nesbot/carbon (2.16.2 => 2.16.3)
 	* Chg: Remove padding of imdbid as column is now varchar and stores imdbid properly
 	* Chg: Use our own is_it_json function
 2019-04-05 DariusIII
