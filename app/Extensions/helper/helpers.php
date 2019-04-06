@@ -347,7 +347,7 @@ if (! function_exists('makeFieldLinks')) {
             }
             json_decode($isIt);
 
-            return (json_last_error() === JSON_ERROR_NONE);
+            return json_last_error() === JSON_ERROR_NONE;
         }
     }
 }
