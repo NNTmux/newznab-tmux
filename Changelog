@@ -1,4 +1,5 @@
 2019-04-08 DariusIII
+	* Chg: Update misc/testing/DB/change_imdb_column.php script
 	* Chg: Update browse.tpl
 2019-04-07 DariusIII
 	* Chg: Update myclabs/deep-copy (1.8.1 => 1.9.0)

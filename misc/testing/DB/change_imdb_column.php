@@ -10,7 +10,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $sql = Release::query()->whereNotNull('imdbid')->where('imdbid', '<>', '0000000')->get(['imdbid', 'id']);
 
-DB::statement('
+DB::unprepared('
     DROP TABLE IF EXISTS movie_temp;
     CREATE TABLE movie_temp (
         releases_id INT(11),
@@ -20,7 +20,7 @@ DB::statement('
     DEFAULT CHARACTER SET utf8
     COLLATE utf8_unicode_ci;
     ');
-
+DB::commit();
 $count = $sql->count();
 
 echo 'Copying '.$count.' imdbid values'.PHP_EOL;
