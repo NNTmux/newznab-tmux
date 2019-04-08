@@ -146,7 +146,7 @@
 												<span class="badge badge-info">{$result->group_name}</span>
 												<span class="badge badge-info">{$result->fromname}</span>
                                                 {if $lastvisit|strtotime<$result->adddate|strtotime}
-                                                    <span class="badge badge-info">New</span>
+                                                    <span class="badge badge-success">New</span>
                                                 {/if}
 											</td>
 											<td><span class="badge badge-info">{$result->category_name}</span>
