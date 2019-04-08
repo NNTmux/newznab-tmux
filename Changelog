@@ -1,4 +1,5 @@
 2019-04-08 DariusIII
+	* Chg: Update BasePageController, change 15 minute last login update code
 	* Chg: Update pear/archive_tar (1.4.6 => 1.4.7)
 	* Chg: Update misc/testing/DB/change_imdb_column.php script
 	* Chg: Update browse.tpl
