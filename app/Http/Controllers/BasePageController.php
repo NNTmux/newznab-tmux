@@ -243,7 +243,7 @@ class BasePageController extends Controller
         }
 
         // Update last login every 15 mins.
-        if (now()->subMinutes(15) > $this->userdata['lastlogin']) {
+        if (now()->subHours(3) > $this->userdata['lastlogin']) {
             event(new UserLoggedIn($this->userdata));
         }
 
