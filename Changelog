@@ -1,4 +1,5 @@
 2019-04-09 DariusIII
+	* Chg: Update spatie/laravel-permission (2.36.1 => 2.37.0)
 	* Chg: Update clue/stream-filter (v1.4.0 => v1.4.1)
 	* Chg: Update BasePageController to update lastlogin every 3 hours for better new releases handling
 2019-04-08 DariusIII
