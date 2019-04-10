@@ -6,9 +6,9 @@ class RootCategoriesTableSeeder extends Seeder
 {
     public function run()
     {
-        \DB::table('categories')->delete();
+        \DB::table('root_categories')->delete();
 
-        \DB::table('categories')->insert(
+        \DB::table('root_categories')->insert(
             [
                 0 =>
                     [

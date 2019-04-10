@@ -1,3 +1,5 @@
+2019-04-10 DariusIII
+	* Fix: Fix wrong table name used in RootCategoriesTableSeeder class
 2019-04-09 DariusIII
 	* Chg: Update clue/stream-filter (v1.4.0 => v1.4.1)
 	* Chg: Update BasePageController to update lastlogin every 3 hours for better new releases handling
