@@ -199,15 +199,15 @@ class ProfileController extends BasePageController
                         $this->userdata->givePermissionTo('view console');
                     } elseif ((int) $request->input('viewconsole') === 0 && $this->userdata->can('view console') && $this->userdata->hasDirectPermission('view console')) {
                         $this->userdata->revokePermissionTo('view console');
-                    } elseif ($this->userdata->cant('view console') && \in_array((int) $request->input('viewconsole'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view console') && \in_array((int) $request->input('viewconsole'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view console');
                     }
 
-                    if ((int) $request->input('viewmovies') === 1 && $this->userdata->can('view movies')&& ! $this->userdata->hasDirectPermission('view movies')) {
+                    if ((int) $request->input('viewmovies') === 1 && $this->userdata->can('view movies') && ! $this->userdata->hasDirectPermission('view movies')) {
                         $this->userdata->givePermissionTo('view movies');
                     } elseif ((int) $request->input('viewmovies') === 0 && $this->userdata->can('view movies') && $this->userdata->hasDirectPermission('view movies')) {
                         $this->userdata->revokePermissionTo('view movies');
-                    } elseif ($this->userdata->cant('view movies') && $this->userdata->hasDirectPermission('view movies') && \in_array((int) $request->input('viewmovies'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view movies') && $this->userdata->hasDirectPermission('view movies') && \in_array((int) $request->input('viewmovies'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view movies');
                     }
 
@@ -215,7 +215,7 @@ class ProfileController extends BasePageController
                         $this->userdata->givePermissionTo('view audio');
                     } elseif ((int) $request->input('viewaudio') === 0 && $this->userdata->can('view audio') && $this->userdata->hasDirectPermission('view audio')) {
                         $this->userdata->revokePermissionTo('view audio');
-                    } elseif ($this->userdata->cant('view audio') && $this->userdata->hasDirectPermission('view audio') && \in_array((int) $request->input('viewaudio'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view audio') && $this->userdata->hasDirectPermission('view audio') && \in_array((int) $request->input('viewaudio'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view audio');
                     }
 
@@ -223,7 +223,7 @@ class ProfileController extends BasePageController
                         $this->userdata->givePermissionTo('view pc');
                     } elseif ((int) $request->input('viewpc') === 0 && $this->userdata->can('view pc') && $this->userdata->hasDirectPermission('view pc')) {
                         $this->userdata->revokePermissionTo('view pc');
-                    } elseif ($this->userdata->cant('view pc') && $this->userdata->hasDirectPermission('view pc') && \in_array((int) $request->input('viewpc'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view pc') && $this->userdata->hasDirectPermission('view pc') && \in_array((int) $request->input('viewpc'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view pc');
                     }
 
@@ -231,7 +231,7 @@ class ProfileController extends BasePageController
                         $this->userdata->givePermissionTo('view tv');
                     } elseif ((int) $request->input('viewtv') === 0 && $this->userdata->can('view tv') && $this->userdata->hasDirectPermission('view tv')) {
                         $this->userdata->revokePermissionTo('view tv');
-                    } elseif ($this->userdata->cant('view tv') && $this->userdata->hasDirectPermission('view tv') && \in_array((int) $request->input('viewtv'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view tv') && $this->userdata->hasDirectPermission('view tv') && \in_array((int) $request->input('viewtv'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view tv');
                     }
 
@@ -239,15 +239,15 @@ class ProfileController extends BasePageController
                         $this->userdata->givePermissionTo('view adult');
                     } elseif ((int) $request->input('viewadult') === 0 && $this->userdata->can('view adult') && $this->userdata->hasDirectPermission('view adult')) {
                         $this->userdata->revokePermissionTo('view adult');
-                    } elseif ($this->userdata->cant('view adult') && $this->userdata->hasDirectPermission('view adult') && \in_array((int) $request->input('viewadult'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view adult') && $this->userdata->hasDirectPermission('view adult') && \in_array((int) $request->input('viewadult'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view adult');
                     }
 
-                    if ((int) $request->input('viewbooks') === 1 && $this->userdata->can('view books')&& ! $this->userdata->hasDirectPermission('view books')) {
+                    if ((int) $request->input('viewbooks') === 1 && $this->userdata->can('view books') && ! $this->userdata->hasDirectPermission('view books')) {
                         $this->userdata->givePermissionTo('view books');
                     } elseif ((int) $request->input('viewbooks') === 0 && $this->userdata->can('view books') && $this->userdata->hasDirectPermission('view books')) {
                         $this->userdata->revokePermissionTo('view books');
-                    } elseif ($this->userdata->cant('view books') && $this->userdata->hasDirectPermission('view books') && \in_array((int) $request->input('viewbooks'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view books') && $this->userdata->hasDirectPermission('view books') && \in_array((int) $request->input('viewbooks'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view books');
                     }
 
@@ -255,7 +255,7 @@ class ProfileController extends BasePageController
                         $this->userdata->givePermissionTo('view other');
                     } elseif ((int) $request->input('viewother') === 0 && $this->userdata->can('view other') && $this->userdata->hasDirectPermission('view other')) {
                         $this->userdata->revokePermissionTo('view other');
-                    } elseif ($this->userdata->cant('view other') && $this->userdata->hasDirectPermission('view other') && \in_array((int) $request->input('viewother'), [0,1], true)) {
+                    } elseif ($this->userdata->cant('view other') && $this->userdata->hasDirectPermission('view other') && \in_array((int) $request->input('viewother'), [0, 1], true)) {
                         $this->userdata->revokePermissionTo('view other');
                     }
 
