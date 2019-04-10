@@ -1,4 +1,5 @@
 2019-04-10 DariusIII
+	* Chg: Reduce querying of users table in ProfileController, simplify role and permissions code checks
 	* Fix: Fix wrong table name used in RootCategoriesTableSeeder class
 2019-04-09 DariusIII
 	* Chg: Update spatie/laravel-permission (2.36.1 => 2.37.0)
