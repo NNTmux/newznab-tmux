@@ -79,10 +79,8 @@ class MovieController extends BasePageController
             $category = $cat !== null ? $cat['id'] : Category::MOVIE_ROOT;
         }
 
-        $cpapi = $this->userdata['cp_api'];
-        $cpurl = $this->userdata['cp_url'];
-        $this->smarty->assign('cpapi', $cpapi);
-        $this->smarty->assign('cpurl', $cpurl);
+        $this->smarty->assign('cpapi', $this->userdata->cp_api);
+        $this->smarty->assign('cpurl', $this->userdata->cp_url);
 
         $catarray = [];
         if ((int) $category !== -1) {
@@ -100,7 +98,7 @@ class MovieController extends BasePageController
         $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
         $movies = [];
-        $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         foreach ($results as $result) {

@@ -81,7 +81,7 @@ class SearchController extends BasePageController
                 config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
-                $this->userdata['categoryexclusions'] ?? [],
+                $this->userdata->categoryexclusions ?? [],
                 'basic',
                 $categoryID,
                 0,
@@ -92,7 +92,7 @@ class SearchController extends BasePageController
 
             $this->smarty->assign(
                 [
-                    'lastvisit' => $this->userdata['lastlogin'],
+                    'lastvisit' => $this->userdata->lastlogin,
                     'category' => $categoryID,
                 ]
             );
@@ -157,7 +157,7 @@ class SearchController extends BasePageController
                 config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
-                $this->userdata['categoryexclusions'] ?? [],
+                $this->userdata->categoryexclusions ?? [],
                 'advanced',
                 [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
@@ -166,7 +166,7 @@ class SearchController extends BasePageController
 
             $this->smarty->assign(
                 [
-                    'lastvisit' => $this->userdata['lastlogin'],
+                    'lastvisit' => $this->userdata->lastlogin,
                 ]
             );
         }

@@ -117,8 +117,8 @@ class RssController extends BasePageController
 
         $this->smarty->assign(
             [
-                'categorylist'       => Category::getCategories(true, $this->userdata['categoryexclusions']),
-                'parentcategorylist' => Category::getForMenu($this->userdata['categoryexclusions']),
+                'categorylist'       => Category::getCategories(true, $this->userdata->categoryexclusions),
+                'parentcategorylist' => Category::getForMenu($this->userdata->categoryexclusions),
             ]
         );
 

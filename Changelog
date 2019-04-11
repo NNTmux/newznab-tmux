@@ -1,3 +1,5 @@
+2019-04-11 DariusIII
+	* Chg: Update usage of $this->userdata in controllers
 2019-04-10 DariusIII
 	* Chg: Update laravel/framework (v5.8.10 => v5.8.11)
 	* Chg: Reduce querying of users table in ProfileController, simplify role and permissions code checks
