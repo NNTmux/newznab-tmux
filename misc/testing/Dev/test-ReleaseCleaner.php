@@ -40,8 +40,6 @@ if ($group === null) {
     exit('No group with name '.$argv[1].' found in the database.');
 }
 
-$releases = DB::select(sprintf('SELECT name, searchname, fromname, size, id FROM releases WHERE groups_id = %d %s ORDER BY postdate LIMIT %d', $group['id'], $category, $argv[2]));
-
 $releasesQuery = Release::query()->where('groups_id', $group->id);
 if ((int) $argv[4] !== 0 && is_numeric($argv[4])) {
     $releasesQuery->where('categories_id', '=', $argv[4]);
