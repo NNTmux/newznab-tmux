@@ -29,7 +29,6 @@ if (! in_array($argv[3], ['true', 'false'], false)) {
 
 $category = '';
 
-
 $rename = false;
 if ($argv[3] === 'true') {
     $rename = true;
