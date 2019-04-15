@@ -24,7 +24,6 @@ namespace Blacklight\processing;
 use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\VideoAlias;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 /**
