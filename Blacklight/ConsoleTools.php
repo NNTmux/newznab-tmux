@@ -5,13 +5,8 @@ namespace Blacklight;
 /**
  * Class ConsoleTools.
  */
-class ConsoleTools
+class ConsoleTools extends ColorCLI
 {
-    /**
-     * @var \Blacklight\ColorCLI
-     */
-    public $colorCli;
-
     /**
      * @var int
      */
@@ -22,9 +17,8 @@ class ConsoleTools
      */
     public function __construct()
     {
+        parent::__construct();
         $this->lastMessageLength = 0;
-
-        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -42,7 +36,7 @@ class ConsoleTools
         echo str_repeat(\chr(8), $this->lastMessageLength);
 
         $this->lastMessageLength = \strlen($message);
-        $this->colorCli->headerOver($message);
+        $this->headerOver($message);
     }
 
     /**
@@ -60,7 +54,7 @@ class ConsoleTools
         echo str_repeat(\chr(8), $this->lastMessageLength);
 
         $this->lastMessageLength = \strlen($message);
-        $this->colorCli->primaryOver($message);
+        $this->primaryOver($message);
     }
 
     /**
