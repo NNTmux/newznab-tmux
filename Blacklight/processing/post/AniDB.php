@@ -58,7 +58,6 @@ class AniDB
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
-        $this->pdo = DB::connection()->getPdo();
         $this->padb = new PaDb(['Echo' => $options['Echo']]);
         $this->colorCli = new ColorCLI();
 

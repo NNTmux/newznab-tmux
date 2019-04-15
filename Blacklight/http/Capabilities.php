@@ -53,7 +53,6 @@ abstract class Capabilities
             'Settings' => null,
         ];
         $options += $defaults;
-        $this->pdo = DB::connection()->getPdo();
     }
 
     /**
