@@ -52,7 +52,7 @@ function reCategorize($argv)
         $colorCli->header('Categorizing all releases using searchname. This can take a while, be patient.');
     }
     $timeStart = now();
-    if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1])|| $argv[1] === 'misc')) {
+    if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]) || $argv[1] === 'misc')) {
         $chgCount = categorizeRelease(str_replace(' AND', 'WHERE', $where), $update, true);
     } else {
         $chgCount = categorizeRelease('', $update, true);
