@@ -1,3 +1,5 @@
+2019-04-15 DariusIII
+	* Chg: Remove unused ReleaseSearch class
 2019-04-14 DariusIII
 	* Fix: Fix test-ReleaseCleaner.php script (Fixes issue #965)
 2019-04-11 DariusIII
