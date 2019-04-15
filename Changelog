@@ -1,4 +1,5 @@
 2019-04-15 DariusIII
+	* Chg: Remove $this->pdo as it is not used
 	* Chg: Remove unused ReleaseSearch class
 2019-04-14 DariusIII
 	* Fix: Fix test-ReleaseCleaner.php script (Fixes issue #965)

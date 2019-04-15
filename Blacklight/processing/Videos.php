@@ -37,7 +37,6 @@ abstract class Videos
     protected const TYPE_FILM = 1; // Type of video is a Film/Movie
     protected const TYPE_ANIME = 2; // Type of video is a Anime
 
-    protected $pdo;
     /**
      * @var bool
      */
@@ -61,7 +60,6 @@ abstract class Videos
         ];
         $options += $defaults;
 
-        $this->pdo = DB::connection()->getPdo();
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->titleCache = [];
     }
