@@ -24,7 +24,6 @@ namespace Blacklight\http;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Output -- abstract class for printing web requests outside of Smarty.
