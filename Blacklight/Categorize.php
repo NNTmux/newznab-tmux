@@ -1281,7 +1281,7 @@ class Categorize
      */
     public function isXxxUHD(): bool
     {
-        if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(2160p)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
+        if (preg_match('/XXX.+(2160p)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_UHD;
             $this->tmpTag[] = Category::TAG_XXX_UHD;
 
@@ -1410,6 +1410,11 @@ class Categorize
             case $this->checkPoster('/@md-hobbys[.]com/i', $this->poster, Category::XXX_CLIPSD):
                 return true;
             case stripos($this->releaseName, 'SDPORN') !== false:
+                $this->tmpCat = Category::XXX_CLIPSD;
+                $this->tmpTag[] = Category::TAG_XXX_CLIPSD;
+
+                return true;
+            case preg_match('/(iPT\sTeam|KLEENEX)/i', $this->releaseName):
                 $this->tmpCat = Category::XXX_CLIPSD;
                 $this->tmpTag[] = Category::TAG_XXX_CLIPSD;
 
