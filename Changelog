@@ -1,4 +1,5 @@
 2019-04-15 DariusIII
+	* Chg: Update package.json
 	* Chg: ConsoleTools now extends ColorCLI class
 	* Chg: Remove unused PDO class instantiation
 	* Chg: Remove $this->pdo as it is not used
