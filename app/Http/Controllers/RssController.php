@@ -24,7 +24,7 @@ class RssController extends BasePageController
 
         $user = $this->userCheck($request);
 
-        if (is_it_json($user)) {
+        if (is_object($user)) {
             return $user;
         }
 
@@ -48,7 +48,7 @@ class RssController extends BasePageController
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
-        if (is_it_json($user)) {
+        if (is_object($user)) {
             return $user;
         }
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
@@ -70,7 +70,7 @@ class RssController extends BasePageController
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
-        if (is_it_json($user)) {
+        if (is_object($user)) {
             return $user;
         }
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
@@ -141,7 +141,7 @@ class RssController extends BasePageController
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
-        if (is_it_json($user)) {
+        if (is_object($user)) {
             return $user;
         }
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
@@ -175,7 +175,7 @@ class RssController extends BasePageController
         }
 
         $user = $this->userCheck($request);
-        if (is_it_json($user)) {
+        if (is_object($user)) {
             return $user;
         }
         $categoryId = explode(',', $request->input('id'));
