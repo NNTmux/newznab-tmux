@@ -1,4 +1,5 @@
 2019-04-22 DariusIII
+	* Chg: Add failed route to csrf protection exclusion
 	* Chg: Update imdbphp/imdbphp (v6.2.0 => v6.2.1)
 2019-04-21 DariusIII
 	* Fix: Fix error related to $user variable in RssController
