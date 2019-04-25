@@ -1,5 +1,6 @@
 2019-04-25 DariusIII
-	* CHg: Exclude admin area from csrf protection
+	* Chg: Update laravel/framework (v5.8.13 => v5.8.14) and other libraries
+	* Chg: Exclude admin area from csrf protection
 2019-04-22 DariusIII
 	* Chg: Add failed route to csrf protection exclusion
 	* Chg: Update imdbphp/imdbphp (v6.2.0 => v6.2.1)
