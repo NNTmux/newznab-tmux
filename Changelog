@@ -1,4 +1,5 @@
 2019-04-28 DariusIII
+	* Chg: Add option to disable purging of inactive user accounts
 	* Fix: Throw API error if apikey is missing
 	* Chg: Update nesbot/carbon (2.17.0 => 2.17.1) and intervention/imagecache (2.3.3 => 2.3.4)
 2019-04-25 DariusIII

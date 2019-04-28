@@ -22,4 +22,5 @@ return [
     'multiprocessing_max_children_override' => env('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE', 0),
     'multiprocessing_log_type' => env('NN_MULTIPROCESSING_LOG_TYPE', 6),
     'multiprocessing_child_output_type' => env('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE', 1),
+    'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
 ];

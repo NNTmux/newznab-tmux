@@ -30,7 +30,9 @@ class Kernel extends ConsoleKernel
         $schedule->exec('php '.base_path().'/misc/testing/DB/checkUsers.php')->twiceDaily(1, 13);
         $schedule->command('telescope:prune')->daily();
         $schedule->command('horizon:snapshot')->everyFiveMinutes();
-        $schedule->job(new RemoveInactiveAccounts())->daily();
+        if (config('nntmux.purge_inactive_users') === true) {
+            $schedule->job(new RemoveInactiveAccounts())->daily();
+        }
     }
 
     /**
