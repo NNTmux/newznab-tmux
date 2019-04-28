@@ -1,3 +1,5 @@
+2019-04-28 DariusIII
+	* Chg: Update nesbot/carbon (2.17.0 => 2.17.1) and intervention/imagecache (2.3.3 => 2.3.4)
 2019-04-25 DariusIII
 	* Chg: Update laravel/framework (v5.8.13 => v5.8.14) and other libraries
 	* Chg: Exclude admin area from csrf protection
