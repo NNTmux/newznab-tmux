@@ -1,3 +1,5 @@
+2019-05-03 DariusIII
+	* Chg: Update laravel/framework and rest of the used libraries to their latest versions
 2019-04-28 DariusIII
 	* Chg: Add option to disable purging of inactive user accounts
 	* Fix: Throw API error if apikey is missing
