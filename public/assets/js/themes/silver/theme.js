@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.3 (2019-03-19)
+ * Version: 5.0.4 (2019-04-23)
  */
 (function () {
 var silver = (function (domGlobals) {
@@ -42,6 +42,9 @@ var silver = (function (domGlobals) {
     var identity = function (x) {
       return x;
     };
+    var tripleEquals = function (a, b) {
+      return a === b;
+    };
     function curry(fn) {
       var initialArgs = [];
       for (var _i = 1; _i < arguments.length; _i++) {
@@ -70,8 +73,30 @@ var silver = (function (domGlobals) {
         throw new Error(msg);
       };
     };
+    var apply = function (f) {
+      return f();
+    };
+    var call = function (f) {
+      f();
+    };
     var never = constant(false);
     var always = constant(true);
+
+    var Fun = /*#__PURE__*/Object.freeze({
+        noop: noop,
+        noarg: noarg,
+        compose: compose,
+        constant: constant,
+        identity: identity,
+        tripleEquals: tripleEquals,
+        curry: curry,
+        not: not,
+        die: die,
+        apply: apply,
+        call: call,
+        never: never,
+        always: always
+    });
 
     var never$1 = never;
     var always$1 = always;
@@ -220,9 +245,22 @@ var silver = (function (domGlobals) {
     var isString = isType('string');
     var isObject = isType('object');
     var isArray = isType('array');
+    var isNull = isType('null');
     var isBoolean = isType('boolean');
+    var isUndefined = isType('undefined');
     var isFunction = isType('function');
     var isNumber = isType('number');
+
+    var Type = /*#__PURE__*/Object.freeze({
+        isString: isString,
+        isObject: isObject,
+        isArray: isArray,
+        isNull: isNull,
+        isBoolean: isBoolean,
+        isUndefined: isUndefined,
+        isFunction: isFunction,
+        isNumber: isNumber
+    });
 
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
@@ -243,6 +281,13 @@ var silver = (function (domGlobals) {
     };
     var exists = function (xs, pred) {
       return findIndex(xs, pred).isSome();
+    };
+    var range = function (num, f) {
+      var r = [];
+      for (var i = 0; i < num; i++) {
+        r.push(f(i));
+      }
+      return r;
     };
     var chunk = function (array, size) {
       var r = [];
@@ -295,6 +340,29 @@ var silver = (function (domGlobals) {
         }
       }
       return r;
+    };
+    var groupBy = function (xs, f) {
+      if (xs.length === 0) {
+        return [];
+      } else {
+        var wasType = f(xs[0]);
+        var r = [];
+        var group = [];
+        for (var i = 0, len = xs.length; i < len; i++) {
+          var x = xs[i];
+          var type = f(x);
+          if (type !== wasType) {
+            r.push(group);
+            group = [];
+          }
+          wasType = type;
+          group.push(x);
+        }
+        if (group.length !== 0) {
+          r.push(group);
+        }
+        return r;
+      }
     };
     var foldr = function (xs, f, acc) {
       eachr(xs, function (x) {
@@ -357,6 +425,11 @@ var silver = (function (domGlobals) {
       }
       return true;
     };
+    var equal = function (a1, a2) {
+      return a1.length === a2.length && forall(a1, function (x, i) {
+        return x === a2[i];
+      });
+    };
     var slice = Array.prototype.slice;
     var reverse = function (xs) {
       var r = slice.call(xs, 0);
@@ -367,6 +440,14 @@ var silver = (function (domGlobals) {
       return filter(a1, function (x) {
         return !contains(a2, x);
       });
+    };
+    var mapToObject = function (xs, f) {
+      var r = {};
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        r[String(x)] = f(x, i);
+      }
+      return r;
     };
     var pure = function (x) {
       return [x];
@@ -385,6 +466,36 @@ var silver = (function (domGlobals) {
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
+
+    var Arr = /*#__PURE__*/Object.freeze({
+        indexOf: indexOf,
+        contains: contains,
+        exists: exists,
+        range: range,
+        chunk: chunk,
+        map: map,
+        each: each,
+        eachr: eachr,
+        partition: partition,
+        filter: filter,
+        groupBy: groupBy,
+        foldr: foldr,
+        foldl: foldl,
+        find: find,
+        findIndex: findIndex,
+        flatten: flatten,
+        bind: bind,
+        forall: forall,
+        equal: equal,
+        reverse: reverse,
+        difference: difference,
+        mapToObject: mapToObject,
+        pure: pure,
+        sort: sort,
+        head: head,
+        last: last,
+        from: from$1
+    });
 
     var keys = Object.keys;
     var hasOwnProperty = Object.hasOwnProperty;
@@ -412,6 +523,18 @@ var silver = (function (domGlobals) {
       });
       return r;
     };
+    var bifilter = function (obj, pred) {
+      var t = {};
+      var f = {};
+      each$1(obj, function (x, i) {
+        var branch = pred(x, i) ? t : f;
+        branch[i] = x;
+      });
+      return {
+        t: t,
+        f: f
+      };
+    };
     var mapToArray = function (obj, f) {
       var r = [];
       each$1(obj, function (value, name) {
@@ -435,6 +558,9 @@ var silver = (function (domGlobals) {
         return v;
       });
     };
+    var size = function (obj) {
+      return keys(obj).length;
+    };
     var get = function (obj, key) {
       return has(obj, key) ? Option.from(obj[key]) : Option.none();
     };
@@ -442,6 +568,38 @@ var silver = (function (domGlobals) {
       return hasOwnProperty.call(obj, key);
     };
 
+    var Obj = /*#__PURE__*/Object.freeze({
+        keys: keys,
+        hasOwnProperty: hasOwnProperty,
+        each: each$1,
+        map: map$1,
+        tupleMap: tupleMap,
+        bifilter: bifilter,
+        mapToArray: mapToArray,
+        find: find$1,
+        values: values,
+        size: size,
+        get: get,
+        has: has
+    });
+
+    var narrow = function (obj, fields) {
+      var r = {};
+      each(fields, function (field) {
+        if (obj[field] !== undefined && has(obj, field)) {
+          r[field] = obj[field];
+        }
+      });
+      return r;
+    };
+    var indexOnKey = function (array, key) {
+      var obj = {};
+      each(array, function (a) {
+        var keyValue = a[key];
+        obj[keyValue] = a;
+      });
+      return obj;
+    };
     var exclude = function (obj, fields) {
       var r = {};
       each$1(obj, function (v, k) {
@@ -722,6 +880,9 @@ var silver = (function (domGlobals) {
     var deepMerge = baseMerge(deep);
     var merge = baseMerge(shallow);
 
+    var narrow$1 = function (obj, fields) {
+      return narrow(obj, fields);
+    };
     var exclude$1 = function (obj, fields) {
       return exclude(obj, fields);
     };
@@ -740,6 +901,9 @@ var silver = (function (domGlobals) {
     var wrapAll$1 = function (keyvalues) {
       return wrapAll(keyvalues);
     };
+    var indexOnKey$1 = function (array, key) {
+      return indexOnKey(array, key);
+    };
     var mergeValues = function (values, base) {
       return values.length === 0 ? Result.value(base) : Result.value(deepMerge(base, merge.apply(undefined, values)));
     };
@@ -753,6 +917,19 @@ var silver = (function (domGlobals) {
     var hasKey$1 = function (obj, key) {
       return hasKey(obj, key);
     };
+
+    var Objects = /*#__PURE__*/Object.freeze({
+        narrow: narrow$1,
+        exclude: exclude$1,
+        readOpt: readOpt$1,
+        readOr: readOr$1,
+        readOptFrom: readOptFrom$1,
+        wrap: wrap$1,
+        wrapAll: wrapAll$1,
+        indexOnKey: indexOnKey$1,
+        hasKey: hasKey$1,
+        consolidate: consolidate
+    });
 
     var Cell = function (initial) {
       var value = initial;
@@ -803,6 +980,21 @@ var silver = (function (domGlobals) {
       }
       return Option.some(f.apply(null, r));
     };
+    function lift() {
+      var args = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+      }
+      var f = args.pop();
+      return liftN(args, f);
+    }
+
+    var Options = /*#__PURE__*/Object.freeze({
+        cat: cat,
+        findMap: findMap,
+        liftN: liftN,
+        lift: lift
+    });
 
     var touchstart = constant('touchstart');
     var touchmove = constant('touchmove');
@@ -1413,6 +1605,30 @@ var silver = (function (domGlobals) {
       var dom = element.dom();
       return Option.from(dom.parentNode).map(Element.fromDom);
     };
+    var parents = function (element, isRoot) {
+      var stop = isFunction(isRoot) ? isRoot : constant(false);
+      var dom = element.dom();
+      var ret = [];
+      while (dom.parentNode !== null && dom.parentNode !== undefined) {
+        var rawParent = dom.parentNode;
+        var p = Element.fromDom(rawParent);
+        ret.push(p);
+        if (stop(p) === true) {
+          break;
+        } else {
+          dom = rawParent;
+        }
+      }
+      return ret;
+    };
+    var siblings = function (element) {
+      var filterSelf = function (elements) {
+        return filter(elements, function (x) {
+          return !eq(element, x);
+        });
+      };
+      return parent(element).map(children).map(filterSelf).getOr([]);
+    };
     var offsetParent = function (element) {
       var dom = element.dom();
       return Option.from(dom.offsetParent).map(Element.fromDom);
@@ -1522,14 +1738,30 @@ var silver = (function (domGlobals) {
     var type = function (element) {
       return element.dom().nodeType;
     };
+    var value$1 = function (element) {
+      return element.dom().nodeValue;
+    };
     var isType$1 = function (t) {
       return function (element) {
         return type(element) === t;
       };
     };
+    var isComment = function (element) {
+      return type(element) === COMMENT || name(element) === '#comment';
+    };
     var isElement = isType$1(ELEMENT);
     var isText = isType$1(TEXT);
     var isDocument = isType$1(DOCUMENT);
+
+    var Node$1 = /*#__PURE__*/Object.freeze({
+        name: name,
+        type: type,
+        value: value$1,
+        isElement: isElement,
+        isText: isText,
+        isDocument: isDocument,
+        isComment: isComment
+    });
 
     var rawSet = function (dom, key, value) {
       if (isString(value) || isBoolean(value) || isNumber(value)) {
@@ -1778,6 +2010,23 @@ var silver = (function (domGlobals) {
 
     var global = tinymce.util.Tools.resolve('tinymce.ThemeManager');
 
+    var extendStatics = function (d, b) {
+      extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function (d, b) {
+        d.__proto__ = b;
+      } || function (d, b) {
+        for (var p in b)
+          if (b.hasOwnProperty(p))
+            d[p] = b[p];
+      };
+      return extendStatics(d, b);
+    };
+    function __extends(d, b) {
+      extendStatics(d, b);
+      function __() {
+        this.constructor = d;
+      }
+      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
     var __assign = function () {
       __assign = Object.assign || function __assign(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -1801,6 +2050,322 @@ var silver = (function (domGlobals) {
             t[p[i]] = s[p[i]];
       return t;
     }
+    function __decorate(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
+        r = Reflect.decorate(decorators, target, key, desc);
+      else
+        for (var i = decorators.length - 1; i >= 0; i--)
+          if (d = decorators[i])
+            r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    }
+    function __param(paramIndex, decorator) {
+      return function (target, key) {
+        decorator(target, key, paramIndex);
+      };
+    }
+    function __metadata(metadataKey, metadataValue) {
+      if (typeof Reflect === 'object' && typeof Reflect.metadata === 'function')
+        return Reflect.metadata(metadataKey, metadataValue);
+    }
+    function __awaiter(thisArg, _arguments, P, generator) {
+      return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator['throw'](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : new P(function (resolve) {
+            resolve(result.value);
+          }).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    }
+    function __generator(thisArg, body) {
+      var _ = {
+          label: 0,
+          sent: function () {
+            if (t[0] & 1)
+              throw t[1];
+            return t[1];
+          },
+          trys: [],
+          ops: []
+        }, f, y, t, g;
+      return g = {
+        next: verb(0),
+        'throw': verb(1),
+        'return': verb(2)
+      }, typeof Symbol === 'function' && (g[Symbol.iterator] = function () {
+        return this;
+      }), g;
+      function verb(n) {
+        return function (v) {
+          return step([
+            n,
+            v
+          ]);
+        };
+      }
+      function step(op) {
+        if (f)
+          throw new TypeError('Generator is already executing.');
+        while (_)
+          try {
+            if (f = 1, y && (t = op[0] & 2 ? y['return'] : op[0] ? y['throw'] || ((t = y['return']) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
+              return t;
+            if (y = 0, t)
+              op = [
+                op[0] & 2,
+                t.value
+              ];
+            switch (op[0]) {
+            case 0:
+            case 1:
+              t = op;
+              break;
+            case 4:
+              _.label++;
+              return {
+                value: op[1],
+                done: false
+              };
+            case 5:
+              _.label++;
+              y = op[1];
+              op = [0];
+              continue;
+            case 7:
+              op = _.ops.pop();
+              _.trys.pop();
+              continue;
+            default:
+              if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                _ = 0;
+                continue;
+              }
+              if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                _.label = op[1];
+                break;
+              }
+              if (op[0] === 6 && _.label < t[1]) {
+                _.label = t[1];
+                t = op;
+                break;
+              }
+              if (t && _.label < t[2]) {
+                _.label = t[2];
+                _.ops.push(op);
+                break;
+              }
+              if (t[2])
+                _.ops.pop();
+              _.trys.pop();
+              continue;
+            }
+            op = body.call(thisArg, _);
+          } catch (e) {
+            op = [
+              6,
+              e
+            ];
+            y = 0;
+          } finally {
+            f = t = 0;
+          }
+        if (op[0] & 5)
+          throw op[1];
+        return {
+          value: op[0] ? op[1] : void 0,
+          done: true
+        };
+      }
+    }
+    function __exportStar(m, exports) {
+      for (var p in m)
+        if (!exports.hasOwnProperty(p))
+          exports[p] = m[p];
+    }
+    function __values(o) {
+      var m = typeof Symbol === 'function' && o[Symbol.iterator], i = 0;
+      if (m)
+        return m.call(o);
+      return {
+        next: function () {
+          if (o && i >= o.length)
+            o = void 0;
+          return {
+            value: o && o[i++],
+            done: !o
+          };
+        }
+      };
+    }
+    function __read(o, n) {
+      var m = typeof Symbol === 'function' && o[Symbol.iterator];
+      if (!m)
+        return o;
+      var i = m.call(o), r, ar = [], e;
+      try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done)
+          ar.push(r.value);
+      } catch (error) {
+        e = { error: error };
+      } finally {
+        try {
+          if (r && !r.done && (m = i['return']))
+            m.call(i);
+        } finally {
+          if (e)
+            throw e.error;
+        }
+      }
+      return ar;
+    }
+    function __spread() {
+      for (var ar = [], i = 0; i < arguments.length; i++)
+        ar = ar.concat(__read(arguments[i]));
+      return ar;
+    }
+    function __await(v) {
+      return this instanceof __await ? (this.v = v, this) : new __await(v);
+    }
+    function __asyncGenerator(thisArg, _arguments, generator) {
+      if (!Symbol.asyncIterator)
+        throw new TypeError('Symbol.asyncIterator is not defined.');
+      var g = generator.apply(thisArg, _arguments || []), i, q = [];
+      return i = {}, verb('next'), verb('throw'), verb('return'), i[Symbol.asyncIterator] = function () {
+        return this;
+      }, i;
+      function verb(n) {
+        if (g[n])
+          i[n] = function (v) {
+            return new Promise(function (a, b) {
+              q.push([
+                n,
+                v,
+                a,
+                b
+              ]) > 1 || resume(n, v);
+            });
+          };
+      }
+      function resume(n, v) {
+        try {
+          step(g[n](v));
+        } catch (e) {
+          settle(q[0][3], e);
+        }
+      }
+      function step(r) {
+        r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
+      }
+      function fulfill(value) {
+        resume('next', value);
+      }
+      function reject(value) {
+        resume('throw', value);
+      }
+      function settle(f, v) {
+        if (f(v), q.shift(), q.length)
+          resume(q[0][0], q[0][1]);
+      }
+    }
+    function __asyncDelegator(o) {
+      var i, p;
+      return i = {}, verb('next'), verb('throw', function (e) {
+        throw e;
+      }), verb('return'), i[Symbol.iterator] = function () {
+        return this;
+      }, i;
+      function verb(n, f) {
+        i[n] = o[n] ? function (v) {
+          return (p = !p) ? {
+            value: __await(o[n](v)),
+            done: n === 'return'
+          } : f ? f(v) : v;
+        } : f;
+      }
+    }
+    function __asyncValues(o) {
+      if (!Symbol.asyncIterator)
+        throw new TypeError('Symbol.asyncIterator is not defined.');
+      var m = o[Symbol.asyncIterator], i;
+      return m ? m.call(o) : (o = typeof __values === 'function' ? __values(o) : o[Symbol.iterator](), i = {}, verb('next'), verb('throw'), verb('return'), i[Symbol.asyncIterator] = function () {
+        return this;
+      }, i);
+      function verb(n) {
+        i[n] = o[n] && function (v) {
+          return new Promise(function (resolve, reject) {
+            v = o[n](v), settle(resolve, reject, v.done, v.value);
+          });
+        };
+      }
+      function settle(resolve, reject, d, v) {
+        Promise.resolve(v).then(function (v) {
+          resolve({
+            value: v,
+            done: d
+          });
+        }, reject);
+      }
+    }
+    function __makeTemplateObject(cooked, raw) {
+      if (Object.defineProperty) {
+        Object.defineProperty(cooked, 'raw', { value: raw });
+      } else {
+        cooked.raw = raw;
+      }
+      return cooked;
+    }
+    function __importStar(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null)
+        for (var k in mod)
+          if (Object.hasOwnProperty.call(mod, k))
+            result[k] = mod[k];
+      result.default = mod;
+      return result;
+    }
+    function __importDefault(mod) {
+      return mod && mod.__esModule ? mod : { default: mod };
+    }
+
+    var tslib_1 = /*#__PURE__*/Object.freeze({
+        __extends: __extends,
+        get __assign () { return __assign; },
+        __rest: __rest,
+        __decorate: __decorate,
+        __param: __param,
+        __metadata: __metadata,
+        __awaiter: __awaiter,
+        __generator: __generator,
+        __exportStar: __exportStar,
+        __values: __values,
+        __read: __read,
+        __spread: __spread,
+        __await: __await,
+        __asyncGenerator: __asyncGenerator,
+        __asyncDelegator: __asyncDelegator,
+        __asyncValues: __asyncValues,
+        __makeTemplateObject: __makeTemplateObject,
+        __importStar: __importStar,
+        __importDefault: __importDefault
+    });
 
     var adt = Adt.generate([
       { strict: [] },
@@ -1818,7 +2383,6 @@ var silver = (function (domGlobals) {
     var strict = adt.strict;
     var asOption = adt.asOption;
     var defaultedThunk = adt.defaultedThunk;
-    var asDefaultedOptionThunk = adt.asDefaultedOptionThunk;
     var mergeWithThunk = adt.mergeWithThunk;
 
     var SimpleResultType;
@@ -1972,13 +2536,13 @@ var silver = (function (domGlobals) {
     var stringify = function (obj, replacer, space) {
       return json().stringify(obj, replacer, space);
     };
-    var JSON$1 = {
+    var Json = {
       parse: parse,
       stringify: stringify
     };
 
     var formatObj = function (input) {
-      return isObject(input) && keys(input).length > 100 ? ' removed due to size' : JSON$1.stringify(input, null, 2);
+      return isObject(input) && keys(input).length > 100 ? ' removed due to size' : Json.stringify(input, null, 2);
     };
     var formatErrors = function (errors) {
       var es = errors.length > 10 ? errors.slice(0, 10).concat([{
@@ -2107,7 +2671,7 @@ var silver = (function (domGlobals) {
       });
       return ResultCombine.consolidateObj(results, {});
     };
-    var value$1 = function (validator) {
+    var value$2 = function (validator) {
       var extract = function (path, strength, val) {
         return SimpleResult.bindError(validator(val, strength), function (err) {
           return custom(path, err);
@@ -2201,7 +2765,7 @@ var silver = (function (domGlobals) {
     };
     var setOf = function (validator, prop) {
       var validateKeys = function (path, keys) {
-        return arrOf(value$1(validator)).extract(path, identity, keys);
+        return arrOf(value$2(validator)).extract(path, identity, keys);
       };
       var extract = function (path, strength, o) {
         var keys$1 = keys(o);
@@ -2225,7 +2789,45 @@ var silver = (function (domGlobals) {
         toDsl: toDsl
       };
     };
-    var anyValue = constant(value$1(SimpleResult.svalue));
+    var func = function (args, schema, retriever) {
+      var delegate = value$2(function (f, strength) {
+        return isFunction(f) ? SimpleResult.svalue(function () {
+          var gArgs = Array.prototype.slice.call(arguments, 0);
+          var allowedArgs = gArgs.slice(0, args.length);
+          var o = f.apply(null, allowedArgs);
+          return retriever(o, strength);
+        }) : SimpleResult.serror('Not a function');
+      });
+      return {
+        extract: delegate.extract,
+        toString: function () {
+          return 'function';
+        },
+        toDsl: function () {
+          return typeAdt.func(args, schema);
+        }
+      };
+    };
+    var thunk = function (desc, processor) {
+      var getP = cached(function () {
+        return processor();
+      });
+      var extract = function (path, strength, val) {
+        return getP().extract(path, strength, val);
+      };
+      var toString = function () {
+        return getP().toString();
+      };
+      var toDsl = function () {
+        return typeAdt.thunk(desc);
+      };
+      return {
+        extract: extract,
+        toString: toString,
+        toDsl: toDsl
+      };
+    };
+    var anyValue = constant(value$2(SimpleResult.svalue));
     var arrOfObj = compose(arrOf, objOf);
     var state = adt$1.state;
     var field = adt$1.field;
@@ -2260,7 +2862,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var _anyValue = value$1(SimpleResult.svalue);
+    var _anyValue = value$2(SimpleResult.svalue);
     var arrOfObj$1 = function (objFields) {
       return arrOfObj(objFields);
     };
@@ -2268,7 +2870,7 @@ var silver = (function (domGlobals) {
       return arrOf(_anyValue);
     };
     var valueOf = function (validator) {
-      return value$1(function (v) {
+      return value$2(function (v) {
         return validator(v).fold(SimpleResult.serror, SimpleResult.svalue);
       });
     };
@@ -2286,6 +2888,9 @@ var silver = (function (domGlobals) {
         };
       });
     };
+    var asStruct = function (label, prop, obj) {
+      return SimpleResult.toResult(extract(label, prop, constant, obj));
+    };
     var asRaw = function (label, prop, obj) {
       return SimpleResult.toResult(extract(label, prop, identity, obj));
     };
@@ -2297,15 +2902,27 @@ var silver = (function (domGlobals) {
     var asRawOrDie = function (label, prop, obj) {
       return getOrDie$1(asRaw(label, prop, obj));
     };
+    var asStructOrDie = function (label, prop, obj) {
+      return getOrDie$1(asStruct(label, prop, obj));
+    };
     var formatError = function (errInfo) {
       return 'Errors: \n' + formatErrors(errInfo.errors) + '\n\nInput object: ' + formatObj(errInfo.input);
     };
     var choose$1 = function (key, branches) {
       return choose(key, branches);
     };
+    var thunkOf = function (desc, schema) {
+      return thunk(desc, schema);
+    };
+    var funcOrDie = function (args, prop) {
+      var retriever = function (output, strength) {
+        return getOrDie$1(SimpleResult.toResult(extract('()', prop, strength, output)));
+      };
+      return func(args, prop, retriever);
+    };
     var anyValue$1 = constant(_anyValue);
     var typedValue = function (validator, expectedType) {
-      return value$1(function (a) {
+      return value$2(function (a) {
         var actualType = typeof a;
         return validator(a) ? SimpleResult.svalue(a) : SimpleResult.serror('Expected type: ' + expectedType + ' but got: ' + actualType);
       });
@@ -2314,6 +2931,30 @@ var silver = (function (domGlobals) {
     var string = typedValue(isString, 'string');
     var boolean = typedValue(isBoolean, 'boolean');
     var functionProcessor = typedValue(isFunction, 'function');
+
+    var ValueSchema = /*#__PURE__*/Object.freeze({
+        anyValue: anyValue$1,
+        arrOfObj: arrOfObj$1,
+        arrOf: arrOf,
+        arrOfVal: arrOfVal,
+        valueOf: valueOf,
+        setOf: setOf$1,
+        objOf: objOf,
+        objOfOnly: objOfOnly,
+        asStruct: asStruct,
+        asRaw: asRaw,
+        asStructOrDie: asStructOrDie,
+        asRawOrDie: asRawOrDie,
+        getOrDie: getOrDie$1,
+        formatError: formatError,
+        choose: choose$1,
+        thunkOf: thunkOf,
+        funcOrDie: funcOrDie,
+        number: number,
+        string: string,
+        boolean: boolean,
+        func: functionProcessor
+    });
 
     var validateEnum = function (values) {
       return valueOf(function (value) {
@@ -2339,7 +2980,7 @@ var silver = (function (domGlobals) {
       return strictOf(key, functionProcessor);
     };
     var forbid = function (key, message) {
-      return field(key, key, asOption(), value$1(function (v) {
+      return field(key, key, asOption(), value$2(function (v) {
         return SimpleResult.serror('The field: ' + key + ' is forbidden. ' + message);
       }));
     };
@@ -2358,17 +2999,23 @@ var silver = (function (domGlobals) {
     var optionOf = function (key, schema) {
       return field(key, key, asOption(), schema);
     };
+    var optionNumber = function (key) {
+      return optionOf(key, number);
+    };
     var optionString = function (key) {
       return optionOf(key, string);
     };
     var optionFunction = function (key) {
       return optionOf(key, functionProcessor);
     };
+    var optionArrayOf = function (key, schema) {
+      return optionOf(key, arrOf(schema));
+    };
     var optionObjOf = function (key, objSchema) {
-      return field(key, key, asOption(), objOf(objSchema));
+      return optionOf(key, objOf(objSchema));
     };
     var optionObjOfOnly = function (key, objSchema) {
-      return field(key, key, asOption(), objOfOnly(objSchema));
+      return optionOf(key, objOfOnly(objSchema));
     };
     var defaulted$1 = function (key, fallback) {
       return field(key, key, defaulted(fallback), anyValue());
@@ -2392,7 +3039,7 @@ var silver = (function (domGlobals) {
       return defaultedOf(key, fallback, functionProcessor);
     };
     var defaultedObjOf = function (key, fallback, objSchema) {
-      return field(key, key, defaulted(fallback), objOf(objSchema));
+      return defaultedOf(key, fallback, objOf(objSchema));
     };
     var state$1 = function (okey, instantiator) {
       return state(okey, instantiator);
@@ -2404,7 +3051,7 @@ var silver = (function (domGlobals) {
 
     var nu$4 = function (parts) {
       if (!hasKey$1(parts, 'can') && !hasKey$1(parts, 'abort') && !hasKey$1(parts, 'run')) {
-        throw new Error('EventHandler defined by: ' + JSON$1.stringify(parts, null, 2) + ' does not have can, abort, or run!');
+        throw new Error('EventHandler defined by: ' + Json.stringify(parts, null, 2) + ' does not have can, abort, or run!');
       }
       return asRawOrDie('Extracting event.handler', objOfOnly([
         defaulted$1('can', constant(true)),
@@ -2503,6 +3150,9 @@ var silver = (function (domGlobals) {
       return Element.fromDom(b);
     };
 
+    var first = function (predicate) {
+      return descendant(body(), predicate);
+    };
     var ancestor = function (scope, predicate, isRoot) {
       var element = scope.dom();
       var stop = isFunction(isRoot) ? isRoot : constant(false);
@@ -2522,6 +3172,19 @@ var silver = (function (domGlobals) {
         return predicate(s);
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
+    };
+    var sibling = function (scope, predicate) {
+      var element = scope.dom();
+      if (!element.parentNode) {
+        return Option.none();
+      }
+      return child$1(Element.fromDom(element.parentNode), function (x) {
+        return !eq(scope, x) && predicate(x);
+      });
+    };
+    var child$1 = function (scope, predicate) {
+      var result = find(scope.dom().childNodes, compose(predicate, Element.fromDom));
+      return result.map(Element.fromDom);
     };
     var descendant = function (scope, predicate) {
       var descend = function (node) {
@@ -2648,6 +3311,25 @@ var silver = (function (domGlobals) {
     var runOnDetached = runOnSourceName(detachedFromDom());
     var runOnInit = runOnSourceName(systemInit());
     var runOnExecute = runOnName(execute());
+
+    var AlloyEvents = /*#__PURE__*/Object.freeze({
+        derive: derive,
+        run: run,
+        preventDefault: preventDefault,
+        runActionExtra: runActionExtra,
+        runOnAttached: runOnAttached,
+        runOnDetached: runOnDetached,
+        runOnSource: runOnSource,
+        runOnInit: runOnInit,
+        runOnExecute: runOnExecute,
+        redirectToUid: redirectToUid,
+        redirectToPart: redirectToPart,
+        runWithTarget: runWithTarget,
+        abort: abort,
+        can: can,
+        cutter: cutter,
+        stopper: stopper
+    });
 
     var isRecursive = function (component, originator, target) {
       return eq(originator, component.element()) && !eq(originator, target);
@@ -2781,6 +3463,12 @@ var silver = (function (domGlobals) {
       }, f);
     };
 
+    var GuiTypes = /*#__PURE__*/Object.freeze({
+        makeApi: makeApi,
+        premade: premade,
+        getPremade: getPremade
+    });
+
     var NoState = {
       init: function () {
         return nu$5({
@@ -2802,7 +3490,7 @@ var silver = (function (domGlobals) {
         ]);
       });
       var validated = asRaw('component.behaviours', objOf(schema), spec.behaviours).fold(function (errInfo) {
-        throw new Error(formatError(errInfo) + '\nComplete spec:\n' + JSON$1.stringify(spec, null, 2));
+        throw new Error(formatError(errInfo) + '\nComplete spec:\n' + Json.stringify(spec, null, 2));
       }, function (v) {
         return v;
       });
@@ -2893,10 +3581,10 @@ var silver = (function (domGlobals) {
           var aIndex = order.indexOf(aKey);
           var bIndex = order.indexOf(bKey);
           if (aIndex === -1) {
-            throw new Error('The ordering for ' + label + ' does not have an entry for ' + aKey + '.\nOrder specified: ' + JSON$1.stringify(order, null, 2));
+            throw new Error('The ordering for ' + label + ' does not have an entry for ' + aKey + '.\nOrder specified: ' + Json.stringify(order, null, 2));
           }
           if (bIndex === -1) {
-            throw new Error('The ordering for ' + label + ' does not have an entry for ' + bKey + '.\nOrder specified: ' + JSON$1.stringify(order, null, 2));
+            throw new Error('The ordering for ' + label + ' does not have an entry for ' + bKey + '.\nOrder specified: ' + Json.stringify(order, null, 2));
           }
           if (aIndex < bIndex) {
             return -1;
@@ -2971,7 +3659,7 @@ var silver = (function (domGlobals) {
       };
     };
     var missingOrderError = function (eventName, tuples) {
-      return Result.error(['The event (' + eventName + ') has more than one behaviour that listens to it.\nWhen this occurs, you must ' + 'specify an event ordering for the behaviours in your spec (e.g. [ "listing", "toggling" ]).\nThe behaviours that ' + 'can trigger it are: ' + JSON$1.stringify(map(tuples, function (c) {
+      return Result.error(['The event (' + eventName + ') has more than one behaviour that listens to it.\nWhen this occurs, you must ' + 'specify an event ordering for the behaviours in your spec (e.g. [ "listing", "toggling" ]).\nThe behaviours that ' + 'can trigger it are: ' + Json.stringify(map(tuples, function (c) {
           return c.name();
         }), null, 2)]);
     };
@@ -3078,6 +3766,31 @@ var silver = (function (domGlobals) {
       return info.events;
     };
 
+    function Toggler (turnOff, turnOn, initial) {
+      var active = initial || false;
+      var on = function () {
+        turnOn();
+        active = true;
+      };
+      var off = function () {
+        turnOff();
+        active = false;
+      };
+      var toggle = function () {
+        var f = active ? off : on;
+        f();
+      };
+      var isOn = function () {
+        return active;
+      };
+      return {
+        on: on,
+        off: off,
+        toggle: toggle,
+        isOn: isOn
+      };
+    }
+
     var read$2 = function (element, attr) {
       var value = get$2(element, attr);
       return value === undefined || value === '' ? [] : value.split(' ');
@@ -3112,6 +3825,21 @@ var silver = (function (domGlobals) {
     var remove$3 = function (element, clazz) {
       return remove$2(element, 'class', clazz);
     };
+    var toggle = function (element, clazz) {
+      if (contains(get$3(element), clazz)) {
+        return remove$3(element, clazz);
+      } else {
+        return add$1(element, clazz);
+      }
+    };
+
+    var ClassList = /*#__PURE__*/Object.freeze({
+        get: get$3,
+        add: add$1,
+        remove: remove$3,
+        toggle: toggle,
+        supports: supports
+    });
 
     var add$2 = function (element, clazz) {
       if (supports(element)) {
@@ -3135,9 +3863,39 @@ var silver = (function (domGlobals) {
       }
       cleanClass(element);
     };
+    var toggle$1 = function (element, clazz) {
+      return supports(element) ? element.dom().classList.toggle(clazz) : toggle(element, clazz);
+    };
+    var toggler = function (element, clazz) {
+      var hasClasslist = supports(element);
+      var classList = element.dom().classList;
+      var off = function () {
+        if (hasClasslist) {
+          classList.remove(clazz);
+        } else {
+          remove$3(element, clazz);
+        }
+      };
+      var on = function () {
+        if (hasClasslist) {
+          classList.add(clazz);
+        } else {
+          add$1(element, clazz);
+        }
+      };
+      return Toggler(off, on, has$2(element, clazz));
+    };
     var has$2 = function (element, clazz) {
       return supports(element) && element.dom().classList.contains(clazz);
     };
+
+    var Class = /*#__PURE__*/Object.freeze({
+        add: add$2,
+        remove: remove$4,
+        toggle: toggle$1,
+        toggler: toggler,
+        has: has$2
+    });
 
     var add$3 = function (element, classes) {
       each(classes, function (x) {
@@ -3205,6 +3963,17 @@ var silver = (function (domGlobals) {
         return r.length > 0;
       });
     };
+    var getAllRaw = function (element) {
+      var css = {};
+      var dom = element.dom();
+      if (isSupported(dom)) {
+        for (var i = 0; i < dom.style.length; i++) {
+          var ruleName = dom.style.item(i);
+          css[ruleName] = dom.style[ruleName];
+        }
+      }
+      return css;
+    };
     var isValidValue = function (tag, property, value) {
       var element = Element.fromTag(tag);
       set$2(element, property, value);
@@ -3218,9 +3987,53 @@ var silver = (function (domGlobals) {
         remove$1(element, 'style');
       }
     };
+    var preserve = function (element, f) {
+      var oldStyles = get$2(element, 'style');
+      var result = f(element);
+      var restore = oldStyles === undefined ? remove$1 : set$1;
+      restore(element, 'style', oldStyles);
+      return result;
+    };
+    var copy = function (source, target) {
+      var sourceDom = source.dom();
+      var targetDom = target.dom();
+      if (isSupported(sourceDom) && isSupported(targetDom)) {
+        targetDom.style.cssText = sourceDom.style.cssText;
+      }
+    };
     var reflow = function (e) {
       return e.dom().offsetWidth;
     };
+    var transferOne = function (source, destination, style) {
+      getRaw(source, style).each(function (value) {
+        if (getRaw(destination, style).isNone()) {
+          set$2(destination, style, value);
+        }
+      });
+    };
+    var transfer = function (source, destination, styles) {
+      if (!isElement(source) || !isElement(destination)) {
+        return;
+      }
+      each(styles, function (style) {
+        transferOne(source, destination, style);
+      });
+    };
+
+    var Css = /*#__PURE__*/Object.freeze({
+        copy: copy,
+        set: set$2,
+        preserve: preserve,
+        setAll: setAll$1,
+        setOptions: setOptions,
+        remove: remove$6,
+        get: get$4,
+        getRaw: getRaw,
+        getAllRaw: getAllRaw,
+        isValidValue: isValidValue,
+        reflow: reflow,
+        transfer: transfer
+    });
 
     var get$5 = function (element) {
       return element.dom().value;
@@ -3313,7 +4126,7 @@ var silver = (function (domGlobals) {
       var config = function (behaviour) {
         var b = bData;
         var f = isFunction(b[behaviour.name()]) ? b[behaviour.name()] : function () {
-          throw new Error('Could not find ' + behaviour.name() + ' in ' + JSON$1.stringify(spec, null, 2));
+          throw new Error('Could not find ' + behaviour.name() + ' in ' + Json.stringify(spec, null, 2));
         };
         return f();
       };
@@ -3408,21 +4221,74 @@ var silver = (function (domGlobals) {
     };
     var premade$1 = premade;
 
+    var GuiFactory = /*#__PURE__*/Object.freeze({
+        build: build$1,
+        premade: premade$1,
+        external: external,
+        text: text
+    });
+
+    var any$1 = function (predicate) {
+      return first(predicate).isSome();
+    };
+    var ancestor$1 = function (scope, predicate, isRoot) {
+      return ancestor(scope, predicate, isRoot).isSome();
+    };
     var closest$2 = function (scope, predicate, isRoot) {
       return closest(scope, predicate, isRoot).isSome();
     };
+    var sibling$1 = function (scope, predicate) {
+      return sibling(scope, predicate).isSome();
+    };
+    var child$2 = function (scope, predicate) {
+      return child$1(scope, predicate).isSome();
+    };
+    var descendant$1 = function (scope, predicate) {
+      return descendant(scope, predicate).isSome();
+    };
 
-    var ancestor$1 = function (scope, selector, isRoot) {
+    var PredicateExists = /*#__PURE__*/Object.freeze({
+        any: any$1,
+        ancestor: ancestor$1,
+        closest: closest$2,
+        sibling: sibling$1,
+        child: child$2,
+        descendant: descendant$1
+    });
+
+    var first$1 = function (selector) {
+      return one(selector);
+    };
+    var ancestor$2 = function (scope, selector, isRoot) {
       return ancestor(scope, function (e) {
         return is(e, selector);
       }, isRoot);
     };
-    var descendant$1 = function (scope, selector) {
+    var sibling$2 = function (scope, selector) {
+      return sibling(scope, function (e) {
+        return is(e, selector);
+      });
+    };
+    var child$3 = function (scope, selector) {
+      return child$1(scope, function (e) {
+        return is(e, selector);
+      });
+    };
+    var descendant$2 = function (scope, selector) {
       return one(selector, scope);
     };
     var closest$3 = function (scope, selector, isRoot) {
-      return ClosestOrAncestor(is, ancestor$1, scope, selector, isRoot);
+      return ClosestOrAncestor(is, ancestor$2, scope, selector, isRoot);
     };
+
+    var SelectorFind = /*#__PURE__*/Object.freeze({
+        first: first$1,
+        ancestor: ancestor$2,
+        sibling: sibling$2,
+        child: child$3,
+        descendant: descendant$2,
+        closest: closest$3
+    });
 
     var find$3 = function (queryElem) {
       var dependent = closest(queryElem, function (elem) {
@@ -3435,7 +4301,7 @@ var silver = (function (domGlobals) {
       return dependent.bind(function (dep) {
         var id = get$2(dep, 'id');
         var doc = owner(dep);
-        return descendant$1(doc, '[aria-owns="' + id + '"]');
+        return descendant$2(doc, '[aria-owns="' + id + '"]');
       });
     };
     var manager = function () {
@@ -4447,12 +5313,10 @@ var silver = (function (domGlobals) {
         ]
       }
     ]);
-    var range = Immutable('start', 'soffset', 'finish', 'foffset');
+    var range$1 = Immutable('start', 'soffset', 'finish', 'foffset');
     var exactFromRange = function (simRange) {
       return type$1.exact(simRange.start(), simRange.soffset(), simRange.finish(), simRange.foffset());
     };
-    var domRange = type$1.domRange;
-    var relative$1 = type$1.relative;
     var exact = type$1.exact;
 
     var makeRange = function (start, soffset, finish, foffset) {
@@ -4693,6 +5557,10 @@ var silver = (function (domGlobals) {
       });
     };
 
+    var TextPoint = /*#__PURE__*/Object.freeze({
+        locate: locate
+    });
+
     var searchInChildren = function (doc, node, x, y) {
       var r = doc.dom().createRange();
       var nodes = children(node);
@@ -4729,7 +5597,7 @@ var silver = (function (domGlobals) {
       return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
     };
 
-    var first = function (element) {
+    var first$2 = function (element) {
       return descendant(element, isCursorPosition);
     };
     var last$1 = function (element) {
@@ -4769,7 +5637,7 @@ var silver = (function (domGlobals) {
       cursorRange.selectNode(node.dom());
       var rect = cursorRange.getBoundingClientRect();
       var collapseDirection = getCollapseDirection(rect, x);
-      var f = collapseDirection === COLLAPSE_TO_LEFT ? first : last$1;
+      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$2 : last$1;
       return f(node).map(function (target) {
         return createCollapsedNode(doc, target, collapseDirection);
       });
@@ -4816,15 +5684,51 @@ var silver = (function (domGlobals) {
     };
     var availableSearch = document.caretPositionFromPoint ? caretPositionFromPoint : document.caretRangeFromPoint ? caretRangeFromPoint : searchFromPoint;
 
+    var ancestors = function (scope, predicate, isRoot) {
+      return filter(parents(scope, isRoot), predicate);
+    };
+    var siblings$1 = function (scope, predicate) {
+      return filter(siblings(scope), predicate);
+    };
+    var children$1 = function (scope, predicate) {
+      return filter(children(scope), predicate);
+    };
+
+    var all$3 = function (selector) {
+      return all(selector);
+    };
+    var ancestors$1 = function (scope, selector, isRoot) {
+      return ancestors(scope, function (e) {
+        return is(e, selector);
+      }, isRoot);
+    };
+    var siblings$2 = function (scope, selector) {
+      return siblings$1(scope, function (e) {
+        return is(e, selector);
+      });
+    };
+    var children$2 = function (scope, selector) {
+      return children$1(scope, function (e) {
+        return is(e, selector);
+      });
+    };
     var descendants = function (scope, selector) {
       return all(selector, scope);
     };
+
+    var SelectorFilter = /*#__PURE__*/Object.freeze({
+        all: all$3,
+        ancestors: ancestors$1,
+        siblings: siblings$2,
+        children: children$2,
+        descendants: descendants
+    });
 
     var readRange = function (selection) {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(range$1(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
@@ -4832,7 +5736,7 @@ var silver = (function (domGlobals) {
     var doGetExact = function (selection) {
       var anchor = Element.fromDom(selection.anchorNode);
       var focus = Element.fromDom(selection.focusNode);
-      return after$1(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
+      return after$1(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range$1(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var getExact = function (win) {
       return Option.from(win.getSelection()).filter(function (sel) {
@@ -5003,7 +5907,7 @@ var silver = (function (domGlobals) {
       return getSelection().map(function (sel) {
         var modStart = descendOnce$1(sel.start(), sel.soffset());
         var modFinish = descendOnce$1(sel.finish(), sel.foffset());
-        return range(modStart.element(), modStart.offset(), modFinish.element(), modFinish.offset());
+        return range$1(modStart.element(), modStart.offset(), modFinish.element(), modFinish.offset());
       });
     };
     var placement$2 = function (component, anchorInfo, origin) {
@@ -5081,7 +5985,7 @@ var silver = (function (domGlobals) {
     var northwest$2 = function (anchor, element, bubbles) {
       return nu$8(westX$1(anchor, element), northY$1(anchor, element), bubbles.northwest(), northwest(), 'link-layout-nw');
     };
-    var all$3 = function () {
+    var all$4 = function () {
       return [
         southeast$2,
         southwest$2,
@@ -5100,7 +6004,7 @@ var silver = (function (domGlobals) {
 
     var placement$4 = function (component, submenuInfo, origin) {
       var anchorBox = toBox(origin, submenuInfo.item.element());
-      var layouts = get$9(component.element(), submenuInfo, all$3(), allRtl$1());
+      var layouts = get$9(component.element(), submenuInfo, all$4(), allRtl$1());
       return Option.some(nu$9({
         anchorBox: anchorBox,
         bubble: fallback(),
@@ -5441,6 +6345,13 @@ var silver = (function (domGlobals) {
       get: get$b
     };
 
+    var SketchBehaviours$1 = /*#__PURE__*/Object.freeze({
+        SketchBehaviours: SketchBehaviours,
+        field: field$1,
+        get: get$b,
+        augment: augment
+    });
+
     var _placeholder = 'placeholder';
     var adt$8 = Adt.generate([
       {
@@ -5456,6 +6367,9 @@ var silver = (function (domGlobals) {
         ]
       }
     ]);
+    var isSubstitute = function (uiType) {
+      return contains([_placeholder], uiType);
+    };
     var subPlaceholder = function (owner, detail, compSpec, placeholders) {
       if (owner.exists(function (o) {
           return o !== compSpec.owner;
@@ -5463,7 +6377,7 @@ var silver = (function (domGlobals) {
         return adt$8.single(true, constant(compSpec));
       }
       return readOptFrom$1(placeholders, compSpec.name).fold(function () {
-        throw new Error('Unknown placeholder component: ' + compSpec.name + '\nKnown: [' + keys(placeholders) + ']\nNamespace: ' + owner.getOr('none') + '\nSpec: ' + JSON$1.stringify(compSpec, null, 2));
+        throw new Error('Unknown placeholder component: ' + compSpec.name + '\nKnown: [' + keys(placeholders) + ']\nNamespace: ' + owner.getOr('none') + '\nSpec: ' + Json.stringify(compSpec, null, 2));
       }, function (newSpec) {
         return newSpec.replace();
       });
@@ -5528,14 +6442,32 @@ var silver = (function (domGlobals) {
       var outcome = substituteAll(owner, detail, components, ps);
       each$1(ps, function (p) {
         if (p.used() === false && p.required()) {
-          throw new Error('Placeholder: ' + p.name() + ' was not found in components list\nNamespace: ' + owner.getOr('none') + '\nComponents: ' + JSON$1.stringify(detail.components, null, 2));
+          throw new Error('Placeholder: ' + p.name() + ' was not found in components list\nNamespace: ' + owner.getOr('none') + '\nComponents: ' + Json.stringify(detail.components, null, 2));
         }
       });
       return outcome;
     };
+    var singleReplace = function (detail, p) {
+      var replacement = p;
+      return replacement.fold(function (req, valueThunk) {
+        return [valueThunk(detail)];
+      }, function (req, valuesThunk) {
+        return valuesThunk(detail);
+      });
+    };
     var single = adt$8.single;
     var multiple = adt$8.multiple;
     var placeholder = constant(_placeholder);
+
+    var UiSubstitutes = /*#__PURE__*/Object.freeze({
+        single: single,
+        multiple: multiple,
+        isSubstitute: isSubstitute,
+        placeholder: placeholder,
+        substituteAll: substituteAll,
+        substitutePlaces: substitutePlaces,
+        singleReplace: singleReplace
+    });
 
     var adt$9 = Adt.generate([
       { required: ['data'] },
@@ -5854,6 +6786,12 @@ var silver = (function (domGlobals) {
       }, apis, extraApis);
     };
 
+    var Sketcher = /*#__PURE__*/Object.freeze({
+        isSketchSpec: isSketchSpec,
+        single: single$2,
+        composite: composite$1
+    });
+
     var inside = function (target) {
       return name(target) === 'input' && get$2(target, 'type') !== 'radio' || name(target) === 'textarea';
     };
@@ -5950,7 +6888,7 @@ var silver = (function (domGlobals) {
       return has$2(queryTarget.element(), hConfig.highlightClass);
     };
     var getHighlighted = function (component, hConfig, hState) {
-      return descendant$1(component.element(), '.' + hConfig.highlightClass).bind(function (e) {
+      return descendant$2(component.element(), '.' + hConfig.highlightClass).bind(function (e) {
         return component.getSystem().getByDom(e).toOption();
       });
     };
@@ -5961,7 +6899,7 @@ var silver = (function (domGlobals) {
       }, component.getSystem().getByDom);
     };
     var getFirst = function (component, hConfig, hState) {
-      return descendant$1(component.element(), '.' + hConfig.itemClass).bind(function (e) {
+      return descendant$2(component.element(), '.' + hConfig.itemClass).bind(function (e) {
         return component.getSystem().getByDom(e).toOption();
       });
     };
@@ -6085,6 +7023,12 @@ var silver = (function (domGlobals) {
         });
       };
     };
+    var is$1 = function (key) {
+      return function (event) {
+        var raw = event.raw();
+        return raw.which === key;
+      };
+    };
     var isShift = function (event) {
       var raw = event.raw();
       return raw.shiftKey === true;
@@ -6095,6 +7039,12 @@ var silver = (function (domGlobals) {
     };
     var isNotShift = not(isShift);
 
+    var basic = function (key, action) {
+      return {
+        matches: is$1(key),
+        classification: action
+      };
+    };
     var rule = function (matches, action) {
       return {
         matches: matches,
@@ -6109,6 +7059,12 @@ var silver = (function (domGlobals) {
         return t.classification;
       });
     };
+
+    var KeyRules = /*#__PURE__*/Object.freeze({
+        basic: basic,
+        rule: rule,
+        choose: choose$2
+    });
 
     var focus$1 = function (element) {
       element.dom().focus();
@@ -6543,7 +7499,7 @@ var silver = (function (domGlobals) {
       initSize()
     ];
     var focusIn = function (component, gridConfig, gridState) {
-      descendant$1(component.element(), gridConfig.selector).each(function (first) {
+      descendant$2(component.element(), gridConfig.selector).each(function (first) {
         gridConfig.focusManager.set(component, first);
       });
     };
@@ -6634,7 +7590,7 @@ var silver = (function (domGlobals) {
     };
     var focusIn$1 = function (component, flowConfig) {
       flowConfig.getInitial(component).orThunk(function () {
-        return descendant$1(component.element(), flowConfig.selector);
+        return descendant$2(component.element(), flowConfig.selector);
       }).each(function (first) {
         flowConfig.focusManager.set(component, first);
       });
@@ -6748,7 +7704,7 @@ var silver = (function (domGlobals) {
     var focusIn$2 = function (component, matrixConfig) {
       var focused = matrixConfig.previousSelector(component).orThunk(function () {
         var selectors = matrixConfig.selectors;
-        return descendant$1(component.element(), selectors.cell);
+        return descendant$2(component.element(), selectors.cell);
       });
       focused.each(function (cell) {
         matrixConfig.focusManager.set(component, cell);
@@ -6808,7 +7764,7 @@ var silver = (function (domGlobals) {
       });
     };
     var focusIn$3 = function (component, menuConfig) {
-      descendant$1(component.element(), menuConfig.selector).each(function (first) {
+      descendant$2(component.element(), menuConfig.selector).each(function (first) {
         menuConfig.focusManager.set(component, first);
       });
     };
@@ -6940,7 +7896,7 @@ var silver = (function (domGlobals) {
       state: KeyingState
     });
 
-    var preserve = function (f, container) {
+    var preserve$1 = function (f, container) {
       var ownerDoc = owner(container);
       var refocus = active(ownerDoc).bind(function (focused) {
         var hasFocus = function (elem) {
@@ -6961,7 +7917,7 @@ var silver = (function (domGlobals) {
 
     var set$5 = function (component, replaceConfig, replaceState, data) {
       detachChildren(component);
-      preserve(function () {
+      preserve$1(function () {
         var children = map(data, component.getSystem().build);
         each(children, function (l) {
           attach(component, l);
@@ -7323,7 +8279,7 @@ var silver = (function (domGlobals) {
         }
       });
     };
-    var toggle = function (component, toggleConfig, toggleState) {
+    var toggle$2 = function (component, toggleConfig, toggleState) {
       set$6(component, toggleConfig, toggleState, !toggleState.get());
     };
     var on = function (component, toggleConfig, toggleState) {
@@ -7349,7 +8305,7 @@ var silver = (function (domGlobals) {
 
     var ToggleApis = /*#__PURE__*/Object.freeze({
         onLoad: onLoad$4,
-        toggle: toggle,
+        toggle: toggle$2,
         isOn: isOn,
         on: on,
         off: off,
@@ -7360,7 +8316,7 @@ var silver = (function (domGlobals) {
       return nu$6({});
     };
     var events$5 = function (toggleConfig, toggleState) {
-      var execute = executeEvent(toggleConfig, toggleState, toggle);
+      var execute = executeEvent(toggleConfig, toggleState, toggle$2);
       var load = loadEvent(toggleConfig, toggleState, onLoad$4);
       return derive(flatten([
         toggleConfig.toggleOnExecute ? [execute] : [],
@@ -7373,31 +8329,30 @@ var silver = (function (domGlobals) {
         events: events$5
     });
 
-    var init$3 = function (spec) {
-      var cell = Cell(false);
-      var set = function (state) {
-        return cell.set(state);
+    var SetupBehaviourCellState = function (initialState) {
+      var init = function () {
+        var cell = Cell(initialState);
+        var get = function () {
+          return cell.get();
+        };
+        var set = function (newState) {
+          return cell.set(newState);
+        };
+        var clear = function () {
+          return cell.set(initialState);
+        };
+        var readState = function () {
+          return cell.get();
+        };
+        return {
+          get: get,
+          set: set,
+          clear: clear,
+          readState: readState
+        };
       };
-      var clear = function () {
-        return cell.set(false);
-      };
-      var get = function () {
-        return cell.get();
-      };
-      var readState = function () {
-        return cell.get();
-      };
-      return {
-        readState: readState,
-        get: get,
-        set: set,
-        clear: clear
-      };
+      return { init: init };
     };
-
-    var TogglingState = /*#__PURE__*/Object.freeze({
-        init: init$3
-    });
 
     var updatePressed = function (component, ariaInfo, status) {
       set$1(component.element(), 'aria-pressed', status);
@@ -7436,7 +8391,7 @@ var silver = (function (domGlobals) {
       name: 'toggling',
       active: ActiveToggle,
       apis: ToggleApis,
-      state: TogglingState
+      state: SetupBehaviourCellState(false)
     });
 
     var hoverEvent = 'alloy.item-hover';
@@ -7826,7 +8781,7 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var init$4 = function () {
+    var init$3 = function () {
       var expansions = Cell({});
       var menus = Cell({});
       var paths = Cell({});
@@ -7901,7 +8856,7 @@ var silver = (function (domGlobals) {
         isClear: isClear
       };
     };
-    var LayeredState = { init: init$4 };
+    var LayeredState = { init: init$3 };
 
     var make$2 = function (detail, rawUiSpec) {
       var submenuParentItems = Cell(Option.none());
@@ -8474,6 +9429,10 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var Memento = /*#__PURE__*/Object.freeze({
+        record: record
+    });
+
     var defaultIcon = function (icons) {
       return Option.from(icons()['temporary-placeholder']).getOr('!not found!');
     };
@@ -8702,7 +9661,7 @@ var silver = (function (domGlobals) {
             'warning',
             'info'
           ], settings.type) ? settings.type : undefined,
-          progress: settings.progressBar === true ? true : false,
+          progress: settings.progressBar === true,
           icon: Option.from(settings.icon),
           onAction: close,
           iconProvider: backstage.shared.providers.icons,
@@ -9109,7 +10068,7 @@ var silver = (function (domGlobals) {
       onHandler('onShow')
     ];
 
-    var init$5 = function () {
+    var init$4 = function () {
       var timer = Cell(Option.none());
       var popup = Cell(Option.none());
       var getTooltip = function () {
@@ -9148,7 +10107,7 @@ var silver = (function (domGlobals) {
     };
 
     var TooltippingState = /*#__PURE__*/Object.freeze({
-        init: init$5
+        init: init$4
     });
 
     var ExclusivityChannel = generate$1('tooltip.exclusive');
@@ -9397,14 +10356,14 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var renderColorStructure = function (itemText, itemValue, iconSvg) {
+    var renderColorStructure = function (itemText, itemValue, iconSvg, providerBackstage) {
       var colorPickerCommand = 'custom';
       var removeColorCommand = 'remove';
       var getDom = function () {
         var common = colorClass;
         var icon = iconSvg.getOr('');
         var title = itemText.map(function (text) {
-          return ' title="' + text + '"';
+          return ' title="' + providerBackstage.translate(text) + '"';
         }).getOr('');
         if (itemValue === colorPickerCommand) {
           return fromHtml$2('<button class="' + common + ' tox-swatches__picker-btn"' + title + '>' + icon + '</button>');
@@ -9457,7 +10416,7 @@ var silver = (function (domGlobals) {
         return has(meta, 'style') ? curry(renderStyledText, meta.style) : renderText;
       });
       if (info.presets === 'color') {
-        return renderColorStructure(info.ariaLabel, info.value, icon);
+        return renderColorStructure(info.ariaLabel, info.value, icon, providersBackstage);
       } else {
         return renderNormalItemStructure(info, icon, renderIcons, textRender);
       }
@@ -9511,12 +10470,17 @@ var silver = (function (domGlobals) {
     var isDisabled = function (component) {
       return hasNative(component) ? nativeIsDisabled(component) : ariaIsDisabled(component);
     };
+    var set$7 = function (component, disableConfig, disableState, disabled) {
+      var f = disabled ? disable : enable;
+      f(component, disableConfig, disableState);
+    };
 
     var DisableApis = /*#__PURE__*/Object.freeze({
         enable: enable,
         disable: disable,
         isDisabled: isDisabled,
-        onLoad: onLoad$5
+        onLoad: onLoad$5,
+        set: set$7
     });
 
     var exhibit$3 = function (base, disableConfig, disableState) {
@@ -9715,7 +10679,7 @@ var silver = (function (domGlobals) {
             return Disabling.isDisabled(component);
           },
           setDisabled: function (state) {
-            return state ? Disabling.disable(component) : Disabling.enable(component);
+            return Disabling.set(component, state);
           }
         };
       };
@@ -9892,7 +10856,7 @@ var silver = (function (domGlobals) {
             return Disabling.isDisabled(component);
           },
           setDisabled: function (state) {
-            return state ? Disabling.disable(component) : Disabling.enable(component);
+            return Disabling.set(component, state);
           }
         };
       };
@@ -9927,7 +10891,7 @@ var silver = (function (domGlobals) {
             return Disabling.isDisabled(component);
           },
           setDisabled: function (state) {
-            return state ? Disabling.disable(component) : Disabling.enable(component);
+            return Disabling.set(component, state);
           }
         };
       };
@@ -9983,7 +10947,7 @@ var silver = (function (domGlobals) {
             return Disabling.isDisabled(component);
           },
           setDisabled: function (state) {
-            return state ? Disabling.disable(component) : Disabling.enable(component);
+            return Disabling.set(component, state);
           }
         };
       };
@@ -10019,7 +10983,7 @@ var silver = (function (domGlobals) {
     var separator = renderSeparatorItem;
     var normal = renderNormalItem;
     var nested = renderNestedItem;
-    var toggle$1 = renderToggleMenuItem;
+    var toggle$3 = renderToggleMenuItem;
     var fancy = renderFancyMenuItem;
 
     var forMenu = function (presets) {
@@ -10266,7 +11230,7 @@ var silver = (function (domGlobals) {
         });
       case 'togglemenuitem':
         return createToggleMenuItem(item).fold(handleError, function (d) {
-          return Option.some(toggle$1(d, itemResponse, providersBackstage));
+          return Option.some(toggle$3(d, itemResponse, providersBackstage));
         });
       case 'separator':
         return createSeparatorMenuItem(item).fold(handleError, function (d) {
@@ -11241,7 +12205,7 @@ var silver = (function (domGlobals) {
     var fixedContainerElement = function (editor) {
       var selector = fixedContainerSelector(editor);
       var isInline = editor.getParam('inline', false, 'boolean');
-      return selector.length > 0 && isInline ? descendant$1(body(), selector) : Option.none();
+      return selector.length > 0 && isInline ? descendant$2(body(), selector) : Option.none();
     };
     var useFixedContainer = function (editor) {
       return editor.getParam('inline', false, 'boolean') && fixedContainerElement(editor).isSome();
@@ -11431,12 +12395,12 @@ var silver = (function (domGlobals) {
 
     var CouplingSchema = [strictOf('others', setOf$1(Result.value, anyValue$1()))];
 
-    var init$6 = function (spec) {
+    var init$5 = function (spec) {
       var coupled = {};
       var getOrCreate = function (component, coupleConfig, name) {
         var available = keys(coupleConfig.others);
         if (!available) {
-          throw new Error('Cannot find coupled component: ' + name + '. Known coupled components: ' + JSON$1.stringify(available, null, 2));
+          throw new Error('Cannot find coupled component: ' + name + '. Known coupled components: ' + Json.stringify(available, null, 2));
         } else {
           return readOptFrom$1(coupled, name).getOrThunk(function () {
             var builder = readOptFrom$1(coupleConfig.others, name).getOrDie('No information found for coupled component: ' + name);
@@ -11455,7 +12419,7 @@ var silver = (function (domGlobals) {
     };
 
     var CouplingState = /*#__PURE__*/Object.freeze({
-        init: init$6
+        init: init$5
     });
 
     var Coupling = create$1({
@@ -11504,13 +12468,13 @@ var silver = (function (domGlobals) {
         cancel: cancel
       });
     };
-    var init$7 = function (spec) {
+    var init$6 = function (spec) {
       return spec.stream.streams.state(spec);
     };
 
     var StreamingState = /*#__PURE__*/Object.freeze({
         throttle: throttle,
-        init: init$7
+        init: init$6
     });
 
     var setup$2 = function (streamInfo, streamState) {
@@ -12576,26 +13540,34 @@ var silver = (function (domGlobals) {
     var isHexString = function (hex) {
       return shorthandRegex.test(hex) || longformRegex.test(hex);
     };
-    var getLongForm = function (hexColour) {
-      var hexString = hexColour.value().replace(shorthandRegex, function (m, r, g, b) {
+    var getLongForm = function (hex) {
+      var hexString = hex.value().replace(shorthandRegex, function (m, r, g, b) {
         return r + r + g + g + b + b;
       });
       return { value: constant(hexString) };
     };
-    var extractValues = function (hexColour) {
-      var longForm = getLongForm(hexColour);
-      return longformRegex.exec(longForm.value());
+    var extractValues = function (hex) {
+      var longForm = getLongForm(hex);
+      var splitForm = longformRegex.exec(longForm.value());
+      return splitForm === null ? [
+        'FFFFFF',
+        'FF',
+        'FF',
+        'FF'
+      ] : splitForm;
     };
     var toHex = function (component) {
       var hex = component.toString(16);
-      return hex.length == 1 ? '0' + hex : hex;
+      return hex.length === 1 ? '0' + hex : hex;
     };
     var fromRgba = function (rgbaColour) {
       var value = toHex(rgbaColour.red()) + toHex(rgbaColour.green()) + toHex(rgbaColour.blue());
       return hexColour(value);
     };
 
-    var min = Math.min, max = Math.max, round = Math.round;
+    var min = Math.min;
+    var max = Math.max;
+    var round = Math.round;
     var rgbRegex = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)/;
     var rgbaRegex = /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*(\d?(?:\.\d+)?)\)/;
     var rgbaColour = function (red, green, blue, alpha) {
@@ -12611,20 +13583,22 @@ var silver = (function (domGlobals) {
       return num.toString() === value && num >= 0 && num <= 255;
     };
     var fromHsv = function (hsv) {
-      var side, chroma, x, match, hue, saturation, brightness, r, g, b;
-      hue = (hsv.hue() || 0) % 360;
-      saturation = hsv.saturation() / 100;
-      brightness = hsv.value() / 100;
+      var r;
+      var g;
+      var b;
+      var hue = (hsv.hue() || 0) % 360;
+      var saturation = hsv.saturation() / 100;
+      var brightness = hsv.value() / 100;
       saturation = max(0, min(saturation, 1));
       brightness = max(0, min(brightness, 1));
       if (saturation === 0) {
         r = g = b = round(255 * brightness);
         return rgbaColour(r, g, b, 1);
       }
-      side = hue / 60;
-      chroma = brightness * saturation;
-      x = chroma * (1 - Math.abs(side % 2 - 1));
-      match = brightness - chroma;
+      var side = hue / 60;
+      var chroma = brightness * saturation;
+      var x = chroma * (1 - Math.abs(side % 2 - 1));
+      var match = brightness - chroma;
       switch (Math.floor(side)) {
       case 0:
         r = chroma;
@@ -12681,20 +13655,21 @@ var silver = (function (domGlobals) {
     var fromString = function (rgbaString) {
       if (rgbaString === 'transparent') {
         return Option.some(rgbaColour(0, 0, 0, 0));
-      } else if (rgbRegex.test(rgbaString)) {
-        var rgbMatch = rgbRegex.exec(rgbaString);
-        return Option.some(fromStringValues(rgbMatch[1], rgbMatch[2], rgbMatch[3], '1'));
-      } else if (rgbaRegex.test(rgbaString)) {
-        var rgbaMatch = rgbRegex.exec(rgbaString);
-        return Option.some(fromStringValues(rgbaMatch[1], rgbaMatch[2], rgbaMatch[3], rgbaMatch[4]));
-      } else {
-        return Option.none();
       }
+      var rgbMatch = rgbRegex.exec(rgbaString);
+      if (rgbMatch !== null) {
+        return Option.some(fromStringValues(rgbMatch[1], rgbMatch[2], rgbMatch[3], '1'));
+      }
+      var rgbaMatch = rgbaRegex.exec(rgbaString);
+      if (rgbaMatch !== null) {
+        return Option.some(fromStringValues(rgbaMatch[1], rgbaMatch[2], rgbaMatch[3], rgbaMatch[4]));
+      }
+      return Option.none();
     };
     var toString = function (rgba) {
       return 'rgba(' + rgba.red() + ',' + rgba.green() + ',' + rgba.blue() + ',' + rgba.alpha() + ')';
     };
-    var red = constant(rgbaColour(255, 0, 0, 1));
+    var redColour = constant(rgbaColour(255, 0, 0, 1));
 
     var global$7 = tinymce.util.Tools.resolve('tinymce.util.LocalStorage');
 
@@ -13428,6 +14403,45 @@ var silver = (function (domGlobals) {
       });
     };
 
+    var hsvColour = function (hue, saturation, value) {
+      return {
+        hue: constant(hue),
+        saturation: constant(saturation),
+        value: constant(value)
+      };
+    };
+    var fromRgb = function (rgbaColour) {
+      var h = 0;
+      var s = 0;
+      var v = 0;
+      var r = rgbaColour.red() / 255;
+      var g = rgbaColour.green() / 255;
+      var b = rgbaColour.blue() / 255;
+      var minRGB = Math.min(r, Math.min(g, b));
+      var maxRGB = Math.max(r, Math.max(g, b));
+      if (minRGB === maxRGB) {
+        v = minRGB;
+        return hsvColour(0, 0, v * 100);
+      }
+      var d = r === minRGB ? g - b : b === minRGB ? r - g : b - r;
+      h = r === minRGB ? 3 : b === minRGB ? 1 : 5;
+      h = 60 * (h - d / (maxRGB - minRGB));
+      s = (maxRGB - minRGB) / maxRGB;
+      v = maxRGB;
+      return hsvColour(Math.round(h), Math.round(s * 100), Math.round(v * 100));
+    };
+
+    var calcHex = function (value) {
+      var hue = (100 - value) / 100 * 360;
+      var hsv = hsvColour(hue, 100, 100);
+      var rgb = fromHsv(hsv);
+      return fromRgba(rgb);
+    };
+
+    var fieldsUpdate = constant(generate$1('rgb-hex-update'));
+    var sliderUpdate = constant(generate$1('slider-update'));
+    var paletteUpdate = constant(generate$1('palette-update'));
+
     var platform = PlatformDetection$1.detect();
     var isTouch = platform.deviceType.isTouch();
     var labelPart = optional({
@@ -13659,14 +14673,14 @@ var silver = (function (domGlobals) {
     var max1Y = function (detail) {
       return detail.model.maxY + 1;
     };
-    var range$1 = function (detail, max, min) {
+    var range$2 = function (detail, max, min) {
       return max(detail) - min(detail);
     };
     var xRange = function (detail) {
-      return range$1(detail, maxX, minX);
+      return range$2(detail, maxX, minX);
     };
     var yRange = function (detail) {
-      return range$1(detail, maxY, minY);
+      return range$2(detail, maxY, minY);
     };
     var halfX = function (detail) {
       return xRange(detail) / 2;
@@ -14327,96 +15341,6 @@ var silver = (function (domGlobals) {
       }
     });
 
-    var fieldsUpdate = constant(generate$1('rgb-hex-update'));
-    var sliderUpdate = constant(generate$1('slider-update'));
-    var paletteUpdate = constant(generate$1('palette-update'));
-
-    var paletteFactory = function (translate, getClass) {
-      var spectrum = Slider.parts().spectrum({
-        dom: {
-          tag: 'canvas',
-          attributes: { role: 'presentation' },
-          classes: [getClass('sv-palette-spectrum')]
-        }
-      });
-      var thumb = Slider.parts().thumb({
-        dom: {
-          tag: 'div',
-          attributes: { role: 'presentation' },
-          classes: [getClass('sv-palette-thumb')],
-          innerHtml: '<div class=' + getClass('sv-palette-inner-thumb') + ' role="presentation"></div>'
-        }
-      });
-      var setColour = function (canvas, rgba) {
-        var width = canvas.width, height = canvas.height;
-        var ctx = canvas.getContext('2d');
-        ctx.fillStyle = rgba;
-        ctx.fillRect(0, 0, width, height);
-        var grdWhite = ctx.createLinearGradient(0, 0, width, 0);
-        grdWhite.addColorStop(0, 'rgba(255,255,255,1)');
-        grdWhite.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = grdWhite;
-        ctx.fillRect(0, 0, width, height);
-        var grdBlack = ctx.createLinearGradient(0, 0, 0, height);
-        grdBlack.addColorStop(0, 'rgba(0,0,0,0)');
-        grdBlack.addColorStop(1, 'rgba(0,0,0,1)');
-        ctx.fillStyle = grdBlack;
-        ctx.fillRect(0, 0, width, height);
-      };
-      var setSliderColour = function (slider, rgba) {
-        var canvas = slider.components()[0].element().dom();
-        setColour(canvas, toString(rgba));
-      };
-      var factory = function (detail) {
-        var getInitialValue = constant({
-          x: constant(0),
-          y: constant(0)
-        });
-        var onChange = function (slider, _thumb, value) {
-          emitWith(slider, paletteUpdate(), { value: value });
-        };
-        var onInit = function (_slider, _thumb, spectrum, _value) {
-          setColour(spectrum.element().dom(), toString(red()));
-        };
-        var sliderBehaviours = derive$1([
-          Composing.config({ find: Option.some }),
-          Focusing.config({})
-        ]);
-        return Slider.sketch({
-          dom: {
-            tag: 'div',
-            attributes: { role: 'presentation' },
-            classes: [getClass('sv-palette')]
-          },
-          model: {
-            mode: 'xy',
-            getInitialValue: getInitialValue
-          },
-          rounded: false,
-          components: [
-            spectrum,
-            thumb
-          ],
-          onChange: onChange,
-          onInit: onInit,
-          sliderBehaviours: sliderBehaviours
-        });
-      };
-      var SaturationBrightnessPalette = single$2({
-        factory: factory,
-        name: 'SaturationBrightnessPalette',
-        configFields: [],
-        apis: {
-          setRgba: function (apis, slider, rgba) {
-            setSliderColour(slider, rgba);
-          }
-        },
-        extraApis: {}
-      });
-      return SaturationBrightnessPalette;
-    };
-    var SaturationBrightnessPalette = { paletteFactory: paletteFactory };
-
     var sliderFactory = function (translate, getClass) {
       var spectrum = Slider.parts().spectrum({
         dom: {
@@ -14448,7 +15372,7 @@ var silver = (function (domGlobals) {
           thumb
         ],
         sliderBehaviours: derive$1([Focusing.config({})]),
-        onChange: function (slider, thumb, value) {
+        onChange: function (slider, _thumb, value) {
           emitWith(slider, sliderUpdate(), { value: value });
         }
       });
@@ -14615,7 +15539,9 @@ var silver = (function (domGlobals) {
         return hex;
       };
       var copyRgbToForm = function (form, rgb) {
-        var red = rgb.red(), green = rgb.green(), blue = rgb.blue();
+        var red = rgb.red();
+        var green = rgb.green();
+        var blue = rgb.blue();
         Representing.setValue(form, {
           red: red,
           green: green,
@@ -14635,7 +15561,7 @@ var silver = (function (domGlobals) {
           set$2(preview.element(), 'background-color', '#' + hex.value());
         });
       };
-      var factory = function (detail) {
+      var factory = function () {
         var state = {
           red: constant(Cell(Option.some(255))),
           green: constant(Cell(Option.some(255))),
@@ -14663,7 +15589,9 @@ var silver = (function (domGlobals) {
           });
         };
         var setValueRgb = function (rgb) {
-          var red = rgb.red(), green = rgb.green(), blue = rgb.blue();
+          var red = rgb.red();
+          var green = rgb.green();
+          var blue = rgb.blue();
           set('red', Option.some(red));
           set('green', Option.some(green));
           set('blue', Option.some(blue));
@@ -14694,9 +15622,12 @@ var silver = (function (domGlobals) {
             updatePreview(form, hex);
           });
         };
+        var isHexInputEvent = function (data) {
+          return data.type() === 'hex';
+        };
         var onValidInput = function (form, simulatedEvent) {
           var data = simulatedEvent.event();
-          if (data.type() === 'hex') {
+          if (isHexInputEvent(data)) {
             onValidHex(form, data.value());
           } else {
             onValidRgb(form, data.type(), data.value());
@@ -14745,7 +15676,7 @@ var silver = (function (domGlobals) {
           }
         });
       };
-      var RgbForm = single$2({
+      var rgbFormSketcher = single$2({
         factory: factory,
         name: 'RgbForm',
         configFields: [],
@@ -14756,51 +15687,104 @@ var silver = (function (domGlobals) {
         },
         extraApis: {}
       });
-      return RgbForm;
+      return rgbFormSketcher;
     };
     var RgbForm = { rgbFormFactory: rgbFormFactory };
 
-    var hsvColour = function (hue, saturation, value) {
-      return {
-        hue: constant(hue),
-        saturation: constant(saturation),
-        value: constant(value)
+    var paletteFactory = function (_translate, getClass) {
+      var spectrumPart = Slider.parts().spectrum({
+        dom: {
+          tag: 'canvas',
+          attributes: { role: 'presentation' },
+          classes: [getClass('sv-palette-spectrum')]
+        }
+      });
+      var thumbPart = Slider.parts().thumb({
+        dom: {
+          tag: 'div',
+          attributes: { role: 'presentation' },
+          classes: [getClass('sv-palette-thumb')],
+          innerHtml: '<div class=' + getClass('sv-palette-inner-thumb') + ' role="presentation"></div>'
+        }
+      });
+      var setColour = function (canvas, rgba) {
+        var width = canvas.width, height = canvas.height;
+        var ctx = canvas.getContext('2d');
+        if (ctx === null) {
+          return;
+        }
+        ctx.fillStyle = rgba;
+        ctx.fillRect(0, 0, width, height);
+        var grdWhite = ctx.createLinearGradient(0, 0, width, 0);
+        grdWhite.addColorStop(0, 'rgba(255,255,255,1)');
+        grdWhite.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = grdWhite;
+        ctx.fillRect(0, 0, width, height);
+        var grdBlack = ctx.createLinearGradient(0, 0, 0, height);
+        grdBlack.addColorStop(0, 'rgba(0,0,0,0)');
+        grdBlack.addColorStop(1, 'rgba(0,0,0,1)');
+        ctx.fillStyle = grdBlack;
+        ctx.fillRect(0, 0, width, height);
       };
+      var setSliderColour = function (slider, rgba) {
+        var canvas = slider.components()[0].element().dom();
+        setColour(canvas, toString(rgba));
+      };
+      var factory = function (_detail) {
+        var getInitialValue = constant({
+          x: constant(0),
+          y: constant(0)
+        });
+        var onChange = function (slider, _thumb, value) {
+          emitWith(slider, paletteUpdate(), { value: value });
+        };
+        var onInit = function (_slider, _thumb, spectrum, _value) {
+          setColour(spectrum.element().dom(), toString(redColour()));
+        };
+        var sliderBehaviours = derive$1([
+          Composing.config({ find: Option.some }),
+          Focusing.config({})
+        ]);
+        return Slider.sketch({
+          dom: {
+            tag: 'div',
+            attributes: { role: 'presentation' },
+            classes: [getClass('sv-palette')]
+          },
+          model: {
+            mode: 'xy',
+            getInitialValue: getInitialValue
+          },
+          rounded: false,
+          components: [
+            spectrumPart,
+            thumbPart
+          ],
+          onChange: onChange,
+          onInit: onInit,
+          sliderBehaviours: sliderBehaviours
+        });
+      };
+      var saturationBrightnessPaletteSketcher = single$2({
+        factory: factory,
+        name: 'SaturationBrightnessPalette',
+        configFields: [],
+        apis: {
+          setRgba: function (_apis, slider, rgba) {
+            setSliderColour(slider, rgba);
+          }
+        },
+        extraApis: {}
+      });
+      return saturationBrightnessPaletteSketcher;
     };
-    var fromRgb = function (rgbaColour) {
-      var r, g, b, h, s, v, d, minRGB, maxRGB;
-      h = 0;
-      s = 0;
-      v = 0;
-      r = rgbaColour.red() / 255;
-      g = rgbaColour.green() / 255;
-      b = rgbaColour.blue() / 255;
-      minRGB = Math.min(r, Math.min(g, b));
-      maxRGB = Math.max(r, Math.max(g, b));
-      if (minRGB === maxRGB) {
-        v = minRGB;
-        return hsvColour(0, 0, v * 100);
-      }
-      d = r === minRGB ? g - b : b === minRGB ? r - g : b - r;
-      h = r === minRGB ? 3 : b === minRGB ? 1 : 5;
-      h = 60 * (h - d / (maxRGB - minRGB));
-      s = (maxRGB - minRGB) / maxRGB;
-      v = maxRGB;
-      return hsvColour(Math.round(h), Math.round(s * 100), Math.round(v * 100));
-    };
-
-    var calcHex = function (value) {
-      var hue = (100 - value / 100) * 360;
-      var hsv = hsvColour(hue, 100, 100);
-      var rgb = fromHsv(hsv);
-      return fromRgba(rgb);
-    };
+    var SaturationBrightnessPalette = { paletteFactory: paletteFactory };
 
     var makeFactory = function (translate, getClass) {
       var factory = function (detail) {
         var rgbForm = RgbForm.rgbFormFactory(translate, getClass, detail.onValidHex, detail.onInvalidHex);
         var sbPalette = SaturationBrightnessPalette.paletteFactory(translate, getClass);
-        var state = { paletteRgba: constant(Cell(red())) };
+        var state = { paletteRgba: constant(Cell(redColour())) };
         var memPalette = record(sbPalette.sketch({}));
         var memRgb = record(rgbForm.sketch({}));
         var updatePalette = function (anyInSystem, hex) {
@@ -14865,16 +15849,16 @@ var silver = (function (domGlobals) {
           ])
         };
       };
-      var ColourPicker = single$2({
+      var colourPickerSketcher = single$2({
         name: 'ColourPicker',
         configFields: [
+          strict$1('dom'),
           defaulted$1('onValidHex', noop),
-          defaulted$1('onInvalidHex', noop),
-          optionString('formChangeEvent')
+          defaulted$1('onInvalidHex', noop)
         ],
         factory: factory
       });
-      return ColourPicker;
+      return colourPickerSketcher;
     };
     var ColourPicker = { makeFactory: makeFactory };
 
@@ -15549,7 +16533,7 @@ var silver = (function (domGlobals) {
       };
       return Promise;
     };
-    var Promise = window.Promise ? window.Promise : promise();
+    var Promise$1 = window.Promise ? window.Promise : promise();
 
     function Blob (parts, properties) {
       var f = Global$1.getOrDie('Blob');
@@ -15587,7 +16571,7 @@ var silver = (function (domGlobals) {
       return anyUriToBlob(src);
     }
     function blobToImage(blob) {
-      return new Promise(function (resolve, reject) {
+      return new Promise$1(function (resolve, reject) {
         var blobUrl = domGlobals.URL.createObjectURL(blob);
         var image = new domGlobals.Image();
         var removeListeners = function () {
@@ -15611,7 +16595,7 @@ var silver = (function (domGlobals) {
       });
     }
     function anyUriToBlob(url) {
-      return new Promise(function (resolve, reject) {
+      return new Promise$1(function (resolve, reject) {
         var xhr = new domGlobals.XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'blob';
@@ -15660,7 +16644,7 @@ var silver = (function (domGlobals) {
       return Option.some(Blob(byteArrays, { type: mimetype }));
     }
     function dataUriToBlob(uri) {
-      return new Promise(function (resolve, reject) {
+      return new Promise$1(function (resolve, reject) {
         dataUriToBlobSync(uri).fold(function () {
           reject('uri is not base64: ' + uri);
         }, resolve);
@@ -15678,7 +16662,7 @@ var silver = (function (domGlobals) {
     function canvasToBlob(canvas, type, quality) {
       type = type || 'image/png';
       if (domGlobals.HTMLCanvasElement.prototype.toBlob) {
-        return new Promise(function (resolve) {
+        return new Promise$1(function (resolve) {
           canvas.toBlob(function (blob) {
             resolve(blob);
           }, type, quality);
@@ -15704,7 +16688,7 @@ var silver = (function (domGlobals) {
       });
     }
     function blobToDataUri(blob) {
-      return new Promise(function (resolve) {
+      return new Promise$1(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -15713,7 +16697,7 @@ var silver = (function (domGlobals) {
       });
     }
     function blobToArrayBuffer(blob) {
-      return new Promise(function (resolve) {
+      return new Promise$1(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -15746,7 +16730,7 @@ var silver = (function (domGlobals) {
       var initialType = blob.type;
       var getType = constant(initialType);
       function toBlob() {
-        return Promise.resolve(blob);
+        return Promise$1.resolve(blob);
       }
       function toDataURL() {
         return uri;
@@ -15790,7 +16774,7 @@ var silver = (function (domGlobals) {
     }
     function fromCanvas(canvas, type) {
       return Conversions.canvasToBlob(canvas, type).then(function (blob) {
-        return create$5(Promise.resolve(canvas), blob, canvas.toDataURL());
+        return create$5(Promise$1.resolve(canvas), blob, canvas.toDataURL());
       });
     }
     function fromImage(image) {
@@ -16459,7 +17443,7 @@ var silver = (function (domGlobals) {
       });
     }
     function _scale(image, wRatio, hRatio) {
-      return new Promise(function (resolve) {
+      return new Promise$1(function (resolve) {
         var sW = ImageSize.getWidth(image);
         var sH = ImageSize.getHeight(image);
         var dW = Math.floor(sW * wRatio);
@@ -16952,14 +17936,14 @@ var silver = (function (domGlobals) {
                 thumb: exifReader.thumb()
               };
             } else {
-              return Promise.reject('Headers did not include required information');
+              return Promise$1.reject('Headers did not include required information');
             }
             meta.rawHeaders = headers;
             return meta;
           }
-          return Promise.reject('Image was not a jpeg');
+          return Promise$1.reject('Image was not a jpeg');
         } catch (ex) {
-          return Promise.reject('Unsupported format or not an image: ' + blob.type + ' (Exception: ' + ex.message + ')');
+          return Promise$1.reject('Unsupported format or not an image: ' + blob.type + ' (Exception: ' + ex.message + ')');
         }
       });
     };
@@ -17562,7 +18546,7 @@ var silver = (function (domGlobals) {
     var redo = constant(generate$1('redo'));
     var zoom = constant(generate$1('zoom'));
     var back = constant(generate$1('back'));
-    var apply = constant(generate$1('apply'));
+    var apply$1 = constant(generate$1('apply'));
     var swap = constant(generate$1('swap'));
     var transform = constant(generate$1('transform'));
     var tempTransform = constant(generate$1('temp-transform'));
@@ -17572,7 +18556,7 @@ var silver = (function (domGlobals) {
       redo: redo,
       zoom: zoom,
       back: back,
-      apply: apply,
+      apply: apply$1,
       swap: swap,
       transform: transform,
       tempTransform: tempTransform,
@@ -17989,6 +18973,10 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var EditPanel = /*#__PURE__*/Object.freeze({
+        renderEditPanel: renderEditPanel
+    });
+
     var global$8 = tinymce.util.Tools.resolve('tinymce.dom.DomQuery');
 
     var global$9 = tinymce.util.Tools.resolve('tinymce.geom.Rect');
@@ -18218,7 +19206,7 @@ var silver = (function (domGlobals) {
         dragHelpers = global$b.map(handles, createDragHelper);
         repaint(currentRect);
         global$8(containerElm).on('focusin focusout', function (e) {
-          global$8(e.target).attr('aria-grabbed', e.type === 'focus');
+          global$8(e.target).attr('aria-grabbed', e.type === 'focus' ? 'true' : 'false');
         });
         global$8(containerElm).on('keydown', function (e) {
           var activeHandle;
@@ -18565,6 +19553,10 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var ImagePanel = /*#__PURE__*/Object.freeze({
+        renderImagePanel: renderImagePanel
+    });
+
     var createButton = function (innerHtml, icon, disabled, action, providersBackstage) {
       return renderIconButton({
         name: innerHtml,
@@ -18619,6 +19611,10 @@ var silver = (function (domGlobals) {
         updateButtonUndoStates: updateButtonUndoStates
       };
     };
+
+    var SideBar = /*#__PURE__*/Object.freeze({
+        renderSideBar: renderSideBar
+    });
 
     var url = function () {
       return Global$1.getOrDie('URL');
@@ -18995,13 +19991,19 @@ var silver = (function (domGlobals) {
     });
 
     var renderSelectBox = function (spec, providersBackstage) {
+      var translatedOptions = map(spec.items, function (item) {
+        return {
+          text: providersBackstage.translate(item.text),
+          value: item.value
+        };
+      });
       var pLabel = spec.label.map(function (label) {
         return renderLabel(label, providersBackstage);
       });
       var pField = FormField.parts().field({
         dom: {},
         selectAttributes: { size: spec.size },
-        options: spec.items,
+        options: translatedOptions,
         factory: HtmlSelect,
         selectBehaviours: derive$1([
           Tabstopping.config({}),
@@ -19180,7 +20182,7 @@ var silver = (function (domGlobals) {
     var nu$c = function (worker) {
       return wrap$2(Future.nu(worker));
     };
-    var value$2 = function (value) {
+    var value$3 = function (value) {
       return wrap$2(Future.pure(Result.value(value)));
     };
     var error$1 = function (error) {
@@ -19204,8 +20206,8 @@ var silver = (function (domGlobals) {
     var FutureResult = {
       nu: nu$c,
       wrap: wrap$2,
-      pure: value$2,
-      value: value$2,
+      pure: value$3,
+      value: value$3,
       error: error$1,
       fromResult: fromResult$1,
       fromFuture: fromFuture,
@@ -19685,13 +20687,13 @@ var silver = (function (domGlobals) {
           });
         })),
         run(focusin(), runOnItem(function (comp, tgt, itemValue) {
-          descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
+          descendant$2(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
           });
           add$2(tgt, activeClass);
         })),
         run(focusout(), runOnItem(function (comp, tgt, itemValue) {
-          descendant$1(comp.element(), '.' + activeClass).each(function (currentActive) {
+          descendant$2(comp.element(), '.' + activeClass).each(function (currentActive) {
             remove$4(currentActive, activeClass);
           });
         })),
@@ -20017,7 +21019,7 @@ var silver = (function (domGlobals) {
           root: bodyElement(),
           getSelection: function () {
             var rng = editor.selection.getRng();
-            return Option.some(range(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset));
+            return Option.some(range$1(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset));
           }
         };
       };
@@ -20312,7 +21314,7 @@ var silver = (function (domGlobals) {
       return doEnrich(formats);
     };
 
-    var init$8 = function (editor) {
+    var init$7 = function (editor) {
       var isSelectedFor = function (format) {
         return function () {
           return editor.formatter.match(format);
@@ -20607,7 +21609,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var init$9 = function (sink, editor, lazyAnchorbar, lazyMoreButton) {
+    var init$8 = function (sink, editor, lazyAnchorbar, lazyMoreButton) {
       var backstage = {
         shared: {
           providers: {
@@ -20628,7 +21630,7 @@ var silver = (function (domGlobals) {
           }
         },
         urlinput: UrlInputBackstage(editor),
-        styleselect: init$8(editor),
+        styleselect: init$7(editor),
         colorinput: ColorInputBackstage(editor)
       };
       return backstage;
@@ -20908,7 +21910,7 @@ var silver = (function (domGlobals) {
       }))
     ];
 
-    var init$a = function (spec) {
+    var init$9 = function (spec) {
       var state = Cell(spec.expanded);
       var readState = function () {
         return 'expanded: ' + state.get();
@@ -20927,7 +21929,7 @@ var silver = (function (domGlobals) {
     };
 
     var SlidingState = /*#__PURE__*/Object.freeze({
-        init: init$a
+        init: init$9
     });
 
     var Sliding = create$1({
@@ -21533,7 +22535,7 @@ var silver = (function (domGlobals) {
         events: events$e
     });
 
-    var init$b = function (spec) {
+    var init$a = function (spec) {
       var cell = Cell(Option.none());
       var set = function (optS) {
         return cell.set(optS);
@@ -21556,7 +22558,7 @@ var silver = (function (domGlobals) {
     };
 
     var ReflectingState = /*#__PURE__*/Object.freeze({
-        init: init$b
+        init: init$a
     });
 
     var ReflectingSchema = [
@@ -21762,13 +22764,120 @@ var silver = (function (domGlobals) {
       factory: factory$c
     });
 
+    var updateMenuText = generate$1('update-menu-text');
+    var updateMenuIcon = generate$1('update-menu-icon');
+    var renderCommonDropdown = function (spec, prefix, sharedBackstage) {
+      var editorOffCell = Cell(noop);
+      var optMemDisplayText = spec.text.map(function (text) {
+        return record(renderLabel$1(text, prefix, sharedBackstage.providers));
+      });
+      var optMemDisplayIcon = spec.icon.map(function (iconName) {
+        return record(renderReplacableIconFromPack(iconName, sharedBackstage.providers.icons));
+      });
+      var onLeftOrRightInMenu = function (comp, se) {
+        var dropdown = Representing.getValue(comp);
+        Focusing.focus(dropdown);
+        emitWith(dropdown, 'keydown', { raw: se.event().raw() });
+        Dropdown.close(dropdown);
+        return Option.some(true);
+      };
+      var role = spec.role.fold(function () {
+        return {};
+      }, function (role) {
+        return { role: role };
+      });
+      var tooltipAttributes = spec.tooltip.fold(function () {
+        return {};
+      }, function (tooltip) {
+        var translatedTooltip = sharedBackstage.providers.translate(tooltip);
+        return {
+          'title': translatedTooltip,
+          'aria-label': translatedTooltip
+        };
+      });
+      var memDropdown = record(Dropdown.sketch(__assign({}, role, {
+        dom: {
+          tag: 'button',
+          classes: [
+            prefix,
+            prefix + '--select'
+          ].concat(map(spec.classes, function (c) {
+            return prefix + '--' + c;
+          })),
+          attributes: __assign({}, tooltipAttributes)
+        },
+        components: componentRenderPipeline([
+          optMemDisplayIcon.map(function (mem) {
+            return mem.asSpec();
+          }),
+          optMemDisplayText.map(function (mem) {
+            return mem.asSpec();
+          }),
+          Option.some({
+            dom: {
+              tag: 'div',
+              classes: [prefix + '__select-chevron'],
+              innerHtml: get$c('chevron-down', sharedBackstage.providers.icons)
+            }
+          })
+        ]),
+        matchWidth: true,
+        useMinWidth: true,
+        dropdownBehaviours: derive$1(spec.dropdownBehaviours.concat([
+          DisablingConfigs.button(spec.disabled),
+          Unselecting.config({}),
+          Replacing.config({}),
+          config('dropdown-events', [
+            onControlAttached(spec, editorOffCell),
+            onControlDetached(spec, editorOffCell)
+          ]),
+          config('menubutton-update-display-text', [
+            run(updateMenuText, function (comp, se) {
+              optMemDisplayText.bind(function (mem) {
+                return mem.getOpt(comp);
+              }).each(function (displayText) {
+                Replacing.set(displayText, [text(sharedBackstage.providers.translate(se.event().text()))]);
+              });
+            }),
+            run(updateMenuIcon, function (comp, se) {
+              optMemDisplayIcon.bind(function (mem) {
+                return mem.getOpt(comp);
+              }).each(function (displayIcon) {
+                Replacing.set(displayIcon, [renderReplacableIconFromPack(se.event().icon(), sharedBackstage.providers.icons)]);
+              });
+            })
+          ])
+        ])),
+        eventOrder: deepMerge(toolbarButtonEventOrder, {
+          mousedown: [
+            'focusing',
+            'alloy.base.behaviour',
+            'item-type-events',
+            'normal-dropdown-events'
+          ]
+        }),
+        sandboxBehaviours: derive$1([Keying.config({
+            mode: 'special',
+            onLeft: onLeftOrRightInMenu,
+            onRight: onLeftOrRightInMenu
+          })]),
+        lazySink: sharedBackstage.getSink,
+        toggleClass: prefix + '--active',
+        parts: { menu: part(false, spec.columns, spec.presets) },
+        fetch: function () {
+          return Future.nu(spec.fetch);
+        }
+      })));
+      return memDropdown.asSpec();
+    };
+
     var getButtonApi = function (component) {
       return {
         isDisabled: function () {
           return Disabling.isDisabled(component);
         },
         setDisabled: function (state) {
-          return state ? Disabling.disable(component) : Disabling.enable(component);
+          return Disabling.set(component, state);
         }
       };
     };
@@ -21784,7 +22893,30 @@ var silver = (function (domGlobals) {
           return Disabling.isDisabled(component);
         },
         setDisabled: function (state) {
-          return state ? Disabling.disable(component) : Disabling.enable(component);
+          return Disabling.set(component, state);
+        }
+      };
+    };
+    var getMenuButtonApi = function (component) {
+      return {
+        isDisabled: function () {
+          return Disabling.isDisabled(component);
+        },
+        setDisabled: function (state) {
+          return Disabling.set(component, state);
+        },
+        setActive: function (state) {
+          var elm = component.element();
+          if (state) {
+            add$2(elm, 'tox-tbtn--enabled');
+            set$1(elm, 'aria-pressed', true);
+          } else {
+            remove$4(elm, 'tox-tbtn--enabled');
+            remove$1(elm, 'aria-pressed');
+          }
+        },
+        isActive: function () {
+          return has$2(component.element(), 'tox-tbtn--enabled');
         }
       };
     };
@@ -21919,28 +23051,28 @@ var silver = (function (domGlobals) {
             return Disabling.isDisabled(comp);
           },
           setDisabled: function (state) {
-            return state ? Disabling.disable(comp) : Disabling.enable(comp);
+            return Disabling.set(comp, state);
           },
           setIconFill: function (id, value) {
-            descendant$1(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
+            descendant$2(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
               set$1(underlinePath, 'fill', value);
             });
           },
           setIconStroke: function (id, value) {
-            descendant$1(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
+            descendant$2(comp.element(), 'svg path[id="' + id + '"], rect[id="' + id + '"]').each(function (underlinePath) {
               set$1(underlinePath, 'stroke', value);
             });
           },
           setActive: function (state) {
             set$1(comp.element(), 'aria-pressed', state);
-            descendant$1(comp.element(), 'span').each(function (button) {
+            descendant$2(comp.element(), 'span').each(function (button) {
               comp.getSystem().getByDom(button).each(function (buttonComp) {
                 return Toggling.set(buttonComp, state);
               });
             });
           },
           isActive: function () {
-            return descendant$1(comp.element(), 'span').exists(function (button) {
+            return descendant$2(comp.element(), 'span').exists(function (button) {
               return comp.getSystem().getByDom(button).exists(Toggling.isOn);
             });
           }
@@ -21996,6 +23128,25 @@ var silver = (function (domGlobals) {
           SplitDropdown.parts()['aria-descriptor']({ text: sharedBackstage.providers.translate('To open the popup, press Shift+Enter') })
         ]
       });
+    };
+    var renderMenuButton = function (spec, prefix, sharedBackstage, role) {
+      return renderCommonDropdown({
+        text: spec.text,
+        icon: spec.icon,
+        tooltip: spec.tooltip,
+        role: role,
+        fetch: function (callback) {
+          spec.fetch(function (items) {
+            callback(build$2(items, ItemResponse$1.CLOSE_ON_EXECUTE, sharedBackstage.providers));
+          });
+        },
+        onSetup: spec.onSetup,
+        getApi: getMenuButtonApi,
+        columns: 1,
+        presets: 'normal',
+        classes: [],
+        dropdownBehaviours: []
+      }, prefix, sharedBackstage);
     };
 
     var getFormApi = function (input) {
@@ -22210,7 +23361,7 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var ancestor$2 = function (scope, transform, isRoot) {
+    var ancestor$3 = function (scope, transform, isRoot) {
       var element = scope.dom();
       var stop = isFunction(isRoot) ? isRoot : constant(false);
       while (element.parentNode) {
@@ -22241,7 +23392,7 @@ var silver = (function (domGlobals) {
       var startNode = Element.fromDom(editor.selection.getNode());
       return matchTargetWith(startNode, scopes.inNodeScope).orThunk(function () {
         return matchTargetWith(startNode, scopes.inEditorScope).orThunk(function () {
-          return ancestor$2(startNode, function (elem) {
+          return ancestor$3(startNode, function (elem) {
             return matchTargetWith(elem, scopes.inNodeScope);
           }, isRoot);
         });
@@ -22301,110 +23452,6 @@ var silver = (function (domGlobals) {
       };
     };
     var ToolbarScopes = { categorise: categorise };
-
-    var updateMenuText = generate$1('update-menu-text');
-    var updateMenuIcon = generate$1('update-menu-icon');
-    var renderCommonDropdown = function (spec, prefix, sharedBackstage) {
-      var optMemDisplayText = spec.text.map(function (text) {
-        return record(renderLabel$1(text, prefix, sharedBackstage.providers));
-      });
-      var optMemDisplayIcon = spec.icon.map(function (iconName) {
-        return record(renderReplacableIconFromPack(iconName, sharedBackstage.providers.icons));
-      });
-      var onLeftOrRightInMenu = function (comp, se) {
-        var dropdown = Representing.getValue(comp);
-        Focusing.focus(dropdown);
-        emitWith(dropdown, 'keydown', { raw: se.event().raw() });
-        Dropdown.close(dropdown);
-        return Option.some(true);
-      };
-      var role = spec.role.fold(function () {
-        return {};
-      }, function (role) {
-        return { role: role };
-      });
-      var tooltipAttributes = spec.tooltip.fold(function () {
-        return {};
-      }, function (tooltip) {
-        var translatedTooltip = sharedBackstage.providers.translate(tooltip);
-        return {
-          'title': translatedTooltip,
-          'aria-label': translatedTooltip
-        };
-      });
-      var memDropdown = record(Dropdown.sketch(__assign({}, role, {
-        dom: {
-          tag: 'button',
-          classes: [
-            prefix,
-            prefix + '--select'
-          ].concat(map(spec.classes, function (c) {
-            return prefix + '--' + c;
-          })),
-          attributes: __assign({}, tooltipAttributes)
-        },
-        components: componentRenderPipeline([
-          optMemDisplayIcon.map(function (mem) {
-            return mem.asSpec();
-          }),
-          optMemDisplayText.map(function (mem) {
-            return mem.asSpec();
-          }),
-          Option.some({
-            dom: {
-              tag: 'div',
-              classes: [prefix + '__select-chevron'],
-              innerHtml: get$c('chevron-down', sharedBackstage.providers.icons)
-            }
-          })
-        ]),
-        matchWidth: true,
-        useMinWidth: true,
-        dropdownBehaviours: derive$1([
-          DisablingConfigs.button(spec.disabled),
-          Unselecting.config({}),
-          Replacing.config({}),
-          config('menubutton-update-display-text', [
-            runOnAttached(spec.onAttach),
-            runOnDetached(spec.onDetach),
-            run(updateMenuText, function (comp, se) {
-              optMemDisplayText.bind(function (mem) {
-                return mem.getOpt(comp);
-              }).each(function (displayText) {
-                Replacing.set(displayText, [text(sharedBackstage.providers.translate(se.event().text()))]);
-              });
-            }),
-            run(updateMenuIcon, function (comp, se) {
-              optMemDisplayIcon.bind(function (mem) {
-                return mem.getOpt(comp);
-              }).each(function (displayIcon) {
-                Replacing.set(displayIcon, [renderReplacableIconFromPack(se.event().icon(), sharedBackstage.providers.icons)]);
-              });
-            })
-          ])
-        ]),
-        eventOrder: deepMerge(toolbarButtonEventOrder, {
-          mousedown: [
-            'focusing',
-            'alloy.base.behaviour',
-            'item-type-events',
-            'normal-dropdown-events'
-          ]
-        }),
-        sandboxBehaviours: derive$1([Keying.config({
-            mode: 'special',
-            onLeft: onLeftOrRightInMenu,
-            onRight: onLeftOrRightInMenu
-          })]),
-        lazySink: sharedBackstage.getSink,
-        toggleClass: prefix + '--active',
-        parts: { menu: part(false, spec.columns, spec.presets) },
-        fetch: function () {
-          return Future.nu(spec.fetch);
-        }
-      })));
-      return memDropdown.asSpec();
-    };
 
     var onSetupFormatToggle = function (editor, name) {
       return function (api) {
@@ -22513,33 +23560,34 @@ var silver = (function (domGlobals) {
     };
     var createSelectButton = function (editor, backstage, dataset, spec) {
       var _a = createMenuItems(editor, backstage, dataset, spec), items = _a.items, getStyleItems = _a.getStyleItems;
-      var onDestroyCell = Cell(undefined);
-      var onAttach = spec.nodeChangeHandler.map(function (f) {
-        return function (comp) {
-          var handler = f(comp);
-          onDestroyCell.set(handler);
-          editor.on('nodeChange', handler);
-        };
-      }).getOr(noop);
-      var onDetach = spec.nodeChangeHandler.map(function (_f) {
-        return function (_comp) {
-          var onDestroy = onDestroyCell.get();
-          if (onDestroy !== undefined) {
-            editor.off('nodeChange', onDestroy);
+      var getApi = function (comp) {
+        return {
+          getComponent: function () {
+            return comp;
           }
         };
-      }).getOr(noop);
+      };
+      var onSetup = function (api) {
+        return spec.nodeChangeHandler.map(function (f) {
+          var handler = f(api.getComponent());
+          editor.on('NodeChange', handler);
+          return function () {
+            editor.off('NodeChange', handler);
+          };
+        }).getOr(noop);
+      };
       return renderCommonDropdown({
         text: spec.icon.isSome() ? Option.none() : Option.some(''),
         icon: spec.icon,
         tooltip: Option.from(spec.tooltip),
         role: Option.none(),
         fetch: items.getFetch(backstage, getStyleItems),
-        onAttach: onAttach,
-        onDetach: onDetach,
+        onSetup: onSetup,
+        getApi: getApi,
         columns: 1,
         presets: 'normal',
-        classes: spec.icon.isSome() ? [] : ['bespoke']
+        classes: spec.icon.isSome() ? [] : ['bespoke'],
+        dropdownBehaviours: []
       }, 'tox-tbtn', backstage.shared);
     };
 
@@ -23005,113 +24053,6 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var defaultMenubar = 'file edit view insert format tools table help';
-    var defaultMenus = {
-      file: {
-        title: 'File',
-        items: 'newdocument restoredraft | preview | print | deleteallconversations'
-      },
-      edit: {
-        title: 'Edit',
-        items: 'undo redo | cut copy paste pastetext | selectall | searchreplace'
-      },
-      view: {
-        title: 'View',
-        items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
-      },
-      insert: {
-        title: 'Insert',
-        items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime'
-      },
-      format: {
-        title: 'Format',
-        items: 'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align | removeformat'
-      },
-      tools: {
-        title: 'Tools',
-        items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount'
-      },
-      table: {
-        title: 'Table',
-        items: 'inserttable tableprops deletetable row column cell'
-      },
-      help: {
-        title: 'Help',
-        items: 'help'
-      }
-    };
-    var renderMenuButton = function (spec, prefix, sharedBackstage, role) {
-      return renderCommonDropdown({
-        text: spec.text,
-        icon: spec.icon,
-        tooltip: spec.tooltip,
-        role: role,
-        fetch: function (callback) {
-          spec.fetch(function (items) {
-            callback(build$2(items, ItemResponse$1.CLOSE_ON_EXECUTE, sharedBackstage.providers));
-          });
-        },
-        onAttach: function () {
-        },
-        onDetach: function () {
-        },
-        columns: 1,
-        presets: 'normal',
-        classes: []
-      }, prefix, sharedBackstage);
-    };
-    var make$6 = function (menu, registry, editor) {
-      var removedMenuItems = getRemovedMenuItems(editor).split(/[ ,]/);
-      return {
-        text: menu.title,
-        getItems: function () {
-          return bind(menu.items, function (i) {
-            var itemName = i.toLowerCase();
-            if (itemName.trim().length === 0) {
-              return [];
-            } else if (exists(removedMenuItems, function (removedMenuItem) {
-                return removedMenuItem === itemName;
-              })) {
-              return [];
-            } else if (itemName === 'separator' || itemName === '|') {
-              return [{ type: 'separator' }];
-            } else if (registry.menuItems[itemName]) {
-              return [registry.menuItems[itemName]];
-            } else {
-              return [];
-            }
-          });
-        }
-      };
-    };
-    var parseItemsString = function (items) {
-      if (typeof items === 'string') {
-        return items.split(' ');
-      }
-      return items;
-    };
-    var identifyMenus = function (editor, registry) {
-      var rawMenuData = merge(defaultMenus, registry.menus);
-      var userDefinedMenus = keys(registry.menus).length > 0;
-      var menubar = registry.menubar === undefined || registry.menubar === true ? parseItemsString(defaultMenubar) : parseItemsString(registry.menubar === false ? '' : registry.menubar);
-      var validMenus = filter(menubar, function (menuName) {
-        return userDefinedMenus ? registry.menus.hasOwnProperty(menuName) && registry.menus[menuName].hasOwnProperty('items') || defaultMenus.hasOwnProperty(menuName) : defaultMenus.hasOwnProperty(menuName);
-      });
-      var menus = map(validMenus, function (menuName) {
-        var menuData = rawMenuData[menuName];
-        return make$6({
-          title: menuData.title,
-          items: parseItemsString(menuData.items)
-        }, registry, editor);
-      });
-      return filter(menus, function (menu) {
-        var isNotSeparator = function (item) {
-          return item.type !== 'separator';
-        };
-        return menu.getItems().length > 0 && exists(menu.getItems(), isNotSeparator);
-      });
-    };
-
     var defaultToolbar = [
       {
         name: 'history',
@@ -23158,7 +24099,9 @@ var silver = (function (domGlobals) {
     ];
     var renderFromBridge = function (bridgeBuilder, render) {
       return function (spec, extras) {
-        var internal = bridgeBuilder(spec).fold(compose(Result.error, formatError), Result.value).getOrDie();
+        var internal = bridgeBuilder(spec).mapError(function (errInfo) {
+          return formatError(errInfo);
+        }).getOrDie();
         return render(internal, extras);
       };
     };
@@ -23450,7 +24393,7 @@ var silver = (function (domGlobals) {
         timer.set(t);
       };
       editor.on('init', function () {
-        editor.on('click keyup setContent ObjectResized ResizeEditor', function (e) {
+        editor.on('click keyup SetContent ObjectResized ResizeEditor', function (e) {
           resetTimer(global$1.setEditorTimeout(editor, launchContextToolbar, 0));
         });
         editor.on('focusout', function (e) {
@@ -23461,7 +24404,7 @@ var silver = (function (domGlobals) {
             }
           }, 0);
         });
-        editor.on('nodeChange', function (e) {
+        editor.on('NodeChange', function (e) {
           search$1(contextbar.element()).fold(function () {
             resetTimer(global$1.setEditorTimeout(editor, launchContextToolbar, 0));
           }, function (_) {
@@ -23563,14 +24506,16 @@ var silver = (function (domGlobals) {
       var setMenus = function (comp, menus) {
         var newMenus = map(menus, function (m) {
           var buttonSpec = {
-            text: Option.some(m.text),
-            icon: Option.none(),
-            tooltip: Option.none(),
+            type: 'menubutton',
+            text: m.text,
             fetch: function (callback) {
               callback(m.getItems());
             }
           };
-          return renderMenuButton(buttonSpec, 'tox-mbtn', {
+          var internal = createMenuButton(buttonSpec).mapError(function (errInfo) {
+            return formatError(errInfo);
+          }).getOrDie();
+          return renderMenuButton(internal, 'tox-mbtn', {
             getSink: detail.getSink,
             providers: detail.providers
           }, Option.some('menuitem'));
@@ -23592,7 +24537,7 @@ var silver = (function (domGlobals) {
               detail.onSetup(component);
             }),
             run(mouseover(), function (comp, se) {
-              descendant$1(comp.element(), '.' + 'tox-mbtn--active').each(function (activeButton) {
+              descendant$2(comp.element(), '.' + 'tox-mbtn--active').each(function (activeButton) {
                 closest$3(se.event().target(), '.' + 'tox-mbtn').each(function (hoveredButton) {
                   if (!eq(activeButton, hoveredButton)) {
                     comp.getSystem().getByDom(activeButton).each(function (activeComp) {
@@ -23683,9 +24628,9 @@ var silver = (function (domGlobals) {
           pname: getPartName$1(n)
         });
       });
-      return composite(owner$4, schema$n, fieldParts, make$7, spec);
+      return composite(owner$4, schema$n, fieldParts, make$6, spec);
     };
-    var make$7 = function (detail, components, spec) {
+    var make$6 = function (detail, components, spec) {
       var getSlotNames = function (_) {
         return getAllPartNames(detail);
       };
@@ -23980,6 +24925,76 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var renderSpinner = function (providerBackstage) {
+      return {
+        dom: {
+          tag: 'div',
+          attributes: { 'aria-label': providerBackstage.translate('Loading...') },
+          classes: ['tox-throbber__busy-spinner']
+        },
+        components: [{ dom: fromHtml$2('<div class="tox-spinner"><div></div><div></div><div></div></div>') }],
+        behaviours: derive$1([
+          Keying.config({
+            mode: 'special',
+            onTab: function () {
+              return Option.some(true);
+            },
+            onShiftTab: function () {
+              return Option.some(true);
+            }
+          }),
+          Focusing.config({})
+        ])
+      };
+    };
+    var toggleThrobber = function (comp, state, providerBackstage) {
+      var element = comp.element();
+      if (state === true) {
+        Replacing.set(comp, [renderSpinner(providerBackstage)]);
+        remove$6(element, 'display');
+        remove$1(element, 'aria-hidden');
+      } else {
+        Replacing.set(comp, []);
+        set$2(element, 'display', 'none');
+        set$1(element, 'aria-hidden', 'true');
+      }
+    };
+    var renderThrobber = function (spec) {
+      return {
+        uid: spec.uid,
+        dom: {
+          tag: 'div',
+          attributes: { 'aria-hidden': 'true' },
+          classes: ['tox-throbber'],
+          styles: { display: 'none' }
+        },
+        behaviours: derive$1([Replacing.config({})]),
+        components: []
+      };
+    };
+    var setup$5 = function (editor, lazyThrobber, sharedBackstage) {
+      var throbberState = Cell(false);
+      var timer = Cell(Option.none());
+      var toggle = function (state) {
+        if (state !== throbberState.get()) {
+          toggleThrobber(lazyThrobber(), state, sharedBackstage.providers);
+          throbberState.set(state);
+        }
+      };
+      editor.on('ProgressState', function (e) {
+        timer.get().each(global$1.clearTimeout);
+        if (isNumber(e.time)) {
+          var timerId = global$1.setEditorTimeout(editor, function () {
+            return toggle(e.state);
+          }, e.time);
+          timer.set(Option.some(timerId));
+        } else {
+          toggle(e.state);
+          timer.set(Option.none());
+        }
+      });
+    };
+
     var factory$e = function (detail, components, spec) {
       var apis = {
         getSocket: function (comp) {
@@ -24011,6 +25026,9 @@ var silver = (function (domGlobals) {
           return toolbar.bind(function (toolbar) {
             return SplitToolbar.getMoreButton(toolbar);
           });
+        },
+        getThrobber: function (comp) {
+          return parts$b.getPart(comp, detail, 'throbber');
         },
         focusToolbar: function (comp) {
           parts$b.getPart(comp, detail, 'toolbar').each(function (toolbar) {
@@ -24083,6 +25101,11 @@ var silver = (function (domGlobals) {
       name: 'sidebar',
       schema: [strict$1('dom')]
     });
+    var partThrobber = partType$1.optional({
+      factory: { sketch: renderThrobber },
+      name: 'throbber',
+      schema: [strict$1('dom')]
+    });
     var OuterContainer = composite$1({
       name: 'OuterContainer',
       factory: factory$e,
@@ -24094,7 +25117,8 @@ var silver = (function (domGlobals) {
         partMenubar,
         partToolbar,
         partSocket,
-        partSidebar
+        partSidebar,
+        partThrobber
       ],
       apis: {
         getSocket: function (apis, comp) {
@@ -24121,6 +25145,9 @@ var silver = (function (domGlobals) {
         getMoreButton: function (apis, comp) {
           return apis.getMoreButton(comp);
         },
+        getThrobber: function (apis, comp) {
+          return apis.getThrobber(comp);
+        },
         setMenubar: function (apis, comp, menus) {
           apis.setMenubar(comp, menus);
         },
@@ -24132,6 +25159,93 @@ var silver = (function (domGlobals) {
         }
       }
     });
+
+    var defaultMenubar = 'file edit view insert format tools table help';
+    var defaultMenus = {
+      file: {
+        title: 'File',
+        items: 'newdocument restoredraft | preview | print | deleteallconversations'
+      },
+      edit: {
+        title: 'Edit',
+        items: 'undo redo | cut copy paste pastetext | selectall | searchreplace'
+      },
+      view: {
+        title: 'View',
+        items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
+      },
+      insert: {
+        title: 'Insert',
+        items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime'
+      },
+      format: {
+        title: 'Format',
+        items: 'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align | removeformat'
+      },
+      tools: {
+        title: 'Tools',
+        items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount'
+      },
+      table: {
+        title: 'Table',
+        items: 'inserttable tableprops deletetable row column cell'
+      },
+      help: {
+        title: 'Help',
+        items: 'help'
+      }
+    };
+    var make$7 = function (menu, registry, editor) {
+      var removedMenuItems = getRemovedMenuItems(editor).split(/[ ,]/);
+      return {
+        text: menu.title,
+        getItems: function () {
+          return bind(menu.items, function (i) {
+            var itemName = i.toLowerCase();
+            if (itemName.trim().length === 0) {
+              return [];
+            } else if (exists(removedMenuItems, function (removedMenuItem) {
+                return removedMenuItem === itemName;
+              })) {
+              return [];
+            } else if (itemName === 'separator' || itemName === '|') {
+              return [{ type: 'separator' }];
+            } else if (registry.menuItems[itemName]) {
+              return [registry.menuItems[itemName]];
+            } else {
+              return [];
+            }
+          });
+        }
+      };
+    };
+    var parseItemsString = function (items) {
+      if (typeof items === 'string') {
+        return items.split(' ');
+      }
+      return items;
+    };
+    var identifyMenus = function (editor, registry) {
+      var rawMenuData = merge(defaultMenus, registry.menus);
+      var userDefinedMenus = keys(registry.menus).length > 0;
+      var menubar = registry.menubar === undefined || registry.menubar === true ? parseItemsString(defaultMenubar) : parseItemsString(registry.menubar === false ? '' : registry.menubar);
+      var validMenus = filter(menubar, function (menuName) {
+        return userDefinedMenus ? registry.menus.hasOwnProperty(menuName) && registry.menus[menuName].hasOwnProperty('items') || defaultMenus.hasOwnProperty(menuName) : defaultMenus.hasOwnProperty(menuName);
+      });
+      var menus = map(validMenus, function (menuName) {
+        var menuData = rawMenuData[menuName];
+        return make$7({
+          title: menuData.title,
+          items: parseItemsString(menuData.items)
+        }, registry, editor);
+      });
+      return filter(menus, function (menu) {
+        var isNotSeparator = function (item) {
+          return item.type !== 'separator';
+        };
+        return menu.getItems().length > 0 && exists(menu.getItems(), isNotSeparator);
+      });
+    };
 
     var fireSkinLoaded = function (editor) {
       return editor.fire('SkinLoaded');
@@ -24590,7 +25704,7 @@ var silver = (function (domGlobals) {
         }
         updateChromeUi();
         show();
-        editor.on('nodeChange ResizeWindow', updateChromeUi);
+        editor.on('NodeChange ResizeWindow', updateChromeUi);
         editor.on('activate', show);
         editor.on('deactivate', hide);
         editor.nodeChanged();
@@ -24688,7 +25802,7 @@ var silver = (function (domGlobals) {
       });
     };
     var getContextMenu = function (editor) {
-      return getMenuItems(editor, 'contextmenu', 'link image imagetools table spellchecker configurepermanentpen');
+      return getMenuItems(editor, 'contextmenu', 'link linkchecker image imagetools table spellchecker configurepermanentpen');
     };
     var Settings$1 = {
       shouldNeverUseNative: shouldNeverUseNative,
@@ -24768,7 +25882,7 @@ var silver = (function (domGlobals) {
     var isNativeOverrideKeyEvent = function (editor, e) {
       return e.ctrlKey && !Settings$1.shouldNeverUseNative(editor);
     };
-    var setup$5 = function (editor, lazySink, sharedBackstage) {
+    var setup$6 = function (editor, lazySink, sharedBackstage) {
       var contextmenu = build$1(InlineView.sketch({
         dom: { tag: 'div' },
         lazySink: lazySink,
@@ -24853,7 +25967,7 @@ var silver = (function (domGlobals) {
       var y = parseInt(get$2(element, snapsInfo.topAttr), 10);
       return isNaN(x) || isNaN(y) ? Option.none() : Option.some(Position(x, y));
     };
-    var set$7 = function (component, snapsInfo, pt) {
+    var set$8 = function (component, snapsInfo, pt) {
       var element = component.element();
       set$1(element, snapsInfo.leftAttr, pt.left() + 'px');
       set$1(element, snapsInfo.topAttr, pt.top() + 'px');
@@ -24875,7 +25989,7 @@ var silver = (function (domGlobals) {
       var newCoord = getCoords(component, snapInfo, coord, delta);
       var snap = findSnap(component, snapInfo, newCoord, scroll, origin);
       var fixedCoord = asFixed(newCoord, scroll, origin);
-      set$7(component, snapInfo, fixedCoord);
+      set$8(component, snapInfo, fixedCoord);
       return snap.fold(function () {
         return {
           coord: fixed$1(fixedCoord.left(), fixedCoord.top()),
@@ -24962,7 +26076,7 @@ var silver = (function (domGlobals) {
       defaulted$1('lazyViewport', defaultLazyViewport$1)
     ]);
 
-    var init$c = function (dragApi) {
+    var init$b = function (dragApi) {
       return derive([
         run(mousedown(), dragApi.forceDrop),
         run(mouseup(), dragApi.drop),
@@ -25022,7 +26136,7 @@ var silver = (function (domGlobals) {
               },
               classes: [dragConfig.blockerClass]
             },
-            events: init$c(dragApi)
+            events: init$b(dragApi)
           }));
           var stop = function () {
             discard(blocker);
@@ -25107,7 +26221,7 @@ var silver = (function (domGlobals) {
         touch: touch
     });
 
-    var init$d = function () {
+    var init$c = function () {
       var previous = Option.none();
       var reset = function () {
         previous = Option.none();
@@ -25133,7 +26247,7 @@ var silver = (function (domGlobals) {
     };
 
     var DragState = /*#__PURE__*/Object.freeze({
-        init: init$d
+        init: init$c
     });
 
     var Dragging = createModes$1({
@@ -25281,7 +26395,7 @@ var silver = (function (domGlobals) {
               editor.shortcuts.add('alt+F11', 'focus statusbar elementpath', function () {
                 return Keying.focusIn(comp);
               });
-              editor.on('nodeChange', function (e) {
+              editor.on('NodeChange', function (e) {
                 var newPath = updatePath(e.parents);
                 if (newPath.length > 0) {
                   Replacing.set(comp, getDataPath(newPath));
@@ -25435,7 +26549,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var setup$6 = function (editor) {
+    var setup$7 = function (editor) {
       var isInline = editor.getParam('inline', false, 'boolean');
       var mode = isInline ? Inline : Iframe;
       var lazyOuterContainer = Option.none();
@@ -25472,7 +26586,12 @@ var silver = (function (domGlobals) {
           return OuterContainer.getToolbar(container);
         }).getOrDie('Could not find more toolbar element');
       };
-      var backstage = init$9(sink, editor, lazyAnchorBar, lazyMoreButton);
+      var lazyThrobber = function () {
+        return lazyOuterContainer.bind(function (container) {
+          return OuterContainer.getThrobber(container);
+        }).getOrDie('Could not find throbber element');
+      };
+      var backstage = init$8(sink, editor, lazyAnchorBar, lazyMoreButton);
       var lazySink = function () {
         return Result.value(sink);
       };
@@ -25513,6 +26632,13 @@ var silver = (function (domGlobals) {
           classes: ['tox-sidebar']
         }
       });
+      var partThrobber = OuterContainer.parts().throbber({
+        dom: {
+          tag: 'div',
+          classes: ['tox-throbber']
+        },
+        backstage: backstage
+      });
       var statusbar = editor.getParam('statusbar', true, 'boolean') && !isInline ? Option.some(renderStatusbar(editor, backstage.shared.providers)) : Option.none();
       var socketSidebarContainer = {
         dom: {
@@ -25541,7 +26667,8 @@ var silver = (function (domGlobals) {
       };
       var containerComponents = flatten([
         [editorContainer],
-        isInline ? [] : statusbar.toArray()
+        isInline ? [] : statusbar.toArray(),
+        [partThrobber]
       ]);
       var attributes = __assign({ role: 'application' }, global$3.isRtl() ? { dir: 'rtl' } : {});
       var outerContainer = build$1(OuterContainer.sketch({
@@ -25557,7 +26684,7 @@ var silver = (function (domGlobals) {
         components: containerComponents,
         behaviours: derive$1(mode.getBehaviours(editor).concat([Keying.config({
             mode: 'cyclic',
-            selector: '.tox-menubar, .tox-toolbar, .tox-toolbar__primary, .tox-sidebar__overflow--open, .tox-statusbar__path, .tox-statusbar__wordcount, .tox-statusbar__branding a'
+            selector: '.tox-menubar, .tox-toolbar, .tox-toolbar__primary, .tox-toolbar__overflow--open, .tox-sidebar__overflow--open, .tox-statusbar__path, .tox-statusbar__wordcount, .tox-statusbar__branding a'
           })]))
       }));
       lazyOuterContainer = Option.some(outerContainer);
@@ -25610,8 +26737,9 @@ var silver = (function (domGlobals) {
         return parsedHeight;
       };
       var renderUI = function () {
-        setup$5(editor, lazySink, backstage.shared);
+        setup$6(editor, lazySink, backstage.shared);
         setup$4(editor);
+        setup$5(editor, lazyThrobber, backstage.shared);
         var _a = editor.ui.registry.getAll(), buttons = _a.buttons, menuItems = _a.menuItems, contextToolbars = _a.contextToolbars, sidebars = _a.sidebars;
         var rawUiConfig = {
           menuItems: menuItems,
@@ -25645,7 +26773,7 @@ var silver = (function (domGlobals) {
         getUi: getUi
       };
     };
-    var Render = { setup: setup$6 };
+    var Render = { setup: setup$7 };
 
     var register$5 = function (editor) {
       var alignToolbarButtons = [
@@ -25737,7 +26865,7 @@ var silver = (function (domGlobals) {
           text: 'Superscript',
           icon: 'superscript'
         }
-      ], function (btn) {
+      ], function (btn, idx) {
         editor.ui.registry.addToggleButton(btn.name, {
           tooltip: btn.text,
           icon: btn.icon,
@@ -26089,7 +27217,7 @@ var silver = (function (domGlobals) {
     };
     var ComplexControls = { register: register$a };
 
-    var setup$7 = function (editor, backstage) {
+    var setup$8 = function (editor, backstage) {
       AlignmentButtons.register(editor);
       SimpleControls.register(editor);
       ComplexControls.register(editor, backstage);
@@ -26098,7 +27226,7 @@ var silver = (function (domGlobals) {
       VisualAid.register(editor);
       IndentOutdent.register(editor);
     };
-    var FormatControls = { setup: setup$7 };
+    var FormatControls = { setup: setup$8 };
 
     var AriaLabel = {
       labelledBy: function (labelledElement, labelElement) {
@@ -26120,7 +27248,7 @@ var silver = (function (domGlobals) {
       onKeyboardHandler('onExecute'),
       onStrictKeyboardHandler('onEscape')
     ]);
-    var basic = { sketch: identity };
+    var basic$1 = { sketch: identity };
     var parts$c = constant([
       optional({
         name: 'draghandle',
@@ -26129,9 +27257,9 @@ var silver = (function (domGlobals) {
             behaviours: derive$1([Dragging.config({
                 mode: 'mouse',
                 getTarget: function (handle) {
-                  return ancestor$1(handle, '[role="dialog"]').getOr(handle);
+                  return ancestor$2(handle, '[role="dialog"]').getOr(handle);
                 },
-                blockerClass: detail.dragBlockClass.getOrDie(new Error('The drag blocker class was not specified for a dialog with a drag handle: \n' + JSON$1.stringify(spec, null, 2)).message)
+                blockerClass: detail.dragBlockClass.getOrDie(new Error('The drag blocker class was not specified for a dialog with a drag handle: \n' + Json.stringify(spec, null, 2)).message)
               })])
           };
         }
@@ -26141,17 +27269,17 @@ var silver = (function (domGlobals) {
         name: 'title'
       }),
       required({
-        factory: basic,
+        factory: basic$1,
         schema: [strict$1('dom')],
         name: 'close'
       }),
       required({
-        factory: basic,
+        factory: basic$1,
         schema: [strict$1('dom')],
         name: 'body'
       }),
-      required({
-        factory: basic,
+      optional({
+        factory: basic$1,
         schema: [strict$1('dom')],
         name: 'footer'
       }),
@@ -26503,12 +27631,7 @@ var silver = (function (domGlobals) {
       strictArrayOfObj('tabs', tabFields)
     ];
 
-    var dialogButtonSchema = objOf([
-      strictStringEnum('type', [
-        'submit',
-        'cancel',
-        'custom'
-      ]),
+    var dialogButtonFields = [
       field('name', 'name', defaultedThunk(function () {
         return generate$1('button-name');
       }), string),
@@ -26520,7 +27643,12 @@ var silver = (function (domGlobals) {
       ]),
       defaultedBoolean('primary', false),
       defaultedBoolean('disabled', false)
-    ]);
+    ];
+    var dialogButtonSchema = objOf([strictStringEnum('type', [
+        'submit',
+        'cancel',
+        'custom'
+      ])].concat(dialogButtonFields));
     var dialogSchema = objOf([
       strictString('title'),
       strictOf('body', choose$1('type', {
@@ -26587,6 +27715,25 @@ var silver = (function (domGlobals) {
       return objOf(fields);
     };
 
+    var urlDialogButtonSchema = objOf([strictStringEnum('type', [
+        'cancel',
+        'custom'
+      ])].concat(dialogButtonFields));
+    var urlDialogSchema = objOf([
+      strictString('title'),
+      strictString('url'),
+      optionNumber('height'),
+      optionNumber('width'),
+      optionArrayOf('buttons', urlDialogButtonSchema),
+      defaultedFunction('onAction', noop),
+      defaultedFunction('onCancel', noop),
+      defaultedFunction('onClose', noop),
+      defaultedFunction('onMessage', noop)
+    ]);
+    var createUrlDialog = function (spec) {
+      return asRaw('dialog', urlDialogSchema, spec);
+    };
+
     var extract$1 = function (structure) {
       var internalDialog = getOrDie$1(createDialog(structure));
       var dataValidator = createDataValidator(structure);
@@ -26602,15 +27749,14 @@ var silver = (function (domGlobals) {
         var extraction = extract$1(structure);
         return factory(extraction.internalDialog, extraction.initialData, extraction.dataValidator);
       },
+      openUrl: function (factory, structure) {
+        var internalDialog = getOrDie$1(createUrlDialog(structure));
+        return factory(internalDialog);
+      },
       redial: function (structure) {
         return extract$1(structure);
       }
     };
-
-    var dialogChannel = generate$1('update-dialog');
-    var titleChannel = generate$1('update-title');
-    var bodyChannel = generate$1('update-body');
-    var footerChannel = generate$1('update-footer');
 
     var toValidValues = function (values) {
       var errors = [];
@@ -26949,7 +28095,7 @@ var silver = (function (domGlobals) {
       }));
     };
     var getMaxTabviewHeight = function (dialog, dialogBody) {
-      var rootElm = ancestor$1(dialog, '.tox-dialog-wrap').getOr(dialog);
+      var rootElm = ancestor$2(dialog, '.tox-dialog-wrap').getOr(dialog);
       var isFixed = get$4(rootElm, 'position') === 'fixed';
       var maxHeight;
       if (isFixed) {
@@ -26966,7 +28112,7 @@ var silver = (function (domGlobals) {
       });
     };
     var updateTabviewHeight = function (dialogBody, tabview, maxTabHeight) {
-      ancestor$1(dialogBody, '[role="dialog"]').each(function (dialog) {
+      ancestor$2(dialogBody, '[role="dialog"]').each(function (dialog) {
         maxTabHeight.get().map(function (height) {
           set$2(tabview, 'height', '0');
           return Math.min(height, getMaxTabviewHeight(dialog, dialogBody));
@@ -26980,7 +28126,7 @@ var silver = (function (domGlobals) {
         var maxTabHeight = Cell(Option.none());
         var extraEvents = [
           runOnAttached(function (comp) {
-            descendant$1(comp.element(), '[role="tabpanel"]').each(function (tabview) {
+            descendant$2(comp.element(), '[role="tabpanel"]').each(function (tabview) {
               set$2(tabview, 'visibility', 'hidden');
               comp.getSystem().getByDom(tabview).toOption().each(function (tabviewComp) {
                 var heights = measureHeights(allTabs, tabview, tabviewComp);
@@ -26996,12 +28142,12 @@ var silver = (function (domGlobals) {
             });
           }),
           run(windowResize(), function (comp) {
-            descendant$1(comp.element(), '[role="tabpanel"]').each(function (tabview) {
+            descendant$2(comp.element(), '[role="tabpanel"]').each(function (tabview) {
               updateTabviewHeight(comp.element(), tabview, maxTabHeight);
             });
           }),
           run(formResizeEvent, function (comp, se) {
-            descendant$1(comp.element(), '[role="tabpanel"]').each(function (tabview) {
+            descendant$2(comp.element(), '[role="tabpanel"]').each(function (tabview) {
               var oldFocus = active();
               set$2(tabview, 'visibility', 'hidden');
               var oldHeight = getRaw(tabview, 'height').map(function (h) {
@@ -27167,6 +28313,12 @@ var silver = (function (domGlobals) {
       });
     };
 
+    var dialogChannel = generate$1('update-dialog');
+    var titleChannel = generate$1('update-title');
+    var bodyChannel = generate$1('update-body');
+    var footerChannel = generate$1('update-footer');
+    var bodySendMessageChannel = generate$1('body-send-message');
+
     var renderBody = function (foo, id, backstage, ariaAttrs) {
       var renderComponents = function (incoming) {
         switch (incoming.body.type) {
@@ -27210,50 +28362,49 @@ var silver = (function (domGlobals) {
       return renderBody(foo, Option.some(contentId), backstage, ariaAttrs);
     };
     var renderModalBody = function (foo, backstage) {
-      return ModalDialog.parts().body(renderBody(foo, Option.none(), backstage, false));
+      var bodySpec = renderBody(foo, Option.none(), backstage, false);
+      return ModalDialog.parts().body(bodySpec);
+    };
+    var renderIframeBody = function (spec) {
+      var bodySpec = {
+        dom: {
+          tag: 'div',
+          classes: ['tox-dialog__content-js']
+        },
+        components: [{
+            dom: {
+              tag: 'div',
+              classes: ['tox-dialog__body-iframe']
+            },
+            components: [NavigableObject.craft({
+                dom: {
+                  tag: 'iframe',
+                  attributes: { src: spec.url }
+                },
+                behaviours: derive$1([
+                  Tabstopping.config({}),
+                  Focusing.config({})
+                ])
+              })]
+          }],
+        behaviours: derive$1([Keying.config({
+            mode: 'acyclic',
+            useTabstopAt: not(NavigableObject.isPseudoStop)
+          })])
+      };
+      return ModalDialog.parts().body(bodySpec);
     };
 
-    var init$e = function (getInstanceApi, extras) {
-      var fireApiEvent = function (eventName, f) {
-        return run(eventName, function (c, se) {
-          withSpec(c, function (spec, _c) {
-            f(spec, se.event(), c);
-          });
-        });
-      };
-      var withSpec = function (c, f) {
-        Reflecting.getState(c).get().each(function (currentDialogInit) {
-          f(currentDialogInit.internalDialog, c);
-        });
-      };
+    var initCommonEvents = function (fireApiEvent, extras) {
       return [
         runWithTarget(focusin(), NavigableObject.onFocus),
-        fireApiEvent(formSubmitEvent, function (spec) {
-          return spec.onSubmit(getInstanceApi());
-        }),
-        fireApiEvent(formChangeEvent, function (spec, event) {
-          spec.onChange(getInstanceApi(), { name: event.name() });
-        }),
-        fireApiEvent(formActionEvent, function (spec, event) {
-          spec.onAction(getInstanceApi(), {
-            name: event.name(),
-            value: event.value()
-          });
-        }),
-        fireApiEvent(formTabChangeEvent, function (spec, event) {
-          spec.onTabChange(getInstanceApi(), event.title());
-        }),
-        fireApiEvent(formCloseEvent, function (spec) {
+        fireApiEvent(formCloseEvent, function (api, spec) {
           extras.onClose();
           spec.onClose();
         }),
-        fireApiEvent(formCancelEvent, function (spec, _event, self) {
-          spec.onCancel(getInstanceApi());
+        fireApiEvent(formCancelEvent, function (api, spec, _event, self) {
+          spec.onCancel(api);
           emit(self, formCloseEvent);
-        }),
-        runOnDetached(function (component) {
-          var api = getInstanceApi();
-          Representing.setValue(component, api.getData());
         }),
         run(formUnblockEvent, function (c, se) {
           return extras.onUnblock();
@@ -27263,7 +28414,62 @@ var silver = (function (domGlobals) {
         })
       ];
     };
-    var SilverDialogEvents = { init: init$e };
+    var initUrlDialog = function (getInstanceApi, extras) {
+      var fireApiEvent = function (eventName, f) {
+        return run(eventName, function (c, se) {
+          withSpec(c, function (spec, _c) {
+            f(getInstanceApi(), spec, se.event(), c);
+          });
+        });
+      };
+      var withSpec = function (c, f) {
+        Reflecting.getState(c).get().each(function (currentDialog) {
+          f(currentDialog, c);
+        });
+      };
+      return initCommonEvents(fireApiEvent, extras).concat([fireApiEvent(formActionEvent, function (api, spec, event) {
+          spec.onAction(api, { name: event.name() });
+        })]);
+    };
+    var initDialog = function (getInstanceApi, extras) {
+      var fireApiEvent = function (eventName, f) {
+        return run(eventName, function (c, se) {
+          withSpec(c, function (spec, _c) {
+            f(getInstanceApi(), spec, se.event(), c);
+          });
+        });
+      };
+      var withSpec = function (c, f) {
+        Reflecting.getState(c).get().each(function (currentDialogInit) {
+          f(currentDialogInit.internalDialog, c);
+        });
+      };
+      return initCommonEvents(fireApiEvent, extras).concat([
+        fireApiEvent(formSubmitEvent, function (api, spec) {
+          return spec.onSubmit(api);
+        }),
+        fireApiEvent(formChangeEvent, function (api, spec, event) {
+          spec.onChange(api, { name: event.name() });
+        }),
+        fireApiEvent(formActionEvent, function (api, spec, event) {
+          spec.onAction(api, {
+            name: event.name(),
+            value: event.value()
+          });
+        }),
+        fireApiEvent(formTabChangeEvent, function (api, spec, event) {
+          spec.onTabChange(api, event.title());
+        }),
+        runOnDetached(function (component) {
+          var api = getInstanceApi();
+          Representing.setValue(component, api.getData());
+        })
+      ]);
+    };
+    var SilverDialogEvents = {
+      initUrlDialog: initUrlDialog,
+      initDialog: initDialog
+    };
 
     var makeButton = function (button, providersBackstage) {
       return renderFooterButton(button, button.type, providersBackstage);
@@ -27334,86 +28540,6 @@ var silver = (function (domGlobals) {
     };
     var renderModalFooter = function (initFoo, providersBackstage) {
       return ModalDialog.parts().footer(renderFooter(initFoo, providersBackstage));
-    };
-
-    var renderClose = function (providersBackstage) {
-      return Button.sketch({
-        dom: {
-          tag: 'button',
-          classes: [
-            'tox-button',
-            'tox-button--icon',
-            'tox-button--naked'
-          ],
-          attributes: {
-            'type': 'button',
-            'aria-label': providersBackstage.translate('Close'),
-            'title': providersBackstage.translate('Close')
-          }
-        },
-        components: [{
-            dom: {
-              tag: 'div',
-              classes: ['tox-icon'],
-              innerHtml: '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M17.953 7.453L13.422 12l4.531 4.547-1.406 1.406L12 13.422l-4.547 4.531-1.406-1.406L10.578 12 6.047 7.453l1.406-1.406L12 10.578l4.547-4.531z" fill-rule="evenodd"></path></svg>'
-            }
-          }],
-        action: function (comp) {
-          emit(comp, formCancelEvent);
-        }
-      });
-    };
-    var renderTitle = function (foo, id, providersBackstage) {
-      var renderComponents = function (data) {
-        return [text(providersBackstage.translate(data.title))];
-      };
-      return {
-        dom: {
-          tag: 'div',
-          classes: ['tox-dialog__title'],
-          attributes: __assign({}, id.map(function (x) {
-            return { id: x };
-          }).getOr({}))
-        },
-        components: renderComponents(foo),
-        behaviours: derive$1([Reflecting.config({
-            channel: titleChannel,
-            renderComponents: renderComponents
-          })])
-      };
-    };
-    var renderInlineHeader = function (foo, titleId, providersBackstage) {
-      return Container.sketch({
-        dom: fromHtml$2('<div class="tox-dialog__header"></div>'),
-        components: [
-          renderTitle(foo, Option.some(titleId), providersBackstage),
-          renderClose(providersBackstage)
-        ],
-        containerBehaviours: derive$1([Dragging.config({
-            mode: 'mouse',
-            blockerClass: 'blocker',
-            getTarget: function (handle) {
-              return closest$3(handle, '[role="dialog"]').getOrDie();
-            },
-            snaps: {
-              getSnapPoints: function () {
-                return [];
-              },
-              leftAttr: 'data-drag-left',
-              topAttr: 'data-drag-top'
-            }
-          })])
-      });
-    };
-    var renderModalHeader = function (foo, providersBackstage) {
-      var pTitle = ModalDialog.parts().title(renderTitle(foo, Option.none(), providersBackstage));
-      var pHandle = ModalDialog.parts().draghandle({ dom: fromHtml$2('<div class="tox-dialog__draghandle"></div>') });
-      var pClose = ModalDialog.parts().close(renderClose(providersBackstage));
-      var components = [pTitle].concat(foo.draggable ? [pHandle] : []).concat([pClose]);
-      return Container.sketch({
-        dom: fromHtml$2('<div class="tox-dialog__header"></div>'),
-        components: components
-      });
     };
 
     var getCompByName = function (access, name) {
@@ -27525,25 +28651,99 @@ var silver = (function (domGlobals) {
       return instanceApi;
     };
 
-    var renderDialog = function (dialogInit, extra, backstage) {
-      var _a;
-      var updateState = function (_comp, incoming) {
-        return Option.some(incoming);
+    var renderClose = function (providersBackstage) {
+      return Button.sketch({
+        dom: {
+          tag: 'button',
+          classes: [
+            'tox-button',
+            'tox-button--icon',
+            'tox-button--naked'
+          ],
+          attributes: {
+            'type': 'button',
+            'aria-label': providersBackstage.translate('Close'),
+            'title': providersBackstage.translate('Close')
+          }
+        },
+        components: [{
+            dom: {
+              tag: 'div',
+              classes: ['tox-icon'],
+              innerHtml: '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M17.953 7.453L13.422 12l4.531 4.547-1.406 1.406L12 13.422l-4.547 4.531-1.406-1.406L10.578 12 6.047 7.453l1.406-1.406L12 10.578l4.547-4.531z" fill-rule="evenodd"></path></svg>'
+            }
+          }],
+        action: function (comp) {
+          emit(comp, formCancelEvent);
+        }
+      });
+    };
+    var renderTitle = function (foo, id, providersBackstage) {
+      var renderComponents = function (data) {
+        return [text(providersBackstage.translate(data.title))];
       };
-      var header = renderModalHeader({
-        title: backstage.shared.providers.translate(dialogInit.internalDialog.title),
+      return {
+        dom: {
+          tag: 'div',
+          classes: ['tox-dialog__title'],
+          attributes: __assign({}, id.map(function (x) {
+            return { id: x };
+          }).getOr({}))
+        },
+        components: renderComponents(foo),
+        behaviours: derive$1([Reflecting.config({
+            channel: titleChannel,
+            renderComponents: renderComponents
+          })])
+      };
+    };
+    var renderInlineHeader = function (foo, titleId, providersBackstage) {
+      return Container.sketch({
+        dom: fromHtml$2('<div class="tox-dialog__header"></div>'),
+        components: [
+          renderTitle(foo, Option.some(titleId), providersBackstage),
+          renderClose(providersBackstage)
+        ],
+        containerBehaviours: derive$1([Dragging.config({
+            mode: 'mouse',
+            blockerClass: 'blocker',
+            getTarget: function (handle) {
+              return closest$3(handle, '[role="dialog"]').getOrDie();
+            },
+            snaps: {
+              getSnapPoints: function () {
+                return [];
+              },
+              leftAttr: 'data-drag-left',
+              topAttr: 'data-drag-top'
+            }
+          })])
+      });
+    };
+    var renderModalHeader = function (foo, providersBackstage) {
+      var pTitle = ModalDialog.parts().title(renderTitle(foo, Option.none(), providersBackstage));
+      var pHandle = ModalDialog.parts().draghandle({ dom: fromHtml$2('<div class="tox-dialog__draghandle"></div>') });
+      var pClose = ModalDialog.parts().close(renderClose(providersBackstage));
+      var components = [pTitle].concat(foo.draggable ? [pHandle] : []).concat([pClose]);
+      return Container.sketch({
+        dom: fromHtml$2('<div class="tox-dialog__header"></div>'),
+        components: components
+      });
+    };
+
+    var getHeader = function (title, backstage) {
+      return renderModalHeader({
+        title: backstage.shared.providers.translate(title),
         draggable: true
       }, backstage.shared.providers);
-      var body$1 = renderModalBody({ body: dialogInit.internalDialog.body }, backstage);
-      var footer = renderModalFooter({ buttons: dialogInit.internalDialog.buttons }, backstage.shared.providers);
-      var dialogEvents = SilverDialogEvents.init(function () {
-        return instanceApi;
-      }, {
+    };
+    var getEventExtras = function (lazyDialog, extra) {
+      return {
         onClose: function () {
           return extra.closeWindow();
         },
         onBlock: function (blockEvent) {
-          ModalDialog.setBusy(dialog, function (d, bs) {
+          ModalDialog.setBusy(lazyDialog(), function (d, bs) {
             return {
               dom: {
                 tag: 'div',
@@ -27563,11 +28763,16 @@ var silver = (function (domGlobals) {
           });
         },
         onUnblock: function () {
-          ModalDialog.setIdle(dialog);
+          ModalDialog.setIdle(lazyDialog());
         }
-      });
-      var dialogSize = dialogInit.internalDialog.size !== 'normal' ? dialogInit.internalDialog.size === 'large' ? 'tox-dialog--width-lg' : 'tox-dialog--width-md' : [];
-      var dialog = build$1(ModalDialog.sketch({
+      };
+    };
+    var renderModalDialog = function (spec, initialData, dialogEvents, backstage) {
+      var _a;
+      var updateState = function (_comp, incoming) {
+        return Option.some(incoming);
+      };
+      return build$1(ModalDialog.sketch({
         lazySink: backstage.shared.getSink,
         onEscape: function (c) {
           emit(c, formCancelEvent);
@@ -27580,8 +28785,9 @@ var silver = (function (domGlobals) {
           Reflecting.config({
             channel: dialogChannel,
             updateState: updateState,
-            initialData: dialogInit
+            initialData: initialData
           }),
+          RepresentingConfigs.memory({}),
           Focusing.config({}),
           config('execute-on-form', dialogEvents.concat([runOnSource(focusin(), function (comp, se) {
               Keying.focusIn(comp);
@@ -27593,30 +28799,33 @@ var silver = (function (domGlobals) {
             runOnDetached(function () {
               remove$4(body(), 'tox-dialog__disable-scroll');
             })
-          ]),
-          RepresentingConfigs.memory({})
-        ]),
-        eventOrder: (_a = {}, _a[execute()] = ['execute-on-form'], _a[attachedToDom()] = [
+          ])
+        ].concat(spec.extraBehaviours)),
+        eventOrder: (_a = {}, _a[execute()] = ['execute-on-form'], _a[receive()] = [
+          'reflecting',
+          'receiving'
+        ], _a[attachedToDom()] = [
           'scroll-lock',
           'reflecting',
+          'messages',
           'execute-on-form',
           'alloy.base.behaviour'
         ], _a[detachedFromDom()] = [
           'alloy.base.behaviour',
           'execute-on-form',
+          'messages',
           'reflecting',
           'scroll-lock'
         ], _a),
         dom: {
           tag: 'div',
-          classes: ['tox-dialog'].concat(dialogSize),
-          styles: { position: 'relative' }
+          classes: ['tox-dialog'].concat(spec.extraClasses),
+          styles: __assign({ position: 'relative' }, spec.extraStyles)
         },
         components: [
-          header,
-          body$1,
-          footer
-        ],
+          spec.header,
+          spec.body
+        ].concat(spec.footer.toArray()),
         dragBlockClass: 'tox-dialog-wrap',
         parts: {
           blocker: {
@@ -27630,6 +28839,27 @@ var silver = (function (domGlobals) {
           }
         }
       }));
+    };
+
+    var renderDialog = function (dialogInit, extra, backstage) {
+      var header = getHeader(dialogInit.internalDialog.title, backstage);
+      var body = renderModalBody({ body: dialogInit.internalDialog.body }, backstage);
+      var footer = renderModalFooter({ buttons: dialogInit.internalDialog.buttons }, backstage.shared.providers);
+      var dialogEvents = SilverDialogEvents.initDialog(function () {
+        return instanceApi;
+      }, getEventExtras(function () {
+        return dialog;
+      }, extra));
+      var dialogSize = dialogInit.internalDialog.size !== 'normal' ? dialogInit.internalDialog.size === 'large' ? ['tox-dialog--width-lg'] : ['tox-dialog--width-md'] : [];
+      var spec = {
+        header: header,
+        body: body,
+        footer: Option.some(footer),
+        extraClasses: dialogSize,
+        extraBehaviours: [],
+        extraStyles: {}
+      };
+      var dialog = renderModalDialog(spec, dialogInit, dialogEvents, backstage);
       var modalAccess = function () {
         var getForm = function () {
           var outerForm = ModalDialog.getBody(dialog);
@@ -27655,6 +28885,165 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var global$d = tinymce.util.Tools.resolve('tinymce.util.URI');
+
+    var getUrlDialogApi = function (root) {
+      var withRoot = function (f) {
+        if (root.getSystem().isConnected()) {
+          f(root);
+        }
+      };
+      var block = function (message) {
+        if (!isString(message)) {
+          throw new Error('The urlDialogInstanceAPI.block function should be passed a blocking message of type string as an argument');
+        }
+        withRoot(function (root) {
+          emitWith(root, formBlockEvent, { message: message });
+        });
+      };
+      var unblock = function () {
+        withRoot(function (root) {
+          emit(root, formUnblockEvent);
+        });
+      };
+      var close = function () {
+        withRoot(function (root) {
+          emit(root, formCloseEvent);
+        });
+      };
+      var sendMessage = function (data) {
+        withRoot(function (root) {
+          root.getSystem().broadcastOn([bodySendMessageChannel], data);
+        });
+      };
+      return {
+        block: block,
+        unblock: unblock,
+        close: close,
+        sendMessage: sendMessage
+      };
+    };
+
+    var SUPPORTED_MESSAGE_ACTIONS = [
+      'insertContent',
+      'setContent',
+      'execCommand',
+      'close',
+      'block',
+      'unblock'
+    ];
+    var isSupportedMessage = function (data) {
+      return isObject(data) && SUPPORTED_MESSAGE_ACTIONS.indexOf(data.mceAction) !== -1;
+    };
+    var isCustomMessage = function (data) {
+      return !isSupportedMessage(data) && isObject(data) && has(data, 'mceAction');
+    };
+    var handleMessage = function (editor, api, data) {
+      switch (data.mceAction) {
+      case 'insertContent':
+        editor.insertContent(data.content);
+        break;
+      case 'setContent':
+        editor.setContent(data.content);
+        break;
+      case 'execCommand':
+        var ui = isBoolean(data.ui) ? data.ui : false;
+        editor.execCommand(data.cmd, ui, data.value);
+        break;
+      case 'close':
+        api.close();
+        break;
+      case 'block':
+        api.block(data.message);
+        break;
+      case 'unblock':
+        api.unblock();
+        break;
+      }
+    };
+    var renderUrlDialog = function (internalDialog, extra, editor, backstage) {
+      var _a;
+      var header = getHeader(internalDialog.title, backstage);
+      var body = renderIframeBody(internalDialog);
+      var footer = internalDialog.buttons.bind(function (buttons) {
+        if (buttons.length === 0) {
+          return Option.none();
+        } else {
+          return Option.some(renderModalFooter({ buttons: buttons }, backstage.shared.providers));
+        }
+      });
+      var dialogEvents = SilverDialogEvents.initUrlDialog(function () {
+        return instanceApi;
+      }, getEventExtras(function () {
+        return dialog;
+      }, extra));
+      var styles = __assign({}, internalDialog.height.fold(function () {
+        return {};
+      }, function (height) {
+        return {
+          'height': height + 'px',
+          'max-height': height + 'px'
+        };
+      }), internalDialog.width.fold(function () {
+        return {};
+      }, function (width) {
+        return {
+          'width': width + 'px',
+          'max-width': width + 'px'
+        };
+      }));
+      var classes = internalDialog.width.isNone() && internalDialog.height.isNone() ? ['tox-dialog--width-lg'] : [];
+      var iframeUri = new global$d(internalDialog.url, { base_uri: new global$d(domGlobals.window.location.href) });
+      var iframeDomain = iframeUri.protocol + '://' + iframeUri.host + (iframeUri.port ? ':' + iframeUri.port : '');
+      var messageHandlerUnbinder = Cell(Option.none());
+      var extraBehaviours = [
+        config('messages', [
+          runOnAttached(function () {
+            var unbind = bind$3(Element.fromDom(domGlobals.window), 'message', function (e) {
+              if (iframeUri.isSameOrigin(new global$d(e.raw().origin))) {
+                var data = e.raw().data;
+                if (isSupportedMessage(data)) {
+                  handleMessage(editor, instanceApi, data);
+                } else if (isCustomMessage(data)) {
+                  internalDialog.onMessage(instanceApi, data);
+                }
+              }
+            });
+            messageHandlerUnbinder.set(Option.some(unbind));
+          }),
+          runOnDetached(function () {
+            messageHandlerUnbinder.get().each(function (unbinder) {
+              return unbinder.unbind();
+            });
+          })
+        ]),
+        Receiving.config({
+          channels: (_a = {}, _a[bodySendMessageChannel] = {
+            onReceive: function (comp, data) {
+              descendant$2(comp.element(), 'iframe').each(function (iframeEle) {
+                var iframeWin = iframeEle.dom().contentWindow;
+                iframeWin.postMessage(data, iframeDomain);
+              });
+            }
+          }, _a)
+        })
+      ];
+      var spec = {
+        header: header,
+        body: body,
+        footer: footer,
+        extraClasses: classes,
+        extraBehaviours: extraBehaviours,
+        extraStyles: styles
+      };
+      var dialog = renderModalDialog(spec, internalDialog, dialogEvents, backstage);
+      var instanceApi = getUrlDialogApi(dialog);
+      return {
+        dialog: dialog,
+        instanceApi: instanceApi
+      };
+    };
+
     var renderInlineDialog = function (dialogInit, extra, backstage, ariaAttrs) {
       var _a, _b;
       var dialogLabelId = generate$1('dialog-label');
@@ -27668,7 +29057,7 @@ var silver = (function (domGlobals) {
       }, dialogLabelId, backstage.shared.providers));
       var memBody = record(renderInlineBody({ body: dialogInit.internalDialog.body }, dialogContentId, backstage, ariaAttrs));
       var memFooter = record(renderInlineFooter({ buttons: dialogInit.internalDialog.buttons }, backstage.shared.providers));
-      var dialogEvents = SilverDialogEvents.init(function () {
+      var dialogEvents = SilverDialogEvents.initDialog(function () {
         return instanceApi;
       }, {
         onBlock: function () {
@@ -27852,7 +29241,7 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var setup$8 = function (extras) {
+    var setup$9 = function (extras) {
       var sharedBackstage = extras.backstage.shared;
       var open = function (message, callback) {
         var closeDialog = function () {
@@ -27890,7 +29279,7 @@ var silver = (function (domGlobals) {
       return { open: open };
     };
 
-    var setup$9 = function (extras) {
+    var setup$a = function (extras) {
       var sharedBackstage = extras.backstage.shared;
       var open = function (message, callback) {
         var closeDialog = function (state) {
@@ -27942,9 +29331,9 @@ var silver = (function (domGlobals) {
     var validateData$1 = function (data, validator) {
       return getOrDie$1(asRaw('data', validator, data));
     };
-    var setup$a = function (extras) {
-      var alertDialog = setup$8(extras);
-      var confirmDialog = setup$9(extras);
+    var setup$b = function (extras) {
+      var alertDialog = setup$9(extras);
+      var confirmDialog = setup$a(extras);
       var open = function (config, params, closeWindow) {
         if (params !== undefined && params.inline === 'toolbar') {
           return openInlineDialog(config, extras.backstage.shared.anchors.toolbar(), closeWindow, params.ariaAttrs);
@@ -27953,6 +29342,22 @@ var silver = (function (domGlobals) {
         } else {
           return openModalDialog(config, closeWindow);
         }
+      };
+      var openUrl = function (config, closeWindow) {
+        return openModalUrlDialog(config, closeWindow);
+      };
+      var openModalUrlDialog = function (config, closeWindow) {
+        var factory = function (contents) {
+          var dialog = renderUrlDialog(contents, {
+            closeWindow: function () {
+              ModalDialog.hide(dialog.dialog);
+              closeWindow(dialog.instanceApi);
+            }
+          }, extras.editor, extras.backstage);
+          ModalDialog.show(dialog.dialog);
+          return dialog.instanceApi;
+        };
+        return DialogManager.openUrl(factory, config);
       };
       var openModalDialog = function (config, closeWindow) {
         var factory = function (contents, internalInitialData, dataValidator) {
@@ -28023,12 +29428,13 @@ var silver = (function (domGlobals) {
       };
       return {
         open: open,
+        openUrl: openUrl,
         alert: alert,
         close: close,
         confirm: confirm
       };
     };
-    var WindowManager = { setup: setup$a };
+    var WindowManager = { setup: setup$b };
 
     global.add('silver', function (editor) {
       var _a = Render.setup(editor), mothership = _a.mothership, uiMothership = _a.uiMothership, backstage = _a.backstage, renderUI = _a.renderUI, getUi = _a.getUi;
@@ -28036,7 +29442,10 @@ var silver = (function (domGlobals) {
       registerInspector(generate$1('silver-demo'), mothership);
       registerInspector(generate$1('silver-ui-demo'), uiMothership);
       Autocompleter.register(editor, backstage.shared);
-      var windowMgr = WindowManager.setup({ backstage: backstage });
+      var windowMgr = WindowManager.setup({
+        editor: editor,
+        backstage: backstage
+      });
       return {
         renderUI: renderUI,
         getWindowManagerImpl: constant(windowMgr),
