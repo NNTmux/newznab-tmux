@@ -660,5 +660,5 @@ return [
         'disablepreview' => 0,
         'minsizetoformrelease' => 0,
         'maxsizetoformrelease' => 0,
-    ]
+    ],
 ];

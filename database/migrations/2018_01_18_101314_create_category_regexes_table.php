@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateCategoryRegexesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -32,7 +31,6 @@ class CreateCategoryRegexesTable extends Migration
             DB::statement('ALTER SEQUENCE category_regexes_id_seq RESTART 1000000;');
         }
     }
-
 
     /**
      * Reverse the migrations.

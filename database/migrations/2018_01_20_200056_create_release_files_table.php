@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseFilesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,11 +23,10 @@ class CreateReleaseFilesTable extends Migration
             $table->string('crc32')->default('');
             $table->timestamps();
             $table->boolean('passworded')->default(0);
-            $table->primary(['releases_id','name']);
+            $table->primary(['releases_id', 'name']);
             $table->foreign('releases_id', 'FK_rf_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBookinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -35,7 +34,6 @@ class CreateBookinfoTable extends Migration
         });
         DB::statement('ALTER TABLE bookinfo ADD FULLTEXT ix_bookinfo_author_title_ft (author, title)');
     }
-
 
     /**
      * Reverse the migrations.

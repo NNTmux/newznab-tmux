@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use Blacklight\Books;
 use Tests\TestCase;
+use Blacklight\Books;
 
 class GetBooksBrowseByOptionsTest extends TestCase
 {

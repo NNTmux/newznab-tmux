@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMusicinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -34,7 +33,6 @@ class CreateMusicinfoTable extends Migration
         });
         DB::statement('ALTER TABLE musicinfo ADD FULLTEXT ix_musicinfo_artist_title_ft (artist, title)');
     }
-
 
     /**
      * Reverse the migrations.

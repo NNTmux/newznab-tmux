@@ -1,8 +1,7 @@
 <?php
 
 return [
-        0 =>
-            [
+        0 => [
                 'id' => 1,
                 'title' => 'Other',
                 'status' => 1,
@@ -10,8 +9,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        1 =>
-            [
+        1 => [
                 'id' => 1000,
                 'title' => 'Console',
                 'status' => 1,
@@ -19,8 +17,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        2 =>
-            [
+        2 => [
                 'id' => 2000,
                 'title' => 'Movies',
                 'status' => 1,
@@ -28,8 +25,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        3 =>
-            [
+        3 => [
                 'id' => 3000,
                 'title' => 'Audio',
                 'status' => 1,
@@ -37,8 +33,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        4 =>
-            [
+        4 => [
                 'id' => 4000,
                 'title' => 'PC',
                 'status' => 1,
@@ -46,8 +41,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        5 =>
-            [
+        5 => [
                 'id' => 5000,
                 'title' => 'TV',
                 'status' => 1,
@@ -55,8 +49,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        6 =>
-            [
+        6 => [
                 'id' => 6000,
                 'title' => 'XXX',
                 'status' => 1,
@@ -64,8 +57,7 @@ return [
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        7 =>
-            [
+        7 => [
                 'id' => 7000,
                 'title' => 'Books',
                 'status' => 1,

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateConsoleinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -33,7 +32,6 @@ class CreateConsoleinfoTable extends Migration
         });
         DB::statement('ALTER TABLE consoleinfo ADD FULLTEXT ix_consoleinfo_title_platform_ft (title, platform)');
     }
-
 
     /**
      * Reverse the migrations.

@@ -387,7 +387,7 @@ class Forking
 				WHERE g.first_record IS NOT NULL
 				AND g.first_record_postdate IS NOT NULL
 				AND g.backfill = 1
-				AND %s < g.first_record_postdate
+				AND (NOW() - INTERVAL %d DAY ) < g.first_record_postdate
 				GROUP BY a.name, a.last_record, g.name, g.first_record
 				%s LIMIT 1',
                 $backfilldays,

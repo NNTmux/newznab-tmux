@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -28,7 +28,6 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'view adult']);
         Permission::create(['name' => 'view books']);
         Permission::create(['name' => 'view other']);
-
 
         // create roles and assign created permissions
 

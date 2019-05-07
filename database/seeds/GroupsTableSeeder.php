@@ -4,9 +4,8 @@ use Illuminate\Database\Seeder;
 
 class GroupsTableSeeder extends Seeder
 {
-
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -15,8 +14,7 @@ class GroupsTableSeeder extends Seeder
         \DB::table('usenet_groups')->delete();
 
         \DB::table('usenet_groups')->insert([
-            0 =>
-            [
+            0 => [
                 'id' => 1,
                 'name' => 'alt.binaries.0day.stuffz',
                 'backfill_target' => 1,
@@ -31,8 +29,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly 0day software.',
             ],
-            1 =>
-            [
+            1 => [
                 'id' => 2,
                 'name' => 'alt.binaries.anime',
                 'backfill_target' => 1,
@@ -47,8 +44,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly Anime Television.',
             ],
-            2 =>
-            [
+            2 => [
                 'id' => 3,
                 'name' => 'alt.binaries.astronomy',
                 'backfill_target' => 1,
@@ -63,8 +59,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly movies.',
             ],
-            3 =>
-            [
+            3 => [
                 'id' => 4,
                 'name' => 'alt.binaries.ath',
                 'backfill_target' => 1,
@@ -79,8 +74,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music. Some Foreign.',
             ],
-            4 =>
-            [
+            4 => [
                 'id' => 5,
                 'name' => 'alt.binaries.barbarella',
                 'backfill_target' => 1,
@@ -95,8 +89,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of German content.',
             ],
-            5 =>
-            [
+            5 => [
                 'id' => 6,
                 'name' => 'alt.binaries.audio.warez',
                 'backfill_target' => 1,
@@ -111,8 +104,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'There is some old stuff in here, but this group is pretty much dead.',
             ],
-            6 =>
-            [
+            6 => [
                 'id' => 7,
                 'name' => 'alt.binaries.b4e',
                 'backfill_target' => 1,
@@ -127,8 +119,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains 0day and has some foreign.',
             ],
-            7 =>
-            [
+            7 => [
                 'id' => 8,
                 'name' => 'alt.binaries.big',
                 'backfill_target' => 1,
@@ -143,8 +134,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid Movies. Mostly Foreign.',
             ],
-            8 =>
-            [
+            8 => [
                 'id' => 9,
                 'name' => 'alt.binaries.bloaf',
                 'backfill_target' => 1,
@@ -159,8 +149,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety. Mostly Foreign.',
             ],
-            9 =>
-            [
+            9 => [
                 'id' => 10,
                 'name' => 'alt.binaries.blu-ray',
                 'backfill_target' => 1,
@@ -175,8 +164,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains blu-ray movies.',
             ],
-            10 =>
-            [
+            10 => [
                 'id' => 11,
                 'name' => 'alt.binaries.boneless',
                 'backfill_target' => 1,
@@ -191,8 +179,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid and X264 Movies. Some Foreign.',
             ],
-            11 =>
-            [
+            11 => [
                 'id' => 12,
                 'name' => 'alt.binaries.british.drama',
                 'backfill_target' => 1,
@@ -207,8 +194,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains British TV shows.',
             ],
-            12 =>
-            [
+            12 => [
                 'id' => 13,
                 'name' => 'alt.binaries.cartoons.french',
                 'backfill_target' => 1,
@@ -223,8 +209,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains French cartoons.',
             ],
-            13 =>
-            [
+            13 => [
                 'id' => 14,
                 'name' => 'alt.binaries.cats',
                 'backfill_target' => 1,
@@ -239,8 +224,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            14 =>
-            [
+            14 => [
                 'id' => 15,
                 'name' => 'alt.binaries.cd.image.linux',
                 'backfill_target' => 1,
@@ -255,8 +239,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Linux distributions.',
             ],
-            15 =>
-            [
+            15 => [
                 'id' => 16,
                 'name' => 'alt.binaries.cd.image',
                 'backfill_target' => 1,
@@ -271,8 +254,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PC-ISO.',
             ],
-            16 =>
-            [
+            16 => [
                 'id' => 17,
                 'name' => 'alt.binaries.cd.lossless',
                 'backfill_target' => 1,
@@ -287,8 +269,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of lossless Music.',
             ],
-            17 =>
-            [
+            17 => [
                 'id' => 18,
                 'name' => 'alt.binaries.chello',
                 'backfill_target' => 1,
@@ -303,8 +284,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            18 =>
-            [
+            18 => [
                 'id' => 19,
                 'name' => 'alt.binaries.classic.tv.shows',
                 'backfill_target' => 1,
@@ -319,8 +299,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Classic TV and Movies.',
             ],
-            19 =>
-            [
+            19 => [
                 'id' => 20,
                 'name' => 'alt.binaries.comics.dcp',
                 'backfill_target' => 1,
@@ -335,8 +314,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Comic Books',
             ],
-            20 =>
-            [
+            20 => [
                 'id' => 21,
                 'name' => 'alt.binaries.comp',
                 'backfill_target' => 1,
@@ -351,8 +329,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Warez. Mostly Foreign.',
             ],
-            21 =>
-            [
+            21 => [
                 'id' => 22,
                 'name' => 'alt.binaries.console.ps3',
                 'backfill_target' => 1,
@@ -367,8 +344,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PS3 Games.',
             ],
-            22 =>
-            [
+            22 => [
                 'id' => 23,
                 'name' => 'alt.binaries.cores',
                 'backfill_target' => 1,
@@ -383,8 +359,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety including Nintendo DS. Lots of Foreign.',
             ],
-            23 =>
-            [
+            23 => [
                 'id' => 24,
                 'name' => 'alt.binaries.country.mp3',
                 'backfill_target' => 1,
@@ -399,8 +374,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Country Music.',
             ],
-            24 =>
-            [
+            24 => [
                 'id' => 25,
                 'name' => 'alt.binaries.dc',
                 'backfill_target' => 1,
@@ -415,8 +389,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid and X264 Movies and TV. Mostly Foreign.',
             ],
-            25 =>
-            [
+            25 => [
                 'id' => 26,
                 'name' => 'alt.binaries.dgma',
                 'backfill_target' => 1,
@@ -431,8 +404,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid Movies. Mostly Foreign.',
             ],
-            26 =>
-            [
+            26 => [
                 'id' => 27,
                 'name' => 'alt.binaries.divx.french',
                 'backfill_target' => 1,
@@ -447,8 +419,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains French XVid Movies.',
             ],
-            27 =>
-            [
+            27 => [
                 'id' => 28,
                 'name' => 'alt.binaries.documentaries',
                 'backfill_target' => 1,
@@ -463,8 +434,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Documentaries TV and Movies.',
             ],
-            28 =>
-            [
+            28 => [
                 'id' => 29,
                 'name' => 'alt.binaries.documentaries.french',
                 'backfill_target' => 1,
@@ -479,8 +449,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains French Documentaries TV and Movies.',
             ],
-            29 =>
-            [
+            29 => [
                 'id' => 30,
                 'name' => 'alt.binaries.downunder',
                 'backfill_target' => 1,
@@ -495,8 +464,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            30 =>
-            [
+            30 => [
                 'id' => 31,
                 'name' => 'alt.binaries.dvd',
                 'backfill_target' => 1,
@@ -511,8 +479,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains DVD Movies.',
             ],
-            31 =>
-            [
+            31 => [
                 'id' => 32,
                 'name' => 'alt.binaries.dvd.movies',
                 'backfill_target' => 1,
@@ -527,8 +494,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains DVDR Movies.',
             ],
-            32 =>
-            [
+            32 => [
                 'id' => 33,
                 'name' => 'alt.binaries.dvdr',
                 'backfill_target' => 1,
@@ -543,8 +509,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains DVD Movies.',
             ],
-            33 =>
-            [
+            33 => [
                 'id' => 34,
                 'name' => 'alt.binaries.dvd-r',
                 'backfill_target' => 1,
@@ -559,8 +524,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains DVD Movies.',
             ],
-            34 =>
-            [
+            34 => [
                 'id' => 35,
                 'name' => 'alt.binaries.e-book.flood',
                 'backfill_target' => 1,
@@ -575,8 +539,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains E-Books.',
             ],
-            35 =>
-            [
+            35 => [
                 'id' => 36,
                 'name' => 'alt.binaries.e-book.technical',
                 'backfill_target' => 1,
@@ -591,8 +554,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains E-Books.',
             ],
-            36 =>
-            [
+            36 => [
                 'id' => 37,
                 'name' => 'alt.binaries.e-book',
                 'backfill_target' => 1,
@@ -607,8 +569,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains E-Books.',
             ],
-            37 =>
-            [
+            37 => [
                 'id' => 38,
                 'name' => 'alt.binaries.ebook',
                 'backfill_target' => 1,
@@ -623,8 +584,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Ebook\'s.',
             ],
-            38 =>
-            [
+            38 => [
                 'id' => 39,
                 'name' => 'alt.binaries.erotica.divx',
                 'backfill_target' => 1,
@@ -639,8 +599,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX.',
             ],
-            39 =>
-            [
+            39 => [
                 'id' => 40,
                 'name' => 'alt.binaries.erotica',
                 'backfill_target' => 1,
@@ -655,8 +614,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX.',
             ],
-            40 =>
-            [
+            40 => [
                 'id' => 41,
                 'name' => 'alt.binaries.etc',
                 'backfill_target' => 1,
@@ -671,8 +629,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of items.',
             ],
-            41 =>
-            [
+            41 => [
                 'id' => 42,
                 'name' => 'alt.binaries.font',
                 'backfill_target' => 1,
@@ -687,8 +644,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            42 =>
-            [
+            42 => [
                 'id' => 43,
                 'name' => 'alt.binaries.french-tv',
                 'backfill_target' => 1,
@@ -703,8 +659,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains French TV.',
             ],
-            43 =>
-            [
+            43 => [
                 'id' => 44,
                 'name' => 'alt.binaries.frogs',
                 'backfill_target' => 1,
@@ -719,8 +674,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety.',
             ],
-            44 =>
-            [
+            44 => [
                 'id' => 45,
                 'name' => 'alt.binaries.ftn',
                 'backfill_target' => 1,
@@ -735,8 +689,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music and TV.',
             ],
-            45 =>
-            [
+            45 => [
                 'id' => 46,
                 'name' => 'alt.binaries.games.nintendods',
                 'backfill_target' => 1,
@@ -751,8 +704,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Nintendo DS Games ',
             ],
-            46 =>
-            [
+            46 => [
                 'id' => 47,
                 'name' => 'alt.binaries.games',
                 'backfill_target' => 1,
@@ -767,8 +719,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PC and Console Games.',
             ],
-            47 =>
-            [
+            47 => [
                 'id' => 48,
                 'name' => 'alt.binaries.games.wii',
                 'backfill_target' => 1,
@@ -783,8 +734,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Nintendo WII Games, WII-Ware, and VC.',
             ],
-            48 =>
-            [
+            48 => [
                 'id' => 49,
                 'name' => 'alt.binaries.games.xbox360',
                 'backfill_target' => 1,
@@ -799,8 +749,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XBOX 360 Games and DLC.',
             ],
-            49 =>
-            [
+            49 => [
                 'id' => 50,
                 'name' => 'alt.binaries.games.xbox',
                 'backfill_target' => 1,
@@ -815,8 +764,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains original XBOX Games.',
             ],
-            50 =>
-            [
+            50 => [
                 'id' => 51,
                 'name' => 'alt.binaries.ghosts',
                 'backfill_target' => 1,
@@ -831,8 +779,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid TV and Movies. Mostly Foreign.',
             ],
-            51 =>
-            [
+            51 => [
                 'id' => 52,
                 'name' => 'alt.binaries.hdtv',
                 'backfill_target' => 1,
@@ -847,8 +794,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly HDTV 1080i rips.',
             ],
-            52 =>
-            [
+            52 => [
                 'id' => 53,
                 'name' => 'alt.binaries.hdtv.german',
                 'backfill_target' => 1,
@@ -863,8 +809,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains German HDTV.',
             ],
-            53 =>
-            [
+            53 => [
                 'id' => 54,
                 'name' => 'alt.binaries.hdtv.x264',
                 'backfill_target' => 1,
@@ -879,8 +824,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains X264 Movies and HDTV.',
             ],
-            54 =>
-            [
+            54 => [
                 'id' => 55,
                 'name' => 'alt.binaries.highspeed',
                 'backfill_target' => 1,
@@ -895,8 +839,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid Movies. Mostly Foreign.',
             ],
-            55 =>
-            [
+            55 => [
                 'id' => 56,
                 'name' => 'alt.binaries.hou',
                 'backfill_target' => 1,
@@ -911,8 +854,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of content. Mostly Foreign.',
             ],
-            56 =>
-            [
+            56 => [
                 'id' => 57,
                 'name' => 'alt.binaries.ijsklontje',
                 'backfill_target' => 1,
@@ -927,8 +869,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX.',
             ],
-            57 =>
-            [
+            57 => [
                 'id' => 58,
                 'name' => 'alt.binaries.inner-sanctum',
                 'backfill_target' => 1,
@@ -943,8 +884,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PC and Music.',
             ],
-            58 =>
-            [
+            58 => [
                 'id' => 59,
                 'name' => 'alt.binaries.illuminaten',
                 'backfill_target' => 1,
@@ -959,8 +899,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly German.',
             ],
-            59 =>
-            [
+            59 => [
                 'id' => 60,
                 'name' => 'alt.binaries.ipod.videos',
                 'backfill_target' => 1,
@@ -975,8 +914,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Mobile TV and Movies.',
             ],
-            60 =>
-            [
+            60 => [
                 'id' => 61,
                 'name' => 'alt.binaries.linux.iso',
                 'backfill_target' => 1,
@@ -991,8 +929,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Linux distributions.',
             ],
-            61 =>
-            [
+            61 => [
                 'id' => 62,
                 'name' => 'alt.binaries.lou',
                 'backfill_target' => 1,
@@ -1007,8 +944,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly german TV.',
             ],
-            62 =>
-            [
+            62 => [
                 'id' => 63,
                 'name' => 'alt.binaries.mac',
                 'backfill_target' => 1,
@@ -1023,8 +959,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains MAC/OSX Software.',
             ],
-            63 =>
-            [
+            63 => [
                 'id' => 64,
                 'name' => 'alt.binaries.mac.applications',
                 'backfill_target' => 1,
@@ -1039,8 +974,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains MAC/OSX Software.',
             ],
-            64 =>
-            [
+            64 => [
                 'id' => 65,
                 'name' => 'alt.binaries.milo',
                 'backfill_target' => 1,
@@ -1055,8 +989,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV, some german.',
             ],
-            65 =>
-            [
+            65 => [
                 'id' => 66,
                 'name' => 'alt.binaries.misc',
                 'backfill_target' => 1,
@@ -1071,8 +1004,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of items.',
             ],
-            66 =>
-            [
+            66 => [
                 'id' => 67,
                 'name' => 'alt.binaries.mojo',
                 'backfill_target' => 1,
@@ -1087,8 +1019,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            67 =>
-            [
+            67 => [
                 'id' => 68,
                 'name' => 'alt.binaries.mma',
                 'backfill_target' => 1,
@@ -1103,8 +1034,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains MMA/TNA Sport TV.',
             ],
-            68 =>
-            [
+            68 => [
                 'id' => 69,
                 'name' => 'alt.binaries.mom',
                 'backfill_target' => 1,
@@ -1119,8 +1049,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety. Mostly Foreign.',
             ],
-            69 =>
-            [
+            69 => [
                 'id' => 70,
                 'name' => 'alt.binaries.moovee',
                 'backfill_target' => 1,
@@ -1135,8 +1064,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid and X264 Movies.',
             ],
-            70 =>
-            [
+            70 => [
                 'id' => 71,
                 'name' => 'alt.binaries.movies.divx',
                 'backfill_target' => 1,
@@ -1151,8 +1079,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid Movies',
             ],
-            71 =>
-            [
+            71 => [
                 'id' => 72,
                 'name' => 'alt.binaries.movies.erotica',
                 'backfill_target' => 1,
@@ -1167,8 +1094,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX',
             ],
-            72 =>
-            [
+            72 => [
                 'id' => 73,
                 'name' => 'alt.binaries.movies.french',
                 'backfill_target' => 1,
@@ -1183,8 +1109,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains French Movies.',
             ],
-            73 =>
-            [
+            73 => [
                 'id' => 74,
                 'name' => 'alt.binaries.movies',
                 'backfill_target' => 1,
@@ -1199,8 +1124,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains an assortment of Movies.',
             ],
-            74 =>
-            [
+            74 => [
                 'id' => 75,
                 'name' => 'alt.binaries.movies.xvid',
                 'backfill_target' => 1,
@@ -1215,8 +1139,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid Movies.',
             ],
-            75 =>
-            [
+            75 => [
                 'id' => 76,
                 'name' => 'alt.binaries.mp3.audiobooks',
                 'backfill_target' => 1,
@@ -1231,8 +1154,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Audio Books.',
             ],
-            76 =>
-            [
+            76 => [
                 'id' => 77,
                 'name' => 'alt.binaries.mp3.bootlegs',
                 'backfill_target' => 1,
@@ -1247,8 +1169,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Bootleg Music.',
             ],
-            77 =>
-            [
+            77 => [
                 'id' => 78,
                 'name' => 'alt.binaries.mp3.full_albums',
                 'backfill_target' => 1,
@@ -1263,8 +1184,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            78 =>
-            [
+            78 => [
                 'id' => 79,
                 'name' => 'alt.binaries.mp3',
                 'backfill_target' => 1,
@@ -1279,8 +1199,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            79 =>
-            [
+            79 => [
                 'id' => 80,
                 'name' => 'alt.binaries.mpeg.video.music',
                 'backfill_target' => 1,
@@ -1295,8 +1214,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music Videos.',
             ],
-            80 =>
-            [
+            80 => [
                 'id' => 81,
                 'name' => 'alt.binaries.multimedia.anime.highspeed',
                 'backfill_target' => 1,
@@ -1311,8 +1229,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Anime Television.',
             ],
-            81 =>
-            [
+            81 => [
                 'id' => 82,
                 'name' => 'alt.binaries.multimedia.anime.repost',
                 'backfill_target' => 1,
@@ -1327,8 +1244,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Anime Television.',
             ],
-            82 =>
-            [
+            82 => [
                 'id' => 83,
                 'name' => 'alt.binaries.multimedia.anime',
                 'backfill_target' => 1,
@@ -1343,8 +1259,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Anime TV and Movies.',
             ],
-            83 =>
-            [
+            83 => [
                 'id' => 84,
                 'name' => 'alt.binaries.multimedia.cartoons',
                 'backfill_target' => 1,
@@ -1359,8 +1274,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Cartoon TV and Movies.',
             ],
-            84 =>
-            [
+            84 => [
                 'id' => 85,
                 'name' => 'alt.binaries.multimedia.classic-films',
                 'backfill_target' => 1,
@@ -1375,8 +1289,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Classic TV and Movies.',
             ],
-            85 =>
-            [
+            85 => [
                 'id' => 86,
                 'name' => 'alt.binaries.multimedia.comedy.british',
                 'backfill_target' => 1,
@@ -1391,8 +1304,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains British Comedy TV and Movies.',
             ],
-            86 =>
-            [
+            86 => [
                 'id' => 87,
                 'name' => 'alt.binaries.multimedia.disney',
                 'backfill_target' => 1,
@@ -1407,8 +1319,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Disney TV and Movies.',
             ],
-            87 =>
-            [
+            87 => [
                 'id' => 88,
                 'name' => 'alt.binaries.multimedia.documentaries',
                 'backfill_target' => 1,
@@ -1423,8 +1334,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Documentary Movies and TV.',
             ],
-            88 =>
-            [
+            88 => [
                 'id' => 89,
                 'name' => 'alt.binaries.multimedia.erotica',
                 'backfill_target' => 1,
@@ -1439,8 +1349,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX.',
             ],
-            89 =>
-            [
+            89 => [
                 'id' => 90,
                 'name' => 'alt.binaries.multimedia.erotica.amateur',
                 'backfill_target' => 1,
@@ -1455,8 +1364,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX.',
             ],
-            90 =>
-            [
+            90 => [
                 'id' => 91,
                 'name' => 'alt.binaries.multimedia.scifi',
                 'backfill_target' => 1,
@@ -1471,8 +1379,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains science-fiction TV and movies.',
             ],
-            91 =>
-            [
+            91 => [
                 'id' => 92,
                 'name' => 'alt.binaries.multimedia.scifi-and-fantasy',
                 'backfill_target' => 1,
@@ -1487,8 +1394,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains science-fiction and fantasy TV and movies.',
             ],
-            92 =>
-            [
+            92 => [
                 'id' => 93,
                 'name' => 'alt.binaries.multimedia.sitcoms',
                 'backfill_target' => 1,
@@ -1503,8 +1409,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Sitcom TV.',
             ],
-            93 =>
-            [
+            93 => [
                 'id' => 94,
                 'name' => 'alt.binaries.multimedia.sports',
                 'backfill_target' => 1,
@@ -1519,8 +1424,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Sports TV and Movies.',
             ],
-            94 =>
-            [
+            94 => [
                 'id' => 95,
                 'name' => 'alt.binaries.multimedia',
                 'backfill_target' => 1,
@@ -1535,8 +1439,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains TV, Movies, and Music.',
             ],
-            95 =>
-            [
+            95 => [
                 'id' => 96,
                 'name' => 'alt.binaries.multimedia.tv',
                 'backfill_target' => 1,
@@ -1551,8 +1454,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid and X264 TV.',
             ],
-            96 =>
-            [
+            96 => [
                 'id' => 97,
                 'name' => 'alt.binaries.multimedia.vintage-film',
                 'backfill_target' => 1,
@@ -1567,8 +1469,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Vintage Movies pre 1960.',
             ],
-            97 =>
-            [
+            97 => [
                 'id' => 98,
                 'name' => 'alt.binaries.multimedia.vintage-film.post-1960',
                 'backfill_target' => 1,
@@ -1583,8 +1484,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Vintage Movies post 1960.',
             ],
-            98 =>
-            [
+            98 => [
                 'id' => 99,
                 'name' => 'alt.binaries.music.flac',
                 'backfill_target' => 1,
@@ -1599,8 +1499,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of lossless Music.',
             ],
-            99 =>
-            [
+            99 => [
                 'id' => 100,
                 'name' => 'alt.binaries.music.opera',
                 'backfill_target' => 1,
@@ -1615,8 +1514,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Opera Music.',
             ],
-            100 =>
-            [
+            100 => [
                 'id' => 101,
                 'name' => 'alt.binaries.nintendo.ds',
                 'backfill_target' => 1,
@@ -1631,8 +1529,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Nintendo DS Games.',
             ],
-            101 =>
-            [
+            101 => [
                 'id' => 102,
                 'name' => 'alt.binaries.nospam.cheerleaders',
                 'backfill_target' => 1,
@@ -1647,8 +1544,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains various.',
             ],
-            102 =>
-            [
+            102 => [
                 'id' => 103,
                 'name' => 'alt.binaries.pictures.comics.complete',
                 'backfill_target' => 1,
@@ -1663,8 +1559,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains comics.',
             ],
-            103 =>
-            [
+            103 => [
                 'id' => 104,
                 'name' => 'alt.binaries.pictures.comics.dcp',
                 'backfill_target' => 1,
@@ -1679,8 +1574,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Comic Books.',
             ],
-            104 =>
-            [
+            104 => [
                 'id' => 105,
                 'name' => 'alt.binaries.pictures.comics.reposts',
                 'backfill_target' => 1,
@@ -1695,8 +1589,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Comic Books.',
             ],
-            105 =>
-            [
+            105 => [
                 'id' => 106,
                 'name' => 'alt.binaries.pictures.comics.repost',
                 'backfill_target' => 1,
@@ -1711,8 +1604,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Comic Books.',
             ],
-            106 =>
-            [
+            106 => [
                 'id' => 107,
                 'name' => 'alt.binaries.pro-wrestling',
                 'backfill_target' => 1,
@@ -1727,8 +1619,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains WWE Sport TV.',
             ],
-            107 =>
-            [
+            107 => [
                 'id' => 108,
                 'name' => 'alt.binaries.scary.exe.files',
                 'backfill_target' => 1,
@@ -1743,8 +1634,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid and X264 Movies.',
             ],
-            108 =>
-            [
+            108 => [
                 'id' => 109,
                 'name' => 'alt.binaries.series.tv.divx.french',
                 'backfill_target' => 1,
@@ -1759,8 +1649,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains French DIVX TV shows.',
             ],
-            109 =>
-            [
+            109 => [
                 'id' => 110,
                 'name' => 'alt.binaries.sony.psp',
                 'backfill_target' => 1,
@@ -1775,8 +1664,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PSP Games.',
             ],
-            110 =>
-            [
+            110 => [
                 'id' => 111,
                 'name' => 'alt.binaries.sound.audiobooks',
                 'backfill_target' => 1,
@@ -1791,8 +1679,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Audiobooks.',
             ],
-            111 =>
-            [
+            111 => [
                 'id' => 112,
                 'name' => 'alt.binaries.sound.mp3',
                 'backfill_target' => 1,
@@ -1807,8 +1694,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            112 =>
-            [
+            112 => [
                 'id' => 113,
                 'name' => 'alt.binaries.sounds.1960s.mp3',
                 'backfill_target' => 1,
@@ -1823,8 +1709,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 1960\'s.',
             ],
-            113 =>
-            [
+            113 => [
                 'id' => 114,
                 'name' => 'alt.binaries.sounds.1970s.mp3',
                 'backfill_target' => 1,
@@ -1839,8 +1724,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 1970\'s.',
             ],
-            114 =>
-            [
+            114 => [
                 'id' => 115,
                 'name' => 'alt.binaries.sounds.audiobooks.repost',
                 'backfill_target' => 1,
@@ -1855,8 +1739,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Audiobooks.',
             ],
-            115 =>
-            [
+            115 => [
                 'id' => 116,
                 'name' => 'alt.binaries.sounds.country.mp3',
                 'backfill_target' => 1,
@@ -1871,8 +1754,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            116 =>
-            [
+            116 => [
                 'id' => 117,
                 'name' => 'alt.binaries.sounds.flac',
                 'backfill_target' => 1,
@@ -1887,8 +1769,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains lossless music.',
             ],
-            117 =>
-            [
+            117 => [
                 'id' => 118,
                 'name' => 'alt.binaries.sounds.flac.jazz',
                 'backfill_target' => 1,
@@ -1903,8 +1784,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains lossless Jazz Music.',
             ],
-            118 =>
-            [
+            118 => [
                 'id' => 119,
                 'name' => 'alt.binaries.sounds.jpop',
                 'backfill_target' => 1,
@@ -1919,8 +1799,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly Jpop music.',
             ],
-            119 =>
-            [
+            119 => [
                 'id' => 120,
                 'name' => 'alt.binaries.sounds.lossless.1960s',
                 'backfill_target' => 1,
@@ -1935,8 +1814,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains lossless 1960\'s Music.',
             ],
-            120 =>
-            [
+            120 => [
                 'id' => 121,
                 'name' => 'alt.binaries.sounds.lossless.classical',
                 'backfill_target' => 1,
@@ -1951,8 +1829,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains lossless Classical Music.',
             ],
-            121 =>
-            [
+            121 => [
                 'id' => 122,
                 'name' => 'alt.binaries.sounds.lossless.country',
                 'backfill_target' => 1,
@@ -1967,8 +1844,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains lossless Country Music.',
             ],
-            122 =>
-            [
+            122 => [
                 'id' => 123,
                 'name' => 'alt.binaries.sounds.lossless',
                 'backfill_target' => 1,
@@ -1983,8 +1859,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Lossless Music.',
             ],
-            123 =>
-            [
+            123 => [
                 'id' => 124,
                 'name' => 'alt.binaries.sounds.mp3.1950s',
                 'backfill_target' => 1,
@@ -1999,8 +1874,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 1950\'s.',
             ],
-            124 =>
-            [
+            124 => [
                 'id' => 125,
                 'name' => 'alt.binaries.sounds.mp3.1970s',
                 'backfill_target' => 1,
@@ -2015,8 +1889,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 1970\'s.',
             ],
-            125 =>
-            [
+            125 => [
                 'id' => 126,
                 'name' => 'alt.binaries.sounds.mp3.1980s',
                 'backfill_target' => 1,
@@ -2031,8 +1904,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 1980\'s.',
             ],
-            126 =>
-            [
+            126 => [
                 'id' => 127,
                 'name' => 'alt.binaries.sounds.mp3.1990s',
                 'backfill_target' => 1,
@@ -2047,8 +1919,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 1990\'s.',
             ],
-            127 =>
-            [
+            127 => [
                 'id' => 128,
                 'name' => 'alt.binaries.sounds.mp3.2000s',
                 'backfill_target' => 1,
@@ -2063,8 +1934,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Music from the 2000\'s.',
             ],
-            128 =>
-            [
+            128 => [
                 'id' => 129,
                 'name' => 'alt.binaries.sounds.mp3.acoustic',
                 'backfill_target' => 1,
@@ -2079,8 +1949,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Accoustic Music.',
             ],
-            129 =>
-            [
+            129 => [
                 'id' => 130,
                 'name' => 'alt.binaries.sounds.mp3.audiobooks',
                 'backfill_target' => 1,
@@ -2095,8 +1964,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Audiobooks.',
             ],
-            130 =>
-            [
+            130 => [
                 'id' => 131,
                 'name' => 'alt.binaries.sounds.mp3.bluegrass',
                 'backfill_target' => 1,
@@ -2111,8 +1979,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Bluegrass Music.',
             ],
-            131 =>
-            [
+            131 => [
                 'id' => 132,
                 'name' => 'alt.binaries.sounds.mp3.christian',
                 'backfill_target' => 1,
@@ -2127,8 +1994,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Christian Music.',
             ],
-            132 =>
-            [
+            132 => [
                 'id' => 133,
                 'name' => 'alt.binaries.sounds.mp3.classical',
                 'backfill_target' => 1,
@@ -2143,8 +2009,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Classical Music.',
             ],
-            133 =>
-            [
+            133 => [
                 'id' => 134,
                 'name' => 'alt.binaries.sounds.mp3.comedy',
                 'backfill_target' => 1,
@@ -2159,8 +2024,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Comedy Audio.',
             ],
-            134 =>
-            [
+            134 => [
                 'id' => 135,
                 'name' => 'alt.binaries.sounds.mp3.complete_cd',
                 'backfill_target' => 1,
@@ -2175,8 +2039,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            135 =>
-            [
+            135 => [
                 'id' => 136,
                 'name' => 'alt.binaries.sounds.mp3.country',
                 'backfill_target' => 1,
@@ -2191,8 +2054,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly country music.',
             ],
-            136 =>
-            [
+            136 => [
                 'id' => 137,
                 'name' => 'alt.binaries.sounds.mp3.dance',
                 'backfill_target' => 1,
@@ -2207,8 +2069,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Dance Music.',
             ],
-            137 =>
-            [
+            137 => [
                 'id' => 138,
                 'name' => 'alt.binaries.sounds.mp3.disco',
                 'backfill_target' => 1,
@@ -2223,8 +2084,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Disco Music.',
             ],
-            138 =>
-            [
+            138 => [
                 'id' => 139,
                 'name' => 'alt.binaries.sounds.mp3.emo',
                 'backfill_target' => 1,
@@ -2239,8 +2099,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Emo Music.',
             ],
-            139 =>
-            [
+            139 => [
                 'id' => 140,
                 'name' => 'alt.binaries.sounds.mp3.full_albums',
                 'backfill_target' => 1,
@@ -2255,8 +2114,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            140 =>
-            [
+            140 => [
                 'id' => 141,
                 'name' => 'alt.binaries.sounds.mp3.heavy-metal',
                 'backfill_target' => 1,
@@ -2271,8 +2129,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Heavy Metal Music.',
             ],
-            141 =>
-            [
+            141 => [
                 'id' => 142,
                 'name' => 'alt.binaries.sounds.mp3.jazz',
                 'backfill_target' => 1,
@@ -2287,8 +2144,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Jazz Music.',
             ],
-            142 =>
-            [
+            142 => [
                 'id' => 143,
                 'name' => 'alt.binaries.sounds.mp3.jazz.vocals',
                 'backfill_target' => 1,
@@ -2303,8 +2159,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Jazz Vocal Music.',
             ],
-            143 =>
-            [
+            143 => [
                 'id' => 144,
                 'name' => 'alt.binaries.sounds.mp3.musicals',
                 'backfill_target' => 1,
@@ -2319,8 +2174,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Musicals Music.',
             ],
-            144 =>
-            [
+            144 => [
                 'id' => 145,
                 'name' => 'alt.binaries.sounds.mp3.nospam',
                 'backfill_target' => 1,
@@ -2335,8 +2189,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            145 =>
-            [
+            145 => [
                 'id' => 146,
                 'name' => 'alt.binaries.sounds.mp3.opera',
                 'backfill_target' => 1,
@@ -2351,8 +2204,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Opera Music.',
             ],
-            146 =>
-            [
+            146 => [
                 'id' => 147,
                 'name' => 'alt.binaries.sounds.mp3.progressive-country',
                 'backfill_target' => 1,
@@ -2367,8 +2219,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Country Music.',
             ],
-            147 =>
-            [
+            147 => [
                 'id' => 148,
                 'name' => 'alt.binaries.sounds.mp3.rap-hiphop.full-albums',
                 'backfill_target' => 1,
@@ -2383,8 +2234,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Rap and Hip-Hop Music.',
             ],
-            148 =>
-            [
+            148 => [
                 'id' => 149,
                 'name' => 'alt.binaries.sounds.mp3.rap-hiphop',
                 'backfill_target' => 1,
@@ -2399,8 +2249,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Rap and Hip-Hop Music.',
             ],
-            149 =>
-            [
+            149 => [
                 'id' => 150,
                 'name' => 'alt.binaries.sounds.mp3.rock',
                 'backfill_target' => 1,
@@ -2415,8 +2264,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Rock Music.',
             ],
-            150 =>
-            [
+            150 => [
                 'id' => 151,
                 'name' => 'alt.binaries.sounds.mp3',
                 'backfill_target' => 1,
@@ -2431,8 +2279,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            151 =>
-            [
+            151 => [
                 'id' => 152,
                 'name' => 'alt.binaries.sounds.radio.bbc',
                 'backfill_target' => 1,
@@ -2447,8 +2294,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains BBC Radio Music',
             ],
-            152 =>
-            [
+            152 => [
                 'id' => 153,
                 'name' => 'alt.binaries.sounds.radio.british',
                 'backfill_target' => 1,
@@ -2463,8 +2309,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains British Radio Music.',
             ],
-            153 =>
-            [
+            153 => [
                 'id' => 154,
                 'name' => 'alt.binaries.sounds.whitburn.pop',
                 'backfill_target' => 1,
@@ -2479,8 +2324,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Pop Music.',
             ],
-            154 =>
-            [
+            154 => [
                 'id' => 155,
                 'name' => 'alt.binaries.tatu',
                 'backfill_target' => 1,
@@ -2495,8 +2339,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly French TV.',
             ],
-            155 =>
-            [
+            155 => [
                 'id' => 156,
                 'name' => 'alt.binaries.teevee',
                 'backfill_target' => 1,
@@ -2511,8 +2354,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains X264 and XVid TV.',
             ],
-            156 =>
-            [
+            156 => [
                 'id' => 157,
                 'name' => 'alt.binaries.test',
                 'backfill_target' => 1,
@@ -2527,8 +2369,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of content.',
             ],
-            157 =>
-            [
+            157 => [
                 'id' => 158,
                 'name' => 'alt.binaries.town',
                 'backfill_target' => 1,
@@ -2543,8 +2384,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid TV and Movies. Mostly Foreign.',
             ],
-            158 =>
-            [
+            158 => [
                 'id' => 159,
                 'name' => 'alt.binaries.triballs',
                 'backfill_target' => 1,
@@ -2559,8 +2399,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains various.',
             ],
-            159 =>
-            [
+            159 => [
                 'id' => 160,
                 'name' => 'alt.binaries.tun',
                 'backfill_target' => 1,
@@ -2575,8 +2414,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains various.',
             ],
-            160 =>
-            [
+            160 => [
                 'id' => 161,
                 'name' => 'alt.binaries.tvseries',
                 'backfill_target' => 1,
@@ -2591,8 +2429,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains X264 and XVid TV.',
             ],
-            161 =>
-            [
+            161 => [
                 'id' => 162,
                 'name' => 'alt.binaries.tv',
                 'backfill_target' => 1,
@@ -2607,8 +2444,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid TV.',
             ],
-            162 =>
-            [
+            162 => [
                 'id' => 163,
                 'name' => 'alt.binaries.u-4all',
                 'backfill_target' => 1,
@@ -2623,8 +2459,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XVid TV and Movies. Mostly Foreign.',
             ],
-            163 =>
-            [
+            163 => [
                 'id' => 164,
                 'name' => 'alt.binaries.u4e',
                 'backfill_target' => 1,
@@ -2639,8 +2474,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variery, mostly German movies.',
             ],
-            164 =>
-            [
+            164 => [
                 'id' => 165,
                 'name' => 'alt.binaries.ucc',
                 'backfill_target' => 1,
@@ -2655,8 +2489,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            165 =>
-            [
+            165 => [
                 'id' => 166,
                 'name' => 'alt.binaries.ufg',
                 'backfill_target' => 1,
@@ -2671,8 +2504,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains mostly TV.',
             ],
-            166 =>
-            [
+            166 => [
                 'id' => 167,
                 'name' => 'alt.binaries.uzenet',
                 'backfill_target' => 1,
@@ -2687,8 +2519,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains XXX. Some Foreign.',
             ],
-            167 =>
-            [
+            167 => [
                 'id' => 168,
                 'name' => 'alt.binaries.warez.ibm-pc.0-day',
                 'backfill_target' => 1,
@@ -2703,8 +2534,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PC-0Day.',
             ],
-            168 =>
-            [
+            168 => [
                 'id' => 169,
                 'name' => 'alt.binaries.warez.quebec-hackers',
                 'backfill_target' => 1,
@@ -2719,8 +2549,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PC-0day. Some Foreign.',
             ],
-            169 =>
-            [
+            169 => [
                 'id' => 170,
                 'name' => 'alt.binaries.warez.smartphone',
                 'backfill_target' => 1,
@@ -2735,8 +2564,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Mobile Phone Apps.',
             ],
-            170 =>
-            [
+            170 => [
                 'id' => 171,
                 'name' => 'alt.binaries.warez',
                 'backfill_target' => 1,
@@ -2751,8 +2579,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains PC 0DAY, PC ISO, and PC PHONE.',
             ],
-            171 =>
-            [
+            171 => [
                 'id' => 172,
                 'name' => 'alt.binaries.warez.uk.mp3',
                 'backfill_target' => 1,
@@ -2767,8 +2594,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of Music.',
             ],
-            172 =>
-            [
+            172 => [
                 'id' => 173,
                 'name' => 'alt.binaries.wii',
                 'backfill_target' => 1,
@@ -2783,8 +2609,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains Nintendo WII Games, WII-Ware, and VC.',
             ],
-            173 =>
-            [
+            173 => [
                 'id' => 174,
                 'name' => 'alt.binaries.wmvhd',
                 'backfill_target' => 1,
@@ -2799,8 +2624,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains WMVHD Movies.',
             ],
-            174 =>
-            [
+            174 => [
                 'id' => 175,
                 'name' => 'alt.binaries.worms',
                 'backfill_target' => 1,
@@ -2815,8 +2639,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'I have no idea what this group contains besides a lot of U4ALL which isn\'t really usable.',
             ],
-            175 =>
-            [
+            175 => [
                 'id' => 176,
                 'name' => 'alt.binaries.x264',
                 'backfill_target' => 1,
@@ -2831,8 +2654,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains X264 Movies and TV.',
             ],
-            176 =>
-            [
+            176 => [
                 'id' => 177,
                 'name' => 'alt.binaries.x',
                 'backfill_target' => 1,
@@ -2847,8 +2669,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'This group contains a variety of content. Some Foreign.',
             ],
-            177 =>
-            [
+            177 => [
                 'id' => 178,
                 'name' => 'alt.binaries.multimedia.erotica.anime',
                 'backfill_target' => 1,
@@ -2863,8 +2684,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'erotica anime',
             ],
-            178 =>
-            [
+            178 => [
                 'id' => 179,
                 'name' => 'alt.binaries.multimedia.erotica.asian',
                 'backfill_target' => 1,
@@ -2879,8 +2699,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'erotica Asian',
             ],
-            179 =>
-            [
+            179 => [
                 'id' => 180,
                 'name' => 'alt.binaries.mp3.audiobooks.scifi-fantasy',
                 'backfill_target' => 1,
@@ -2895,8 +2714,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Audiobooks',
             ],
-            180 =>
-            [
+            180 => [
                 'id' => 181,
                 'name' => 'alt.binaries.sounds.audiobooks.scifi-fantasy',
                 'backfill_target' => 1,
@@ -2911,8 +2729,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Audiobooks',
             ],
-            181 =>
-            [
+            181 => [
                 'id' => 182,
                 'name' => 'alt.binaries.mp3.abooks',
                 'backfill_target' => 1,
@@ -2927,8 +2744,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Audiobooks',
             ],
-            182 =>
-            [
+            182 => [
                 'id' => 183,
                 'name' => 'alt.binaries.town.xxx',
                 'backfill_target' => 1,
@@ -2943,8 +2759,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'XXX videos',
             ],
-            183 =>
-            [
+            183 => [
                 'id' => 184,
                 'name' => 'alt.binaries.software',
                 'backfill_target' => 1,
@@ -2959,8 +2774,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Software',
             ],
-            184 =>
-            [
+            184 => [
                 'id' => 185,
                 'name' => 'alt.binaries.nzbpirates',
                 'backfill_target' => 1,
@@ -2975,8 +2789,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Misc, mostly Erotica, and foreign movies ',
             ],
-            185 =>
-            [
+            185 => [
                 'id' => 186,
                 'name' => 'alt.binaries.town.cine',
                 'backfill_target' => 1,
@@ -2991,8 +2804,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Movies',
             ],
-            186 =>
-            [
+            186 => [
                 'id' => 187,
                 'name' => 'alt.binaries.usenet-space-cowboys',
                 'backfill_target' => 1,
@@ -3007,8 +2819,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Misc, mostly German',
             ],
-            187 =>
-            [
+            187 => [
                 'id' => 188,
                 'name' => 'alt.binaries.warez.ibm-pc.games',
                 'backfill_target' => 1,
@@ -3023,8 +2834,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'misc, mostly games and applications',
             ],
-            188 =>
-            [
+            188 => [
                 'id' => 189,
                 'name' => 'alt.binaries.warez.games',
                 'backfill_target' => 1,
@@ -3039,8 +2849,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'misc, mostly games and applications',
             ],
-            189 =>
-            [
+            189 => [
                 'id' => 190,
                 'name' => 'alt.binaries.e-book.magazines',
                 'backfill_target' => 1,
@@ -3055,8 +2864,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'magazines, mostly english',
             ],
-            190 =>
-            [
+            190 => [
                 'id' => 191,
                 'name' => 'alt.binaries.sounds.anime',
                 'backfill_target' => 1,
@@ -3071,8 +2879,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'music from Anime',
             ],
-            191 =>
-            [
+            191 => [
                 'id' => 192,
                 'name' => 'alt.binaries.pictures.erotica.anime',
                 'backfill_target' => 1,
@@ -3087,8 +2894,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Anime Manga, Adult',
             ],
-            192 =>
-            [
+            192 => [
                 'id' => 193,
                 'name' => 'alt.binaries.drama.british',
                 'backfill_target' => 1,
@@ -3103,8 +2909,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            193 =>
-            [
+            193 => [
                 'id' => 194,
                 'name' => 'alt.binaries.emulators.misc',
                 'backfill_target' => 1,
@@ -3119,8 +2924,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            194 =>
-            [
+            194 => [
                 'id' => 195,
                 'name' => 'alt.binaries.erotica.classics',
                 'backfill_target' => 1,
@@ -3135,8 +2939,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            195 =>
-            [
+            195 => [
                 'id' => 196,
                 'name' => 'alt.binaries.old.games',
                 'backfill_target' => 1,
@@ -3151,8 +2954,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            196 =>
-            [
+            196 => [
                 'id' => 197,
                 'name' => 'alt.binaries.dvd.anime',
                 'backfill_target' => 1,
@@ -3167,8 +2969,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            197 =>
-            [
+            197 => [
                 'id' => 198,
                 'name' => 'alt.binaries.dvd.erotica.classics',
                 'backfill_target' => 1,
@@ -3183,8 +2984,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => '',
             ],
-            198 =>
-            [
+            198 => [
                 'id' => 199,
                 'name' => 'alt.binaries.gamecube',
                 'backfill_target' => 1,
@@ -3199,8 +2999,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Added by import predb script',
             ],
-            199 =>
-            [
+            199 => [
                 'id' => 200,
                 'name' => 'alt.binaries.games.nintendo3ds',
                 'backfill_target' => 1,
@@ -3215,8 +3014,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Added by import predb script',
             ],
-            200 =>
-            [
+            200 => [
                 'id' => 201,
                 'name' => 'alt.binaries.games.wiiu',
                 'backfill_target' => 1,
@@ -3231,8 +3029,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Added by import predb script',
             ],
-            201 =>
-            [
+            201 => [
                 'id' => 202,
                 'name' => 'alt.binaries.sony.psvita',
                 'backfill_target' => 1,
@@ -3247,8 +3044,7 @@ class GroupsTableSeeder extends Seeder
                 'backfill' => 0,
                 'description' => 'Added by import predb script',
             ],
-            202 =>
-            [
+            202 => [
                 'id' => 203,
                 'name' => 'alt.binaries.fz',
                 'backfill_target' => 1,

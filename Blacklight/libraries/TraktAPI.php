@@ -210,7 +210,7 @@ class TraktAPI
     public function searchId($id, $site = 'trakt', $type = 0)
     {
         if (! \in_array($site, self::$types, false) || ! ctype_digit($id)) {
-            return null;
+            return;
         }
         if ($site === 'imdb') {
             $id = 'tt'.$id;
@@ -268,7 +268,7 @@ class TraktAPI
     public function showSummary($show = '', $type = 'full')
     {
         if (empty($show)) {
-            return null;
+            return;
         }
         $showUrl = self::API_URL.'shows/'.Str::slug($show);
 

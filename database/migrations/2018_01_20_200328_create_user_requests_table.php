@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUserRequestsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,7 +24,6 @@ class CreateUserRequestsTable extends Migration
             $table->foreign('users_id', 'FK_users_urq')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

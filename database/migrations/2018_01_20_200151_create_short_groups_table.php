@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateShortGroupsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,7 +23,6 @@ class CreateShortGroupsTable extends Migration
             $table->dateTime('updated')->nullable();
         });
     }
-
 
     /**
      * Reverse the migrations.

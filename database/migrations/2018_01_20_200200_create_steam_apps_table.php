@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateSteamAppsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,12 +18,11 @@ class CreateSteamAppsTable extends Migration
             $table->collation = 'utf8_unicode_ci';
             $table->string('name')->default('')->comment('Steam application name');
             $table->integer('appid')->unsigned()->comment('Steam application id');
-            $table->primary(['appid','name']);
+            $table->primary(['appid', 'name']);
         });
 
         DB::statement('ALTER TABLE steam_apps ADD FULLTEXT ix_name_ft (name)');
     }
-
 
     /**
      * Reverse the migrations.

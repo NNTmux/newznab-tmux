@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateVideosTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -30,11 +29,10 @@ class CreateVideosTable extends Migration
             $table->integer('tvmaze')->unsigned()->default(0)->index('ix_videos_tvmaze')->comment('ID number for TVMaze site.');
             $table->integer('tvrage')->unsigned()->default(0)->index('ix_videos_tvrage')->comment('ID number for TVRage site.');
             $table->boolean('source')->default(0)->comment('Which site did we use for info?');
-            $table->unique(['title','type','started','countries_id'], 'ix_videos_title');
-            $table->index(['type','source'], 'ix_videos_type_source');
+            $table->unique(['title', 'type', 'started', 'countries_id'], 'ix_videos_title');
+            $table->index(['type', 'source'], 'ix_videos_type_source');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleasesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -69,21 +68,20 @@ processed');
             $table->boolean('proc_hash16k')->default(0)->comment('Has the release been hash16k
 processed');
             $table->boolean('proc_crc32')->default(0)->comment('Has the release been crc32 processed');
-            $table->index(['groups_id','passwordstatus'], 'ix_releases_groupsid');
-            $table->index(['postdate','searchname'], 'ix_releases_postdate_searchname');
-            $table->index(['leftguid','predb_id'], 'ix_releases_leftguid');
-            $table->index(['musicinfo_id','passwordstatus'], 'ix_releases_musicinfo_id');
-            $table->index(['predb_id','searchname'], 'ix_releases_predb_id_searchname');
-            $table->index(['haspreview','passwordstatus'], 'ix_releases_haspreview_passwordstatus');
-            $table->index(['nfostatus','size'], 'ix_releases_nfostatus');
-            $table->index(['dehashstatus','ishashed'], 'ix_releases_dehashstatus');
+            $table->index(['groups_id', 'passwordstatus'], 'ix_releases_groupsid');
+            $table->index(['postdate', 'searchname'], 'ix_releases_postdate_searchname');
+            $table->index(['leftguid', 'predb_id'], 'ix_releases_leftguid');
+            $table->index(['musicinfo_id', 'passwordstatus'], 'ix_releases_musicinfo_id');
+            $table->index(['predb_id', 'searchname'], 'ix_releases_predb_id_searchname');
+            $table->index(['haspreview', 'passwordstatus'], 'ix_releases_haspreview_passwordstatus');
+            $table->index(['nfostatus', 'size'], 'ix_releases_nfostatus');
+            $table->index(['dehashstatus', 'ishashed'], 'ix_releases_dehashstatus');
         });
 
         DB::statement('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
         DB::statement('ALTER TABLE releases ADD COLUMN nzb_guid BINARY(16) NULL');
         DB::statement('ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid)');
     }
-
 
     /**
      * Reverse the migrations.

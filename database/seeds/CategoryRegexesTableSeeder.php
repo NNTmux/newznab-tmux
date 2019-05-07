@@ -4,9 +4,8 @@ use Illuminate\Database\Seeder;
 
 class CategoryRegexesTableSeeder extends Seeder
 {
-
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -15,8 +14,7 @@ class CategoryRegexesTableSeeder extends Seeder
         \DB::table('category_regexes')->delete();
 
         \DB::table('category_regexes')->insert([
-            0 =>
-            [
+            0 => [
                 'id' => 1,
                 'group_regex' => '^alt\\.binaries\\.sony\\.psvita$',
                 'regex' => '/.*/ ',

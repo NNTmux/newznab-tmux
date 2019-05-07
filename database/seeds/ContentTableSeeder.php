@@ -4,9 +4,8 @@ use Illuminate\Database\Seeder;
 
 class ContentTableSeeder extends Seeder
 {
-
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -15,8 +14,7 @@ class ContentTableSeeder extends Seeder
         \DB::table('content')->delete();
 
         \DB::table('content')->insert([
-            0 =>
-            [
+            0 => [
                 'id' => 1,
                 'title' => 'Welcome to NNTmux.',
                 'url' => 'NULL',
@@ -29,8 +27,7 @@ class ContentTableSeeder extends Seeder
                 'ordinal' => 0,
                 'role' => 0,
             ],
-            1 =>
-            [
+            1 => [
                 'id' => 2,
                 'title' => 'example content',
                 'url' => '/great/seo/content/page/',
@@ -43,8 +40,7 @@ class ContentTableSeeder extends Seeder
                 'ordinal' => 1,
                 'role' => 0,
             ],
-            2 =>
-            [
+            2 => [
                 'id' => 3,
                 'title' => 'another example',
                 'url' => '/another/great/seo/content/page/',

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateAudioDataTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -29,11 +28,10 @@ class CreateAudioDataTable extends Migration
             $table->string('audiolibrary', 50)->nullable();
             $table->string('audiolanguage', 50)->nullable();
             $table->string('audiotitle', 50)->nullable();
-            $table->unique(['releases_id','audioid'], 'ix_releaseaudio_releaseid_audioid');
+            $table->unique(['releases_id', 'audioid'], 'ix_releaseaudio_releaseid_audioid');
             $table->foreign('releases_id', 'FK_ad_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

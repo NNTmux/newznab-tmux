@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateTvEpisodesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,10 +24,9 @@ class CreateTvEpisodesTable extends Migration
             $table->string('title', 180)->comment('Title of the episode.');
             $table->date('firstaired')->comment('Date of original airing/release.');
             $table->text('summary', 65535)->comment('Description/summary of the episode.');
-            $table->unique(['videos_id','series','episode','firstaired'], 'videos_id');
+            $table->unique(['videos_id', 'series', 'episode', 'firstaired'], 'videos_id');
         });
     }
-
 
     /**
      * Reverse the migrations.

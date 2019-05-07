@@ -16,10 +16,10 @@ use App\Extensions\util\PhpYenc;
  */
 
 /*
-* 'Service discontinued' (RFC977)
-*
-* @access     public
-*/
+ * 'Service discontinued' (RFC977)
+ *
+ * @access     public
+ */
 define('NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_FORCED', 400);
 
 /*
