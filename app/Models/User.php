@@ -673,7 +673,7 @@ class User extends Authenticatable
      *
      * @param int $role
      * @param bool $validate
-     * @return bool|int
+     * @return bool|int|string
      * @throws \Exception
      */
     public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER, $validate = true)
