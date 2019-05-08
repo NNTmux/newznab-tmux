@@ -13,6 +13,7 @@ use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Facades\UserVerification;
 
@@ -337,8 +338,8 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      * @throws \Exception
      */
     public function destroy(Request $request)
@@ -347,9 +348,9 @@ class ProfileController extends BasePageController
         $userId = $request->input('id');
 
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {
-            $this->userdata->delete();
-
-            return redirect('login');
+            Auth::logout();
+            $user = User::find($userId);
+            $user->delete();
         }
 
         if ($this->userdata->hasRole('Admin')) {
