@@ -1,4 +1,5 @@
 2019-05-08 DariusIII
+	* Fix: Fix adding user from admin area (fixes issue #972)
 	* Chg: Update profile deletion behaviour
 2019-05-07 DariusIII
 	* Chg: Fix code style of many files

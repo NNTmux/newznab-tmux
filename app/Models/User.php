@@ -667,17 +667,17 @@ class User extends Authenticatable
      * @param        $password
      * @param        $email
      * @param        $host
-     * @param int    $role
      * @param        $notes
-     * @param int    $invites
+     * @param int $invites
      * @param string $inviteCode
-     * @param bool   $forceInviteMode
+     * @param bool $forceInviteMode
      *
+     * @param int $role
+     * @param bool $validate
      * @return bool|int
      * @throws \Exception
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER)
+    public static function signUp($userName, $password, $email, $host, $notes, $invites = Invitation::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false, $role = self::ROLE_USER, $validate = true)
     {
         $user = [
             'username' => trim($userName),
@@ -685,14 +685,17 @@ class User extends Authenticatable
             'email' => trim($email),
         ];
 
-        $validator = Validator::make($user, [
-            'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
-        ]);
+        if ($validate) {
+            $validator = Validator::make($user, [
+                'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+                'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+            ]);
 
-        if ($validator->fails()) {
-            (new ColorCLI())->error(implode('', Arr::collapse($validator->errors()->toArray())));
+            if ($validator->fails()) {
+                $error = implode('', Arr::collapse($validator->errors()->toArray()));
+                return $error;
+            }
         }
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
@@ -708,7 +711,7 @@ class User extends Authenticatable
             }
         }
 
-        return self::add($user['userName'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
+        return self::add($user['username'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
     }
 
     /**

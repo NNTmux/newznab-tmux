@@ -75,8 +75,8 @@ class UserController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function edit(Request $request)
@@ -134,7 +134,7 @@ class UserController extends BasePageController
                             $invites = $role['defaultinvites'];
                         }
                     }
-                    $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'));
+                    $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'), false);
                     $this->smarty->assign('role', $request->input('role'));
                 } else {
                     $editedUser = User::find($request->input('id'));
