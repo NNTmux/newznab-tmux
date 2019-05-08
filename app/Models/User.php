@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Blacklight\ColorCLI;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -694,6 +693,7 @@ class User extends Authenticatable
 
             if ($validator->fails()) {
                 $error = implode('', Arr::collapse($validator->errors()->toArray()));
+
                 return $error;
             }
         }
