@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.3 (2019-03-19)
+ * Version: 5.0.5 (2019-05-09)
  */
 (function () {
 var image = (function (domGlobals) {
@@ -447,9 +447,15 @@ var image = (function (domGlobals) {
         toOption: Option.none
       };
     };
+    var fromOption = function (opt, err) {
+      return opt.fold(function () {
+        return error(err);
+      }, value);
+    };
     var Result = {
       value: value,
-      error: error
+      error: error,
+      fromOption: fromOption
     };
 
     var wrap = function (delegate) {
@@ -893,6 +899,9 @@ var image = (function (domGlobals) {
         reader.readAsDataURL(blob);
       });
     };
+    var isPlaceholderImage = function (imgElm) {
+      return imgElm.nodeName === 'IMG' && (imgElm.hasAttribute('data-mce-object') || imgElm.hasAttribute('data-mce-placeholder'));
+    };
     var Utils = {
       getImageSize: getImageSize,
       buildListItems: buildListItems,
@@ -901,7 +910,8 @@ var image = (function (domGlobals) {
       mergeMargins: mergeMargins,
       createImageList: createImageList,
       waitLoadImage: waitLoadImage,
-      blobToDataUri: blobToDataUri
+      blobToDataUri: blobToDataUri,
+      isPlaceholderImage: isPlaceholderImage
     };
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
@@ -948,7 +958,7 @@ var image = (function (domGlobals) {
       var figureElm = DOM.create('figure', { class: 'image' });
       DOM.insertAfter(figureElm, image);
       figureElm.appendChild(image);
-      figureElm.appendChild(DOM.create('figcaption', { contentEditable: true }, 'Caption'));
+      figureElm.appendChild(DOM.create('figcaption', { contentEditable: 'true' }, 'Caption'));
       figureElm.contentEditable = 'false';
     };
     var removeFigure = function (image) {
@@ -1056,7 +1066,7 @@ var image = (function (domGlobals) {
       if (data.caption) {
         var figure = DOM.create('figure', { class: 'image' });
         figure.appendChild(image);
-        figure.appendChild(DOM.create('figcaption', { contentEditable: true }, 'Caption'));
+        figure.appendChild(DOM.create('figcaption', { contentEditable: 'true' }, 'Caption'));
         figure.contentEditable = 'false';
         return figure;
       } else {
@@ -1122,7 +1132,7 @@ var image = (function (domGlobals) {
       if (figureElm) {
         return editor.dom.select('img', figureElm)[0];
       }
-      if (imgElm && (imgElm.nodeName !== 'IMG' || imgElm.getAttribute('data-mce-object') || imgElm.getAttribute('data-mce-placeholder'))) {
+      if (imgElm && (imgElm.nodeName !== 'IMG' || Utils.isPlaceholderImage(imgElm))) {
         return null;
       }
       return imgElm;
@@ -1905,7 +1915,7 @@ var image = (function (domGlobals) {
       };
     };
     var setup = function (editor) {
-      editor.on('preInit', function () {
+      editor.on('PreInit', function () {
         editor.parser.addNodeFilter('figure', toggleContentEditableState(true));
         editor.serializer.addNodeFilter('figure', toggleContentEditableState(false));
       });
@@ -2381,7 +2391,7 @@ var image = (function (domGlobals) {
       });
       editor.ui.registry.addContextMenu('image', {
         update: function (element) {
-          return isFigure(element) || isImage(element) ? [makeContextMenuItem(element)] : [];
+          return isFigure(element) || isImage(element) && !Utils.isPlaceholderImage(element) ? [makeContextMenuItem(element)] : [];
         }
       });
     };

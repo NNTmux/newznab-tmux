@@ -23,7 +23,7 @@ cd /tmp/tmux
 
 git fetch --all --tags --prune
 
-git checkout 2.8
+git checkout 2.9
 
 sh autogen.sh
 

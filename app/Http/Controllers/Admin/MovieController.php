@@ -46,7 +46,7 @@ class MovieController extends BasePageController
 
         $meta_title = $title = 'Movie Add';
 
-        $id = str_pad($request->input('id'), 7, '0', STR_PAD_LEFT);
+        $id = $request->input('id');
 
         if ($request->has('id') && \strlen($id) === 7) {
             $movCheck = $movie->getMovieInfo($id);

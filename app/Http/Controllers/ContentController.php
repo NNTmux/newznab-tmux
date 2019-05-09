@@ -20,7 +20,7 @@ class ContentController extends BasePageController
 
         $role = 0;
         if (! empty($this->userdata)) {
-            $role = $this->userdata['role'];
+            $role = $this->userdata->role;
         }
 
         /* The role column in the content table values are :

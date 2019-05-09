@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateSharingTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -32,7 +31,6 @@ class CreateSharingTable extends Migration
             $table->integer('max_pull')->unsigned()->default(20000);
         });
     }
-
 
     /**
      * Reverse the migrations.

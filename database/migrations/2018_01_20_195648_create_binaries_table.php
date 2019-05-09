@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBinariesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,7 +30,6 @@ class CreateBinariesTable extends Migration
         DB::statement("ALTER TABLE binaries ADD COLUMN binaryhash BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
         DB::statement('ALTER TABLE binaries ADD UNIQUE INDEX ix_binaries_binaryhash (binaryhash)');
     }
-
 
     /**
      * Reverse the migrations.

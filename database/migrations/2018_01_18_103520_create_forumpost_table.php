@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateForumpostTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -30,7 +29,6 @@ class CreateForumpostTable extends Migration
             $table->foreign('users_id', 'FK_users_fp')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

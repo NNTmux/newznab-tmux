@@ -230,11 +230,11 @@ class BasePageController extends Controller
      */
     protected function setUserPreferences(): void
     {
-        $this->userdata['categoryexclusions'] = User::getCategoryExclusionById(Auth::id());
+        $this->userdata->categoryexclusions = User::getCategoryExclusionById(Auth::id());
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
-            $this->theme = $this->userdata['style'] ?? 'None';
+            $this->theme = $this->userdata->style ?? 'None';
             if ($this->theme === 'None') {
                 $this->theme = Settings::settingValue('site.main.style');
             }
@@ -243,14 +243,14 @@ class BasePageController extends Controller
         }
 
         // Update last login every 15 mins.
-        if ((strtotime($this->userdata['now']) - 900) > strtotime($this->userdata['lastlogin'])) {
+        if (now()->subHours(3) > $this->userdata->lastlogin) {
             event(new UserLoggedIn($this->userdata));
         }
 
         $this->smarty->assign('userdata', $this->userdata);
         $this->smarty->assign('loggedin', 'true');
 
-        if ($this->userdata['nzbvortex_api_key'] !== '' && $this->userdata['nzbvortex_server_url'] !== '') {
+        if ($this->userdata->nzbvortex_api_key !== '' && $this->userdata->nzbvortex_server_url !== '') {
             $this->smarty->assign('weHasVortex', true);
         } else {
             $this->smarty->assign('weHasVortex', false);
@@ -278,7 +278,7 @@ class BasePageController extends Controller
 
         $role = User::ROLE_USER;
         if (! empty($this->userdata)) {
-            $role = $this->userdata['roles_id'];
+            $role = $this->userdata->roles_id;
         }
 
         $content = new Contents();
@@ -288,7 +288,7 @@ class BasePageController extends Controller
             $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
-        $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions']);
+        $parentcatlist = Category::getForMenu($this->userdata->categoryexclusions);
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
         $this->smarty->assign('catClass', Category::class);

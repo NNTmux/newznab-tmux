@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.3 (2019-03-19)
+ * Version: 5.0.5 (2019-05-09)
  */
 (function () {
 var textpattern = (function (domGlobals) {
@@ -268,6 +268,9 @@ var textpattern = (function (domGlobals) {
       copy.sort(comparator);
       return copy;
     };
+    var head = function (xs) {
+      return xs.length === 0 ? Option.none() : Option.some(xs[0]);
+    };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -487,9 +490,15 @@ var textpattern = (function (domGlobals) {
         toOption: Option.none
       };
     };
+    var fromOption = function (opt, err) {
+      return opt.fold(function () {
+        return error(err);
+      }, value);
+    };
     var Result = {
       value: value,
-      error: error
+      error: error,
+      fromOption: fromOption
     };
 
     var isInlinePattern = function (pattern) {
@@ -748,6 +757,10 @@ var textpattern = (function (domGlobals) {
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Delay');
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.VK');
+
+    var zeroWidth = function () {
+      return '\uFEFF';
+    };
 
     var checkRange = function (str, substr, start) {
       if (substr === '')
@@ -1116,6 +1129,12 @@ var textpattern = (function (domGlobals) {
       }
       editor.selection.moveToBookmark(cursor);
     };
+    var isBlockFormatName = function (name, formatter) {
+      var formatSet = formatter.get(name);
+      return isArray(formatSet) && head(formatSet).exists(function (format) {
+        return has(format, 'block');
+      });
+    };
     var applyBlockPattern = function (editor, pattern) {
       var dom = editor.dom;
       var rng = editor.selection.getRng();
@@ -1143,26 +1162,19 @@ var textpattern = (function (domGlobals) {
       }
       var cursor = editor.selection.getBookmark();
       if (pattern.type === 'block-format') {
-        var format = editor.formatter.get(pattern.format);
-        if (format && format[0].block) {
+        if (isBlockFormatName(pattern.format, editor.formatter)) {
           editor.undoManager.transact(function () {
             firstTextNode.deleteData(0, pattern.start.length);
-            editor.selection.select(block);
             editor.formatter.apply(pattern.format);
           });
         }
       } else if (pattern.type === 'block-command') {
         editor.undoManager.transact(function () {
           firstTextNode.deleteData(0, pattern.start.length);
-          editor.selection.select(block);
           editor.execCommand(pattern.cmd, false, pattern.value);
         });
       }
       editor.selection.moveToBookmark(cursor);
-    };
-
-    var zeroWidth = function () {
-      return '\uFEFF';
     };
 
     var handleEnter = function (editor, patternSet) {

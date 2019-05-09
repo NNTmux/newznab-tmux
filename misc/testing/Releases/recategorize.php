@@ -31,14 +31,14 @@ function reCategorize($argv)
 {
     $colorCli = new ColorCLI();
     $where = '';
-    $othercats = implode(',', Category::OTHERS_GROUP);
+    $otherCats = implode(',', Category::OTHERS_GROUP);
     $update = true;
     if (isset($argv[1]) && is_numeric($argv[1])) {
         $where = ' AND groups_id = '.$argv[1];
     } elseif (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
         $where = ' AND groups_id IN '.$argv[1];
     } elseif (isset($argv[1]) && $argv[1] === 'misc') {
-        $where = sprintf(' AND categories_id IN (%s)', $othercats);
+        $where = sprintf(' AND categories_id IN (%s)', $otherCats);
     }
     if (isset($argv[2]) && $argv[2] === 'test') {
         $update = false;
@@ -51,36 +51,35 @@ function reCategorize($argv)
     } else {
         $colorCli->header('Categorizing all releases using searchname. This can take a while, be patient.');
     }
-    $timestart = now();
-    if (isset($argv[1]) && (is_numeric($argv[1]) || $argv[1] === 'misc')) {
-        $chgcount = categorizeRelease(str_replace(' AND', 'WHERE', $where), $update, true);
+    $timeStart = now();
+    if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]) || $argv[1] === 'misc')) {
+        $chgCount = categorizeRelease(str_replace(' AND', 'WHERE', $where), $update, true);
     } else {
-        $chgcount = categorizeRelease('', $update, true);
+        $chgCount = categorizeRelease('', $update, true);
     }
-    $time = now()->diffInSeconds($timestart);
+    $time = now()->diffInSeconds($timeStart);
     if ($update === true) {
-        $colorCli->header('Finished re-categorizing '.number_format($chgcount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
+        $colorCli->header('Finished re-categorizing '.number_format($chgCount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
     } else {
         $colorCli->header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
-            .'This would have changed '.number_format($chgcount).' releases but no updates were done.'.PHP_EOL);
+            .'This would have changed '.number_format($chgCount).' releases but no updates were done.'.PHP_EOL);
     }
 }
 
 // Categorizes releases.
 // Returns the quantity of categorized releases.
-function categorizeRelease($where, $update = true, $echooutput = false)
+function categorizeRelease($where, $update = true, $echoOutput = false)
 {
-    $colorCli = new ColorCLI();
     $cat = new Categorize();
-    $consoletools = new ConsoleTools();
-    $relcount = $chgcount = 0;
-    $colorCli->primary('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
-    $resrel = DB::select('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
-    $total = \count($resrel);
+    $consoleTools = new ConsoleTools();
+    $relCount = $chgCount = 0;
+    $consoleTools->primary('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
+    $resRel = DB::select('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
+    $total = \count($resRel);
     if ($total > 0) {
-        foreach ($resrel as $rowrel) {
-            $catId = $cat->determineCategory($rowrel->groups_id, $rowrel->searchname, $rowrel->fromname);
-            if ((int) $rowrel->categories_id !== $catId) {
+        foreach ($resRel as $rowRel) {
+            $catId = $cat->determineCategory($rowRel->groups_id, $rowRel->searchname, $rowRel->fromname);
+            if ((int) $rowRel->categories_id !== $catId) {
                 if ($update === true) {
                     DB::update(
                         sprintf(
@@ -99,23 +98,23 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 								categories_id = %d
 							WHERE id = %d',
                             $catId['categories_id'],
-                            $rowrel->id
+                            $rowRel->id
                         )
                     );
-                    $release = Release::find($rowrel->id);
+                    $release = Release::find($rowRel->id);
                     $release->retag($catId['tags']);
                 }
-                $chgcount++;
+                $chgCount++;
             }
-            $relcount++;
-            if ($echooutput) {
-                $consoletools->overWritePrimary('Re-Categorized: ['.number_format($chgcount).'] '.$consoletools->percentString($relcount, $total));
+            $relCount++;
+            if ($echoOutput) {
+                $consoleTools->overWritePrimary('Re-Categorized: ['.number_format($chgCount).'] '.$consoleTools->percentString($relCount, $total));
             }
         }
     }
-    if ($echooutput !== false && $relcount > 0) {
+    if ($echoOutput !== false && $relCount > 0) {
         echo PHP_EOL;
     }
 
-    return $chgcount;
+    return $chgCount;
 }

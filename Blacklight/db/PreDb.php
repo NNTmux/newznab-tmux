@@ -106,11 +106,11 @@ class PreDb
         $options += $defaults;
 
         if (empty($options['path'])) {
-            return null;
+            return;
         }
 
         if (! is_numeric($options['limit'])) {
-            return null;
+            return;
         }
 
         $limit = $options['limit'] > 0 ? "LIMIT {$options['limit']}" : '';
@@ -153,7 +153,7 @@ SQL_EXPORT;
         $options += $defaults;
 
         if (empty($options['path'])) {
-            return null;
+            return;
         }
 
         if (! isset($this->ps['LoadData'])) {

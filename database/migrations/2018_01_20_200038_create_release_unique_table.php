@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseUniqueTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,6 @@ class CreateReleaseUniqueTable extends Migration
             $table->foreign('releases_id', 'FK_ru_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

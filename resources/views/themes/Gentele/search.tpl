@@ -260,7 +260,7 @@
 													   class="modal_nfo badge badge-info" rel="nfo">Nfo</a>
 												{/if}
 												{if $result->imdbid > 0}
-													<a href="#" name="name{str_pad($result->imdbid, 7, '0', STR_PAD_LEFT)}" title="View movie info"
+													<a href="#" name="name{$result->imdbid}" title="View movie info"
 													   class="modal_imdb badge badge-info" rel="movie">Cover</a>
 												{/if}
 												{if $result->haspreview == 1 && $userdata->can('preview') == true}

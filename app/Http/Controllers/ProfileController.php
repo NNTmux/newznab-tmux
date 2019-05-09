@@ -13,6 +13,7 @@ use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Models\ReleaseComment;
 use Blacklight\utility\Utility;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Facades\UserVerification;
 
@@ -53,21 +54,20 @@ class ProfileController extends BasePageController
         $downloadList = UserDownload::getDownloadRequestsForUser($userID);
         $this->smarty->assign('downloadlist', $downloadList);
 
-        $data = User::find($userID);
-        if ($data === null) {
+        if ($this->userdata === null) {
             $this->show404('No such user!');
         }
 
         // Check if the user selected a theme.
-        if (! isset($data['style']) || $data['style'] === 'None') {
-            $data['style'] = 'Using the admin selected theme.';
+        if (! isset($this->userdata->style) || $this->userdata->style === 'None') {
+            $this->userdata->style = 'Using the admin selected theme.';
         }
         $this->smarty->assign(
             [
                 'apirequests'       => UserRequest::getApiRequests($userID),
                 'grabstoday'        => UserDownload::getDownloadRequests($userID),
-                'userinvitedby'     => $data['invitedby'] !== '' ? User::find($data['invitedby']) : '',
-                'user'              => $data,
+                'userinvitedby'     => $this->userdata->invitedby !== '' ? User::find($this->userdata->invitedby) : '',
+                'user'              => $this->userdata,
                 'privateprofiles'   => $privateProfiles,
                 'publicview'        => $publicView,
                 'privileged'        => $privileged,
@@ -98,7 +98,7 @@ class ProfileController extends BasePageController
 
         $meta_title = 'View User Profile';
         $meta_keywords = 'view,profile,user,details';
-        $meta_description = 'View User Profile for '.$data['username'];
+        $meta_description = 'View User Profile for '.$this->userdata->username;
 
         $content = $this->smarty->fetch('profile.tpl');
 
@@ -128,8 +128,7 @@ class ProfileController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         $userid = $this->userdata->id;
-        $data = User::find($userid);
-        if (! $data) {
+        if (! $this->userdata) {
             $this->show404('No such user!');
         }
 
@@ -170,12 +169,12 @@ class ProfileController extends BasePageController
 
                     User::updateUser(
                         $userid,
-                        $data['username'],
+                        $this->userdata->username,
                         $request->input('email'),
-                        $data['grabs'],
-                        $data['roles_id'],
-                        $data['notes'],
-                        $data['invites'],
+                        $this->userdata->grabs,
+                        $this->userdata->roles_id,
+                        $this->userdata->notes,
+                        $this->userdata->invites,
                         $request->has('movieview') ? 1 : 0,
                         $request->has('musicview') ? 1 : 0,
                         $request->has('gameview') ? 1 : 0,
@@ -197,80 +196,80 @@ class ProfileController extends BasePageController
                         (int) Settings::settingValue('site.main.userselstyle') === 1 ? $request->input('style') : 'None'
                     );
 
-                    if ((int) $request->input('viewconsole') === 1 && $data->role->hasPermissionTo('view console') === true && ! $data->hasDirectPermission('view console')) {
-                        $data->givePermissionTo('view console');
-                    } elseif ((int) $request->input('viewconsole') === 0 && $data->role->hasPermissionTo('view console') === true && $data->hasPermissionTo('view console')) {
-                        $data->revokePermissionTo('view console');
-                    } elseif ($data->role->hasPermissionTo('view console') === false && $data->hasDirectPermission('view console') && ((int) $request->input('viewconsole') === 0 || (int) $request->input('viewconsole') === 1)) {
-                        $data->revokePermissionTo('view console');
+                    if ((int) $request->input('viewconsole') === 1 && $this->userdata->can('view console') && ! $this->userdata->hasDirectPermission('view console')) {
+                        $this->userdata->givePermissionTo('view console');
+                    } elseif ((int) $request->input('viewconsole') === 0 && $this->userdata->can('view console') && $this->userdata->hasDirectPermission('view console')) {
+                        $this->userdata->revokePermissionTo('view console');
+                    } elseif ($this->userdata->cant('view console') && \in_array((int) $request->input('viewconsole'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view console');
                     }
 
-                    if ((int) $request->input('viewmovies') === 1 && $data->role->hasPermissionTo('view movies') === true && ! $data->hasDirectPermission('view movies')) {
-                        $data->givePermissionTo('view movies');
-                    } elseif ((int) $request->input('viewmovies') === 0 && $data->role->hasPermissionTo('view movies') === true && $data->hasDirectPermission('view movies')) {
-                        $data->revokePermissionTo('view movies');
-                    } elseif ($data->role->hasPermissionTo('view movies') === false && $data->hasDirectPermission('view movies') && ((int) $request->input('viewmovies') === 0 || (int) $request->input('viewmovies') === 1)) {
-                        $data->revokePermissionTo('view movies');
+                    if ((int) $request->input('viewmovies') === 1 && $this->userdata->can('view movies') && ! $this->userdata->hasDirectPermission('view movies')) {
+                        $this->userdata->givePermissionTo('view movies');
+                    } elseif ((int) $request->input('viewmovies') === 0 && $this->userdata->can('view movies') && $this->userdata->hasDirectPermission('view movies')) {
+                        $this->userdata->revokePermissionTo('view movies');
+                    } elseif ($this->userdata->cant('view movies') && $this->userdata->hasDirectPermission('view movies') && \in_array((int) $request->input('viewmovies'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view movies');
                     }
 
-                    if ((int) $request->input('viewaudio') === 1 && $data->role->hasPermissionTo('view audio') === true && ! $data->hasDirectPermission('view audio')) {
-                        $data->givePermissionTo('view audio');
-                    } elseif ((int) $request->input('viewaudio') === 0 && $data->role->hasPermissionTo('view audio') === true && $data->hasDirectPermission('view audio')) {
-                        $data->revokePermissionTo('view audio');
-                    } elseif ($data->role->hasPermissionTo('view audio') === false && $data->hasDirectPermission('view audio') && ((int) $request->input('viewaudio') === 0 || (int) $request->input('viewaudio') === 1)) {
-                        $data->revokePermissionTo('view audio');
+                    if ((int) $request->input('viewaudio') === 1 && $this->userdata->can('view audio') && ! $this->userdata->hasDirectPermission('view audio')) {
+                        $this->userdata->givePermissionTo('view audio');
+                    } elseif ((int) $request->input('viewaudio') === 0 && $this->userdata->can('view audio') && $this->userdata->hasDirectPermission('view audio')) {
+                        $this->userdata->revokePermissionTo('view audio');
+                    } elseif ($this->userdata->cant('view audio') && $this->userdata->hasDirectPermission('view audio') && \in_array((int) $request->input('viewaudio'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view audio');
                     }
 
-                    if ((int) $request->input('viewpc') === 1 && $data->role->hasPermissionTo('view pc') === true && ! $data->hasDirectPermission('view pc')) {
-                        $data->givePermissionTo('view pc');
-                    } elseif ((int) $request->input('viewpc') === 0 && $data->role->hasPermissionTo('view pc') === true && $data->hasDirectPermission('view pc')) {
-                        $data->revokePermissionTo('view pc');
-                    } elseif ($data->role->hasPermissionTo('view pc') === false && $data->hasDirectPermission('view pc') && ((int) $request->input('viewpc') === 0 || (int) $request->input('viewpc') === 1)) {
-                        $data->revokePermissionTo('view pc');
+                    if ((int) $request->input('viewpc') === 1 && $this->userdata->can('view pc') && ! $this->userdata->hasDirectPermission('view pc')) {
+                        $this->userdata->givePermissionTo('view pc');
+                    } elseif ((int) $request->input('viewpc') === 0 && $this->userdata->can('view pc') && $this->userdata->hasDirectPermission('view pc')) {
+                        $this->userdata->revokePermissionTo('view pc');
+                    } elseif ($this->userdata->cant('view pc') && $this->userdata->hasDirectPermission('view pc') && \in_array((int) $request->input('viewpc'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view pc');
                     }
 
-                    if ((int) $request->input('viewtv') === 1 && $data->role->hasPermissionTo('view tv') === true && ! $data->hasDirectPermission('view tv')) {
-                        $data->givePermissionTo('view tv');
-                    } elseif ((int) $request->input('viewtv') === 0 && $data->role->hasPermissionTo('view tv') === true && $data->hasDirectPermission('view tv')) {
-                        $data->revokePermissionTo('view tv');
-                    } elseif ($data->role->hasPermissionTo('view tv') === false && $data->hasDirectPermission('view tv') && ((int) $request->input('viewtv') === 0 || (int) $request->input('viewtv') === 1)) {
-                        $data->revokePermissionTo('view tv');
+                    if ((int) $request->input('viewtv') === 1 && $this->userdata->can('view tv') && ! $this->userdata->hasDirectPermission('view tv')) {
+                        $this->userdata->givePermissionTo('view tv');
+                    } elseif ((int) $request->input('viewtv') === 0 && $this->userdata->can('view tv') && $this->userdata->hasDirectPermission('view tv')) {
+                        $this->userdata->revokePermissionTo('view tv');
+                    } elseif ($this->userdata->cant('view tv') && $this->userdata->hasDirectPermission('view tv') && \in_array((int) $request->input('viewtv'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view tv');
                     }
 
-                    if ((int) $request->input('viewadult') === 1 && $data->role->hasPermissionTo('view adult') === true && ! $data->hasDirectPermission('view adult')) {
-                        $data->givePermissionTo('view adult');
-                    } elseif ((int) $request->input('viewadult') === 0 && $data->role->hasPermissionTo('view adult') === true && $data->hasDirectPermission('view adult')) {
-                        $data->revokePermissionTo('view adult');
-                    } elseif ($data->role->hasPermissionTo('view adult') === false && $data->hasDirectPermission('view adult') && ((int) $request->input('viewadult') === 0 || (int) $request->input('viewadult') === 1)) {
-                        $data->revokePermissionTo('view adult');
+                    if ((int) $request->input('viewadult') === 1 && $this->userdata->can('view adult') && ! $this->userdata->hasDirectPermission('view adult')) {
+                        $this->userdata->givePermissionTo('view adult');
+                    } elseif ((int) $request->input('viewadult') === 0 && $this->userdata->can('view adult') && $this->userdata->hasDirectPermission('view adult')) {
+                        $this->userdata->revokePermissionTo('view adult');
+                    } elseif ($this->userdata->cant('view adult') && $this->userdata->hasDirectPermission('view adult') && \in_array((int) $request->input('viewadult'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view adult');
                     }
 
-                    if ((int) $request->input('viewbooks') === 1 && $data->role->hasPermissionTo('view books') === true && ! $data->hasDirectPermission('view books')) {
-                        $data->givePermissionTo('view books');
-                    } elseif ((int) $request->input('viewbooks') === 0 && $data->role->hasPermissionTo('view books') === true && $data->hasDirectPermission('view books')) {
-                        $data->revokePermissionTo('view books');
-                    } elseif ($data->role->hasPermissionTo('view books') === false && $data->hasDirectPermission('view books') && ((int) $request->input('viewbooks') === 0 || (int) $request->input('viewbooks') === 1)) {
-                        $data->revokePermissionTo('view books');
+                    if ((int) $request->input('viewbooks') === 1 && $this->userdata->can('view books') && ! $this->userdata->hasDirectPermission('view books')) {
+                        $this->userdata->givePermissionTo('view books');
+                    } elseif ((int) $request->input('viewbooks') === 0 && $this->userdata->can('view books') && $this->userdata->hasDirectPermission('view books')) {
+                        $this->userdata->revokePermissionTo('view books');
+                    } elseif ($this->userdata->cant('view books') && $this->userdata->hasDirectPermission('view books') && \in_array((int) $request->input('viewbooks'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view books');
                     }
 
-                    if ((int) $request->input('viewother') === 1 && $data->role->hasPermissionTo('view other') === true && ! $data->hasDirectPermission('view other')) {
-                        $data->givePermissionTo('view other');
-                    } elseif ((int) $request->input('viewother') === 0 && $data->role->hasPermissionTo('view other') === true && $data->hasDirectPermission('view other')) {
-                        $data->revokePermissionTo('view other');
-                    } elseif ($data->role->hasPermissionTo('view other') === false && $data->hasDirectPermission('view other') && ((int) $request->input('viewother') === 0 || (int) $request->input('viewother') === 1)) {
-                        $data->revokePermissionTo('view other');
+                    if ((int) $request->input('viewother') === 1 && $this->userdata->can('view other') && ! $this->userdata->hasDirectPermission('view other')) {
+                        $this->userdata->givePermissionTo('view other');
+                    } elseif ((int) $request->input('viewother') === 0 && $this->userdata->can('view other') && $this->userdata->hasDirectPermission('view other')) {
+                        $this->userdata->revokePermissionTo('view other');
+                    } elseif ($this->userdata->cant('view other') && $this->userdata->hasDirectPermission('view other') && \in_array((int) $request->input('viewother'), [0, 1], true)) {
+                        $this->userdata->revokePermissionTo('view other');
                     }
 
                     if ($request->has('password') && ! empty($request->input('password'))) {
                         User::updatePassword($userid, $request->input('password'));
                     }
 
-                    if (! empty($request->input('email')) && $data['email'] !== $request->input('email')) {
-                        $data['email'] = $request->input('email');
+                    if (! empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
+                        $this->userdata->email = $request->input('email');
 
-                        UserVerification::generate($data);
+                        UserVerification::generate($this->userdata);
 
-                        UserVerification::send($data, 'User email verification required');
+                        UserVerification::send($this->userdata, 'User email verification required');
                     }
 
                     return redirect('profile');
@@ -287,7 +286,7 @@ class ProfileController extends BasePageController
         }
 
         $this->smarty->assign('error', $errorStr);
-        $this->smarty->assign('user', $data);
+        $this->smarty->assign('user', $this->userdata);
         $this->smarty->assign('userexccat', User::getCategoryExclusionById($userid));
 
         $this->smarty->assign('saburl_selected', $sab->url);
@@ -325,10 +324,10 @@ class ProfileController extends BasePageController
 
         $meta_title = 'Edit User Profile';
         $meta_keywords = 'edit,profile,user,details';
-        $meta_description = 'Edit User Profile for '.$data['username'];
+        $meta_description = 'Edit User Profile for '.$this->userdata->username;
 
-        $this->smarty->assign('cp_url_selected', $data['cp_url']);
-        $this->smarty->assign('cp_api_selected', $data['cp_api']);
+        $this->smarty->assign('cp_url_selected', $this->userdata->cp_url);
+        $this->smarty->assign('cp_api_selected', $this->userdata->cp_api);
         $this->smarty->assign('yesno_ids', [1, 0]);
         $this->smarty->assign('yesno_names', ['Yes', 'No']);
 
@@ -339,8 +338,8 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      * @throws \Exception
      */
     public function destroy(Request $request)
@@ -349,10 +348,9 @@ class ProfileController extends BasePageController
         $userId = $request->input('id');
 
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {
+            Auth::logout();
             $user = User::find($userId);
             $user->delete();
-
-            return redirect('login');
         }
 
         if ($this->userdata->hasRole('Admin')) {

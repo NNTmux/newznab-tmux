@@ -53,25 +53,22 @@ $filePattern = '(?P<filename>(?P<stamp>\d+)_predb_dump\.csv\.gz)';
 
 $result = getDirListing($url);
 
-$dirs = json_decode($result, true);
-
-if ($dirs === null || (isset($dirs['message']) && strpos($dirs['message'], 'API rate limit exceeded for') === 0)) {
+if ($result === null || (isset($result['message']) && strpos($result['message'], 'API rate limit exceeded for') === 0)) {
     exit("Error: $result");
 }
 
-foreach ($dirs as $dir) {
+foreach ($result as $dir) {
     if ($dir['name'] === '0README.txt') {
         continue;
     }
 
     $result = getDirListing($url.$dir['name'].'/');
 
-    $temp = json_decode($result, true);
-    if ($temp === null) {
+    if ($result === false) {
         exit("Error: $result");
     }
 
-    $data[$dir['name']] = $temp;
+    $data[$dir['name']] = $result;
 }
 
 $total = 0;

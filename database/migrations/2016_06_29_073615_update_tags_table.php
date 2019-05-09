@@ -12,7 +12,6 @@ class UpdateTagsTable extends Migration
         });
     }
 
-
     public function down()
     {
         Schema::table('tagging_tags', function ($table) {

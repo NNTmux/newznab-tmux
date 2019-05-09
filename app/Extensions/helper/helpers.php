@@ -333,4 +333,21 @@ if (! function_exists('makeFieldLinks')) {
             return sprintf('%02dh:%02dm:%02ds', $time / 3600, $time / 60 % 60, $time % 60);
         }
     }
+
+    if (! function_exists('is_it_json')) {
+
+        /**
+         * @param array|string $isIt
+         * @return bool
+         */
+        function is_it_json($isIt)
+        {
+            if (is_array($isIt)) {
+                return false;
+            }
+            json_decode($isIt);
+
+            return json_last_error() === JSON_ERROR_NONE;
+        }
+    }
 }

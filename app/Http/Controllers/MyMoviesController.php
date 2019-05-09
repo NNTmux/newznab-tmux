@@ -59,7 +59,7 @@ class MyMoviesController extends BasePageController
 
                 if ($action === 'doadd') {
                     $category = ($request->has('category') && \is_array($request->input('category')) && ! empty($request->input('category'))) ? $request->input('category') : [];
-                    UserMovie::addMovie($this->userdata->id, str_pad($imdbid, 7, '0', STR_PAD_LEFT), $category);
+                    UserMovie::addMovie($this->userdata->id, $imdbid, $category);
                     if ($request->has('from')) {
                         return redirect($request->input('from'));
                     }
@@ -152,7 +152,7 @@ class MyMoviesController extends BasePageController
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
-                $results = $mv->getMovieRange($page, $movie['categoryNames'], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata['categoryexclusions']);
+                $results = $mv->getMovieRange($page, $movie['categoryNames'], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata->categoryexclusions);
 
                 $this->smarty->assign('covgroup', '');
 
@@ -160,7 +160,7 @@ class MyMoviesController extends BasePageController
                     $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/mymovies/browse?ob='.$ordertype.'&amp;offset=0');
                 }
 
-                $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
+                $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
 
                 $this->smarty->assign('results', $results);
 

@@ -27,7 +27,7 @@ $count = $sql->count();
 echo 'Copying '.$count.' imdbid values'.PHP_EOL;
 
 foreach ($sql as $movie) {
-    DB::table('movie_temp')->insert(['releases_id' => $movie['id'], 'imdbid' => str_pad($movie['imdbid'], 7, '0', STR_PAD_LEFT)]);
+    DB::table('movie_temp')->insert(['releases_id' => $movie['id'], 'imdbid' => $movie['imdbid']]);
     echo '.';
 }
 

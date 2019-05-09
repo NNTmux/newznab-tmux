@@ -23,12 +23,12 @@ class BrowseController extends BasePageController
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], -1);
+        $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions, -1);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign('catname', 'All');
 
-        $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
+        $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
 
         foreach ($results as $result) {
             $browse[] = $result;
@@ -82,7 +82,7 @@ class BrowseController extends BasePageController
         $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions'], $grp);
+        $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions, $grp);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $browse = [];
@@ -93,7 +93,7 @@ class BrowseController extends BasePageController
 
         $this->smarty->assign('catname', $id);
 
-        $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
+        $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
 
         $this->smarty->assign(
             [
@@ -151,7 +151,7 @@ class BrowseController extends BasePageController
             $group = $request->input('g');
             $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
-            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata['categoryexclusions'], $group);
+            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, $group);
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
             $browse = [];
@@ -191,7 +191,7 @@ class BrowseController extends BasePageController
             $tags = explode(',', $request->input('tags'));
             $page = request()->has('page') && is_numeric(request()->input('page')) ? request()->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
-            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata['categoryexclusions'], -1, 0, $tags);
+            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, -1, 0, $tags);
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
             $browse = [];

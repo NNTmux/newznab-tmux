@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMovieinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,7 @@ class CreateMovieinfoTable extends Migration
             $table->charset = 'utf8';
             $table->collation = 'utf8_unicode_ci';
             $table->increments('id');
-            $table->integer('imdbid')->unsigned()->unique('ix_movieinfo_imdbid');
+            $table->string('imdbid')->unique('ix_movieinfo_imdbid');
             $table->integer('tmdbid')->unsigned()->default(0);
             $table->integer('traktid')->unsigned()->default(0);
             $table->string('title')->default('')->index('ix_movieinfo_title');
@@ -38,7 +37,6 @@ class CreateMovieinfoTable extends Migration
             $table->string('trailer')->default('');
         });
     }
-
 
     /**
      * Reverse the migrations.

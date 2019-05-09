@@ -122,7 +122,7 @@ class Predb extends Model
 
                 if (config('nntmux.echocli')) {
                     $consoleTools->overWritePrimary(
-                            'Matching up preDB titles with release searchnames: '.$consoleTools->percentString(++$updated, $total)
+                        'Matching up preDB titles with release searchnames: '.$consoleTools->percentString(++$updated, $total)
                         );
                 }
             }

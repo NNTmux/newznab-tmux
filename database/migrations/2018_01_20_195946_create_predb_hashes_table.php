@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreatePredbHashesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,6 @@ class CreatePredbHashesTable extends Migration
         DB::statement('ALTER TABLE predb_hashes ADD COLUMN hash VARBINARY(40) DEFAULT ""');
         DB::statement('ALTER TABLE predb_hashes ADD PRIMARY KEY (hash)');
     }
-
 
     /**
      * Reverse the migrations.

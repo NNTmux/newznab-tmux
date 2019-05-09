@@ -262,32 +262,36 @@ class Popporn extends AdultMovies
             $this->_response = getRawHtml(self::POPURL.$this->_trailUrl, $this->cookie);
             if ($this->_response !== false) {
                 if ($ret = $this->_html->loadHtml($this->_response)->find('div.product-info, div.title', 1)) {
-                    $this->_title = trim($ret->plaintext);
-                    $title = str_replace('XXX', '', $ret->plaintext);
-                    $title = trim(preg_replace('/\(.*?\)|[._-]/i', ' ', $title));
-                    similar_text(strtolower($movie), strtolower($title), $p);
-                    if ($p >= 90) {
-                        if ($ret = $ret->findOne('a')) {
-                            $this->_trailUrl = trim($ret->href);
-                            unset($this->_response);
-                            $this->_response = getRawHtml(self::POPURL.$this->_trailUrl, $this->cookie);
-                            if ($this->_response !== false) {
-                                $this->_html->loadHtml($this->_response);
-                                if ($ret = $this->_html->findOne('#link-to-this')) {
-                                    $this->_directUrl = trim($ret->href);
-                                    unset($this->_response);
-                                    $this->_response = getRawHtml($this->_directUrl, $this->cookie);
+                    if (! empty($ret->plaintext)) {
+                        $this->_title = trim($ret->plaintext);
+                        $title = str_replace('XXX', '', $ret->plaintext);
+                        $title = trim(preg_replace('/\(.*?\)|[._-]/i', ' ', $title));
+                        similar_text(strtolower($movie), strtolower($title), $p);
+                        if ($p >= 90) {
+                            if ($ret = $ret->findOne('a')) {
+                                $this->_trailUrl = trim($ret->href);
+                                unset($this->_response);
+                                $this->_response = getRawHtml(self::POPURL.$this->_trailUrl, $this->cookie);
+                                if ($this->_response !== false) {
                                     $this->_html->loadHtml($this->_response);
+                                    if ($ret = $this->_html->findOne('#link-to-this')) {
+                                        $this->_directUrl = trim($ret->href);
+                                        unset($this->_response);
+                                        $this->_response = getRawHtml($this->_directUrl, $this->cookie);
+                                        $this->_html->loadHtml($this->_response);
 
-                                    return true;
+                                        return true;
+                                    }
+
+                                    return false;
                                 }
-
-                                return false;
                             }
-                        }
 
-                        return true;
+                            return true;
+                        }
                     }
+
+                    return false;
                 }
             } else {
                 $this->_response = getRawHtml(self::IF18, $this->cookie);

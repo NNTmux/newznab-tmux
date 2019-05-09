@@ -139,7 +139,7 @@ class MyShowsController extends BasePageController
                 $results = [];
                 foreach ($shows as $showk => $show) {
                     $showcats = explode('|', $show['categories']);
-                    if (\is_array($showcats) && \count($showcats) > 0) {
+                    if (\is_array($showcats) && ! empty($showcats)) {
                         $catarr = [];
                         foreach ($showcats as $scat) {
                             if (! empty($scat)) {
@@ -183,9 +183,9 @@ class MyShowsController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_page');
         $ordering = $releases->getBrowseOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
-        $browseCount = $releases->getShowsCount($shows, -1, $this->userdata['categoryexclusions']);
+        $browseCount = $releases->getShowsCount($shows, -1, $this->userdata->categoryexclusions);
 
-        $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, request()->url(), request()->query());
 
         $this->smarty->assign('covgroup', '');
@@ -194,7 +194,7 @@ class MyShowsController extends BasePageController
             $this->smarty->assign('orderby'.$ordertype, WWW_TOP.'/myshows/browse?ob='.$ordertype.'&amp;offset=0');
         }
 
-        $this->smarty->assign('lastvisit', $this->userdata['lastlogin']);
+        $this->smarty->assign('lastvisit', $this->userdata->lastlogin);
 
         $this->smarty->assign(['results' => $results, 'resultsadd' => $rslt]);
 

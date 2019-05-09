@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateVideoDataTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,7 +30,6 @@ class CreateVideoDataTable extends Migration
             $table->foreign('releases_id', 'FK_vd_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
-
 
     /**
      * Reverse the migrations.

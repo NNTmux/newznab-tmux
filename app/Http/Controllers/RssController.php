@@ -13,8 +13,8 @@ class RssController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
-     * @return void
-     * @throws \Exception
+     *
+     * @return array|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request)
@@ -23,6 +23,10 @@ class RssController extends BasePageController
         $offset = 0;
 
         $user = $this->userCheck($request);
+
+        if (is_object($user)) {
+            return $user;
+        }
 
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
@@ -35,7 +39,8 @@ class RssController extends BasePageController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @throws \Exception
+     *
+     * @return array|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     public function myShowsRss(Request $request)
@@ -43,6 +48,9 @@ class RssController extends BasePageController
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
+        if (is_object($user)) {
+            return $user;
+        }
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
         $relData = $rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
@@ -53,7 +61,8 @@ class RssController extends BasePageController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @throws \Exception
+     *
+     * @return array|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request)
@@ -61,6 +70,9 @@ class RssController extends BasePageController
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
+        if (is_object($user)) {
+            return $user;
+        }
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
         $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
@@ -105,8 +117,8 @@ class RssController extends BasePageController
 
         $this->smarty->assign(
             [
-                'categorylist'       => Category::getCategories(true, $this->userdata['categoryexclusions']),
-                'parentcategorylist' => Category::getForMenu($this->userdata['categoryexclusions']),
+                'categorylist'       => Category::getCategories(true, $this->userdata->categoryexclusions),
+                'parentcategorylist' => Category::getForMenu($this->userdata->categoryexclusions),
             ]
         );
 
@@ -117,12 +129,21 @@ class RssController extends BasePageController
         $this->pagerender();
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return array|\Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
     public function cartRss(Request $request)
     {
         $this->setPrefs();
         $rss = new RSS(['Settings' => $this->settings]);
         $offset = 0;
         $user = $this->userCheck($request);
+        if (is_object($user)) {
+            return $user;
+        }
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
@@ -140,8 +161,8 @@ class RssController extends BasePageController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
+     *
+     * @return array|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
     public function categoryFeedRss(Request $request)
@@ -154,6 +175,9 @@ class RssController extends BasePageController
         }
 
         $user = $this->userCheck($request);
+        if (is_object($user)) {
+            return $user;
+        }
         $categoryId = explode(',', $request->input('id'));
         $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
         $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);

@@ -176,7 +176,7 @@
 								<div class="row small-gutter-left">
 									<div class="col-md-3 small-gutter-left">
 										{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
-											<img src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($movie.imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"
+											<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 												 width="185"
 												 alt="{$movie.title|escape:"htmlall"}"
 												 data-toggle="modal"
@@ -880,7 +880,7 @@
 			</div>
 			<div class="modal-body">
 				{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
-					<img src="{$smarty.const.WWW_TOP}/covers/movies/{str_pad($movie.imdbid, 7, '0', STR_PAD_LEFT)}-cover.jpg"
+					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
 				{if $show && $release.videos_id > 0 && $show.image != "0"}

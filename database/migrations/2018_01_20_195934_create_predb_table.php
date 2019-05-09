@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreatePredbTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,11 +30,10 @@ class CreatePredbTable extends Migration
             $table->string('files', 50)->nullable()->comment('How many files does this pre have ?');
             $table->string('filename')->default('');
             $table->boolean('searched')->default(0)->index('ix_predb_searched');
-            $table->index(['requestid','groups_id'], 'ix_predb_requestid');
+            $table->index(['requestid', 'groups_id'], 'ix_predb_requestid');
         });
         DB::statement('ALTER TABLE predb ADD FULLTEXT ft_predb_filename (filename)');
     }
-
 
     /**
      * Reverse the migrations.

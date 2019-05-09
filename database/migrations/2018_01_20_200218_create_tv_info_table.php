@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateTvInfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,7 +23,6 @@ class CreateTvInfoTable extends Migration
             $table->boolean('image')->default(0)->index('ix_tv_info_image')->comment('Does the video have a cover image?');
         });
     }
-
 
     /**
      * Reverse the migrations.

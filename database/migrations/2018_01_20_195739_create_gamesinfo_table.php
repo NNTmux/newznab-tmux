@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateGamesinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -35,7 +34,6 @@ class CreateGamesinfoTable extends Migration
 
         DB::statement('ALTER TABLE gamesinfo ADD FULLTEXT ix_title_ft(title)');
     }
-
 
     /**
      * Reverse the migrations.

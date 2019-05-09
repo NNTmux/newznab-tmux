@@ -95,16 +95,12 @@
     "aharen/omdbapi": "^2.0",
     "anhskohbo/no-captcha": "^3.0",
     "b3rs3rk/steamfront": "dev-master",
-    "barracudanetworks/forkdaemon-php": "~1.0",
     "bhuvidya/laravel-countries": "^1.0",
     "canihavesomecoffee/thetvdbapi": "^1.0",
     "chumper/zipper": "^1.0",
     "czproject/git-php": "^3.14",
-    "laravelcollective/html": "^5.7",
     "dariusiii/laravel": "dev-master",
     "dariusiii/laravel-database-trigger": "dev-master",
-    "ytake/laravel-smarty": "^2.5",
-    "jrean/laravel-user-verification": "^7.0",
     "dariusiii/php-itunes-api": "^1.0",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "^1.0",
@@ -112,6 +108,7 @@
     "doctrine/dbal": "^2.7",
     "fideloper/proxy": "~4.0",
     "foolz/sphinxql-query-builder": "^2.0",
+    "genealabs/laravel-caffeine": "^0.8.1",
     "geoip2/geoip2": "^2.9",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
@@ -120,12 +117,14 @@
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
+    "jrean/laravel-user-verification": "^7.0",
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.8.*",
     "laravel/horizon": "^2.0",
     "laravel/scout": "^7.0",
     "laravel/telescope": "^2.0",
     "laravel/tinker": "~1.0",
+    "laravelcollective/html": "^5.7",
     "league/climate": "^3.4",
     "mayconbordin/l5-fixtures": "dev-master",
     "messerli90/igdb": "^1.0",
@@ -142,17 +141,19 @@
     "ramsey/uuid": "^3.7",
     "rtconner/laravel-tagging": "^3.0",
     "smarty/smarty": "^3.1",
+    "spatie/async": "^1.0",
     "spatie/laravel-directory-cleanup": "^1.2",
     "spatie/laravel-fractal": "^5.3",
     "spatie/laravel-permission": "^2.12",
     "tunaabutbul/cloudflare-middleware": "^1.2",
     "vlucas/phpdotenv": "^3.3",
-    "voku/simple_html_dom": "^4.2",
+    "voku/simple_html_dom": "4.3.*",
     "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",
     "wildbit/swiftmailer-postmark": "^3.0",
     "yab/laravel-scout-mysql-driver": "^2.1",
-    "yadakhov/insert-on-duplicate-key": "^1.2"
+    "yadakhov/insert-on-duplicate-key": "^1.2",
+    "ytake/laravel-smarty": "^2.5"
   },
 
   "require-dev": {
@@ -163,6 +164,7 @@
     "friendsofphp/php-cs-fixer": "^2.14",
     "fzaninotto/faker": "~1.4",
     "laracasts/generators": "dev-master",
+    "matt-allan/laravel-code-style": "^0.2.0",
     "mockery/mockery": "^1.0",
     "moontoast/math": "^1.1",
     "nunomaduro/collision": "^3.0",
@@ -191,9 +193,8 @@
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi"
     ],
-    "format": [
-      "vendor/bin/php-cs-fixer fix --config .php-cs"
-    ]
+    "check-style": "php-cs-fixer fix --dry-run --diff",
+    "fix-style": "php-cs-fixer fix"
   },
   "suggest": {
     "ext-gd": "to use GD library based image processing.",

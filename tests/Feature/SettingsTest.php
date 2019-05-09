@@ -1,8 +1,9 @@
 <?php
+
 namespace Tests\Feature;
 
-use App\Models\Settings;
 use Tests\TestCase;
+use App\Models\Settings;
 
 class SettingsTest extends TestCase
 {

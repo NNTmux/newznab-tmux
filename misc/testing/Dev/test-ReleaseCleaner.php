@@ -2,9 +2,10 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Release;
+use App\Models\UsenetGroup;
 use Blacklight\SphinxSearch;
 use Blacklight\ReleaseCleaning;
-use Illuminate\Support\Facades\DB;
 
 $message =
     'Shows old searchname vs new searchname for releases in a group using the releaseCleaning class. (Good for testing new regex)'.
@@ -26,44 +27,46 @@ if (! in_array($argv[3], ['true', 'false'], false)) {
 }
 
 $category = '';
-if ($argv[4] !== '0' && strlen($argv[4]) === 4) {
-    $category = 'AND categories_id = '.$argv[4];
-}
 
 $rename = false;
 if ($argv[3] === 'true') {
     $rename = true;
 }
 
-$pdo = DB::connection()->getPdo();
+$group = UsenetGroup::query()->where('name', '=', $argv[1])->select(['id'])->first();
 
-$group = DB::selectOne(sprintf('SELECT id FROM usenet_groups WHERE name = %s', escapeString($argv[1])));
-
-if ($group === false) {
+if ($group === null) {
     exit('No group with name '.$argv[1].' found in the database.');
 }
 
-$releases = DB::select(sprintf('SELECT name, searchname, fromname, size, id FROM releases WHERE groups_id = %d %s ORDER BY postdate LIMIT %d', $group['id'], $category, $argv[2]));
+$releasesQuery = Release::query()->where('groups_id', $group->id);
+if ((int) $argv[4] !== 0 && is_numeric($argv[4])) {
+    $releasesQuery->where('categories_id', '=', $argv[4]);
+}
+$releasesQuery->select(['name', 'searchname', 'fromname', 'size', 'id', 'postdate'])->orderBy('postdate')->limit($argv[2]);
+
+$releases = $releasesQuery->get();
 
 if (\count($releases) === 0) {
     exit('No releases found in your database for group '.$argv[1].PHP_EOL);
 }
 
-$RC = new ReleaseCleaning();
+$releaseCleaner = new ReleaseCleaning();
 $sphinx = new SphinxSearch();
 
 foreach ($releases as $release) {
-    $newName = $RC->releaseCleaner($release->name, $release->fromname, $argv[1]);
+    echo '.';
+    $newName = $releaseCleaner->releaseCleaner($release->name, $release->fromname, $argv[1]);
     if (is_array($newName)) {
         $newName = $newName['cleansubject'];
     }
     if ($newName !== $release['searchname']) {
+        PHP_EOL;
         echo 'Old name: '.$release->searchname.PHP_EOL;
         echo 'New name: '.$newName.PHP_EOL.PHP_EOL;
 
         if ($rename === true) {
-            $newName = escapeString($newName);
-            DB::update(sprintf('UPDATE releases SET searchname = %s WHERE id = %d', $newName, $release->id));
+            Release::query()->where('id', '=', $release->id)->update(['searchname' => $newName]);
             $sphinx->updateRelease($release->id);
         }
     }

@@ -1,4 +1,115 @@
+2019-05-09 DariusIII
+	* Chg: Update fontawesome and tinyMCE to latest versions
+	* Fix: Fix browse queries and add back missing jpgstatus column select (should fix missing sample button on browse pages)
+2019-05-08 DariusIII
+	* Fix: Fix adding user from admin area (fixes issue #972)
+	* Chg: Update profile deletion behaviour
+2019-05-07 DariusIII
+	* Chg: Fix code style of many files
+	* Chg: Update code fixing in dev, used libraries and laravel/framework to latest versions
+2019-05-05 DariusIII
+	* Chg: Update pnotify to version 4.0.0 and tinyMCE to latest version
+2019-05-03 DariusIII
+	* Chg: Update laravel/framework and rest of the used libraries to their latest versions
+2019-04-28 DariusIII
+	* Chg: Add option to disable purging of inactive user accounts
+	* Fix: Throw API error if apikey is missing
+	* Chg: Update nesbot/carbon (2.17.0 => 2.17.1) and intervention/imagecache (2.3.3 => 2.3.4)
+2019-04-25 DariusIII
+	* Chg: Update laravel/framework (v5.8.13 => v5.8.14) and other libraries
+	* Chg: Exclude admin area from csrf protection
+2019-04-22 DariusIII
+	* Chg: Add failed route to csrf protection exclusion
+	* Chg: Update imdbphp/imdbphp (v6.2.0 => v6.2.1)
+2019-04-21 DariusIII
+	* Fix: Fix error related to $user variable in RssController
+	* Chg: Update used libraries to latest versions
+2019-04-18 DariusIII
+	* Chg: Update laravel/framework and nesbot/carbon to latest versions
+2019-04-17 DariusIII
+	* Chg: Update symfony components
+2019-04-16 DariusIII
+	* Chg: Add back genealabs/laravel-caffeine
+	* Chg: Update used libraries to their latest versions
+2019-04-15 DariusIII
+	* Chg: Update recategorize.php script
+	* Chg: Update XXX UHD and XXX ClipSD matching regexes
+	* Fix: Fix predb_import_daily_batch.php script (Fixes issue #970)
+	* Chg: Update package.json
+	* Chg: ConsoleTools now extends ColorCLI class
+	* Chg: Remove unused PDO class instantiation
+	* Chg: Remove $this->pdo as it is not used
+	* Chg: Remove unused ReleaseSearch class
+2019-04-14 DariusIII
+	* Fix: Fix test-ReleaseCleaner.php script (Fixes issue #965)
+2019-04-11 DariusIII
+	* Chg: Use $this-> in Git class
+	* Chg: Update usage of $this->userdata in controllers
+2019-04-10 DariusIII
+	* Chg: Update laravel/framework (v5.8.10 => v5.8.11)
+	* Chg: Reduce querying of users table in ProfileController, simplify role and permissions code checks
+	* Fix: Fix wrong table name used in RootCategoriesTableSeeder class
+2019-04-09 DariusIII
+	* Chg: Update spatie/laravel-permission (2.36.1 => 2.37.0)
+	* Chg: Update clue/stream-filter (v1.4.0 => v1.4.1)
+	* Chg: Update BasePageController to update lastlogin every 3 hours for better new releases handling
+2019-04-08 DariusIII
+	* Chg: Update BasePageController, change 15 minute last login update code
+	* Chg: Update pear/archive_tar (1.4.6 => 1.4.7)
+	* Chg: Update misc/testing/DB/change_imdb_column.php script
+	* Chg: Update browse.tpl
+2019-04-07 DariusIII
+	* Chg: Update myclabs/deep-copy (1.8.1 => 1.9.0)
+2019-04-06 DariusIII
+	* Chg: Update nesbot/carbon (2.16.2 => 2.16.3)
+	* Chg: Remove padding of imdbid as column is now varchar and stores imdbid properly
+	* Chg: Use our own is_it_json function
+2019-04-05 DariusIII
+	* Fix: Update Forking class, fix releases check query
+	* Chg: Use output of userCheck if it passes the json check
+	* Chg: Don't use constant for multiprocessing path, use the path directly
+2019-04-04 DariusIII
+	* Chg: Update laravel/framework (v5.8.9 => v5.8.10)
+	* Chg: Add migrations and update themes for new imdbid length
+	* Chg: Update releases, movieinfo and user_movies migrations imdbid column definition to be string(varchar in mysql) due to changes in imdbid numbering
+	* Chg: Add nntmux shell command script to shorten typing (ie ./nntmux nntmux:all in place of php artisan nntmux:all command)
+2019-04-03 DariusIII
+	* Chg: Update tmux install script to install Tmux version 2.9
+	* Chg: Update used libraries
+	* Chg: Update env.example with multiprocessing switches and use them in nntmux config and Forking
+	* Chg: Remove deleting of releases by group as non-mgr mode does not exist anymore
+2019-04-02 DariusIII
+	* Chg: Update symfony components to their latest versions and downgrade voku/simple_html_dom
+	* Chg: Update laravel/framework (v5.8.8 => v5.8.9)
+2019-04-01 DariusIII
+	* Chg: Move check for PPA queue inside main PPA function
+	* Chg: Check if title check returns no result in PopPorn class
+	* CHg: Revert to old behavior on bad nzb (decrement password status, do not delete the release)
+	* Fix: Fix bad check for debug condition in Forking
+	* Chg: Use now() helper in Forking date display
+	* Chg: Update used libraries to their latest versions
+2019-03-31 DariusIII
+    * Chg: Update Date output
+2019-03-29 DariusIII
+    * Chg: Add timeout to Forking class
+2019-03-28 DariusIII
+    * Chg: Separate PPA from rest of the postprocessing
+    * Chg: Adjust output messages for binaries and releases processing
+    * Chg: Revert all but PPA to older behaviour
+2019-03-27 DariusIII
+    * Chg: Remove $groups assignment from queries and use $this->work
+    * Chg: Switch back to using PHP_BINARY in Forking in place of php
+    * Fix: Fix queries for nfo, tv and movies postprocessing
+    * Chg: Update returned messages after thread is finished
+2019-03-26 DariusIII
+    * Chg: Update ForkingImportNZB
+2019-03-25 DariusIII
+    * Chg: Update multiprocessing scripts
+    * Chg: Update Forking class to use spatie/async
 2019-03-22 DariusIII
+	* Chg: Add spatie/async
+	* Chg: Update symfony components
+	* Chg: Update doctrine/instantiator (1.1.0 => 1.2.0)
 	* Chg: Update laravel/framework (v5.8.5 => v5.8.7)
 2019-03-21 DariusIII
 	* Fix: Fix logic and add check for duplicated data

@@ -81,7 +81,7 @@
                                     </tr>
                                     <tr>
                                         <th width="200"></th>
-                                        {if $user->role->hasPermissionTo('view console') == true}
+                                        {if $user->can('view console')}
                                     <tr>
                                         <td>View Console releases</td>
                                         <td>
@@ -89,7 +89,7 @@
                                         </td>
                                     </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view movies') == true}
+                                    {if $user->can('view movies')}
                                         <tr>
                                             <td>View Movie releases</td>
                                             <td>
@@ -97,7 +97,7 @@
                                             </td>
                                         </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view audio') == true}
+                                    {if $user->can('view audio')}
                                         <tr>
                                             <td>View Audio releases</td>
                                             <td>
@@ -105,7 +105,7 @@
                                             </td>
                                         </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view pc') == true}
+                                    {if $user->can('view pc')}
                                         <tr>
                                             <td>View PC releases</td>
                                             <td>
@@ -113,7 +113,7 @@
                                             </td>
                                         </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view tv') == true}
+                                    {if $user->can('view tv')}
                                         <tr>
                                             <td>View TV releases</td>
                                             <td>
@@ -121,7 +121,7 @@
                                             </td>
                                         </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view adult') == true}
+                                    {if $user->can('view adult')}
                                         <tr>
                                             <td>View Adult releases</td>
                                             <td>
@@ -129,7 +129,7 @@
                                             </td>
                                         </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view books') == true}
+                                    {if $user->can('view books')}
                                         <tr>
                                             <td>View Book releases</td>
                                             <td>
@@ -137,7 +137,7 @@
                                             </td>
                                         </tr>
                                     {/if}
-                                    {if $user->role->hasPermissionTo('view other') == true}
+                                    {if $user->can('view other')}
                                         <tr>
                                             <td>View Other releases</td>
                                             <td>

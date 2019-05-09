@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBinaryblacklistTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -33,7 +32,6 @@ class CreateBinaryblacklistTable extends Migration
             DB::statement('ALTER SEQUENCE binaryblacklist_id_seq RESTART 1000000;');
         }
     }
-
 
     /**
      * Reverse the migrations.

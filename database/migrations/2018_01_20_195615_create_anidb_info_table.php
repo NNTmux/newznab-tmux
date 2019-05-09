@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateAnidbInfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -30,10 +29,9 @@ class CreateAnidbInfoTable extends Migration
             $table->string('picture')->nullable();
             $table->string('categories', 1024)->nullable();
             $table->string('characters', 1024)->nullable();
-            $table->index(['startdate','enddate','updated'], 'ix_anidb_info_datetime');
+            $table->index(['startdate', 'enddate', 'updated'], 'ix_anidb_info_datetime');
         });
     }
-
 
     /**
      * Reverse the migrations.

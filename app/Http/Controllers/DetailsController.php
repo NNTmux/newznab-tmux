@@ -58,7 +58,7 @@ class DetailsController extends BasePageController
             $reAudio = $re->getAudio($data['id']);
             $reSubs = $re->getSubs($data['id']);
             $comments = ReleaseComment::getComments($data['id']);
-            $similars = $releases->searchSimilar($data['id'], $data['searchname'], $this->userdata['categoryexclusions']);
+            $similars = $releases->searchSimilar($data['id'], $data['searchname'], $this->userdata->categoryexclusions);
             $failed = DnzbFailure::getFailedCount($data['id']);
             $downloadedBy = UserDownload::query()->with('user')->where('releases_id', $data['id'])->get(['users_id']);
 

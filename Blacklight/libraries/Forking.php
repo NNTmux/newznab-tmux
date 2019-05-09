@@ -5,11 +5,14 @@ namespace Blacklight\libraries;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
+use Spatie\Async\Pool;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Opis\Closure\SerializableClosure;
 use Blacklight\processing\PostProcess;
 
 /**
@@ -20,7 +23,7 @@ use Blacklight\processing\PostProcess;
  * For example, you get all the ID's of the active groups in the groups table, you then iterate over them and spawn
  * processes of misc/update_binaries.php passing the group ID's.
  */
-class Forking extends \fork_daemon
+class Forking
 {
     private const OUTPUT_NONE = 0; // Don't display child output.
     private const OUTPUT_REALTIME = 1; // Display child output in real time.
@@ -84,7 +87,6 @@ class Forking extends \fork_daemon
      * @var string
      */
     private $safeBackfillGroup = '';
-
     /**
      * @var int
      */
@@ -120,32 +122,12 @@ class Forking extends \fork_daemon
      */
     public function __construct()
     {
-        parent::__construct();
-
+        SerializableClosure::removeSecurityProvider();
         $this->colorCli = new ColorCLI();
 
-        $this->register_logging(
-            [0 => $this, 1 => 'logger'],
-            (\defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
-        );
+        $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
-        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
-            $this->max_work_per_child_set(NN_MULTIPROCESSING_MAX_CHILD_WORK);
-        } else {
-            $this->max_work_per_child_set(1);
-        }
-
-        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
-            $this->child_max_run_time_set(NN_MULTIPROCESSING_MAX_CHILD_TIME);
-        } else {
-            $this->child_max_run_time_set(1800);
-        }
-
-        // Use a single exit method for all children, makes things easier.
-        $this->register_parent_child_exit([0 => $this, 1 => 'childExit']);
-
-        if (\defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
-            switch (NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE) {
+        switch (config('nntmux.multiprocessing_child_output_type')) {
                 case 0:
                     $this->outputType = self::OUTPUT_NONE;
                     break;
@@ -158,11 +140,8 @@ class Forking extends \fork_daemon
                 default:
                     $this->outputType = self::OUTPUT_REALTIME;
             }
-        } else {
-            $this->outputType = self::OUTPUT_REALTIME;
-        }
 
-        $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run/switch.php "php  ';
+        $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -194,17 +173,14 @@ class Forking extends \fork_daemon
         // Get work to fork.
         $this->getWork();
 
-        // Process the work we got.
-        $this->processWork();
-
         // Process extra work that should not be forked and done after.
         $this->processEndWork();
 
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Multi-processing for '.$this->workType.' finished in '.(now()->timestamp - $startTime).
-                    ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
-                );
+                ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
+            );
         }
     }
 
@@ -222,25 +198,25 @@ class Forking extends \fork_daemon
      */
     private function getWork()
     {
-        $maxProcesses = 0;
+        $this->maxProcesses = 0;
 
         switch ($this->workType) {
 
             case 'backfill':
-                $maxProcesses = $this->backfillMainMethod();
+                $this->backfill();
                 break;
 
             case 'binaries':
-                $maxProcesses = $this->binariesMainMethod();
+                $this->binaries();
                 break;
 
             case 'fixRelNames_standard':
             case 'fixRelNames_predbft':
-                $maxProcesses = $this->fixRelNamesMainMethod();
+                $this->fixRelNames();
                 break;
 
             case 'releases':
-                $maxProcesses = $this->releasesMainMethod();
+                $this->releases();
                 break;
 
             case 'postProcess_ama':
@@ -248,16 +224,16 @@ class Forking extends \fork_daemon
                 break;
 
             case 'postProcess_add':
-                $maxProcesses = $this->postProcessAddMainMethod();
+                $this->postProcessAdd();
                 break;
 
             case 'postProcess_mov':
                 $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
-                $maxProcesses = $this->postProcessMovMainMethod();
+                $this->postProcessMov();
                 break;
 
             case 'postProcess_nfo':
-                $maxProcesses = $this->postProcessNfoMainMethod();
+                $this->postProcessNfo();
                 break;
 
             case 'postProcess_sha':
@@ -266,23 +242,21 @@ class Forking extends \fork_daemon
 
             case 'postProcess_tv':
                 $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
-                $maxProcesses = $this->postProcessTvMainMethod();
+                $this->postProcessTv();
                 break;
 
             case 'safe_backfill':
-                $maxProcesses = $this->safeBackfillMainMethod();
+                $this->safeBackfill();
                 break;
 
             case 'safe_binaries':
-                $maxProcesses = $this->safeBinariesMainMethod();
+                $this->safeBinaries();
                 break;
 
             case 'update_per_group':
-                $maxProcesses = $this->updatePerGroupMainMethod();
+                $this->updatePerGroup();
                 break;
         }
-
-        $this->setMaxProcesses($maxProcesses);
     }
 
     /**
@@ -291,32 +265,26 @@ class Forking extends \fork_daemon
     private function processWork()
     {
         $this->_workCount = \count($this->work);
-        if ($this->_workCount > 0) {
-            if (config('nntmux.echocli') === true) {
-                $this->colorCli->header(
-                    'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
-                        ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
-                    );
-            }
-
-            $this->addwork($this->work);
-            $this->process_work(true);
-        } elseif (config('nntmux.echocli') === true) {
+        if ($this->_workCount > 0 && config('nntmux.echocli') === true) {
+            $this->colorCli->header(
+                'Multi-processing started at '.now()->toRfc2822String().' for '.$this->workType.' with '.$this->_workCount.
+                ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
+            );
+        }
+        if (empty($this->_workCount) && config('nntmux.echocli') === true) {
             $this->colorCli->header('No work to do!');
         }
     }
 
     /**
-     * Process any work that does not need to be forked, but needs to run at the end.
+     * Process any work that does not need to be forked, but needs to run at the start.
      */
     private function processStartWork()
     {
         switch ($this->workType) {
             case 'safe_backfill':
             case 'safe_binaries':
-                $this->_executeCommand(
-                    PHP_BINARY.' '.NN_UPDATE.'tmux/bin/update_groups.php'
-                );
+                $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
                 break;
         }
     }
@@ -328,14 +296,13 @@ class Forking extends \fork_daemon
     {
         switch ($this->workType) {
             case 'releases':
-                $this->_executeCommand(
-                    $this->dnr_path.'releases  '.\count($this->work).'_"'
-                );
+
+                $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
+
                 break;
             case 'update_per_group':
-                $this->_executeCommand(
-                    $this->dnr_path.'releases  '.\count($this->work).'_"'
-                );
+                $this->_executeCommand($this->dnr_path.'releases  '.\count($this->work).'_"');
+
                 break;
         }
     }
@@ -344,13 +311,8 @@ class Forking extends \fork_daemon
     //////////////////////////////////////// All backFill code here ////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return int
-     * @throws \Exception
-     */
-    private function backfillMainMethod(): int
+    private function backfill()
     {
-        $this->register_child_run([0 => $this, 1 => 'backFillChildWorker']);
         // The option for backFill is for doing up to x articles. Else it's done by date.
         $this->work = DB::select(
             sprintf(
@@ -359,29 +321,24 @@ class Forking extends \fork_daemon
             )
         );
 
-        return (int) Settings::settingValue('..backfillthreads');
-    }
-
-    /**
-     * @param $groups
-     */
-    public function backFillChildWorker($groups)
-    {
-        foreach ($groups as $group) {
-            $this->_executeCommand(
-                PHP_BINARY.' '.NN_UPDATE.'backfill.php '.
-                $group->name.(isset($group->max) ? (' '.$group->max) : '')
-            );
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
+        $this->processWork();
+        $maxWork = \count($this->work);
+        foreach ($this->work as $group) {
+            $pool->add(function () use ($group) {
+                $this->_executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
+            })->then(function () use ($group, $maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Backfilled group '.$group->name);
+            })->catch(function (\Throwable $exception) {
+                // Handle exception
+            });
+            $maxWork--;
         }
+        $pool->wait();
     }
 
-    /**
-     * @return int
-     */
-    private function safeBackfillMainMethod(): int
+    private function safeBackfill()
     {
-        $this->register_child_run([0 => $this, 1 => 'safeBackfillChildWorker']);
-
         $backfill_qty = (int) Settings::settingValue('site.tmux.backfill_qty');
         $backfill_order = (int) Settings::settingValue('site.tmux.backfill_order');
         $backfill_days = (int) Settings::settingValue('site.tmux.backfill_days');
@@ -414,9 +371,9 @@ class Forking extends \fork_daemon
         $backfilldays = '';
         if ($backfill_days === 1) {
             $days = 'backfill_target';
-            $backfilldays = now()->subDays(Carbon::createFromDate($days));
+            $backfilldays = now()->diffInDays(Carbon::createFromDate($days));
         } elseif ($backfill_days === 2) {
-            $backfilldays = now()->subDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate'))->diffInDays())->format('Y-m-d');
+            $backfilldays = now()->diffInDays(Carbon::createFromFormat('Y-m-d', Settings::settingValue('..safebackfilldate')));
         }
 
         $data = DB::select(
@@ -430,7 +387,7 @@ class Forking extends \fork_daemon
 				WHERE g.first_record IS NOT NULL
 				AND g.first_record_postdate IS NOT NULL
 				AND g.backfill = 1
-				AND %s < g.first_record_postdate
+				AND (NOW() - INTERVAL %d DAY ) < g.first_record_postdate
 				GROUP BY a.name, a.last_record, g.name, g.first_record
 				%s LIMIT 1',
                 $backfilldays,
@@ -452,26 +409,24 @@ class Forking extends \fork_daemon
                 $geteach = $count / $maxmssgs;
             }
 
-            $queue = [];
+            $queues = [];
             for ($i = 0; $i <= $geteach - 1; $i++) {
-                $queue[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
+                $queues[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data[0]->name, $data[0]->our_first - $i * $maxmssgs - $maxmssgs, $data[0]->our_first - $i * $maxmssgs - 1, $i + 1);
             }
-            $this->work = $queue;
-        }
 
-        return $threads;
-    }
+            $pool = Pool::create()->concurrency($threads)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
-    /**
-     * @param        $ranges
-     * @param string $identifier
-     */
-    public function safeBackfillChildWorker($ranges, $identifier = '')
-    {
-        foreach ($ranges as $range) {
-            $this->_executeCommand(
-                $this->dnr_path.$range.'"'
-            );
+            $this->processWork();
+            foreach ($queues as $queue) {
+                $pool->add(function () use ($queue) {
+                    $this->_executeCommand($this->dnr_path.$queue.'"');
+                })->then(function () use ($data) {
+                    $this->colorCli->primary('Backfilled group '.$data[0]->name);
+                })->catch(function (\Throwable $exception) {
+                    // Handle exception
+                });
+            }
+            $pool->wait();
         }
     }
 
@@ -479,12 +434,8 @@ class Forking extends \fork_daemon
     //////////////////////////////////////// All binaries code here ////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return int
-     */
-    private function binariesMainMethod()
+    private function binaries()
     {
-        $this->register_child_run([0 => $this, 1 => 'binariesChildWorker']);
         $this->work = DB::select(
             sprintf(
                 'SELECT name, %d AS max FROM usenet_groups WHERE active = 1',
@@ -492,35 +443,37 @@ class Forking extends \fork_daemon
             )
         );
 
-        return (int) Settings::settingValue('..binarythreads');
-    }
+        $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
 
-    /**
-     * @param        $groups
-     * @param string $identifier
-     */
-    public function binariesChildWorker($groups, $identifier = '')
-    {
-        foreach ($groups as $group) {
-            $this->_executeCommand(
-                PHP_BINARY.' '.NN_UPDATE.'update_binaries.php '.$group->name.' '.$group->max
-            );
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
+
+        $maxWork = \count($this->work);
+
+        $this->processWork();
+        foreach ($this->work as $group) {
+            $pool->add(function () use ($group) {
+                $this->_executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
+            })->then(function () use ($group, $maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Updated group '.$group->name);
+            })->catch(function (\Throwable $exception) {
+                echo $exception->getMessage();
+            });
+            $maxWork--;
         }
+
+        $pool->wait();
     }
 
     /**
-     * @return int
      * @throws \Exception
      */
-    private function safeBinariesMainMethod()
+    private function safeBinaries()
     {
-        $this->register_child_run([0 => $this, 1 => 'safeBinariesChildWorker']);
-
         $maxheaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
         $maxmssgs = (int) Settings::settingValue('..maxmssgs');
-        $threads = (int) Settings::settingValue('..binarythreads');
+        $this->maxProcesses = (int) Settings::settingValue('..binarythreads');
 
-        $groups = DB::select(
+        $this->work = DB::select(
             '
 			SELECT g.name AS groupname, g.last_record AS our_last,
 				a.last_record AS their_last
@@ -529,53 +482,53 @@ class Forking extends \fork_daemon
 			ORDER BY a.last_record DESC'
         );
 
-        if (! empty($groups)) {
+        if (! empty($this->work)) {
             $i = 1;
-            $queue = [];
-            foreach ($groups as $group) {
+            $queues = [];
+            foreach ($this->work as $group) {
                 if ((int) $group->our_last === 0) {
-                    $queue[$i] = sprintf('update_group_headers  %s', $group->groupname);
+                    $queues[$i] = sprintf('update_group_headers  %s', $group->groupname);
                     $i++;
                 } else {
                     //only process if more than 20k headers available and skip the first 20k
                     $count = $group->their_last - $group->our_last - 20000;
                     //echo "count: " . $count . "maxmsgs x2: " . ($maxmssgs * 2) . PHP_EOL;
                     if ($count <= $maxmssgs * 2) {
-                        $queue[$i] = sprintf('update_group_headers  %s', $group->groupname);
+                        $queues[$i] = sprintf('update_group_headers  %s', $group->groupname);
                         $i++;
                     } else {
-                        $queue[$i] = sprintf('part_repair  %s', $group->groupname);
+                        $queues[$i] = sprintf('part_repair  %s', $group->groupname);
                         $i++;
                         $geteach = floor(min($count, $maxheaders) / $maxmssgs);
                         $remaining = min($count, $maxheaders) - $geteach * $maxmssgs;
                         //echo "maxmssgs: " . $maxmssgs . " geteach: " . $geteach . " remaining: " . $remaining . PHP_EOL;
                         for ($j = 0; $j < $geteach; $j++) {
-                            $queue[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + $j * $maxmssgs + 1, $group->our_last + $j * $maxmssgs + $maxmssgs, $i);
+                            $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + $j * $maxmssgs + 1, $group->our_last + $j * $maxmssgs + $maxmssgs, $i);
                             $i++;
                         }
                         //add remainder to queue
-                        $queue[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + ($j + 1) * $maxmssgs + 1, $group->our_last + ($j + 1) * $maxmssgs + $remaining + 1, $i);
+                        $queues[$i] = sprintf('get_range  binaries  %s  %s  %s  %s', $group->groupname, $group->our_last + ($j + 1) * $maxmssgs + 1, $group->our_last + ($j + 1) * $maxmssgs + $remaining + 1, $i);
                         $i++;
                     }
                 }
             }
-            //var_dump($queue);
-            $this->work = $queue;
-        }
+            $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
 
-        return $threads;
-    }
+            $this->processWork();
+            foreach ($queues as $queue) {
+                preg_match('/alt\..+/i', $queue, $match);
+                $pool->add(function () use ($queue) {
+                    $this->_executeCommand($this->dnr_path.$queue.'"');
+                })->then(function () use ($match) {
+                    if (! empty($match)) {
+                        $this->colorCli->primary('Updated group '.$match[0]);
+                    }
+                })->catch(function (\Throwable $exception) {
+                    // Handle exception
+                });
+            }
 
-    /**
-     * @param        $ranges
-     * @param string $identifier
-     */
-    public function safeBinariesChildWorker($ranges, $identifier = '')
-    {
-        foreach ($ranges as $range) {
-            $this->_executeCommand(
-                $this->dnr_path.$range.'"'
-            );
+            $pool->wait();
         }
     }
 
@@ -583,20 +536,15 @@ class Forking extends \fork_daemon
     //////////////////////////////////// All fix release names code here ///////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return int
-     */
-    private function fixRelNamesMainMethod()
+    private function fixRelNames()
     {
-        $this->register_child_run([0 => $this, 1 => 'fixRelNamesChildWorker']);
-
-        $threads = (int) Settings::settingValue('..fixnamethreads');
+        $this->maxProcesses = (int) Settings::settingValue('..fixnamethreads');
         $maxperrun = (int) Settings::settingValue('..fixnamesperrun');
 
-        if ($threads > 16) {
-            $threads = 16;
-        } elseif ($threads === 0) {
-            $threads = 1;
+        if ($this->maxProcesses > 16) {
+            $this->maxProcesses = 16;
+        } elseif ($this->maxProcesses === 0) {
+            $this->maxProcesses = 1;
         }
 
         $leftGuids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
@@ -622,68 +570,76 @@ class Forking extends \fork_daemon
         }
 
         $count = 0;
-        $queue = [];
+        $queues = [];
         foreach ($leftGuids as $leftGuid) {
             $count++;
             if ($maxperrun > 0) {
-                $queue[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftGuid, $maxperrun, $count);
+                $queues[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftGuid, $maxperrun, $count);
             }
         }
-        $this->work = $queue;
 
-        return $threads;
-    }
+        $this->work = $queues;
 
-    /**
-     * @param        $guids
-     * @param string $identifier
-     */
-    public function fixRelNamesChildWorker($guids, $identifier = '')
-    {
-        foreach ($guids as $guid) {
-            $this->_executeCommand(
-                PHP_BINARY.' '.NN_UPDATE.'tmux/bin/groupfixrelnames.php "'.$guid.'"'.' true'
-            );
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
+
+        $maxWork = \count($queues);
+
+        $this->processWork();
+        foreach ($this->work as $queue) {
+            $pool->add(function () use ($queue) {
+                $this->_executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'"'.' true');
+            })->then(function () use ($maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Finished fixing releases names');
+            })->catch(function (\Throwable $exception) {
+                // Handle exception
+            });
+            $maxWork--;
         }
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////// All releases code here ////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return int
-     */
-    private function releasesMainMethod()
+    private function releases()
     {
-        $this->register_child_run([0 => $this, 1 => 'releasesChildWorker']);
+        $work = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->maxProcesses = (int) Settings::settingValue('..releasethreads');
 
-        $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
-
-        foreach ($groups as $group) {
+        $uGroups = [];
+        foreach ($work as $group) {
             try {
-                if (! empty(DB::select(sprintf('SELECT id FROM collections LIMIT 1')))) {
-                    $this->work[] = ['id' => $group->id];
+                $query = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id));
+                if (! empty($query)) {
+                    $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
-                if (config('app.debug' === true)) {
+                if (config('app.debug') === true) {
                     Log::debug($e->getMessage());
                 }
             }
         }
 
-        return (int) Settings::settingValue('..releasethreads');
-    }
+        $maxWork = \count($uGroups);
 
-    /**
-     * @param        $groups
-     * @param string $identifier
-     */
-    public function releasesChildWorker($groups, $identifier = '')
-    {
-        foreach ($groups as $group) {
-            $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
+        $this->work = $uGroups;
+
+        $pool = Pool::create()->concurrency($this->maxProcesses)->timeout(config('nntmux.multiprocessing_max_child_time'));
+
+        $this->processWork();
+        foreach ($uGroups as $group) {
+            $pool->add(function () use ($group) {
+                $this->_executeCommand($this->dnr_path.'releases  '.$group['id'].'"');
+            })->then(function () use ($maxWork) {
+                $this->colorCli->primary('Task #'.$maxWork.' Finished performing release processing');
+            })->catch(function (\Throwable $exception) {
+                // Handle exception
+            });
+            $maxWork--;
         }
+
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -694,49 +650,59 @@ class Forking extends \fork_daemon
      * Only 1 exit method is used for post process, since they are all similar.
      *
      *
-     * @param array $groups
-     * @param string $identifier
+     * @param array $releases
+     * @param int   $maxProcess
      */
-    public function postProcessChildWorker($groups, $identifier = '')
+    public function postProcess($releases, $maxProcess)
     {
-        $type = '';
+        $type = $desc = '';
         if ($this->processAdditional) {
             $type = 'pp_additional  ';
+            $desc = 'additional postprocessing';
         } elseif ($this->processNFO) {
             $type = 'pp_nfo  ';
+            $desc = 'nfo postprocessing';
         } elseif ($this->processMovies) {
             $type = 'pp_movie  ';
+            $desc = 'movies postprocessing';
         } elseif ($this->processTV) {
             $type = 'pp_tv  ';
+            $desc = 'tv postprocessing';
         }
-        foreach ($groups as $group) {
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
+        $count = \count($releases);
+        $this->processWork();
+        foreach ($releases as $release) {
             if ($type !== '') {
-                $this->_executeCommand(
-                    $this->dnr_path.$type.$group->id.(isset($group->renamed) ? ('  '.$group->renamed) : '').'"'
-                );
+                $pool->add(function () use ($release, $type) {
+                    $this->_executeCommand($this->dnr_path.$type.$release->id.(isset($release->renamed) ? ('  '.$release->renamed) : '').'"');
+                })->then(function () use ($desc, $count) {
+                    $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
+                })->catch(function (\Throwable $exception) {
+                    // Handle exception
+                })->timeout(function () use ($count) {
+                    $this->colorCli->notice('Task #'.$count.': Timeout occurred.');
+                });
+                $count--;
             }
         }
+        $pool->wait();
     }
 
-    private $ppAddMinSize;
-    private $ppAddMaxSize;
-
     /**
-     * Check if we should process Additional's.
-     * @return bool
      * @throws \Exception
      */
-    private function checkProcessAdditional()
+    private function postProcessAdd()
     {
-        $this->ppAddMinSize =
-            Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
-        $this->ppAddMinSize = ($this->ppAddMinSize > 0 ? ('AND r.size > '.($this->ppAddMinSize * 1048576)) : '');
-        $this->ppAddMaxSize =
-            (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
-        $this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < '.($this->ppAddMaxSize * 1073741824)) : '');
-
-        return DB::select(sprintf('
-					SELECT r.id
+        $ppAddMinSize = Settings::settingValue('..minsizetopostprocess') !== '' ? (int) Settings::settingValue('..minsizetopostprocess') : 1;
+        $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
+        $ppAddMaxSize = (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
+        $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
+        $this->maxProcesses = 1;
+        $ppQueue = DB::select(
+            sprintf(
+                '
+					SELECT r.leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
@@ -744,41 +710,20 @@ class Forking extends \fork_daemon
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					LIMIT 1', NZB::NZB_ADDED, $this->ppAddMaxSize, $this->ppAddMinSize)) > 0;
-    }
-
-    /**
-     * @return int
-     * @throws \Exception
-     */
-    private function postProcessAddMainMethod()
-    {
-        $maxProcesses = 1;
-        if ($this->checkProcessAdditional()) {
-            $this->processAdditional = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = DB::select(
-                sprintf(
-                    '
-					SELECT leftguid AS id
-					FROM releases r
-					LEFT JOIN categories c ON c.id = r.categories_id
-					WHERE r.nzbstatus = %d
-					AND r.passwordstatus BETWEEN -6 AND -1
-					AND r.haspreview = -1
-					AND c.disablepreview = 0
-					%s %s
-					GROUP BY leftguid
+					GROUP BY r.leftguid
 					LIMIT 16',
-                    NZB::NZB_ADDED,
-                    $this->ppAddMaxSize,
-                    $this->ppAddMinSize
-                )
-            );
-            $maxProcesses = (int) Settings::settingValue('..postthreads');
+                NZB::NZB_ADDED,
+                $ppAddMaxSize,
+                $ppAddMinSize
+            )
+        );
+        if (\count($ppQueue) > 0) {
+            $this->processAdditional = true;
+            $this->work = $ppQueue;
+            $this->maxProcesses = (int) Settings::settingValue('..postthreads');
         }
 
-        return $maxProcesses;
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     private $nfoQueryString = '';
@@ -801,30 +746,28 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int
      * @throws \Exception
      */
-    private function postProcessNfoMainMethod(): int
+    private function postProcessNfo()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessNfo()) {
             $this->processNFO = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
                 sprintf(
                     '
-					SELECT leftguid AS id
+					SELECT r.leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
-					GROUP BY leftguid
+					GROUP BY r.leftguid
 					LIMIT 16',
                     $this->nfoQueryString
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..nfothreads');
+            $this->maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
 
-        return $maxProcesses;
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     /**
@@ -848,15 +791,13 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int
      * @throws \Exception
      */
-    private function postProcessMovMainMethod(): int
+    private function postProcessMov()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessMovies()) {
             $this->processMovies = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
                 sprintf(
                     '
@@ -874,10 +815,10 @@ class Forking extends \fork_daemon
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..postthreadsnon');
+            $this->maxProcesses = (int) Settings::settingValue('..postthreadsnon');
         }
 
-        return $maxProcesses;
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     /**
@@ -903,15 +844,13 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int
      * @throws \Exception
      */
-    private function postProcessTvMainMethod()
+    private function postProcessTv()
     {
-        $maxProcesses = 1;
+        $this->maxProcesses = 1;
         if ($this->checkProcessTV()) {
             $this->processTV = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = DB::select(
                 sprintf(
                     '
@@ -930,10 +869,10 @@ class Forking extends \fork_daemon
                     ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..postthreadsnon');
+            $this->maxProcesses = (int) Settings::settingValue('..postthreadsnon');
         }
 
-        return $maxProcesses;
+        $this->postProcess($this->work, $this->maxProcesses);
     }
 
     /**
@@ -972,44 +911,33 @@ class Forking extends \fork_daemon
         $postProcess->processXXX();
     }
 
-    /**
-     * @param        $groups
-     * @param string $identifier
-     */
-    public function requestIDChildWorker($groups, $identifier = '')
-    {
-        foreach ($groups as $group) {
-            $this->_executeCommand($this->dnr_path.'requestid  '.$group['id'].'"');
-        }
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////// All "update_per_Group" code goes here ////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @return int
      * @throws \Exception
      */
-    private function updatePerGroupMainMethod()
+    private function updatePerGroup()
     {
-        $this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
-        $this->work = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $this->work = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
 
-        return (int) Settings::settingValue('..releasethreads');
-    }
+        $maxProcess = (int) Settings::settingValue('..releasethreads');
 
-    /**
-     * @param        $groups
-     * @param string $identifier
-     */
-    public function updatePerGroupChildWorker($groups, $identifier = '')
-    {
-        foreach ($groups as $group) {
-            $this->_executeCommand(
-                $this->dnr_path.'update_per_group  '.$group->id.'"'
-            );
+        $pool = Pool::create()->concurrency($maxProcess)->timeout(config('nntmux.multiprocessing_max_child_time'));
+        $this->processWork();
+        foreach ($this->work as $group) {
+            $pool->add(function () use ($group) {
+                $this->_executeCommand($this->dnr_path.'update_per_group  '.$group->id.'"');
+            })->then(function () use ($group) {
+                $name = UsenetGroup::getNameByID($group->id);
+                $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
+            })->catch(function (\Throwable $exception) {
+                // Handle exception
+            });
         }
+
+        $pool->wait();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1017,7 +945,7 @@ class Forking extends \fork_daemon
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Execute a shell command, use the appropriate PHP function based on user setting.
+     * Execute a shell command.
      *
      * @param string $command
      */
@@ -1037,35 +965,6 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * Set the amount of max child processes.
-     *
-     * @param int $maxProcesses
-     */
-    private function setMaxProcesses($maxProcesses)
-    {
-        // Check if override setting is on.
-        if (\defined('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE') && NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE > 0) {
-            $maxProcesses = NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE;
-        }
-
-        if (is_numeric($maxProcesses) && $maxProcesses > 0) {
-            switch ($this->workType) {
-                case 'postProcess_tv':
-                case 'postProcess_mov':
-                case 'postProcess_nfo':
-                case 'postProcess_add':
-                    if ($maxProcesses > 16) {
-                        $maxProcesses = 16;
-                    }
-            }
-            $this->maxProcesses = (int) $maxProcesses;
-            $this->max_children_set($this->maxProcesses);
-        } else {
-            $this->max_children_set(1);
-        }
-    }
-
-    /**
      * Echo a message to CLI.
      *
      * @param string $message
@@ -1081,17 +980,16 @@ class Forking extends \fork_daemon
      * This method is executed whenever a child is finished doing work.
      *
      * @param string $pid        The PID numbers.
-     * @param string $identifier Optional identifier to give a PID a name.
      */
-    public function childExit($pid, $identifier = '')
+    public function exit($pid)
     {
         if (config('nntmux.echocli')) {
             $this->colorCli->header(
                 'Process ID #'.$pid.' has completed.'.PHP_EOL.
-                    'There are '.($this->forked_children_count - 1).' process(es) still active with '.
-                    (--$this->_workCount).' job(s) left in the queue.',
+                'There are '.($this->maxProcesses - 1).' process(es) still active with '.
+                (--$this->_workCount).' job(s) left in the queue.',
                 true
-                );
+            );
         }
     }
 }

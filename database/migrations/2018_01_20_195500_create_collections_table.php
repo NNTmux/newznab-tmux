@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateCollectionsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -34,7 +33,6 @@ class CreateCollectionsTable extends Migration
             $table->char('noise', 32)->default('');
         });
     }
-
 
     /**
      * Reverse the migrations.

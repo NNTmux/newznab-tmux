@@ -54,7 +54,7 @@ class Git extends GitRepository
         $options += $defaults;
 
         parent::__construct($options['filepath']);
-        $this->branch = parent::getCurrentBranchName();
+        $this->branch = $this->getCurrentBranchName();
     }
 
     /**
