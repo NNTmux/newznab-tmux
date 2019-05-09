@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.4 (2019-04-23)
+ * Version: 5.0.5 (2019-05-09)
  */
 (function () {
 var mobile = (function (domGlobals) {
@@ -1865,9 +1865,15 @@ var mobile = (function (domGlobals) {
         toOption: Option.none
       };
     };
+    var fromOption = function (opt, err) {
+      return opt.fold(function () {
+        return error(err);
+      }, value$1);
+    };
     var Result = {
       value: value$1,
-      error: error
+      error: error,
+      fromOption: fromOption
     };
 
     var generate = function (cases) {
@@ -7356,60 +7362,19 @@ var mobile = (function (domGlobals) {
         record: record
     });
 
-    function create$3(width, height) {
-      return resize(domGlobals.document.createElement('canvas'), width, height);
+    function FileReader () {
+      var f = Global$1.getOrDie('FileReader');
+      return new f();
     }
-    function clone$2(canvas) {
-      var tCanvas, ctx;
-      tCanvas = create$3(canvas.width, canvas.height);
-      ctx = get2dContext(tCanvas);
-      ctx.drawImage(canvas, 0, 0);
-      return tCanvas;
-    }
-    function get2dContext(canvas) {
-      return canvas.getContext('2d');
-    }
-    function get3dContext(canvas) {
-      var gl = null;
-      try {
-        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      } catch (e) {
-      }
-      if (!gl) {
-        gl = null;
-      }
-      return gl;
-    }
-    function resize(canvas, width, height) {
-      canvas.width = width;
-      canvas.height = height;
-      return canvas;
-    }
-    var Canvas = {
-      create: create$3,
-      clone: clone$2,
-      resize: resize,
-      get2dContext: get2dContext,
-      get3dContext: get3dContext
-    };
-
-    function getWidth(image) {
-      return image.naturalWidth || image.width;
-    }
-    function getHeight(image) {
-      return image.naturalHeight || image.height;
-    }
-    var ImageSize = {
-      getWidth: getWidth,
-      getHeight: getHeight
-    };
 
     var promise = function () {
       var Promise = function (fn) {
-        if (typeof this !== 'object')
+        if (typeof this !== 'object') {
           throw new TypeError('Promises must be constructed via new');
-        if (typeof fn !== 'function')
+        }
+        if (typeof fn !== 'function') {
           throw new TypeError('not a function');
+        }
         this._state = null;
         this._value = null;
         this._deferreds = [];
@@ -7420,7 +7385,7 @@ var mobile = (function (domGlobals) {
       };
       function bind(fn, thisArg) {
         return function () {
-          fn.apply(thisArg, arguments);
+          return fn.apply(thisArg, arguments);
         };
       }
       var isArray = Array.isArray || function (value) {
@@ -7450,8 +7415,9 @@ var mobile = (function (domGlobals) {
       }
       function resolve(newValue) {
         try {
-          if (newValue === this)
+          if (newValue === this) {
             throw new TypeError('A promise cannot be resolved with itself.');
+          }
           if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
             var then = newValue.then;
             if (typeof then === 'function') {
@@ -7472,10 +7438,11 @@ var mobile = (function (domGlobals) {
         finale.call(this);
       }
       function finale() {
-        for (var i = 0, len = this._deferreds.length; i < len; i++) {
-          handle.call(this, this._deferreds[i]);
+        for (var _i = 0, _a = this._deferreds; _i < _a.length; _i++) {
+          var deferred = _a[_i];
+          handle.call(this, deferred);
         }
-        this._deferreds = null;
+        this._deferreds = [];
       }
       function Handler(onFulfilled, onRejected, resolve, reject) {
         this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
@@ -7487,24 +7454,27 @@ var mobile = (function (domGlobals) {
         var done = false;
         try {
           fn(function (value) {
-            if (done)
+            if (done) {
               return;
+            }
             done = true;
             onFulfilled(value);
           }, function (reason) {
-            if (done)
+            if (done) {
               return;
+            }
             done = true;
             onRejected(reason);
           });
         } catch (ex) {
-          if (done)
+          if (done) {
             return;
+          }
           done = true;
           onRejected(ex);
         }
       }
-      Promise.prototype['catch'] = function (onRejected) {
+      Promise.prototype.catch = function (onRejected) {
         return this.then(null, onRejected);
       };
       Promise.prototype.then = function (onFulfilled, onRejected) {
@@ -7514,10 +7484,15 @@ var mobile = (function (domGlobals) {
         });
       };
       Promise.all = function () {
-        var args = Array.prototype.slice.call(arguments.length === 1 && isArray(arguments[0]) ? arguments[0] : arguments);
+        var values = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          values[_i] = arguments[_i];
+        }
+        var args = Array.prototype.slice.call(values.length === 1 && isArray(values[0]) ? values[0] : values);
         return new Promise(function (resolve, reject) {
-          if (args.length === 0)
+          if (args.length === 0) {
             return resolve([]);
+          }
           var remaining = args.length;
           function res(i, val) {
             try {
@@ -7551,15 +7526,16 @@ var mobile = (function (domGlobals) {
           resolve(value);
         });
       };
-      Promise.reject = function (value) {
+      Promise.reject = function (reason) {
         return new Promise(function (resolve, reject) {
-          reject(value);
+          reject(reason);
         });
       };
       Promise.race = function (values) {
         return new Promise(function (resolve, reject) {
-          for (var i = 0, len = values.length; i < len; i++) {
-            values[i].then(resolve, reject);
+          for (var _i = 0, values_1 = values; _i < values_1.length; _i++) {
+            var value = values_1[_i];
+            value.then(resolve, reject);
           }
         });
       };
@@ -7567,158 +7543,6 @@ var mobile = (function (domGlobals) {
     };
     var Promise$1 = window.Promise ? window.Promise : promise();
 
-    function Blob (parts, properties) {
-      var f = Global$1.getOrDie('Blob');
-      return new f(parts, properties);
-    }
-
-    function FileReader () {
-      var f = Global$1.getOrDie('FileReader');
-      return new f();
-    }
-
-    function Uint8Array (arr) {
-      var f = Global$1.getOrDie('Uint8Array');
-      return new f(arr);
-    }
-
-    var requestAnimationFrame = function (callback) {
-      var f = Global$1.getOrDie('requestAnimationFrame');
-      f(callback);
-    };
-    var atob = function (base64) {
-      var f = Global$1.getOrDie('atob');
-      return f(base64);
-    };
-    var Window = {
-      atob: atob,
-      requestAnimationFrame: requestAnimationFrame
-    };
-
-    function imageToBlob(image) {
-      var src = image.src;
-      if (src.indexOf('data:') === 0) {
-        return dataUriToBlob(src);
-      }
-      return anyUriToBlob(src);
-    }
-    function blobToImage(blob) {
-      return new Promise$1(function (resolve, reject) {
-        var blobUrl = domGlobals.URL.createObjectURL(blob);
-        var image = new domGlobals.Image();
-        var removeListeners = function () {
-          image.removeEventListener('load', loaded);
-          image.removeEventListener('error', error);
-        };
-        function loaded() {
-          removeListeners();
-          resolve(image);
-        }
-        function error() {
-          removeListeners();
-          reject('Unable to load data of type ' + blob.type + ': ' + blobUrl);
-        }
-        image.addEventListener('load', loaded);
-        image.addEventListener('error', error);
-        image.src = blobUrl;
-        if (image.complete) {
-          loaded();
-        }
-      });
-    }
-    function anyUriToBlob(url) {
-      return new Promise$1(function (resolve, reject) {
-        var xhr = new domGlobals.XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'blob';
-        xhr.onload = function () {
-          if (this.status == 200) {
-            resolve(this.response);
-          }
-        };
-        xhr.onerror = function () {
-          var _this = this;
-          var corsError = function () {
-            var obj = new Error('No access to download image');
-            obj.code = 18;
-            obj.name = 'SecurityError';
-            return obj;
-          };
-          var genericError = function () {
-            return new Error('Error ' + _this.status + ' downloading image');
-          };
-          reject(this.status === 0 ? corsError() : genericError());
-        };
-        xhr.send();
-      });
-    }
-    function dataUriToBlobSync(uri) {
-      var data = uri.split(',');
-      var matches = /data:([^;]+)/.exec(data[0]);
-      if (!matches)
-        return Option.none();
-      var mimetype = matches[1];
-      var base64 = data[1];
-      var sliceSize = 1024;
-      var byteCharacters = Window.atob(base64);
-      var bytesLength = byteCharacters.length;
-      var slicesCount = Math.ceil(bytesLength / sliceSize);
-      var byteArrays = new Array(slicesCount);
-      for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-        var begin = sliceIndex * sliceSize;
-        var end = Math.min(begin + sliceSize, bytesLength);
-        var bytes = new Array(end - begin);
-        for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
-          bytes[i] = byteCharacters[offset].charCodeAt(0);
-        }
-        byteArrays[sliceIndex] = Uint8Array(bytes);
-      }
-      return Option.some(Blob(byteArrays, { type: mimetype }));
-    }
-    function dataUriToBlob(uri) {
-      return new Promise$1(function (resolve, reject) {
-        dataUriToBlobSync(uri).fold(function () {
-          reject('uri is not base64: ' + uri);
-        }, resolve);
-      });
-    }
-    function uriToBlob(url) {
-      if (url.indexOf('blob:') === 0) {
-        return anyUriToBlob(url);
-      }
-      if (url.indexOf('data:') === 0) {
-        return dataUriToBlob(url);
-      }
-      return null;
-    }
-    function canvasToBlob(canvas, type, quality) {
-      type = type || 'image/png';
-      if (domGlobals.HTMLCanvasElement.prototype.toBlob) {
-        return new Promise$1(function (resolve) {
-          canvas.toBlob(function (blob) {
-            resolve(blob);
-          }, type, quality);
-        });
-      } else {
-        return dataUriToBlob(canvas.toDataURL(type, quality));
-      }
-    }
-    function canvasToDataURL(getCanvas, type, quality) {
-      type = type || 'image/png';
-      return getCanvas.then(function (canvas) {
-        return canvas.toDataURL(type, quality);
-      });
-    }
-    function blobToCanvas(blob) {
-      return blobToImage(blob).then(function (image) {
-        revokeImageUrl(image);
-        var context, canvas;
-        canvas = Canvas.create(ImageSize.getWidth(image), ImageSize.getHeight(image));
-        context = Canvas.get2dContext(canvas);
-        context.drawImage(image, 0, 0);
-        return canvas;
-      });
-    }
     function blobToDataUri(blob) {
       return new Promise$1(function (resolve) {
         var reader = FileReader();
@@ -7728,65 +7552,18 @@ var mobile = (function (domGlobals) {
         reader.readAsDataURL(blob);
       });
     }
-    function blobToArrayBuffer(blob) {
-      return new Promise$1(function (resolve) {
-        var reader = FileReader();
-        reader.onloadend = function () {
-          resolve(reader.result);
-        };
-        reader.readAsArrayBuffer(blob);
-      });
-    }
     function blobToBase64(blob) {
       return blobToDataUri(blob).then(function (dataUri) {
         return dataUri.split(',')[1];
       });
     }
-    function revokeImageUrl(image) {
-      domGlobals.URL.revokeObjectURL(image.src);
-    }
-    var Conversions = {
-      blobToImage: blobToImage,
-      imageToBlob: imageToBlob,
-      blobToArrayBuffer: blobToArrayBuffer,
-      blobToDataUri: blobToDataUri,
-      blobToBase64: blobToBase64,
-      dataUriToBlobSync: dataUriToBlobSync,
-      canvasToBlob: canvasToBlob,
-      canvasToDataURL: canvasToDataURL,
-      blobToCanvas: blobToCanvas,
-      uriToBlob: uriToBlob
-    };
 
-    var blobToImage$1 = function (image) {
-      return Conversions.blobToImage(image);
-    };
-    var imageToBlob$1 = function (blob) {
-      return Conversions.imageToBlob(blob);
-    };
-    var blobToDataUri$1 = function (blob) {
-      return Conversions.blobToDataUri(blob);
-    };
     var blobToBase64$1 = function (blob) {
-      return Conversions.blobToBase64(blob);
-    };
-    var dataUriToBlobSync$1 = function (uri) {
-      return Conversions.dataUriToBlobSync(uri);
-    };
-    var uriToBlob$1 = function (uri) {
-      return Option.from(Conversions.uriToBlob(uri));
-    };
-    var BlobConversions = {
-      blobToImage: blobToImage$1,
-      imageToBlob: imageToBlob$1,
-      blobToDataUri: blobToDataUri$1,
-      blobToBase64: blobToBase64$1,
-      dataUriToBlobSync: dataUriToBlobSync$1,
-      uriToBlob: uriToBlob$1
+      return blobToBase64(blob);
     };
 
     var addImage = function (editor, blob) {
-      BlobConversions.blobToBase64(blob).then(function (base64) {
+      blobToBase64$1(blob).then(function (base64) {
         editor.undoManager.transact(function () {
           var cache = editor.editorUpload.blobCache;
           var info = cache.create(generate$1('mceu'), blob, base64);
@@ -11895,7 +11672,7 @@ var mobile = (function (domGlobals) {
     };
     var MetaViewport = { tag: tag };
 
-    var create$4 = function (platform, mask) {
+    var create$3 = function (platform, mask) {
       var meta = MetaViewport.tag();
       var androidApi = api$2();
       var androidEvents = api$2();
@@ -11926,7 +11703,7 @@ var mobile = (function (domGlobals) {
         exit: exit
       };
     };
-    var AndroidMode = { create: create$4 };
+    var AndroidMode = { create: create$3 };
 
     var adaptable = function (fn, rate) {
       var timer = null;
@@ -13562,7 +13339,7 @@ var mobile = (function (domGlobals) {
         return Option.some(value - amount);
       }
     };
-    var create$5 = function () {
+    var create$4 = function () {
       var interval = null;
       var animate = function (getCurrent, destination, amount, increment, doFinish, rate) {
         var finished = false;
@@ -13595,7 +13372,7 @@ var mobile = (function (domGlobals) {
       return { animate: animate };
     };
     var SmoothAnimation = {
-      create: create$5,
+      create: create$4,
       adjust: adjust
     };
 
@@ -14126,7 +13903,7 @@ var mobile = (function (domGlobals) {
     };
     var IosSetup = { setup: setup$3 };
 
-    var create$6 = function (platform, mask) {
+    var create$5 = function (platform, mask) {
       var meta = MetaViewport.tag();
       var priorState = value$3();
       var scrollEvents = value$3();
@@ -14227,7 +14004,7 @@ var mobile = (function (domGlobals) {
         exit: exit
       };
     };
-    var IosMode = { create: create$6 };
+    var IosMode = { create: create$5 };
 
     var produce$1 = function (raw) {
       var mobile = asRawOrDie('Getting IosWebapp schema', MobileSchema, raw);
