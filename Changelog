@@ -1,3 +1,5 @@
+2019-05-10 DariusIII
+	* Chg: Update getBrowseRange query, it should add back missing group name on release browse pages
 2019-05-09 DariusIII
 	* Chg: Update fontawesome and tinyMCE to latest versions
 	* Fix: Fix browse queries and add back missing jpgstatus column select (should fix missing sample button on browse pages)
