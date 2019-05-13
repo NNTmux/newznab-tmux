@@ -3263,16 +3263,16 @@
         },
         {
             "name": "league/fractal",
-            "version": "0.17.0",
+            "version": "0.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/fractal.git",
-                "reference": "a0b350824f22fc2fdde2500ce9d6851a3f275b0e"
+                "reference": "4e553dae1a9402adbe11c81430a64675dc97b4fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/fractal/zipball/a0b350824f22fc2fdde2500ce9d6851a3f275b0e",
-                "reference": "a0b350824f22fc2fdde2500ce9d6851a3f275b0e",
+                "url": "https://api.github.com/repos/thephpleague/fractal/zipball/4e553dae1a9402adbe11c81430a64675dc97b4fc",
+                "reference": "4e553dae1a9402adbe11c81430a64675dc97b4fc",
                 "shasum": ""
             },
             "require": {
@@ -3283,7 +3283,7 @@
                 "illuminate/contracts": "~5.0",
                 "mockery/mockery": "~0.9",
                 "pagerfanta/pagerfanta": "~1.0.0",
-                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit": "^4.8.35 || ^7.5",
                 "squizlabs/php_codesniffer": "~1.5",
                 "zendframework/zend-paginator": "~2.3"
             },
@@ -3323,7 +3323,7 @@
                 "league",
                 "rest"
             ],
-            "time": "2017-06-12T11:04:56+00:00"
+            "time": "2019-05-10T02:16:43+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -5710,20 +5710,20 @@
         },
         {
             "name": "spatie/fractalistic",
-            "version": "2.7.2",
+            "version": "2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/fractalistic.git",
-                "reference": "5b5710b748beb2c1d5c272f4d3598d44b5b59fc9"
+                "reference": "9d29952f4552d6fc117e1f44f89d8dfdd36c393d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/5b5710b748beb2c1d5c272f4d3598d44b5b59fc9",
-                "reference": "5b5710b748beb2c1d5c272f4d3598d44b5b59fc9",
+                "url": "https://api.github.com/repos/spatie/fractalistic/zipball/9d29952f4552d6fc117e1f44f89d8dfdd36c393d",
+                "reference": "9d29952f4552d6fc117e1f44f89d8dfdd36c393d",
                 "shasum": ""
             },
             "require": {
-                "league/fractal": "^0.17.0",
+                "league/fractal": "^0.18.0",
                 "php": "^7.0"
             },
             "require-dev": {
@@ -5757,7 +5757,7 @@
                 "spatie",
                 "transform"
             ],
-            "time": "2018-10-08T09:18:33+00:00"
+            "time": "2019-05-13T07:08:06+00:00"
         },
         {
             "name": "spatie/laravel-directory-cleanup",
@@ -10316,16 +10316,16 @@
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v3.8.2",
+            "version": "v3.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "598caa6f7813b8a29b2f1b69912b40659dcef79b"
+                "reference": "b8f827ace31a15d5343301daf8eb6ce2db00726b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/598caa6f7813b8a29b2f1b69912b40659dcef79b",
-                "reference": "598caa6f7813b8a29b2f1b69912b40659dcef79b",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/b8f827ace31a15d5343301daf8eb6ce2db00726b",
+                "reference": "b8f827ace31a15d5343301daf8eb6ce2db00726b",
                 "shasum": ""
             },
             "require": {
@@ -10339,7 +10339,7 @@
                 "phpunit/phpunit": "^7.5 || ^8.0"
             },
             "suggest": {
-                "laravel/framework": "Required for testing (~5.8.3).",
+                "laravel/framework": "Required for testing (~5.8.15).",
                 "mockery/mockery": "Allow to use Mockery for testing (^1.0).",
                 "orchestra/testbench-browser-kit": "Allow to use legacy Laravel BrowserKit for testing (^3.8).",
                 "orchestra/testbench-dusk": "Allow to use Laravel Dusk for testing (^3.8).",
@@ -10377,7 +10377,7 @@
                 "orchestral",
                 "testing"
             ],
-            "time": "2019-04-10T12:50:29+00:00"
+            "time": "2019-05-13T02:02:41+00:00"
         },
         {
             "name": "phar-io/manifest",
