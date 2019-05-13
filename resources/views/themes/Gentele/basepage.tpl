@@ -129,6 +129,10 @@
 									<span class="fa fa-searchengin"></span>
 									<span class="menu-collapsed">Search</span>
 								</a>
+                                <a href="{$smarty.const.WWW_TOP}/search?search_type=adv" class="list-group-item list-group-item-action bg-dark text-white">
+                                    <span class="fa fa-searchengin"></span>
+                                    <span class="menu-collapsed">Advanced Search</span>
+                                </a>
 								<a href="{$smarty.const.WWW_TOP}/rsshelp" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-rss-square"></span>
 									<span class="menu-collapsed">RSS Feeds</span>
