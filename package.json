@@ -15,9 +15,10 @@
         "cross-env": "^5.2.0",
         "jquery": "^3.4",
         "laravel-mix": "^4.0.15",
+        "laravel-mix-purgecss": "^4.1.0",
         "lodash": "^4.17.11",
         "popper.js": "^1.15.0",
-        "prettier": "^1.17.0",
+        "prettier": "^1.17.1",
         "vue": "^2.6.10"
     },
     "dependencies": {
