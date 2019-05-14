@@ -1,4 +1,5 @@
 2019-05-14 DariusIII
+	* Chg: Remove unused basePage() function from BasePageController
 	* Chg: Update phpunit/phpunit (7.5.10 => 7.5.11)
 2019-05-13 DariusIII
 	* Chg: Add link to advanced search to Articles & links menu
