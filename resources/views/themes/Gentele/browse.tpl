@@ -10,7 +10,7 @@
 	</div>
 </div>
 {$site->adbrowse}
-{if $results|@count > 0}
+{if count($results) > 0}
 	{{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 		<div class="box-body">
 			<div class="row">
@@ -69,11 +69,9 @@
 										</div>
 									</div>
 								</div>
-								{if    count($results) > 0}
-									<div class="col-md-8">
-										{$results->onEachSide(5)->links()}
-									</div>
-								{/if}
+                                <div class="col-md-8">
+                                    {$results->onEachSide(5)->links()}
+                                </div>
 							</div>
 							<hr>
 							<div class="container">
@@ -232,11 +230,9 @@
 										</div>
 									</div>
 								</div>
-								{if    count($results) > 0}
 									<div class="col-md-8">
 										{$results->onEachSide(5)->links()}
 									</div>
-								{/if}
 							</div>
 						</div>
 					</div>
@@ -244,4 +240,6 @@
 			</div>
 		</div>
 	{{Form::close()}}
+{else}
+    No releases indexed yet!
 {/if}

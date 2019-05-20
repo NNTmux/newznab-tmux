@@ -1,4 +1,5 @@
 2019-05-20 DariusIII
+	* Fix: Fix browse pages when no releases are indexed yet
 	* Chg: Update voku/simple_html_dom (4.3.3 => 4.5.2)
 2019-05-19 DariusIII
 	* Chg: Update spatie/async (1.0.1 => 1.0.2)
