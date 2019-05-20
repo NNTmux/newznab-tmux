@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01c8d8d9e9cd296f54ff730a8ef5c66f",
+    "content-hash": "46eb2f153f0d38d979dfec67f0802940",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -7849,16 +7849,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.3.3",
+            "version": "4.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7"
+                "reference": "156e9e425357095bf95402fa95f9452a2d584868"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/3084547002a84268033f2a1d1414c8cde0c388d7",
-                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/156e9e425357095bf95402fa95f9452a2d584868",
+                "reference": "156e9e425357095bf95402fa95f9452a2d584868",
                 "shasum": ""
             },
             "require": {
@@ -7904,7 +7904,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-03-04T08:10:15+00:00"
+            "time": "2019-04-29T19:49:02+00:00"
         },
         {
             "name": "wandersonwhcr/illuminate-romans",

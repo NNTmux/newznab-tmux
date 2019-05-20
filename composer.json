@@ -147,7 +147,7 @@
     "spatie/laravel-permission": "^2.12",
     "tunaabutbul/cloudflare-middleware": "^1.2",
     "vlucas/phpdotenv": "^3.3",
-    "voku/simple_html_dom": "4.3.*",
+    "voku/simple_html_dom": "^4.3",
     "wandersonwhcr/illuminate-romans": "^1.0",
     "watson/rememberable": "^2.0",
     "wildbit/swiftmailer-postmark": "^3.0",
