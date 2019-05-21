@@ -1,3 +1,5 @@
+2019-05-21 DariusIII
+	* Chg: Update laravel/framework (v5.8.17 => v5.8.18)
 2019-05-20 DariusIII
 	* Chg: Update voku/simple_html_dom (4.5.2 => 4.5.3)
 	* Fix: Fix browse pages when no releases are indexed yet
