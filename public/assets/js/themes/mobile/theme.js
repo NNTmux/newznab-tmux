@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.6 (2019-05-22)
  */
 (function () {
 var mobile = (function (domGlobals) {
@@ -11887,6 +11887,7 @@ var mobile = (function (domGlobals) {
     var AndroidWebapp = { produce: produce };
 
     var schema$e = constant([
+      strict$1('dom'),
       defaulted$1('shell', true),
       field$1('toolbarBehaviours', [Replacing])
     ]);

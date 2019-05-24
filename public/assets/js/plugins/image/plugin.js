@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.6 (2019-05-22)
  */
 (function () {
 var image = (function (domGlobals) {
@@ -181,7 +181,6 @@ var image = (function (domGlobals) {
     var isString = isType('string');
     var isObject = isType('object');
     var isFunction = isType('function');
-    var isNumber = isType('number');
 
     var each = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
@@ -698,54 +697,56 @@ var image = (function (domGlobals) {
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+    var global$2 = tinymce.util.Tools.resolve('tinymce.util.XHR');
 
     var hasDimensions = function (editor) {
-      return editor.settings.image_dimensions === false ? false : true;
+      return editor.getParam('image_dimensions', true, 'boolean');
     };
     var hasAdvTab = function (editor) {
-      return editor.settings.image_advtab === true ? true : false;
+      return editor.getParam('image_advtab', false, 'boolean');
+    };
+    var hasUploadTab = function (editor) {
+      return editor.getParam('image_uploadtab', true, 'boolean');
     };
     var getPrependUrl = function (editor) {
-      return editor.getParam('image_prepend_url', '');
+      return editor.getParam('image_prepend_url', '', 'string');
     };
     var getClassList = function (editor) {
       return editor.getParam('image_class_list');
     };
     var hasDescription = function (editor) {
-      return editor.settings.image_description === false ? false : true;
+      return editor.getParam('image_description', true, 'boolean');
     };
     var hasImageTitle = function (editor) {
-      return editor.settings.image_title === true ? true : false;
+      return editor.getParam('image_title', false, 'boolean');
     };
     var hasImageCaption = function (editor) {
-      return editor.settings.image_caption === true ? true : false;
+      return editor.getParam('image_caption', false, 'boolean');
     };
     var getImageList = function (editor) {
       return editor.getParam('image_list', false);
     };
     var hasUploadUrl = function (editor) {
-      return !!editor.getParam('images_upload_url', false);
+      return !!getUploadUrl(editor);
     };
     var hasUploadHandler = function (editor) {
-      return !!editor.getParam('images_upload_handler', false);
+      return !!getUploadHandler(editor);
     };
     var getUploadUrl = function (editor) {
-      return editor.getParam('images_upload_url');
+      return editor.getParam('images_upload_url', '', 'string');
     };
     var getUploadHandler = function (editor) {
-      return editor.getParam('images_upload_handler');
+      return editor.getParam('images_upload_handler', undefined, 'function');
     };
     var getUploadBasePath = function (editor) {
-      return editor.getParam('images_upload_base_path');
+      return editor.getParam('images_upload_base_path', undefined, 'string');
     };
     var getUploadCredentials = function (editor) {
-      return editor.getParam('images_upload_credentials');
+      return editor.getParam('images_upload_credentials', false, 'boolean');
     };
     var Settings = {
       hasDimensions: hasDimensions,
+      hasUploadTab: hasUploadTab,
       hasAdvTab: hasAdvTab,
       getPrependUrl: getPrependUrl,
       getClassList: getClassList,
@@ -766,12 +767,12 @@ var image = (function (domGlobals) {
     };
     var getImageSize = function (url, callback) {
       var img = domGlobals.document.createElement('img');
-      function done(dimensions) {
+      var done = function (dimensions) {
         if (img.parentNode) {
           img.parentNode.removeChild(img);
         }
         callback(dimensions);
-      }
+      };
       img.onload = function () {
         var width = parseIntAndGetMax(img.width, img.clientWidth);
         var height = parseIntAndGetMax(img.height, img.clientHeight);
@@ -782,7 +783,7 @@ var image = (function (domGlobals) {
         done(Result.value(dimensions));
       };
       img.onerror = function () {
-        done(Result.error(undefined));
+        done(Result.error('Failed to get image dimensions for: ' + url));
       };
       var style = img.style;
       style.visibility = 'hidden';
@@ -791,23 +792,6 @@ var image = (function (domGlobals) {
       style.width = style.height = 'auto';
       domGlobals.document.body.appendChild(img);
       img.src = url;
-    };
-    var buildListItems = function (inputList, itemCallback, startItems) {
-      function appendItems(values, output) {
-        output = output || [];
-        global$2.each(values, function (item) {
-          var menuItem = { text: item.text || item.title };
-          if (item.menu) {
-            menuItem.menu = appendItems(item.menu);
-          } else {
-            menuItem.value = item.value;
-            itemCallback(menuItem);
-          }
-          output.push(menuItem);
-        });
-        return output;
-      }
-      return appendItems(inputList, startItems || []);
     };
     var removePixelSuffix = function (value) {
       if (value) {
@@ -856,7 +840,7 @@ var image = (function (domGlobals) {
     var createImageList = function (editor, callback) {
       var imageList = Settings.getImageList(editor);
       if (typeof imageList === 'string') {
-        global$3.send({
+        global$2.send({
           url: imageList,
           success: function (text) {
             callback(JSON.parse(text));
@@ -869,18 +853,18 @@ var image = (function (domGlobals) {
       }
     };
     var waitLoadImage = function (editor, data, imgElm) {
-      function selectImage() {
+      var selectImage = function () {
         imgElm.onload = imgElm.onerror = null;
         if (editor.selection) {
           editor.selection.select(imgElm);
           editor.nodeChanged();
         }
-      }
+      };
       imgElm.onload = function () {
         if (!data.width && !data.height && Settings.hasDimensions(editor)) {
           editor.dom.setAttribs(imgElm, {
-            width: imgElm.clientWidth,
-            height: imgElm.clientHeight
+            width: String(imgElm.clientWidth),
+            height: String(imgElm.clientHeight)
           });
         }
         selectImage();
@@ -904,7 +888,6 @@ var image = (function (domGlobals) {
     };
     var Utils = {
       getImageSize: getImageSize,
-      buildListItems: buildListItems,
       removePixelSuffix: removePixelSuffix,
       addPixelSuffix: addPixelSuffix,
       mergeMargins: mergeMargins,
@@ -914,9 +897,9 @@ var image = (function (domGlobals) {
       isPlaceholderImage: isPlaceholderImage
     };
 
-    var global$4 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-    var DOM = global$4.DOM;
+    var DOM = global$3.DOM;
     var getHspace = function (image) {
       if (image.style.marginLeft && image.style.marginRight && image.style.marginLeft === image.style.marginRight) {
         return Utils.removePixelSuffix(image.style.marginLeft);
@@ -1223,12 +1206,14 @@ var image = (function (domGlobals) {
       return Option.none();
     };
 
+    var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
     var getValue = function (item) {
       return isString(item.value) ? item.value : '';
     };
     var sanitizeList = function (list, extractValue) {
       var out = [];
-      global$2.each(list, function (item) {
+      global$4.each(list, function (item) {
         var text = isString(item.text) ? item.text : isString(item.title) ? item.title : '';
         if (item.menu !== undefined) {
           var items = sanitizeList(item.menu, extractValue);
@@ -1293,8 +1278,6 @@ var image = (function (domGlobals) {
       return new f();
     }
 
-    var noop$1 = function () {
-    };
     var pathJoin = function (path1, path2) {
       if (path1) {
         return path1.replace(/\/$/, '') + '/' + path2.replace(/^\//, '');
@@ -1333,7 +1316,7 @@ var image = (function (domGlobals) {
       var uploadBlob = function (blobInfo, handler) {
         return new global$1(function (resolve, reject) {
           try {
-            handler(blobInfo, resolve, reject, noop$1);
+            handler(blobInfo, resolve, reject, noop);
           } catch (ex) {
             reject(ex.message);
           }
@@ -1345,7 +1328,7 @@ var image = (function (domGlobals) {
       var upload = function (blobInfo) {
         return !settings.url && isDefaultHandler(settings.handler) ? global$1.reject('Upload url missing from the settings.') : uploadBlob(blobInfo, settings.handler);
       };
-      settings = global$2.extend({
+      settings = global$4.extend({
         credentials: false,
         handler: defaultHandler
       }, settings);
@@ -1457,6 +1440,7 @@ var image = (function (domGlobals) {
       });
       var classList = ListUtils.sanitize(Settings.getClassList(editor));
       var hasAdvTab = Settings.hasAdvTab(editor);
+      var hasUploadTab = Settings.hasUploadTab(editor);
       var hasUploadUrl = Settings.hasUploadUrl(editor);
       var hasUploadHandler = Settings.hasUploadHandler(editor);
       var image = readImageDataFromSelection(editor);
@@ -1477,6 +1461,7 @@ var image = (function (domGlobals) {
           imageList: imageList,
           classList: classList,
           hasAdvTab: hasAdvTab,
+          hasUploadTab: hasUploadTab,
           hasUploadUrl: hasUploadUrl,
           hasUploadHandler: hasUploadHandler,
           hasDescription: hasDescription,
@@ -1776,7 +1761,7 @@ var image = (function (domGlobals) {
           tabs: flatten([
             [MainTab.makeTab(info)],
             info.hasAdvTab ? [AdvTab.makeTab(info)] : [],
-            info.hasUploadUrl || info.hasUploadHandler ? [UploadTab.makeTab(info)] : []
+            info.hasUploadTab && (info.hasUploadUrl || info.hasUploadHandler) ? [UploadTab.makeTab(info)] : []
           ])
         };
         return tabPanel;
@@ -1831,11 +1816,11 @@ var image = (function (domGlobals) {
       return function (url) {
         return FutureResult.nu(function (completer) {
           Utils.getImageSize(editor.documentBaseURI.toAbsolute(url), function (data) {
-            var result = data.bind(function (dimensions) {
-              return (isString(dimensions.width) || isNumber(dimensions.width)) && (isString(dimensions.height) || isNumber(dimensions.height)) ? Result.value({
+            var result = data.map(function (dimensions) {
+              return {
                 width: String(dimensions.width),
                 height: String(dimensions.height)
-              }) : Result.error(undefined);
+              };
             });
             completer(result);
           });
@@ -1901,15 +1886,15 @@ var image = (function (domGlobals) {
     };
     var toggleContentEditableState = function (state) {
       return function (nodes) {
-        var i = nodes.length, node;
+        var i = nodes.length;
         var toggleContentEditable = function (node) {
           node.attr('contenteditable', state ? 'true' : null);
         };
         while (i--) {
-          node = nodes[i];
+          var node = nodes[i];
           if (hasImageClass(node)) {
             node.attr('contenteditable', state ? 'false' : null);
-            global$2.each(node.getAll('figcaption'), toggleContentEditable);
+            global$4.each(node.getAll('figcaption'), toggleContentEditable);
           }
         }
       };

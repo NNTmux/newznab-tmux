@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.6 (2019-05-22)
  */
 (function () {
 var textpattern = (function (domGlobals) {
@@ -229,6 +229,12 @@ var textpattern = (function (domGlobals) {
         f(x, i, xs);
       }
     };
+    var eachr = function (xs, f) {
+      for (var i = xs.length - 1; i >= 0; i--) {
+        var x = xs[i];
+        f(x, i, xs);
+      }
+    };
     var filter = function (xs, pred) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; i++) {
@@ -239,11 +245,26 @@ var textpattern = (function (domGlobals) {
       }
       return r;
     };
+    var foldr = function (xs, f, acc) {
+      eachr(xs, function (x) {
+        acc = f(acc, x);
+      });
+      return acc;
+    };
     var foldl = function (xs, f, acc) {
       each(xs, function (x) {
         acc = f(acc, x);
       });
       return acc;
+    };
+    var find = function (xs, pred) {
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        if (pred(x, i, xs)) {
+          return Option.some(x);
+        }
+      }
+      return Option.none();
     };
     var slowIndexOf = function (xs, x) {
       for (var i = 0, len = xs.length; i < len; ++i) {
@@ -762,47 +783,176 @@ var textpattern = (function (domGlobals) {
       return '\uFEFF';
     };
 
-    var checkRange = function (str, substr, start) {
-      if (substr === '')
-        return true;
-      if (str.length < substr.length)
-        return false;
-      var x = str.substr(start, start + substr.length);
-      return x === substr;
-    };
-    var startsWith = function (str, prefix) {
-      return checkRange(str, prefix, 0);
-    };
-    var endsWith = function (str, suffix) {
-      return checkRange(str, suffix, str.length - suffix.length);
-    };
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
-    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.TreeWalker');
-
-    var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    var ATTRIBUTE = domGlobals.Node.ATTRIBUTE_NODE;
-    var CDATA_SECTION = domGlobals.Node.CDATA_SECTION_NODE;
-    var COMMENT = domGlobals.Node.COMMENT_NODE;
-    var DOCUMENT = domGlobals.Node.DOCUMENT_NODE;
-    var DOCUMENT_TYPE = domGlobals.Node.DOCUMENT_TYPE_NODE;
-    var DOCUMENT_FRAGMENT = domGlobals.Node.DOCUMENT_FRAGMENT_NODE;
-    var ELEMENT = domGlobals.Node.ELEMENT_NODE;
-    var TEXT = domGlobals.Node.TEXT_NODE;
-    var PROCESSING_INSTRUCTION = domGlobals.Node.PROCESSING_INSTRUCTION_NODE;
-    var ENTITY_REFERENCE = domGlobals.Node.ENTITY_REFERENCE_NODE;
-    var ENTITY = domGlobals.Node.ENTITY_NODE;
-    var NOTATION = domGlobals.Node.NOTATION_NODE;
+    var global$4 = tinymce.util.Tools.resolve('tinymce.dom.TreeWalker');
 
     var isElement = function (node) {
-      return node.nodeType === ELEMENT;
+      return node.nodeType === domGlobals.Node.ELEMENT_NODE;
     };
     var isText = function (node) {
-      return node.nodeType === TEXT;
+      return node.nodeType === domGlobals.Node.TEXT_NODE;
     };
-    var generatePath = function (root, node, offset) {
-      if (offset < 0 || offset > node.data.length) {
+    var cleanEmptyNodes = function (dom, node, isRoot) {
+      if (node && dom.isEmpty(node) && !isRoot(node)) {
+        var parent = node.parentNode;
+        dom.remove(node);
+        cleanEmptyNodes(dom, parent, isRoot);
+      }
+    };
+    var deleteRng = function (dom, rng, isRoot, clean) {
+      if (clean === void 0) {
+        clean = true;
+      }
+      var startParent = rng.startContainer.parentNode;
+      var endParent = rng.endContainer.parentNode;
+      rng.deleteContents();
+      if (clean && !isRoot(rng.startContainer)) {
+        if (isText(rng.startContainer) && rng.startContainer.data.length === 0) {
+          dom.remove(rng.startContainer);
+        }
+        if (isText(rng.endContainer) && rng.endContainer.data.length === 0) {
+          dom.remove(rng.endContainer);
+        }
+        cleanEmptyNodes(dom, startParent, isRoot);
+        if (startParent !== endParent) {
+          cleanEmptyNodes(dom, endParent, isRoot);
+        }
+      }
+    };
+    var isBlockFormatName = function (name, formatter) {
+      var formatSet = formatter.get(name);
+      return isArray(formatSet) && head(formatSet).exists(function (format) {
+        return has(format, 'block');
+      });
+    };
+    var isInlinePattern$1 = function (pattern) {
+      return has(pattern, 'end');
+    };
+    var isReplacementPattern = function (pattern) {
+      return pattern.start.length === 0;
+    };
+    var findPattern = function (patterns, text) {
+      return find(patterns, function (pattern) {
+        if (text.indexOf(pattern.start) !== 0) {
+          return false;
+        }
+        if (isInlinePattern$1(pattern) && pattern.end && text.lastIndexOf(pattern.end) !== text.length - pattern.end.length) {
+          return false;
+        }
+        return true;
+      });
+    };
+
+    var point = function (element, offset) {
+      return {
+        element: element,
+        offset: offset
+      };
+    };
+
+    var TextWalker = function (startNode, rootNode) {
+      var walker = new global$4(startNode, rootNode);
+      var walk = function (direction) {
+        var next = walker[direction]();
+        while (next && next.nodeType !== domGlobals.Node.TEXT_NODE) {
+          next = walker[direction]();
+        }
+        return next && next.nodeType === domGlobals.Node.TEXT_NODE ? Option.some(next) : Option.none();
+      };
+      return {
+        next: function () {
+          return walk('next');
+        },
+        prev: function () {
+          return walk('prev');
+        },
+        prev2: function () {
+          return walk('prev2');
+        }
+      };
+    };
+
+    var textBefore = function (node, offset, rootNode) {
+      if (isText(node) && offset >= 0) {
+        return Option.some(point(node, offset));
+      } else {
+        var textWalker = TextWalker(node, rootNode);
+        return textWalker.prev().map(function (prev) {
+          return point(prev, prev.data.length);
+        });
+      }
+    };
+    var scanLeft = function (node, offset, rootNode) {
+      if (!isText(node)) {
         return Option.none();
+      }
+      var text = node.textContent;
+      if (offset >= 0 && offset <= text.length) {
+        return Option.some(point(node, offset));
+      } else {
+        var textWalker = TextWalker(node, rootNode);
+        return textWalker.prev().bind(function (prev) {
+          var prevText = prev.textContent;
+          return scanLeft(prev, offset + prevText.length, rootNode);
+        });
+      }
+    };
+    var scanRight = function (node, offset, rootNode) {
+      if (!isText(node)) {
+        return Option.none();
+      }
+      var text = node.textContent;
+      if (offset <= text.length) {
+        return Option.some(point(node, offset));
+      } else {
+        var textWalker = TextWalker(node, rootNode);
+        return textWalker.next().bind(function (next) {
+          return scanRight(next, offset - text.length, rootNode);
+        });
+      }
+    };
+    var outcome = Adt.generate([
+      { aborted: [] },
+      { edge: ['element'] },
+      { success: ['info'] }
+    ]);
+    var phase = Adt.generate([
+      { abort: [] },
+      { kontinue: [] },
+      { finish: ['info'] }
+    ]);
+    var repeat = function (dom, node, offset, process, walker, recent) {
+      var terminate = function () {
+        return recent.fold(outcome.aborted, outcome.edge);
+      };
+      var recurse = function () {
+        var next = walker();
+        if (next) {
+          return repeat(dom, next, Option.none(), process, walker, Option.some(node));
+        } else {
+          return terminate();
+        }
+      };
+      if (dom.isBlock(node)) {
+        return terminate();
+      } else if (!isText(node)) {
+        return recurse();
+      } else {
+        var text = node.textContent;
+        return process(phase, node, text, offset).fold(outcome.aborted, function () {
+          return recurse();
+        }, outcome.success);
+      }
+    };
+    var repeatLeft = function (dom, node, offset, process, rootNode) {
+      var walker = new global$4(node, rootNode);
+      return repeat(dom, node, Option.some(offset), process, walker.prev, Option.none());
+    };
+
+    var generatePath = function (root, node, offset) {
+      if (isText(node) && (offset < 0 || offset > node.data.length)) {
+        return [];
       }
       var p = [offset];
       var current = node;
@@ -816,17 +966,15 @@ var textpattern = (function (domGlobals) {
         }
         current = parent;
       }
-      return current === root ? Option.some(p.reverse()) : Option.none();
+      return current === root ? p.reverse() : [];
     };
     var generatePathRange = function (root, startNode, startOffset, endNode, endOffset) {
-      return generatePath(root, startNode, startOffset).bind(function (start) {
-        return generatePath(root, endNode, endOffset).map(function (end) {
-          return {
-            start: start,
-            end: end
-          };
-        });
-      });
+      var start = generatePath(root, startNode, startOffset);
+      var end = generatePath(root, endNode, endOffset);
+      return {
+        start: start,
+        end: end
+      };
     };
     var resolvePath = function (root, path) {
       var nodePath = path.slice();
@@ -841,8 +989,12 @@ var textpattern = (function (domGlobals) {
             node: node,
             offset: offset
           });
+        } else {
+          return Option.some({
+            node: node,
+            offset: offset
+          });
         }
-        return Option.none();
       });
     };
     var resolvePathRange = function (root, range) {
@@ -850,171 +1002,91 @@ var textpattern = (function (domGlobals) {
         var startNode = _a.node, startOffset = _a.offset;
         return resolvePath(root, range.end).map(function (_a) {
           var endNode = _a.node, endOffset = _a.offset;
-          return {
-            startNode: startNode,
-            startOffset: startOffset,
-            endNode: endNode,
-            endOffset: endOffset
-          };
+          var rng = domGlobals.document.createRange();
+          rng.setStart(startNode, startOffset);
+          rng.setEnd(endNode, endOffset);
+          return rng;
         });
       });
+    };
+    var generatePathRangeFromRange = function (root, range) {
+      return generatePathRange(root, range.startContainer, range.startOffset, range.endContainer, range.endOffset);
     };
 
-    var findPattern = function (patterns, text) {
-      for (var i = 0; i < patterns.length; i++) {
-        var pattern = patterns[i];
-        if (text.indexOf(pattern.start) !== 0) {
-          continue;
-        }
-        if (pattern.end && text.lastIndexOf(pattern.end) !== text.length - pattern.end.length) {
-          continue;
-        }
-        return pattern;
-      }
-    };
-    var textBefore = function (node, offset, block) {
-      if (isText(node) && offset > 0) {
-        return Option.some({
-          node: node,
-          offset: offset
-        });
-      }
-      var startNode;
-      if (offset > 0) {
-        startNode = node.childNodes[offset - 1];
-      } else {
-        for (var current = node; current && current !== block && !startNode; current = current.parentNode) {
-          startNode = current.previousSibling;
-        }
-      }
-      var tw = new global$3(startNode, block);
-      for (var current = tw.current(); current; current = tw.prev()) {
-        if (isText(current) && current.length > 0) {
-          return Option.some({
-            node: current,
-            offset: current.length
+    var stripPattern = function (dom, block, pattern) {
+      var firstTextNode = TextWalker(block, block).next();
+      firstTextNode.each(function (node) {
+        scanRight(node, pattern.start.length, block).each(function (end) {
+          var rng = dom.createRng();
+          rng.setStart(node, 0);
+          rng.setEnd(end.element, end.offset);
+          deleteRng(dom, rng, function (e) {
+            return e === block;
           });
-        }
-      }
-      return Option.none();
-    };
-    var findInlinePatternStart = function (dom, pattern, node, offset, block, requireGap) {
-      if (requireGap === void 0) {
-        requireGap = false;
-      }
-      if (pattern.start.length === 0 && !requireGap) {
-        return Option.some({
-          node: node,
-          offset: offset
-        });
-      }
-      var sameBlockParent = function (spot) {
-        return dom.getParent(spot.node, dom.isBlock) === block;
-      };
-      return textBefore(node, offset, block).filter(sameBlockParent).bind(function (_a) {
-        var node = _a.node, offset = _a.offset;
-        var text = node.data.substring(0, offset);
-        var startPos = text.lastIndexOf(pattern.start);
-        if (startPos === -1) {
-          if (text.indexOf(pattern.end) !== -1) {
-            return Option.none();
-          }
-          return findInlinePatternStart(dom, pattern, node, 0, block, requireGap && text.length === 0);
-        }
-        if (text.indexOf(pattern.end, startPos + pattern.start.length) !== -1) {
-          return Option.none();
-        }
-        if (requireGap && startPos + pattern.start.length === text.length) {
-          return Option.none();
-        }
-        return Option.some({
-          node: node,
-          offset: startPos
         });
       });
     };
-    var findInlinePatternRec = function (dom, patterns, node, offset, block) {
-      return textBefore(node, offset, block).bind(function (_a) {
-        var endNode = _a.node, endOffset = _a.offset;
-        var text = endNode.data.substring(0, endOffset);
-        var _loop_1 = function (i) {
-          var pattern = patterns[i];
-          if (!endsWith(text, pattern.end)) {
-            return 'continue';
-          }
-          var newOffset = endOffset - pattern.end.length;
-          var hasContent = pattern.start.length > 0 && pattern.end.length > 0;
-          var allowInner = hasContent ? Option.some(true) : Option.none();
-          var recursiveMatch = allowInner.bind(function () {
-            var patternsWithoutCurrent = patterns.slice();
-            patternsWithoutCurrent.splice(i, 1);
-            return findInlinePatternRec(dom, patternsWithoutCurrent, endNode, newOffset, block);
-          }).fold(function () {
-            var start = findInlinePatternStart(dom, pattern, endNode, newOffset, block, hasContent);
-            return start.map(function (_a) {
-              var startNode = _a.node, startOffset = _a.offset;
-              var range = generatePathRange(dom.getRoot(), startNode, startOffset, endNode, endOffset).getOrDie('Internal constraint violation');
-              return [{
-                  pattern: pattern,
-                  range: range
-                }];
-            });
-          }, function (areas) {
-            var outermostRange = resolvePathRange(dom.getRoot(), areas[areas.length - 1].range).getOrDie('Internal constraint violation');
-            var start = findInlinePatternStart(dom, pattern, outermostRange.startNode, outermostRange.startOffset, block);
-            return start.map(function (_a) {
-              var startNode = _a.node, startOffset = _a.offset;
-              var range = generatePathRange(dom.getRoot(), startNode, startOffset, endNode, endOffset).getOrDie('Internal constraint violation');
-              return areas.concat([{
-                  pattern: pattern,
-                  range: range
-                }]);
-            });
-          });
-          if (recursiveMatch.isSome()) {
-            return { value: recursiveMatch };
-          }
-        };
-        for (var i = 0; i < patterns.length; i++) {
-          var state_1 = _loop_1(i);
-          if (typeof state_1 === 'object')
-            return state_1.value;
-        }
-        return Option.none();
-      });
-    };
-    var findNestedInlinePatterns = function (dom, patterns, rng, space) {
-      if (rng.collapsed === false) {
-        return [];
-      }
+    var applyPattern = function (editor, match) {
+      var dom = editor.dom;
+      var pattern = match.pattern;
+      var rng = resolvePathRange(dom.getRoot(), match.range).getOrDie('Unable to resolve path range');
       var block = dom.getParent(rng.startContainer, dom.isBlock);
-      return findInlinePatternRec(dom, patterns, rng.startContainer, rng.startOffset - (space ? 1 : 0), block).getOr([]);
+      if (pattern.type === 'block-format') {
+        if (isBlockFormatName(pattern.format, editor.formatter)) {
+          editor.undoManager.transact(function () {
+            stripPattern(editor.dom, block, pattern);
+            editor.formatter.apply(pattern.format);
+          });
+        }
+      } else if (pattern.type === 'block-command') {
+        editor.undoManager.transact(function () {
+          stripPattern(editor.dom, block, pattern);
+          editor.execCommand(pattern.cmd, false, pattern.value);
+        });
+      }
+      return true;
     };
-    var findBlockPattern = function (dom, patterns, rng) {
+    var findPatterns = function (editor, patterns) {
+      var dom = editor.dom;
+      var rng = editor.selection.getRng();
       var block = dom.getParent(rng.startContainer, dom.isBlock);
       if (!(dom.is(block, 'p') && isElement(block))) {
-        return Option.none();
+        return [];
       }
-      var walker = new global$3(block, block);
-      var node;
-      var firstTextNode;
-      while (node = walker.next()) {
-        if (isText(node)) {
-          firstTextNode = node;
-          break;
+      var blockText = block.textContent;
+      var matchedPattern = findPattern(patterns, blockText);
+      return matchedPattern.map(function (pattern) {
+        if (global$3.trim(blockText).length === pattern.start.length) {
+          return [];
         }
+        return [{
+            pattern: pattern,
+            range: generatePathRange(dom.getRoot(), block, 0, block, 0)
+          }];
+      }).getOr([]);
+    };
+    var applyMatches = function (editor, matches) {
+      if (matches.length === 0) {
+        return;
       }
-      if (!firstTextNode) {
-        return Option.none();
-      }
-      var pattern = findPattern(patterns, firstTextNode.data);
-      if (!pattern) {
-        return Option.none();
-      }
-      if (global$4.trim(block.textContent).length === pattern.start.length) {
-        return Option.none();
-      }
-      return Option.some(pattern);
+      var bookmark = editor.selection.getBookmark();
+      each(matches, function (match) {
+        return applyPattern(editor, match);
+      });
+      editor.selection.moveToBookmark(bookmark);
+    };
+
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
     };
 
     var unique = 0;
@@ -1026,180 +1098,269 @@ var textpattern = (function (domGlobals) {
       return prefix + '_' + random + unique + String(time);
     };
 
-    var liftN = function (arr, f) {
-      var r = [];
-      for (var i = 0; i < arr.length; i++) {
-        var x = arr[i];
-        if (x.isSome()) {
-          r.push(x.getOrDie());
-        } else {
-          return Option.none();
-        }
-      }
-      return Option.some(f.apply(null, r));
+    var checkRange = function (str, substr, start) {
+      if (substr === '')
+        return true;
+      if (str.length < substr.length)
+        return false;
+      var x = str.substr(start, start + substr.length);
+      return x === substr;
     };
-    function lift() {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
-      var f = args.pop();
-      return liftN(args, f);
-    }
+    var endsWith = function (str, suffix) {
+      return checkRange(str, suffix, str.length - suffix.length);
+    };
 
-    var isCollapsed = function (start, end, root) {
-      var walker = new global$3(start, root);
-      while (walker.next()) {
-        var node = walker.current();
-        if (isText(node) && node.data.length === 0) {
-          continue;
-        }
-        return node === end;
-      }
-      return false;
-    };
-    var applyInlinePatterns = function (editor, areas) {
-      var dom = editor.dom;
-      var newMarker = function (id) {
-        return dom.create('span', {
-          'data-mce-type': 'bookmark',
-          'id': id
-        });
-      };
-      var markerRange = function (ids) {
-        var start = Option.from(dom.select('#' + ids.start)[0]);
-        var end = Option.from(dom.select('#' + ids.end)[0]);
-        return lift(start, end, function (start, end) {
-          var range = dom.createRng();
-          range.setStartAfter(start);
-          if (!isCollapsed(start, end, dom.getRoot())) {
-            range.setEndBefore(end);
-          } else {
-            range.collapse(true);
-          }
-          return range;
-        });
-      };
-      var markerPrefix = generate$1('mce_');
-      var markerIds = map(areas, function (_area, i) {
-        return {
-          start: markerPrefix + '_' + i + '_start',
-          end: markerPrefix + '_' + i + '_end'
-        };
+    var newMarker = function (dom, id) {
+      return dom.create('span', {
+        'data-mce-type': 'bookmark',
+        'id': id
       });
-      var cursor = editor.selection.getBookmark();
-      for (var i = areas.length - 1; i >= 0; i--) {
-        var _a = areas[i], pattern = _a.pattern, range = _a.range;
-        var _b = resolvePath(dom.getRoot(), range.end).getOrDie('Failed to resolve range[' + i + '].end'), endNode = _b.node, endOffset = _b.offset;
-        var textOutsideRange = endOffset === 0 ? endNode : endNode.splitText(endOffset);
-        textOutsideRange.parentNode.insertBefore(newMarker(markerIds[i].end), textOutsideRange);
-        if (pattern.start.length > 0) {
-          endNode.deleteData(endOffset - pattern.end.length, pattern.end.length);
+    };
+    var rangeFromMarker = function (dom, marker) {
+      var rng = dom.createRng();
+      rng.setStartAfter(marker.start);
+      rng.setEndBefore(marker.end);
+      return rng;
+    };
+    var createMarker = function (dom, markerPrefix, pathRange) {
+      var rng = resolvePathRange(dom.getRoot(), pathRange).getOrDie('Unable to resolve path range');
+      var startNode = rng.startContainer;
+      var endNode = rng.endContainer;
+      var textEnd = rng.endOffset === 0 ? endNode : endNode.splitText(rng.endOffset);
+      var textStart = rng.startOffset === 0 ? startNode : startNode.splitText(rng.startOffset);
+      return {
+        prefix: markerPrefix,
+        end: textEnd.parentNode.insertBefore(newMarker(dom, markerPrefix + '-end'), textEnd),
+        start: textStart.parentNode.insertBefore(newMarker(dom, markerPrefix + '-start'), textStart)
+      };
+    };
+    var removeMarker = function (dom, marker, isRoot) {
+      cleanEmptyNodes(dom, dom.get(marker.prefix + '-end'), isRoot);
+      cleanEmptyNodes(dom, dom.get(marker.prefix + '-start'), isRoot);
+    };
+
+    var nodeMatchesPattern = function (dom, block, content) {
+      return function (phase, element, text, optOffset) {
+        if (element === block) {
+          return phase.abort();
         }
-      }
-      for (var i = 0; i < areas.length; i++) {
-        var _c = areas[i], pattern = _c.pattern, range = _c.range;
-        var _d = resolvePath(dom.getRoot(), range.start).getOrDie('Failed to resolve range.start'), startNode = _d.node, startOffset = _d.offset;
-        var textInsideRange = startOffset === 0 ? startNode : startNode.splitText(startOffset);
-        textInsideRange.parentNode.insertBefore(newMarker(markerIds[i].start), textInsideRange);
-        if (pattern.start.length > 0) {
-          textInsideRange.deleteData(0, pattern.start.length);
+        var searchText = text.substring(0, optOffset.getOr(text.length));
+        var startEndIndex = searchText.lastIndexOf(content.charAt(content.length - 1));
+        var startIndex = searchText.lastIndexOf(content);
+        if (startIndex !== -1) {
+          var rng = dom.createRng();
+          rng.setStart(element, startIndex);
+          rng.setEnd(element, startIndex + content.length);
+          return phase.finish(rng);
+        } else if (startEndIndex !== -1) {
+          return scanLeft(element, startEndIndex + 1 - content.length, block).fold(function () {
+            return phase.kontinue();
+          }, function (spot) {
+            var rng = dom.createRng();
+            rng.setStart(spot.element, spot.offset);
+            rng.setEnd(element, startEndIndex + 1);
+            if (rng.toString() === content) {
+              return phase.finish(rng);
+            } else {
+              return phase.kontinue();
+            }
+          });
         } else {
-          textInsideRange.deleteData(0, pattern.end.length);
+          return phase.kontinue();
         }
-      }
-      var _loop_1 = function (i) {
-        var pattern = areas[i].pattern;
-        var optRange = markerRange(markerIds[i]);
-        optRange.each(function (range) {
-          editor.selection.setRng(range);
-          if (pattern.type === 'inline-format') {
-            pattern.format.forEach(function (format) {
-              editor.formatter.apply(format);
-            });
-          } else {
-            editor.execCommand(pattern.cmd, false, pattern.value);
-          }
-        });
-        dom.remove(markerIds[i].start);
-        dom.remove(markerIds[i].end);
       };
-      for (var i = 0; i < areas.length; i++) {
-        _loop_1(i);
-      }
-      editor.selection.moveToBookmark(cursor);
     };
-    var isBlockFormatName = function (name, formatter) {
-      var formatSet = formatter.get(name);
-      return isArray(formatSet) && head(formatSet).exists(function (format) {
-        return has(format, 'block');
+    var findPatternStart = function (dom, pattern, node, offset, block, requireGap) {
+      if (requireGap === void 0) {
+        requireGap = false;
+      }
+      if (pattern.start.length === 0 && !requireGap) {
+        var rng = dom.createRng();
+        rng.setStart(node, offset);
+        rng.setEnd(node, offset);
+        return Option.some(rng);
+      }
+      return textBefore(node, offset, block).bind(function (spot) {
+        var outcome = repeatLeft(dom, spot.element, spot.offset, nodeMatchesPattern(dom, block, pattern.start), block);
+        var start = outcome.fold(Option.none, Option.none, Option.some);
+        return start.bind(function (startRange) {
+          if (requireGap) {
+            if (startRange.endContainer === spot.element && startRange.endOffset === spot.offset) {
+              return Option.none();
+            } else if (spot.offset === 0 && startRange.endContainer.textContent.length === startRange.endOffset) {
+              return Option.none();
+            }
+          }
+          return Option.some(startRange);
+        });
       });
     };
-    var applyBlockPattern = function (editor, pattern) {
+    var findPattern$1 = function (editor, block, details) {
       var dom = editor.dom;
-      var rng = editor.selection.getRng();
-      var block = dom.getParent(rng.startContainer, dom.isBlock);
-      if (!block || !dom.is(block, 'p') || !isElement(block)) {
-        return;
-      }
-      var walker = new global$3(block, block);
-      var node;
-      var firstTextNode;
-      while (node = walker.next()) {
-        if (isText(node)) {
-          firstTextNode = node;
-          break;
-        }
-      }
-      if (!firstTextNode) {
-        return;
-      }
-      if (!startsWith(firstTextNode.data, pattern.start)) {
-        return;
-      }
-      if (global$4.trim(block.textContent).length === pattern.start.length) {
-        return;
-      }
-      var cursor = editor.selection.getBookmark();
-      if (pattern.type === 'block-format') {
-        if (isBlockFormatName(pattern.format, editor.formatter)) {
-          editor.undoManager.transact(function () {
-            firstTextNode.deleteData(0, pattern.start.length);
-            editor.formatter.apply(pattern.format);
+      var root = dom.getRoot();
+      var pattern = details.pattern;
+      var endNode = details.position.element;
+      var endOffset = details.position.offset;
+      return scanLeft(endNode, endOffset - details.pattern.end.length, block).bind(function (spot) {
+        var endPathRng = generatePathRange(root, spot.element, spot.offset, endNode, endOffset);
+        if (isReplacementPattern(pattern)) {
+          return Option.some({
+            matches: [{
+                pattern: pattern,
+                startRng: endPathRng,
+                endRng: endPathRng
+              }],
+            position: spot
+          });
+        } else {
+          var resultsOpt = findPatternsRec(editor, details.remainingPatterns, spot.element, spot.offset, block);
+          var results_1 = resultsOpt.getOr({
+            matches: [],
+            position: spot
+          });
+          var pos = results_1.position;
+          var start = findPatternStart(dom, pattern, pos.element, pos.offset, block, resultsOpt.isNone());
+          return start.map(function (startRng) {
+            var startPathRng = generatePathRangeFromRange(root, startRng);
+            return {
+              matches: results_1.matches.concat([{
+                  pattern: pattern,
+                  startRng: startPathRng,
+                  endRng: endPathRng
+                }]),
+              position: point(startRng.startContainer, startRng.startOffset)
+            };
           });
         }
-      } else if (pattern.type === 'block-command') {
-        editor.undoManager.transact(function () {
-          firstTextNode.deleteData(0, pattern.start.length);
-          editor.execCommand(pattern.cmd, false, pattern.value);
+      });
+    };
+    var findPatternsRec = function (editor, patterns, node, offset, block) {
+      var dom = editor.dom;
+      return textBefore(node, offset, dom.getRoot()).bind(function (endSpot) {
+        var rng = dom.createRng();
+        rng.setStart(block, 0);
+        rng.setEnd(node, offset);
+        var text = rng.toString();
+        for (var i = 0; i < patterns.length; i++) {
+          var pattern = patterns[i];
+          if (!endsWith(text, pattern.end)) {
+            continue;
+          }
+          var patternsWithoutCurrent = patterns.slice();
+          patternsWithoutCurrent.splice(i, 1);
+          var result = findPattern$1(editor, block, {
+            pattern: pattern,
+            remainingPatterns: patternsWithoutCurrent,
+            position: endSpot
+          });
+          if (result.isSome()) {
+            return result;
+          }
+        }
+        return Option.none();
+      });
+    };
+    var applyPattern$1 = function (editor, pattern, patternRange) {
+      editor.selection.setRng(patternRange);
+      if (pattern.type === 'inline-format') {
+        each(pattern.format, function (format) {
+          editor.formatter.apply(format);
         });
+      } else {
+        editor.execCommand(pattern.cmd, false, pattern.value);
       }
-      editor.selection.moveToBookmark(cursor);
+    };
+    var applyReplacementPattern = function (editor, pattern, marker, isRoot) {
+      var markerRange = rangeFromMarker(editor.dom, marker);
+      deleteRng(editor.dom, markerRange, isRoot);
+      applyPattern$1(editor, pattern, markerRange);
+    };
+    var applyPatternWithContent = function (editor, pattern, startMarker, endMarker, isRoot) {
+      var dom = editor.dom;
+      var markerEndRange = rangeFromMarker(dom, endMarker);
+      var markerStartRange = rangeFromMarker(dom, startMarker);
+      deleteRng(dom, markerStartRange, isRoot);
+      deleteRng(dom, markerEndRange, isRoot);
+      var patternMarker = {
+        prefix: startMarker.prefix,
+        start: startMarker.end,
+        end: endMarker.start
+      };
+      var patternRange = rangeFromMarker(dom, patternMarker);
+      applyPattern$1(editor, pattern, patternRange);
+    };
+    var addMarkers = function (dom, matches) {
+      var markerPrefix = generate$1('mce_textpattern');
+      var matchesWithEnds = foldr(matches, function (acc, match) {
+        var endMarker = createMarker(dom, markerPrefix + ('_end' + acc.length), match.endRng);
+        return acc.concat([__assign({}, match, { endMarker: endMarker })]);
+      }, []);
+      return foldr(matchesWithEnds, function (acc, match) {
+        var idx = matchesWithEnds.length - acc.length - 1;
+        var startMarker = isReplacementPattern(match.pattern) ? match.endMarker : createMarker(dom, markerPrefix + ('_start' + idx), match.startRng);
+        return acc.concat([__assign({}, match, { startMarker: startMarker })]);
+      }, []);
+    };
+    var findPatterns$1 = function (editor, patterns, space) {
+      var rng = editor.selection.getRng();
+      if (rng.collapsed === false) {
+        return [];
+      }
+      var block = editor.dom.getParent(rng.startContainer, editor.dom.isBlock);
+      var offset = rng.startOffset - (space ? 1 : 0);
+      var resultOpt = findPatternsRec(editor, patterns, rng.startContainer, offset, block);
+      return resultOpt.fold(function () {
+        return [];
+      }, function (result) {
+        return result.matches;
+      });
+    };
+    var applyMatches$1 = function (editor, matches) {
+      if (matches.length === 0) {
+        return;
+      }
+      var dom = editor.dom;
+      var bookmark = editor.selection.getBookmark();
+      var matchesWithMarkers = addMarkers(dom, matches);
+      each(matchesWithMarkers, function (match) {
+        var block = dom.getParent(match.startMarker.start, dom.isBlock);
+        var isRoot = function (node) {
+          return node === block;
+        };
+        if (isReplacementPattern(match.pattern)) {
+          applyReplacementPattern(editor, match.pattern, match.endMarker, isRoot);
+        } else {
+          applyPatternWithContent(editor, match.pattern, match.startMarker, match.endMarker, isRoot);
+        }
+        removeMarker(dom, match.endMarker, isRoot);
+        removeMarker(dom, match.startMarker, isRoot);
+      });
+      editor.selection.moveToBookmark(bookmark);
     };
 
     var handleEnter = function (editor, patternSet) {
-      var inlineAreas = findNestedInlinePatterns(editor.dom, patternSet.inlinePatterns, editor.selection.getRng(), false);
-      var blockArea = findBlockPattern(editor.dom, patternSet.blockPatterns, editor.selection.getRng());
-      if (editor.selection.isCollapsed() && (inlineAreas.length > 0 || blockArea.isSome())) {
+      if (!editor.selection.isCollapsed()) {
+        return false;
+      }
+      var inlineMatches = findPatterns$1(editor, patternSet.inlinePatterns, false);
+      var blockMatches = findPatterns(editor, patternSet.blockPatterns);
+      if (blockMatches.length > 0 || inlineMatches.length > 0) {
         editor.undoManager.add();
         editor.undoManager.extra(function () {
           editor.execCommand('mceInsertNewLine');
         }, function () {
           editor.insertContent(zeroWidth());
-          applyInlinePatterns(editor, inlineAreas);
-          blockArea.each(function (pattern) {
-            return applyBlockPattern(editor, pattern);
-          });
+          applyMatches$1(editor, inlineMatches);
+          applyMatches(editor, blockMatches);
           var range = editor.selection.getRng();
-          var block = editor.dom.getParent(range.startContainer, editor.dom.isBlock);
-          var spot = textBefore(range.startContainer, range.startOffset, block);
+          var spot = textBefore(range.startContainer, range.startOffset, editor.dom.getRoot());
           editor.execCommand('mceInsertNewLine');
           spot.each(function (s) {
-            if (s.node.data.charAt(s.offset - 1) === zeroWidth()) {
-              s.node.deleteData(s.offset - 1, 1);
-              if (editor.dom.isEmpty(s.node.parentNode)) {
-                editor.dom.remove(s.node.parentNode);
-              }
+            if (s.element.data.charAt(s.offset - 1) === zeroWidth()) {
+              s.element.deleteData(s.offset - 1, 1);
+              cleanEmptyNodes(editor.dom, s.element.parentNode, function (e) {
+                return e === editor.dom.getRoot();
+              });
             }
           });
         });
@@ -1208,10 +1369,10 @@ var textpattern = (function (domGlobals) {
       return false;
     };
     var handleInlineKey = function (editor, patternSet) {
-      var areas = findNestedInlinePatterns(editor.dom, patternSet.inlinePatterns, editor.selection.getRng(), true);
-      if (areas.length > 0) {
+      var inlineMatches = findPatterns$1(editor, patternSet.inlinePatterns, true);
+      if (inlineMatches.length > 0) {
         editor.undoManager.transact(function () {
-          applyInlinePatterns(editor, areas);
+          applyMatches$1(editor, inlineMatches);
         });
       }
     };

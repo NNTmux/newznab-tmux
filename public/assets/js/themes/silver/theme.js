@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.6 (2019-05-22)
  */
 (function () {
 var silver = (function (domGlobals) {
@@ -2981,6 +2981,9 @@ var silver = (function (domGlobals) {
     };
     var strictStringEnum = function (key, values) {
       return field(key, key, strict(), validateEnum(values));
+    };
+    var strictBoolean = function (key) {
+      return strictOf(key, boolean);
     };
     var strictFunction = function (key) {
       return strictOf(key, functionProcessor);
@@ -20966,6 +20969,59 @@ var silver = (function (domGlobals) {
 
     var showContextToolbarEvent = 'contexttoolbar-show';
 
+    var schema$j = constant([
+      strict$1('dom'),
+      defaulted$1('shell', true),
+      field$1('toolbarBehaviours', [Replacing])
+    ]);
+    var enhanceGroups = function (detail) {
+      return { behaviours: derive$1([Replacing.config({})]) };
+    };
+    var parts$7 = constant([optional({
+        name: 'groups',
+        overrides: enhanceGroups
+      })]);
+
+    var factory$9 = function (detail, components, spec, _externals) {
+      var setGroups = function (toolbar, groups) {
+        getGroupContainer(toolbar).fold(function () {
+          domGlobals.console.error('Toolbar was defined to not be a shell, but no groups container was specified in components');
+          throw new Error('Toolbar was defined to not be a shell, but no groups container was specified in components');
+        }, function (container) {
+          Replacing.set(container, groups);
+        });
+      };
+      var getGroupContainer = function (component) {
+        return detail.shell ? Option.some(component) : getPart(component, detail, 'groups');
+      };
+      var extra = detail.shell ? {
+        behaviours: [Replacing.config({})],
+        components: []
+      } : {
+        behaviours: [],
+        components: components
+      };
+      return {
+        uid: detail.uid,
+        dom: detail.dom,
+        components: extra.components,
+        behaviours: augment(detail.toolbarBehaviours, extra.behaviours),
+        apis: { setGroups: setGroups },
+        domModification: { attributes: { role: 'group' } }
+      };
+    };
+    var Toolbar = composite$1({
+      name: 'Toolbar',
+      configFields: schema$j(),
+      partFields: parts$7(),
+      factory: factory$9,
+      apis: {
+        setGroups: function (apis, toolbar, groups) {
+          apis.setGroups(toolbar, groups);
+        }
+      }
+    });
+
     var generate$6 = function (xs, f) {
       var init = {
         len: 0,
@@ -21042,6 +21098,293 @@ var silver = (function (domGlobals) {
         return fitAll(within, extra, withinWidth);
       }
     };
+
+    var setStoredGroups = function (toolbar, storedGroups) {
+      var bGroups = map(storedGroups, function (g) {
+        return premade$1(g);
+      });
+      Toolbar.setGroups(toolbar, bGroups);
+    };
+    var findFocusedComp = function (overflow, overflowButton) {
+      return overflow.bind(function (overf) {
+        return search$1(overf.element()).bind(function (focusedElm) {
+          return overf.getSystem().getByDom(focusedElm).toOption();
+        });
+      }).orThunk(function () {
+        return overflowButton.filter(Focusing.isFocused);
+      });
+    };
+    var refresh = function (toolbar, detail, overflow, isOpen) {
+      var primary = getPartOrDie(toolbar, detail, 'primary');
+      var overflowButton = getPart(toolbar, detail, 'overflow-button');
+      var overflowGroup = Coupling.getCoupled(toolbar, 'overflowGroup');
+      set$2(primary.element(), 'visibility', 'hidden');
+      var focusedComp = findFocusedComp(overflow, overflowButton);
+      overflow.each(function (overf) {
+        Toolbar.setGroups(overf, []);
+      });
+      var groups = detail.builtGroups.get();
+      setStoredGroups(primary, groups.concat([overflowGroup]));
+      var total = get$7(primary.element());
+      var overflows = partition$3(total, groups, function (comp) {
+        return get$7(comp.element());
+      }, overflowGroup);
+      if (overflows.extra().length === 0) {
+        Replacing.remove(primary, overflowGroup);
+        overflow.each(function (overf) {
+          Toolbar.setGroups(overf, []);
+        });
+      } else {
+        setStoredGroups(primary, overflows.within());
+        overflow.each(function (overf) {
+          setStoredGroups(overf, overflows.extra());
+        });
+      }
+      remove$6(primary.element(), 'visibility');
+      reflow(primary.element());
+      overflow.each(function (overf) {
+        overflowButton.each(function (button) {
+          return Toggling.set(button, isOpen(overf));
+        });
+        focusedComp.each(Focusing.focus);
+      });
+    };
+
+    var schema$k = constant([
+      strict$1('items'),
+      markers(['itemSelector']),
+      field$1('tgroupBehaviours', [Keying])
+    ]);
+    var parts$8 = constant([group({
+        name: 'items',
+        unit: 'item'
+      })]);
+
+    var factory$a = function (detail, components, spec, _externals) {
+      return {
+        'uid': detail.uid,
+        'dom': detail.dom,
+        'components': components,
+        'behaviours': augment(detail.tgroupBehaviours, [Keying.config({
+            mode: 'flow',
+            selector: detail.markers.itemSelector
+          })]),
+        domModification: { attributes: { role: 'toolbar' } }
+      };
+    };
+    var ToolbarGroup = composite$1({
+      name: 'ToolbarGroup',
+      configFields: schema$k(),
+      partFields: parts$8(),
+      factory: factory$a
+    });
+
+    var schema$l = constant([
+      field$1('splitToolbarBehaviours', []),
+      state$1('builtGroups', function () {
+        return Cell([]);
+      })
+    ]);
+    var spec = function (detail, components, spec, externals, extras) {
+      var toolbarToggleEvent = 'alloy.toolbar.toggle';
+      var doSetGroups = function (toolbar, groups) {
+        var built = map(groups, toolbar.getSystem().build);
+        detail.builtGroups.set(built);
+      };
+      var setGroups = function (toolbar, groups) {
+        doSetGroups(toolbar, groups);
+        extras.refresh(toolbar, detail);
+      };
+      var getMoreButton = function (toolbar) {
+        return getPart(toolbar, detail, 'overflow-button');
+      };
+      var getOverflow = function (toolbar) {
+        return extras.getOverflow(toolbar);
+      };
+      return {
+        uid: detail.uid,
+        dom: detail.dom,
+        components: components,
+        behaviours: augment(detail.splitToolbarBehaviours, [
+          Coupling.config({
+            others: __assign({}, extras.coupling, {
+              overflowGroup: function (toolbar) {
+                return ToolbarGroup.sketch(__assign({}, externals['overflow-group'](), {
+                  items: [Button.sketch(__assign({}, externals['overflow-button'](), {
+                      action: function (_button) {
+                        emit(toolbar, toolbarToggleEvent);
+                      }
+                    }))]
+                }));
+              }
+            })
+          }),
+          config('toolbar-toggle-events', [run(toolbarToggleEvent, function (toolbar) {
+              extras.toggleToolbar(toolbar, detail, externals);
+            })])
+        ]),
+        apis: {
+          setGroups: setGroups,
+          refresh: function (toolbar) {
+            extras.refresh(toolbar, detail);
+          },
+          getMoreButton: function (toolbar) {
+            return getMoreButton(toolbar);
+          },
+          getOverflow: function (toolbar) {
+            return getOverflow(toolbar);
+          },
+          toggle: function (toolbar) {
+            extras.toggleToolbar(toolbar, detail, externals);
+          }
+        },
+        domModification: { attributes: { role: 'group' } }
+      };
+    };
+
+    var schema$m = constant([
+      markers(['overflowToggledClass']),
+      strict$1('getAnchor'),
+      strict$1('lazySink')
+    ].concat(schema$l()));
+    var parts$9 = constant([
+      required({
+        factory: Toolbar,
+        schema: schema$j(),
+        name: 'primary'
+      }),
+      external$1({
+        factory: Toolbar,
+        schema: schema$j(),
+        name: 'overflow',
+        overrides: function (detail) {
+          return {
+            toolbarBehaviours: derive$1([Keying.config({
+                mode: 'cyclic',
+                onEscape: function (comp) {
+                  getPart(comp, detail, 'overflow-button').each(Focusing.focus);
+                  return Option.none();
+                }
+              })])
+          };
+        }
+      }),
+      external$1({
+        name: 'overflow-button',
+        overrides: function (detail) {
+          return {
+            dom: { attributes: { 'aria-haspopup': 'true' } },
+            buttonBehaviours: derive$1([Toggling.config({
+                toggleClass: detail.markers.overflowToggledClass,
+                aria: { mode: 'expanded' },
+                toggleOnExecute: false
+              })])
+          };
+        }
+      }),
+      external$1({ name: 'overflow-group' })
+    ]);
+
+    var toggleToolbar = function (toolbar, detail, externals) {
+      var sandbox = Coupling.getCoupled(toolbar, 'sandbox');
+      if (Sandboxing.isOpen(sandbox)) {
+        Sandboxing.close(sandbox);
+      } else {
+        Sandboxing.open(sandbox, externals['overflow']());
+      }
+    };
+    var isOpen$1 = function (over) {
+      return over.getSystem().isConnected();
+    };
+    var refresh$1 = function (toolbar, detail) {
+      var overflow = Sandboxing.getState(Coupling.getCoupled(toolbar, 'sandbox'));
+      refresh(toolbar, detail, overflow, isOpen$1);
+      overflow.each(function (overf) {
+        var sink = detail.lazySink(toolbar).getOrDie();
+        var anchor = detail.getAnchor(toolbar);
+        Positioning.position(sink, anchor, overf);
+      });
+    };
+    var makeSandbox$1 = function (toolbar, detail) {
+      var ariaOwner = manager();
+      var onOpen = function (sandbox, overf) {
+        refresh$1(toolbar, detail);
+        getPart(toolbar, detail, 'overflow-button').each(function (button) {
+          Toggling.on(button);
+          ariaOwner.link(button.element());
+        });
+        Keying.focusIn(overf);
+      };
+      var onClose = function () {
+        getPart(toolbar, detail, 'overflow-button').each(function (button) {
+          Toggling.off(button);
+          Focusing.focus(button);
+          ariaOwner.unlink(button.element());
+        });
+      };
+      return {
+        dom: {
+          tag: 'div',
+          attributes: { id: ariaOwner.id() }
+        },
+        behaviours: derive$1([
+          Keying.config({
+            mode: 'special',
+            onEscape: function (comp) {
+              Sandboxing.close(comp);
+              return Option.some(true);
+            }
+          }),
+          Sandboxing.config({
+            onOpen: onOpen,
+            onClose: onClose,
+            isPartOf: function (container, data, queryElem) {
+              return isPartOf(data, queryElem) || isPartOf(toolbar, queryElem);
+            },
+            getAttachPoint: function () {
+              return detail.lazySink(toolbar).getOrDie();
+            }
+          })
+        ])
+      };
+    };
+    var factory$b = function (detail, components, spec$1, externals) {
+      return spec(detail, components, spec$1, externals, {
+        refresh: refresh$1,
+        toggleToolbar: toggleToolbar,
+        getOverflow: function (toolbar) {
+          return Sandboxing.getState(Coupling.getCoupled(toolbar, 'sandbox'));
+        },
+        coupling: {
+          sandbox: function (toolbar) {
+            return makeSandbox$1(toolbar, detail);
+          }
+        }
+      });
+    };
+    var SplitFloatingToolbar = composite$1({
+      name: 'SplitFloatingToolbar',
+      configFields: schema$m(),
+      partFields: parts$9(),
+      factory: factory$b,
+      apis: {
+        setGroups: function (apis, toolbar, groups) {
+          apis.setGroups(toolbar, groups);
+        },
+        refresh: function (apis, toolbar) {
+          apis.refresh(toolbar);
+        },
+        getMoreButton: function (apis, toolbar) {
+          return apis.getMoreButton(toolbar);
+        },
+        getOverflow: function (apis, toolbar) {
+          return apis.getOverflow(toolbar);
+        },
+        toggle: function (apis, toolbar) {
+          apis.toggle(toolbar);
+        }
+      }
+    });
 
     var getAnimationRoot = function (component, slideConfig) {
       return slideConfig.getAnimationRoot.fold(function () {
@@ -21124,7 +21467,7 @@ var silver = (function (domGlobals) {
       slideState.setExpanded();
       slideConfig.onStartGrow(component);
     };
-    var refresh = function (component, slideConfig, slideState) {
+    var refresh$2 = function (component, slideConfig, slideState) {
       if (slideState.isExpanded()) {
         remove$6(component.element(), getDimensionProperty(slideConfig));
         var fullSize = getDimension(slideConfig, component.element());
@@ -21169,7 +21512,7 @@ var silver = (function (domGlobals) {
     };
 
     var SlidingApis = /*#__PURE__*/Object.freeze({
-        refresh: refresh,
+        refresh: refresh$2,
         grow: grow,
         shrink: shrink,
         immediateShrink: immediateShrink,
@@ -21268,91 +21611,22 @@ var silver = (function (domGlobals) {
       state: SlidingState
     });
 
-    var schema$j = constant([
-      defaulted$1('shell', true),
-      field$1('toolbarBehaviours', [Replacing])
-    ]);
-    var enhanceGroups = function (detail) {
-      return { behaviours: derive$1([Replacing.config({})]) };
-    };
-    var parts$7 = constant([optional({
-        name: 'groups',
-        overrides: enhanceGroups
-      })]);
-
-    var factory$9 = function (detail, components, spec, _externals) {
-      var setGroups = function (toolbar, groups) {
-        getGroupContainer(toolbar).fold(function () {
-          domGlobals.console.error('Toolbar was defined to not be a shell, but no groups container was specified in components');
-          throw new Error('Toolbar was defined to not be a shell, but no groups container was specified in components');
-        }, function (container) {
-          Replacing.set(container, groups);
-        });
-      };
-      var getGroupContainer = function (component) {
-        return detail.shell ? Option.some(component) : getPart(component, detail, 'groups');
-      };
-      var extra = detail.shell ? {
-        behaviours: [Replacing.config({})],
-        components: []
-      } : {
-        behaviours: [],
-        components: components
-      };
-      return {
-        uid: detail.uid,
-        dom: detail.dom,
-        components: extra.components,
-        behaviours: augment(detail.toolbarBehaviours, extra.behaviours),
-        apis: { setGroups: setGroups },
-        domModification: { attributes: { role: 'group' } }
-      };
-    };
-    var Toolbar = composite$1({
-      name: 'Toolbar',
-      configFields: schema$j(),
-      partFields: parts$7(),
-      factory: factory$9,
-      apis: {
-        setGroups: function (apis, toolbar, groups) {
-          apis.setGroups(toolbar, groups);
-        }
-      }
-    });
-
-    var schema$k = constant([
-      markers([
+    var schema$n = constant([markers([
         'closedClass',
         'openClass',
         'shrinkingClass',
         'growingClass',
         'overflowToggledClass'
-      ]),
-      field$1('splitToolbarBehaviours', []),
-      state$1('builtGroups', function () {
-        return Cell([]);
-      }),
-      defaulted$1('overflow', function (toolbar) {
-        return Option.none();
-      }),
-      defaultedBoolean('floating', false)
-    ]);
-    var toolbarSchema = [
-      strict$1('dom'),
-      defaulted$1('overflow', function (toolbar) {
-        return Option.none();
-      }),
-      defaultedBoolean('floating', false)
-    ];
-    var parts$8 = constant([
+      ])].concat(schema$l()));
+    var parts$a = constant([
       required({
         factory: Toolbar,
-        schema: toolbarSchema,
+        schema: schema$j(),
         name: 'primary'
       }),
-      optional({
+      required({
         factory: Toolbar,
-        schema: toolbarSchema,
+        schema: schema$j(),
         name: 'overflow',
         overrides: function (detail) {
           return {
@@ -21362,12 +21636,24 @@ var silver = (function (domGlobals) {
                 closedClass: detail.markers.closedClass,
                 openClass: detail.markers.openClass,
                 shrinkingClass: detail.markers.shrinkingClass,
-                growingClass: detail.markers.growingClass
+                growingClass: detail.markers.growingClass,
+                onShrunk: function (comp) {
+                  getPart(comp, detail, 'overflow-button').each(function (button) {
+                    Toggling.off(button);
+                    Focusing.focus(button);
+                  });
+                },
+                onGrown: function (comp) {
+                  Keying.focusIn(comp);
+                },
+                onStartGrow: function (comp) {
+                  getPart(comp, detail, 'overflow-button').each(Toggling.on);
+                }
               }),
               Keying.config({
                 mode: 'acyclic',
                 onEscape: function (comp) {
-                  getPart(comp, detail, 'overflow-button').each(Keying.focusIn);
+                  getPart(comp, detail, 'overflow-button').each(Focusing.focus);
                   return Option.some(true);
                 }
               })
@@ -21377,11 +21663,12 @@ var silver = (function (domGlobals) {
       }),
       external$1({
         name: 'overflow-button',
-        overrides: function (toolbarDetail) {
+        overrides: function (detail) {
           return {
             buttonBehaviours: derive$1([Toggling.config({
-                toggleClass: toolbarDetail.markers.overflowToggledClass,
-                aria: { mode: 'pressed' }
+                toggleClass: detail.markers.overflowToggledClass,
+                aria: { mode: 'pressed' },
+                toggleOnExecute: false
               })])
           };
         }
@@ -21389,140 +21676,35 @@ var silver = (function (domGlobals) {
       external$1({ name: 'overflow-group' })
     ]);
 
-    var schema$l = constant([
-      strict$1('items'),
-      markers(['itemSelector']),
-      field$1('tgroupBehaviours', [Keying])
-    ]);
-    var parts$9 = constant([group({
-        name: 'items',
-        unit: 'item'
-      })]);
-
-    var factory$a = function (detail, components, spec, _externals) {
-      return {
-        'uid': detail.uid,
-        'dom': detail.dom,
-        'components': components,
-        'behaviours': augment(detail.tgroupBehaviours, [Keying.config({
-            mode: 'flow',
-            selector: detail.markers.itemSelector
-          })]),
-        domModification: { attributes: { role: 'toolbar' } }
-      };
-    };
-    var ToolbarGroup = composite$1({
-      name: 'ToolbarGroup',
-      configFields: schema$l(),
-      partFields: parts$9(),
-      factory: factory$a
-    });
-
-    var setStoredGroups = function (bar, storedGroups) {
-      var bGroups = map(storedGroups, function (g) {
-        return premade$1(g);
-      });
-      Toolbar.setGroups(bar, bGroups);
-    };
-    var refresh$1 = function (toolbar, detail, externals, toolbarToggleEvent) {
-      var primary = getPartOrDie(toolbar, detail, 'primary');
-      var overflow = getPart(toolbar, detail, 'overflow').orThunk(function () {
-        return detail.overflow(toolbar);
-      });
-      set$2(primary.element(), 'visibility', 'hidden');
-      overflow.each(function (overf) {
-        Toolbar.setGroups(overf, []);
-      });
-      var groups = detail.builtGroups.get();
-      var overflowGroupSpec = ToolbarGroup.sketch(__assign({}, externals['overflow-group'](), {
-        items: [Button.sketch(__assign({}, externals['overflow-button'](), {
-            action: function (_button) {
-              if (detail.floating === true) {
-                emit(toolbar, toolbarToggleEvent);
-              } else {
-                overflow.each(function (overf) {
-                  Sliding.toggleGrow(overf);
-                });
-              }
-            }
-          }))]
-      }));
-      var overflowGroup = toolbar.getSystem().build(overflowGroupSpec);
-      setStoredGroups(primary, groups.concat([overflowGroup]));
-      var total = get$7(primary.element());
-      var overflows = partition$3(total, groups, function (comp) {
-        return get$7(comp.element());
-      }, overflowGroup);
-      if (overflows.extra().length === 0) {
-        Replacing.remove(primary, overflowGroup);
-        overflow.each(function (overf) {
-          Toolbar.setGroups(overf, []);
-        });
-      } else {
-        setStoredGroups(primary, overflows.within());
-        overflow.each(function (overf) {
-          setStoredGroups(overf, overflows.extra());
-        });
-      }
-      remove$6(primary.element(), 'visibility');
-      reflow(primary.element());
-      overflow.each(function (overf) {
-        if (!detail.floating) {
-          Sliding.refresh(overf);
-        }
-        getPart(toolbar, detail, 'overflow-button').each(function (moreButton) {
-          if (detail.floating) {
-            Toggling.set(moreButton, overf.getSystem().isConnected());
-          } else {
-            Toggling.set(moreButton, Sliding.hasGrown(overf));
-            Keying.focusIn(overf);
-          }
-        });
+    var toggleToolbar$1 = function (toolbar, detail) {
+      getPart(toolbar, detail, 'overflow').each(function (overf) {
+        refresh$3(toolbar, detail);
+        Sliding.toggleGrow(overf);
       });
     };
-    var factory$b = function (detail, components, spec, externals) {
-      var toolbarToggleEvent = 'alloy.toolbar.toggle';
-      var doSetGroups = function (toolbar, groups) {
-        var built = map(groups, toolbar.getSystem().build);
-        detail.builtGroups.set(built);
-      };
-      var setGroups = function (toolbar, groups) {
-        doSetGroups(toolbar, groups);
-        refresh$1(toolbar, detail, externals, toolbarToggleEvent);
-      };
-      var getMoreButton = function (toolbar) {
-        return getPart(toolbar, detail, 'overflow-button');
-      };
-      var getOverflow = function (toolbar) {
-        return getPart(toolbar, detail, 'overflow').orThunk(function () {
-          return detail.overflow(toolbar);
-        });
-      };
-      return {
-        uid: detail.uid,
-        dom: detail.dom,
-        components: components,
-        behaviours: augment(detail.splitToolbarBehaviours, []),
-        apis: {
-          setGroups: setGroups,
-          refresh: function (toolbar) {
-            refresh$1(toolbar, detail, externals, toolbarToggleEvent);
-          },
-          getMoreButton: function (toolbar) {
-            return getMoreButton(toolbar);
-          },
-          getOverflow: function (toolbar) {
-            return getOverflow(toolbar);
-          }
+    var isOpen$2 = function (overf) {
+      return Sliding.hasGrown(overf);
+    };
+    var refresh$3 = function (toolbar, detail) {
+      var overflow = getPart(toolbar, detail, 'overflow');
+      refresh(toolbar, detail, overflow, isOpen$2);
+      overflow.each(Sliding.refresh);
+    };
+    var factory$c = function (detail, components, spec$1, externals) {
+      return spec(detail, components, spec$1, externals, {
+        refresh: refresh$3,
+        toggleToolbar: toggleToolbar$1,
+        getOverflow: function (toolbar) {
+          return getPart(toolbar, detail, 'overflow');
         },
-        domModification: { attributes: { role: 'group' } }
-      };
+        coupling: {}
+      });
     };
-    var SplitToolbar = composite$1({
-      name: 'SplitToolbar',
-      configFields: schema$k(),
-      partFields: parts$8(),
-      factory: factory$b,
+    var SplitSlidingToolbar = composite$1({
+      name: 'SplitSlidingToolbar',
+      configFields: schema$n(),
+      partFields: parts$a(),
+      factory: factory$c,
       apis: {
         setGroups: function (apis, toolbar, groups) {
           apis.setGroups(toolbar, groups);
@@ -21535,9 +21717,71 @@ var silver = (function (domGlobals) {
         },
         getOverflow: function (apis, toolbar) {
           return apis.getOverflow(toolbar);
+        },
+        toggle: function (apis, toolbar) {
+          apis.toggle(toolbar);
         }
       }
     });
+
+    var ReadOnlyChannel = 'silver.readonly';
+    var ReadOnlyDataSchema = objOf([strictBoolean('readonly')]);
+    var setDisabledAll = function (element, state) {
+      all('*', element.element()).forEach(function (elm) {
+        element.getSystem().getByDom(elm).each(function (comp) {
+          if (comp.hasConfigured(Disabling)) {
+            Disabling.set(comp, state);
+          }
+        });
+      });
+    };
+    var broadcastReadonly = function (uiComponents, readonly) {
+      var outerContainer = uiComponents.outerContainer;
+      var target = outerContainer.element();
+      if (readonly) {
+        uiComponents.mothership.broadcastOn([dismissPopups()], { target: target });
+        uiComponents.uiMothership.broadcastOn([dismissPopups()], { target: target });
+      }
+      uiComponents.mothership.broadcastOn([ReadOnlyChannel], { readonly: readonly });
+      uiComponents.uiMothership.broadcastOn([ReadOnlyChannel], { readonly: readonly });
+    };
+    var toggleToReadOnly = function (uiComponents, readonly) {
+      var outerContainer = uiComponents.outerContainer;
+      broadcastReadonly(uiComponents, readonly);
+      all('*', outerContainer.element()).forEach(function (elm) {
+        outerContainer.getSystem().getByDom(elm).each(function (comp) {
+          if (comp.hasConfigured(Disabling)) {
+            Disabling.set(comp, readonly);
+          }
+        });
+      });
+    };
+    var setupReadonlyModeSwitch = function (editor, uiComponents) {
+      editor.on('init', function () {
+        if (editor.readonly) {
+          toggleToReadOnly(uiComponents, true);
+        }
+      });
+      editor.on('SwitchMode', function () {
+        return toggleToReadOnly(uiComponents, editor.readonly);
+      });
+      if (isReadOnly(editor)) {
+        editor.setMode('readonly');
+      }
+    };
+    var createReadonlyReceivingForOverflow = function (getOverflow) {
+      var _a;
+      return Receiving.config({
+        channels: (_a = {}, _a[ReadOnlyChannel] = {
+          schema: ReadOnlyDataSchema,
+          onReceive: function (comp, data) {
+            getOverflow(comp).each(function (toolbar) {
+              setDisabledAll(toolbar, data.readonly);
+            });
+          }
+        }, _a)
+      });
+    };
 
     var renderToolbarGroupCommon = function (toolbarGroup) {
       var attributes = toolbarGroup.title.fold(function () {
@@ -21562,31 +21806,10 @@ var silver = (function (domGlobals) {
     var renderToolbarGroup = function (toolbarGroup) {
       return ToolbarGroup.sketch(renderToolbarGroupCommon(toolbarGroup));
     };
-    var getToolbarbehaviours = function (toolbarSpec, modeName, overflowOpt) {
+    var getToolbarbehaviours = function (toolbarSpec, modeName, getOverflow) {
       var onAttached = runOnAttached(function (component) {
         var groups = map(toolbarSpec.initGroups, renderToolbarGroup);
         Toolbar.setGroups(component, groups);
-      });
-      var eventBehaviours = overflowOpt.fold(function () {
-        return [onAttached];
-      }, function (memOverflow) {
-        return [
-          onAttached,
-          run('alloy.toolbar.toggle', function (toolbar, se) {
-            toolbarSpec.getSink().toOption().each(function (sink) {
-              memOverflow.getOpt(sink).fold(function () {
-                var builtoverFlow = build$1(memOverflow.asSpec());
-                attach(sink, builtoverFlow);
-                Positioning.position(sink, toolbarSpec.backstage.shared.anchors.toolbarOverflow(), builtoverFlow);
-                SplitToolbar.refresh(toolbar);
-                SplitToolbar.getMoreButton(toolbar).each(Focusing.focus);
-                Keying.focusIn(builtoverFlow);
-              }, function (builtOverflow) {
-                detach(builtOverflow);
-              });
-            });
-          })
-        ];
       });
       return derive$1([
         Keying.config({
@@ -21594,62 +21817,18 @@ var silver = (function (domGlobals) {
           onEscape: toolbarSpec.onEscape,
           selector: '.tox-toolbar__group'
         }),
-        config('toolbar-events', eventBehaviours)
+        config('toolbar-events', [onAttached]),
+        createReadonlyReceivingForOverflow(getOverflow)
       ]);
     };
-    var renderMoreToolbar = function (toolbarSpec) {
+    var renderMoreToolbarCommon = function (toolbarSpec, getOverflow) {
       var modeName = toolbarSpec.cyclicKeying ? 'cyclic' : 'acyclic';
-      var memOverflow = record(Toolbar.sketch({
-        dom: {
-          tag: 'div',
-          classes: ['tox-toolbar__overflow']
-        },
-        toolbarBehaviours: derive$1([Keying.config({
-            mode: 'cyclic',
-            onEscape: function () {
-              emit(toolbarSpec.moreDrawerData.lazyToolbar(), 'alloy.toolbar.toggle');
-              Keying.focusIn(toolbarSpec.moreDrawerData.lazyMoreButton());
-              return Option.some(true);
-            }
-          })])
-      }));
-      var getOverflow = function (toolbar) {
-        return toolbarSpec.getSink().toOption().bind(function (sink) {
-          return memOverflow.getOpt(sink).bind(function (overflow) {
-            return SplitToolbar.getMoreButton(toolbar).bind(function (_moreButton) {
-              if (overflow.getSystem().isConnected()) {
-                Positioning.position(sink, toolbarSpec.backstage.shared.anchors.toolbarOverflow(), overflow);
-                return Option.some(overflow);
-              } else {
-                return Option.none();
-              }
-            });
-          });
-        });
-      };
-      var primary = SplitToolbar.parts().primary({
-        dom: {
-          tag: 'div',
-          classes: ['tox-toolbar__primary']
-        }
-      });
-      var splitToolbarComponents = toolbarSpec.moreDrawerData.floating ? [primary] : [
-        primary,
-        SplitToolbar.parts().overflow({
-          dom: {
-            tag: 'div',
-            classes: ['tox-toolbar__overflow']
-          }
-        })
-      ];
-      return SplitToolbar.sketch({
+      return {
         uid: toolbarSpec.uid,
         dom: {
           tag: 'div',
           classes: ['tox-toolbar-overlord']
         },
-        floating: toolbarSpec.moreDrawerData.floating,
-        overflow: getOverflow,
         parts: {
           'overflow-group': renderToolbarGroupCommon({
             title: Option.none(),
@@ -21662,16 +21841,61 @@ var silver = (function (domGlobals) {
             tooltip: Option.some('More...')
           }, Option.none(), toolbarSpec.backstage.shared.providers)
         },
-        components: splitToolbarComponents,
+        splitToolbarBehaviours: getToolbarbehaviours(toolbarSpec, modeName, getOverflow)
+      };
+    };
+    var renderFloatingMoreToolbar = function (toolbarSpec) {
+      var baseSpec = renderMoreToolbarCommon(toolbarSpec, SplitFloatingToolbar.getOverflow);
+      var primary = SplitFloatingToolbar.parts().primary({
+        dom: {
+          tag: 'div',
+          classes: ['tox-toolbar__primary']
+        }
+      });
+      return SplitFloatingToolbar.sketch(__assign({}, baseSpec, {
+        lazySink: toolbarSpec.getSink,
+        getAnchor: function () {
+          return toolbarSpec.backstage.shared.anchors.toolbarOverflow();
+        },
+        parts: __assign({}, baseSpec.parts, {
+          overflow: {
+            dom: {
+              tag: 'div',
+              classes: ['tox-toolbar__overflow']
+            }
+          }
+        }),
+        components: [primary],
+        markers: { overflowToggledClass: 'tox-tbtn--enabled' }
+      }));
+    };
+    var renderSlidingMoreToolbar = function (toolbarSpec) {
+      var primary = SplitSlidingToolbar.parts().primary({
+        dom: {
+          tag: 'div',
+          classes: ['tox-toolbar__primary']
+        }
+      });
+      var overflow = SplitSlidingToolbar.parts().overflow({
+        dom: {
+          tag: 'div',
+          classes: ['tox-toolbar__overflow']
+        }
+      });
+      var baseSpec = renderMoreToolbarCommon(toolbarSpec, SplitSlidingToolbar.getOverflow);
+      return SplitSlidingToolbar.sketch(__assign({}, baseSpec, {
+        components: [
+          primary,
+          overflow
+        ],
         markers: {
           openClass: 'tox-toolbar__overflow--open',
           closedClass: 'tox-toolbar__overflow--closed',
           growingClass: 'tox-toolbar__overflow--growing',
           shrinkingClass: 'tox-toolbar__overflow--shrinking',
           overflowToggledClass: 'tox-tbtn--enabled'
-        },
-        splitToolbarBehaviours: getToolbarbehaviours(toolbarSpec, modeName, Option.some(memOverflow))
-      });
+        }
+      }));
     };
     var renderToolbar = function (toolbarSpec) {
       var modeName = toolbarSpec.cyclicKeying ? 'cyclic' : 'acyclic';
@@ -21682,7 +21906,7 @@ var silver = (function (domGlobals) {
           classes: ['tox-toolbar']
         },
         components: [Toolbar.parts().groups({})],
-        toolbarBehaviours: getToolbarbehaviours(toolbarSpec, modeName, Option.none())
+        toolbarBehaviours: getToolbarbehaviours(toolbarSpec, modeName, constant(Option.none()))
       });
     };
 
@@ -21904,7 +22128,7 @@ var silver = (function (domGlobals) {
       state: ReflectingState
     });
 
-    var schema$m = constant([
+    var schema$o = constant([
       strict$1('toggleClass'),
       strict$1('fetch'),
       onStrictHandler('onExecute'),
@@ -21969,7 +22193,7 @@ var silver = (function (domGlobals) {
         };
       }
     });
-    var parts$a = constant([
+    var parts$b = constant([
       arrowPart,
       buttonPart,
       optional({
@@ -22005,7 +22229,7 @@ var silver = (function (domGlobals) {
       partType()
     ]);
 
-    var factory$c = function (detail, components, spec, externals) {
+    var factory$d = function (detail, components, spec, externals) {
       var switchToMenu = function (sandbox) {
         Composing.getCurrent(sandbox).each(function (current) {
           Highlighting.highlightFirst(current);
@@ -22088,9 +22312,9 @@ var silver = (function (domGlobals) {
     };
     var SplitDropdown = composite$1({
       name: 'SplitDropdown',
-      configFields: schema$m(),
-      partFields: parts$a(),
-      factory: factory$c
+      configFields: schema$o(),
+      partFields: parts$b(),
+      factory: factory$d
     });
 
     var updateMenuText = generate$1('update-menu-text');
@@ -22914,6 +23138,9 @@ var silver = (function (domGlobals) {
         };
       };
       var onSetup = function (api) {
+        spec.setInitialValue.each(function (f) {
+          return f(api.getComponent());
+        });
         return spec.nodeChangeHandler.map(function (f) {
           var handler = f(api.getComponent());
           editor.on('NodeChange', handler);
@@ -23016,16 +23243,22 @@ var silver = (function (domGlobals) {
           return Option.none();
         };
       };
+      var updateSelectMenuIcon = function (comp) {
+        var match = getMatchingValue();
+        var alignment = match.fold(function () {
+          return 'left';
+        }, function (item) {
+          return item.title.toLowerCase();
+        });
+        emitWith(comp, updateMenuIcon, { icon: 'align-' + alignment });
+      };
       var nodeChangeHandler = Option.some(function (comp) {
         return function () {
-          var match = getMatchingValue();
-          var alignment = match.fold(function () {
-            return 'left';
-          }, function (item) {
-            return item.title.toLowerCase();
-          });
-          emitWith(comp, updateMenuIcon, { icon: 'align-' + alignment });
+          return updateSelectMenuIcon(comp);
         };
+      });
+      var setInitialValue = Option.some(function (comp) {
+        return updateSelectMenuIcon(comp);
       });
       var dataset = buildBasicStaticDataset(alignMenuItems);
       return {
@@ -23034,6 +23267,7 @@ var silver = (function (domGlobals) {
         isSelectedFor: isSelectedFor,
         getPreviewFor: getPreviewFor,
         onAction: onActionToggleFormat(editor),
+        setInitialValue: setInitialValue,
         nodeChangeHandler: nodeChangeHandler,
         dataset: dataset,
         shouldHide: false,
@@ -23119,17 +23353,23 @@ var silver = (function (domGlobals) {
           });
         };
       };
+      var updateSelectMenuText = function (comp) {
+        var fontFamily = editor.queryCommandValue('FontName');
+        var match = getMatchingValue();
+        var text = match.fold(function () {
+          return fontFamily;
+        }, function (item) {
+          return item.title;
+        });
+        emitWith(comp, updateMenuText, { text: text });
+      };
       var nodeChangeHandler = Option.some(function (comp) {
         return function () {
-          var fontFamily = editor.queryCommandValue('FontName');
-          var match = getMatchingValue();
-          var text = match.fold(function () {
-            return fontFamily;
-          }, function (item) {
-            return item.title;
-          });
-          emitWith(comp, updateMenuText, { text: text });
+          return updateSelectMenuText(comp);
         };
+      });
+      var setInitialValue = Option.some(function (comp) {
+        return updateSelectMenuText(comp);
       });
       var dataset = buildBasicSettingsDataset(editor, 'font_formats', defaultFontsFormats, Delimiter.SemiColon);
       return {
@@ -23138,6 +23378,7 @@ var silver = (function (domGlobals) {
         isSelectedFor: isSelectedFor,
         getPreviewFor: getPreviewFor,
         onAction: onAction,
+        setInitialValue: setInitialValue,
         nodeChangeHandler: nodeChangeHandler,
         dataset: dataset,
         shouldHide: false,
@@ -23214,16 +23455,22 @@ var silver = (function (domGlobals) {
           });
         };
       };
+      var updateSelectMenuText = function (comp) {
+        var _a = getMatchingValue(), matchOpt = _a.matchOpt, px = _a.px;
+        var text = matchOpt.fold(function () {
+          return px;
+        }, function (match) {
+          return match.title;
+        });
+        emitWith(comp, updateMenuText, { text: text });
+      };
       var nodeChangeHandler = Option.some(function (comp) {
         return function () {
-          var _a = getMatchingValue(), matchOpt = _a.matchOpt, px = _a.px;
-          var text = matchOpt.fold(function () {
-            return px;
-          }, function (match) {
-            return match.title;
-          });
-          emitWith(comp, updateMenuText, { text: text });
+          return updateSelectMenuText(comp);
         };
+      });
+      var setInitialValue = Option.some(function (comp) {
+        return updateSelectMenuText(comp);
       });
       var dataset = buildBasicSettingsDataset(editor, 'fontsize_formats', defaultFontsizeFormats, Delimiter.Space);
       return {
@@ -23232,6 +23479,7 @@ var silver = (function (domGlobals) {
         isSelectedFor: isSelectedFor,
         getPreviewFor: getPreviewFor,
         onAction: onAction,
+        setInitialValue: setInitialValue,
         nodeChangeHandler: nodeChangeHandler,
         dataset: dataset,
         shouldHide: false,
@@ -23255,8 +23503,7 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var findNearest = function (editor, getStyles, nodeChangeEvent) {
-      var parents = nodeChangeEvent.parents;
+    var findNearest = function (editor, getStyles, parents) {
       var styles = getStyles();
       return findMap(parents, function (parent) {
         return find(styles, function (fmt) {
@@ -23271,6 +23518,12 @@ var silver = (function (domGlobals) {
         }
         return Option.none();
       });
+    };
+    var getCurrentSelectionParents = function (editor) {
+      var currentNode = editor.selection.getStart(true) || editor.getBody();
+      return editor.dom.getParents(currentNode, function () {
+        return true;
+      }, editor.getBody());
     };
 
     var defaultBlocks = 'Paragraph=p;' + 'Heading 1=h1;' + 'Heading 2=h2;' + 'Heading 3=h3;' + 'Heading 4=h4;' + 'Heading 5=h5;' + 'Heading 6=h6;' + 'Preformatted=pre';
@@ -23294,16 +23547,23 @@ var silver = (function (domGlobals) {
           });
         };
       };
+      var updateSelectMenuText = function (parents, comp) {
+        var detectedFormat = getMatchingValue(parents);
+        var text = detectedFormat.fold(function () {
+          return 'Paragraph';
+        }, function (fmt) {
+          return fmt.title;
+        });
+        emitWith(comp, updateMenuText, { text: text });
+      };
       var nodeChangeHandler = Option.some(function (comp) {
         return function (e) {
-          var detectedFormat = getMatchingValue(e);
-          var text = detectedFormat.fold(function () {
-            return 'Paragraph';
-          }, function (fmt) {
-            return fmt.title;
-          });
-          emitWith(comp, updateMenuText, { text: text });
+          return updateSelectMenuText(e.parents, comp);
         };
+      });
+      var setInitialValue = Option.some(function (comp) {
+        var parents = getCurrentSelectionParents(editor);
+        updateSelectMenuText(parents, comp);
       });
       var dataset = buildBasicSettingsDataset(editor, 'block_formats', defaultBlocks, Delimiter.SemiColon);
       return {
@@ -23312,6 +23572,7 @@ var silver = (function (domGlobals) {
         isSelectedFor: isSelectedFor,
         getPreviewFor: getPreviewFor,
         onAction: onActionToggleFormat(editor),
+        setInitialValue: setInitialValue,
         nodeChangeHandler: nodeChangeHandler,
         dataset: dataset,
         shouldHide: false,
@@ -23350,7 +23611,7 @@ var silver = (function (domGlobals) {
           }) : Option.none();
         };
       };
-      var nodeChangeHandler = Option.some(function (comp) {
+      var updateSelectMenuText = function (parents, comp) {
         var getFormatItems = function (fmt) {
           var subs = fmt.items;
           return subs !== undefined && subs.length > 0 ? bind(subs, getFormatItems) : [{
@@ -23359,17 +23620,24 @@ var silver = (function (domGlobals) {
             }];
         };
         var flattenedItems = bind(getStyleFormats(editor), getFormatItems);
+        var detectedFormat = findNearest(editor, function () {
+          return flattenedItems;
+        }, parents);
+        var text = detectedFormat.fold(function () {
+          return 'Paragraph';
+        }, function (fmt) {
+          return fmt.title;
+        });
+        emitWith(comp, updateMenuText, { text: text });
+      };
+      var nodeChangeHandler = Option.some(function (comp) {
         return function (e) {
-          var detectedFormat = findNearest(editor, function () {
-            return flattenedItems;
-          }, e);
-          var text = detectedFormat.fold(function () {
-            return 'Paragraph';
-          }, function (fmt) {
-            return fmt.title;
-          });
-          emitWith(comp, updateMenuText, { text: text });
+          return updateSelectMenuText(e.parents, comp);
         };
+      });
+      var setInitialValue = Option.some(function (comp) {
+        var parents = getCurrentSelectionParents(editor);
+        updateSelectMenuText(parents, comp);
       });
       return {
         tooltip: 'Formats',
@@ -23377,6 +23645,7 @@ var silver = (function (domGlobals) {
         isSelectedFor: isSelectedFor,
         getPreviewFor: getPreviewFor,
         onAction: onActionToggleFormat(editor),
+        setInitialValue: setInitialValue,
         nodeChangeHandler: nodeChangeHandler,
         shouldHide: editor.getParam('style_formats_autohide', false, 'boolean'),
         isInvalid: function (item) {
@@ -23750,6 +24019,12 @@ var silver = (function (domGlobals) {
             }
           }, 0);
         });
+        editor.on('SwitchMode', function () {
+          if (editor.readonly) {
+            lastAnchor.set(Option.none());
+            InlineView.hide(contextbar);
+          }
+        });
         editor.on('NodeChange', function (e) {
           search$1(contextbar.element()).fold(function () {
             resetTimer(global$1.setEditorTimeout(editor, launchContextToolbar, 0));
@@ -23845,10 +24120,29 @@ var silver = (function (domGlobals) {
     };
     var Events = { setup: setup$3 };
 
-    var parts$b = AlloyParts;
+    var fireSkinLoaded = function (editor) {
+      return editor.fire('SkinLoaded');
+    };
+    var fireResizeEditor = function (editor) {
+      return editor.fire('ResizeEditor');
+    };
+    var fireBeforeRenderUI = function (editor) {
+      return editor.fire('BeforeRenderUI');
+    };
+    var fireResizeContent = function (editor) {
+      return editor.fire('ResizeContent');
+    };
+    var Events$1 = {
+      fireSkinLoaded: fireSkinLoaded,
+      fireResizeEditor: fireResizeEditor,
+      fireBeforeRenderUI: fireBeforeRenderUI,
+      fireResizeContent: fireResizeContent
+    };
+
+    var parts$c = AlloyParts;
     var partType$1 = PartType;
 
-    var factory$d = function (detail, spec) {
+    var factory$e = function (detail, spec) {
       var setMenus = function (comp, menus) {
         var newMenus = map(menus, function (m) {
           var buttonSpec = {
@@ -23924,7 +24218,7 @@ var silver = (function (domGlobals) {
       };
     };
     var SilverMenubar = single$2({
-      factory: factory$d,
+      factory: factory$e,
       name: 'silver.Menubar',
       configFields: [
         strict$1('dom'),
@@ -23944,7 +24238,7 @@ var silver = (function (domGlobals) {
     });
 
     var owner$4 = 'container';
-    var schema$n = [field$1('slotBehaviours', [])];
+    var schema$p = [field$1('slotBehaviours', [])];
     var getPartName$1 = function (name) {
       return '<alloy.field.' + name + '>';
     };
@@ -23970,7 +24264,7 @@ var silver = (function (domGlobals) {
           pname: getPartName$1(n)
         });
       });
-      return composite(owner$4, schema$n, fieldParts, make$6, spec);
+      return composite(owner$4, schema$p, fieldParts, make$6, spec);
     };
     var make$6 = function (detail, components, spec) {
       var getSlotNames = function (_) {
@@ -24337,53 +24631,59 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var factory$e = function (detail, components, spec) {
+    var factory$f = function (detail, components, spec) {
       var apis = {
         getSocket: function (comp) {
-          return parts$b.getPart(comp, detail, 'socket');
+          return parts$c.getPart(comp, detail, 'socket');
         },
         setSidebar: function (comp, panelConfigs) {
-          parts$b.getPart(comp, detail, 'sidebar').each(function (sidebar) {
+          parts$c.getPart(comp, detail, 'sidebar').each(function (sidebar) {
             return setSidebar(sidebar, panelConfigs);
           });
         },
         toggleSidebar: function (comp, name) {
-          parts$b.getPart(comp, detail, 'sidebar').each(function (sidebar) {
+          parts$c.getPart(comp, detail, 'sidebar').each(function (sidebar) {
             return toggleSidebar(sidebar, name);
           });
         },
         whichSidebar: function (comp) {
-          return parts$b.getPart(comp, detail, 'sidebar').bind(whichSidebar).getOrNull();
+          return parts$c.getPart(comp, detail, 'sidebar').bind(whichSidebar).getOrNull();
         },
         getToolbar: function (comp) {
-          return parts$b.getPart(comp, detail, 'toolbar');
+          return parts$c.getPart(comp, detail, 'toolbar');
         },
         setToolbar: function (comp, groups) {
-          parts$b.getPart(comp, detail, 'toolbar').each(function (toolbar) {
-            Toolbar.setGroups(toolbar, groups);
+          parts$c.getPart(comp, detail, 'toolbar').each(function (toolbar) {
+            toolbar.getApis().setGroups(toolbar, groups);
+          });
+        },
+        refreshToolbar: function (comp) {
+          var toolbar = parts$c.getPart(comp, detail, 'toolbar');
+          toolbar.each(function (toolbar) {
+            return toolbar.getApis().refresh(toolbar);
           });
         },
         getMoreButton: function (comp) {
-          var toolbar = parts$b.getPart(comp, detail, 'toolbar');
+          var toolbar = parts$c.getPart(comp, detail, 'toolbar');
           return toolbar.bind(function (toolbar) {
-            return SplitToolbar.getMoreButton(toolbar);
+            return toolbar.getApis().getMoreButton(toolbar);
           });
         },
         getThrobber: function (comp) {
-          return parts$b.getPart(comp, detail, 'throbber');
+          return parts$c.getPart(comp, detail, 'throbber');
         },
         focusToolbar: function (comp) {
-          parts$b.getPart(comp, detail, 'toolbar').each(function (toolbar) {
+          parts$c.getPart(comp, detail, 'toolbar').each(function (toolbar) {
             Keying.focusIn(toolbar);
           });
         },
         setMenubar: function (comp, menus) {
-          parts$b.getPart(comp, detail, 'menubar').each(function (menubar) {
+          parts$c.getPart(comp, detail, 'menubar').each(function (menubar) {
             SilverMenubar.setMenus(menubar, menus);
           });
         },
         focusMenubar: function (comp) {
-          parts$b.getPart(comp, detail, 'menubar').each(function (menubar) {
+          parts$c.getPart(comp, detail, 'menubar').each(function (menubar) {
             SilverMenubar.focus(menubar);
           });
         }
@@ -24401,10 +24701,19 @@ var silver = (function (domGlobals) {
       name: 'menubar',
       schema: [strict$1('backstage')]
     });
+    var toolbarFactory = function (spec) {
+      if (spec.split === ToolbarDrawer.sliding) {
+        return renderSlidingMoreToolbar;
+      } else if (spec.split === ToolbarDrawer.floating) {
+        return renderFloatingMoreToolbar;
+      } else {
+        return renderToolbar;
+      }
+    };
     var partToolbar = partType$1.optional({
       factory: {
         sketch: function (spec) {
-          var renderer = spec.split === ToolbarDrawer.sliding || spec.split === ToolbarDrawer.floating ? renderMoreToolbar : renderToolbar;
+          var renderer = toolbarFactory(spec);
           var toolbarSpec = {
             uid: spec.uid,
             onEscape: function () {
@@ -24416,7 +24725,6 @@ var silver = (function (domGlobals) {
             getSink: spec.getSink,
             backstage: spec.backstage,
             moreDrawerData: {
-              floating: spec.split === ToolbarDrawer.floating,
               lazyToolbar: spec.lazyToolbar,
               lazyMoreButton: spec.lazyMoreButton
             }
@@ -24447,7 +24755,7 @@ var silver = (function (domGlobals) {
     });
     var OuterContainer = composite$1({
       name: 'OuterContainer',
-      factory: factory$e,
+      factory: factory$f,
       configFields: [
         strict$1('dom'),
         strict$1('behaviours')
@@ -24483,6 +24791,9 @@ var silver = (function (domGlobals) {
         },
         getMoreButton: function (apis, comp) {
           return apis.getMoreButton(comp);
+        },
+        refreshToolbar: function (apis, comp) {
+          return apis.refreshToolbar(comp);
         },
         getThrobber: function (apis, comp) {
           return apis.getThrobber(comp);
@@ -24586,25 +24897,6 @@ var silver = (function (domGlobals) {
       });
     };
 
-    var fireSkinLoaded = function (editor) {
-      return editor.fire('SkinLoaded');
-    };
-    var fireResizeEditor = function (editor) {
-      return editor.fire('ResizeEditor');
-    };
-    var fireBeforeRenderUI = function (editor) {
-      return editor.fire('BeforeRenderUI');
-    };
-    var fireResizeContent = function (editor) {
-      return editor.fire('ResizeContent');
-    };
-    var Events$1 = {
-      fireSkinLoaded: fireSkinLoaded,
-      fireResizeEditor: fireResizeEditor,
-      fireBeforeRenderUI: fireBeforeRenderUI,
-      fireResizeContent: fireResizeContent
-    };
-
     var fireSkinLoaded$1 = function (editor) {
       var done = function () {
         editor._skinLoaded = true;
@@ -24637,22 +24929,6 @@ var silver = (function (domGlobals) {
     var inline = curry(loadSkin, true);
 
     var DOM = global$6.DOM;
-    var handleSwitchMode = function (uiComponents) {
-      return function (e) {
-        var outerContainer = uiComponents.outerContainer;
-        all('*', outerContainer.element()).forEach(function (elm) {
-          outerContainer.getSystem().getByDom(elm).each(function (comp) {
-            if (comp.hasConfigured(Disabling)) {
-              if (e.mode === 'readonly') {
-                Disabling.disable(comp);
-              } else {
-                Disabling.enable(comp);
-              }
-            }
-          });
-        });
-      };
-    };
     var setupEvents = function (editor) {
       var contentWindow = editor.getWin();
       var initialDocEle = editor.getDoc().documentElement;
@@ -24678,23 +24954,19 @@ var silver = (function (domGlobals) {
       });
     };
     var render = function (editor, uiComponents, rawUiConfig, backstage, args) {
+      var lastToolbarWidth = Cell(0);
       iframe(editor);
       attachSystemAfter(Element.fromDom(args.targetNode), uiComponents.mothership);
       attachSystem(body(), uiComponents.uiMothership);
       editor.on('init', function () {
         OuterContainer.setToolbar(uiComponents.outerContainer, identifyButtons(editor, rawUiConfig, { backstage: backstage }, Option.none()));
+        lastToolbarWidth.set(editor.getWin().innerWidth);
         OuterContainer.setMenubar(uiComponents.outerContainer, identifyMenus(editor, rawUiConfig));
         OuterContainer.setSidebar(uiComponents.outerContainer, rawUiConfig.sidebar);
-        if (editor.readonly) {
-          handleSwitchMode(uiComponents)({ mode: 'readonly' });
-        }
         setupEvents(editor);
       });
       var socket = OuterContainer.getSocket(uiComponents.outerContainer).getOrDie('Could not find expected socket element');
-      editor.on('SwitchMode', handleSwitchMode(uiComponents));
-      if (isReadOnly(editor)) {
-        editor.setMode('readonly');
-      }
+      setupReadonlyModeSwitch(editor, uiComponents);
       editor.addCommand('ToggleSidebar', function (ui, value) {
         OuterContainer.toggleSidebar(uiComponents.outerContainer, value);
         editor.fire('ToggleSidebar');
@@ -24704,11 +24976,16 @@ var silver = (function (domGlobals) {
       });
       var drawer = getToolbarDrawer(editor);
       var refreshDrawer = function () {
-        var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
-        toolbar.each(SplitToolbar.refresh);
+        OuterContainer.refreshToolbar(uiComponents.outerContainer);
       };
       if (drawer === ToolbarDrawer.sliding || drawer === ToolbarDrawer.floating) {
-        editor.on('ResizeContent', refreshDrawer);
+        editor.on('ResizeContent', function () {
+          var width = editor.getWin().innerWidth;
+          if (width !== lastToolbarWidth.get()) {
+            refreshDrawer();
+          }
+          lastToolbarWidth.set(width);
+        });
       }
       return {
         iframeContainer: socket.element().dom(),
@@ -24906,7 +25183,7 @@ var silver = (function (domGlobals) {
       return isDocked ? morphToAbsolute(component, dockInfo, viewport) : morphToFixed(component, dockInfo, viewport, scroll, origin);
     };
 
-    var refresh$2 = function (component, config, state) {
+    var refresh$4 = function (component, config, state) {
       var viewport = config.lazyViewport(component);
       config.contextual.each(function (contextInfo) {
         contextInfo.lazyContext(component).each(function (elem) {
@@ -24926,7 +25203,7 @@ var silver = (function (domGlobals) {
     };
 
     var DockingApis = /*#__PURE__*/Object.freeze({
-        refresh: refresh$2
+        refresh: refresh$4
     });
 
     var events$f = function (dockInfo, dockState) {
@@ -24940,7 +25217,7 @@ var silver = (function (domGlobals) {
           });
         }),
         run(windowScroll(), function (component, _) {
-          refresh$2(component, dockInfo, dockState);
+          refresh$4(component, dockInfo, dockState);
         })
       ]);
     };
@@ -24978,7 +25255,6 @@ var silver = (function (domGlobals) {
       var useFixedToolbarContainer = useFixedContainer(editor);
       var splitSetting = getToolbarDrawer(editor);
       var split = splitSetting === ToolbarDrawer.sliding || splitSetting === ToolbarDrawer.floating;
-      var floating = splitSetting === ToolbarDrawer.floating;
       inline(editor);
       var calcPosition = function (offset) {
         if (offset === void 0) {
@@ -24986,23 +25262,36 @@ var silver = (function (domGlobals) {
         }
         var location = absolute(Element.fromDom(editor.getBody()));
         return {
-          top: Math.round(location.top() - get$8(floatContainer.element())) + offset + 'px',
-          left: Math.round(location.left()) + 'px'
+          top: Math.round(location.top() - get$8(floatContainer.element())) + offset,
+          left: Math.round(location.left())
         };
       };
       var setChromePosition = function (toolbar) {
+        var isDocked = getRaw(floatContainer.element(), 'position').is('fixed');
         var offset = split ? toolbar.fold(function () {
           return 0;
         }, function (tbar) {
           return tbar.components().length > 1 ? get$8(tbar.components()[1].element()) : 0;
         }) : 0;
-        setAll$1(floatContainer.element(), calcPosition(offset));
+        var position = calcPosition(offset);
+        if (isDocked) {
+          setAll(floatContainer.element(), tupleMap(position, function (value, key) {
+            return {
+              k: 'data-dock-' + key,
+              v: value
+            };
+          }));
+        } else {
+          setAll$1(floatContainer.element(), map$1(position, function (value) {
+            return value + 'px';
+          }));
+        }
         Docking.refresh(floatContainer);
       };
       var updateChromeUi = function () {
         var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
         if (split) {
-          toolbar.each(SplitToolbar.refresh);
+          OuterContainer.refreshToolbar(uiComponents.outerContainer);
         }
         if (!useFixedToolbarContainer) {
           setChromePosition(toolbar);
@@ -25011,31 +25300,15 @@ var silver = (function (domGlobals) {
       var show = function () {
         set$2(uiComponents.outerContainer.element(), 'display', 'flex');
         DOM.addClass(editor.getBody(), 'mce-edit-focus');
+        remove$6(uiComponents.uiMothership.element(), 'display');
         updateChromeUi();
-        if (floating) {
-          var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
-          toolbar.each(function (tb) {
-            var overflow = SplitToolbar.getOverflow(tb);
-            overflow.each(function (overf) {
-              remove$4(overf.element(), 'tox-toolbar__overflow--closed');
-            });
-          });
-        }
       };
       var hide = function () {
         if (uiComponents.outerContainer) {
           set$2(uiComponents.outerContainer.element(), 'display', 'none');
           DOM.removeClass(editor.getBody(), 'mce-edit-focus');
-          if (floating) {
-            var toolbar = OuterContainer.getToolbar(uiComponents.outerContainer);
-            toolbar.each(function (tb) {
-              var overflow = SplitToolbar.getOverflow(tb);
-              overflow.each(function (overf) {
-                add$2(overf.element(), 'tox-toolbar__overflow--closed');
-              });
-            });
-          }
         }
+        set$2(uiComponents.uiMothership.element(), 'display', 'none');
       };
       var render = function () {
         if (floatContainer) {
@@ -25065,6 +25338,7 @@ var silver = (function (domGlobals) {
           render();
         }
       });
+      setupReadonlyModeSwitch(editor, uiComponents);
       return { editorContainer: uiComponents.outerContainer.element().dom() };
     };
     var getBehaviours$2 = function (editor) {
@@ -25503,7 +25777,7 @@ var silver = (function (domGlobals) {
           start();
         })]);
     };
-    var schema$o = [
+    var schema$q = [
       defaulted$1('useFixed', false),
       strict$1('blockerClass'),
       defaulted$1('getTarget', identity),
@@ -25552,7 +25826,7 @@ var silver = (function (domGlobals) {
         })
       ]);
     };
-    var schema$p = [
+    var schema$r = [
       defaulted$1('useFixed', false),
       defaulted$1('getTarget', identity),
       defaulted$1('onDrag', noop),
@@ -25562,8 +25836,8 @@ var silver = (function (domGlobals) {
       output('dragger', { handlers: handlers$1 })
     ];
 
-    var mouse = schema$o;
-    var touch = schema$p;
+    var mouse = schema$q;
+    var touch = schema$r;
 
     var DraggingBranches = /*#__PURE__*/Object.freeze({
         mouse: mouse,
@@ -25902,6 +26176,9 @@ var silver = (function (domGlobals) {
       var isInline = editor.getParam('inline', false, 'boolean');
       var mode = isInline ? Inline : Iframe;
       var lazyOuterContainer = Option.none();
+      var platform = PlatformDetection$1.detect();
+      var isIE = platform.browser.isIE();
+      var platformClasses = isIE ? ['tox-platform-ie'] : [];
       var dirAttributes = global$3.isRtl() ? { attributes: { dir: 'rtl' } } : {};
       var sink = build$1({
         dom: __assign({
@@ -25910,7 +26187,7 @@ var silver = (function (domGlobals) {
             'tox',
             'tox-silver-sink',
             'tox-tinymce-aux'
-          ]
+          ].concat(platformClasses)
         }, dirAttributes),
         behaviours: derive$1([Positioning.config({ useFixed: false })])
       });
@@ -26025,7 +26302,7 @@ var silver = (function (domGlobals) {
           classes: [
             'tox',
             'tox-tinymce'
-          ].concat(isInline ? ['tox-tinymce-inline'] : []),
+          ].concat(isInline ? ['tox-tinymce-inline'] : []).concat(platformClasses),
           styles: { visibility: 'hidden' },
           attributes: attributes
         },
@@ -26587,7 +26864,7 @@ var silver = (function (domGlobals) {
       }
     };
 
-    var schema$q = constant([
+    var schema$s = constant([
       strict$1('lazySink'),
       option('dragBlockClass'),
       defaulted$1('useTabstopAt', constant(true)),
@@ -26597,7 +26874,7 @@ var silver = (function (domGlobals) {
       onStrictKeyboardHandler('onEscape')
     ]);
     var basic$1 = { sketch: identity };
-    var parts$c = constant([
+    var parts$d = constant([
       optional({
         name: 'draghandle',
         overrides: function (detail, spec) {
@@ -26666,7 +26943,7 @@ var silver = (function (domGlobals) {
       set$1(describedElement, 'aria-describedby', describeId);
     };
 
-    var factory$f = function (detail, components, spec, externals) {
+    var factory$g = function (detail, components, spec, externals) {
       var dialogBusyEvent = generate$1('alloy.dialog.busy');
       var dialogIdleEvent = generate$1('alloy.dialog.idle');
       var busyBehaviours = derive$1([
@@ -26772,9 +27049,9 @@ var silver = (function (domGlobals) {
     };
     var ModalDialog = composite$1({
       name: 'ModalDialog',
-      configFields: schema$q(),
-      partFields: parts$c(),
-      factory: factory$f,
+      configFields: schema$s(),
+      partFields: parts$d(),
+      factory: factory$g,
       apis: {
         show: function (apis, dialog) {
           apis.show(dialog);
@@ -27163,7 +27440,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var factory$g = function (detail, spec) {
+    var factory$h = function (detail, spec) {
       return {
         uid: detail.uid,
         dom: detail.dom,
@@ -27209,10 +27486,10 @@ var silver = (function (domGlobals) {
         ]),
         strict$1('view')
       ],
-      factory: factory$g
+      factory: factory$h
     });
 
-    var schema$r = constant([
+    var schema$t = constant([
       strict$1('tabs'),
       strict$1('dom'),
       defaulted$1('clickToDismiss', false),
@@ -27263,9 +27540,9 @@ var silver = (function (domGlobals) {
         };
       }
     });
-    var parts$d = constant([tabsPart]);
+    var parts$e = constant([tabsPart]);
 
-    var factory$h = function (detail, components, spec, externals) {
+    var factory$i = function (detail, components, spec, externals) {
       return {
         'uid': detail.uid,
         'dom': detail.dom,
@@ -27298,12 +27575,12 @@ var silver = (function (domGlobals) {
     };
     var Tabbar = composite$1({
       name: 'Tabbar',
-      configFields: schema$r(),
-      partFields: parts$d(),
-      factory: factory$h
+      configFields: schema$t(),
+      partFields: parts$e(),
+      factory: factory$i
     });
 
-    var factory$i = function (detail, spec) {
+    var factory$j = function (detail, spec) {
       return {
         uid: detail.uid,
         dom: detail.dom,
@@ -27314,10 +27591,10 @@ var silver = (function (domGlobals) {
     var Tabview = single$2({
       name: 'Tabview',
       configFields: [field$1('tabviewBehaviours', [Replacing])],
-      factory: factory$i
+      factory: factory$j
     });
 
-    var schema$s = constant([
+    var schema$u = constant([
       defaulted$1('selectFirst', true),
       onHandler('onChangeTab'),
       onHandler('onDismissTab'),
@@ -27342,12 +27619,12 @@ var silver = (function (domGlobals) {
       factory: Tabview,
       name: 'tabview'
     });
-    var parts$e = constant([
+    var parts$f = constant([
       barPart,
       viewPart
     ]);
 
-    var factory$j = function (detail, components, spec, externals) {
+    var factory$k = function (detail, components, spec, externals) {
       var changeTab$1 = function (button) {
         var tabValue = Representing.getValue(button);
         getPart(button, detail, 'tabview').each(function (tabview) {
@@ -27410,9 +27687,9 @@ var silver = (function (domGlobals) {
     };
     var TabSection = composite$1({
       name: 'TabSection',
-      configFields: schema$s(),
-      partFields: parts$e(),
-      factory: factory$j,
+      configFields: schema$u(),
+      partFields: parts$f(),
+      factory: factory$k,
       apis: {
         getViewItems: function (apis, component) {
           return apis.getViewItems(component);

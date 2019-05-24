@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.6 (2019-05-22)
  */
 (function () {
 var legacyoutput = (function () {
@@ -27,7 +27,7 @@ var legacyoutput = (function () {
       editor.settings.font_formats = font_formats;
     };
     var getFontSizeStyleValues = function (editor) {
-      return editor.getParam('font_size_style_values');
+      return editor.getParam('font_size_style_values', 'xx-small,x-small,small,medium,large,x-large,xx-large');
     };
     var setInlineStyles = function (editor, inline_styles) {
       editor.settings.inline_styles = inline_styles;

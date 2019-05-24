@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.5 (2019-05-09)
+ * Version: 5.0.6 (2019-05-22)
  */
 (function () {
 var table = (function (domGlobals) {
@@ -7084,10 +7084,6 @@ var table = (function (domGlobals) {
     };
     var Dragger = { transform: transform$1 };
 
-    var closest$2 = function (scope, selector, isRoot) {
-      return closest$1(scope, selector, isRoot).isSome();
-    };
-
     function Mutation () {
       var events = Events.create({
         drag: Event([
@@ -7132,6 +7128,13 @@ var table = (function (domGlobals) {
         events: events.registry
       };
     }
+
+    var isContentEditableTrue = function (elm) {
+      return get$1(elm, 'contenteditable') === 'true';
+    };
+    var findClosestContentEditable = function (target, isRoot) {
+      return closest$1(target, '[contenteditable]', isRoot);
+    };
 
     var resizeBarDragging = Styles.resolve('resizer-bar-dragging');
     function BarManager (wire, direction, hdirection) {
@@ -7192,15 +7195,20 @@ var table = (function (domGlobals) {
       var isRoot = function (e) {
         return eq(e, wire.view());
       };
+      var findClosestEditableTable = function (target) {
+        return closest$1(target, 'table', isRoot).filter(function (table) {
+          return findClosestContentEditable(table, isRoot).exists(isContentEditableTrue);
+        });
+      };
       var mouseover = bind$2(wire.view(), 'mouseover', function (event) {
-        if (name(event.target()) === 'table' || closest$2(event.target(), 'table', isRoot)) {
-          hoverTable = name(event.target()) === 'table' ? Option.some(event.target()) : ancestor$1(event.target(), 'table', isRoot);
-          hoverTable.each(function (ht) {
-            Bars.refresh(wire, ht, hdirection, direction);
-          });
-        } else if (inBody(event.target())) {
-          Bars.destroy(wire);
-        }
+        findClosestEditableTable(event.target()).fold(function () {
+          if (inBody(event.target())) {
+            Bars.destroy(wire);
+          }
+        }, function (table) {
+          hoverTable = Option.some(table);
+          Bars.refresh(wire, table, hdirection, direction);
+        });
       });
       var destroy = function () {
         mousedown.unbind();
@@ -7380,6 +7388,15 @@ var table = (function (domGlobals) {
             });
           }
         }
+      });
+      editor.on('SwitchMode', function () {
+        lazyResize().each(function (resize) {
+          if (editor.readonly) {
+            resize.hideBars();
+          } else {
+            resize.showBars();
+          }
+        });
       });
       return {
         lazyResize: lazyResize,
