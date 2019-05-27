@@ -105,7 +105,7 @@ class Hotmovies extends AdultMovies
     {
         $studio = false;
         $director = false;
-        if (($ret = $this->_html->find('div.page_video_info')) && !empty($ret->find('text'))) {
+        if (($ret = $this->_html->find('div.page_video_info')) && ! empty($ret->find('text'))) {
             foreach ($ret->find('text') as $e) {
                 $e = trim($e->plaintext);
                 $rArray = [',', '...', '&nbsp:'];
@@ -119,12 +119,12 @@ class Hotmovies extends AdultMovies
                 }
                 if ($studio === true) {
                     if ((stripos($e, 'Custodian of Records') === false) && stripos($e, 'Description') === false) {
-                        if ($director === true && !empty($e)) {
+                        if ($director === true && ! empty($e)) {
                             $this->_res['director'] = $e;
                             $e = null;
                             $director = false;
                         }
-                        if (!empty($e)) {
+                        if (! empty($e)) {
                             $this->_res['productinfo'][] = $e;
                         }
                     } else {
