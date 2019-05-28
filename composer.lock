@@ -713,16 +713,16 @@
         },
         {
             "name": "dariusiii/php-itunes-api",
-            "version": "v1.0.8.2",
+            "version": "v1.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/php-itunes-api.git",
-                "reference": "8b301f7d157b8b202b4a06f4c57890423ba26bbc"
+                "reference": "daef97f232f1dd5ed0afa331418cdccc80c3f74d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/php-itunes-api/zipball/8b301f7d157b8b202b4a06f4c57890423ba26bbc",
-                "reference": "8b301f7d157b8b202b4a06f4c57890423ba26bbc",
+                "url": "https://api.github.com/repos/DariusIII/php-itunes-api/zipball/daef97f232f1dd5ed0afa331418cdccc80c3f74d",
+                "reference": "daef97f232f1dd5ed0afa331418cdccc80c3f74d",
                 "shasum": ""
             },
             "require": {
@@ -762,7 +762,7 @@
                 "music",
                 "query"
             ],
-            "time": "2019-05-23T09:18:08+00:00"
+            "time": "2019-05-28T07:10:40+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
@@ -8741,16 +8741,16 @@
         },
         {
             "name": "composer/xdebug-handler",
-            "version": "1.3.2",
+            "version": "1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/xdebug-handler.git",
-                "reference": "d17708133b6c276d6e42ef887a877866b909d892"
+                "reference": "46867cbf8ca9fb8d60c506895449eb799db1184f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/d17708133b6c276d6e42ef887a877866b909d892",
-                "reference": "d17708133b6c276d6e42ef887a877866b909d892",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/46867cbf8ca9fb8d60c506895449eb799db1184f",
+                "reference": "46867cbf8ca9fb8d60c506895449eb799db1184f",
                 "shasum": ""
             },
             "require": {
@@ -8781,7 +8781,7 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2019-01-28T20:25:53+00:00"
+            "time": "2019-05-27T17:52:04+00:00"
         },
         {
             "name": "doctrine/annotations",
