@@ -1,3 +1,5 @@
+2019-05-29 DariusIII
+	* Chg: Update laravel/framework (v5.8.18 => v5.8.19) and symfony components to their latest versions
 2019-05-28 DariusIII
 	* Chg: Update symfony components to latest versions
 	* Chg: Update dariusiii/php-itunes-api (v1.0.8.2 => v1.0.9)
