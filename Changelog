@@ -1,3 +1,5 @@
+2019-05-30 DariusIII
+	* Chg: Update used libraries to their latest versions
 2019-05-29 DariusIII
 	* Chg: Update animate.css to latest version(3.9.1)
 	* Chg: Update laravel/framework (v5.8.18 => v5.8.19) and symfony components to their latest versions
