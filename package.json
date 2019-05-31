@@ -11,7 +11,7 @@
         "format": "prettier --write 'resources/**/*.{css,js,vue}'"
     },
     "devDependencies": {
-        "axios": "^0.18",
+        "axios": "^0.19",
         "cross-env": "^5.2.0",
         "jquery": "^3.4",
         "laravel-mix": "^4.0.15",
