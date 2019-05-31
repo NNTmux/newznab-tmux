@@ -1,4 +1,5 @@
 2019-05-31 DariusIII
+	* Chg: Check if content is set, if not use empty string
 	* CHg: Update config/database, AuthServiceProvider and env.example
 	* Chg: Update laravel/horizon to version 3.2.1
 2019-05-30 DariusIII

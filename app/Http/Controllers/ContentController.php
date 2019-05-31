@@ -63,9 +63,9 @@ class ContentController extends BasePageController
             $content = $contents->getFrontPage();
             $index = $contents->getIndex();
             $this->smarty->assign('front', true);
-            $meta_title = $index->title;
-            $meta_keywords = $index->metakeywords;
-            $meta_description = $index->metadescription;
+            $meta_title = $index->title ?? '';
+            $meta_keywords = $index->metakeyword ?? '';
+            $meta_description = $index->metadescription ?? '';
         }
 
         if (empty($content)) {
