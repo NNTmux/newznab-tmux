@@ -120,7 +120,7 @@
     "jrean/laravel-user-verification": "^7.0",
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.8.*",
-    "laravel/horizon": "^2.0",
+    "laravel/horizon": "^3.0",
     "laravel/scout": "^7.0",
     "laravel/telescope": "^2.0",
     "laravel/tinker": "~1.0",
