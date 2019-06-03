@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\Release;
-use Blacklight\NZB;
-use Blacklight\utility\Utility;
-use Chumper\Zipper\Zipper;
 use Colors\Color;
+use Blacklight\NZB;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
+use App\Models\Release;
+use Chumper\Zipper\Zipper;
 use Tuna\CloudflareMiddleware;
+use Blacklight\utility\Utility;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use Illuminate\Support\Facades\DB;
@@ -367,8 +367,8 @@ if (! function_exists('makeFieldLinks')) {
         {
             $nzb = new NZB();
             $zipped = new Zipper();
-            $zippedFileName = now()->format('Ymdhis') . '.nzb.zip';
-            $zippedFilePath = resource_path() . '/tmp/' . $zippedFileName;
+            $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
+            $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
 
             foreach ($guids as $guid) {
                 $nzbPath = $nzb->NZBPath($guid);
@@ -382,7 +382,7 @@ if (! function_exists('makeFieldLinks')) {
                         if ($r) {
                             $filename = $r['searchname'];
                         }
-                        $zipped->make($zippedFilePath)->addString($filename . '.nzb', $nzbContents);
+                        $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
                     }
                 }
             }
