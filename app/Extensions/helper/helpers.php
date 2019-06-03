@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Chumper\Zipper\Zipper;
@@ -25,11 +26,11 @@ if (! function_exists('getRawHtml')) {
      */
     function getRawHtml($url, $cookie = false)
     {
-        $cookiejar = new CookieJar();
+        $cookieJar = new CookieJar();
         $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         if ($cookie !== false) {
-            $cookieJar = $cookiejar->setCookie(SetCookie::fromString($cookie));
-            $client = new Client(['cookies' => $cookieJar, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
+            $cookie = $cookieJar->setCookie(SetCookie::fromString($cookie));
+            $client = new Client(['cookies' => $cookie, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         }
         try {
             $response = $client->get($url)->getBody()->getContents();
@@ -377,7 +378,7 @@ if (! function_exists('makeFieldLinks')) {
 
                     if ($nzbContents) {
                         $filename = $guid;
-                        $r = self::getByGuid($guid);
+                        $r = Release::getByGuid($guid);
                         if ($r) {
                             $filename = $r['searchname'];
                         }
