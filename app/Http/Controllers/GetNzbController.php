@@ -5,20 +5,22 @@ namespace App\Http\Controllers;
 use Blacklight\NZB;
 use App\Models\User;
 use App\Models\Release;
-use Blacklight\Releases;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
 {
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+     * @return StreamedResponse|BinaryFileResponse|JsonResponse
      * @throws \Exception
      */
     public function getNzb(Request $request)
@@ -64,7 +66,6 @@ class GetNzbController extends BasePageController
         // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
         $request->merge(['id' => str_ireplace('.nzb', '', $request->input('id'))]);
 
-        $rel = new Releases();
         // User requested a zip of guid,guid,guid releases.
         if ($request->has('zip') && $request->input('zip') === '1') {
             $guids = explode(',', $request->input('id'));
@@ -72,7 +73,7 @@ class GetNzbController extends BasePageController
                 Utility::showApiError(501);
             }
 
-            $zip = $rel->getZipped($guids);
+            $zip = getZipped($guids);
             if ($zip !== '') {
                 User::incrementGrabs($uid, \count($guids));
                 foreach ($guids as $guid) {
@@ -131,7 +132,7 @@ class GetNzbController extends BasePageController
         $headers += ['X-DNZB-RCode' => '200',
             'X-DNZB-RText' => 'OK, NZB content follows.', ];
 
-        return response()->streamDownload(function () use ($nzbPath) {
+        return response()->streamDownload(function() use ($nzbPath) {
             readgzfile($nzbPath);
         }, $cleanName.'.nzb', $headers);
     }

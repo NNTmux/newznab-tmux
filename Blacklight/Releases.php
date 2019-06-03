@@ -1245,41 +1245,6 @@ class Releases extends Release
     }
 
     /**
-     * @param array $guids
-     *
-     * @return string
-     * @throws \Exception
-     */
-    public function getZipped(array $guids = []): string
-    {
-        $nzb = new NZB();
-        $zipped = new Zipper();
-        $zippedFileName = now()->format('Ymdhis').'.nzb.zip';
-        $zippedFilePath = resource_path().'/tmp/'.$zippedFileName;
-
-        foreach ($guids as $guid) {
-            $nzbPath = $nzb->NZBPath($guid);
-
-            if ($nzbPath) {
-                $nzbContents = Utility::unzipGzipFile($nzbPath);
-
-                if ($nzbContents) {
-                    $filename = $guid;
-                    $r = self::getByGuid($guid);
-                    if ($r) {
-                        $filename = $r['searchname'];
-                    }
-                    $zipped->make($zippedFilePath)->addString($filename.'.nzb', $nzbContents);
-                }
-            }
-        }
-
-        $zipped->close();
-
-        return File::isFile($zippedFilePath) ? $zippedFilePath : '';
-    }
-
-    /**
      * Get count of releases for pager.
      *
      *
