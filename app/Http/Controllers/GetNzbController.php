@@ -7,13 +7,13 @@ use App\Models\User;
 use App\Models\Release;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GetNzbController extends BasePageController
 {
@@ -132,7 +132,7 @@ class GetNzbController extends BasePageController
         $headers += ['X-DNZB-RCode' => '200',
             'X-DNZB-RText' => 'OK, NZB content follows.', ];
 
-        return response()->streamDownload(function() use ($nzbPath) {
+        return response()->streamDownload(function () use ($nzbPath) {
             readgzfile($nzbPath);
         }, $cleanName.'.nzb', $headers);
     }

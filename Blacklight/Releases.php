@@ -5,14 +5,12 @@ namespace Blacklight;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use Chumper\Zipper\Zipper;
 use App\Models\UsenetGroup;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class Releases.
