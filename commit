@@ -1,0 +1,20 @@
+#!/bin/sh
+
+EXIT_STATUS=0
+
+# Use composer to call php-cs-fixer
+composer fix-style
+
+# Add changes.
+git add -i
+
+# Edit changelog.
+nano Changelog
+
+# Add changes to changelog.
+git add Changelog
+
+php artisan migrate
+
+# Commit changes.
+git commit
