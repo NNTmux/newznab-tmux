@@ -1,3 +1,5 @@
+2019-06-04 DariusIII
+	* Chg: Update commit script to include composer fix-style command
 2019-06-03 DariusIII
 	* Chg: Move getZipped function from Releases class to helpers file
 	* Chg: Update used libraries to their latest versions
