@@ -2588,16 +2588,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.8.19",
+            "version": "v5.8.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "47bb1471b727a0c1497143dccf46aacf73c0ce6b"
+                "reference": "c78796cc1159c8dc63c45a2011ddc4af17059cb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/47bb1471b727a0c1497143dccf46aacf73c0ce6b",
-                "reference": "47bb1471b727a0c1497143dccf46aacf73c0ce6b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/c78796cc1159c8dc63c45a2011ddc4af17059cb4",
+                "reference": "c78796cc1159c8dc63c45a2011ddc4af17059cb4",
                 "shasum": ""
             },
             "require": {
@@ -2731,20 +2731,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-05-28T13:19:37+00:00"
+            "time": "2019-06-05T00:13:05+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.2.1",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "a9204280f72a1c6d3874e0f98b68e354b212311a"
+                "reference": "5a6a1744c7101ce509df79e4caa12198eff40faa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/a9204280f72a1c6d3874e0f98b68e354b212311a",
-                "reference": "a9204280f72a1c6d3874e0f98b68e354b212311a",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/5a6a1744c7101ce509df79e4caa12198eff40faa",
+                "reference": "5a6a1744c7101ce509df79e4caa12198eff40faa",
                 "shasum": ""
             },
             "require": {
@@ -2800,7 +2800,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-05-21T19:58:03+00:00"
+            "time": "2019-06-04T13:52:41+00:00"
         },
         {
             "name": "laravel/scout",
@@ -3716,16 +3716,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.19.0",
+            "version": "2.19.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "c3545b39197d314205226ac3c33cb4db99aa54ab"
+                "reference": "5cf102d1476fdf92f1f991bd1a1a0d93c65755ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/c3545b39197d314205226ac3c33cb4db99aa54ab",
-                "reference": "c3545b39197d314205226ac3c33cb4db99aa54ab",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/5cf102d1476fdf92f1f991bd1a1a0d93c65755ca",
+                "reference": "5cf102d1476fdf92f1f991bd1a1a0d93c65755ca",
                 "shasum": ""
             },
             "require": {
@@ -3772,7 +3772,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2019-05-30T10:15:05+00:00"
+            "time": "2019-06-04T20:07:46+00:00"
         },
         {
             "name": "neutron/temporary-filesystem",

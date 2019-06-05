@@ -1,3 +1,5 @@
+2019-06-05 DariusIII
+	* Chg: Update laravel/framework, nesbot/carbon and laravel/horizon to latest versions
 2019-06-04 DariusIII
 	* Chg: Update commit script to include composer fix-style command
 2019-06-03 DariusIII
