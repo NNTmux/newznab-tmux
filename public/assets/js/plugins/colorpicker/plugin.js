@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var colorpicker = (function (domGlobals) {

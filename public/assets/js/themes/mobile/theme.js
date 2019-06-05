@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var mobile = (function (domGlobals) {
@@ -368,17 +368,9 @@ var mobile = (function (domGlobals) {
     });
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var noarg = function (f) {
       return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
         return f();
       };
     };
@@ -885,6 +877,7 @@ var mobile = (function (domGlobals) {
         isNumber: isNumber
     });
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -915,7 +908,7 @@ var mobile = (function (domGlobals) {
     var chunk = function (array, size) {
       var r = [];
       for (var i = 0; i < array.length; i += size) {
-        var s = array.slice(i, i + size);
+        var s = slice.call(array, i, i + size);
         r.push(s);
       }
       return r;
@@ -1053,7 +1046,6 @@ var mobile = (function (domGlobals) {
         return x === a2[i];
       });
     };
-    var slice = Array.prototype.slice;
     var reverse = function (xs) {
       var r = slice.call(xs, 0);
       r.reverse();

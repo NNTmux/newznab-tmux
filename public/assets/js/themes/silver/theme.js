@@ -4,24 +4,16 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var silver = (function (domGlobals) {
     'use strict';
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var noarg = function (f) {
       return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
         return f();
       };
     };
@@ -262,6 +254,7 @@ var silver = (function (domGlobals) {
         isNumber: isNumber
     });
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -292,7 +285,7 @@ var silver = (function (domGlobals) {
     var chunk = function (array, size) {
       var r = [];
       for (var i = 0; i < array.length; i += size) {
-        var s = array.slice(i, i + size);
+        var s = slice.call(array, i, i + size);
         r.push(s);
       }
       return r;
@@ -430,7 +423,6 @@ var silver = (function (domGlobals) {
         return x === a2[i];
       });
     };
-    var slice = Array.prototype.slice;
     var reverse = function (xs) {
       var r = slice.call(xs, 0);
       r.reverse();
@@ -1699,6 +1691,11 @@ var silver = (function (domGlobals) {
       });
     };
 
+    var before$1 = function (marker, elements) {
+      each(elements, function (x) {
+        before(marker, x);
+      });
+    };
     var append$1 = function (parent, elements) {
       each(elements, function (x) {
         append(parent, x);
@@ -1716,6 +1713,13 @@ var silver = (function (domGlobals) {
       if (dom.parentNode !== null) {
         dom.parentNode.removeChild(dom);
       }
+    };
+    var unwrap = function (wrapper) {
+      var children$1 = children(wrapper);
+      if (children$1.length > 0) {
+        before$1(wrapper, children$1);
+      }
+      remove(wrapper);
     };
 
     var get$1 = function (element) {
@@ -5593,6 +5597,13 @@ var silver = (function (domGlobals) {
       return locateNode(doc, node, boundedX, boundedY);
     };
 
+    var getEnd = function (element) {
+      return name(element) === 'img' ? 1 : getOption(element).fold(function () {
+        return children(element).length;
+      }, function (v) {
+        return v.length;
+      });
+    };
     var NBSP = '\xA0';
     var isTextNodeWithCursorPosition = function (el) {
       return getOption(el).filter(function (text) {
@@ -9758,6 +9769,68 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var global$2 = tinymce.util.Tools.resolve('tinymce.dom.TreeWalker');
+
+    var isText$1 = function (node) {
+      return node.nodeType === domGlobals.Node.TEXT_NODE;
+    };
+    var outcome$1 = Adt.generate([
+      { aborted: [] },
+      { edge: ['element'] },
+      { success: ['info'] }
+    ]);
+    var phase = Adt.generate([
+      { abort: [] },
+      { kontinue: [] },
+      { finish: ['info'] }
+    ]);
+    var repeat = function (dom, node, offset, process, walker, recent) {
+      var terminate = function () {
+        return recent.fold(outcome$1.aborted, outcome$1.edge);
+      };
+      var recurse = function () {
+        var next = walker();
+        if (next) {
+          return repeat(dom, next, Option.none(), process, walker, Option.some(node));
+        } else {
+          return terminate();
+        }
+      };
+      if (dom.isBlock(node)) {
+        return terminate();
+      } else if (!isText$1(node)) {
+        return recurse();
+      } else {
+        var text = node.textContent;
+        return process(phase, node, text, offset).fold(outcome$1.aborted, function () {
+          return recurse();
+        }, outcome$1.success);
+      }
+    };
+    var repeatLeft = function (dom, node, offset, process, rootNode) {
+      var walker = new global$2(node, rootNode || dom.getRoot());
+      return repeat(dom, node, Option.some(offset), process, walker.prev, Option.none());
+    };
+
+    var autocompleteSelector = '[data-mce-type="autocompleter"]';
+    var create$3 = function (editor, range) {
+      return detect$4(Element.fromDom(editor.selection.getNode())).getOrThunk(function () {
+        var wrapper = Element.fromHtml('<span data-mce-type="autocompleter" data-mce-bogus="1"></span>', editor.getDoc());
+        append(wrapper, Element.fromDom(range.extractContents()));
+        range.insertNode(wrapper.dom());
+        parent(wrapper).each(function (elm) {
+          return elm.dom().normalize();
+        });
+        last$1(wrapper).map(function (last) {
+          editor.selection.setCursorLocation(last.dom(), getEnd(last));
+        });
+        return wrapper;
+      });
+    };
+    var detect$4 = function (elm) {
+      return closest$3(elm, autocompleteSelector);
+    };
+
     var isValidTextRange = function (rng) {
       return rng.collapsed && rng.startContainer.nodeType === 3;
     };
@@ -9765,10 +9838,11 @@ var silver = (function (domGlobals) {
     var parse$1 = function (text, index, ch, minChars) {
       var i;
       for (i = index - 1; i >= 0; i--) {
-        if (whiteSpace.test(text.charAt(i))) {
+        var char = text.charAt(i);
+        if (whiteSpace.test(char)) {
           return Option.none();
         }
-        if (text.charAt(i) === ch) {
+        if (char === ch) {
           break;
         }
       }
@@ -9777,26 +9851,53 @@ var silver = (function (domGlobals) {
       }
       return Option.some(text.substring(i + 1, index));
     };
-    var getContext = function (initRange, ch, text, index, minChars) {
+    var getText = function (rng, ch) {
+      var text = rng.toString().substring(ch.length);
+      return text.replace(/\u00A0/g, ' ').replace(/\uFEFF/g, '');
+    };
+    var findStart = function (dom, initRange, ch, minChars) {
       if (minChars === void 0) {
         minChars = 0;
       }
       if (!isValidTextRange(initRange)) {
         return Option.none();
       }
-      return parse$1(text, index, ch, minChars).map(function (newText) {
-        var rng = initRange.cloneRange();
-        rng.setStart(initRange.startContainer, initRange.startOffset - newText.length - 1);
-        rng.setEnd(initRange.startContainer, initRange.startOffset);
-        return {
-          text: newText,
-          rng: rng
-        };
+      var findTriggerCh = function (phase, element, text, optOffset) {
+        var index = optOffset.getOr(text.length);
+        return parse$1(text, index, ch, 1).fold(function () {
+          return text.match(whiteSpace) ? phase.abort() : phase.kontinue();
+        }, function (newText) {
+          var range = initRange.cloneRange();
+          range.setStart(element, index - newText.length - 1);
+          range.setEnd(initRange.endContainer, initRange.endOffset);
+          return text.length < minChars ? phase.abort() : phase.finish({
+            text: getText(range, ch),
+            range: range,
+            triggerChar: ch
+          });
+        });
+      };
+      return repeatLeft(dom, initRange.startContainer, initRange.startOffset, findTriggerCh).fold(Option.none, Option.none, Option.some);
+    };
+    var getContext = function (dom, initRange, ch, minChars) {
+      if (minChars === void 0) {
+        minChars = 0;
+      }
+      return detect$4(Element.fromDom(initRange.startContainer)).fold(function () {
+        return findStart(dom, initRange, ch, minChars);
+      }, function (elm) {
+        var range = dom.createRng();
+        range.selectNode(elm.dom());
+        return Option.some({
+          range: range,
+          text: getText(range, ch),
+          triggerChar: ch
+        });
       });
     };
 
     var setup = function (api, editor) {
-      editor.on('keypress', api.onKeypress.throttle);
+      editor.on('keypress compositionend', api.onKeypress.throttle);
       editor.on('remove', api.onKeypress.cancel);
       var redirectKeyToItem = function (item, e) {
         emitWith(item, keydown(), { raw: e });
@@ -9810,70 +9911,135 @@ var silver = (function (domGlobals) {
         }
         if (api.isActive()) {
           if (e.which === 27) {
-            api.closeIfNecessary();
-          } else if (e.which === 32) {
-            api.closeIfNecessary();
-          } else if (e.which === 13) {
-            getItem().each(emitExecute);
-            e.preventDefault();
-          } else if (e.which === 40) {
-            getItem().fold(function () {
-              api.getView().each(Highlighting.highlightFirst);
-            }, function (item) {
-              redirectKeyToItem(item, e);
-            });
-            e.preventDefault();
-          } else if (e.which === 37 || e.which === 38 || e.which === 39) {
-            getItem().each(function (item) {
-              redirectKeyToItem(item, e);
-              e.preventDefault();
-            });
+            api.cancelIfNecessary();
           }
+          if (api.isMenuOpen()) {
+            if (e.which === 13) {
+              getItem().each(emitExecute);
+              e.preventDefault();
+            } else if (e.which === 40) {
+              getItem().fold(function () {
+                api.getView().each(Highlighting.highlightFirst);
+              }, function (item) {
+                redirectKeyToItem(item, e);
+              });
+              e.preventDefault();
+              e.stopImmediatePropagation();
+            } else if (e.which === 37 || e.which === 38 || e.which === 39) {
+              getItem().each(function (item) {
+                redirectKeyToItem(item, e);
+                e.preventDefault();
+                e.stopImmediatePropagation();
+              });
+            }
+          } else {
+            if (e.which === 13 || e.which === 38 || e.which === 40) {
+              api.cancelIfNecessary();
+            }
+          }
+        }
+      });
+      editor.on('NodeChange', function (e) {
+        if (api.isActive() && detect$4(Element.fromDom(e.element)).isNone()) {
+          api.cancelIfNecessary();
         }
       });
     };
     var AutocompleterEditorEvents = { setup: setup };
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Promise');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
-    var isStartOfWord = function (rng, text) {
-      return rng.startOffset === 0 || /\s/.test(text.charAt(rng.startOffset - 1));
+    var point$2 = function (element, offset) {
+      return {
+        element: element,
+        offset: offset
+      };
     };
-    var getTriggerContext = function (initRange, initText, database) {
+    var rangeFromPoints = function (startSpot, endSpot) {
+      var rng = domGlobals.document.createRange();
+      rng.setStart(startSpot.element, startSpot.offset);
+      rng.setEnd(endSpot.element, endSpot.offset);
+      return rng;
+    };
+
+    var Spot = /*#__PURE__*/Object.freeze({
+        point: point$2,
+        rangeFromPoints: rangeFromPoints
+    });
+
+    var isText$2 = function (node) {
+      return node.nodeType === domGlobals.Node.TEXT_NODE;
+    };
+    var isElement$1 = function (node) {
+      return node.nodeType === domGlobals.Node.ELEMENT_NODE;
+    };
+    var toLast = function (node) {
+      if (isText$2(node)) {
+        return point$2(node, node.data.length);
+      } else {
+        var children = node.childNodes;
+        return children.length > 0 ? toLast(children[children.length - 1]) : point$2(node, children.length);
+      }
+    };
+    var toLeaf = function (node, offset) {
+      var children = node.childNodes;
+      if (children.length > 0 && offset < children.length) {
+        return toLeaf(children[offset], 0);
+      } else if (children.length > 0 && isElement$1(node) && children.length === offset) {
+        return toLast(children[children.length - 1]);
+      } else {
+        return point$2(node, offset);
+      }
+    };
+
+    var isStartOfWord = function (dom) {
+      var process = function (phase, element, text, optOffset) {
+        var index = optOffset.getOr(text.length);
+        return index === 0 ? phase.kontinue() : phase.finish(/\s/.test(text.charAt(index - 1)));
+      };
+      return function (rng) {
+        var leaf = toLeaf(rng.startContainer, rng.startOffset);
+        return repeatLeft(dom, leaf.element, leaf.offset, process).fold(constant(true), constant(true), identity);
+      };
+    };
+    var getTriggerContext = function (dom, initRange, database) {
       return findMap(database.triggerChars, function (ch) {
-        return getContext(initRange, ch, initText, initRange.startOffset).map(function (_a) {
-          var rng = _a.rng, text = _a.text;
-          return {
-            range: rng,
-            text: text,
-            triggerChar: ch
-          };
-        });
+        return getContext(dom, initRange, ch);
       });
     };
     var lookup = function (editor, getDatabase) {
       var database = getDatabase();
       var rng = editor.selection.getRng();
+      return getTriggerContext(editor.dom, rng, database).bind(function (context) {
+        return lookupWithContext(editor, getDatabase, context);
+      });
+    };
+    var lookupWithContext = function (editor, getDatabase, context) {
+      var database = getDatabase();
+      var rng = editor.selection.getRng();
       var startText = rng.startContainer.nodeValue;
-      return getTriggerContext(rng, startText, database).map(function (context) {
-        var autocompleters = filter(database.lookupByChar(context.triggerChar), function (autocompleter) {
-          return context.text.length >= autocompleter.minChars && autocompleter.matches.getOr(isStartOfWord)(context.range, startText, context.text);
+      var autocompleters = filter(database.lookupByChar(context.triggerChar), function (autocompleter) {
+        return context.text.length >= autocompleter.minChars && autocompleter.matches.getOrThunk(function () {
+          return isStartOfWord(editor.dom);
+        })(context.range, startText, context.text);
+      });
+      if (autocompleters.length === 0) {
+        return Option.none();
+      }
+      var lookupData = global$3.all(map(autocompleters, function (ac) {
+        var fetchResult = ac.fetch(context.text, ac.maxResults);
+        return fetchResult.then(function (results) {
+          return {
+            matchText: context.text,
+            items: results,
+            columns: ac.columns,
+            onAction: ac.onAction
+          };
         });
-        var lookupData = global$2.all(map(autocompleters, function (ac) {
-          var fetchResult = ac.fetch(context.text, ac.maxResults);
-          return fetchResult.then(function (results) {
-            return {
-              items: results,
-              columns: ac.columns,
-              onAction: ac.onAction
-            };
-          });
-        }));
-        return {
-          lookupData: lookupData,
-          triggerChar: context.triggerChar,
-          range: context.range
-        };
+      }));
+      return Option.some({
+        lookupData: lookupData,
+        context: context
       });
     };
 
@@ -10263,7 +10429,7 @@ var silver = (function (domGlobals) {
       }, contents);
     };
 
-    var global$3 = tinymce.util.Tools.resolve('tinymce.util.I18n');
+    var global$4 = tinymce.util.Tools.resolve('tinymce.util.I18n');
 
     var navClass = 'tox-menu-nav__js';
     var selectableClass = 'tox-collection__item';
@@ -10285,7 +10451,7 @@ var silver = (function (domGlobals) {
       return readOptFrom$1(presetClasses, presets).getOr(navClass);
     };
 
-    var global$4 = tinymce.util.Tools.resolve('tinymce.Env');
+    var global$5 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var convertText = function (source) {
       var mac = {
@@ -10299,13 +10465,13 @@ var silver = (function (domGlobals) {
         meta: 'Ctrl',
         access: 'Shift+Alt'
       };
-      var replace = global$4.mac ? mac : other;
+      var replace = global$5.mac ? mac : other;
       var shortcut = source.split('+');
       var updated = map(shortcut, function (segment) {
         var search = segment.toLowerCase().trim();
         return has(replace, search) ? replace[search] : segment;
       });
-      return global$4.mac ? updated.join('') : updated.join('+');
+      return global$5.mac ? updated.join('') : updated.join('+');
     };
     var ConvertShortcut = { convertText: convertText };
 
@@ -10324,7 +10490,16 @@ var silver = (function (domGlobals) {
           tag: 'div',
           classes: [textClass]
         },
-        components: [text(global$3.translate(text$1))]
+        components: [text(global$4.translate(text$1))]
+      };
+    };
+    var renderHtml = function (html) {
+      return {
+        dom: {
+          tag: 'div',
+          classes: [textClass],
+          innerHtml: html
+        }
       };
     };
     var renderStyledText = function (style, text$1) {
@@ -10338,7 +10513,7 @@ var silver = (function (domGlobals) {
               tag: style.tag,
               attributes: { style: style.styleAttr }
             },
-            components: [text(global$3.translate(text$1))]
+            components: [text(global$4.translate(text$1))]
           }]
       };
     };
@@ -10400,7 +10575,7 @@ var silver = (function (domGlobals) {
         return icon.or(Option.some('')).map(renderIcon);
       }) : Option.none();
       var domTitle = info.ariaLabel.map(function (label) {
-        return { attributes: { title: global$3.translate(label) } };
+        return { attributes: { title: global$4.translate(label) } };
       }).getOr({});
       var dom = merge({
         tag: 'div',
@@ -10409,11 +10584,16 @@ var silver = (function (domGlobals) {
           selectableClass
         ].concat(rtlClass ? [iconClassRtl] : [])
       }, domTitle);
+      var content = info.htmlContent.fold(function () {
+        return info.textContent.map(textRender);
+      }, function (html) {
+        return Option.some(renderHtml(html));
+      });
       var menuItem = {
         dom: dom,
         optComponents: [
           leftIcon,
-          info.textContent.map(textRender),
+          content,
           info.shortcutContent.map(renderShortcut),
           info.caret
         ]
@@ -10439,10 +10619,10 @@ var silver = (function (domGlobals) {
       }
       var getIconName = function (iconName) {
         return iconName.map(function (name) {
-          return global$3.isRtl() && contains(rtlIcon, name) ? name + '-rtl' : name;
+          return global$4.isRtl() && contains(rtlIcon, name) ? name + '-rtl' : name;
         });
       };
-      var needRtlClass = global$3.isRtl() && info.iconContent.exists(function (name) {
+      var needRtlClass = global$4.isRtl() && info.iconContent.exists(function (name) {
         return contains(rtlTransform, name);
       });
       var icon = getIconName(info.iconContent).map(function (iconName) {
@@ -10651,6 +10831,8 @@ var silver = (function (domGlobals) {
       };
     };
 
+    var global$6 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+
     var tooltipBehaviour = function (meta, sharedBackstage) {
       return get(meta, 'tooltipWorker').map(function (tooltipWorker) {
         return [Tooltipping.config({
@@ -10676,13 +10858,34 @@ var silver = (function (domGlobals) {
           })];
       }).getOr([]);
     };
-    var renderAutocompleteItem = function (spec, useText, presets, onItemValueHandler, itemResponse, sharedBackstage, renderIcons) {
+    var escapeRegExp = function (text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+    var encodeText = function (text) {
+      return global$6.DOM.encode(text);
+    };
+    var replaceText = function (text, matchText) {
+      var translated = global$4.translate(text);
+      var encoded = encodeText(translated);
+      if (matchText.length > 0) {
+        var escapedMatchRegex = new RegExp(escapeRegExp(matchText), 'gi');
+        return encoded.replace(escapedMatchRegex, function (match) {
+          return '<span class="tox-autocompleter-highlight">' + match + '</span>';
+        });
+      } else {
+        return encoded;
+      }
+    };
+    var renderAutocompleteItem = function (spec, matchText, useText, presets, onItemValueHandler, itemResponse, sharedBackstage, renderIcons) {
       if (renderIcons === void 0) {
         renderIcons = true;
       }
       var structure = renderItemStructure({
         presets: presets,
-        textContent: useText ? spec.text : Option.none(),
+        textContent: Option.none(),
+        htmlContent: useText ? spec.text.map(function (text) {
+          return replaceText(text, matchText);
+        }) : Option.none(),
         ariaLabel: spec.text,
         iconContent: spec.icon,
         shortcutContent: Option.none(),
@@ -10728,6 +10931,7 @@ var silver = (function (domGlobals) {
       var structure = renderItemStructure({
         presets: presets,
         textContent: useText ? spec.text : Option.none(),
+        htmlContent: Option.none(),
         ariaLabel: spec.text,
         iconContent: spec.icon,
         shortcutContent: useText ? spec.shortcut : Option.none(),
@@ -11017,14 +11221,14 @@ var silver = (function (domGlobals) {
     };
     var redColour = constant(rgbaColour(255, 0, 0, 1));
 
-    var global$5 = tinymce.util.Tools.resolve('tinymce.util.LocalStorage');
+    var global$7 = tinymce.util.Tools.resolve('tinymce.util.LocalStorage');
 
     var storageName = 'tinymce-custom-colors';
     function ColorCache (max) {
       if (max === void 0) {
         max = 10;
       }
-      var storageString = global$5.getItem(storageName);
+      var storageString = global$7.getItem(storageName);
       var localstorage = isString(storageString) ? JSON.parse(storageString) : [];
       var prune = function (list) {
         var diff = max - list.length;
@@ -11037,7 +11241,7 @@ var silver = (function (domGlobals) {
         if (cache.length > max) {
           cache.pop();
         }
-        global$5.setItem(storageName, JSON.stringify(cache));
+        global$7.setItem(storageName, JSON.stringify(cache));
       };
       var remove = function (idx) {
         cache.splice(idx, 1);
@@ -11212,6 +11416,29 @@ var silver = (function (domGlobals) {
       addColor: addColor
     };
 
+    var fireSkinLoaded = function (editor) {
+      return editor.fire('SkinLoaded');
+    };
+    var fireResizeEditor = function (editor) {
+      return editor.fire('ResizeEditor');
+    };
+    var fireBeforeRenderUI = function (editor) {
+      return editor.fire('BeforeRenderUI');
+    };
+    var fireResizeContent = function (editor) {
+      return editor.fire('ResizeContent');
+    };
+    var fireTextColorChange = function (editor, data) {
+      editor.fire('TextColorChange', data);
+    };
+    var Events = {
+      fireSkinLoaded: fireSkinLoaded,
+      fireResizeEditor: fireResizeEditor,
+      fireBeforeRenderUI: fireBeforeRenderUI,
+      fireResizeContent: fireResizeContent,
+      fireTextColorChange: fireTextColorChange
+    };
+
     var getCurrentColor = function (editor, format) {
       var color;
       editor.dom.getParents(editor.selection.getStart(), function (elm) {
@@ -11271,7 +11498,7 @@ var silver = (function (domGlobals) {
         custom
       ] : [remove];
     };
-    var applyColour = function (editor, format, value, onChoice) {
+    var applyColor = function (editor, format, value, onChoice) {
       if (value === 'custom') {
         var dialog = colorPickerDialog(editor);
         dialog(function (colorOpt) {
@@ -11323,21 +11550,31 @@ var silver = (function (domGlobals) {
         fetch: getFetch(Settings.getColors(editor), Settings.hasCustomColors(editor)),
         onAction: function (splitButtonApi) {
           if (lastColor.get() !== null) {
-            applyColour(editor, format, lastColor.get(), function () {
+            applyColor(editor, format, lastColor.get(), function () {
             });
           }
         },
         onItemAction: function (splitButtonApi, value) {
-          applyColour(editor, format, value, function (newColour) {
-            lastColor.set(newColour);
-            setIconColor(splitButtonApi, name, newColour);
+          applyColor(editor, format, value, function (newColor) {
+            lastColor.set(newColor);
+            Events.fireTextColorChange(editor, {
+              name: name,
+              color: newColor
+            });
           });
         },
         onSetup: function (splitButtonApi) {
           if (lastColor.get() !== null) {
             setIconColor(splitButtonApi, name, lastColor.get());
           }
+          var handler = function (e) {
+            if (e.name === name) {
+              setIconColor(splitButtonApi, e.name, e.color);
+            }
+          };
+          editor.on('TextColorChange', handler);
           return function () {
+            editor.off('TextColorChange', handler);
           };
         }
       });
@@ -11351,7 +11588,7 @@ var silver = (function (domGlobals) {
               type: 'fancymenuitem',
               fancytype: 'colorswatch',
               onAction: function (data) {
-                applyColour(editor, format, data.value, noop);
+                applyColor(editor, format, data.value, noop);
               }
             }];
         }
@@ -11786,6 +12023,7 @@ var silver = (function (domGlobals) {
         presets: 'normal',
         iconContent: spec.icon,
         textContent: spec.text,
+        htmlContent: Option.none(),
         ariaLabel: spec.text,
         caret: Option.none(),
         checkMark: Option.none(),
@@ -11821,6 +12059,7 @@ var silver = (function (domGlobals) {
         presets: 'normal',
         iconContent: spec.icon,
         textContent: spec.text,
+        htmlContent: Option.none(),
         ariaLabel: spec.text,
         caret: Option.some(caret),
         checkMark: Option.none(),
@@ -11876,6 +12115,7 @@ var silver = (function (domGlobals) {
       var structure = renderItemStructure({
         iconContent: Option.none(),
         textContent: spec.text,
+        htmlContent: Option.none(),
         ariaLabel: spec.text,
         checkMark: Option.some(renderCheckmark(providersBackstage.icons)),
         caret: Option.none(),
@@ -11950,12 +12190,12 @@ var silver = (function (domGlobals) {
         }
       }
     };
-    var createAutocompleteItems = function (items, onItemValueHandler, columns, itemResponse, sharedBackstage) {
+    var createAutocompleteItems = function (items, matchText, onItemValueHandler, columns, itemResponse, sharedBackstage) {
       var renderText = columns === 1;
       var renderIcons = !renderText || menuHasIcons$1(items);
       return cat(map(items, function (item) {
         return createAutocompleterItem(item).fold(handleError, function (d) {
-          return Option.some(autocomplete(d, renderText, 'normal', onItemValueHandler, itemResponse, sharedBackstage, renderIcons));
+          return Option.some(autocomplete(d, matchText, renderText, 'normal', onItemValueHandler, itemResponse, sharedBackstage, renderIcons));
         });
       }));
     };
@@ -12002,20 +12242,38 @@ var silver = (function (domGlobals) {
     };
 
     var register$2 = function (editor, sharedBackstage) {
+      var activeAutocompleter = Cell(Option.none());
       var autocompleter = build$1(InlineView.sketch({
         dom: {
           tag: 'div',
           classes: ['tox-autocompleter']
         },
         components: [],
+        fireDismissalEventInstead: {},
+        inlineBehaviours: derive$1([config('dismissAutocompleter', [run(dismissRequested(), function () {
+              return cancelIfNecessary();
+            })])]),
         lazySink: sharedBackstage.getSink
       }));
-      var isActive = function () {
+      var isMenuOpen = function () {
         return InlineView.isOpen(autocompleter);
       };
-      var closeIfNecessary = function () {
+      var isActive = function () {
+        return activeAutocompleter.get().isSome();
+      };
+      var hideIfNecessary = function () {
         if (isActive()) {
           InlineView.hide(autocompleter);
+        }
+      };
+      var cancelIfNecessary = function () {
+        if (isActive()) {
+          var lastElement = activeAutocompleter.get().map(function (ac) {
+            return ac.element;
+          });
+          detect$4(lastElement.getOr(Element.fromDom(editor.selection.getNode()))).each(unwrap);
+          hideIfNecessary();
+          activeAutocompleter.set(Option.none());
         }
       };
       var getAutocompleters = cached(function () {
@@ -12027,58 +12285,76 @@ var silver = (function (domGlobals) {
         }).getOr(1);
         return bind(matches, function (match) {
           var choices = match.items;
-          return createAutocompleteItems(choices, function (itemValue, itemMeta) {
+          return createAutocompleteItems(choices, match.matchText, function (itemValue, itemMeta) {
             var nr = editor.selection.getRng();
-            var textNode = nr.startContainer;
-            getContext(nr, triggerChar, textNode.data, nr.startOffset).fold(function () {
+            getContext(editor.dom, nr, triggerChar).fold(function () {
               return domGlobals.console.error('Lost context. Cursor probably moved');
             }, function (_a) {
-              var rng = _a.rng;
-              var autocompleterApi = { hide: closeIfNecessary };
-              match.onAction(autocompleterApi, rng, itemValue, itemMeta);
+              var range = _a.range;
+              var autocompleterApi = { hide: cancelIfNecessary };
+              match.onAction(autocompleterApi, range, itemValue, itemMeta);
             });
           }, columns, ItemResponse$1.BUBBLE_TO_SANDBOX, sharedBackstage);
         });
       };
+      var commenceIfNecessary = function (context) {
+        if (!isActive()) {
+          var wrapper = create$3(editor, context.range);
+          activeAutocompleter.set(Option.some({
+            triggerChar: context.triggerChar,
+            element: wrapper,
+            matchLength: context.text.length
+          }));
+        }
+      };
+      var display = function (ac, context, lookupData, items) {
+        ac.matchLength = context.text.length;
+        var columns = findMap(lookupData, function (ld) {
+          return Option.from(ld.columns);
+        }).getOr(1);
+        InlineView.showAt(autocompleter, {
+          anchor: 'node',
+          root: Element.fromDom(editor.getBody()),
+          node: Option.from(ac.element)
+        }, Menu.sketch(createMenuFrom(createPartialMenuWithAlloyItems('autocompleter-value', true, items, columns, 'normal'), columns, FocusMode.ContentFocus, 'normal')));
+        InlineView.getContent(autocompleter).each(Highlighting.highlightFirst);
+      };
+      var doLookup = function () {
+        return activeAutocompleter.get().map(function (ac) {
+          return getContext(editor.dom, editor.selection.getRng(), ac.triggerChar).bind(function (newContext) {
+            return lookupWithContext(editor, getAutocompleters, newContext);
+          });
+        }).getOrThunk(function () {
+          return lookup(editor, getAutocompleters);
+        });
+      };
       var onKeypress = last$2(function (e) {
-        var optMatches = e.key === ' ' ? Option.none() : lookup(editor, getAutocompleters);
-        optMatches.fold(closeIfNecessary, function (lookupInfo) {
+        if (e.which === 27) {
+          return;
+        }
+        doLookup().fold(cancelIfNecessary, function (lookupInfo) {
+          commenceIfNecessary(lookupInfo.context);
           lookupInfo.lookupData.then(function (lookupData) {
-            var combinedItems = getCombinedItems(lookupInfo.triggerChar, lookupData);
-            if (combinedItems.length > 0) {
-              var columns = findMap(lookupData, function (ld) {
-                return Option.from(ld.columns);
-              }).getOr(1);
-              InlineView.showAt(autocompleter, {
-                anchor: 'selection',
-                root: Element.fromDom(editor.getBody()),
-                getSelection: function () {
-                  return Option.some({
-                    start: function () {
-                      return Element.fromDom(lookupInfo.range.startContainer);
-                    },
-                    soffset: function () {
-                      return lookupInfo.range.startOffset;
-                    },
-                    finish: function () {
-                      return Element.fromDom(lookupInfo.range.endContainer);
-                    },
-                    foffset: function () {
-                      return lookupInfo.range.endOffset;
-                    }
-                  });
+            activeAutocompleter.get().map(function (ac) {
+              var context = lookupInfo.context;
+              if (ac.triggerChar === context.triggerChar) {
+                var combinedItems = getCombinedItems(context.triggerChar, lookupData);
+                if (combinedItems.length > 0) {
+                  display(ac, context, lookupData, combinedItems);
+                } else if (context.text.length - ac.matchLength >= 10) {
+                  cancelIfNecessary();
+                } else {
+                  hideIfNecessary();
                 }
-              }, Menu.sketch(createMenuFrom(createPartialMenuWithAlloyItems('autocompleter-value', true, combinedItems, columns, 'normal'), columns, FocusMode.ContentFocus, 'normal')));
-              InlineView.getContent(autocompleter).each(Highlighting.highlightFirst);
-            } else {
-              closeIfNecessary();
-            }
+              }
+            });
           });
         });
       }, 50);
       var autocompleterUiApi = {
         onKeypress: onKeypress,
-        closeIfNecessary: closeIfNecessary,
+        cancelIfNecessary: cancelIfNecessary,
+        isMenuOpen: isMenuOpen,
         isActive: isActive,
         getView: function () {
           return InlineView.getContent(autocompleter);
@@ -12752,9 +13028,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var global$6 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-
-    var global$7 = tinymce.util.Tools.resolve('tinymce.EditorManager');
+    var global$8 = tinymce.util.Tools.resolve('tinymce.EditorManager');
 
     var getSkinUrl = function (editor) {
       var settings = editor.settings;
@@ -12765,7 +13039,7 @@ var silver = (function (domGlobals) {
         if (skinUrl) {
           skinUrl = editor.documentBaseURI.toAbsolute(skinUrl);
         } else {
-          skinUrl = global$7.baseURL + '/skins/ui/' + skinName;
+          skinUrl = global$8.baseURL + '/skins/ui/' + skinName;
         }
       }
       return skinUrl;
@@ -16398,11 +16672,11 @@ var silver = (function (domGlobals) {
       return renderFormFieldWith(pLabel, pField, ['tox-form__group--stretched']);
     };
 
-    function create$3(width, height) {
+    function create$4(width, height) {
       return resize(domGlobals.document.createElement('canvas'), width, height);
     }
     function clone$1(canvas) {
-      var tCanvas = create$3(canvas.width, canvas.height);
+      var tCanvas = create$4(canvas.width, canvas.height);
       var ctx = get2dContext(tCanvas);
       ctx.drawImage(canvas, 0, 0);
       return tCanvas;
@@ -16738,7 +17012,7 @@ var silver = (function (domGlobals) {
     function blobToCanvas(blob) {
       return blobToImage(blob).then(function (image) {
         revokeImageUrl(image);
-        var canvas = create$3(getWidth(image), getHeight(image));
+        var canvas = create$4(getWidth(image), getHeight(image));
         var context = get2dContext(canvas);
         context.drawImage(image, 0, 0);
         return canvas;
@@ -16757,7 +17031,7 @@ var silver = (function (domGlobals) {
       domGlobals.URL.revokeObjectURL(image.src);
     }
 
-    function create$4(getCanvas, blob, uri) {
+    function create$5(getCanvas, blob, uri) {
       var initialType = blob.type;
       var getType = constant(initialType);
       function toBlob() {
@@ -16800,12 +17074,12 @@ var silver = (function (domGlobals) {
     }
     function fromBlob(blob) {
       return blobToDataUri(blob).then(function (uri) {
-        return create$4(blobToCanvas(blob), blob, uri);
+        return create$5(blobToCanvas(blob), blob, uri);
       });
     }
     function fromCanvas(canvas, type) {
       return canvasToBlob(canvas, type).then(function (blob) {
-        return create$4(Promise$1.resolve(canvas), blob, canvas.toDataURL());
+        return create$5(Promise$1.resolve(canvas), blob, canvas.toDataURL());
       });
     }
     function fromImage(image) {
@@ -16814,7 +17088,7 @@ var silver = (function (domGlobals) {
       });
     }
     var fromBlobAndUrlSync = function (blob, url) {
-      return create$4(blobToCanvas(blob), blob, url);
+      return create$5(blobToCanvas(blob), blob, url);
     };
 
     var ImageResult = /*#__PURE__*/Object.freeze({
@@ -17284,7 +17558,7 @@ var silver = (function (domGlobals) {
         var sH = getHeight(image);
         var dW = Math.floor(sW * wRatio);
         var dH = Math.floor(sH * hRatio);
-        var canvas = create$3(dW, dH);
+        var canvas = create$4(dW, dH);
         var context = get2dContext(canvas);
         context.drawImage(image, 0, 0, sW, sH, 0, 0, dW, dH);
         resolve(canvas);
@@ -17297,7 +17571,7 @@ var silver = (function (domGlobals) {
       });
     }
     function applyRotate(image, type, angle) {
-      var canvas = create$3(image.width, image.height);
+      var canvas = create$4(image.width, image.height);
       var context = get2dContext(canvas);
       var translateX = 0;
       var translateY = 0;
@@ -17322,7 +17596,7 @@ var silver = (function (domGlobals) {
       });
     }
     function applyFlip(image, type, axis) {
-      var canvas = create$3(image.width, image.height);
+      var canvas = create$4(image.width, image.height);
       var context = get2dContext(canvas);
       if (axis === 'v') {
         context.scale(1, -1);
@@ -17339,7 +17613,7 @@ var silver = (function (domGlobals) {
       });
     }
     function applyCrop(image, type, x, y, w, h) {
-      var canvas = create$3(w, h);
+      var canvas = create$4(w, h);
       var context = get2dContext(canvas);
       context.drawImage(image, -x, -y);
       return fromCanvas(canvas, type);
@@ -18295,15 +18569,15 @@ var silver = (function (domGlobals) {
         renderEditPanel: renderEditPanel
     });
 
-    var global$8 = tinymce.util.Tools.resolve('tinymce.dom.DomQuery');
+    var global$9 = tinymce.util.Tools.resolve('tinymce.dom.DomQuery');
 
-    var global$9 = tinymce.util.Tools.resolve('tinymce.geom.Rect');
+    var global$a = tinymce.util.Tools.resolve('tinymce.geom.Rect');
 
-    var global$a = tinymce.util.Tools.resolve('tinymce.util.Observable');
+    var global$b = tinymce.util.Tools.resolve('tinymce.util.Observable');
 
-    var global$b = tinymce.util.Tools.resolve('tinymce.util.Tools');
+    var global$c = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
-    var global$c = tinymce.util.Tools.resolve('tinymce.util.VK');
+    var global$d = tinymce.util.Tools.resolve('tinymce.util.VK');
 
     function getDocumentSize(doc) {
       var documentElement, body, scrollWidth, clientWidth;
@@ -18352,7 +18626,7 @@ var silver = (function (domGlobals) {
         } else {
           cursor = handleElm.runtimeStyle.cursor;
         }
-        $eventOverlay = global$8('<div></div>').css({
+        $eventOverlay = global$9('<div></div>').css({
           position: 'absolute',
           top: 0,
           left: 0,
@@ -18362,7 +18636,7 @@ var silver = (function (domGlobals) {
           opacity: 0.0001,
           cursor: cursor
         }).appendTo(doc.body);
-        global$8(doc).on('mousemove touchmove', drag).on('mouseup touchend', stop);
+        global$9(doc).on('mousemove touchmove', drag).on('mouseup touchend', stop);
         settings.start(e);
       };
       drag = function (e) {
@@ -18377,16 +18651,16 @@ var silver = (function (domGlobals) {
       };
       stop = function (e) {
         updateWithTouchData(e);
-        global$8(doc).off('mousemove touchmove', drag).off('mouseup touchend', stop);
+        global$9(doc).off('mousemove touchmove', drag).off('mouseup touchend', stop);
         $eventOverlay.remove();
         if (settings.stop) {
           settings.stop(e);
         }
       };
       this.destroy = function () {
-        global$8(handleElement).off();
+        global$9(handleElement).off();
       };
-      global$8(handleElement).on('mousedown touchstart', start);
+      global$9(handleElement).on('mousedown touchstart', start);
     }
 
     var count = 0;
@@ -18490,7 +18764,7 @@ var silver = (function (domGlobals) {
         if (h < 20) {
           h = 20;
         }
-        rect = currentRect = global$9.clamp({
+        rect = currentRect = global$a.clamp({
           x: x,
           y: y,
           w: w,
@@ -18514,21 +18788,21 @@ var silver = (function (domGlobals) {
             }
           });
         }
-        global$8('<div id="' + id + '" class="' + prefix + 'croprect-container"' + ' role="grid" aria-dropeffect="execute">').appendTo(containerElm);
-        global$b.each(blockers, function (blocker) {
-          global$8('#' + id, containerElm).append('<div id="' + id + '-' + blocker + '"class="' + prefix + 'croprect-block" style="display: none" data-mce-bogus="all">');
+        global$9('<div id="' + id + '" class="' + prefix + 'croprect-container"' + ' role="grid" aria-dropeffect="execute">').appendTo(containerElm);
+        global$c.each(blockers, function (blocker) {
+          global$9('#' + id, containerElm).append('<div id="' + id + '-' + blocker + '"class="' + prefix + 'croprect-block" style="display: none" data-mce-bogus="all">');
         });
-        global$b.each(handles, function (handle) {
-          global$8('#' + id, containerElm).append('<div id="' + id + '-' + handle.name + '" class="' + prefix + 'croprect-handle ' + prefix + 'croprect-handle-' + handle.name + '"' + 'style="display: none" data-mce-bogus="all" role="gridcell" tabindex="-1"' + ' aria-label="' + handle.label + '" aria-grabbed="false" title="' + handle.label + '">');
+        global$c.each(handles, function (handle) {
+          global$9('#' + id, containerElm).append('<div id="' + id + '-' + handle.name + '" class="' + prefix + 'croprect-handle ' + prefix + 'croprect-handle-' + handle.name + '"' + 'style="display: none" data-mce-bogus="all" role="gridcell" tabindex="-1"' + ' aria-label="' + handle.label + '" aria-grabbed="false" title="' + handle.label + '">');
         });
-        dragHelpers = global$b.map(handles, createDragHelper);
+        dragHelpers = global$c.map(handles, createDragHelper);
         repaint(currentRect);
-        global$8(containerElm).on('focusin focusout', function (e) {
-          global$8(e.target).attr('aria-grabbed', e.type === 'focus' ? 'true' : 'false');
+        global$9(containerElm).on('focusin focusout', function (e) {
+          global$9(e.target).attr('aria-grabbed', e.type === 'focus' ? 'true' : 'false');
         });
-        global$8(containerElm).on('keydown', function (e) {
+        global$9(containerElm).on('keydown', function (e) {
           var activeHandle;
-          global$b.each(handles, function (handle) {
+          global$c.each(handles, function (handle) {
             if (e.target.id === id + '-' + handle.name) {
               activeHandle = handle;
               return false;
@@ -18540,20 +18814,20 @@ var silver = (function (domGlobals) {
             moveRect(activeHandle, startRect, deltaX, deltaY);
           }
           switch (e.keyCode) {
-          case global$c.LEFT:
+          case global$d.LEFT:
             moveAndBlock(e, activeHandle, currentRect, -10, 0);
             break;
-          case global$c.RIGHT:
+          case global$d.RIGHT:
             moveAndBlock(e, activeHandle, currentRect, 10, 0);
             break;
-          case global$c.UP:
+          case global$d.UP:
             moveAndBlock(e, activeHandle, currentRect, 0, -10);
             break;
-          case global$c.DOWN:
+          case global$d.DOWN:
             moveAndBlock(e, activeHandle, currentRect, 0, 10);
             break;
-          case global$c.ENTER:
-          case global$c.SPACEBAR:
+          case global$d.ENTER:
+          case global$d.SPACEBAR:
             e.preventDefault();
             action();
             break;
@@ -18562,15 +18836,15 @@ var silver = (function (domGlobals) {
       }
       function toggleVisibility(state) {
         var selectors;
-        selectors = global$b.map(handles, function (handle) {
+        selectors = global$c.map(handles, function (handle) {
           return '#' + id + '-' + handle.name;
-        }).concat(global$b.map(blockers, function (blocker) {
+        }).concat(global$c.map(blockers, function (blocker) {
           return '#' + id + '-' + blocker;
         })).join(',');
         if (state) {
-          global$8(selectors, containerElm).show();
+          global$9(selectors, containerElm).show();
         } else {
-          global$8(selectors, containerElm).hide();
+          global$9(selectors, containerElm).hide();
         }
       }
       function repaint(rect) {
@@ -18581,15 +18855,15 @@ var silver = (function (domGlobals) {
           if (rect.w < 0) {
             rect.w = 0;
           }
-          global$8('#' + id + '-' + name, containerElm).css({
+          global$9('#' + id + '-' + name, containerElm).css({
             left: rect.x,
             top: rect.y,
             width: rect.w,
             height: rect.h
           });
         }
-        global$b.each(handles, function (handle) {
-          global$8('#' + id + '-' + handle.name, containerElm).css({
+        global$c.each(handles, function (handle) {
+          global$9('#' + id + '-' + handle.name, containerElm).css({
             left: rect.w * handle.xMul + rect.x,
             top: rect.h * handle.yMul + rect.y
           });
@@ -18636,13 +18910,13 @@ var silver = (function (domGlobals) {
         repaint(currentRect);
       }
       function destroy() {
-        global$b.each(dragHelpers, function (helper) {
+        global$c.each(dragHelpers, function (helper) {
           helper.destroy();
         });
         dragHelpers = [];
       }
       render();
-      instance = global$b.extend({
+      instance = global$c.extend({
         toggleVisibility: toggleVisibility,
         setClampRect: setClampRect,
         setRect: setRect,
@@ -18650,12 +18924,12 @@ var silver = (function (domGlobals) {
         setInnerRect: setInnerRect,
         setViewPortRect: setViewPortRect,
         destroy: destroy
-      }, global$a);
+      }, global$b);
       return instance;
     }
 
     var loadImage = function (image) {
-      return new global$2(function (resolve) {
+      return new global$3(function (resolve) {
         var loaded = function () {
           image.removeEventListener('load', loaded);
           resolve(image);
@@ -18761,7 +19035,7 @@ var silver = (function (domGlobals) {
               h: img.dom().naturalHeight
             };
             viewRectState.set(viewRect);
-            var rect = global$9.inflate(viewRect, -20, -20);
+            var rect = global$a.inflate(viewRect, -20, -20);
             rectState.set(rect);
             if (lastViewRect.w !== viewRect.w || lastViewRect.h !== viewRect.h) {
               zoomFit(panel, img);
@@ -19020,7 +19294,7 @@ var silver = (function (domGlobals) {
         URL.revokeObjectURL(state.url);
       };
       var destroyStates = function (states) {
-        global$b.each(states, destroyState);
+        global$c.each(states, destroyState);
       };
       var destroyTempState = function () {
         tempState.get().each(destroyState);
@@ -20697,7 +20971,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var trim$1 = global$b.trim;
+    var trim$1 = global$c.trim;
     var hasContentEditableState = function (value) {
       return function (node) {
         if (node && node.nodeType === 1) {
@@ -20713,7 +20987,7 @@ var silver = (function (domGlobals) {
     };
     var isContentEditableTrue = hasContentEditableState('true');
     var isContentEditableFalse = hasContentEditableState('false');
-    var create$5 = function (type, title, url, level, attach) {
+    var create$6 = function (type, title, url, level, attach) {
       return {
         type: type,
         title: title,
@@ -20765,12 +21039,12 @@ var silver = (function (domGlobals) {
       var attach = function () {
         elm.id = headerId;
       };
-      return create$5('header', getElementText(elm), '#' + headerId, getLevel(elm), attach);
+      return create$6('header', getElementText(elm), '#' + headerId, getLevel(elm), attach);
     };
     var anchorTarget = function (elm) {
       var anchorId = elm.id || elm.name;
       var anchorText = getElementText(elm);
-      return create$5('anchor', anchorText ? anchorText : '#' + anchorId, '#' + anchorId, 0, noop);
+      return create$6('anchor', anchorText ? anchorText : '#' + anchorId, '#' + anchorId, 0, noop);
     };
     var getHeaderTargets = function (elms) {
       return map(filter(elms, isValidHeader), headerTarget);
@@ -20853,7 +21127,7 @@ var silver = (function (domGlobals) {
       return !!value;
     };
     var makeMap = function (value) {
-      return map$1(global$b.makeMap(value, /[, ]/), isTruthy);
+      return map$1(global$c.makeMap(value, /[, ]/), isTruthy);
     };
     var getOpt = function (obj, key) {
       return hasOwnProperty$2.call(obj, key) ? Option.some(obj[key]) : Option.none();
@@ -20904,7 +21178,7 @@ var silver = (function (domGlobals) {
               };
               completer(r);
             };
-            var meta = global$b.extend({ filetype: filetype }, Option.from(entry.meta).getOr({}));
+            var meta = global$c.extend({ filetype: filetype }, Option.from(entry.meta).getOr({}));
             picker.call(editor, handler, entry.value, meta);
           });
         };
@@ -20950,7 +21224,7 @@ var silver = (function (domGlobals) {
             menuItems: function () {
               return editor.ui.registry.getAll().menuItems;
             },
-            translate: global$3.translate
+            translate: global$4.translate
           },
           interpreter: function (s) {
             return interpretWithoutForm(s, backstage);
@@ -22496,9 +22770,9 @@ var silver = (function (domGlobals) {
     var renderCommonStructure = function (icon, text, tooltip, receiver, behaviours, providersBackstage) {
       var _a;
       var getIconName = function (iconName) {
-        return global$3.isRtl() && contains(rtlIcon$1, iconName) ? iconName + '-rtl' : iconName;
+        return global$4.isRtl() && contains(rtlIcon$1, iconName) ? iconName + '-rtl' : iconName;
       };
-      var needsRtlClass = global$3.isRtl() && icon.exists(function (name) {
+      var needsRtlClass = global$4.isRtl() && icon.exists(function (name) {
         return contains(rtlTransform$1, name);
       });
       return {
@@ -24118,26 +24392,7 @@ var silver = (function (domGlobals) {
         uiMothership.destroy();
       });
     };
-    var Events = { setup: setup$3 };
-
-    var fireSkinLoaded = function (editor) {
-      return editor.fire('SkinLoaded');
-    };
-    var fireResizeEditor = function (editor) {
-      return editor.fire('ResizeEditor');
-    };
-    var fireBeforeRenderUI = function (editor) {
-      return editor.fire('BeforeRenderUI');
-    };
-    var fireResizeContent = function (editor) {
-      return editor.fire('ResizeContent');
-    };
-    var Events$1 = {
-      fireSkinLoaded: fireSkinLoaded,
-      fireResizeEditor: fireResizeEditor,
-      fireBeforeRenderUI: fireBeforeRenderUI,
-      fireResizeContent: fireResizeContent
-    };
+    var Events$1 = { setup: setup$3 };
 
     var parts$c = AlloyParts;
     var partType$1 = PartType;
@@ -24900,7 +25155,7 @@ var silver = (function (domGlobals) {
     var fireSkinLoaded$1 = function (editor) {
       var done = function () {
         editor._skinLoaded = true;
-        Events$1.fireSkinLoaded(editor);
+        Events.fireSkinLoaded(editor);
       };
       return function () {
         if (editor.initialized) {
@@ -24940,10 +25195,10 @@ var silver = (function (domGlobals) {
         var inner = lastDocumentDimensions.get();
         if (outer.left() !== contentWindow.innerWidth || outer.top() !== contentWindow.innerHeight) {
           lastWindowDimensions.set(Position(contentWindow.innerWidth, contentWindow.innerHeight));
-          Events$1.fireResizeContent(editor);
+          Events.fireResizeContent(editor);
         } else if (inner.left() !== docEle.offsetWidth || inner.top() !== docEle.offsetHeight) {
           lastDocumentDimensions.set(Position(docEle.offsetWidth, docEle.offsetHeight));
-          Events$1.fireResizeContent(editor);
+          Events.fireResizeContent(editor);
         }
       };
       DOM.bind(contentWindow, 'resize', resize);
@@ -25923,7 +26178,7 @@ var silver = (function (domGlobals) {
       each$1(dimensions, function (val, dim) {
         return set$2(container, dim, Utils.numToPx(val));
       });
-      Events$1.fireResizeEditor(editor);
+      Events.fireResizeEditor(editor);
     };
 
     var isHidden$1 = function (elm) {
@@ -26109,7 +26364,7 @@ var silver = (function (domGlobals) {
         };
       };
       var renderBranding = function () {
-        var label = global$3.translate([
+        var label = global$4.translate([
           'Powered by {0}',
           'Tiny'
         ]);
@@ -26179,7 +26434,7 @@ var silver = (function (domGlobals) {
       var platform = PlatformDetection$1.detect();
       var isIE = platform.browser.isIE();
       var platformClasses = isIE ? ['tox-platform-ie'] : [];
-      var dirAttributes = global$3.isRtl() ? { attributes: { dir: 'rtl' } } : {};
+      var dirAttributes = global$4.isRtl() ? { attributes: { dir: 'rtl' } } : {};
       var sink = build$1({
         dom: __assign({
           tag: 'div',
@@ -26295,7 +26550,7 @@ var silver = (function (domGlobals) {
         isInline ? [] : statusbar.toArray(),
         [partThrobber]
       ]);
-      var attributes = __assign({ role: 'application' }, global$3.isRtl() ? { dir: 'rtl' } : {});
+      var attributes = __assign({ role: 'application' }, global$4.isRtl() ? { dir: 'rtl' } : {});
       var outerContainer = build$1(OuterContainer.sketch({
         dom: {
           tag: 'div',
@@ -26321,7 +26576,7 @@ var silver = (function (domGlobals) {
       });
       var mothership = takeover(outerContainer);
       var uiMothership = takeover(sink);
-      Events.setup(editor, mothership, uiMothership);
+      Events$1.setup(editor, mothership, uiMothership);
       var getUi = function () {
         var channels = {
           broadcastAll: uiMothership.broadcast,
@@ -26427,7 +26682,7 @@ var silver = (function (domGlobals) {
           icon: 'align-justify'
         }
       ];
-      global$b.each(alignToolbarButtons, function (item) {
+      global$c.each(alignToolbarButtons, function (item) {
         editor.ui.registry.addToggleButton(item.name, {
           tooltip: item.text,
           onAction: function () {
@@ -26459,7 +26714,7 @@ var silver = (function (domGlobals) {
       };
     };
     var registerFormatButtons = function (editor) {
-      global$b.each([
+      global$c.each([
         {
           name: 'bold',
           text: 'Bold',
@@ -26509,7 +26764,7 @@ var silver = (function (domGlobals) {
       }
     };
     var registerCommandButtons = function (editor) {
-      global$b.each([
+      global$c.each([
         {
           name: 'cut',
           text: 'Cut',
@@ -26569,7 +26824,7 @@ var silver = (function (domGlobals) {
       });
     };
     var registerCommandToggleButtons = function (editor) {
-      global$b.each([{
+      global$c.each([{
           name: 'blockquote',
           text: 'Blockquote',
           action: 'mceBlockQuote',
@@ -26591,7 +26846,7 @@ var silver = (function (domGlobals) {
       registerCommandToggleButtons(editor);
     };
     var registerMenuItems = function (editor) {
-      global$b.each([
+      global$c.each([
         {
           name: 'bold',
           text: 'Bold',
@@ -27248,6 +27503,9 @@ var silver = (function (domGlobals) {
     ];
 
     var tabFields = [
+      field('name', 'name', defaultedThunk(function () {
+        return generate$1('tab-name');
+      }), string),
       strictString('title'),
       strictArrayOf('items', itemSchema$2)
     ];
@@ -27834,7 +28092,7 @@ var silver = (function (domGlobals) {
       var oldTab = Cell(null);
       var allTabs = map(spec.tabs, function (tab) {
         return {
-          value: tab.title,
+          value: tab.name,
           dom: {
             tag: 'div',
             classes: ['tox-dialog__body-nav-item'],
@@ -27884,12 +28142,12 @@ var silver = (function (domGlobals) {
           classes: ['tox-dialog__body']
         },
         onChangeTab: function (section, button, _viewItems) {
-          var title = Representing.getValue(button);
+          var name = Representing.getValue(button);
           emitWith(section, formTabChangeEvent, {
-            title: title,
-            oldTitle: oldTab.get()
+            name: name,
+            oldName: oldTab.get()
           });
-          oldTab.set(title);
+          oldTab.set(name);
         },
         tabs: allTabs,
         components: [
@@ -28083,7 +28341,10 @@ var silver = (function (domGlobals) {
           });
         }),
         fireApiEvent(formTabChangeEvent, function (api, spec, event) {
-          spec.onTabChange(api, event.title());
+          spec.onTabChange(api, {
+            newTabName: event.name(),
+            oldTabName: event.oldName()
+          });
         }),
         runOnDetached(function (component) {
           var api = getInstanceApi();
@@ -28233,7 +28494,7 @@ var silver = (function (domGlobals) {
           emit(root, formUnblockEvent);
         });
       };
-      var showTab = function (title) {
+      var showTab = function (name) {
         withRoot(function (_) {
           var body = access.getBody();
           var bodyState = Reflecting.getState(body);
@@ -28241,7 +28502,7 @@ var silver = (function (domGlobals) {
               return b.isTabPanel();
             })) {
             Composing.getCurrent(body).each(function (tabSection) {
-              TabSection.showTab(tabSection, title);
+              TabSection.showTab(tabSection, name);
             });
           }
         });
@@ -28510,7 +28771,7 @@ var silver = (function (domGlobals) {
       };
     };
 
-    var global$d = tinymce.util.Tools.resolve('tinymce.util.URI');
+    var global$e = tinymce.util.Tools.resolve('tinymce.util.URI');
 
     var getUrlDialogApi = function (root) {
       var withRoot = function (f) {
@@ -28618,14 +28879,14 @@ var silver = (function (domGlobals) {
         };
       }));
       var classes = internalDialog.width.isNone() && internalDialog.height.isNone() ? ['tox-dialog--width-lg'] : [];
-      var iframeUri = new global$d(internalDialog.url, { base_uri: new global$d(domGlobals.window.location.href) });
+      var iframeUri = new global$e(internalDialog.url, { base_uri: new global$e(domGlobals.window.location.href) });
       var iframeDomain = iframeUri.protocol + '://' + iframeUri.host + (iframeUri.port ? ':' + iframeUri.port : '');
       var messageHandlerUnbinder = Cell(Option.none());
       var extraBehaviours = [
         config('messages', [
           runOnAttached(function () {
             var unbind = bind$3(Element.fromDom(domGlobals.window), 'message', function (e) {
-              if (iframeUri.isSameOrigin(new global$d(e.raw().origin))) {
+              if (iframeUri.isSameOrigin(new global$e(e.raw().origin))) {
                 var data = e.raw().data;
                 if (isSupportedMessage(data)) {
                   handleMessage(editor, instanceApi, data);

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var link = (function (domGlobals) {
@@ -15,7 +15,13 @@ var link = (function (domGlobals) {
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
 
     var assumeExternalTargets = function (editorSettings) {
-      return typeof editorSettings.link_assume_external_targets === 'boolean' ? editorSettings.link_assume_external_targets : false;
+      var externalTargets = editorSettings.link_assume_external_targets;
+      if (typeof externalTargets === 'boolean' && externalTargets) {
+        return 1;
+      } else if (typeof externalTargets === 'string' && (externalTargets === 'http' || externalTargets === 'https')) {
+        return externalTargets;
+      }
+      return 0;
     };
     var hasContextToolbar = function (editorSettings) {
       return typeof editorSettings.link_context_toolbar === 'boolean' ? editorSettings.link_context_toolbar : false;
@@ -109,10 +115,6 @@ var link = (function (domGlobals) {
     var OpenUrl = { open: open };
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var constant = function (value) {
       return function () {
@@ -269,6 +271,7 @@ var link = (function (domGlobals) {
     var isString = isType('string');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -325,13 +328,15 @@ var link = (function (domGlobals) {
       var output = map(xs, f);
       return flatten(output);
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
+    var hasProtocol = function (url) {
+      return /^\w+:/i.test(url);
+    };
     var getHref = function (elm) {
       var href = elm.getAttribute('data-mce-href');
       return href ? href : elm.getAttribute('href');
@@ -397,6 +402,12 @@ var link = (function (domGlobals) {
         return acc;
       }, { href: data.href });
     };
+    var handleExternalTargets = function (href, assumeExternalTargets) {
+      if ((assumeExternalTargets === 'http' || assumeExternalTargets === 'https') && !hasProtocol(href)) {
+        return assumeExternalTargets + '://' + href;
+      }
+      return href;
+    };
     var updateLink = function (editor, anchorElm, text, linkAttrs) {
       text.each(function (text) {
         if (anchorElm.hasOwnProperty('innerText')) {
@@ -428,6 +439,7 @@ var link = (function (domGlobals) {
           var newRel = applyRelTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
           linkAttrs.rel = newRel ? newRel : null;
         }
+        linkAttrs.href = handleExternalTargets(linkAttrs.href, Settings.assumeExternalTargets(editor.settings));
         if (data.href === attachState.href) {
           attachState.attach();
         }
@@ -480,7 +492,8 @@ var link = (function (domGlobals) {
       isOnlyTextSelected: isOnlyTextSelected,
       getAnchorElement: getAnchorElement,
       getAnchorText: getAnchorText,
-      applyRelTargetRules: applyRelTargetRules
+      applyRelTargetRules: applyRelTargetRules,
+      hasProtocol: hasProtocol
     };
 
     var cat = function (arr) {
@@ -794,7 +807,7 @@ var link = (function (domGlobals) {
     var tryProtocolTransform = function (assumeExternalTargets) {
       return function (data) {
         var url = data.href;
-        var suggestProtocol = assumeExternalTargets === true && !/^\w+:/i.test(url) || assumeExternalTargets === false && /^\s*www[\.|\d\.]/i.test(url);
+        var suggestProtocol = assumeExternalTargets === 1 && !Utils.hasProtocol(url) || assumeExternalTargets === 0 && /^\s*www[\.|\d\.]/i.test(url);
         return suggestProtocol ? Option.some({
           message: 'The URL you entered seems to be an external link. Do you want to add the required http:// prefix?',
           preprocess: function (oldData) {

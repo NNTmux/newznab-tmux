@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var table = (function (domGlobals) {
@@ -29,17 +29,9 @@ var table = (function (domGlobals) {
     };
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var noarg = function (f) {
       return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
         return f();
       };
     };
@@ -268,6 +260,7 @@ var table = (function (domGlobals) {
     var isFunction = isType('function');
     var isNumber = isType('number');
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -298,7 +291,7 @@ var table = (function (domGlobals) {
     var chunk = function (array, size) {
       var r = [];
       for (var i = 0; i < array.length; i += size) {
-        var s = array.slice(i, i + size);
+        var s = slice.call(array, i, i + size);
         r.push(s);
       }
       return r;
@@ -436,7 +429,6 @@ var table = (function (domGlobals) {
         return x === a2[i];
       });
     };
-    var slice = Array.prototype.slice;
     var reverse = function (xs) {
       var r = slice.call(xs, 0);
       r.reverse();
@@ -5609,6 +5601,7 @@ var table = (function (domGlobals) {
       ];
       return {
         title: 'Advanced',
+        name: 'advanced',
         items: items
       };
     };
@@ -5856,14 +5849,14 @@ var table = (function (domGlobals) {
         ]
       }
     ];
-    var items = function (editor) {
+    var getItems = function (editor) {
       return getClassList(editor).fold(function () {
         return children$3;
       }, function (classlist) {
         return children$3.concat(classlist);
       });
     };
-    var CellDialogGeneralTab = { items: items };
+    var CellDialogGeneralTab = { getItems: getItems };
 
     var normal = function (dom, node) {
       var setAttrib = function (attr, value) {
@@ -5974,7 +5967,8 @@ var table = (function (domGlobals) {
         tabs: [
           {
             title: 'General',
-            items: CellDialogGeneralTab.items(editor)
+            name: 'general',
+            items: CellDialogGeneralTab.getItems(editor)
           },
           Helpers.getAdvancedTab()
         ]
@@ -5984,7 +5978,7 @@ var table = (function (domGlobals) {
         items: [{
             type: 'grid',
             columns: 2,
-            items: CellDialogGeneralTab.items(editor)
+            items: CellDialogGeneralTab.getItems(editor)
           }]
       };
       editor.windowManager.open({
@@ -6081,14 +6075,14 @@ var table = (function (domGlobals) {
         type: 'input'
       }
     ];
-    var items$1 = function (editor) {
+    var getItems$1 = function (editor) {
       return getClassList$1(editor).fold(function () {
         return formChildren;
       }, function (classes) {
         return formChildren.concat(classes);
       });
     };
-    var RowDialogGeneralTab = { items: items$1 };
+    var RowDialogGeneralTab = { getItems: getItems$1 };
 
     var switchRowType = function (dom, rowElm, toType) {
       var tableElm = dom.getParent(rowElm, 'table');
@@ -6171,7 +6165,8 @@ var table = (function (domGlobals) {
         tabs: [
           {
             title: 'General',
-            items: RowDialogGeneralTab.items(editor)
+            name: 'general',
+            items: RowDialogGeneralTab.getItems(editor)
           },
           Helpers.getAdvancedTab()
         ]
@@ -6181,7 +6176,7 @@ var table = (function (domGlobals) {
         items: [{
             type: 'grid',
             columns: 2,
-            items: RowDialogGeneralTab.items(editor)
+            items: RowDialogGeneralTab.getItems(editor)
           }]
       };
       editor.windowManager.open({
@@ -6315,123 +6310,8 @@ var table = (function (domGlobals) {
     };
     var InsertTable = { insert: insert$1 };
 
-    var styleTDTH = function (dom, elm, name, value) {
-      if (elm.tagName === 'TD' || elm.tagName === 'TH') {
-        if (isString(name)) {
-          dom.setStyle(elm, name, value);
-        } else {
-          dom.setStyle(elm, name);
-        }
-      } else {
-        if (elm.children) {
-          for (var i = 0; i < elm.children.length; i++) {
-            styleTDTH(dom, elm.children[i], name, value);
-          }
-        }
-      }
-    };
-    var applyDataToElement = function (editor, tableElm, data) {
-      var dom = editor.dom;
-      var attrs = {};
-      var styles = {};
-      attrs.class = data.class;
-      styles.height = addSizeSuffix(data.height);
-      if (dom.getAttrib(tableElm, 'width') && !shouldStyleWithCss(editor)) {
-        attrs.width = removePxSuffix(data.width);
-      } else {
-        styles.width = addSizeSuffix(data.width);
-      }
-      if (shouldStyleWithCss(editor)) {
-        styles['border-width'] = addSizeSuffix(data.border);
-        styles['border-spacing'] = addSizeSuffix(data.cellspacing);
-      } else {
-        attrs.border = data.border;
-        attrs.cellpadding = data.cellpadding;
-        attrs.cellspacing = data.cellspacing;
-      }
-      if (shouldStyleWithCss(editor) && tableElm.children) {
-        for (var i = 0; i < tableElm.children.length; i++) {
-          styleTDTH(dom, tableElm.children[i], {
-            'border-width': addSizeSuffix(data.border),
-            'padding': addSizeSuffix(data.cellpadding)
-          });
-          if (hasAdvancedTableTab(editor)) {
-            styleTDTH(dom, tableElm.children[i], { 'border-color': data.bordercolor });
-          }
-        }
-      }
-      if (hasAdvancedTableTab(editor)) {
-        styles['background-color'] = data.backgroundcolor;
-        styles['border-color'] = data.bordercolor;
-        styles['border-style'] = data.borderstyle;
-      }
-      attrs.style = dom.serializeStyle(merge(getDefaultStyles(editor), styles));
-      dom.setAttribs(tableElm, merge(getDefaultAttributes(editor), attrs));
-    };
-    var onSubmitTableForm = function (editor, tableElm, api) {
-      var dom = editor.dom;
-      var captionElm;
-      var data = api.getData();
-      api.close();
-      if (data.class === '') {
-        delete data.class;
-      }
-      editor.undoManager.transact(function () {
-        if (!tableElm) {
-          var cols = parseInt(data.cols, 10) || 1;
-          var rows = parseInt(data.rows, 10) || 1;
-          tableElm = InsertTable.insert(editor, cols, rows);
-        }
-        applyDataToElement(editor, tableElm, data);
-        captionElm = dom.select('caption', tableElm)[0];
-        if (captionElm && !data.caption) {
-          dom.remove(captionElm);
-        }
-        if (!captionElm && data.caption) {
-          captionElm = dom.create('caption');
-          captionElm.innerHTML = !global$2.ie ? '<br data-mce-bogus="1"/>' : '\xA0';
-          tableElm.insertBefore(captionElm, tableElm.firstChild);
-        }
-        if (data.align === '') {
-          Styles$1.unApplyAlign(editor, tableElm);
-        } else {
-          Styles$1.applyAlign(editor, tableElm, data.align);
-        }
-        editor.focus();
-        editor.addVisual();
-      });
-    };
-    var open$2 = function (editor, isNew) {
-      var dom = editor.dom;
-      var tableElm;
-      var data = Helpers.extractDataFromSettings(editor, hasAdvancedTableTab(editor));
-      if (isNew === false) {
-        tableElm = dom.getParent(editor.selection.getStart(), 'table');
-        if (tableElm) {
-          data = Helpers.extractDataFromTableElement(editor, tableElm, hasAdvancedTableTab(editor));
-        } else {
-          if (hasAdvancedTableTab(editor)) {
-            data.borderstyle = '';
-            data.bordercolor = '';
-            data.backgroundcolor = '';
-          }
-        }
-      } else {
-        data.cols = '1';
-        data.rows = '1';
-        if (hasAdvancedTableTab(editor)) {
-          data.borderstyle = '';
-          data.bordercolor = '';
-          data.backgroundcolor = '';
-        }
-      }
-      var hasClasses = getTableClassList(editor).length > 0;
-      if (hasClasses) {
-        if (data.class) {
-          data.class = data.class.replace(/\s*mce\-item\-table\s*/g, '');
-        }
-      }
-      var rowColCountItems = !isNew ? [] : [
+    var getItems$2 = function (editor, hasClasses, insertNewTable) {
+      var rowColCountItems = !insertNewTable ? [] : [
         {
           type: 'input',
           name: 'cols',
@@ -6519,27 +6399,151 @@ var table = (function (domGlobals) {
             }
           })
         }] : [];
-      var generalTabItems = rowColCountItems.concat(alwaysItems).concat(appearanceItems).concat(alignmentItem).concat(classListItem);
+      return rowColCountItems.concat(alwaysItems).concat(appearanceItems).concat(alignmentItem).concat(classListItem);
+    };
+    var TableDialogGeneralTab = { getItems: getItems$2 };
+
+    var styleTDTH = function (dom, elm, name, value) {
+      if (elm.tagName === 'TD' || elm.tagName === 'TH') {
+        if (isString(name)) {
+          dom.setStyle(elm, name, value);
+        } else {
+          dom.setStyle(elm, name);
+        }
+      } else {
+        if (elm.children) {
+          for (var i = 0; i < elm.children.length; i++) {
+            styleTDTH(dom, elm.children[i], name, value);
+          }
+        }
+      }
+    };
+    var applyDataToElement = function (editor, tableElm, data) {
+      var dom = editor.dom;
+      var attrs = {};
+      var styles = {};
+      attrs.class = data.class;
+      styles.height = addSizeSuffix(data.height);
+      if (dom.getAttrib(tableElm, 'width') && !shouldStyleWithCss(editor)) {
+        attrs.width = removePxSuffix(data.width);
+      } else {
+        styles.width = addSizeSuffix(data.width);
+      }
+      if (shouldStyleWithCss(editor)) {
+        styles['border-width'] = addSizeSuffix(data.border);
+        styles['border-spacing'] = addSizeSuffix(data.cellspacing);
+      } else {
+        attrs.border = data.border;
+        attrs.cellpadding = data.cellpadding;
+        attrs.cellspacing = data.cellspacing;
+      }
+      if (shouldStyleWithCss(editor) && tableElm.children) {
+        for (var i = 0; i < tableElm.children.length; i++) {
+          styleTDTH(dom, tableElm.children[i], {
+            'border-width': addSizeSuffix(data.border),
+            'padding': addSizeSuffix(data.cellpadding)
+          });
+          if (hasAdvancedTableTab(editor)) {
+            styleTDTH(dom, tableElm.children[i], { 'border-color': data.bordercolor });
+          }
+        }
+      }
+      if (hasAdvancedTableTab(editor)) {
+        styles['background-color'] = data.backgroundcolor;
+        styles['border-color'] = data.bordercolor;
+        styles['border-style'] = data.borderstyle;
+      }
+      attrs.style = dom.serializeStyle(merge(getDefaultStyles(editor), styles));
+      dom.setAttribs(tableElm, merge(getDefaultAttributes(editor), attrs));
+    };
+    var onSubmitTableForm = function (editor, tableElm, api) {
+      var dom = editor.dom;
+      var captionElm;
+      var data = api.getData();
+      api.close();
+      if (data.class === '') {
+        delete data.class;
+      }
+      editor.undoManager.transact(function () {
+        if (!tableElm) {
+          var cols = parseInt(data.cols, 10) || 1;
+          var rows = parseInt(data.rows, 10) || 1;
+          tableElm = InsertTable.insert(editor, cols, rows);
+        }
+        applyDataToElement(editor, tableElm, data);
+        captionElm = dom.select('caption', tableElm)[0];
+        if (captionElm && !data.caption) {
+          dom.remove(captionElm);
+        }
+        if (!captionElm && data.caption) {
+          captionElm = dom.create('caption');
+          captionElm.innerHTML = !global$2.ie ? '<br data-mce-bogus="1"/>' : '\xA0';
+          tableElm.insertBefore(captionElm, tableElm.firstChild);
+        }
+        if (data.align === '') {
+          Styles$1.unApplyAlign(editor, tableElm);
+        } else {
+          Styles$1.applyAlign(editor, tableElm, data.align);
+        }
+        editor.focus();
+        editor.addVisual();
+      });
+    };
+    var open$2 = function (editor, insertNewTable) {
+      var dom = editor.dom;
+      var tableElm;
+      var data = Helpers.extractDataFromSettings(editor, hasAdvancedTableTab(editor));
+      if (insertNewTable === false) {
+        tableElm = dom.getParent(editor.selection.getStart(), 'table');
+        if (tableElm) {
+          data = Helpers.extractDataFromTableElement(editor, tableElm, hasAdvancedTableTab(editor));
+        } else {
+          if (hasAdvancedTableTab(editor)) {
+            data.borderstyle = '';
+            data.bordercolor = '';
+            data.backgroundcolor = '';
+          }
+        }
+      } else {
+        data.cols = '1';
+        data.rows = '1';
+        if (hasAdvancedTableTab(editor)) {
+          data.borderstyle = '';
+          data.bordercolor = '';
+          data.backgroundcolor = '';
+        }
+      }
+      var hasClasses = getTableClassList(editor).length > 0;
+      if (hasClasses) {
+        if (data.class) {
+          data.class = data.class.replace(/\s*mce\-item\-table\s*/g, '');
+        }
+      }
       var generalPanel = {
         type: 'grid',
         columns: 2,
-        items: generalTabItems
+        items: TableDialogGeneralTab.getItems(editor, hasClasses, insertNewTable)
       };
-      var nonAdvancedForm = {
-        type: 'panel',
-        items: [generalPanel]
+      var nonAdvancedForm = function () {
+        return {
+          type: 'panel',
+          items: [generalPanel]
+        };
       };
-      var advancedForm = {
-        type: 'tabpanel',
-        tabs: [
-          {
-            title: 'General',
-            items: [generalPanel]
-          },
-          Helpers.getAdvancedTab()
-        ]
+      var advancedForm = function () {
+        return {
+          type: 'tabpanel',
+          tabs: [
+            {
+              title: 'General',
+              name: 'general',
+              items: [generalPanel]
+            },
+            Helpers.getAdvancedTab()
+          ]
+        };
       };
-      var dialogBody = hasAdvancedTableTab(editor) ? advancedForm : nonAdvancedForm;
+      var dialogBody = hasAdvancedTableTab(editor) ? advancedForm() : nonAdvancedForm();
       editor.windowManager.open({
         title: 'Table Properties',
         size: 'normal',
@@ -9372,6 +9376,11 @@ var table = (function (domGlobals) {
         icon: 'temporary-placeholder',
         onSetup: selectionTargets.onSetupCellOrRow
       });
+      editor.ui.registry.addButton('tableinsertdialog', {
+        tooltip: 'Insert table',
+        onAction: cmd('mceInsertTable'),
+        icon: 'table'
+      });
     };
     var addToolbars = function (editor) {
       var isTable = function (table) {
@@ -9554,6 +9563,11 @@ var table = (function (domGlobals) {
           }
         });
       }
+      editor.ui.registry.addMenuItem('inserttabledialog', {
+        text: 'Insert table',
+        icon: 'table',
+        onAction: cmd('mceInsertTable')
+      });
       editor.ui.registry.addMenuItem('tableprops', tableProperties);
       editor.ui.registry.addMenuItem('deletetable', deleteTable);
       editor.ui.registry.addNestedMenuItem('row', row);

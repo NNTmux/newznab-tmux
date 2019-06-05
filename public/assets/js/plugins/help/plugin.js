@@ -4,13 +4,73 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var help = (function () {
     'use strict';
 
+    var Cell = function (initial) {
+      var value = initial;
+      var get = function () {
+        return value;
+      };
+      var set = function (v) {
+        value = v;
+      };
+      var clone = function () {
+        return Cell(get());
+      };
+      return {
+        get: get,
+        set: set,
+        clone: clone
+      };
+    };
+
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    var get = function (customTabs) {
+      var addTab = function (spec) {
+        var currentCustomTabs = customTabs.get();
+        currentCustomTabs[spec.name] = spec;
+        customTabs.set(currentCustomTabs);
+      };
+      return { addTab: addTab };
+    };
+
+    var register = function (editor, dialogOpener) {
+      editor.addCommand('mceHelp', dialogOpener);
+    };
+    var Commands = { register: register };
+
+    var register$1 = function (editor, dialogOpener) {
+      editor.ui.registry.addButton('help', {
+        icon: 'help',
+        tooltip: 'Help',
+        onAction: dialogOpener
+      });
+      editor.ui.registry.addMenuItem('help', {
+        text: 'Help',
+        icon: 'help',
+        shortcut: 'Alt+0',
+        onAction: dialogOpener
+      });
+    };
+    var Buttons = { register: register$1 };
+
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
+    };
 
     var constant = function (value) {
       return function () {
@@ -189,6 +249,7 @@ var help = (function () {
     };
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -199,6 +260,10 @@ var help = (function () {
       };
       return pIndexOf === undefined ? slowIndex : fastIndex;
     }();
+    var indexOf = function (xs, x) {
+      var r = rawIndexOf(xs, x);
+      return r === -1 ? Option.none() : Option.some(r);
+    };
     var contains = function (xs, x) {
       return rawIndexOf(xs, x) > -1;
     };
@@ -238,9 +303,32 @@ var help = (function () {
       }
       return -1;
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
+    };
+
+    var keys = Object.keys;
+    var hasOwnProperty = Object.hasOwnProperty;
+    var get$1 = function (obj, key) {
+      return has(obj, key) ? Option.from(obj[key]) : Option.none();
+    };
+    var has = function (obj, key) {
+      return hasOwnProperty.call(obj, key);
+    };
+
+    var cat = function (arr) {
+      var r = [];
+      var push = function (x) {
+        r.push(x);
+      };
+      for (var i = 0; i < arr.length; i++) {
+        arr[i].each(push);
+      }
+      return r;
+    };
+
+    var getHelpTabs = function (editor) {
+      return Option.from(editor.getParam('help_tabs'));
     };
 
     var shortcuts = [
@@ -350,12 +438,6 @@ var help = (function () {
     ];
     var KeyboardShortcuts = { shortcuts: shortcuts };
 
-    var keys = Object.keys;
-    var hasOwnProperty = Object.hasOwnProperty;
-    var has = function (obj, key) {
-      return hasOwnProperty.call(obj, key);
-    };
-
     var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var convertText = function (source) {
@@ -397,6 +479,7 @@ var help = (function () {
         cells: shortcutList
       };
       return {
+        name: 'shortcuts',
         title: 'Handy Shortcuts',
         items: [tablePanel]
       };
@@ -714,6 +797,7 @@ var help = (function () {
         ].join('')
       };
       return {
+        name: 'plugins',
         title: 'Plugins',
         items: [htmlPanel]
       };
@@ -722,7 +806,7 @@ var help = (function () {
 
     var global$3 = tinymce.util.Tools.resolve('tinymce.EditorManager');
 
-    var defaultPanel = function () {
+    var tab$2 = function () {
       var getVersion = function (major, minor) {
         return major.indexOf('@') === 0 ? 'X.X.X' : major + '.' + minor;
       };
@@ -736,32 +820,66 @@ var help = (function () {
         ]) + '</p>',
         presets: 'document'
       };
-      return htmlPanel;
-    };
-    var VersionPanel = { defaultPanel: defaultPanel };
-
-    var getVersionPanel = function (editor) {
-      return editor.getParam('help_version', VersionPanel.defaultPanel, 'function')();
-    };
-    var Settings = { getVersionPanel: getVersionPanel };
-
-    var tab$2 = function (editor) {
       return {
+        name: 'versions',
         title: 'Version',
-        items: [Settings.getVersionPanel(editor)]
+        items: [htmlPanel]
       };
     };
     var VersionTab = { tab: tab$2 };
 
-    var opener = function (editor) {
+    var parseHelpTabsSetting = function (tabsFromSettings, tabs) {
+      var newTabs = {};
+      var names = map(tabsFromSettings, function (t) {
+        if (typeof t === 'string') {
+          if (has(tabs, t)) {
+            newTabs[t] = tabs[t];
+          }
+          return t;
+        } else {
+          newTabs[t.name] = t;
+          return t.name;
+        }
+      });
+      return {
+        tabs: newTabs,
+        names: names
+      };
+    };
+    var getNamesFromTabs = function (tabs) {
+      var names = keys(tabs);
+      var versionsIdx = indexOf(names, 'versions');
+      versionsIdx.each(function (idx) {
+        names.splice(idx, 1);
+        names.push('versions');
+      });
+      return {
+        tabs: tabs,
+        names: names
+      };
+    };
+    var parseCustomTabs = function (editor, customTabs) {
+      var _a;
+      var shortcuts = KeyboardShortcutsTab.tab();
+      var plugins = PluginsTab.tab(editor);
+      var versions = VersionTab.tab();
+      var tabs = __assign((_a = {}, _a[shortcuts.name] = shortcuts, _a[plugins.name] = plugins, _a[versions.name] = versions, _a), customTabs.get());
+      return getHelpTabs(editor).fold(function () {
+        return getNamesFromTabs(tabs);
+      }, function (tabsFromSettings) {
+        return parseHelpTabsSetting(tabsFromSettings, tabs);
+      });
+    };
+    var init = function (editor, customTabs) {
       return function () {
+        var _a = parseCustomTabs(editor, customTabs), tabs = _a.tabs, names = _a.names;
+        var foundTabs = map(names, function (name) {
+          return get$1(tabs, name);
+        });
+        var dialogTabs = cat(foundTabs);
         var body = {
           type: 'tabpanel',
-          tabs: [
-            KeyboardShortcutsTab.tab(),
-            PluginsTab.tab(editor),
-            VersionTab.tab(editor)
-          ]
+          tabs: dialogTabs
         };
         editor.windowManager.open({
           title: 'Help',
@@ -777,32 +895,15 @@ var help = (function () {
         });
       };
     };
-    var Dialog = { opener: opener };
-
-    var register = function (editor) {
-      editor.addCommand('mceHelp', Dialog.opener(editor));
-    };
-    var Commands = { register: register };
-
-    var register$1 = function (editor) {
-      editor.ui.registry.addButton('help', {
-        icon: 'help',
-        tooltip: 'Help',
-        onAction: Dialog.opener(editor)
-      });
-      editor.ui.registry.addMenuItem('help', {
-        text: 'Help',
-        icon: 'help',
-        shortcut: 'Alt+0',
-        onAction: Dialog.opener(editor)
-      });
-    };
-    var Buttons = { register: register$1 };
 
     global.add('help', function (editor) {
-      Buttons.register(editor);
-      Commands.register(editor);
+      var customTabs = Cell({});
+      var api = get(customTabs);
+      var dialogOpener = init(editor, customTabs);
+      Buttons.register(editor, dialogOpener);
+      Commands.register(editor, dialogOpener);
       editor.shortcuts.add('Alt+0', 'Open help dialog', 'mceHelp');
+      return api;
     });
     function Plugin () {
     }

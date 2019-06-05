@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var textpattern = (function (domGlobals) {
@@ -31,10 +31,6 @@ var textpattern = (function (domGlobals) {
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var constant = function (value) {
       return function () {
@@ -201,6 +197,7 @@ var textpattern = (function (domGlobals) {
     var isArray = isType('array');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -283,7 +280,6 @@ var textpattern = (function (domGlobals) {
       }
       return true;
     };
-    var slice = Array.prototype.slice;
     var sort = function (xs, comparator) {
       var copy = slice.call(xs, 0);
       copy.sort(comparator);

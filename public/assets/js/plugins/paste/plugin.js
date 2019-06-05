@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var paste = (function (domGlobals) {
@@ -899,6 +899,7 @@ var paste = (function (domGlobals) {
     };
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var map = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
@@ -924,7 +925,6 @@ var paste = (function (domGlobals) {
       }
       return r;
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -1081,6 +1081,28 @@ var paste = (function (domGlobals) {
       return par$1(futures);
     };
 
+    var value = function () {
+      var subject = Cell(Option.none());
+      var clear = function () {
+        subject.set(Option.none());
+      };
+      var set = function (s) {
+        subject.set(Option.some(s));
+      };
+      var on = function (f) {
+        subject.get().each(f);
+      };
+      var isSet = function () {
+        return subject.get().isSome();
+      };
+      return {
+        clear: clear,
+        set: set,
+        isSet: isSet,
+        on: on
+      };
+    };
+
     var pasteHtml$1 = function (editor, html, internalFlag) {
       var internal = internalFlag ? internalFlag : InternalHtml.isMarked(html);
       var args = ProcessFilters.process(editor, InternalHtml.unmark(html), internal);
@@ -1222,7 +1244,7 @@ var paste = (function (domGlobals) {
       return global$4.metaKeyPressed(e) && e.keyCode === 86 || e.shiftKey && e.keyCode === 45;
     };
     var registerEventHandlers = function (editor, pasteBin, pasteFormat) {
-      var keyboardPasteTimeStamp = 0;
+      var keyboardPasteEvent = value();
       var keyboardPastePlainTextState;
       editor.on('keydown', function (e) {
         function removePasteBinOnKeyUp(e) {
@@ -1236,7 +1258,10 @@ var paste = (function (domGlobals) {
             return;
           }
           e.stopImmediatePropagation();
-          keyboardPasteTimeStamp = new Date().getTime();
+          keyboardPasteEvent.set(e);
+          window.setTimeout(function () {
+            keyboardPasteEvent.clear();
+          }, 100);
           if (global$1.ie && keyboardPastePlainTextState) {
             e.preventDefault();
             Events.firePaste(editor, true);
@@ -1290,10 +1315,8 @@ var paste = (function (domGlobals) {
         return pasteBin.getLastRng() || editor.selection.getRng();
       };
       editor.on('paste', function (e) {
-        var clipboardTimer = new Date().getTime();
+        var isKeyBoardPaste = keyboardPasteEvent.isSet();
         var clipboardContent = getClipboardContent(editor, e);
-        var clipboardDelay = new Date().getTime() - clipboardTimer;
-        var isKeyBoardPaste = new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay < 1000;
         var plainTextMode = pasteFormat.get() === 'text' || keyboardPastePlainTextState;
         var internal = hasContentType(clipboardContent, InternalHtml.internalHtmlMime());
         keyboardPastePlainTextState = false;

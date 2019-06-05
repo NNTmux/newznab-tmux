@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var imagetools = (function (domGlobals) {
@@ -721,6 +721,9 @@ var imagetools = (function (domGlobals) {
     var getCredentialsHosts = function (editor) {
       return editor.getParam('imagetools_credentials_hosts', [], 'string[]');
     };
+    var getFetchImage = function (editor) {
+      return Option.from(editor.getParam('imagetools_fetch_image', null, 'function'));
+    };
     var getApiKey = function (editor) {
       return editor.getParam('api_key', editor.getParam('imagetools_api_key', '', 'string'), 'string');
     };
@@ -804,6 +807,7 @@ var imagetools = (function (domGlobals) {
     };
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var find = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
@@ -813,7 +817,6 @@ var imagetools = (function (domGlobals) {
       }
       return Option.none();
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -1470,7 +1473,7 @@ var imagetools = (function (domGlobals) {
     var isCorsWithCredentialsImage = function (editor, img) {
       return global$1.inArray(getCredentialsHosts(editor), new global$4(img.src).host) !== -1;
     };
-    var imageToBlob$2 = function (editor, img) {
+    var defaultFetchImage = function (editor, img) {
       var src = img.src, apiKey;
       if (isCorsImage(editor, img)) {
         return getUrl(img.src, null, isCorsWithCredentialsImage(editor, img));
@@ -1482,6 +1485,13 @@ var imagetools = (function (domGlobals) {
         return getUrl(src, apiKey, false);
       }
       return imageToBlob$1(img);
+    };
+    var imageToBlob$2 = function (editor, img) {
+      return getFetchImage(editor).fold(function () {
+        return defaultFetchImage(editor, img);
+      }, function (customFetchImage) {
+        return customFetchImage(img);
+      });
     };
     var findBlob = function (editor, img) {
       var blobInfo;

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var image = (function (domGlobals) {
@@ -13,10 +13,6 @@ var image = (function (domGlobals) {
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var constant = function (value) {
       return function () {
@@ -180,8 +176,10 @@ var image = (function (domGlobals) {
     };
     var isString = isType('string');
     var isObject = isType('object');
+    var isBoolean = isType('boolean');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var each = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
@@ -207,7 +205,6 @@ var image = (function (domGlobals) {
       }
       return r;
     };
-    var slice = Array.prototype.slice;
     var head = function (xs) {
       return xs.length === 0 ? Option.none() : Option.some(xs[0]);
     };
@@ -682,6 +679,7 @@ var image = (function (domGlobals) {
     var makeTab = function (info) {
       return {
         title: 'General',
+        name: 'general',
         items: makeItems(info)
       };
     };
@@ -1338,6 +1336,7 @@ var image = (function (domGlobals) {
     var makeTab$1 = function (info) {
       return {
         title: 'Advanced',
+        name: 'advanced',
         items: [
           {
             type: 'input',
@@ -1484,6 +1483,7 @@ var image = (function (domGlobals) {
         }];
       return {
         title: 'Upload',
+        name: 'upload',
         items: items
       };
     };
@@ -1557,51 +1557,54 @@ var image = (function (domGlobals) {
         });
       });
     };
-    var formFillFromMeta2 = function (info, data) {
-      var meta = data.src.meta;
-      if (meta !== undefined) {
-        var dataCopy_1 = deepMerge({}, data);
-        if (info.hasDescription && isString(meta.alt)) {
-          dataCopy_1.alt = meta.alt;
-        }
-        if (info.hasImageTitle && isString(meta.title)) {
-          dataCopy_1.title = meta.title;
-        }
-        if (info.hasDimensions) {
-          if (isString(meta.width)) {
-            dataCopy_1.dimensions.width = meta.width;
-          }
-          if (isString(meta.height)) {
-            dataCopy_1.dimensions.height = meta.height;
-          }
-        }
-        if (isString(meta.class)) {
-          ListUtils.findEntry(info.classList, meta.class).each(function (entry) {
-            dataCopy_1.classes = entry.value;
-          });
-        }
-        if (info.hasAdvTab) {
-          if (isString(meta.vspace)) {
-            dataCopy_1.vspace = meta.vspace;
-          }
-          if (isString(meta.border)) {
-            dataCopy_1.border = meta.border;
-          }
-          if (isString(meta.hspace)) {
-            dataCopy_1.hspace = meta.hspace;
-          }
-          if (isString(meta.borderstyle)) {
-            dataCopy_1.borderstyle = meta.borderstyle;
-          }
-        }
-        return Option.some(dataCopy_1);
+    var formFillFromMeta2 = function (info, data, meta) {
+      if (info.hasDescription && isString(meta.alt)) {
+        data.alt = meta.alt;
       }
-      return Option.none();
+      if (info.hasImageTitle && isString(meta.title)) {
+        data.title = meta.title;
+      }
+      if (info.hasDimensions) {
+        if (isString(meta.width)) {
+          data.dimensions.width = meta.width;
+        }
+        if (isString(meta.height)) {
+          data.dimensions.height = meta.height;
+        }
+      }
+      if (isString(meta.class)) {
+        ListUtils.findEntry(info.classList, meta.class).each(function (entry) {
+          data.classes = entry.value;
+        });
+      }
+      if (info.hasImageCaption) {
+        if (isBoolean(meta.caption)) {
+          data.caption = meta.caption;
+        }
+      }
+      if (info.hasAdvTab) {
+        if (isString(meta.vspace)) {
+          data.vspace = meta.vspace;
+        }
+        if (isString(meta.border)) {
+          data.border = meta.border;
+        }
+        if (isString(meta.hspace)) {
+          data.hspace = meta.hspace;
+        }
+        if (isString(meta.borderstyle)) {
+          data.borderstyle = meta.borderstyle;
+        }
+      }
     };
     var formFillFromMeta = function (info, api) {
-      formFillFromMeta2(info, api.getData()).each(function (data) {
-        return api.setData(data);
-      });
+      var data = api.getData();
+      var meta = data.src.meta;
+      if (meta !== undefined) {
+        var newData = deepMerge({}, data);
+        formFillFromMeta2(info, newData, meta);
+        api.setData(newData);
+      }
     };
     var calculateImageSize = function (helpers, info, state, api) {
       var data = api.getData();
@@ -1722,7 +1725,7 @@ var image = (function (domGlobals) {
                 meta: {}
               }
             });
-            api.showTab('General');
+            api.showTab('general');
             changeSrc(helpers, info, state, api);
             finalize();
           }).catch(function (err) {

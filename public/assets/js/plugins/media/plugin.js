@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var media = (function () {
@@ -199,6 +199,7 @@ var media = (function () {
       return hasOwnProperty$1.call(obj, key);
     };
 
+    var slice = Array.prototype.slice;
     var each = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
@@ -215,7 +216,6 @@ var media = (function () {
       }
       return r;
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -908,6 +908,7 @@ var media = (function () {
         }];
       var generalTab = {
         title: 'General',
+        name: 'general',
         items: flatten([
           mediaInput,
           sizeInput
@@ -941,6 +942,7 @@ var media = (function () {
       }
       var advancedTab = {
         title: 'Advanced',
+        name: 'advanced',
         items: advancedFormItems
       };
       var tabs = [

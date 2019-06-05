@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var lists = (function (domGlobals) {
@@ -378,6 +378,7 @@ var lists = (function (domGlobals) {
     var isFunction = isType('function');
     var isNumber = isType('number');
 
+    var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
       var fastIndex = function (xs, x) {
@@ -408,7 +409,7 @@ var lists = (function (domGlobals) {
     var chunk = function (array, size) {
       var r = [];
       for (var i = 0; i < array.length; i += size) {
-        var s = array.slice(i, i + size);
+        var s = slice.call(array, i, i + size);
         r.push(s);
       }
       return r;
@@ -546,7 +547,6 @@ var lists = (function (domGlobals) {
         return x === a2[i];
       });
     };
-    var slice = Array.prototype.slice;
     var reverse = function (xs) {
       var r = slice.call(xs, 0);
       r.reverse();
@@ -2138,7 +2138,7 @@ var lists = (function (domGlobals) {
           }
           return true;
         } else if (!otherLi) {
-          if (!isForward) {
+          if (!isForward && rng.startOffset === 0 && rng.endOffset === 0) {
             flattenListSelection(editor);
             return true;
           }

@@ -14,7 +14,7 @@
         "axios": "^0.19",
         "cross-env": "^5.2.0",
         "jquery": "^3.4",
-        "laravel-mix": "^4.0.15",
+        "laravel-mix": "^4.0.16",
         "laravel-mix-purgecss": "^4.1.0",
         "lodash": "^4.17.11",
         "popper.js": "^1.15.0",
@@ -23,8 +23,8 @@
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^5.8.2",
-        "animate.css": "^3.7.1",
+        "@fortawesome/fontawesome-free": "^5.9.0",
+        "animate.css": "^3.7.2",
         "autosize": "^4.0.2",
         "bootstrap": "^4.3.1",
         "bootstrap-datepicker": "^1.9.0",
@@ -44,6 +44,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0",
-        "tinymce": "^5.0.6"
+        "tinymce": "^5.0.7"
     }
 }

@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var fullscreen = (function (domGlobals) {
@@ -47,25 +47,6 @@ var fullscreen = (function (domGlobals) {
     var Events = { fireFullscreenStateChanged: fireFullscreenStateChanged };
 
     var DOM = global$1.DOM;
-    var getWindowSize = function () {
-      var w;
-      var h;
-      var win = domGlobals.window;
-      var doc = domGlobals.document;
-      var body = doc.body;
-      if (body.offsetWidth) {
-        w = body.offsetWidth;
-        h = body.offsetHeight;
-      }
-      if (win.innerWidth && win.innerHeight) {
-        w = win.innerWidth;
-        h = win.innerHeight;
-      }
-      return {
-        w: w,
-        h: h
-      };
-    };
     var getScrollPos = function () {
       var vp = DOM.getViewPort();
       return {
@@ -82,12 +63,6 @@ var fullscreen = (function (domGlobals) {
       var editorContainerStyle;
       var editorContainer, iframe, iframeStyle;
       var fullscreenInfo = fullscreenState.get();
-      var resize = function () {
-        DOM.setStyle(iframe, 'height', getWindowSize().h - (editorContainer.clientHeight - iframe.clientHeight));
-      };
-      var removeResize = function () {
-        DOM.unbind(domGlobals.window, 'resize', resize);
-      };
       editorContainer = editor.getContainer();
       editorContainerStyle = editorContainer.style;
       iframe = editor.getContentAreaContainer().firstChild;
@@ -98,18 +73,13 @@ var fullscreen = (function (domGlobals) {
           containerWidth: editorContainerStyle.width,
           containerHeight: editorContainerStyle.height,
           iframeWidth: iframeStyle.width,
-          iframeHeight: iframeStyle.height,
-          resizeHandler: resize,
-          removeHandler: removeResize
+          iframeHeight: iframeStyle.height
         };
         iframeStyle.width = iframeStyle.height = '100%';
         editorContainerStyle.width = editorContainerStyle.height = '';
         DOM.addClass(body, 'tox-fullscreen');
         DOM.addClass(documentElement, 'tox-fullscreen');
         DOM.addClass(editorContainer, 'tox-fullscreen');
-        DOM.bind(domGlobals.window, 'resize', resize);
-        editor.on('remove', removeResize);
-        resize();
         fullscreenState.set(newFullScreenInfo);
         Events.fireFullscreenStateChanged(editor, true);
       } else {
@@ -125,8 +95,6 @@ var fullscreen = (function (domGlobals) {
         DOM.removeClass(documentElement, 'tox-fullscreen');
         DOM.removeClass(editorContainer, 'tox-fullscreen');
         setScrollPos(fullscreenInfo.scrollPos);
-        DOM.unbind(domGlobals.window, 'resize', fullscreenInfo.resizeHandler);
-        editor.off('remove', fullscreenInfo.removeHandler);
         fullscreenState.set(null);
         Events.fireFullscreenStateChanged(editor, false);
       }

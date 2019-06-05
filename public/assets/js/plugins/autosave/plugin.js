@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var autosave = (function (domGlobals) {
@@ -162,20 +162,22 @@ var autosave = (function (domGlobals) {
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.EditorManager');
 
-    global$4._beforeUnloadHandler = function () {
-      var msg;
-      global$3.each(global$4.get(), function (editor) {
-        if (editor.plugins.autosave) {
-          editor.plugins.autosave.storeDraft();
-        }
-        if (!msg && editor.isDirty() && shouldAskBeforeUnload(editor)) {
-          msg = editor.translate('You have unsaved changes are you sure you want to navigate away?');
+    var setup = function (editor) {
+      editor.editorManager.on('BeforeUnload', function (e) {
+        var msg;
+        global$3.each(global$4.get(), function (editor) {
+          if (editor.plugins.autosave) {
+            editor.plugins.autosave.storeDraft();
+          }
+          if (!msg && editor.isDirty() && shouldAskBeforeUnload(editor)) {
+            msg = editor.translate('You have unsaved changes are you sure you want to navigate away?');
+          }
+        });
+        if (msg) {
+          e.preventDefault();
+          e.returnValue = msg;
         }
       });
-      return msg;
-    };
-    var setup = function (editor) {
-      domGlobals.window.onbeforeunload = global$4._beforeUnloadHandler;
     };
 
     var makeSetupHandler = function (editor, started) {

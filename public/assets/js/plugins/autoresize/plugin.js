@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var autoresize = (function () {
@@ -33,6 +33,11 @@ var autoresize = (function () {
     var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+
+    var fireResizeEditor = function (editor) {
+      return editor.fire('ResizeEditor');
+    };
+    var Events = { fireResizeEditor: fireResizeEditor };
 
     var getAutoResizeMinHeight = function (editor) {
       return editor.getParam('min_height', editor.getElement().offsetHeight, 'number');
@@ -120,6 +125,7 @@ var autoresize = (function () {
         deltaSize = resizeHeight - oldSize.get();
         dom.setStyle(editor.getContainer(), 'height', resizeHeight + 'px');
         oldSize.set(resizeHeight);
+        Events.fireResizeEditor(editor);
         if (global$1.webkit && deltaSize < 0) {
           resize(editor, oldSize);
         }

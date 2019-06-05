@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var importcss = (function () {
@@ -135,6 +135,7 @@ var importcss = (function () {
     };
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var map = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
@@ -158,7 +159,6 @@ var importcss = (function () {
       var output = map(xs, f);
       return flatten(output);
     };
-    var slice = Array.prototype.slice;
     var from = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };

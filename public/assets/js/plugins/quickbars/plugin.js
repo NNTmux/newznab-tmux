@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var quickbars = (function (domGlobals) {
@@ -364,6 +364,7 @@ var quickbars = (function (domGlobals) {
     var isUndefined = isType('undefined');
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var find = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
@@ -373,7 +374,6 @@ var quickbars = (function (domGlobals) {
       }
       return Option.none();
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };

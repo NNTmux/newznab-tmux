@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.6 (2019-05-22)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
 var charmap = (function (domGlobals) {
@@ -190,6 +190,7 @@ var charmap = (function (domGlobals) {
     };
     var isFunction = isType('function');
 
+    var slice = Array.prototype.slice;
     var map = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
@@ -228,7 +229,6 @@ var charmap = (function (domGlobals) {
       var output = map(xs, f);
       return flatten(output);
     };
-    var slice = Array.prototype.slice;
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
@@ -1581,11 +1581,11 @@ var charmap = (function (domGlobals) {
         return map(charMap, function (charGroup) {
           return {
             title: charGroup.name,
+            name: charGroup.name,
             items: makeGroupItems()
           };
         });
       };
-      var currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
       var makePanel = function () {
         return {
           type: 'panel',
@@ -1598,6 +1598,7 @@ var charmap = (function (domGlobals) {
           tabs: makeTabs()
         };
       };
+      var currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
       var scanAndSet = function (dialogApi, pattern) {
         find(charMap, function (group) {
           return group.name === currentTab.get();
@@ -1633,8 +1634,8 @@ var charmap = (function (domGlobals) {
             api.close();
           }
         },
-        onTabChange: function (dialogApi, title) {
-          currentTab.set(title);
+        onTabChange: function (dialogApi, details) {
+          currentTab.set(details.newTabName);
           updateFilter.throttle(dialogApi);
         },
         onChange: function (dialogApi, changeData) {
