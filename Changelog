@@ -1,3 +1,5 @@
+2019-06-06 DariusIII
+	* Fix: Fix display of release details when using api
 2019-06-05 DariusIII
 	* Chg: Update fontawesome to latest version
 	* Fix: Fix safe backfill $backfilldays variable. Closes #978
