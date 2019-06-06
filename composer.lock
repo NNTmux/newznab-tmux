@@ -578,12 +578,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/laravel.git",
-                "reference": "4adf3ab6c2ea5819a0626f7cc50871de736967b8"
+                "reference": "c6d7277b1da023b8b7c955bdcd77a1e2459090dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/laravel/zipball/4adf3ab6c2ea5819a0626f7cc50871de736967b8",
-                "reference": "4adf3ab6c2ea5819a0626f7cc50871de736967b8",
+                "url": "https://api.github.com/repos/DariusIII/laravel/zipball/c6d7277b1da023b8b7c955bdcd77a1e2459090dc",
+                "reference": "c6d7277b1da023b8b7c955bdcd77a1e2459090dc",
                 "shasum": ""
             },
             "require": {
@@ -595,8 +595,9 @@
                 "doctrine/cache": ">=1.3.0",
                 "illuminate/events": "~5.0",
                 "monolog/monolog": ">=1.7.0",
-                "phpunit/phpunit": "~4.5",
-                "symfony/event-dispatcher": "~2.8|~3.0"
+                "phpunit/phpunit": "~4.5|~7.0",
+                "psr/event-dispatcher": "~1.0",
+                "symfony/event-dispatcher": "~2.8|~3.0|~4.0"
             },
             "suggest": {
                 "doctrine/cache": "Required if you want to make use of caching features.",
@@ -642,7 +643,7 @@
             "support": {
                 "source": "https://github.com/DariusIII/laravel/tree/master"
             },
-            "time": "2019-02-28T11:27:10+00:00"
+            "time": "2019-06-06T07:52:01+00:00"
         },
         {
             "name": "dariusiii/laravel-database-trigger",
@@ -2869,16 +2870,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v2.0.4",
+            "version": "v2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "eb3f6f8337050cc31fe1a1164240fe205e33b167"
+                "reference": "a3f15809dd1de4759d44c159e99b9474d8b83e94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/eb3f6f8337050cc31fe1a1164240fe205e33b167",
-                "reference": "eb3f6f8337050cc31fe1a1164240fe205e33b167",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/a3f15809dd1de4759d44c159e99b9474d8b83e94",
+                "reference": "a3f15809dd1de4759d44c159e99b9474d8b83e94",
                 "shasum": ""
             },
             "require": {
@@ -2927,7 +2928,7 @@
                 "laravel",
                 "monitoring"
             ],
-            "time": "2019-03-28T05:06:56+00:00"
+            "time": "2019-06-03T11:40:15+00:00"
         },
         {
             "name": "laravel/tinker",
