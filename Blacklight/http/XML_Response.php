@@ -352,19 +352,23 @@ class XML_Response
      */
     public function includeReleases(): void
     {
-        if (! empty($this->releases) && is_array($this->releases)) {
-            foreach ($this->releases as $this->release) {
+        if (! empty($this->releases->toArray())) {
+            if (isset($this->releases[0]->_totalrows)) {
+                if ($this->releases[0]->_totalrows > 1) {
+                    foreach ($this->releases as $this->release) {
+                        $this->xml->startElement('item');
+                        $this->includeReleaseMain();
+                        $this->setZedAttributes();
+                        $this->xml->endElement();
+                    }
+                }
+            } else {
+                $this->release = $this->releases;
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();
                 $this->setZedAttributes();
                 $this->xml->endElement();
             }
-        } else {
-            $this->release = $this->releases;
-            $this->xml->startElement('item');
-            $this->includeReleaseMain();
-            $this->setZedAttributes();
-            $this->xml->endElement();
         }
     }
 
