@@ -1,3 +1,5 @@
+2019-06-07 DariusIII
+	* Chg: Update symfony components to latest versions
 2019-06-06 DariusIII
 	* Chg: Update dariusiii/laravel to latest commit
 	* Fix: Fix display of release details when using api
