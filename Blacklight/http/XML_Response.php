@@ -352,7 +352,7 @@ class XML_Response
      */
     public function includeReleases(): void
     {
-        if (! empty($this->releases->toArray())) {
+        if (isset($this->releases) && ! empty($this->releases->toArray())) {
             if (isset($this->releases[0]->_totalrows)) {
                 if ($this->releases[0]->_totalrows > 1) {
                     foreach ($this->releases as $this->release) {
