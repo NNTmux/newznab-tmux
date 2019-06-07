@@ -362,6 +362,13 @@ class XML_Response
                         $this->xml->endElement();
                     }
                 }
+            } elseif (! isset($this->releases[0]->_totalrows) && preg_match('/rss/i', request()->getRequestUri())) {
+                foreach ($this->releases as $this->release) {
+                    $this->xml->startElement('item');
+                    $this->includeReleaseMain();
+                    $this->setZedAttributes();
+                    $this->xml->endElement();
+                }
             } else {
                 $this->release = $this->releases;
                 $this->xml->startElement('item');
