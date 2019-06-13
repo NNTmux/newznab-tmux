@@ -21,6 +21,7 @@
 
 namespace Blacklight\http;
 
+use App\Models\Release;
 use App\Models\Category;
 use Illuminate\Support\Carbon;
 
@@ -352,24 +353,15 @@ class XML_Response
      */
     public function includeReleases(): void
     {
-        if (isset($this->releases) && ! empty($this->releases->toArray())) {
-            if (isset($this->releases[0]->_totalrows)) {
-                if ($this->releases[0]->_totalrows > 1) {
-                    foreach ($this->releases as $this->release) {
-                        $this->xml->startElement('item');
-                        $this->includeReleaseMain();
-                        $this->setZedAttributes();
-                        $this->xml->endElement();
-                    }
-                }
-            } elseif (! isset($this->releases[0]->_totalrows) && preg_match('/rss/i', request()->getRequestUri())) {
+        if (! empty($this->releases)) {
+            if (! $this->releases instanceof Release) {
                 foreach ($this->releases as $this->release) {
                     $this->xml->startElement('item');
                     $this->includeReleaseMain();
                     $this->setZedAttributes();
                     $this->xml->endElement();
                 }
-            } else {
+            } elseif ($this->releases instanceof Release) {
                 $this->release = $this->releases;
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();
