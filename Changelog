@@ -1,3 +1,5 @@
+201906-13 DariusIII
+	* Chg: Update laravel/framework (v5.8.21 => v5.8.22), cakephp/chronos, composer/composer and barryvdh/laravel-debugbar to their latest versions
 2019-06-11 DariusIII
 	* Chg: Update used libraries to latest versions
 2019-06-07 DariusIII
