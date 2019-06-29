@@ -1,3 +1,5 @@
+2019-06-29 DariusIII
+	* Chg: Update used libraries to their latest versions
 2019-06-13 DariusIII
 	* Chg: Simplify API response checks
 	* Chg: Update phpspec/prophecy (1.8.0 => 1.8.1)
