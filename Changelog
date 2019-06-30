@@ -1,4 +1,5 @@
 2019-06-30 DariusIII
+	* Chg: Add artisan commands to update expired roles and delete unverified users
 	* Chg: Update tinyMCE to latest version
 2019-06-29 DariusIII
 	* Chg: Update used libraries to their latest versions
