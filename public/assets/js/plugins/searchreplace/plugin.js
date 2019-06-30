@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
 (function () {
-var searchreplace = (function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -722,16 +721,15 @@ var searchreplace = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('searchreplace', function (editor) {
-      var currentIndexState = Cell(-1);
-      Commands.register(editor, currentIndexState);
-      Buttons.register(editor, currentIndexState);
-      return Api.get(editor, currentIndexState);
-    });
     function Plugin () {
+      global.add('searchreplace', function (editor) {
+        var currentIndexState = Cell(-1);
+        Commands.register(editor, currentIndexState);
+        Buttons.register(editor, currentIndexState);
+        return Api.get(editor, currentIndexState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

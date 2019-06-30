@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var codesample = (function (domGlobals) {
+(function (domGlobals) {
   'use strict';
 
   var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -1087,20 +1086,19 @@ var codesample = (function (domGlobals) {
   };
   var Buttons = { register: register$1 };
 
-  global.add('codesample', function (editor, pluginUrl) {
-    FilterContent.setup(editor);
-    Buttons.register(editor);
-    Commands.register(editor);
-    editor.on('dblclick', function (ev) {
-      if (Utils.isCodeSample(ev.target)) {
-        Dialog.open(editor);
-      }
-    });
-  });
   function Plugin () {
+    global.add('codesample', function (editor) {
+      FilterContent.setup(editor);
+      Buttons.register(editor);
+      Commands.register(editor);
+      editor.on('dblclick', function (ev) {
+        if (Utils.isCodeSample(ev.target)) {
+          Dialog.open(editor);
+        }
+      });
+    });
   }
 
-  return Plugin;
+  Plugin();
 
 }(window));
-})();

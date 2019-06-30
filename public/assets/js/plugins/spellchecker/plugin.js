@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var spellchecker = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -42,6 +41,23 @@ var spellchecker = (function (domGlobals) {
     };
     var DetectProPlugin = { hasProPlugin: hasProPlugin };
 
+    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
+    var global$2 = tinymce.util.Tools.resolve('tinymce.util.URI');
+
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+
+    var fireSpellcheckStart = function (editor) {
+      return editor.fire('SpellcheckStart');
+    };
+    var fireSpellcheckEnd = function (editor) {
+      return editor.fire('SpellcheckEnd');
+    };
+    var Events = {
+      fireSpellcheckStart: fireSpellcheckStart,
+      fireSpellcheckEnd: fireSpellcheckEnd
+    };
+
     var getLanguages = function (editor) {
       var defaultLanguages = 'English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr_FR,German=de,Italian=it,Polish=pl,Portuguese=pt_BR,Spanish=es,Swedish=sv';
       return editor.getParam('spellchecker_languages', defaultLanguages);
@@ -66,23 +82,6 @@ var spellchecker = (function (domGlobals) {
       getRpcUrl: getRpcUrl,
       getSpellcheckerCallback: getSpellcheckerCallback,
       getSpellcheckerWordcharPattern: getSpellcheckerWordcharPattern
-    };
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.URI');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.util.XHR');
-
-    var fireSpellcheckStart = function (editor) {
-      return editor.fire('SpellcheckStart');
-    };
-    var fireSpellcheckEnd = function (editor) {
-      return editor.fire('SpellcheckEnd');
-    };
-    var Events = {
-      fireSpellcheckStart: fireSpellcheckStart,
-      fireSpellcheckEnd: fireSpellcheckEnd
     };
 
     function isContentEditableFalse(node) {
@@ -693,7 +692,8 @@ var spellchecker = (function (domGlobals) {
 
     var ignoreAll = true;
     var getSuggestions = function (editor, pluginUrl, lastSuggestionsState, startedState, textMatcherState, currentLanguageState, word, spans) {
-      var items = [], suggestions = lastSuggestionsState.get().suggestions[word];
+      var items = [];
+      var suggestions = lastSuggestionsState.get().suggestions[word];
       global$1.each(suggestions, function (suggestion) {
         items.push({
           text: suggestion,
@@ -751,22 +751,21 @@ var spellchecker = (function (domGlobals) {
     };
     var SuggestionsMenu = { setup: setup };
 
-    global.add('spellchecker', function (editor, pluginUrl) {
-      if (DetectProPlugin.hasProPlugin(editor) === false) {
-        var startedState = Cell(false);
-        var currentLanguageState = Cell(Settings.getLanguage(editor));
-        var textMatcherState = Cell(null);
-        var lastSuggestionsState = Cell(null);
-        Buttons.register(editor, pluginUrl, startedState, textMatcherState, currentLanguageState, lastSuggestionsState);
-        SuggestionsMenu.setup(editor, pluginUrl, lastSuggestionsState, startedState, textMatcherState, currentLanguageState);
-        Commands.register(editor, pluginUrl, startedState, textMatcherState, lastSuggestionsState, currentLanguageState);
-        return Api.get(editor, startedState, lastSuggestionsState, textMatcherState, currentLanguageState, pluginUrl);
-      }
-    });
     function Plugin () {
+      global.add('spellchecker', function (editor, pluginUrl) {
+        if (DetectProPlugin.hasProPlugin(editor) === false) {
+          var startedState = Cell(false);
+          var currentLanguageState = Cell(Settings.getLanguage(editor));
+          var textMatcherState = Cell(null);
+          var lastSuggestionsState = Cell(null);
+          Buttons.register(editor, pluginUrl, startedState, textMatcherState, currentLanguageState, lastSuggestionsState);
+          SuggestionsMenu.setup(editor, pluginUrl, lastSuggestionsState, startedState, textMatcherState, currentLanguageState);
+          Commands.register(editor, pluginUrl, startedState, textMatcherState, lastSuggestionsState, currentLanguageState);
+          return Api.get(editor, startedState, lastSuggestionsState, textMatcherState, currentLanguageState, pluginUrl);
+        }
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

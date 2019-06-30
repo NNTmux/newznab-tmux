@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var table = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -1417,6 +1416,7 @@ var table = (function (domGlobals) {
       remove$2(wrapper);
     };
 
+    var dimension = Immutable('width', 'height');
     var dimensions = Immutable('width', 'height');
     var grid = Immutable('rows', 'columns');
     var address = Immutable('row', 'column');
@@ -1430,21 +1430,6 @@ var table = (function (domGlobals) {
     var rowcells = Immutable('cells', 'section');
     var rowdetails = Immutable('details', 'section');
     var bounds = Immutable('startRow', 'startCol', 'finishRow', 'finishCol');
-    var Structs = {
-      dimensions: dimensions,
-      grid: grid,
-      address: address,
-      coords: coords,
-      extended: extended,
-      detail: detail,
-      detailnew: detailnew,
-      rowdata: rowdata,
-      elementnew: elementnew,
-      rowdatanew: rowdatanew,
-      rowcells: rowcells,
-      rowdetails: rowdetails,
-      bounds: bounds
-    };
 
     var ancestors = function (scope, predicate, isRoot) {
       return filter(parents(scope, isRoot), predicate);
@@ -1501,15 +1486,6 @@ var table = (function (domGlobals) {
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
     };
-    var sibling = function (scope, predicate) {
-      var element = scope.dom();
-      if (!element.parentNode) {
-        return Option.none();
-      }
-      return child$1(Element.fromDom(element.parentNode), function (x) {
-        return !eq(scope, x) && predicate(x);
-      });
-    };
     var child$1 = function (scope, predicate) {
       var result = find(scope.dom().childNodes, compose(predicate, Element.fromDom));
       return result.map(Element.fromDom);
@@ -1530,18 +1506,10 @@ var table = (function (domGlobals) {
       return descend(scope.dom());
     };
 
-    var first = function (selector) {
-      return one(selector);
-    };
     var ancestor$1 = function (scope, selector, isRoot) {
       return ancestor(scope, function (e) {
         return is(e, selector);
       }, isRoot);
-    };
-    var sibling$1 = function (scope, selector) {
-      return sibling(scope, function (e) {
-        return is(e, selector);
-      });
     };
     var child$2 = function (scope, selector) {
       return child$1(scope, function (e) {
@@ -1554,15 +1522,6 @@ var table = (function (domGlobals) {
     var closest$1 = function (scope, selector, isRoot) {
       return ClosestOrAncestor(is, ancestor$1, scope, selector, isRoot);
     };
-
-    var SelectorFind = /*#__PURE__*/Object.freeze({
-        first: first,
-        ancestor: ancestor$1,
-        sibling: sibling$1,
-        child: child$2,
-        descendant: descendant$1,
-        closest: closest$1
-    });
 
     var firstLayer = function (scope, selector) {
       return filterFirstLayer(scope, selector, constant(true));
@@ -1577,8 +1536,10 @@ var table = (function (domGlobals) {
       filterFirstLayer: filterFirstLayer
     };
 
-    var lookup = function (tags, element, _isRoot) {
-      var isRoot = _isRoot !== undefined ? _isRoot : constant(false);
+    var lookup = function (tags, element, isRoot) {
+      if (isRoot === void 0) {
+        isRoot = never;
+      }
       if (isRoot(element)) {
         return Option.none();
       }
@@ -1633,7 +1594,7 @@ var table = (function (domGlobals) {
     var grid$1 = function (element, rowProp, colProp) {
       var rowsCount = attr(element, rowProp);
       var cols = attr(element, colProp);
-      return Structs.grid(rowsCount, cols);
+      return grid(rowsCount, cols);
     };
     var TableLookup = {
       cell: cell,
@@ -1661,9 +1622,9 @@ var table = (function (domGlobals) {
         var cells = map(TableLookup.cells(row), function (cell) {
           var rowspan = has$1(cell, 'rowspan') ? parseInt(get$1(cell, 'rowspan'), 10) : 1;
           var colspan = has$1(cell, 'colspan') ? parseInt(get$1(cell, 'colspan'), 10) : 1;
-          return Structs.detail(cell, rowspan, colspan);
+          return detail(cell, rowspan, colspan);
         });
-        return Structs.rowdata(element, cells, parentSection);
+        return rowdata(element, cells, parentSection);
       });
     };
     var fromPastedRows = function (rows, example) {
@@ -1671,9 +1632,9 @@ var table = (function (domGlobals) {
         var cells = map(TableLookup.cells(row), function (cell) {
           var rowspan = has$1(cell, 'rowspan') ? parseInt(get$1(cell, 'rowspan'), 10) : 1;
           var colspan = has$1(cell, 'colspan') ? parseInt(get$1(cell, 'colspan'), 10) : 1;
-          return Structs.detail(cell, rowspan, colspan);
+          return detail(cell, rowspan, colspan);
         });
-        return Structs.rowdata(row, cells, example.section());
+        return rowdata(row, cells, example.section());
       });
     };
     var DetailsList = {
@@ -1707,12 +1668,12 @@ var table = (function (domGlobals) {
       var maxColumns = 0;
       each(list, function (details, r) {
         var currentRow = [];
-        each(details.cells(), function (detail, c) {
+        each(details.cells(), function (detail) {
           var start = 0;
           while (access[key(r, start)] !== undefined) {
             start++;
           }
-          var current = Structs.extended(detail.element(), detail.rowspan(), detail.colspan(), r, start);
+          var current = extended(detail.element(), detail.rowspan(), detail.colspan(), r, start);
           for (var i = 0; i < detail.colspan(); i++) {
             for (var j = 0; j < detail.rowspan(); j++) {
               var cr = r + j;
@@ -1724,11 +1685,11 @@ var table = (function (domGlobals) {
           }
           currentRow.push(current);
         });
-        cells.push(Structs.rowdata(details.element(), currentRow, details.section()));
+        cells.push(rowdata(details.element(), currentRow, details.section()));
       });
-      var grid = Structs.grid(maxRows, maxColumns);
+      var grid$1 = grid(maxRows, maxColumns);
       return {
-        grid: constant(grid),
+        grid: constant(grid$1),
         access: constant(access),
         all: constant(cells)
       };
@@ -1898,7 +1859,7 @@ var table = (function (domGlobals) {
       return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
     };
 
-    var first$1 = function (element) {
+    var first = function (element) {
       return descendant(element, isCursorPosition);
     };
     var last$1 = function (element) {
@@ -1960,8 +1921,8 @@ var table = (function (domGlobals) {
       });
       return replica;
     };
-    var pasteReplace = function (cellContent) {
-      return cellContent;
+    var pasteReplace = function (cell) {
+      return cell;
     };
     var newRow = function (doc) {
       return function () {
@@ -1969,8 +1930,8 @@ var table = (function (domGlobals) {
       };
     };
     var cloneFormats = function (oldCell, newCell, formats) {
-      var first = first$1(oldCell);
-      return first.map(function (firstText) {
+      var first$1 = first(oldCell);
+      return first$1.map(function (firstText) {
         var formatSelector = formats.join(',');
         var parents = ancestors$1(firstText, formatSelector, function (element) {
           return eq(element, oldCell);
@@ -2038,6 +1999,121 @@ var table = (function (domGlobals) {
       var div = doc.createElement('div');
       div.innerHTML = html;
       return children(Element.fromDom(div));
+    };
+
+    var inSelection = function (bounds, detail) {
+      var leftEdge = detail.column();
+      var rightEdge = detail.column() + detail.colspan() - 1;
+      var topEdge = detail.row();
+      var bottomEdge = detail.row() + detail.rowspan() - 1;
+      return leftEdge <= bounds.finishCol() && rightEdge >= bounds.startCol() && (topEdge <= bounds.finishRow() && bottomEdge >= bounds.startRow());
+    };
+    var isWithin = function (bounds, detail) {
+      return detail.column() >= bounds.startCol() && detail.column() + detail.colspan() - 1 <= bounds.finishCol() && detail.row() >= bounds.startRow() && detail.row() + detail.rowspan() - 1 <= bounds.finishRow();
+    };
+    var isRectangular = function (warehouse, bounds) {
+      var isRect = true;
+      var detailIsWithin = curry(isWithin, bounds);
+      for (var i = bounds.startRow(); i <= bounds.finishRow(); i++) {
+        for (var j = bounds.startCol(); j <= bounds.finishCol(); j++) {
+          isRect = isRect && Warehouse.getAt(warehouse, i, j).exists(detailIsWithin);
+        }
+      }
+      return isRect ? Option.some(bounds) : Option.none();
+    };
+    var CellBounds = {
+      inSelection: inSelection,
+      isWithin: isWithin,
+      isRectangular: isRectangular
+    };
+
+    var getBounds = function (detailA, detailB) {
+      return bounds(Math.min(detailA.row(), detailB.row()), Math.min(detailA.column(), detailB.column()), Math.max(detailA.row() + detailA.rowspan() - 1, detailB.row() + detailB.rowspan() - 1), Math.max(detailA.column() + detailA.colspan() - 1, detailB.column() + detailB.colspan() - 1));
+    };
+    var getAnyBox = function (warehouse, startCell, finishCell) {
+      var startCoords = Warehouse.findItem(warehouse, startCell, eq);
+      var finishCoords = Warehouse.findItem(warehouse, finishCell, eq);
+      return startCoords.bind(function (sc) {
+        return finishCoords.map(function (fc) {
+          return getBounds(sc, fc);
+        });
+      });
+    };
+    var getBox = function (warehouse, startCell, finishCell) {
+      return getAnyBox(warehouse, startCell, finishCell).bind(function (bounds) {
+        return CellBounds.isRectangular(warehouse, bounds);
+      });
+    };
+    var CellGroup = {
+      getAnyBox: getAnyBox,
+      getBox: getBox
+    };
+
+    var moveBy = function (warehouse, cell, row, column) {
+      return Warehouse.findItem(warehouse, cell, eq).bind(function (detail) {
+        var startRow = row > 0 ? detail.row() + detail.rowspan() - 1 : detail.row();
+        var startCol = column > 0 ? detail.column() + detail.colspan() - 1 : detail.column();
+        var dest = Warehouse.getAt(warehouse, startRow + row, startCol + column);
+        return dest.map(function (d) {
+          return d.element();
+        });
+      });
+    };
+    var intercepts = function (warehouse, start, finish) {
+      return CellGroup.getAnyBox(warehouse, start, finish).map(function (bounds) {
+        var inside = Warehouse.filterItems(warehouse, curry(CellBounds.inSelection, bounds));
+        return map(inside, function (detail) {
+          return detail.element();
+        });
+      });
+    };
+    var parentCell = function (warehouse, innerCell) {
+      var isContainedBy = function (c1, c2) {
+        return contains$2(c2, c1);
+      };
+      return Warehouse.findItem(warehouse, innerCell, isContainedBy).map(function (detail) {
+        return detail.element();
+      });
+    };
+    var CellFinder = {
+      moveBy: moveBy,
+      intercepts: intercepts,
+      parentCell: parentCell
+    };
+
+    var moveBy$1 = function (cell, deltaRow, deltaColumn) {
+      return TableLookup.table(cell).bind(function (table) {
+        var warehouse = getWarehouse(table);
+        return CellFinder.moveBy(warehouse, cell, deltaRow, deltaColumn);
+      });
+    };
+    var intercepts$1 = function (table, first, last) {
+      var warehouse = getWarehouse(table);
+      return CellFinder.intercepts(warehouse, first, last);
+    };
+    var nestedIntercepts = function (table, first, firstTable, last, lastTable) {
+      var warehouse = getWarehouse(table);
+      var optStartCell = eq(table, firstTable) ? Option.some(first) : CellFinder.parentCell(warehouse, first);
+      var optLastCell = eq(table, lastTable) ? Option.some(last) : CellFinder.parentCell(warehouse, last);
+      return optStartCell.bind(function (startCell) {
+        return optLastCell.bind(function (lastCell) {
+          return CellFinder.intercepts(warehouse, startCell, lastCell);
+        });
+      });
+    };
+    var getBox$1 = function (table, first, last) {
+      var warehouse = getWarehouse(table);
+      return CellGroup.getBox(warehouse, first, last);
+    };
+    var getWarehouse = function (table) {
+      var list = DetailsList.fromTable(table);
+      return Warehouse.generate(list);
+    };
+    var TablePositions = {
+      moveBy: moveBy$1,
+      intercepts: intercepts$1,
+      nestedIntercepts: nestedIntercepts,
+      getBox: getBox$1
     };
 
     var TagBoundaries = [
@@ -2170,6 +2246,7 @@ var table = (function (domGlobals) {
     }
 
     var leftRight = Immutable('left', 'right');
+    var brokenPath = Immutable('first', 'second', 'splits');
     var bisect = function (universe, parent, child) {
       var children = universe.property().children(parent);
       var index = findIndex(children, curry(universe.eq, child));
@@ -2198,12 +2275,11 @@ var table = (function (domGlobals) {
       });
     };
     var breakPath = function (universe, item, isTop, breaker) {
-      var result = Immutable('first', 'second', 'splits');
       var next = function (child, group, splits) {
-        var fallback = result(child, Option.none(), splits);
-        if (isTop(child))
-          return result(child, group, splits);
-        else {
+        var fallback = brokenPath(child, Option.none(), splits);
+        if (isTop(child)) {
+          return brokenPath(child, group, splits);
+        } else {
           return universe.property().parent(child).bind(function (parent) {
             return breaker(universe, parent, child).map(function (breakage) {
               var extra = [{
@@ -2212,16 +2288,11 @@ var table = (function (domGlobals) {
                 }];
               var nextChild = isTop(parent) ? parent : breakage.left();
               return next(nextChild, Option.some(breakage.right()), splits.concat(extra));
-            }).getOr(fallback);
-          });
+            });
+          }).getOr(fallback);
         }
       };
       return next(item, Option.none(), []);
-    };
-    var Breaker = {
-      breakToLeft: breakToLeft,
-      breakToRight: breakToRight,
-      breakPath: breakPath
     };
 
     var all$1 = function (universe, look, elements, f) {
@@ -2244,17 +2315,18 @@ var table = (function (domGlobals) {
         return end.filter(curry(universe.eq, s));
       });
     };
-    var Shared = { oneAll: oneAll };
 
     var eq$1 = function (universe, item) {
       return curry(universe.eq, item);
     };
     var unsafeSubset = function (universe, common, ps1, ps2) {
       var children = universe.property().children(common);
-      if (universe.eq(common, ps1[0]))
+      if (universe.eq(common, ps1[0])) {
         return Option.some([ps1[0]]);
-      if (universe.eq(common, ps2[0]))
+      }
+      if (universe.eq(common, ps2[0])) {
         return Option.some([ps2[0]]);
+      }
       var finder = function (ps) {
         var topDown = reverse(ps);
         var index = findIndex(topDown, eq$1(universe, common)).getOr(-1);
@@ -2271,8 +2343,10 @@ var table = (function (domGlobals) {
         });
       });
     };
-    var ancestors$2 = function (universe, start, end, _isRoot) {
-      var isRoot = _isRoot !== undefined ? _isRoot : constant(false);
+    var ancestors$2 = function (universe, start, end, isRoot) {
+      if (isRoot === void 0) {
+        isRoot = never;
+      }
       var ps1 = [start].concat(universe.up().all(start));
       var ps2 = [end].concat(universe.up().all(end));
       var prune = function (path) {
@@ -2300,29 +2374,17 @@ var table = (function (domGlobals) {
         return unsafeSubset(universe, shared, ancs.firstpath(), ancs.secondpath());
       });
     };
-    var Subset = {
+    var SubsetFn = {
       subset: subset,
       ancestors: ancestors$2
     };
 
-    var sharedOne = function (universe, look, elements) {
-      return Shared.oneAll(universe, look, elements);
-    };
-    var subset$1 = function (universe, start, finish) {
-      return Subset.subset(universe, start, finish);
-    };
-    var ancestors$3 = function (universe, start, finish, _isRoot) {
-      return Subset.ancestors(universe, start, finish, _isRoot);
-    };
-    var breakToLeft$1 = function (universe, parent, child) {
-      return Breaker.breakToLeft(universe, parent, child);
-    };
-    var breakToRight$1 = function (universe, parent, child) {
-      return Breaker.breakToRight(universe, parent, child);
-    };
-    var breakPath$1 = function (universe, child, isTop, breaker) {
-      return Breaker.breakPath(universe, child, isTop, breaker);
-    };
+    var sharedOne = oneAll;
+    var subset$1 = SubsetFn.subset;
+    var ancestors$3 = SubsetFn.ancestors;
+    var breakToLeft$1 = breakToLeft;
+    var breakToRight$1 = breakToRight;
+    var breakPath$1 = breakPath;
     var Parent = {
       sharedOne: sharedOne,
       subset: subset$1,
@@ -2334,15 +2396,15 @@ var table = (function (domGlobals) {
 
     var universe = DomUniverse();
     var sharedOne$1 = function (look, elements) {
-      return Parent.sharedOne(universe, function (universe, element) {
+      return Parent.sharedOne(universe, function (_universe, element) {
         return look(element);
       }, elements);
     };
     var subset$2 = function (start, finish) {
       return Parent.subset(universe, start, finish);
     };
-    var ancestors$4 = function (start, finish, _isRoot) {
-      return Parent.ancestors(universe, start, finish, _isRoot);
+    var ancestors$4 = function (start, finish, isRoot) {
+      return Parent.ancestors(universe, start, finish, isRoot);
     };
     var breakToLeft$2 = function (parent, child) {
       return Parent.breakToLeft(universe, parent, child);
@@ -2364,142 +2426,33 @@ var table = (function (domGlobals) {
       breakPath: breakPath$2
     };
 
-    var inSelection = function (bounds, detail) {
-      var leftEdge = detail.column();
-      var rightEdge = detail.column() + detail.colspan() - 1;
-      var topEdge = detail.row();
-      var bottomEdge = detail.row() + detail.rowspan() - 1;
-      return leftEdge <= bounds.finishCol() && rightEdge >= bounds.startCol() && (topEdge <= bounds.finishRow() && bottomEdge >= bounds.startRow());
-    };
-    var isWithin = function (bounds, detail) {
-      return detail.column() >= bounds.startCol() && detail.column() + detail.colspan() - 1 <= bounds.finishCol() && detail.row() >= bounds.startRow() && detail.row() + detail.rowspan() - 1 <= bounds.finishRow();
-    };
-    var isRectangular = function (warehouse, bounds) {
-      var isRect = true;
-      var detailIsWithin = curry(isWithin, bounds);
-      for (var i = bounds.startRow(); i <= bounds.finishRow(); i++) {
-        for (var j = bounds.startCol(); j <= bounds.finishCol(); j++) {
-          isRect = isRect && Warehouse.getAt(warehouse, i, j).exists(detailIsWithin);
-        }
-      }
-      return isRect ? Option.some(bounds) : Option.none();
-    };
-    var CellBounds = {
-      inSelection: inSelection,
-      isWithin: isWithin,
-      isRectangular: isRectangular
-    };
-
-    var getBounds = function (detailA, detailB) {
-      return Structs.bounds(Math.min(detailA.row(), detailB.row()), Math.min(detailA.column(), detailB.column()), Math.max(detailA.row() + detailA.rowspan() - 1, detailB.row() + detailB.rowspan() - 1), Math.max(detailA.column() + detailA.colspan() - 1, detailB.column() + detailB.colspan() - 1));
-    };
-    var getAnyBox = function (warehouse, startCell, finishCell) {
-      var startCoords = Warehouse.findItem(warehouse, startCell, eq);
-      var finishCoords = Warehouse.findItem(warehouse, finishCell, eq);
-      return startCoords.bind(function (sc) {
-        return finishCoords.map(function (fc) {
-          return getBounds(sc, fc);
-        });
-      });
-    };
-    var getBox = function (warehouse, startCell, finishCell) {
-      return getAnyBox(warehouse, startCell, finishCell).bind(function (bounds) {
-        return CellBounds.isRectangular(warehouse, bounds);
-      });
-    };
-    var CellGroup = {
-      getAnyBox: getAnyBox,
-      getBox: getBox
-    };
-
-    var moveBy = function (warehouse, cell, row, column) {
-      return Warehouse.findItem(warehouse, cell, eq).bind(function (detail) {
-        var startRow = row > 0 ? detail.row() + detail.rowspan() - 1 : detail.row();
-        var startCol = column > 0 ? detail.column() + detail.colspan() - 1 : detail.column();
-        var dest = Warehouse.getAt(warehouse, startRow + row, startCol + column);
-        return dest.map(function (d) {
-          return d.element();
-        });
-      });
-    };
-    var intercepts = function (warehouse, start, finish) {
-      return CellGroup.getAnyBox(warehouse, start, finish).map(function (bounds) {
-        var inside = Warehouse.filterItems(warehouse, curry(CellBounds.inSelection, bounds));
-        return map(inside, function (detail) {
-          return detail.element();
-        });
-      });
-    };
-    var parentCell = function (warehouse, innerCell) {
-      var isContainedBy = function (c1, c2) {
-        return contains$2(c2, c1);
-      };
-      return Warehouse.findItem(warehouse, innerCell, isContainedBy).bind(function (detail) {
-        return detail.element();
-      });
-    };
-    var CellFinder = {
-      moveBy: moveBy,
-      intercepts: intercepts,
-      parentCell: parentCell
-    };
-
-    var moveBy$1 = function (cell, deltaRow, deltaColumn) {
-      return TableLookup.table(cell).bind(function (table) {
-        var warehouse = getWarehouse(table);
-        return CellFinder.moveBy(warehouse, cell, deltaRow, deltaColumn);
-      });
-    };
-    var intercepts$1 = function (table, first, last) {
-      var warehouse = getWarehouse(table);
-      return CellFinder.intercepts(warehouse, first, last);
-    };
-    var nestedIntercepts = function (table, first, firstTable, last, lastTable) {
-      var warehouse = getWarehouse(table);
-      var startCell = eq(table, firstTable) ? first : CellFinder.parentCell(warehouse, first);
-      var lastCell = eq(table, lastTable) ? last : CellFinder.parentCell(warehouse, last);
-      return CellFinder.intercepts(warehouse, startCell, lastCell);
-    };
-    var getBox$1 = function (table, first, last) {
-      var warehouse = getWarehouse(table);
-      return CellGroup.getBox(warehouse, first, last);
-    };
-    var getWarehouse = function (table) {
-      var list = DetailsList.fromTable(table);
-      return Warehouse.generate(list);
-    };
-    var TablePositions = {
-      moveBy: moveBy$1,
-      intercepts: intercepts$1,
-      nestedIntercepts: nestedIntercepts,
-      getBox: getBox$1
-    };
-
-    var lookupTable = function (container, isRoot) {
-      return ancestor$1(container, 'table');
-    };
-    var identified = MixedBag([
+    var create = MixedBag([
       'boxes',
       'start',
       'finish'
     ], []);
+    var Identified = { create: create };
+
+    var lookupTable = function (container) {
+      return ancestor$1(container, 'table');
+    };
     var identify = function (start, finish, isRoot) {
       var getIsRoot = function (rootTable) {
         return function (element) {
-          return isRoot(element) || eq(element, rootTable);
+          return isRoot !== undefined && isRoot(element) || eq(element, rootTable);
         };
       };
       if (eq(start, finish)) {
-        return Option.some(identified({
+        return Option.some(Identified.create({
           boxes: Option.some([start]),
           start: start,
           finish: finish
         }));
       } else {
-        return lookupTable(start, isRoot).bind(function (startTable) {
-          return lookupTable(finish, isRoot).bind(function (finishTable) {
+        return lookupTable(start).bind(function (startTable) {
+          return lookupTable(finish).bind(function (finishTable) {
             if (eq(startTable, finishTable)) {
-              return Option.some(identified({
+              return Option.some(Identified.create({
                 boxes: TablePositions.intercepts(startTable, start, finish),
                 start: start,
                 finish: finish
@@ -2507,7 +2460,7 @@ var table = (function (domGlobals) {
             } else if (contains$2(startTable, finishTable)) {
               var ancestorCells = ancestors$1(finish, 'td,th', getIsRoot(startTable));
               var finishCell = ancestorCells.length > 0 ? ancestorCells[ancestorCells.length - 1] : finish;
-              return Option.some(identified({
+              return Option.some(Identified.create({
                 boxes: TablePositions.nestedIntercepts(startTable, start, startTable, finish, finishTable),
                 start: start,
                 finish: finishCell
@@ -2515,7 +2468,7 @@ var table = (function (domGlobals) {
             } else if (contains$2(finishTable, startTable)) {
               var ancestorCells = ancestors$1(start, 'td,th', getIsRoot(finishTable));
               var startCell = ancestorCells.length > 0 ? ancestorCells[ancestorCells.length - 1] : start;
-              return Option.some(identified({
+              return Option.some(Identified.create({
                 boxes: TablePositions.nestedIntercepts(finishTable, start, startTable, finish, finishTable),
                 start: start,
                 finish: startCell
@@ -2527,7 +2480,7 @@ var table = (function (domGlobals) {
                   var finishCell = finishAncestorCells.length > 0 ? finishAncestorCells[finishAncestorCells.length - 1] : finish;
                   var startAncestorCells = ancestors$1(start, 'td,th', getIsRoot(lcaTable));
                   var startCell = startAncestorCells.length > 0 ? startAncestorCells[startAncestorCells.length - 1] : start;
-                  return Option.some(identified({
+                  return Option.some(Identified.create({
                     boxes: TablePositions.nestedIntercepts(lcaTable, start, startTable, finish, finishTable),
                     start: startCell,
                     finish: finishCell
@@ -2984,8 +2937,8 @@ var table = (function (domGlobals) {
       return cellWidth / tableSize.pixelWidth() * 100;
     };
     var choosePercentageSize = function (element, width, tableSize) {
-      if (percentageBasedSizeRegex.test(width)) {
-        var percentMatch = percentageBasedSizeRegex.exec(width);
+      var percentMatch = percentageBasedSizeRegex.exec(width);
+      if (percentMatch !== null) {
         return parseFloat(percentMatch[1]);
       } else {
         var intWidth = get$5(element);
@@ -3005,16 +2958,16 @@ var table = (function (domGlobals) {
       return cellWidth / 100 * tableSize.pixelWidth();
     };
     var choosePixelSize = function (element, width, tableSize) {
-      if (pixelBasedSizeRegex.test(width)) {
-        var pixelMatch = pixelBasedSizeRegex.exec(width);
+      var pixelMatch = pixelBasedSizeRegex.exec(width);
+      if (pixelMatch !== null) {
         return parseInt(pixelMatch[1], 10);
-      } else if (percentageBasedSizeRegex.test(width)) {
-        var percentMatch = percentageBasedSizeRegex.exec(width);
+      }
+      var percentMatch = percentageBasedSizeRegex.exec(width);
+      if (percentMatch !== null) {
         var floatWidth = parseFloat(percentMatch[1]);
         return normalizePixelWidth(floatWidth, tableSize);
-      } else {
-        return get$5(element);
       }
+      return get$5(element);
     };
     var getPixelWidth = function (cell, tableSize) {
       var width = getRawWidth(cell);
@@ -3030,10 +2983,10 @@ var table = (function (domGlobals) {
     var getGenericWidth = function (cell) {
       var width = getRawWidth(cell);
       return width.bind(function (w) {
-        if (genericSizeRegex.test(w)) {
-          var match = genericSizeRegex.exec(w);
+        var match = genericSizeRegex.exec(w);
+        if (match !== null) {
           return Option.some({
-            width: constant(match[1]),
+            width: constant(parseFloat(match[1])),
             unit: constant(match[3])
           });
         } else {
@@ -3162,23 +3115,29 @@ var table = (function (domGlobals) {
       });
       return lines.concat([lastLine]);
     };
-    var negate = function (step, _table) {
+    var negate = function (step) {
       return -step;
     };
     var height = {
       delta: identity,
-      positions: curry(findPositions, getTopEdge, getBottomEdge),
+      positions: function (optElements) {
+        return findPositions(getTopEdge, getBottomEdge, optElements);
+      },
       edge: getTop
     };
     var ltr = {
       delta: identity,
       edge: ltrEdge,
-      positions: curry(findPositions, getLeftEdge, getRightEdge)
+      positions: function (optElements) {
+        return findPositions(getLeftEdge, getRightEdge, optElements);
+      }
     };
     var rtl = {
       delta: negate,
       edge: rtlEdge,
-      positions: curry(findPositions, getRightEdge, getLeftEdge)
+      positions: function (optElements) {
+        return findPositions(getRightEdge, getLeftEdge, optElements);
+      }
     };
     var BarPositions = {
       height: height,
@@ -3199,7 +3158,7 @@ var table = (function (domGlobals) {
         return auto(table).delta(amount, table);
       };
       var positions = function (cols, table) {
-        return auto(table).positions(cols);
+        return auto(table).positions(cols, table);
       };
       var edge = function (cell) {
         return auto(cell).edge(cell);
@@ -3218,29 +3177,18 @@ var table = (function (domGlobals) {
     };
     var TableGridSize = { getGridSize: getGridSize };
 
-    var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
-    var shallow$1 = function (old, nu) {
-      return nu;
-    };
-    var baseMerge = function (merger) {
-      return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
-          objects[i] = arguments[i];
-        if (objects.length === 0)
-          throw new Error('Can\'t merge zero objects');
-        var ret = {};
-        for (var j = 0; j < objects.length; j++) {
-          var curObject = objects[j];
-          for (var key in curObject)
-            if (hasOwnProperty$1.call(curObject, key)) {
-              ret[key] = merger(ret[key], curObject[key]);
-            }
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
         }
-        return ret;
+        return t;
       };
+      return __assign.apply(this, arguments);
     };
-    var merge = baseMerge(shallow$1);
 
     var cat = function (arr) {
       var r = [];
@@ -3439,17 +3387,6 @@ var table = (function (domGlobals) {
       }
       return r;
     };
-    var unique = function (xs, comparator) {
-      var result = [];
-      each(xs, function (x, i) {
-        if (i < xs.length - 1 && !comparator(x, xs[i + 1])) {
-          result.push(x);
-        } else if (i === xs.length - 1) {
-          result.push(x);
-        }
-      });
-      return result;
-    };
     var deduce = function (xs, index) {
       if (index < 0 || index >= xs.length - 1) {
         return Option.none();
@@ -3493,17 +3430,11 @@ var table = (function (domGlobals) {
         });
       });
     };
-    var Util = {
-      repeat: repeat,
-      range: range$1,
-      unique: unique,
-      deduce: deduce
-    };
 
     var columns = function (warehouse) {
       var grid = warehouse.grid();
-      var cols = Util.range(0, grid.columns());
-      var rowsArr = Util.range(0, grid.rows());
+      var cols = range$1(0, grid.columns());
+      var rowsArr = range$1(0, grid.rows());
       return map(cols, function (col) {
         var getBlock = function () {
           return bind(rowsArr, function (r) {
@@ -3535,8 +3466,8 @@ var table = (function (domGlobals) {
     };
     var rows$1 = function (warehouse) {
       var grid = warehouse.grid();
-      var rowsArr = Util.range(0, grid.rows());
-      var cols = Util.range(0, grid.columns());
+      var rowsArr = range$1(0, grid.rows());
+      var cols = range$1(0, grid.columns());
       return map(rowsArr, function (row) {
         var getBlock = function () {
           return bind(cols, function (c) {
@@ -3611,7 +3542,7 @@ var table = (function (domGlobals) {
     var resizeRowBar = Styles.resolve('resizer-rows');
     var resizeColBar = Styles.resolve('resizer-cols');
     var BAR_THICKNESS = 7;
-    var clear = function (wire) {
+    var destroy = function (wire) {
       var previous = descendants$1(wire.parent(), '.' + resizeBar);
       each(previous, remove$2);
     };
@@ -3647,7 +3578,7 @@ var table = (function (domGlobals) {
       refreshCol(wire, colPositions, position, getOuter(table));
     };
     var refresh = function (wire, table, hdirection, vdirection) {
-      clear(wire);
+      destroy(wire);
       var list = DetailsList.fromTable(table);
       var warehouse = Warehouse.generate(list);
       var rows = Blocks.rows(warehouse);
@@ -3678,7 +3609,7 @@ var table = (function (domGlobals) {
       refresh: refresh,
       hide: hide,
       show: show,
-      destroy: clear,
+      destroy: destroy,
       isRowBar: isRowBar,
       isColBar: isColBar
     };
@@ -3695,12 +3626,12 @@ var table = (function (domGlobals) {
       cells[index] = cell;
     };
     var setCells = function (gridRow, cells) {
-      return Structs.rowcells(cells, gridRow.section());
+      return rowcells(cells, gridRow.section());
     };
     var mapCells = function (gridRow, f) {
       var cells = gridRow.cells();
       var r = map(cells, f);
-      return Structs.rowcells(r, gridRow.section());
+      return rowcells(r, gridRow.section());
     };
     var getCell = function (gridRow, index) {
       return gridRow.cells()[index];
@@ -3773,12 +3704,12 @@ var table = (function (domGlobals) {
           if (seen[ri][ci] === false) {
             var result = TableGrid.subgrid(grid, ri, ci, comparator);
             updateSeen(ri, ci, result.rowspan(), result.colspan());
-            return [Structs.detailnew(cell.element(), result.rowspan(), result.colspan(), cell.isNew())];
+            return [detailnew(cell.element(), result.rowspan(), result.colspan(), cell.isNew())];
           } else {
             return [];
           }
         });
-        return Structs.rowdetails(details, row.section());
+        return rowdetails(details, row.section());
       });
     };
     var toGrid = function (warehouse, generators, isNew) {
@@ -3787,13 +3718,13 @@ var table = (function (domGlobals) {
         var rowCells = [];
         for (var j = 0; j < warehouse.grid().columns(); j++) {
           var element = Warehouse.getAt(warehouse, i, j).map(function (item) {
-            return Structs.elementnew(item.element(), isNew);
+            return elementnew(item.element(), isNew);
           }).getOrThunk(function () {
-            return Structs.elementnew(generators.gap(), true);
+            return elementnew(generators.gap(), true);
           });
           rowCells.push(element);
         }
-        var row = Structs.rowcells(rowCells, warehouse.all()[i].section());
+        var row = rowcells(rowCells, warehouse.all()[i].section());
         grid.push(row);
       }
       return grid;
@@ -3811,16 +3742,16 @@ var table = (function (domGlobals) {
         var rowOfCells = findMap(details, function (detail) {
           return parent(detail.element()).map(function (row) {
             var isNew = parent(row).isNone();
-            return Structs.elementnew(row, isNew);
+            return elementnew(row, isNew);
           });
         });
         return rowOfCells.getOrThunk(function () {
-          return Structs.elementnew(generators.row(), true);
+          return elementnew(generators.row(), true);
         });
       };
       return map(rendered, function (details) {
         var row = findRow(details.details());
-        return Structs.rowdatanew(row.element(), details.details(), details.section(), row.isNew());
+        return rowdatanew(row.element(), details.details(), details.section(), row.isNew());
       });
     };
     var toDetailList = function (grid, generators) {
@@ -3871,10 +3802,11 @@ var table = (function (domGlobals) {
     var onPaste = function (warehouse, target) {
       return TableLookup.cell(target.element()).bind(function (cell) {
         return findInWarehouse(warehouse, cell).map(function (details) {
-          return merge(details, {
+          var value = __assign({}, details, {
             generators: target.generators,
             clipboard: target.clipboard
           });
+          return value;
         });
       });
     };
@@ -3885,15 +3817,16 @@ var table = (function (domGlobals) {
         });
       });
       var cells = cat(details);
-      return cells.length > 0 ? Option.some(merge({ cells: cells }, {
+      return cells.length > 0 ? Option.some({
+        cells: cells,
         generators: target.generators,
         clipboard: target.clipboard
-      })) : Option.none();
+      }) : Option.none();
     };
-    var onMergable = function (warehouse, target) {
+    var onMergable = function (_warehouse, target) {
       return target.mergable();
     };
-    var onUnmergable = function (warehouse, target) {
+    var onUnmergable = function (_warehouse, target) {
       return target.unmergable();
     };
     var onCells = function (warehouse, target) {
@@ -3904,16 +3837,6 @@ var table = (function (domGlobals) {
       });
       var cells = cat(details);
       return cells.length > 0 ? Option.some(cells) : Option.none();
-    };
-    var RunOperation = {
-      run: run,
-      toDetailList: toDetailList,
-      onCell: onCell,
-      onCells: onCells,
-      onPaste: onPaste,
-      onPasteRows: onPasteRows,
-      onMergable: onMergable,
-      onUnmergable: onUnmergable
     };
 
     var value$1 = function (o) {
@@ -4047,17 +3970,17 @@ var table = (function (domGlobals) {
     };
     var fill = function (cells, generator) {
       return map(cells, function () {
-        return Structs.elementnew(generator.cell(), true);
+        return elementnew(generator.cell(), true);
       });
     };
     var rowFill = function (grid, amount, generator) {
-      return grid.concat(Util.repeat(amount, function (_row) {
+      return grid.concat(repeat(amount, function (_row) {
         return GridRow.setCells(grid[grid.length - 1], fill(grid[grid.length - 1].cells(), generator));
       }));
     };
     var colFill = function (grid, amount, generator) {
       return map(grid, function (row) {
-        return GridRow.setCells(row, row.cells().concat(fill(Util.range(0, amount), generator)));
+        return GridRow.setCells(row, row.cells().concat(fill(range$1(0, amount), generator)));
       });
     };
     var tailor = function (gridA, delta, generator) {
@@ -4073,13 +3996,13 @@ var table = (function (domGlobals) {
       tailor: tailor
     };
 
-    var merge$1 = function (grid, bounds, comparator, substitution) {
+    var merge = function (grid, bounds, comparator, substitution) {
       if (grid.length === 0) {
         return grid;
       }
       for (var i = bounds.startRow(); i <= bounds.finishRow(); i++) {
         for (var j = bounds.startCol(); j <= bounds.finishCol(); j++) {
-          GridRow.mutateCell(grid[i], j, Structs.elementnew(substitution(), false));
+          GridRow.mutateCell(grid[i], j, elementnew(substitution(), false));
         }
       }
       return grid;
@@ -4091,7 +4014,7 @@ var table = (function (domGlobals) {
           var current = GridRow.getCellElement(grid[i], j);
           var isToReplace = comparator(current, target);
           if (isToReplace === true && first === false) {
-            GridRow.mutateCell(grid[i], j, Structs.elementnew(substitution(), true));
+            GridRow.mutateCell(grid[i], j, elementnew(substitution(), true));
           } else if (isToReplace === true) {
             first = false;
           }
@@ -4121,7 +4044,7 @@ var table = (function (domGlobals) {
                   replacement = Option.some(substitution());
                 }
                 replacement.each(function (sub) {
-                  GridRow.mutateCell(grid[i], j, Structs.elementnew(sub, true));
+                  GridRow.mutateCell(grid[i], j, elementnew(sub, true));
                 });
               }
             };
@@ -4137,7 +4060,7 @@ var table = (function (domGlobals) {
       return grid;
     };
     var MergingOperations = {
-      merge: merge$1,
+      merge: merge,
       unmerge: unmerge,
       splitRows: splitRows
     };
@@ -4146,7 +4069,7 @@ var table = (function (domGlobals) {
       var candidate = GridRow.getCell(grid[row], col);
       var matching = curry(comparator, candidate.element());
       var currentRow = grid[row];
-      return grid.length > 1 && GridRow.cellLength(currentRow) > 1 && (col > 0 && matching(GridRow.getCellElement(currentRow, col - 1)) || col < currentRow.length - 1 && matching(GridRow.getCellElement(currentRow, col + 1)) || row > 0 && matching(GridRow.getCellElement(grid[row - 1], col)) || row < grid.length - 1 && matching(GridRow.getCellElement(grid[row + 1], col)));
+      return grid.length > 1 && GridRow.cellLength(currentRow) > 1 && (col > 0 && matching(GridRow.getCellElement(currentRow, col - 1)) || col < currentRow.cells().length - 1 && matching(GridRow.getCellElement(currentRow, col + 1)) || row > 0 && matching(GridRow.getCellElement(grid[row - 1], col)) || row < grid.length - 1 && matching(GridRow.getCellElement(grid[row + 1], col)));
     };
     var mergeTables = function (startAddress, gridA, gridB, generator, comparator) {
       var startRow = startAddress.row();
@@ -4162,12 +4085,12 @@ var table = (function (domGlobals) {
           }
           var newCell = GridRow.getCellElement(gridB[r - startRow], c - startCol);
           var replacement = generator.replace(newCell);
-          GridRow.mutateCell(gridA[r], c, Structs.elementnew(replacement, true));
+          GridRow.mutateCell(gridA[r], c, elementnew(replacement, true));
         }
       }
       return gridA;
     };
-    var merge$2 = function (startAddress, gridA, gridB, generator, comparator) {
+    var merge$1 = function (startAddress, gridA, gridB, generator, comparator) {
       var result = Fitment.measure(startAddress, gridA, gridB);
       return result.map(function (delta) {
         var fittedGrid = Fitment.tailor(gridA, delta, generator);
@@ -4183,7 +4106,7 @@ var table = (function (domGlobals) {
       return fittedOldGrid.slice(0, index).concat(fittedNewGrid).concat(fittedOldGrid.slice(index, fittedOldGrid.length));
     };
     var TableMerge = {
-      merge: merge$2,
+      merge: merge$1,
       insert: insert
     };
 
@@ -4192,7 +4115,7 @@ var table = (function (domGlobals) {
       var after = grid.slice(index);
       var between = GridRow.mapCells(grid[example], function (ex, c) {
         var withinSpan = index > 0 && index < grid.length && comparator(GridRow.getCellElement(grid[index - 1], c), GridRow.getCellElement(grid[index], c));
-        var ret = withinSpan ? GridRow.getCell(grid[index], c) : Structs.elementnew(substitution(ex.element(), comparator), true);
+        var ret = withinSpan ? GridRow.getCell(grid[index], c) : elementnew(substitution(ex.element(), comparator), true);
         return ret;
       });
       return before.concat([between]).concat(after);
@@ -4200,7 +4123,7 @@ var table = (function (domGlobals) {
     var insertColumnAt = function (grid, index, example, comparator, substitution) {
       return map(grid, function (row) {
         var withinSpan = index > 0 && index < GridRow.cellLength(row) && comparator(GridRow.getCellElement(row, index - 1), GridRow.getCellElement(row, index));
-        var sub = withinSpan ? GridRow.getCell(row, index) : Structs.elementnew(substitution(GridRow.getCellElement(row, example), comparator), true);
+        var sub = withinSpan ? GridRow.getCell(row, index) : elementnew(substitution(GridRow.getCellElement(row, example), comparator), true);
         return GridRow.addCell(row, index, sub);
       });
     };
@@ -4208,7 +4131,7 @@ var table = (function (domGlobals) {
       var index = exampleCol + 1;
       return map(grid, function (row, i) {
         var isTargetCell = i === exampleRow;
-        var sub = isTargetCell ? Structs.elementnew(substitution(GridRow.getCellElement(row, exampleCol), comparator), true) : GridRow.getCell(row, exampleCol);
+        var sub = isTargetCell ? elementnew(substitution(GridRow.getCellElement(row, exampleCol), comparator), true) : GridRow.getCell(row, exampleCol);
         return GridRow.addCell(row, index, sub);
       });
     };
@@ -4218,14 +4141,14 @@ var table = (function (domGlobals) {
       var after = grid.slice(index);
       var between = GridRow.mapCells(grid[exampleRow], function (ex, i) {
         var isTargetCell = i === exampleCol;
-        return isTargetCell ? Structs.elementnew(substitution(ex.element(), comparator), true) : ex;
+        return isTargetCell ? elementnew(substitution(ex.element(), comparator), true) : ex;
       });
       return before.concat([between]).concat(after);
     };
     var deleteColumnsAt = function (grid, start, finish) {
       var rows = map(grid, function (row) {
         var cells = row.cells().slice(0, start).concat(row.cells().slice(finish + 1));
-        return Structs.rowcells(cells, row.section());
+        return rowcells(cells, row.section());
       });
       return filter(rows, function (row) {
         return row.cells().length > 0;
@@ -4251,7 +4174,7 @@ var table = (function (domGlobals) {
       };
       return map(grid, function (row) {
         return GridRow.mapCells(row, function (cell) {
-          return isTarget(cell) ? Structs.elementnew(substitution(cell.element(), comparator), true) : cell;
+          return isTarget(cell) ? elementnew(substitution(cell.element(), comparator), true) : cell;
         });
       });
     };
@@ -4281,41 +4204,30 @@ var table = (function (domGlobals) {
       replaceRow: replaceRow
     };
 
-    var none$1 = function () {
-      return folder(function (n, o, l, m, r) {
-        return n();
-      });
-    };
-    var only = function (index) {
-      return folder(function (n, o, l, m, r) {
-        return o(index);
-      });
-    };
-    var left = function (index, next) {
-      return folder(function (n, o, l, m, r) {
-        return l(index, next);
-      });
-    };
-    var middle = function (prev, index, next) {
-      return folder(function (n, o, l, m, r) {
-        return m(prev, index, next);
-      });
-    };
-    var right = function (prev, index) {
-      return folder(function (n, o, l, m, r) {
-        return r(prev, index);
-      });
-    };
-    var folder = function (fold) {
-      return { fold: fold };
-    };
-    var ColumnContext = {
-      none: none$1,
-      only: only,
-      left: left,
-      middle: middle,
-      right: right
-    };
+    var adt = Adt.generate([
+      { none: [] },
+      { only: ['index'] },
+      {
+        left: [
+          'index',
+          'next'
+        ]
+      },
+      {
+        middle: [
+          'prev',
+          'index',
+          'next'
+        ]
+      },
+      {
+        right: [
+          'prev',
+          'index'
+        ]
+      }
+    ]);
+    var ColumnContext = __assign({}, adt);
 
     var neighbours$1 = function (input, index) {
       if (input.length === 0) {
@@ -4362,10 +4274,10 @@ var table = (function (domGlobals) {
         }
       };
       var onLeft = onChange;
-      var onMiddle = function (prev, index, next) {
+      var onMiddle = function (_prev, index, next) {
         return onChange(index, next);
       };
-      var onRight = function (prev, index) {
+      var onRight = function (_prev, index) {
         if (step >= 0) {
           return zero(result.slice(0, index)).concat([step]);
         } else {
@@ -4404,8 +4316,10 @@ var table = (function (domGlobals) {
         return raw;
       });
     };
-    var getRawW = function (cell) {
-      return getRaw$1(cell, 'width', Sizes.getPixelWidth);
+    var getRawW = function (cell, tableSize) {
+      return getRaw$1(cell, 'width', function (e) {
+        return Sizes.getPixelWidth(e, tableSize);
+      });
     };
     var getRawH = function (cell) {
       return getRaw$1(cell, 'height', Sizes.getHeight);
@@ -4418,7 +4332,7 @@ var table = (function (domGlobals) {
       return map(columns, function (cellOption, c) {
         var columnCell = cellOption.filter(not(CellUtils.hasColspan));
         return columnCell.fold(function () {
-          var deduced = Util.deduce(backups, c);
+          var deduced = deduce(backups, c);
           return fallback(deduced);
         }, function (cell) {
           return getWidth(cell, tableSize);
@@ -4430,8 +4344,8 @@ var table = (function (domGlobals) {
         return d + 'px';
       }).getOr('');
     };
-    var getRawWidths = function (warehouse, direction) {
-      return getWidthFrom(warehouse, direction, getRawW, getDeduced);
+    var getRawWidths = function (warehouse, direction, tableSize) {
+      return getWidthFrom(warehouse, direction, getRawW, getDeduced, tableSize);
     };
     var getPercentageWidths = function (warehouse, direction, tableSize) {
       return getWidthFrom(warehouse, direction, Sizes.getPercentageWidth, function (deduced) {
@@ -4455,7 +4369,7 @@ var table = (function (domGlobals) {
       return map(rows, function (cellOption, c) {
         var rowCell = cellOption.filter(not(CellUtils.hasRowspan));
         return rowCell.fold(function () {
-          var deduced = Util.deduce(backups, c);
+          var deduced = deduce(backups, c);
           return fallback(deduced);
         }, function (cell) {
           return getHeight(cell);
@@ -4549,7 +4463,6 @@ var table = (function (domGlobals) {
       };
     };
     var pixelSize = function (width) {
-      var intWidth = parseInt(width, 10);
       var getCellDelta = identity;
       var singleColumnWidth = function (w, delta) {
         var newNext = Math.max(CellUtils.minWidth(), w + delta);
@@ -4562,8 +4475,8 @@ var table = (function (domGlobals) {
         Sizes.setPixelWidth(table, total);
       };
       return {
-        width: constant(intWidth),
-        pixelWidth: constant(intWidth),
+        width: constant(width),
+        pixelWidth: constant(width),
         getWidths: ColumnSizes.getPixelWidths,
         getCellDelta: getCellDelta,
         singleColumnWidth: singleColumnWidth,
@@ -4573,16 +4486,17 @@ var table = (function (domGlobals) {
       };
     };
     var chooseSize = function (element, width) {
-      if (Sizes.percentageBasedSizeRegex().test(width)) {
-        var percentMatch = Sizes.percentageBasedSizeRegex().exec(width);
+      var percentMatch = Sizes.percentageBasedSizeRegex().exec(width);
+      if (percentMatch !== null) {
         return percentageSize(percentMatch[1], element);
-      } else if (Sizes.pixelBasedSizeRegex().test(width)) {
-        var pixelMatch = Sizes.pixelBasedSizeRegex().exec(width);
-        return pixelSize(pixelMatch[1]);
-      } else {
-        var fallbackWidth = get$5(element);
-        return pixelSize(fallbackWidth);
       }
+      var pixelMatch = Sizes.pixelBasedSizeRegex().exec(width);
+      if (pixelMatch !== null) {
+        var intWidth = parseInt(pixelMatch[1], 10);
+        return pixelSize(intWidth);
+      }
+      var fallbackWidth = get$5(element);
+      return pixelSize(fallbackWidth);
     };
     var getTableSize = function (element) {
       var width = Sizes.getRawWidth(element);
@@ -4649,11 +4563,8 @@ var table = (function (domGlobals) {
       each(newSizes, function (cell) {
         tableSize.setElementWidth(cell.element(), cell.width());
       });
-      var total = foldr(widths, function (b, a) {
-        return a + b;
-      }, 0);
       if (newSizes.length > 0) {
-        tableSize.setTableWidth(table, total);
+        tableSize.setTableWidth(table, widths, tableSize.getCellDelta(0));
       }
     };
     var Adjustments = {
@@ -4696,23 +4607,16 @@ var table = (function (domGlobals) {
       if (unsupported.length > 0)
         unsuppMessage(unsupported);
     };
-    var allowExtra = noop;
     var exactly = function (required) {
       return base(handleExact, required);
     };
-    var ensure = function (required) {
-      return base(allowExtra, required);
-    };
-    var ensureWith = function (required, condition) {
-      return baseWith(allowExtra, required, condition);
-    };
 
-    var Contracts = /*#__PURE__*/Object.freeze({
-        exactly: exactly,
-        ensure: ensure,
-        ensureWith: ensureWith
-    });
-
+    var verifyGenerators = exactly([
+      'cell',
+      'row',
+      'replace',
+      'gap'
+    ]);
     var elementToData = function (element) {
       var colspan = has$1(element, 'colspan') ? parseInt(get$1(element, 'colspan'), 10) : 1;
       var rowspan = has$1(element, 'rowspan') ? parseInt(get$1(element, 'rowspan'), 10) : 1;
@@ -4722,10 +4626,12 @@ var table = (function (domGlobals) {
         rowspan: constant(rowspan)
       };
     };
-    var modification = function (generators, _toData) {
-      contract(generators);
+    var modification = function (generators, toData) {
+      if (toData === void 0) {
+        toData = elementToData;
+      }
+      verifyGenerators(generators);
       var position = Cell(Option.none());
-      var toData = _toData !== undefined ? _toData : elementToData;
       var nu = function (data) {
         return generators.cell(data);
       };
@@ -4760,7 +4666,7 @@ var table = (function (domGlobals) {
     var transform = function (scope, tag) {
       return function (generators) {
         var position = Cell(Option.none());
-        contract(generators);
+        verifyGenerators(generators);
         var list = [];
         var find$1 = function (element, comparator) {
           return find(list, function (x) {
@@ -4768,7 +4674,8 @@ var table = (function (domGlobals) {
           });
         };
         var makeNew = function (element) {
-          var cell = generators.replace(element, tag, { scope: scope });
+          var attrs = { scope: scope };
+          var cell = generators.replace(element, tag, attrs);
           list.push({
             item: element,
             sub: cell
@@ -4792,7 +4699,7 @@ var table = (function (domGlobals) {
       };
     };
     var merging = function (generators) {
-      contract(generators);
+      verifyGenerators(generators);
       var position = Cell(Option.none());
       var combine = function (cell) {
         if (position.get().isNone()) {
@@ -4814,12 +4721,6 @@ var table = (function (domGlobals) {
         cursor: position.get
       };
     };
-    var contract = exactly([
-      'cell',
-      'row',
-      'replace',
-      'gap'
-    ]);
     var Generators = {
       modification: modification,
       transform: transform,
@@ -4966,7 +4867,7 @@ var table = (function (domGlobals) {
       isInline: isInline$1
     };
 
-    var merge$3 = function (cells) {
+    var merge$2 = function (cells) {
       var isBr = function (el) {
         return name(el) === 'br';
       };
@@ -4986,6 +4887,7 @@ var table = (function (domGlobals) {
           if (DomStructure.isEmptyTag(rightSibling)) {
             return name(rightSibling) === 'img' ? false : true;
           }
+          return false;
         }).getOr(false);
       };
       var markCell = function (cell) {
@@ -5007,7 +4909,7 @@ var table = (function (domGlobals) {
       empty(cells[0]);
       append$1(cells[0], contents);
     };
-    var TableContent = { merge: merge$3 };
+    var TableContent = { merge: merge$2 };
 
     var prune = function (table) {
       var cells = TableLookup.cells(table);
@@ -5133,13 +5035,13 @@ var table = (function (domGlobals) {
       var newGrid = ModificationOperations.splitCellIntoRows(grid, detail.row(), detail.column(), comparator, genWrappers.getOrInit);
       return bundle(newGrid, detail.row(), detail.column());
     };
-    var eraseColumns = function (grid, details, comparator, _genWrappers) {
+    var eraseColumns = function (grid, details, _comparator, _genWrappers) {
       var columns = uniqueColumns(details);
       var newGrid = ModificationOperations.deleteColumnsAt(grid, columns[0].column(), columns[columns.length - 1].column());
       var cursor = elementFromGrid(newGrid, details[0].row(), details[0].column());
       return outcome(newGrid, cursor);
     };
-    var eraseRows = function (grid, details, comparator, _genWrappers) {
+    var eraseRows = function (grid, details, _comparator, _genWrappers) {
       var rows = uniqueRows(details);
       var newGrid = ModificationOperations.deleteRowsAt(grid, rows[0].row(), rows[rows.length - 1].row());
       var cursor = elementFromGrid(newGrid, details[0].row(), details[0].column());
@@ -5157,14 +5059,14 @@ var table = (function (domGlobals) {
       }, grid);
       return outcome(newGrid, Option.from(unmergable[0]));
     };
-    var pasteCells = function (grid, pasteDetails, comparator, genWrappers) {
+    var pasteCells = function (grid, pasteDetails, comparator, _genWrappers) {
       var gridify = function (table, generators) {
         var list = DetailsList.fromTable(table);
         var wh = Warehouse.generate(list);
         return Transitions.toGrid(wh, generators, true);
       };
       var gridB = gridify(pasteDetails.clipboard(), pasteDetails.generators());
-      var startAddress = Structs.address(pasteDetails.row(), pasteDetails.column());
+      var startAddress = address(pasteDetails.row(), pasteDetails.column());
       var mergedGrid = TableMerge.merge(startAddress, grid, gridB, pasteDetails.generators(), comparator);
       return mergedGrid.fold(function () {
         return outcome(grid, Option.some(pasteDetails.element()));
@@ -5178,7 +5080,7 @@ var table = (function (domGlobals) {
       var wh = Warehouse.generate(pasteDetails);
       return Transitions.toGrid(wh, generators, true);
     };
-    var pasteRowsBefore = function (grid, pasteDetails, comparator, genWrappers) {
+    var pasteRowsBefore = function (grid, pasteDetails, comparator, _genWrappers) {
       var example = grid[pasteDetails.cells[0].row()];
       var index = pasteDetails.cells[0].row();
       var gridB = gridifyRows(pasteDetails.clipboard(), pasteDetails.generators(), example);
@@ -5186,7 +5088,7 @@ var table = (function (domGlobals) {
       var cursor = elementFromGrid(mergedGrid, pasteDetails.cells[0].row(), pasteDetails.cells[0].column());
       return outcome(mergedGrid, cursor);
     };
-    var pasteRowsAfter = function (grid, pasteDetails, comparator, genWrappers) {
+    var pasteRowsAfter = function (grid, pasteDetails, comparator, _genWrappers) {
       var example = grid[pasteDetails.cells[0].row()];
       var index = pasteDetails.cells[pasteDetails.cells.length - 1].row() + pasteDetails.cells[pasteDetails.cells.length - 1].rowspan();
       var gridB = gridifyRows(pasteDetails.clipboard(), pasteDetails.generators(), example);
@@ -5196,27 +5098,27 @@ var table = (function (domGlobals) {
     };
     var resize = Adjustments.adjustWidthTo;
     var TableOperations = {
-      insertRowBefore: RunOperation.run(insertRowBefore, RunOperation.onCell, noop, noop, Generators.modification),
-      insertRowsBefore: RunOperation.run(insertRowsBefore, RunOperation.onCells, noop, noop, Generators.modification),
-      insertRowAfter: RunOperation.run(insertRowAfter, RunOperation.onCell, noop, noop, Generators.modification),
-      insertRowsAfter: RunOperation.run(insertRowsAfter, RunOperation.onCells, noop, noop, Generators.modification),
-      insertColumnBefore: RunOperation.run(insertColumnBefore, RunOperation.onCell, resize, noop, Generators.modification),
-      insertColumnsBefore: RunOperation.run(insertColumnsBefore, RunOperation.onCells, resize, noop, Generators.modification),
-      insertColumnAfter: RunOperation.run(insertColumnAfter, RunOperation.onCell, resize, noop, Generators.modification),
-      insertColumnsAfter: RunOperation.run(insertColumnsAfter, RunOperation.onCells, resize, noop, Generators.modification),
-      splitCellIntoColumns: RunOperation.run(splitCellIntoColumns$1, RunOperation.onCell, resize, noop, Generators.modification),
-      splitCellIntoRows: RunOperation.run(splitCellIntoRows$1, RunOperation.onCell, noop, noop, Generators.modification),
-      eraseColumns: RunOperation.run(eraseColumns, RunOperation.onCells, resize, prune, Generators.modification),
-      eraseRows: RunOperation.run(eraseRows, RunOperation.onCells, noop, prune, Generators.modification),
-      makeColumnHeader: RunOperation.run(makeColumnHeader, RunOperation.onCell, noop, noop, Generators.transform('row', 'th')),
-      unmakeColumnHeader: RunOperation.run(unmakeColumnHeader, RunOperation.onCell, noop, noop, Generators.transform(null, 'td')),
-      makeRowHeader: RunOperation.run(makeRowHeader, RunOperation.onCell, noop, noop, Generators.transform('col', 'th')),
-      unmakeRowHeader: RunOperation.run(unmakeRowHeader, RunOperation.onCell, noop, noop, Generators.transform(null, 'td')),
-      mergeCells: RunOperation.run(mergeCells, RunOperation.onMergable, noop, noop, Generators.merging),
-      unmergeCells: RunOperation.run(unmergeCells, RunOperation.onUnmergable, resize, noop, Generators.merging),
-      pasteCells: RunOperation.run(pasteCells, RunOperation.onPaste, resize, noop, Generators.modification),
-      pasteRowsBefore: RunOperation.run(pasteRowsBefore, RunOperation.onPasteRows, noop, noop, Generators.modification),
-      pasteRowsAfter: RunOperation.run(pasteRowsAfter, RunOperation.onPasteRows, noop, noop, Generators.modification)
+      insertRowBefore: run(insertRowBefore, onCell, noop, noop, Generators.modification),
+      insertRowsBefore: run(insertRowsBefore, onCells, noop, noop, Generators.modification),
+      insertRowAfter: run(insertRowAfter, onCell, noop, noop, Generators.modification),
+      insertRowsAfter: run(insertRowsAfter, onCells, noop, noop, Generators.modification),
+      insertColumnBefore: run(insertColumnBefore, onCell, resize, noop, Generators.modification),
+      insertColumnsBefore: run(insertColumnsBefore, onCells, resize, noop, Generators.modification),
+      insertColumnAfter: run(insertColumnAfter, onCell, resize, noop, Generators.modification),
+      insertColumnsAfter: run(insertColumnsAfter, onCells, resize, noop, Generators.modification),
+      splitCellIntoColumns: run(splitCellIntoColumns$1, onCell, resize, noop, Generators.modification),
+      splitCellIntoRows: run(splitCellIntoRows$1, onCell, noop, noop, Generators.modification),
+      eraseColumns: run(eraseColumns, onCells, resize, prune, Generators.modification),
+      eraseRows: run(eraseRows, onCells, noop, prune, Generators.modification),
+      makeColumnHeader: run(makeColumnHeader, onCell, noop, noop, Generators.transform('row', 'th')),
+      unmakeColumnHeader: run(unmakeColumnHeader, onCell, noop, noop, Generators.transform(null, 'td')),
+      makeRowHeader: run(makeRowHeader, onCell, noop, noop, Generators.transform('col', 'th')),
+      unmakeRowHeader: run(unmakeRowHeader, onCell, noop, noop, Generators.transform(null, 'td')),
+      mergeCells: run(mergeCells, onMergable, noop, noop, Generators.merging),
+      unmergeCells: run(unmergeCells, onUnmergable, resize, noop, Generators.merging),
+      pasteCells: run(pasteCells, onPaste, resize, noop, Generators.modification),
+      pasteRowsBefore: run(pasteRowsBefore, onPasteRows, noop, noop, Generators.modification),
+      pasteRowsAfter: run(pasteRowsAfter, onPasteRows, noop, noop, Generators.modification)
     };
 
     var getBody$1 = function (editor) {
@@ -5414,11 +5316,11 @@ var table = (function (domGlobals) {
     var copyRows = function (table, target, generators) {
       var list = DetailsList.fromTable(table);
       var house = Warehouse.generate(list);
-      var details = RunOperation.onCells(house, target);
+      var details = onCells(house, target);
       return details.map(function (selectedCells) {
         var grid = Transitions.toGrid(house, generators, false);
         var slicedGrid = grid.slice(selectedCells[0].row(), selectedCells[selectedCells.length - 1].row() + selectedCells[selectedCells.length - 1].rowspan());
-        var slicedDetails = RunOperation.toDetailList(slicedGrid, generators);
+        var slicedDetails = toDetailList(slicedGrid, generators);
         return Redraw.copy(slicedDetails);
       });
     };
@@ -5470,19 +5372,6 @@ var table = (function (domGlobals) {
       unApplyAlign: unApplyAlign,
       unApplyVAlign: unApplyVAlign,
       getTDTHOverallStyle: getTDTHOverallStyle
-    };
-
-    var __assign = function () {
-      __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-          s = arguments[i];
-          for (var p in s)
-            if (Object.prototype.hasOwnProperty.call(s, p))
-              t[p] = s[p];
-        }
-        return t;
-      };
-      return __assign.apply(this, arguments);
     };
 
     var buildListItems = function (inputList, itemCallback, startItems) {
@@ -6202,6 +6091,30 @@ var table = (function (domGlobals) {
     };
     var RowDialog = { open: open$1 };
 
+    var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+    var shallow$1 = function (old, nu) {
+      return nu;
+    };
+    var baseMerge = function (merger) {
+      return function () {
+        var objects = new Array(arguments.length);
+        for (var i = 0; i < objects.length; i++)
+          objects[i] = arguments[i];
+        if (objects.length === 0)
+          throw new Error('Can\'t merge zero objects');
+        var ret = {};
+        for (var j = 0; j < objects.length; j++) {
+          var curObject = objects[j];
+          for (var key in curObject)
+            if (hasOwnProperty$1.call(curObject, key)) {
+              ret[key] = merger(ret[key], curObject[key]);
+            }
+        }
+        return ret;
+      };
+    };
+    var merge$3 = baseMerge(shallow$1);
+
     var global$2 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var DefaultRenderOptions = {
@@ -6453,8 +6366,8 @@ var table = (function (domGlobals) {
         styles['border-color'] = data.bordercolor;
         styles['border-style'] = data.borderstyle;
       }
-      attrs.style = dom.serializeStyle(merge(getDefaultStyles(editor), styles));
-      dom.setAttribs(tableElm, merge(getDefaultAttributes(editor), attrs));
+      attrs.style = dom.serializeStyle(merge$3(getDefaultStyles(editor), styles));
+      dom.setAttribs(tableElm, merge$3(getDefaultAttributes(editor), attrs));
     };
     var onSubmitTableForm = function (editor, tableElm, api) {
       var dom = editor.dom;
@@ -6717,7 +6630,7 @@ var table = (function (domGlobals) {
     };
     var Commands = { registerCommands: registerCommands };
 
-    var only$1 = function (element) {
+    var only = function (element) {
       var parent = Option.from(element.dom().documentElement).map(Element.fromDom).getOr(element);
       return {
         parent: constant(parent),
@@ -6741,17 +6654,17 @@ var table = (function (domGlobals) {
       };
     };
     var ResizeWire = {
-      only: only$1,
+      only: only,
       detached: detached,
       body: body$1
     };
 
-    function Event (fields) {
+    var Event = function (fields) {
       var struct = Immutable.apply(null, fields);
       var handlers = [];
       var bind = function (handler) {
         if (handler === undefined) {
-          throw 'Event bind error: undefined handler';
+          throw new Error('Event bind error: undefined handler');
         }
         handlers.push(handler);
       };
@@ -6761,7 +6674,11 @@ var table = (function (domGlobals) {
         });
       };
       var trigger = function () {
-        var event = struct.apply(null, arguments);
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+        var event = struct.apply(null, args);
         each(handlers, function (handler) {
           handler(event);
         });
@@ -6771,9 +6688,9 @@ var table = (function (domGlobals) {
         unbind: unbind,
         trigger: trigger
       };
-    }
+    };
 
-    var create = function (typeDefs) {
+    var create$1 = function (typeDefs) {
       var registry = map$1(typeDefs, function (event) {
         return {
           bind: event.bind,
@@ -6788,59 +6705,7 @@ var table = (function (domGlobals) {
         trigger: trigger
       };
     };
-    var Events = { create: create };
-
-    var mode = exactly([
-      'compare',
-      'extract',
-      'mutate',
-      'sink'
-    ]);
-    var sink = exactly([
-      'element',
-      'start',
-      'stop',
-      'destroy'
-    ]);
-    var api$3 = exactly([
-      'forceDrop',
-      'drop',
-      'move',
-      'delayDrop'
-    ]);
-    var DragApis = {
-      mode: mode,
-      sink: sink,
-      api: api$3
-    };
-
-    var styles$1 = css('ephox-dragster');
-    var Styles$2 = { resolve: styles$1.resolve };
-
-    function Blocker (options) {
-      var settings = merge({ 'layerClass': Styles$2.resolve('blocker') }, options);
-      var div = Element.fromTag('div');
-      set(div, 'role', 'presentation');
-      setAll$1(div, {
-        position: 'fixed',
-        left: '0px',
-        top: '0px',
-        width: '100%',
-        height: '100%'
-      });
-      add$2(div, Styles$2.resolve('blocker'));
-      add$2(div, settings.layerClass);
-      var element = function () {
-        return div;
-      };
-      var destroy = function () {
-        remove$2(div);
-      };
-      return {
-        element: element,
-        destroy: destroy
-      };
-    }
+    var Events = { create: create$1 };
 
     var mkEvent = function (target, x, y, stop, prevent, kill, raw) {
       return {
@@ -6887,6 +6752,53 @@ var table = (function (domGlobals) {
       return bind$1(element, event, filter$1, handler);
     };
 
+    var styles$1 = css('ephox-dragster');
+    var Styles$2 = { resolve: styles$1.resolve };
+
+    var Blocker = function (options) {
+      var settings = merge$3({ layerClass: Styles$2.resolve('blocker') }, options);
+      var div = Element.fromTag('div');
+      set(div, 'role', 'presentation');
+      setAll$1(div, {
+        position: 'fixed',
+        left: '0px',
+        top: '0px',
+        width: '100%',
+        height: '100%'
+      });
+      add$2(div, Styles$2.resolve('blocker'));
+      add$2(div, settings.layerClass);
+      var element = function () {
+        return div;
+      };
+      var destroy = function () {
+        remove$2(div);
+      };
+      return {
+        element: element,
+        destroy: destroy
+      };
+    };
+
+    var DragMode = exactly([
+      'compare',
+      'extract',
+      'mutate',
+      'sink'
+    ]);
+    var DragSink = exactly([
+      'element',
+      'start',
+      'stop',
+      'destroy'
+    ]);
+    var DragApi = exactly([
+      'forceDrop',
+      'drop',
+      'move',
+      'delayDrop'
+    ]);
+
     var compare = function (old, nu) {
       return Position(nu.left() - old.left(), nu.top() - old.top());
     };
@@ -6896,7 +6808,7 @@ var table = (function (domGlobals) {
     var mutate = function (mutation, info) {
       mutation.mutate(info.left(), info.top());
     };
-    var sink$1 = function (dragApi, settings) {
+    var sink = function (dragApi, settings) {
       var blocker = Blocker(settings);
       var mdown = bind$2(blocker.element(), 'mousedown', dragApi.forceDrop);
       var mup = bind$2(blocker.element(), 'mouseup', dragApi.drop);
@@ -6915,19 +6827,45 @@ var table = (function (domGlobals) {
       var stop = function () {
         remove$2(blocker.element());
       };
-      return DragApis.sink({
+      return DragSink({
         element: blocker.element,
         start: start,
         stop: stop,
         destroy: destroy
       });
     };
-    var MouseDrag = DragApis.mode({
+    var MouseDrag = DragMode({
       compare: compare,
       extract: extract$1,
-      sink: sink$1,
+      sink: sink,
       mutate: mutate
     });
+
+    var last$2 = function (fn, rate) {
+      var timer = null;
+      var cancel = function () {
+        if (timer !== null) {
+          domGlobals.clearTimeout(timer);
+          timer = null;
+        }
+      };
+      var throttle = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+        if (timer !== null)
+          domGlobals.clearTimeout(timer);
+        timer = domGlobals.setTimeout(function () {
+          fn.apply(null, args);
+          timer = null;
+        }, rate);
+      };
+      return {
+        cancel: cancel,
+        throttle: throttle
+      };
+    };
 
     function InDrag () {
       var previous = Option.none();
@@ -6958,11 +6896,9 @@ var table = (function (domGlobals) {
       };
     }
 
-    function NoDrag (anchor) {
-      var onEvent = function (event, mode) {
-      };
+    function NoDrag () {
       return {
-        onEvent: onEvent,
+        onEvent: noop,
         reset: noop
       };
     }
@@ -6994,32 +6930,6 @@ var table = (function (domGlobals) {
       };
     }
 
-    var last$2 = function (fn, rate) {
-      var timer = null;
-      var cancel = function () {
-        if (timer !== null) {
-          domGlobals.clearTimeout(timer);
-          timer = null;
-        }
-      };
-      var throttle = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        if (timer !== null)
-          domGlobals.clearTimeout(timer);
-        timer = domGlobals.setTimeout(function () {
-          fn.apply(null, args);
-          timer = null;
-        }, rate);
-      };
-      return {
-        cancel: cancel,
-        throttle: throttle
-      };
-    };
-
     var setup = function (mutation, mode, settings) {
       var active = false;
       var events = Events.create({
@@ -7040,7 +6950,7 @@ var table = (function (domGlobals) {
         movement.on();
         events.trigger.start();
       };
-      var mousemove = function (event, ui) {
+      var mousemove = function (event) {
         throttledDrop.cancel();
         movement.onEvent(event, mode);
       };
@@ -7055,13 +6965,16 @@ var table = (function (domGlobals) {
       };
       var runIfActive = function (f) {
         return function () {
-          var args = Array.prototype.slice.call(arguments, 0);
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+          }
           if (active) {
-            return f.apply(null, args);
+            f.apply(null, args);
           }
         };
       };
-      var sink = mode.sink(DragApis.api({
+      var sink = mode.sink(DragApi({
         forceDrop: drop,
         drop: runIfActive(drop),
         move: runIfActive(mousemove),
@@ -7081,14 +6994,16 @@ var table = (function (domGlobals) {
     };
     var Dragging = { setup: setup };
 
-    var transform$1 = function (mutation, options) {
-      var settings = options !== undefined ? options : {};
+    var transform$1 = function (mutation, settings) {
+      if (settings === void 0) {
+        settings = {};
+      }
       var mode = settings.mode !== undefined ? settings.mode : MouseDrag;
-      return Dragging.setup(mutation, mode, options);
+      return Dragging.setup(mutation, mode, settings);
     };
     var Dragger = { transform: transform$1 };
 
-    function Mutation () {
+    var Mutation = function () {
       var events = Events.create({
         drag: Event([
           'xDelta',
@@ -7102,9 +7017,9 @@ var table = (function (domGlobals) {
         mutate: mutate,
         events: events.registry
       };
-    }
+    };
 
-    function BarMutation () {
+    var BarMutation = function () {
       var events = Events.create({
         drag: Event([
           'xDelta',
@@ -7131,7 +7046,7 @@ var table = (function (domGlobals) {
         mutate: delegate.mutate,
         events: events.registry
       };
-    }
+    };
 
     var isContentEditableTrue = function (elm) {
       return get$1(elm, 'contenteditable') === 'true';
@@ -7141,7 +7056,7 @@ var table = (function (domGlobals) {
     };
 
     var resizeBarDragging = Styles.resolve('resizer-bar-dragging');
-    function BarManager (wire, direction, hdirection) {
+    var BarManager = function (wire, direction, hdirection) {
       var mutation = BarMutation();
       var resizing = Dragger.transform(mutation, {});
       var hoverTable = Option.none();
@@ -7245,7 +7160,7 @@ var table = (function (domGlobals) {
         showBars: curry(Bars.show, wire),
         events: events.registry
       };
-    }
+    };
 
     function TableResize (wire, vdirection) {
       var hdirection = BarPositions.height;
@@ -7257,7 +7172,7 @@ var table = (function (domGlobals) {
       });
       manager.events.adjustHeight.bind(function (event) {
         events.trigger.beforeResize(event.table());
-        var delta = hdirection.delta(event.delta());
+        var delta = hdirection.delta(event.delta(), event.table());
         Adjustments.adjustHeight(event.table(), delta, event.row(), hdirection);
         events.trigger.afterResize(event.table());
       });
@@ -7409,35 +7324,24 @@ var table = (function (domGlobals) {
       };
     };
 
-    var folder$1 = function (fold) {
-      return { fold: fold };
+    var adt$1 = Adt.generate([
+      { none: ['current'] },
+      { first: ['current'] },
+      {
+        middle: [
+          'current',
+          'target'
+        ]
+      },
+      { last: ['current'] }
+    ]);
+    var none$1 = function (current) {
+      if (current === void 0) {
+        current = undefined;
+      }
+      return adt$1.none(current);
     };
-    var none$2 = function (current) {
-      return folder$1(function (n, f, m, l) {
-        return n(current);
-      });
-    };
-    var first$2 = function (current) {
-      return folder$1(function (n, f, m, l) {
-        return f(current);
-      });
-    };
-    var middle$1 = function (current, target) {
-      return folder$1(function (n, f, m, l) {
-        return m(current, target);
-      });
-    };
-    var last$3 = function (current) {
-      return folder$1(function (n, f, m, l) {
-        return l(current);
-      });
-    };
-    var CellLocation = {
-      none: none$2,
-      first: first$2,
-      middle: middle$1,
-      last: last$3
-    };
+    var CellLocation = __assign({}, adt$1, { none: none$1 });
 
     var detect$4 = function (current, isRoot) {
       return TableLookup.table(current, isRoot).bind(function (table) {
@@ -7474,7 +7378,10 @@ var table = (function (domGlobals) {
       prev: prev
     };
 
-    var adt = Adt.generate([
+    var create$2 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var SimRange = { create: create$2 };
+
+    var adt$2 = Adt.generate([
       { before: ['element'] },
       {
         on: [
@@ -7490,9 +7397,9 @@ var table = (function (domGlobals) {
     var getStart = function (situ) {
       return situ.fold(identity, identity, identity);
     };
-    var before$2 = adt.before;
-    var on = adt.on;
-    var after$2 = adt.after;
+    var before$2 = adt$2.before;
+    var on = adt$2.on;
+    var after$2 = adt$2.after;
     var Situ = {
       before: before$2,
       on: on,
@@ -7501,7 +7408,7 @@ var table = (function (domGlobals) {
       getStart: getStart
     };
 
-    var type$2 = Adt.generate([
+    var adt$3 = Adt.generate([
       { domRange: ['rng'] },
       {
         relative: [
@@ -7518,7 +7425,9 @@ var table = (function (domGlobals) {
         ]
       }
     ]);
-    var range$2 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var exactFromRange = function (simRange) {
+      return adt$3.exact(simRange.start(), simRange.soffset(), simRange.finish(), simRange.foffset());
+    };
     var getStart$1 = function (selection) {
       return selection.match({
         domRange: function (rng) {
@@ -7532,24 +7441,21 @@ var table = (function (domGlobals) {
         }
       });
     };
+    var domRange = adt$3.domRange;
+    var relative = adt$3.relative;
+    var exact = adt$3.exact;
     var getWin = function (selection) {
       var start = getStart$1(selection);
       return defaultView(start);
     };
-    var relative = type$2.relative;
-    var exact = type$2.exact;
-
-    var makeRange = function (start, soffset, finish, foffset) {
-      var doc = owner(start);
-      var rng = doc.dom().createRange();
-      rng.setStart(start.dom(), soffset);
-      rng.setEnd(finish.dom(), foffset);
-      return rng;
-    };
-    var after$3 = function (start, soffset, finish, foffset) {
-      var r = makeRange(start, soffset, finish, foffset);
-      var same = eq(start, finish) && soffset === foffset;
-      return r.collapsed && !same;
+    var range$2 = SimRange.create;
+    var Selection = {
+      domRange: domRange,
+      relative: relative,
+      exact: exact,
+      exactFromRange: exactFromRange,
+      getWin: getWin,
+      range: range$2
     };
 
     var selectNodeContents = function (win, element) {
@@ -7606,7 +7512,7 @@ var table = (function (domGlobals) {
       return rect.width > 0 || rect.height > 0 ? Option.some(rect).map(toRect) : Option.none();
     };
 
-    var adt$1 = Adt.generate([
+    var adt$4 = Adt.generate([
       {
         ltr: [
           'start',
@@ -7664,12 +7570,12 @@ var table = (function (domGlobals) {
           return rev.collapsed === false;
         });
         return reversed.map(function (rev) {
-          return adt$1.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
+          return adt$4.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
         }).getOrThunk(function () {
-          return fromRange(win, adt$1.ltr, rng);
+          return fromRange(win, adt$4.ltr, rng);
         });
       } else {
-        return fromRange(win, adt$1.ltr, rng);
+        return fromRange(win, adt$4.ltr, rng);
       }
     };
     var diagnose = function (win, selection) {
@@ -7786,7 +7692,7 @@ var table = (function (domGlobals) {
       cursorRange.selectNode(node.dom());
       var rect = cursorRange.getBoundingClientRect();
       var collapseDirection = getCollapseDirection(rect, x);
-      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$1 : last$1;
+      var f = collapseDirection === COLLAPSE_TO_LEFT ? first : last$1;
       return f(node).map(function (target) {
         return createCollapsedNode(doc, target, collapseDirection);
       });
@@ -7835,7 +7741,7 @@ var table = (function (domGlobals) {
     var fromPoint$1 = function (win, x, y) {
       var doc = Element.fromDom(win.document);
       return availableSearch(doc, x, y).map(function (rng) {
-        return range$2(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset);
+        return SimRange.create(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset);
       });
     };
 
@@ -7855,12 +7761,12 @@ var table = (function (domGlobals) {
     var preprocessRelative = function (startSitu, finishSitu) {
       var start = startSitu.fold(Situ.before, beforeSpecial, Situ.after);
       var finish = finishSitu.fold(Situ.before, beforeSpecial, Situ.after);
-      return relative(start, finish);
+      return Selection.relative(start, finish);
     };
     var preprocessExact = function (start, soffset, finish, foffset) {
       var startSitu = beforeSpecial(start, soffset);
       var finishSitu = beforeSpecial(finish, foffset);
-      return relative(startSitu, finishSitu);
+      return Selection.relative(startSitu, finishSitu);
     };
     var preprocess = function (selection) {
       return selection.match({
@@ -7872,6 +7778,19 @@ var table = (function (domGlobals) {
         relative: preprocessRelative,
         exact: preprocessExact
       });
+    };
+
+    var makeRange = function (start, soffset, finish, foffset) {
+      var doc = owner(start);
+      var rng = doc.dom().createRange();
+      rng.setStart(start.dom(), soffset);
+      rng.setEnd(finish.dom(), foffset);
+      return rng;
+    };
+    var after$3 = function (start, soffset, finish, foffset) {
+      var r = makeRange(start, soffset, finish, foffset);
+      var same = eq(start, finish) && soffset === foffset;
+      return r.collapsed && !same;
     };
 
     var doSetNativeRange = function (win, rng) {
@@ -7918,7 +7837,7 @@ var table = (function (domGlobals) {
       setRangeFromRelative(win, relative);
     };
     var toNative = function (selection) {
-      var win = getWin(selection).dom();
+      var win = Selection.getWin(selection).dom();
       var getDomRange = function (start, soffset, finish, foffset) {
         return exactToNative(win, start, soffset, finish, foffset);
       };
@@ -7932,7 +7851,7 @@ var table = (function (domGlobals) {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range$2(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(SimRange.create(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
@@ -7940,7 +7859,7 @@ var table = (function (domGlobals) {
     var doGetExact = function (selection) {
       var anchor = Element.fromDom(selection.anchorNode);
       var focus = Element.fromDom(selection.focusNode);
-      return after$3(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range$2(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
+      return after$3(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(SimRange.create(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var setToElement = function (win, element) {
       var rng = selectNodeContents(win, element);
@@ -7953,7 +7872,7 @@ var table = (function (domGlobals) {
     };
     var get$a = function (win) {
       return getExact(win).map(function (range) {
-        return exact(range.start(), range.soffset(), range.finish(), range.foffset());
+        return Selection.exact(range.start(), range.soffset(), range.finish(), range.foffset());
       });
     };
     var getFirstRect$1 = function (win, selection) {
@@ -7963,7 +7882,7 @@ var table = (function (domGlobals) {
     var getAtPoint = function (win, x, y) {
       return fromPoint$1(win, x, y);
     };
-    var clear$1 = function (win) {
+    var clear = function (win) {
       var selection = win.getSelection();
       selection.removeAllRanges();
     };
@@ -7977,7 +7896,7 @@ var table = (function (domGlobals) {
       return go(editor, isRoot, CellNavigation.prev(cell), lazyWire);
     };
     var getCellFirstCursorPosition = function (editor, cell) {
-      var selection = exact(cell, 0, cell, 0);
+      var selection = Selection.exact(cell, 0, cell, 0);
       return toNative(selection);
     };
     var getNewRowCursorPosition = function (editor, table) {
@@ -7990,7 +7909,7 @@ var table = (function (domGlobals) {
     };
     var go = function (editor, isRoot, cell, actions, lazyWire) {
       return cell.fold(Option.none, Option.none, function (current, next) {
-        return first$1(next).map(function (cell) {
+        return first(next).map(function (cell) {
           return getCellFirstCursorPosition(editor, cell);
         });
       }, function (current) {
@@ -8031,134 +7950,26 @@ var table = (function (domGlobals) {
     };
     var TabContext = { handle: handle$1 };
 
-    var response = Immutable('selection', 'kill');
-    var Responses = { response: response };
+    var create$3 = Immutable('selection', 'kill');
+    var Response = { create: create$3 };
 
-    var isKey = function (key) {
-      return function (keycode) {
-        return keycode === key;
-      };
-    };
-    var isUp = isKey(38);
-    var isDown = isKey(40);
-    var isNavigation = function (keycode) {
-      return keycode >= 37 && keycode <= 40;
-    };
-    var SelectionKeys = {
-      ltr: {
-        isBackward: isKey(37),
-        isForward: isKey(39)
-      },
-      rtl: {
-        isBackward: isKey(39),
-        isForward: isKey(37)
-      },
-      isUp: isUp,
-      isDown: isDown,
-      isNavigation: isNavigation
-    };
-
-    var convertToRange = function (win, selection) {
-      var rng = asLtrRange(win, selection);
-      return {
-        start: constant(Element.fromDom(rng.startContainer)),
-        soffset: constant(rng.startOffset),
-        finish: constant(Element.fromDom(rng.endContainer)),
-        foffset: constant(rng.endOffset)
-      };
-    };
-    var makeSitus = function (start, soffset, finish, foffset) {
+    var create$4 = function (start, soffset, finish, foffset) {
       return {
         start: constant(Situ.on(start, soffset)),
         finish: constant(Situ.on(finish, foffset))
       };
     };
-    var Util$1 = {
+    var Situs = { create: create$4 };
+
+    var convertToRange = function (win, selection) {
+      var rng = asLtrRange(win, selection);
+      return SimRange.create(Element.fromDom(rng.startContainer), rng.startOffset, Element.fromDom(rng.endContainer), rng.endOffset);
+    };
+    var makeSitus = Situs.create;
+    var Util = {
       convertToRange: convertToRange,
       makeSitus: makeSitus
     };
-
-    var isSafari = PlatformDetection$1.detect().browser.isSafari();
-    var get$b = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
-      var x = doc.body.scrollLeft || doc.documentElement.scrollLeft;
-      var y = doc.body.scrollTop || doc.documentElement.scrollTop;
-      return Position(x, y);
-    };
-    var by = function (x, y, _DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
-      var win = doc.defaultView;
-      win.scrollBy(x, y);
-    };
-
-    function WindowBridge (win) {
-      var elementFromPoint = function (x, y) {
-        return Element.fromPoint(Element.fromDom(win.document), x, y);
-      };
-      var getRect = function (element) {
-        return element.dom().getBoundingClientRect();
-      };
-      var getRangedRect = function (start, soffset, finish, foffset) {
-        var sel = exact(start, soffset, finish, foffset);
-        return getFirstRect$1(win, sel).map(function (structRect) {
-          return map$1(structRect, apply);
-        });
-      };
-      var getSelection = function () {
-        return get$a(win).map(function (exactAdt) {
-          return Util$1.convertToRange(win, exactAdt);
-        });
-      };
-      var fromSitus = function (situs) {
-        var relative$1 = relative(situs.start(), situs.finish());
-        return Util$1.convertToRange(win, relative$1);
-      };
-      var situsFromPoint = function (x, y) {
-        return getAtPoint(win, x, y).map(function (exact) {
-          return {
-            start: constant(Situ.on(exact.start(), exact.soffset())),
-            finish: constant(Situ.on(exact.finish(), exact.foffset()))
-          };
-        });
-      };
-      var clearSelection = function () {
-        clear$1(win);
-      };
-      var selectContents = function (element) {
-        setToElement(win, element);
-      };
-      var setSelection = function (sel) {
-        setExact(win, sel.start(), sel.soffset(), sel.finish(), sel.foffset());
-      };
-      var setRelativeSelection = function (start, finish) {
-        setRelative(win, start, finish);
-      };
-      var getInnerHeight = function () {
-        return win.innerHeight;
-      };
-      var getScrollY = function () {
-        var pos = get$b(Element.fromDom(win.document));
-        return pos.top();
-      };
-      var scrollBy = function (x, y) {
-        by(x, y, Element.fromDom(win.document));
-      };
-      return {
-        elementFromPoint: elementFromPoint,
-        getRect: getRect,
-        getRangedRect: getRangedRect,
-        getSelection: getSelection,
-        fromSitus: fromSitus,
-        situsFromPoint: situsFromPoint,
-        clearSelection: clearSelection,
-        setSelection: setSelection,
-        setRelativeSelection: setRelativeSelection,
-        selectContents: selectContents,
-        getInnerHeight: getInnerHeight,
-        getScrollY: getScrollY,
-        scrollBy: scrollBy
-      };
-    }
 
     var sync = function (container, isRoot, start, soffset, finish, foffset, selectRange) {
       if (!(eq(start, finish) && soffset === foffset)) {
@@ -8177,7 +7988,7 @@ var table = (function (domGlobals) {
           var boxes = cellSel.boxes().getOr([]);
           if (boxes.length > 0) {
             selectRange(container, boxes, cellSel.start(), cellSel.finish());
-            return Option.some(Responses.response(Option.some(Util$1.makeSitus(start, 0, start, getEnd(start))), true));
+            return Option.some(Response.create(Option.some(Util.makeSitus(start, 0, start, getEnd(start))), true));
           } else {
             return Option.none();
           }
@@ -8198,6 +8009,262 @@ var table = (function (domGlobals) {
       sync: sync,
       detect: detect$5,
       update: update
+    };
+
+    var traverse = Immutable('item', 'mode');
+    var backtrack = function (universe, item, _direction, transition) {
+      if (transition === void 0) {
+        transition = sidestep;
+      }
+      return universe.property().parent(item).map(function (p) {
+        return traverse(p, transition);
+      });
+    };
+    var sidestep = function (universe, item, direction, transition) {
+      if (transition === void 0) {
+        transition = advance;
+      }
+      return direction.sibling(universe, item).map(function (p) {
+        return traverse(p, transition);
+      });
+    };
+    var advance = function (universe, item, direction, transition) {
+      if (transition === void 0) {
+        transition = advance;
+      }
+      var children = universe.property().children(item);
+      var result = direction.first(children);
+      return result.map(function (r) {
+        return traverse(r, transition);
+      });
+    };
+    var successors = [
+      {
+        current: backtrack,
+        next: sidestep,
+        fallback: Option.none()
+      },
+      {
+        current: sidestep,
+        next: advance,
+        fallback: Option.some(backtrack)
+      },
+      {
+        current: advance,
+        next: advance,
+        fallback: Option.some(sidestep)
+      }
+    ];
+    var go$1 = function (universe, item, mode, direction, rules) {
+      if (rules === void 0) {
+        rules = successors;
+      }
+      var ruleOpt = find(rules, function (succ) {
+        return succ.current === mode;
+      });
+      return ruleOpt.bind(function (rule) {
+        return rule.current(universe, item, direction, rule.next).orThunk(function () {
+          return rule.fallback.bind(function (fb) {
+            return go$1(universe, item, fb, direction);
+          });
+        });
+      });
+    };
+
+    var left = function () {
+      var sibling = function (universe, item) {
+        return universe.query().prevSibling(item);
+      };
+      var first = function (children) {
+        return children.length > 0 ? Option.some(children[children.length - 1]) : Option.none();
+      };
+      return {
+        sibling: sibling,
+        first: first
+      };
+    };
+    var right = function () {
+      var sibling = function (universe, item) {
+        return universe.query().nextSibling(item);
+      };
+      var first = function (children) {
+        return children.length > 0 ? Option.some(children[0]) : Option.none();
+      };
+      return {
+        sibling: sibling,
+        first: first
+      };
+    };
+    var Walkers = {
+      left: left,
+      right: right
+    };
+
+    var hone = function (universe, item, predicate, mode, direction, isRoot) {
+      var next = go$1(universe, item, mode, direction);
+      return next.bind(function (n) {
+        if (isRoot(n.item()))
+          return Option.none();
+        else
+          return predicate(n.item()) ? Option.some(n.item()) : hone(universe, n.item(), predicate, n.mode(), direction, isRoot);
+      });
+    };
+    var left$1 = function (universe, item, predicate, isRoot) {
+      return hone(universe, item, predicate, sidestep, Walkers.left(), isRoot);
+    };
+    var right$1 = function (universe, item, predicate, isRoot) {
+      return hone(universe, item, predicate, sidestep, Walkers.right(), isRoot);
+    };
+
+    var Seeker = /*#__PURE__*/Object.freeze({
+        left: left$1,
+        right: right$1
+    });
+
+    var isLeaf = function (universe) {
+      return function (element) {
+        return universe.property().children(element).length === 0;
+      };
+    };
+    var before$3 = function (universe, item, isRoot) {
+      return seekLeft(universe, item, isLeaf(universe), isRoot);
+    };
+    var after$4 = function (universe, item, isRoot) {
+      return seekRight(universe, item, isLeaf(universe), isRoot);
+    };
+    var seekLeft = left$1;
+    var seekRight = right$1;
+
+    var universe$2 = DomUniverse();
+    var before$4 = function (element, isRoot) {
+      return before$3(universe$2, element, isRoot);
+    };
+    var after$5 = function (element, isRoot) {
+      return after$4(universe$2, element, isRoot);
+    };
+    var seekLeft$1 = function (element, predicate, isRoot) {
+      return seekLeft(universe$2, element, predicate, isRoot);
+    };
+    var seekRight$1 = function (element, predicate, isRoot) {
+      return seekRight(universe$2, element, predicate, isRoot);
+    };
+
+    var ancestor$2 = function (scope, predicate, isRoot) {
+      return ancestor(scope, predicate, isRoot).isSome();
+    };
+
+    var point = Immutable('element', 'offset');
+    var delta = Immutable('element', 'deltaOffset');
+    var range$3 = Immutable('element', 'start', 'finish');
+    var points = Immutable('begin', 'end');
+    var text = Immutable('element', 'text');
+
+    var adt$5 = Adt.generate([
+      { none: ['message'] },
+      { success: [] },
+      { failedUp: ['cell'] },
+      { failedDown: ['cell'] }
+    ]);
+    var isOverlapping = function (bridge, before, after) {
+      var beforeBounds = bridge.getRect(before);
+      var afterBounds = bridge.getRect(after);
+      return afterBounds.right > beforeBounds.left && afterBounds.left < beforeBounds.right;
+    };
+    var isRow = function (elem) {
+      return closest$1(elem, 'tr');
+    };
+    var verify = function (bridge, before, beforeOffset, after, afterOffset, failure, isRoot) {
+      return closest$1(after, 'td,th', isRoot).bind(function (afterCell) {
+        return closest$1(before, 'td,th', isRoot).map(function (beforeCell) {
+          if (!eq(afterCell, beforeCell)) {
+            return DomParent.sharedOne(isRow, [
+              afterCell,
+              beforeCell
+            ]).fold(function () {
+              return isOverlapping(bridge, beforeCell, afterCell) ? adt$5.success() : failure(beforeCell);
+            }, function (_sharedRow) {
+              return failure(beforeCell);
+            });
+          } else {
+            return eq(after, afterCell) && getEnd(afterCell) === afterOffset ? failure(beforeCell) : adt$5.none('in same cell');
+          }
+        });
+      }).getOr(adt$5.none('default'));
+    };
+    var cata$2 = function (subject, onNone, onSuccess, onFailedUp, onFailedDown) {
+      return subject.fold(onNone, onSuccess, onFailedUp, onFailedDown);
+    };
+    var BeforeAfter = __assign({}, adt$5, {
+      verify: verify,
+      cata: cata$2
+    });
+
+    var inAncestor = Immutable('ancestor', 'descendants', 'element', 'index');
+    var inParent = Immutable('parent', 'children', 'element', 'index');
+    var indexInParent = function (element) {
+      return parent(element).bind(function (parent) {
+        var children$1 = children(parent);
+        return indexOf$1(children$1, element).map(function (index) {
+          return inParent(parent, children$1, element, index);
+        });
+      });
+    };
+    var indexOf$1 = function (elements, element) {
+      return findIndex(elements, curry(eq, element));
+    };
+
+    var isBr = function (elem) {
+      return name(elem) === 'br';
+    };
+    var gatherer = function (cand, gather, isRoot) {
+      return gather(cand, isRoot).bind(function (target) {
+        return isText(target) && get$3(target).trim().length === 0 ? gatherer(target, gather, isRoot) : Option.some(target);
+      });
+    };
+    var handleBr = function (isRoot, element, direction) {
+      return direction.traverse(element).orThunk(function () {
+        return gatherer(element, direction.gather, isRoot);
+      }).map(direction.relative);
+    };
+    var findBr = function (element, offset) {
+      return child(element, offset).filter(isBr).orThunk(function () {
+        return child(element, offset - 1).filter(isBr);
+      });
+    };
+    var handleParent = function (isRoot, element, offset, direction) {
+      return findBr(element, offset).bind(function (br) {
+        return direction.traverse(br).fold(function () {
+          return gatherer(br, direction.gather, isRoot).map(direction.relative);
+        }, function (adjacent) {
+          return indexInParent(adjacent).map(function (info) {
+            return Situ.on(info.parent(), info.index());
+          });
+        });
+      });
+    };
+    var tryBr = function (isRoot, element, offset, direction) {
+      var target = isBr(element) ? handleBr(isRoot, element, direction) : handleParent(isRoot, element, offset, direction);
+      return target.map(function (tgt) {
+        return {
+          start: constant(tgt),
+          finish: constant(tgt)
+        };
+      });
+    };
+    var process = function (analysis) {
+      return BeforeAfter.cata(analysis, function (message) {
+        return Option.none();
+      }, function () {
+        return Option.none();
+      }, function (cell) {
+        return Option.some(point(cell, 0));
+      }, function (cell) {
+        return Option.some(point(cell, getEnd(cell)));
+      });
+    };
+    var BrTags = {
+      tryBr: tryBr,
+      process: process
     };
 
     var nu$3 = MixedBag([
@@ -8270,10 +8337,11 @@ var table = (function (domGlobals) {
     };
 
     var getPartialBox = function (bridge, element, offset) {
-      if (offset >= 0 && offset < getEnd(element))
+      if (offset >= 0 && offset < getEnd(element)) {
         return bridge.getRangedRect(element, offset, element, offset + 1);
-      else if (offset > 0)
+      } else if (offset > 0) {
         return bridge.getRangedRect(element, offset - 1, element, offset);
+      }
       return Option.none();
     };
     var toCaret = function (rect) {
@@ -8288,169 +8356,33 @@ var table = (function (domGlobals) {
       return Option.some(bridge.getRect(element));
     };
     var getBoxAt = function (bridge, element, offset) {
-      if (isElement(element))
+      if (isElement(element)) {
         return getElemBox(bridge, element).map(toCaret);
-      else if (isText(element))
+      } else if (isText(element)) {
         return getPartialBox(bridge, element, offset).map(toCaret);
-      else
+      } else {
         return Option.none();
+      }
     };
     var getEntireBox = function (bridge, element) {
-      if (isElement(element))
+      if (isElement(element)) {
         return getElemBox(bridge, element).map(toCaret);
-      else if (isText(element))
+      } else if (isText(element)) {
         return bridge.getRangedRect(element, 0, element, getEnd(element)).map(toCaret);
-      else
+      } else {
         return Option.none();
+      }
     };
     var Rectangles = {
       getBoxAt: getBoxAt,
       getEntireBox: getEntireBox
     };
 
-    var traverse = Immutable('item', 'mode');
-    var backtrack = function (universe, item, _direction, transition) {
-      if (transition === void 0) {
-        transition = sidestep;
-      }
-      return universe.property().parent(item).map(function (p) {
-        return traverse(p, transition);
-      });
-    };
-    var sidestep = function (universe, item, direction, transition) {
-      if (transition === void 0) {
-        transition = advance;
-      }
-      return direction.sibling(universe, item).map(function (p) {
-        return traverse(p, transition);
-      });
-    };
-    var advance = function (universe, item, direction, transition) {
-      if (transition === void 0) {
-        transition = advance;
-      }
-      var children = universe.property().children(item);
-      var result = direction.first(children);
-      return result.map(function (r) {
-        return traverse(r, transition);
-      });
-    };
-    var successors = [
-      {
-        current: backtrack,
-        next: sidestep,
-        fallback: Option.none()
-      },
-      {
-        current: sidestep,
-        next: advance,
-        fallback: Option.some(backtrack)
-      },
-      {
-        current: advance,
-        next: advance,
-        fallback: Option.some(sidestep)
-      }
-    ];
-    var go$1 = function (universe, item, mode, direction, rules) {
-      if (rules === void 0) {
-        rules = successors;
-      }
-      var ruleOpt = find(rules, function (succ) {
-        return succ.current === mode;
-      });
-      return ruleOpt.bind(function (rule) {
-        return rule.current(universe, item, direction, rule.next).orThunk(function () {
-          return rule.fallback.bind(function (fb) {
-            return go$1(universe, item, fb, direction);
-          });
-        });
-      });
-    };
-
-    var left$1 = function () {
-      var sibling = function (universe, item) {
-        return universe.query().prevSibling(item);
-      };
-      var first = function (children) {
-        return children.length > 0 ? Option.some(children[children.length - 1]) : Option.none();
-      };
-      return {
-        sibling: sibling,
-        first: first
-      };
-    };
-    var right$1 = function () {
-      var sibling = function (universe, item) {
-        return universe.query().nextSibling(item);
-      };
-      var first = function (children) {
-        return children.length > 0 ? Option.some(children[0]) : Option.none();
-      };
-      return {
-        sibling: sibling,
-        first: first
-      };
-    };
-    var Walkers = {
-      left: left$1,
-      right: right$1
-    };
-
-    var hone = function (universe, item, predicate, mode, direction, isRoot) {
-      var next = go$1(universe, item, mode, direction);
-      return next.bind(function (n) {
-        if (isRoot(n.item()))
-          return Option.none();
-        else
-          return predicate(n.item()) ? Option.some(n.item()) : hone(universe, n.item(), predicate, n.mode(), direction, isRoot);
-      });
-    };
-    var left$2 = function (universe, item, predicate, isRoot) {
-      return hone(universe, item, predicate, sidestep, Walkers.left(), isRoot);
-    };
-    var right$2 = function (universe, item, predicate, isRoot) {
-      return hone(universe, item, predicate, sidestep, Walkers.right(), isRoot);
-    };
-
-    var Seeker = /*#__PURE__*/Object.freeze({
-        left: left$2,
-        right: right$2
-    });
-
-    var isLeaf = function (universe) {
-      return function (element) {
-        return universe.property().children(element).length === 0;
-      };
-    };
-    var before$3 = function (universe, item, isRoot) {
-      return seekLeft(universe, item, isLeaf(universe), isRoot);
-    };
-    var after$4 = function (universe, item, isRoot) {
-      return seekRight(universe, item, isLeaf(universe), isRoot);
-    };
-    var seekLeft = left$2;
-    var seekRight = right$2;
-
-    var universe$2 = DomUniverse();
-    var before$4 = function (element, isRoot) {
-      return before$3(universe$2, element, isRoot);
-    };
-    var after$5 = function (element, isRoot) {
-      return after$4(universe$2, element, isRoot);
-    };
-    var seekLeft$1 = function (element, predicate, isRoot) {
-      return seekLeft(universe$2, element, predicate, isRoot);
-    };
-    var seekRight$1 = function (element, predicate, isRoot) {
-      return seekRight(universe$2, element, predicate, isRoot);
-    };
-
     var JUMP_SIZE = 5;
     var NUM_RETRIES = 100;
-    var adt$2 = Adt.generate([
-      { 'none': [] },
-      { 'retry': ['caret'] }
+    var adt$6 = Adt.generate([
+      { none: [] },
+      { retry: ['caret'] }
     ]);
     var isOutside = function (caret, box) {
       return caret.left() < box.left() || Math.abs(box.right() - caret.left()) < 1 || caret.left() > box.right();
@@ -8464,25 +8396,27 @@ var table = (function (domGlobals) {
     };
     var adjustDown = function (bridge, element, guessBox, original, caret) {
       var lowerCaret = Carets.moveDown(caret, JUMP_SIZE);
-      if (Math.abs(guessBox.bottom() - original.bottom()) < 1)
-        return adt$2.retry(lowerCaret);
-      else if (guessBox.top() > caret.bottom())
-        return adt$2.retry(lowerCaret);
-      else if (guessBox.top() === caret.bottom())
-        return adt$2.retry(Carets.moveDown(caret, 1));
-      else
-        return inOutsideBlock(bridge, element, caret) ? adt$2.retry(Carets.translate(lowerCaret, JUMP_SIZE, 0)) : adt$2.none();
+      if (Math.abs(guessBox.bottom() - original.bottom()) < 1) {
+        return adt$6.retry(lowerCaret);
+      } else if (guessBox.top() > caret.bottom()) {
+        return adt$6.retry(lowerCaret);
+      } else if (guessBox.top() === caret.bottom()) {
+        return adt$6.retry(Carets.moveDown(caret, 1));
+      } else {
+        return inOutsideBlock(bridge, element, caret) ? adt$6.retry(Carets.translate(lowerCaret, JUMP_SIZE, 0)) : adt$6.none();
+      }
     };
     var adjustUp = function (bridge, element, guessBox, original, caret) {
       var higherCaret = Carets.moveUp(caret, JUMP_SIZE);
-      if (Math.abs(guessBox.top() - original.top()) < 1)
-        return adt$2.retry(higherCaret);
-      else if (guessBox.bottom() < caret.top())
-        return adt$2.retry(higherCaret);
-      else if (guessBox.bottom() === caret.top())
-        return adt$2.retry(Carets.moveUp(caret, 1));
-      else
-        return inOutsideBlock(bridge, element, caret) ? adt$2.retry(Carets.translate(higherCaret, JUMP_SIZE, 0)) : adt$2.none();
+      if (Math.abs(guessBox.top() - original.top()) < 1) {
+        return adt$6.retry(higherCaret);
+      } else if (guessBox.bottom() < caret.top()) {
+        return adt$6.retry(higherCaret);
+      } else if (guessBox.bottom() === caret.top()) {
+        return adt$6.retry(Carets.moveUp(caret, 1));
+      } else {
+        return inOutsideBlock(bridge, element, caret) ? adt$6.retry(Carets.translate(higherCaret, JUMP_SIZE, 0)) : adt$6.none();
+      }
     };
     var upMovement = {
       point: Carets.getTop,
@@ -8505,13 +8439,15 @@ var table = (function (domGlobals) {
       return adjustTil(bridge, movement, original, movement.move(caret, JUMP_SIZE), numRetries);
     };
     var adjustTil = function (bridge, movement, original, caret, numRetries) {
-      if (numRetries === 0)
+      if (numRetries === 0) {
         return Option.some(caret);
-      if (isAtTable(bridge, caret.left(), movement.point(caret)))
+      }
+      if (isAtTable(bridge, caret.left(), movement.point(caret))) {
         return adjustForTable(bridge, movement, original, caret, numRetries - 1);
+      }
       return bridge.situsFromPoint(caret.left(), movement.point(caret)).bind(function (guess) {
-        return guess.start().fold(Option.none, function (element, offset) {
-          return Rectangles.getEntireBox(bridge, element, offset).bind(function (guessBox) {
+        return guess.start().fold(Option.none, function (element) {
+          return Rectangles.getEntireBox(bridge, element).bind(function (guessBox) {
             return movement.adjuster(bridge, element, guessBox, original, caret).fold(Option.none, function (newCaret) {
               return adjustTil(bridge, movement, original, newCaret, numRetries - 1);
             });
@@ -8528,12 +8464,13 @@ var table = (function (domGlobals) {
       return bridge.situsFromPoint(caret.left(), caret.top() - JUMP_SIZE);
     };
     var checkScroll = function (movement, adjusted, bridge) {
-      if (movement.point(adjusted) > bridge.getInnerHeight())
+      if (movement.point(adjusted) > bridge.getInnerHeight()) {
         return Option.some(movement.point(adjusted) - bridge.getInnerHeight());
-      else if (movement.point(adjusted) < 0)
+      } else if (movement.point(adjusted) < 0) {
         return Option.some(-movement.point(adjusted));
-      else
+      } else {
         return Option.none();
+      }
     };
     var retry = function (movement, bridge, caret) {
       var moved = movement.move(caret, JUMP_SIZE);
@@ -8553,121 +8490,6 @@ var table = (function (domGlobals) {
       getJumpSize: constant(JUMP_SIZE)
     };
 
-    var adt$3 = Adt.generate([
-      { 'none': ['message'] },
-      { 'success': [] },
-      { 'failedUp': ['cell'] },
-      { 'failedDown': ['cell'] }
-    ]);
-    var isOverlapping = function (bridge, before, after) {
-      var beforeBounds = bridge.getRect(before);
-      var afterBounds = bridge.getRect(after);
-      return afterBounds.right > beforeBounds.left && afterBounds.left < beforeBounds.right;
-    };
-    var verify = function (bridge, before, beforeOffset, after, afterOffset, failure, isRoot) {
-      return closest$1(after, 'td,th', isRoot).bind(function (afterCell) {
-        return closest$1(before, 'td,th', isRoot).map(function (beforeCell) {
-          if (!eq(afterCell, beforeCell)) {
-            return DomParent.sharedOne(isRow, [
-              afterCell,
-              beforeCell
-            ]).fold(function () {
-              return isOverlapping(bridge, beforeCell, afterCell) ? adt$3.success() : failure(beforeCell);
-            }, function (sharedRow) {
-              return failure(beforeCell);
-            });
-          } else {
-            return eq(after, afterCell) && getEnd(afterCell) === afterOffset ? failure(beforeCell) : adt$3.none('in same cell');
-          }
-        });
-      }).getOr(adt$3.none('default'));
-    };
-    var isRow = function (elem) {
-      return closest$1(elem, 'tr');
-    };
-    var cata$2 = function (subject, onNone, onSuccess, onFailedUp, onFailedDown) {
-      return subject.fold(onNone, onSuccess, onFailedUp, onFailedDown);
-    };
-    var BeforeAfter = {
-      verify: verify,
-      cata: cata$2,
-      adt: adt$3
-    };
-
-    var point = Immutable('element', 'offset');
-    var delta = Immutable('element', 'deltaOffset');
-    var range$3 = Immutable('element', 'start', 'finish');
-    var points = Immutable('begin', 'end');
-    var text = Immutable('element', 'text');
-
-    var inAncestor = Immutable('ancestor', 'descendants', 'element', 'index');
-    var inParent = Immutable('parent', 'children', 'element', 'index');
-    var indexInParent = function (element) {
-      return parent(element).bind(function (parent) {
-        var children$1 = children(parent);
-        return indexOf$1(children$1, element).map(function (index) {
-          return inParent(parent, children$1, element, index);
-        });
-      });
-    };
-    var indexOf$1 = function (elements, element) {
-      return findIndex(elements, curry(eq, element));
-    };
-
-    var isBr = function (elem) {
-      return name(elem) === 'br';
-    };
-    var gatherer = function (cand, gather, isRoot) {
-      return gather(cand, isRoot).bind(function (target) {
-        return isText(target) && get$3(target).trim().length === 0 ? gatherer(target, gather, isRoot) : Option.some(target);
-      });
-    };
-    var handleBr = function (isRoot, element, direction) {
-      return direction.traverse(element).orThunk(function () {
-        return gatherer(element, direction.gather, isRoot);
-      }).map(direction.relative);
-    };
-    var findBr = function (element, offset) {
-      return child(element, offset).filter(isBr).orThunk(function () {
-        return child(element, offset - 1).filter(isBr);
-      });
-    };
-    var handleParent = function (isRoot, element, offset, direction) {
-      return findBr(element, offset).bind(function (br) {
-        return direction.traverse(br).fold(function () {
-          return gatherer(br, direction.gather, isRoot).map(direction.relative);
-        }, function (adjacent) {
-          return indexInParent(adjacent).map(function (info) {
-            return Situ.on(info.parent(), info.index());
-          });
-        });
-      });
-    };
-    var tryBr = function (isRoot, element, offset, direction) {
-      var target = isBr(element) ? handleBr(isRoot, element, direction) : handleParent(isRoot, element, offset, direction);
-      return target.map(function (tgt) {
-        return {
-          start: constant(tgt),
-          finish: constant(tgt)
-        };
-      });
-    };
-    var process = function (analysis) {
-      return BeforeAfter.cata(analysis, function (message) {
-        return Option.none();
-      }, function () {
-        return Option.none();
-      }, function (cell) {
-        return Option.some(point(cell, 0));
-      }, function (cell) {
-        return Option.some(point(cell, getEnd(cell)));
-      });
-    };
-    var BrTags = {
-      tryBr: tryBr,
-      process: process
-    };
-
     var MAX_RETRIES = 20;
     var platform$1 = PlatformDetection$1.detect();
     var findSpot = function (bridge, isRoot, direction) {
@@ -8682,8 +8504,9 @@ var table = (function (domGlobals) {
       });
     };
     var scan = function (bridge, isRoot, element, offset, direction, numRetries) {
-      if (numRetries === 0)
+      if (numRetries === 0) {
         return Option.none();
+      }
       return tryCursor(bridge, isRoot, element, offset, direction).bind(function (situs) {
         var range = bridge.fromSitus(situs);
         var analysis = BeforeAfter.verify(bridge, element, offset, range.finish(), range.foffset(), direction.failure, isRoot);
@@ -8692,15 +8515,17 @@ var table = (function (domGlobals) {
         }, function () {
           return Option.some(situs);
         }, function (cell) {
-          if (eq(element, cell) && offset === 0)
+          if (eq(element, cell) && offset === 0) {
             return tryAgain(bridge, element, offset, Carets.moveUp, direction);
-          else
+          } else {
             return scan(bridge, isRoot, cell, 0, direction, numRetries - 1);
+          }
         }, function (cell) {
-          if (eq(element, cell) && offset === getEnd(cell))
+          if (eq(element, cell) && offset === getEnd(cell)) {
             return tryAgain(bridge, element, offset, Carets.moveDown, direction);
-          else
+          } else {
             return scan(bridge, isRoot, cell, getEnd(cell), direction, numRetries - 1);
+          }
         });
       });
     };
@@ -8710,12 +8535,13 @@ var table = (function (domGlobals) {
       });
     };
     var tryAt = function (bridge, direction, box) {
-      if (platform$1.browser.isChrome() || platform$1.browser.isSafari() || platform$1.browser.isFirefox() || platform$1.browser.isEdge())
+      if (platform$1.browser.isChrome() || platform$1.browser.isSafari() || platform$1.browser.isFirefox() || platform$1.browser.isEdge()) {
         return direction.otherRetry(bridge, box);
-      else if (platform$1.browser.isIE())
+      } else if (platform$1.browser.isIE()) {
         return direction.ieRetry(bridge, box);
-      else
+      } else {
         return Option.none();
+      }
     };
     var tryCursor = function (bridge, isRoot, element, offset, direction) {
       return Rectangles.getBoxAt(bridge, element, offset).bind(function (box) {
@@ -8729,10 +8555,6 @@ var table = (function (domGlobals) {
     };
     var TableKeys = { handle: handle$2 };
 
-    var ancestor$2 = function (scope, predicate, isRoot) {
-      return ancestor(scope, predicate, isRoot).isSome();
-    };
-
     var detection = PlatformDetection$1.detect();
     var inSameTable = function (elem, table) {
       return ancestor$2(elem, function (e) {
@@ -8744,8 +8566,9 @@ var table = (function (domGlobals) {
     var simulate = function (bridge, isRoot, direction, initial, anchor) {
       return closest$1(initial, 'td,th', isRoot).bind(function (start) {
         return closest$1(start, 'table', isRoot).bind(function (table) {
-          if (!inSameTable(anchor, table))
+          if (!inSameTable(anchor, table)) {
             return Option.none();
+          }
           return TableKeys.handle(bridge, isRoot, direction).bind(function (range) {
             return closest$1(range.finish(), 'td,th', isRoot).map(function (finish) {
               return {
@@ -8765,7 +8588,7 @@ var table = (function (domGlobals) {
         return precheck(initial, isRoot).orThunk(function () {
           return simulate(bridge, isRoot, direction, initial, anchor).map(function (info) {
             var range = info.range();
-            return Responses.response(Option.some(Util$1.makeSitus(range.start(), range.soffset(), range.finish(), range.foffset())), true);
+            return Response.create(Option.some(Util.makeSitus(range.start(), range.soffset(), range.finish(), range.foffset())), true);
           });
         });
       }
@@ -8779,7 +8602,7 @@ var table = (function (domGlobals) {
               return last$1(element).isSome();
             }, isRoot).map(function (last) {
               var lastOffset = getEnd(last);
-              return Responses.response(Option.some(Util$1.makeSitus(last, lastOffset, last, lastOffset)), true);
+              return Response.create(Option.some(Util.makeSitus(last, lastOffset, last, lastOffset)), true);
             });
           } else {
             return Option.none();
@@ -8793,9 +8616,9 @@ var table = (function (domGlobals) {
           var rows = descendants$1(table, 'tr');
           if (eq(startRow, rows[rows.length - 1])) {
             return seekRight$1(table, function (element) {
-              return first$1(element).isSome();
+              return first(element).isSome();
             }, isRoot).map(function (first) {
-              return Responses.response(Option.some(Util$1.makeSitus(first, 0, first, 0)), true);
+              return Response.create(Option.some(Util.makeSitus(first, 0, first, 0)), true);
             });
           } else {
             return Option.none();
@@ -8841,7 +8664,7 @@ var table = (function (domGlobals) {
           });
         });
       };
-      var mouseup = function () {
+      var mouseup = function (_event) {
         cursor.each(clearState);
       };
       return {
@@ -8851,23 +8674,128 @@ var table = (function (domGlobals) {
       };
     }
 
+    var down = {
+      traverse: nextSibling,
+      gather: after$5,
+      relative: Situ.before,
+      otherRetry: Retries.tryDown,
+      ieRetry: Retries.ieTryDown,
+      failure: BeforeAfter.failedDown
+    };
+    var up = {
+      traverse: prevSibling,
+      gather: before$4,
+      relative: Situ.before,
+      otherRetry: Retries.tryUp,
+      ieRetry: Retries.ieTryUp,
+      failure: BeforeAfter.failedUp
+    };
     var KeyDirection = {
-      down: {
-        traverse: nextSibling,
-        gather: after$5,
-        relative: Situ.before,
-        otherRetry: Retries.tryDown,
-        ieRetry: Retries.ieTryDown,
-        failure: BeforeAfter.adt.failedDown
+      down: down,
+      up: up
+    };
+
+    var isKey = function (key) {
+      return function (keycode) {
+        return keycode === key;
+      };
+    };
+    var isUp = isKey(38);
+    var isDown = isKey(40);
+    var isNavigation = function (keycode) {
+      return keycode >= 37 && keycode <= 40;
+    };
+    var SelectionKeys = {
+      ltr: {
+        isBackward: isKey(37),
+        isForward: isKey(39)
       },
-      up: {
-        traverse: prevSibling,
-        gather: before$4,
-        relative: Situ.before,
-        otherRetry: Retries.tryUp,
-        ieRetry: Retries.ieTryUp,
-        failure: BeforeAfter.adt.failedUp
-      }
+      rtl: {
+        isBackward: isKey(39),
+        isForward: isKey(37)
+      },
+      isUp: isUp,
+      isDown: isDown,
+      isNavigation: isNavigation
+    };
+
+    var isSafari = PlatformDetection$1.detect().browser.isSafari();
+    var get$b = function (_DOC) {
+      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+      var x = doc.body.scrollLeft || doc.documentElement.scrollLeft;
+      var y = doc.body.scrollTop || doc.documentElement.scrollTop;
+      return Position(x, y);
+    };
+    var by = function (x, y, _DOC) {
+      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+      var win = doc.defaultView;
+      win.scrollBy(x, y);
+    };
+
+    var WindowBridge = function (win) {
+      var elementFromPoint = function (x, y) {
+        return Element.fromPoint(Element.fromDom(win.document), x, y);
+      };
+      var getRect = function (element) {
+        return element.dom().getBoundingClientRect();
+      };
+      var getRangedRect = function (start, soffset, finish, foffset) {
+        var sel = Selection.exact(start, soffset, finish, foffset);
+        return getFirstRect$1(win, sel).map(function (structRect) {
+          return map$1(structRect, apply);
+        });
+      };
+      var getSelection = function () {
+        return get$a(win).map(function (exactAdt) {
+          return Util.convertToRange(win, exactAdt);
+        });
+      };
+      var fromSitus = function (situs) {
+        var relative = Selection.relative(situs.start(), situs.finish());
+        return Util.convertToRange(win, relative);
+      };
+      var situsFromPoint = function (x, y) {
+        return getAtPoint(win, x, y).map(function (exact) {
+          return Situs.create(exact.start(), exact.soffset(), exact.finish(), exact.foffset());
+        });
+      };
+      var clearSelection = function () {
+        clear(win);
+      };
+      var selectContents = function (element) {
+        setToElement(win, element);
+      };
+      var setSelection = function (sel) {
+        setExact(win, sel.start(), sel.soffset(), sel.finish(), sel.foffset());
+      };
+      var setRelativeSelection = function (start, finish) {
+        setRelative(win, start, finish);
+      };
+      var getInnerHeight = function () {
+        return win.innerHeight;
+      };
+      var getScrollY = function () {
+        var pos = get$b(Element.fromDom(win.document));
+        return pos.top();
+      };
+      var scrollBy = function (x, y) {
+        by(x, y, Element.fromDom(win.document));
+      };
+      return {
+        elementFromPoint: elementFromPoint,
+        getRect: getRect,
+        getRangedRect: getRangedRect,
+        getSelection: getSelection,
+        fromSitus: fromSitus,
+        situsFromPoint: situsFromPoint,
+        clearSelection: clearSelection,
+        setSelection: setSelection,
+        setRelativeSelection: setRelativeSelection,
+        selectContents: selectContents,
+        getInnerHeight: getInnerHeight,
+        getScrollY: getScrollY,
+        scrollBy: scrollBy
+      };
     };
 
     var rc = Immutable('rows', 'cols');
@@ -8887,8 +8815,9 @@ var table = (function (domGlobals) {
         return Option.none();
       };
       var keydown = function (event, start, soffset, finish, foffset, direction) {
-        var keycode = event.raw().which;
-        var shiftKey = event.raw().shiftKey === true;
+        var realEvent = event.raw();
+        var keycode = realEvent.which;
+        var shiftKey = realEvent.shiftKey === true;
         var handler = CellSelection.retrieve(container, annotations.selectedSelector()).fold(function () {
           if (SelectionKeys.isDown(keycode) && shiftKey) {
             return curry(VerticalMovement.select, bridge, container, isRoot, KeyDirection.down, finish, start, annotations.selectRange);
@@ -8912,44 +8841,48 @@ var table = (function (domGlobals) {
                   var relative = SelectionKeys.isDown(keycode) || direction.isForward(keycode) ? Situ.after : Situ.before;
                   bridge.setRelativeSelection(Situ.on(edges.first(), 0), relative(edges.table()));
                   annotations.clear(container);
-                  return Responses.response(Option.none(), true);
+                  return Response.create(Option.none(), true);
                 });
               }, function (_) {
-                return Option.some(Responses.response(Option.none(), true));
+                return Option.some(Response.create(Option.none(), true));
               });
             };
           };
-          if (SelectionKeys.isDown(keycode) && shiftKey)
+          if (SelectionKeys.isDown(keycode) && shiftKey) {
             return update([rc(+1, 0)]);
-          else if (SelectionKeys.isUp(keycode) && shiftKey)
+          } else if (SelectionKeys.isUp(keycode) && shiftKey) {
             return update([rc(-1, 0)]);
-          else if (direction.isBackward(keycode) && shiftKey)
+          } else if (direction.isBackward(keycode) && shiftKey) {
             return update([
               rc(0, -1),
               rc(-1, 0)
             ]);
-          else if (direction.isForward(keycode) && shiftKey)
+          } else if (direction.isForward(keycode) && shiftKey) {
             return update([
               rc(0, +1),
               rc(+1, 0)
             ]);
-          else if (SelectionKeys.isNavigation(keycode) && shiftKey === false)
+          } else if (SelectionKeys.isNavigation(keycode) && shiftKey === false) {
             return clearToNavigate;
-          else
+          } else {
             return Option.none;
+          }
         });
         return handler();
       };
       var keyup = function (event, start, soffset, finish, foffset) {
         return CellSelection.retrieve(container, annotations.selectedSelector()).fold(function () {
-          var keycode = event.raw().which;
-          var shiftKey = event.raw().shiftKey === true;
-          if (shiftKey === false)
+          var realEvent = event.raw();
+          var keycode = realEvent.which;
+          var shiftKey = realEvent.shiftKey === true;
+          if (shiftKey === false) {
             return Option.none();
-          if (SelectionKeys.isNavigation(keycode))
+          }
+          if (SelectionKeys.isNavigation(keycode)) {
             return KeySelection.sync(container, isRoot, start, soffset, finish, foffset, annotations.selectRange);
-          else
+          } else {
             return Option.none();
+          }
         }, Option.none);
       };
       return {
@@ -9078,8 +9011,8 @@ var table = (function (domGlobals) {
             event.kill();
           }
           response.selection().each(function (ns) {
-            var relative$1 = relative(ns.start(), ns.finish());
-            var rng = asLtrRange(win, relative$1);
+            var relative = Selection.relative(ns.start(), ns.finish());
+            var rng = asLtrRange(win, relative);
             editor.selection.setRng(rng);
           });
         };
@@ -9644,11 +9577,10 @@ var table = (function (domGlobals) {
       });
       return getApi(editor, clipboardRows);
     }
-    global.add('table', Plugin);
     function Plugin$1 () {
+      global.add('table', Plugin);
     }
 
-    return Plugin$1;
+    Plugin$1();
 
 }(window));
-})();

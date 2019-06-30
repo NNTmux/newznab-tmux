@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var quickbars = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -869,15 +868,14 @@ var quickbars = (function (domGlobals) {
     };
     var SelectionToolbars = { addToEditor: addToEditor$1 };
 
-    global.add('quickbars', function (editor) {
-      InsertButtons.setupButtons(editor);
-      InsertToolbars.addToEditor(editor);
-      SelectionToolbars.addToEditor(editor);
-    });
     function Plugin () {
+      global.add('quickbars', function (editor) {
+        InsertButtons.setupButtons(editor);
+        InsertToolbars.addToEditor(editor);
+        SelectionToolbars.addToEditor(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

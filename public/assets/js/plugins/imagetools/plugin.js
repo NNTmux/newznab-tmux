@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var imagetools = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -1812,18 +1811,17 @@ var imagetools = (function (domGlobals) {
     };
     var ContextToolbar = { register: register$2 };
 
-    global.add('imagetools', function (editor) {
-      var imageUploadTimerState = Cell(0);
-      var lastSelectedImageState = Cell(null);
-      Commands.register(editor, imageUploadTimerState);
-      Buttons.register(editor);
-      ContextToolbar.register(editor);
-      UploadSelectedImage.setup(editor, imageUploadTimerState, lastSelectedImageState);
-    });
     function Plugin () {
+      global.add('imagetools', function (editor) {
+        var imageUploadTimerState = Cell(0);
+        var lastSelectedImageState = Cell(null);
+        Commands.register(editor, imageUploadTimerState);
+        Buttons.register(editor);
+        ContextToolbar.register(editor);
+        UploadSelectedImage.setup(editor, imageUploadTimerState, lastSelectedImageState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

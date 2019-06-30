@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var mobile = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var extendStatics = function (d, b) {
@@ -865,6 +864,17 @@ var mobile = (function (domGlobals) {
     var isUndefined = isType('undefined');
     var isFunction = isType('function');
     var isNumber = isType('number');
+    var isArrayOf = function (value, pred) {
+      if (isArray(value)) {
+        for (var i = 0, len = value.length; i < len; ++i) {
+          if (pred(value[i]) !== true) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
+    };
 
     var Type = /*#__PURE__*/Object.freeze({
         isString: isString,
@@ -874,7 +884,8 @@ var mobile = (function (domGlobals) {
         isBoolean: isBoolean,
         isUndefined: isUndefined,
         isFunction: isFunction,
-        isNumber: isNumber
+        isNumber: isNumber,
+        isArrayOf: isArrayOf
     });
 
     var slice = Array.prototype.slice;
@@ -1600,6 +1611,11 @@ var mobile = (function (domGlobals) {
 
     var owner = function (element) {
       return Element.fromDom(element.dom().ownerDocument);
+    };
+    var defaultView = function (element) {
+      var el = element.dom();
+      var defView = el.ownerDocument.defaultView;
+      return Element.fromDom(defView);
     };
     var parent = function (element) {
       var dom = element.dom();
@@ -10905,6 +10921,9 @@ var mobile = (function (domGlobals) {
       return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
     };
 
+    var create$3 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var SimRange = { create: create$3 };
+
     var adt$4 = Adt.generate([
       { before: ['element'] },
       {
@@ -10932,7 +10951,7 @@ var mobile = (function (domGlobals) {
       getStart: getStart
     };
 
-    var type$1 = Adt.generate([
+    var adt$5 = Adt.generate([
       { domRange: ['rng'] },
       {
         relative: [
@@ -10949,21 +10968,37 @@ var mobile = (function (domGlobals) {
         ]
       }
     ]);
-    var range$2 = Immutable('start', 'soffset', 'finish', 'foffset');
-    var relative = type$1.relative;
-    var exact = type$1.exact;
-
-    var makeRange = function (start, soffset, finish, foffset) {
-      var doc = owner(start);
-      var rng = doc.dom().createRange();
-      rng.setStart(start.dom(), soffset);
-      rng.setEnd(finish.dom(), foffset);
-      return rng;
+    var exactFromRange = function (simRange) {
+      return adt$5.exact(simRange.start(), simRange.soffset(), simRange.finish(), simRange.foffset());
     };
-    var after$2 = function (start, soffset, finish, foffset) {
-      var r = makeRange(start, soffset, finish, foffset);
-      var same = eq(start, finish) && soffset === foffset;
-      return r.collapsed && !same;
+    var getStart$1 = function (selection) {
+      return selection.match({
+        domRange: function (rng) {
+          return Element.fromDom(rng.startContainer);
+        },
+        relative: function (startSitu, finishSitu) {
+          return Situ.getStart(startSitu);
+        },
+        exact: function (start, soffset, finish, foffset) {
+          return start;
+        }
+      });
+    };
+    var domRange = adt$5.domRange;
+    var relative = adt$5.relative;
+    var exact = adt$5.exact;
+    var getWin = function (selection) {
+      var start = getStart$1(selection);
+      return defaultView(start);
+    };
+    var range$2 = SimRange.create;
+    var Selection = {
+      domRange: domRange,
+      relative: relative,
+      exact: exact,
+      exactFromRange: exactFromRange,
+      getWin: getWin,
+      range: range$2
     };
 
     var setStart = function (rng, situ) {
@@ -11012,7 +11047,7 @@ var mobile = (function (domGlobals) {
       return rect.width > 0 || rect.height > 0 ? Option.some(rect).map(toRect) : Option.none();
     };
 
-    var adt$5 = Adt.generate([
+    var adt$6 = Adt.generate([
       {
         ltr: [
           'start',
@@ -11070,12 +11105,12 @@ var mobile = (function (domGlobals) {
           return rev.collapsed === false;
         });
         return reversed.map(function (rev) {
-          return adt$5.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
+          return adt$6.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
         }).getOrThunk(function () {
-          return fromRange(win, adt$5.ltr, rng);
+          return fromRange(win, adt$6.ltr, rng);
         });
       } else {
-        return fromRange(win, adt$5.ltr, rng);
+        return fromRange(win, adt$6.ltr, rng);
       }
     };
     var diagnose = function (win, selection) {
@@ -11279,7 +11314,20 @@ var mobile = (function (domGlobals) {
     var preprocessExact = function (start, soffset, finish, foffset) {
       var startSitu = beforeSpecial(start, soffset);
       var finishSitu = beforeSpecial(finish, foffset);
-      return relative(startSitu, finishSitu);
+      return Selection.relative(startSitu, finishSitu);
+    };
+
+    var makeRange = function (start, soffset, finish, foffset) {
+      var doc = owner(start);
+      var rng = doc.dom().createRange();
+      rng.setStart(start.dom(), soffset);
+      rng.setEnd(finish.dom(), foffset);
+      return rng;
+    };
+    var after$2 = function (start, soffset, finish, foffset) {
+      var r = makeRange(start, soffset, finish, foffset);
+      var same = eq(start, finish) && soffset === foffset;
+      return r.collapsed && !same;
     };
 
     var doSetNativeRange = function (win, rng) {
@@ -11325,7 +11373,7 @@ var mobile = (function (domGlobals) {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range$2(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(SimRange.create(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
@@ -11333,7 +11381,7 @@ var mobile = (function (domGlobals) {
     var doGetExact = function (selection) {
       var anchor = Element.fromDom(selection.anchorNode);
       var focus = Element.fromDom(selection.focusNode);
-      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range$2(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
+      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(SimRange.create(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var getExact = function (win) {
       return Option.from(win.getSelection()).filter(function (sel) {
@@ -11342,7 +11390,7 @@ var mobile = (function (domGlobals) {
     };
     var get$d = function (win) {
       return getExact(win).map(function (range) {
-        return exact(range.start(), range.soffset(), range.finish(), range.foffset());
+        return Selection.exact(range.start(), range.soffset(), range.finish(), range.foffset());
       });
     };
     var getFirstRect$1 = function (win, selection) {
@@ -11381,7 +11429,7 @@ var mobile = (function (domGlobals) {
       } else {
         var start_1 = Element.fromDom(range.startContainer);
         return parent(start_1).bind(function (parent) {
-          var selection = exact(start_1, range.startOffset, parent, getEnd(parent));
+          var selection = Selection.exact(start_1, range.startOffset, parent, getEnd(parent));
           var optRect = getFirstRect$1(range.startContainer.ownerDocument.defaultView, selection);
           return optRect.map(collapsedRect).map(pure);
         }).getOr([]);
@@ -11664,7 +11712,7 @@ var mobile = (function (domGlobals) {
     };
     var MetaViewport = { tag: tag };
 
-    var create$3 = function (platform, mask) {
+    var create$4 = function (platform, mask) {
       var meta = MetaViewport.tag();
       var androidApi = api$2();
       var androidEvents = api$2();
@@ -11695,7 +11743,7 @@ var mobile = (function (domGlobals) {
         exit: exit
       };
     };
-    var AndroidMode = { create: create$3 };
+    var AndroidMode = { create: create$4 };
 
     var adaptable = function (fn, rate) {
       var timer = null;
@@ -12552,7 +12600,7 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    var adt$6 = Adt.generate([
+    var adt$7 = Adt.generate([
       { stopped: [] },
       { resume: ['element'] },
       { complete: [] }
@@ -12562,24 +12610,24 @@ var mobile = (function (domGlobals) {
       var simulatedEvent = fromSource(rawEvent, source);
       return handler.fold(function () {
         logger.logEventNoHandlers(eventType, target);
-        return adt$6.complete();
+        return adt$7.complete();
       }, function (handlerInfo) {
         var descHandler = handlerInfo.descHandler();
         var eventHandler = getCurried(descHandler);
         eventHandler(simulatedEvent);
         if (simulatedEvent.isStopped()) {
           logger.logEventStopped(eventType, handlerInfo.element(), descHandler.purpose());
-          return adt$6.stopped();
+          return adt$7.stopped();
         } else if (simulatedEvent.isCut()) {
           logger.logEventCut(eventType, handlerInfo.element(), descHandler.purpose());
-          return adt$6.complete();
+          return adt$7.complete();
         } else {
           return parent(handlerInfo.element()).fold(function () {
             logger.logNoParent(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.complete();
+            return adt$7.complete();
           }, function (parent) {
             logger.logEventResponse(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.resume(parent);
+            return adt$7.resume(parent);
           });
         }
       });
@@ -13332,7 +13380,7 @@ var mobile = (function (domGlobals) {
         return Option.some(value - amount);
       }
     };
-    var create$4 = function () {
+    var create$5 = function () {
       var interval = null;
       var animate = function (getCurrent, destination, amount, increment, doFinish, rate) {
         var finished = false;
@@ -13365,7 +13413,7 @@ var mobile = (function (domGlobals) {
       return { animate: animate };
     };
     var SmoothAnimation = {
-      create: create$4,
+      create: create$5,
       adjust: adjust
     };
 
@@ -13896,7 +13944,7 @@ var mobile = (function (domGlobals) {
     };
     var IosSetup = { setup: setup$3 };
 
-    var create$5 = function (platform, mask) {
+    var create$6 = function (platform, mask) {
       var meta = MetaViewport.tag();
       var priorState = value$3();
       var scrollEvents = value$3();
@@ -13997,7 +14045,7 @@ var mobile = (function (domGlobals) {
         exit: exit
       };
     };
-    var IosMode = { create: create$5 };
+    var IosMode = { create: create$6 };
 
     var produce$1 = function (raw) {
       var mobile = asRawOrDie('Getting IosWebapp schema', MobileSchema, raw);
@@ -14346,11 +14394,10 @@ var mobile = (function (domGlobals) {
         renderUI: renderUI
       };
     };
-    global$1.add('mobile', renderMobileTheme);
     function Theme () {
+      global$1.add('mobile', renderMobileTheme);
     }
 
-    return Theme;
+    Theme();
 
 }(window));
-})();

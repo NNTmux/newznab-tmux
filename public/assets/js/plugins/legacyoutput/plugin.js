@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
 (function () {
-var legacyoutput = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -42,7 +41,7 @@ var legacyoutput = (function () {
     };
 
     var overrideFormats = function (editor) {
-      var alignElements = 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', fontSizes = global$1.explode(Settings.getFontSizeStyleValues(editor)), schema = editor.schema;
+      var alignElements = 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table', fontSizes = global$1.explode(Settings.getFontSizeStyleValues(editor)), schema = editor.schema;
       editor.formatter.register({
         alignleft: {
           selector: alignElements,
@@ -112,10 +111,12 @@ var legacyoutput = (function () {
         ],
         fontname: {
           inline: 'font',
+          toggle: false,
           attributes: { face: '%value' }
         },
         fontsize: {
           inline: 'font',
+          toggle: false,
           attributes: {
             size: function (vars) {
               return global$1.inArray(fontSizes, vars.value) + 1;
@@ -124,11 +125,17 @@ var legacyoutput = (function () {
         },
         forecolor: {
           inline: 'font',
-          attributes: { color: '%value' }
+          attributes: { color: '%value' },
+          links: true,
+          remove_similar: true,
+          clear_child_styles: true
         },
         hilitecolor: {
           inline: 'font',
-          styles: { backgroundColor: '%value' }
+          styles: { backgroundColor: '%value' },
+          links: true,
+          remove_similar: true,
+          clear_child_styles: true
         }
       });
       global$1.each('b,i,u,strike'.split(','), function (name) {
@@ -166,13 +173,12 @@ var legacyoutput = (function () {
     };
     var Formats = { setup: setup };
 
-    global.add('legacyoutput', function (editor) {
-      Formats.setup(editor);
-    });
     function Plugin () {
+      global.add('legacyoutput', function (editor) {
+        Formats.setup(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

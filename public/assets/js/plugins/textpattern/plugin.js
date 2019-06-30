@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
-(function () {
-var textpattern = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -1428,15 +1427,14 @@ var textpattern = (function (domGlobals) {
     };
     var Keyboard = { setup: setup };
 
-    global.add('textpattern', function (editor) {
-      var patternsState = Cell(getPatternSet(editor.settings));
-      Keyboard.setup(editor, patternsState);
-      return Api.get(patternsState);
-    });
     function Plugin () {
+      global.add('textpattern', function (editor) {
+        var patternsState = Cell(getPatternSet(editor.settings));
+        Keyboard.setup(editor, patternsState);
+        return Api.get(patternsState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

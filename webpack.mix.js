@@ -71,6 +71,5 @@ mix
             'resources/assets/js/custom.js',
             'resources/assets/js/functions.js'
         ]
-    , 'public/assets/js/all-js.js')
-    .sourceMaps();
+    , 'public/assets/js/all-js.js');
 

@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.9 (2019-06-26)
  */
 (function () {
-var media = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -375,6 +374,7 @@ var media = (function () {
     var guess = function (url) {
       var mimes = {
         mp3: 'audio/mpeg',
+        m4a: 'audio/x-m4a',
         wav: 'audio/wav',
         mp4: 'video/mp4',
         webm: 'video/webm',
@@ -1332,18 +1332,17 @@ var media = (function () {
     };
     var Buttons = { register: register$1 };
 
-    global.add('media', function (editor) {
-      Commands.register(editor);
-      Buttons.register(editor);
-      ResolveName.setup(editor);
-      FilterContent.setup(editor);
-      Selection.setup(editor);
-      return Api.get(editor);
-    });
     function Plugin () {
+      global.add('media', function (editor) {
+        Commands.register(editor);
+        Buttons.register(editor);
+        ResolveName.setup(editor);
+        FilterContent.setup(editor);
+        Selection.setup(editor);
+        return Api.get(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();
