@@ -2599,16 +2599,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.8.26",
+            "version": "v5.8.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "1d8ec9afdedc79314c18715056b8143d7e1fac31"
+                "reference": "f1dccffb96f614895393e27e4667105a05407af5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/1d8ec9afdedc79314c18715056b8143d7e1fac31",
-                "reference": "1d8ec9afdedc79314c18715056b8143d7e1fac31",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/f1dccffb96f614895393e27e4667105a05407af5",
+                "reference": "f1dccffb96f614895393e27e4667105a05407af5",
                 "shasum": ""
             },
             "require": {
@@ -2742,20 +2742,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-06-25T16:20:51+00:00"
+            "time": "2019-07-02T13:43:47+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.2.4",
+            "version": "v3.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "dab98e62eb3604e96dc5c7afcbb974999f187d4e"
+                "reference": "03cfd34e84a83e537df1d640d196193e69c229b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/dab98e62eb3604e96dc5c7afcbb974999f187d4e",
-                "reference": "dab98e62eb3604e96dc5c7afcbb974999f187d4e",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/03cfd34e84a83e537df1d640d196193e69c229b4",
+                "reference": "03cfd34e84a83e537df1d640d196193e69c229b4",
                 "shasum": ""
             },
             "require": {
@@ -2811,7 +2811,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-06-25T15:20:03+00:00"
+            "time": "2019-07-02T15:31:06+00:00"
         },
         {
             "name": "laravel/scout",
@@ -5450,16 +5450,16 @@
         },
         {
             "name": "rtconner/laravel-tagging",
-            "version": "3.1.1",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtconner/laravel-tagging.git",
-                "reference": "2b151ba2962b6ae6cc1499b5983b95c5174787d9"
+                "reference": "f66d0411a0112f6e9e761acc4fd83dbcee172dc7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/2b151ba2962b6ae6cc1499b5983b95c5174787d9",
-                "reference": "2b151ba2962b6ae6cc1499b5983b95c5174787d9",
+                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/f66d0411a0112f6e9e761acc4fd83dbcee172dc7",
+                "reference": "f66d0411a0112f6e9e761acc4fd83dbcee172dc7",
                 "shasum": ""
             },
             "require": {
@@ -5508,7 +5508,7 @@
                 "tagging",
                 "tags"
             ],
-            "time": "2019-03-21T01:31:09+00:00"
+            "time": "2019-07-03T03:20:10+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
