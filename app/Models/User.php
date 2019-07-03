@@ -410,9 +410,9 @@ class User extends Authenticatable
             } else {
                 if ($emailCheckQuery->isNotEmpty()) {
                     $booleans = [
-                        'day' => $period === 1 && $emailCheckQuery->day === false,
-                        'week' => $period === 7 && $emailCheckQuery->week === false,
-                        'month' => $period === 30 && $emailCheckQuery->month === false,
+                        'day' => ($period === 1 && $emailCheckQuery->day === false) ? true : $emailCheckQuery->day,
+                        'week' => ($period === 7 && $emailCheckQuery->week === false) ? true : $emailCheckQuery->week,
+                        'month' => ($period === 30 && $emailCheckQuery->month === false) ? true : $emailCheckQuery->month,
                     ];
                     RoleExpirationEmail::query()->where('users_id', '=', $userCheck->id)->update($booleans);
                 } else {
