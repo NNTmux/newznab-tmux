@@ -1,3 +1,5 @@
+2019-07-04 DariusIII
+	* Chg: Remove byGroup release categorization, update isSportTV regexes
 2019-07-03 DariusIII
 	* Chg: Update expired roles handling (send emails for 1, 7, 30 days expiration notice)
 	* Chg: Update laravel/framework, laravel/horizon and rtconner/laravel-tagging to latest versions
