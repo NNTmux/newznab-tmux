@@ -396,7 +396,7 @@ class User extends Authenticatable
         $query = self::query()->whereDate('rolechangedate', '>', now())->whereDate('rolechangedate', '<=', $endDate);
         if ($period === null) {
             $endDate = $now;
-            $query = self::query()->whereDate('rolechangedate', '>', $endDate);
+            $query = self::query()->whereDate('rolechangedate', '<', $endDate);
         }
 
         $usersCheck = $query->get();
