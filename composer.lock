@@ -5450,16 +5450,16 @@
         },
         {
             "name": "rtconner/laravel-tagging",
-            "version": "3.2.1",
+            "version": "3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtconner/laravel-tagging.git",
-                "reference": "f66d0411a0112f6e9e761acc4fd83dbcee172dc7"
+                "reference": "5c115443721c2c4bb38099234d08555c5ff52bc7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/f66d0411a0112f6e9e761acc4fd83dbcee172dc7",
-                "reference": "f66d0411a0112f6e9e761acc4fd83dbcee172dc7",
+                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/5c115443721c2c4bb38099234d08555c5ff52bc7",
+                "reference": "5c115443721c2c4bb38099234d08555c5ff52bc7",
                 "shasum": ""
             },
             "require": {
@@ -5508,7 +5508,7 @@
                 "tagging",
                 "tags"
             ],
-            "time": "2019-07-03T03:20:10+00:00"
+            "time": "2019-07-06T13:39:53+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
@@ -10071,16 +10071,16 @@
         },
         {
             "name": "nette/php-generator",
-            "version": "v3.2.2",
+            "version": "v3.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/php-generator.git",
-                "reference": "acff8b136fad84b860a626d133e791f95781f9f5"
+                "reference": "aea6e81437bb238e5f0e5b5ce06337433908e63b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/php-generator/zipball/acff8b136fad84b860a626d133e791f95781f9f5",
-                "reference": "acff8b136fad84b860a626d133e791f95781f9f5",
+                "url": "https://api.github.com/repos/nette/php-generator/zipball/aea6e81437bb238e5f0e5b5ce06337433908e63b",
+                "reference": "aea6e81437bb238e5f0e5b5ce06337433908e63b",
                 "shasum": ""
             },
             "require": {
@@ -10126,7 +10126,7 @@
                 "php",
                 "scaffolding"
             ],
-            "time": "2019-03-15T03:41:13+00:00"
+            "time": "2019-07-05T13:01:56+00:00"
         },
         {
             "name": "nette/robot-loader",
