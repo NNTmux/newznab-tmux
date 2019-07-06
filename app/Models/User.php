@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -386,51 +387,26 @@ class User extends Authenticatable
         }
     }
 
-    /**
-     * @param int|null $period
-     */
-    public static function updateExpiredRoles(int $period = null): void
+    public static function updateExpiredRoles(): void
     {
-        $now = now();
-        $endDate = $now->addDays($period);
-        $query = self::query()->whereDate('rolechangedate', '>', now())->whereDate('rolechangedate', '<=', $endDate);
-        if ($period === null) {
-            $endDate = $now;
-            $query = self::query()->whereDate('rolechangedate', '<', $endDate);
-        }
+        $now = CarbonImmutable::now();
+        $period = [
+            'day' => $now->addDay(),
+            'week' => $now->addWeek(),
+            'month' => $now->addMonth(),
+        ];
 
-        $usersCheck = $query->get();
-
-        foreach ($usersCheck as $userCheck) {
-            $emailCheckQuery = RoleExpirationEmail::query()->where('users_id', $userCheck->id)->get();
-            if ($period === null) {
-                $userCheck->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
-                $userCheck->syncRoles('User');
-                SendAccountExpiredEmail::dispatch($userCheck);
-            } else {
-                if ($emailCheckQuery->isNotEmpty()) {
-                    $booleans = [
-                        'day' => ($period === 1 && $emailCheckQuery->day === false) ? true : $emailCheckQuery->day,
-                        'week' => ($period === 7 && $emailCheckQuery->week === false) ? true : $emailCheckQuery->week,
-                        'month' => ($period === 30 && $emailCheckQuery->month === false) ? true : $emailCheckQuery->month,
-                    ];
-                    RoleExpirationEmail::query()->where('users_id', '=', $userCheck->id)->update($booleans);
-                } else {
-                    $booleans = [
-                        'day' => $period === 1,
-                        'week' => $period === 7,
-                        'month' => $period === 30,
-                    ];
-                    $userId = [
-                        'users_id' => $userCheck->id,
-                    ];
-                    $booleans += $userId;
-
-                    RoleExpirationEmail::create($booleans);
-                }
-
-                SendAccountWillExpireEmail::dispatch($userCheck, $period);
+        foreach ($period as $value) {
+            $users = self::query()->whereDate('rolechangedate', '=', $value)->get();
+            $days = $now->diffInDays($value);
+            foreach ($users as $user) {
+                SendAccountWillExpireEmail::dispatch($user, $days);
             }
+        }
+        foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
+            $expired->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $expired->syncRoles('User');
+            SendAccountExpiredEmail::dispatch($expired);
         }
     }
 

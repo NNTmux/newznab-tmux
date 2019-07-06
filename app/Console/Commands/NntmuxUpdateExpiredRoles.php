@@ -12,7 +12,7 @@ class NntmuxUpdateExpiredRoles extends Command
      *
      * @var string
      */
-    protected $signature = 'nntmux:update-expired-roles {--p|period=* : Update expired roles, add the switch to check user that will have their accounts expire in future}';
+    protected $signature = 'nntmux:update-expired-roles';
 
     /**
      * The console command description.
@@ -39,14 +39,8 @@ class NntmuxUpdateExpiredRoles extends Command
     public function handle()
     {
         $this->info('Updating expired roles.');
-        if (empty($this->option('period'))) {
-            $this->info('Updating users who have their role expired');
-            User::updateExpiredRoles();
-        } else {
-            $days = $this->option('period')[0];
-            $this->info('Updating users that will have their role expire in '.$days.' days.');
-            User::updateExpiredRoles($days);
-        }
+        $this->info('Updating users that will have their roles expire or are already expired');
+        User::updateExpiredRoles();
         $this->info('Expired roles updated.');
     }
 }
