@@ -4,9 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.9 (2019-06-26)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
+var importcss = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -400,13 +401,14 @@
     };
     var Api = { get: get };
 
+    global.add('importcss', function (editor) {
+      ImportCss.setup(editor);
+      return Api.get(editor);
+    });
     function Plugin () {
-      global.add('importcss', function (editor) {
-        ImportCss.setup(editor);
-        return Api.get(editor);
-      });
     }
 
-    Plugin();
+    return Plugin;
 
 }());
+})();

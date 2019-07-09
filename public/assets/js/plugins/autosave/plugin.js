@@ -4,9 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.9 (2019-06-26)
+ * Version: 5.0.7 (2019-06-05)
  */
-(function (domGlobals) {
+(function () {
+var autosave = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -211,20 +212,21 @@
       });
     };
 
-    function Plugin () {
-      global.add('autosave', function (editor) {
-        var started = Cell(false);
-        setup(editor);
-        register(editor, started);
-        editor.on('init', function () {
-          if (shouldRestoreWhenEmpty(editor) && editor.dom.isEmpty(editor.getBody())) {
-            restoreDraft(editor);
-          }
-        });
-        return get(editor);
+    global.add('autosave', function (editor) {
+      var started = Cell(false);
+      setup(editor);
+      register(editor, started);
+      editor.on('init', function () {
+        if (shouldRestoreWhenEmpty(editor) && editor.dom.isEmpty(editor.getBody())) {
+          restoreDraft(editor);
+        }
       });
+      return get(editor);
+    });
+    function Plugin () {
     }
 
-    Plugin();
+    return Plugin;
 
 }(window));
+})();

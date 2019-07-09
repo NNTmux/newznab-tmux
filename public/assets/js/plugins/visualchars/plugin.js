@@ -4,9 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.9 (2019-06-26)
+ * Version: 5.0.7 (2019-06-05)
  */
-(function (domGlobals) {
+(function () {
+var visualchars = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -464,17 +465,18 @@
       });
     };
 
+    global.add('visualchars', function (editor) {
+      var toggleState = Cell(false);
+      Commands.register(editor, toggleState);
+      register$1(editor, toggleState);
+      Keyboard.setup(editor, toggleState);
+      Bindings.setup(editor, toggleState);
+      return Api.get(toggleState);
+    });
     function Plugin () {
-      global.add('visualchars', function (editor) {
-        var toggleState = Cell(false);
-        Commands.register(editor, toggleState);
-        register$1(editor, toggleState);
-        Keyboard.setup(editor, toggleState);
-        Bindings.setup(editor, toggleState);
-        return Api.get(toggleState);
-      });
     }
 
-    Plugin();
+    return Plugin;
 
 }(window));
+})();

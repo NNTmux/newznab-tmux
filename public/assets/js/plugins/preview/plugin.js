@@ -4,9 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.9 (2019-06-26)
+ * Version: 5.0.7 (2019-06-05)
  */
 (function () {
+var preview = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -22,14 +23,10 @@
     var getContentStyle = function (editor) {
       return editor.getParam('content_style', '');
     };
-    var shouldUseContentCssCors = function (editor) {
-      return editor.getParam('content_css_cors', false, 'boolean');
-    };
     var Settings = {
       getPreviewDialogWidth: getPreviewDialogWidth,
       getPreviewDialogHeight: getPreviewDialogHeight,
-      getContentStyle: getContentStyle,
-      shouldUseContentCssCors: shouldUseContentCssCors
+      getContentStyle: getContentStyle
     };
 
     var getPreviewHtml = function (editor) {
@@ -40,9 +37,8 @@
       if (contentStyle) {
         headHtml += '<style type="text/css">' + contentStyle + '</style>';
       }
-      var cors = Settings.shouldUseContentCssCors(editor) ? ' crossorigin="anonymous"' : '';
       global$1.each(editor.contentCSS, function (url) {
-        headHtml += '<link type="text/css" rel="stylesheet" href="' + encode(editor.documentBaseURI.toAbsolute(url)) + '"' + cors + '>';
+        headHtml += '<link type="text/css" rel="stylesheet" href="' + encode(editor.documentBaseURI.toAbsolute(url)) + '">';
       });
       var bodyId = editor.settings.body_id || 'tinymce';
       if (bodyId.indexOf('=') !== -1) {
@@ -111,13 +107,14 @@
     };
     var Buttons = { register: register$1 };
 
+    global.add('preview', function (editor) {
+      Commands.register(editor);
+      Buttons.register(editor);
+    });
     function Plugin () {
-      global.add('preview', function (editor) {
-        Commands.register(editor);
-        Buttons.register(editor);
-      });
     }
 
-    Plugin();
+    return Plugin;
 
 }());
+})();

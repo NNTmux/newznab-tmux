@@ -4,9 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.9 (2019-06-26)
+ * Version: 5.0.7 (2019-06-05)
  */
-(function (domGlobals) {
+(function () {
+var fullscreen = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -139,19 +140,20 @@
     };
     var Buttons = { register: register$1 };
 
-    function Plugin () {
-      global.add('fullscreen', function (editor) {
-        var fullscreenState = Cell(null);
-        if (editor.settings.inline) {
-          return Api.get(fullscreenState);
-        }
-        Commands.register(editor, fullscreenState);
-        Buttons.register(editor, fullscreenState);
-        editor.addShortcut('Meta+Shift+F', '', 'mceFullScreen');
+    global.add('fullscreen', function (editor) {
+      var fullscreenState = Cell(null);
+      if (editor.settings.inline) {
         return Api.get(fullscreenState);
-      });
+      }
+      Commands.register(editor, fullscreenState);
+      Buttons.register(editor, fullscreenState);
+      editor.addShortcut('Meta+Shift+F', '', 'mceFullScreen');
+      return Api.get(fullscreenState);
+    });
+    function Plugin () {
     }
 
-    Plugin();
+    return Plugin;
 
 }(window));
+})();

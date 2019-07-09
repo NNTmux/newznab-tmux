@@ -4,9 +4,10 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.9 (2019-06-26)
+ * Version: 5.0.7 (2019-06-05)
  */
-(function (domGlobals) {
+(function () {
+var paste = (function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -1839,23 +1840,24 @@
     };
     var Buttons = { register: register$2 };
 
+    global.add('paste', function (editor) {
+      if (DetectProPlugin.hasProPlugin(editor) === false) {
+        var draggingInternallyState = Cell(false);
+        var pasteFormat = Cell(Settings.isPasteAsTextEnabled(editor) ? 'text' : 'html');
+        var clipboard = Clipboard(editor, pasteFormat);
+        var quirks = Quirks.setup(editor);
+        Buttons.register(editor, clipboard);
+        Commands.register(editor, clipboard);
+        PrePostProcess.setup(editor);
+        CutCopy.register(editor);
+        DragDrop.setup(editor, clipboard, draggingInternallyState);
+        return Api.get(clipboard, quirks);
+      }
+    });
     function Plugin () {
-      global.add('paste', function (editor) {
-        if (DetectProPlugin.hasProPlugin(editor) === false) {
-          var draggingInternallyState = Cell(false);
-          var pasteFormat = Cell(Settings.isPasteAsTextEnabled(editor) ? 'text' : 'html');
-          var clipboard = Clipboard(editor, pasteFormat);
-          var quirks = Quirks.setup(editor);
-          Buttons.register(editor, clipboard);
-          Commands.register(editor, clipboard);
-          PrePostProcess.setup(editor);
-          CutCopy.register(editor);
-          DragDrop.setup(editor, clipboard, draggingInternallyState);
-          return Api.get(clipboard, quirks);
-        }
-      });
     }
 
-    Plugin();
+    return Plugin;
 
 }(window));
+})();
