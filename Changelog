@@ -1,3 +1,5 @@
+2019-07-10 DariusIII
+	* Chg: Update laravel/framework (v5.8.27 => v5.8.28)
 2019-07-09 DariusIII
 	* Chg: Update registration page with email adress clarification text
 	* Chg: Update tinyMCE to latest version
