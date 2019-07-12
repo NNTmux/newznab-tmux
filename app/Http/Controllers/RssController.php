@@ -213,6 +213,7 @@ class RssController extends BasePageController
         $uid = $res['id'];
         $rssToken = $res['api_token'];
         $maxRequests = $res->role->apirequests;
+        $maxDownloads = $res->role->downloadrequests;
         $usedRequests = UserRequest::getApiRequests($uid);
 
         if ($res->hasRole('Disabled')) {
@@ -231,8 +232,10 @@ class RssController extends BasePageController
                 'extended' => 1,
                 'uid'      => $uid,
                 'token'    => $rssToken,
-                'limit'    => $maxRequests,
-                'grabs'    => $usedRequests,
+                'apilimit'    => $maxRequests,
+                'requests' => $usedRequests,
+                'downloadlimit' => $maxDownloads,
+                'grabs' => $res->grabs,
             ];
 
         return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];

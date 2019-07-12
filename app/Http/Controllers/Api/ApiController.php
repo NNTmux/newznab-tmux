@@ -86,6 +86,7 @@ class ApiController extends BasePageController
             $uid = $res['id'];
             $catExclusions = User::getCategoryExclusionForApi($request);
             $maxRequests = $res->role->apirequests;
+            $maxDownloads = $res->role->downloadrequests;
         }
 
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
@@ -110,8 +111,10 @@ class ApiController extends BasePageController
         $params['del'] = $request->has('del') && (int) $request->input('del') === 1 ? '1' : '0';
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
-        $params['limit'] = $maxRequests;
-        $params['grabs'] = $apiRequests;
+        $params['apilimit'] = $maxRequests;
+        $params['requests'] = $apiRequests;
+        $params['downloadlimit'] = $maxDownloads;
+        $params['grabs'] = $res->grabs;
 
         switch ($function) {
            // Search releases.
