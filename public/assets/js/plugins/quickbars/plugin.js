@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
-(function () {
-var quickbars = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -346,9 +345,9 @@ var quickbars = (function (domGlobals) {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -869,15 +868,14 @@ var quickbars = (function (domGlobals) {
     };
     var SelectionToolbars = { addToEditor: addToEditor$1 };
 
-    global.add('quickbars', function (editor) {
-      InsertButtons.setupButtons(editor);
-      InsertToolbars.addToEditor(editor);
-      SelectionToolbars.addToEditor(editor);
-    });
     function Plugin () {
+      global.add('quickbars', function (editor) {
+        InsertButtons.setupButtons(editor);
+        InsertToolbars.addToEditor(editor);
+        SelectionToolbars.addToEditor(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

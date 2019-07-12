@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
 (function () {
-var wordcount = (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -149,9 +148,9 @@ var wordcount = (function () {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -483,16 +482,15 @@ var wordcount = (function () {
       });
     };
 
-    global.add('wordcount', function (editor) {
-      var api = get(editor);
-      register(editor, api);
-      setup(editor, api);
-      return api;
-    });
     function Plugin () {
+      global.add('wordcount', function (editor) {
+        var api = get(editor);
+        register(editor, api);
+        setup(editor, api);
+        return api;
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
 (function () {
-var searchreplace = (function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -29,6 +28,19 @@ var searchreplace = (function () {
     };
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
+    };
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
@@ -231,12 +243,12 @@ var searchreplace = (function () {
       }
       return value;
     };
-    var markAllMatches = function (editor, currentIndexState, regex) {
+    var markAllMatches = function (editor, currentSearchState, regex) {
       var node, marker;
       marker = editor.dom.create('span', { 'data-mce-bogus': 1 });
       marker.className = 'mce-match-marker';
       node = editor.getBody();
-      done(editor, currentIndexState, false);
+      done(editor, currentSearchState, false);
       return FindReplaceText.findAndReplaceDOMText(regex, node, marker, false, editor.schema);
     };
     var unwrap = function (node) {
@@ -263,16 +275,25 @@ var searchreplace = (function () {
       }
       return spans;
     };
-    var moveSelection = function (editor, currentIndexState, forward) {
-      var testIndex = currentIndexState.get();
+    var moveSelection = function (editor, currentSearchState, forward) {
+      var searchState = currentSearchState.get();
+      var testIndex = searchState.index;
       var dom = editor.dom;
       forward = forward !== false;
       if (forward) {
-        testIndex++;
+        if (testIndex + 1 === searchState.count) {
+          testIndex = 0;
+        } else {
+          testIndex++;
+        }
       } else {
-        testIndex--;
+        if (testIndex - 1 === -1) {
+          testIndex = searchState.count - 1;
+        } else {
+          testIndex--;
+        }
       }
-      dom.removeClass(findSpansByIndex(editor, currentIndexState.get()), 'mce-match-marker-selected');
+      dom.removeClass(findSpansByIndex(editor, searchState.index), 'mce-match-marker-selected');
       var spans = findSpansByIndex(editor, testIndex);
       if (spans.length) {
         dom.addClass(findSpansByIndex(editor, testIndex), 'mce-match-marker-selected');
@@ -288,42 +309,46 @@ var searchreplace = (function () {
         dom.remove(parent);
       }
     };
-    var find = function (editor, currentIndexState, text, matchCase, wholeWord) {
+    var find = function (editor, currentSearchState, text, matchCase, wholeWord) {
       text = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
       text = text.replace(/\s/g, '[^\\S\\r\\n]');
       text = wholeWord ? '\\b' + text + '\\b' : text;
-      var count = markAllMatches(editor, currentIndexState, new RegExp(text, matchCase ? 'g' : 'gi'));
+      var count = markAllMatches(editor, currentSearchState, new RegExp(text, matchCase ? 'g' : 'gi'));
       if (count) {
-        currentIndexState.set(-1);
-        currentIndexState.set(moveSelection(editor, currentIndexState, true));
+        var newIndex = moveSelection(editor, currentSearchState, true);
+        currentSearchState.set({
+          index: newIndex,
+          count: count,
+          text: text,
+          matchCase: matchCase,
+          wholeWord: wholeWord
+        });
       }
       return count;
     };
-    var next = function (editor, currentIndexState) {
-      var index = moveSelection(editor, currentIndexState, true);
-      if (index !== -1) {
-        currentIndexState.set(index);
-      }
+    var next = function (editor, currentSearchState) {
+      var index = moveSelection(editor, currentSearchState, true);
+      currentSearchState.set(__assign({}, currentSearchState.get(), { index: index }));
     };
-    var prev = function (editor, currentIndexState) {
-      var index = moveSelection(editor, currentIndexState, false);
-      if (index !== -1) {
-        currentIndexState.set(index);
-      }
+    var prev = function (editor, currentSearchState) {
+      var index = moveSelection(editor, currentSearchState, false);
+      currentSearchState.set(__assign({}, currentSearchState.get(), { index: index }));
     };
     var isMatchSpan = function (node) {
       var matchIndex = getElmIndex(node);
       return matchIndex !== null && matchIndex.length > 0;
     };
-    var replace = function (editor, currentIndexState, text, forward, all) {
-      var i, nodes, node, matchIndex, currentMatchIndex, nextIndex = currentIndexState.get(), hasMore;
+    var replace = function (editor, currentSearchState, text, forward, all) {
+      var searchState = currentSearchState.get();
+      var currentIndex = searchState.index;
+      var i, nodes, node, matchIndex, currentMatchIndex, nextIndex = currentIndex;
       forward = forward !== false;
       node = editor.getBody();
       nodes = global$1.grep(global$1.toArray(node.getElementsByTagName('span')), isMatchSpan);
       for (i = 0; i < nodes.length; i++) {
         var nodeIndex = getElmIndex(nodes[i]);
         matchIndex = currentMatchIndex = parseInt(nodeIndex, 10);
-        if (all || matchIndex === currentIndexState.get()) {
+        if (all || matchIndex === searchState.index) {
           if (text.length) {
             nodes[i].firstChild.nodeValue = text;
             unwrap(nodes[i]);
@@ -342,27 +367,29 @@ var searchreplace = (function () {
           if (forward) {
             nextIndex--;
           }
-        } else if (currentMatchIndex > currentIndexState.get()) {
-          nodes[i].setAttribute('data-mce-index', currentMatchIndex - 1);
+        } else if (currentMatchIndex > currentIndex) {
+          nodes[i].setAttribute('data-mce-index', String(currentMatchIndex - 1));
         }
       }
-      currentIndexState.set(nextIndex);
+      currentSearchState.set(__assign({}, searchState, {
+        count: all ? 0 : searchState.count - 1,
+        index: nextIndex
+      }));
       if (forward) {
-        hasMore = hasNext(editor, currentIndexState);
-        next(editor, currentIndexState);
+        next(editor, currentSearchState);
       } else {
-        hasMore = hasPrev(editor, currentIndexState);
-        prev(editor, currentIndexState);
+        prev(editor, currentSearchState);
       }
-      return !all && hasMore;
+      return !all && currentSearchState.get().count > 0;
     };
-    var done = function (editor, currentIndexState, keepEditorSelection) {
+    var done = function (editor, currentSearchState, keepEditorSelection) {
       var i, nodes, startContainer, endContainer;
+      var searchState = currentSearchState.get();
       nodes = global$1.toArray(editor.getBody().getElementsByTagName('span'));
       for (i = 0; i < nodes.length; i++) {
         var nodeIndex = getElmIndex(nodes[i]);
         if (nodeIndex !== null && nodeIndex.length) {
-          if (nodeIndex === currentIndexState.get().toString()) {
+          if (nodeIndex === searchState.index.toString()) {
             if (!startContainer) {
               startContainer = nodes[i].firstChild;
             }
@@ -380,45 +407,43 @@ var searchreplace = (function () {
         }
         return rng;
       }
+      currentSearchState.set({
+        index: -1,
+        count: 0,
+        text: '',
+        matchCase: false,
+        wholeWord: false
+      });
     };
-    var hasNext = function (editor, currentIndexState) {
-      return findSpansByIndex(editor, currentIndexState.get() + 1).length > 0;
+    var hasNext = function (editor, currentSearchState) {
+      return currentSearchState.get().count > 1;
     };
-    var hasPrev = function (editor, currentIndexState) {
-      return findSpansByIndex(editor, currentIndexState.get() - 1).length > 0;
-    };
-    var Actions = {
-      done: done,
-      find: find,
-      next: next,
-      prev: prev,
-      replace: replace,
-      hasNext: hasNext,
-      hasPrev: hasPrev
+    var hasPrev = function (editor, currentSearchState) {
+      return currentSearchState.get().count > 1;
     };
 
-    var get = function (editor, currentIndexState) {
-      var done = function (keepEditorSelection) {
-        return Actions.done(editor, currentIndexState, keepEditorSelection);
+    var get = function (editor, currentState) {
+      var done$1 = function (keepEditorSelection) {
+        return done(editor, currentState, keepEditorSelection);
       };
-      var find = function (text, matchCase, wholeWord) {
-        return Actions.find(editor, currentIndexState, text, matchCase, wholeWord);
+      var find$1 = function (text, matchCase, wholeWord) {
+        return find(editor, currentState, text, matchCase, wholeWord);
       };
-      var next = function () {
-        return Actions.next(editor, currentIndexState);
+      var next$1 = function () {
+        return next(editor, currentState);
       };
-      var prev = function () {
-        return Actions.prev(editor, currentIndexState);
+      var prev$1 = function () {
+        return prev(editor, currentState);
       };
-      var replace = function (text, forward, all) {
-        return Actions.replace(editor, currentIndexState, text, forward, all);
+      var replace$1 = function (text, forward, all) {
+        return replace(editor, currentState, text, forward, all);
       };
       return {
-        done: done,
-        find: find,
-        next: next,
-        prev: prev,
-        replace: replace
+        done: done$1,
+        find: find$1,
+        next: next$1,
+        prev: prev$1,
+        replace: replace$1
       };
     };
     var Api = { get: get };
@@ -494,9 +519,9 @@ var searchreplace = (function () {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -520,14 +545,13 @@ var searchreplace = (function () {
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.util.I18n');
 
-    var open = function (editor, currentIndexState) {
-      var last = {}, selectedText;
+    var open = function (editor, currentSearchState) {
       editor.undoManager.add();
-      selectedText = global$1.trim(editor.selection.getContent({ format: 'text' }));
+      var selectedText = global$1.trim(editor.selection.getContent({ format: 'text' }));
       function updateButtonStates(api) {
-        var updateNext = Actions.hasNext(editor, currentIndexState) ? api.enable : api.disable;
+        var updateNext = hasNext(editor, currentSearchState) ? api.enable : api.disable;
         updateNext('next');
-        var updatePrev = Actions.hasPrev(editor, currentIndexState) ? api.enable : api.disable;
+        var updatePrev = hasPrev(editor, currentSearchState) ? api.enable : api.disable;
         updatePrev('prev');
       }
       var disableAll = function (api, disable) {
@@ -545,34 +569,28 @@ var searchreplace = (function () {
           api.focus('findtext');
         });
       }
-      var doSubmit = function (api) {
-        var data = api.getData();
-        if (!data.findtext.length) {
-          Actions.done(editor, currentIndexState, false);
-          disableAll(api, true);
-          updateButtonStates(api);
-          return;
-        }
-        if (last.text === data.findtext && last.caseState === data.matchcase && last.wholeWord === data.wholewords) {
-          if (!Actions.hasNext(editor, currentIndexState)) {
-            notFoundAlert(api);
-            return;
-          }
-          Actions.next(editor, currentIndexState);
-          updateButtonStates(api);
-          return;
-        }
-        var count = Actions.find(editor, currentIndexState, data.findtext, data.matchcase, data.wholewords);
-        if (!count) {
-          notFoundAlert(api);
-        }
-        disableAll(api, count === 0);
+      var reset = function (api) {
+        done(editor, currentSearchState, false);
+        disableAll(api, true);
         updateButtonStates(api);
-        last = {
-          text: data.findtext,
-          caseState: data.matchcase,
-          wholeWord: data.wholewords
-        };
+      };
+      var doFind = function (api) {
+        var data = api.getData();
+        var last = currentSearchState.get();
+        if (!data.findtext.length) {
+          reset(api);
+          return;
+        }
+        if (last.text === data.findtext && last.matchCase === data.matchcase && last.wholeWord === data.wholewords) {
+          next(editor, currentSearchState);
+        } else {
+          var count = find(editor, currentSearchState, data.findtext, data.matchcase, data.wholewords);
+          if (count <= 0) {
+            notFoundAlert(api);
+          }
+          disableAll(api, count === 0);
+        }
+        updateButtonStates(api);
       };
       var initialData = {
         findtext: selectedText,
@@ -654,84 +672,93 @@ var searchreplace = (function () {
           }
         ],
         initialData: initialData,
+        onChange: function (api, details) {
+          if (details.name === 'findtext' && currentSearchState.get().count > 0) {
+            reset(api);
+          }
+        },
         onAction: function (api, details) {
           var data = api.getData();
           switch (details.name) {
           case 'find':
-            doSubmit(api);
+            doFind(api);
             break;
           case 'replace':
-            if (!Actions.replace(editor, currentIndexState, data.replacetext)) {
-              disableAll(api, true);
-              currentIndexState.set(-1);
-              last = {};
+            if (!replace(editor, currentSearchState, data.replacetext)) {
+              reset(api);
+            } else {
+              updateButtonStates(api);
             }
             break;
           case 'replaceall':
-            Actions.replace(editor, currentIndexState, data.replacetext, true, true);
-            disableAll(api, true);
-            last = {};
+            replace(editor, currentSearchState, data.replacetext, true, true);
+            reset(api);
             break;
           case 'prev':
-            Actions.prev(editor, currentIndexState);
+            prev(editor, currentSearchState);
             updateButtonStates(api);
             break;
           case 'next':
-            Actions.next(editor, currentIndexState);
+            next(editor, currentSearchState);
             updateButtonStates(api);
             break;
           default:
             break;
           }
         },
-        onSubmit: doSubmit,
+        onSubmit: doFind,
         onClose: function () {
           editor.focus();
-          Actions.done(editor, currentIndexState);
+          done(editor, currentSearchState);
           editor.undoManager.add();
         }
       });
     };
     var Dialog = { open: open };
 
-    var register = function (editor, currentIndexState) {
+    var register = function (editor, currentSearchState) {
       editor.addCommand('SearchReplace', function () {
-        Dialog.open(editor, currentIndexState);
+        Dialog.open(editor, currentSearchState);
       });
     };
     var Commands = { register: register };
 
-    var showDialog = function (editor, currentIndexState) {
+    var showDialog = function (editor, currentSearchState) {
       return function () {
-        Dialog.open(editor, currentIndexState);
+        Dialog.open(editor, currentSearchState);
       };
     };
-    var register$1 = function (editor, currentIndexState) {
+    var register$1 = function (editor, currentSearchState) {
       editor.ui.registry.addMenuItem('searchreplace', {
         text: 'Find and replace...',
         shortcut: 'Meta+F',
-        onAction: showDialog(editor, currentIndexState),
+        onAction: showDialog(editor, currentSearchState),
         icon: 'search'
       });
       editor.ui.registry.addButton('searchreplace', {
         tooltip: 'Find and replace',
-        onAction: showDialog(editor, currentIndexState),
+        onAction: showDialog(editor, currentSearchState),
         icon: 'search'
       });
-      editor.shortcuts.add('Meta+F', '', showDialog(editor, currentIndexState));
+      editor.shortcuts.add('Meta+F', '', showDialog(editor, currentSearchState));
     };
     var Buttons = { register: register$1 };
 
-    global.add('searchreplace', function (editor) {
-      var currentIndexState = Cell(-1);
-      Commands.register(editor, currentIndexState);
-      Buttons.register(editor, currentIndexState);
-      return Api.get(editor, currentIndexState);
-    });
     function Plugin () {
+      global.add('searchreplace', function (editor) {
+        var currentSearchState = Cell({
+          index: -1,
+          count: 0,
+          text: '',
+          matchCase: false,
+          wholeWord: false
+        });
+        Commands.register(editor, currentSearchState);
+        Buttons.register(editor, currentSearchState);
+        return Api.get(editor, currentSearchState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

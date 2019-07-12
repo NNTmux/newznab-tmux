@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
-(function () {
-var imagetools = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var Cell = function (initial) {
@@ -619,21 +618,6 @@ var imagetools = (function (domGlobals) {
         return create$1(Promise.resolve(canvas), blob, canvas.toDataURL());
       });
     }
-    function fromImage(image) {
-      return imageToBlob(image).then(function (blob) {
-        return fromBlob(blob);
-      });
-    }
-    var fromBlobAndUrlSync = function (blob, url) {
-      return create$1(blobToCanvas(blob), blob, url);
-    };
-
-    var ImageResult = /*#__PURE__*/Object.freeze({
-        fromBlob: fromBlob,
-        fromCanvas: fromCanvas,
-        fromImage: fromImage,
-        fromBlobAndUrlSync: fromBlobAndUrlSync
-    });
 
     function rotate(ir, angle) {
       return ir.toCanvas().then(function (canvas) {
@@ -794,9 +778,9 @@ var imagetools = (function (domGlobals) {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -1812,18 +1796,17 @@ var imagetools = (function (domGlobals) {
     };
     var ContextToolbar = { register: register$2 };
 
-    global.add('imagetools', function (editor) {
-      var imageUploadTimerState = Cell(0);
-      var lastSelectedImageState = Cell(null);
-      Commands.register(editor, imageUploadTimerState);
-      Buttons.register(editor);
-      ContextToolbar.register(editor);
-      UploadSelectedImage.setup(editor, imageUploadTimerState, lastSelectedImageState);
-    });
     function Plugin () {
+      global.add('imagetools', function (editor) {
+        var imageUploadTimerState = Cell(0);
+        var lastSelectedImageState = Cell(null);
+        Commands.register(editor, imageUploadTimerState);
+        Buttons.register(editor);
+        ContextToolbar.register(editor);
+        UploadSelectedImage.setup(editor, imageUploadTimerState, lastSelectedImageState);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();

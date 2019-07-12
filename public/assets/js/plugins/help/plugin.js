@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
 (function () {
-var help = (function () {
     'use strict';
 
     var Cell = function (initial) {
@@ -236,9 +235,9 @@ var help = (function () {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -896,19 +895,18 @@ var help = (function () {
       };
     };
 
-    global.add('help', function (editor) {
-      var customTabs = Cell({});
-      var api = get(customTabs);
-      var dialogOpener = init(editor, customTabs);
-      Buttons.register(editor, dialogOpener);
-      Commands.register(editor, dialogOpener);
-      editor.shortcuts.add('Alt+0', 'Open help dialog', 'mceHelp');
-      return api;
-    });
     function Plugin () {
+      global.add('help', function (editor) {
+        var customTabs = Cell({});
+        var api = get(customTabs);
+        var dialogOpener = init(editor, customTabs);
+        Buttons.register(editor, dialogOpener);
+        Commands.register(editor, dialogOpener);
+        editor.shortcuts.add('Alt+0', 'Open help dialog', 'mceHelp');
+        return api;
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }());
-})();

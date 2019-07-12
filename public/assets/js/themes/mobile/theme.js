@@ -4,29 +4,11 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
-(function () {
-var mobile = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
-    var extendStatics = function (d, b) {
-      extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function (d, b) {
-        d.__proto__ = b;
-      } || function (d, b) {
-        for (var p in b)
-          if (b.hasOwnProperty(p))
-            d[p] = b[p];
-      };
-      return extendStatics(d, b);
-    };
-    function __extends(d, b) {
-      extendStatics(d, b);
-      function __() {
-        this.constructor = d;
-      }
-      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    }
     var __assign = function () {
       __assign = Object.assign || function __assign(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45,334 +27,14 @@ var mobile = (function (domGlobals) {
         if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
           t[p] = s[p];
       if (s != null && typeof Object.getOwnPropertySymbols === 'function')
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++)
-          if (e.indexOf(p[i]) < 0)
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+          if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
             t[p[i]] = s[p[i]];
+        }
       return t;
     }
-    function __decorate(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-        r = Reflect.decorate(decorators, target, key, desc);
-      else
-        for (var i = decorators.length - 1; i >= 0; i--)
-          if (d = decorators[i])
-            r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    }
-    function __param(paramIndex, decorator) {
-      return function (target, key) {
-        decorator(target, key, paramIndex);
-      };
-    }
-    function __metadata(metadataKey, metadataValue) {
-      if (typeof Reflect === 'object' && typeof Reflect.metadata === 'function')
-        return Reflect.metadata(metadataKey, metadataValue);
-    }
-    function __awaiter(thisArg, _arguments, P, generator) {
-      return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator['throw'](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : new P(function (resolve) {
-            resolve(result.value);
-          }).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    }
-    function __generator(thisArg, body) {
-      var _ = {
-          label: 0,
-          sent: function () {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-      return g = {
-        next: verb(0),
-        'throw': verb(1),
-        'return': verb(2)
-      }, typeof Symbol === 'function' && (g[Symbol.iterator] = function () {
-        return this;
-      }), g;
-      function verb(n) {
-        return function (v) {
-          return step([
-            n,
-            v
-          ]);
-        };
-      }
-      function step(op) {
-        if (f)
-          throw new TypeError('Generator is already executing.');
-        while (_)
-          try {
-            if (f = 1, y && (t = op[0] & 2 ? y['return'] : op[0] ? y['throw'] || ((t = y['return']) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-              return t;
-            if (y = 0, t)
-              op = [
-                op[0] & 2,
-                t.value
-              ];
-            switch (op[0]) {
-            case 0:
-            case 1:
-              t = op;
-              break;
-            case 4:
-              _.label++;
-              return {
-                value: op[1],
-                done: false
-              };
-            case 5:
-              _.label++;
-              y = op[1];
-              op = [0];
-              continue;
-            case 7:
-              op = _.ops.pop();
-              _.trys.pop();
-              continue;
-            default:
-              if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                _ = 0;
-                continue;
-              }
-              if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                _.label = op[1];
-                break;
-              }
-              if (op[0] === 6 && _.label < t[1]) {
-                _.label = t[1];
-                t = op;
-                break;
-              }
-              if (t && _.label < t[2]) {
-                _.label = t[2];
-                _.ops.push(op);
-                break;
-              }
-              if (t[2])
-                _.ops.pop();
-              _.trys.pop();
-              continue;
-            }
-            op = body.call(thisArg, _);
-          } catch (e) {
-            op = [
-              6,
-              e
-            ];
-            y = 0;
-          } finally {
-            f = t = 0;
-          }
-        if (op[0] & 5)
-          throw op[1];
-        return {
-          value: op[0] ? op[1] : void 0,
-          done: true
-        };
-      }
-    }
-    function __exportStar(m, exports) {
-      for (var p in m)
-        if (!exports.hasOwnProperty(p))
-          exports[p] = m[p];
-    }
-    function __values(o) {
-      var m = typeof Symbol === 'function' && o[Symbol.iterator], i = 0;
-      if (m)
-        return m.call(o);
-      return {
-        next: function () {
-          if (o && i >= o.length)
-            o = void 0;
-          return {
-            value: o && o[i++],
-            done: !o
-          };
-        }
-      };
-    }
-    function __read(o, n) {
-      var m = typeof Symbol === 'function' && o[Symbol.iterator];
-      if (!m)
-        return o;
-      var i = m.call(o), r, ar = [], e;
-      try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done)
-          ar.push(r.value);
-      } catch (error) {
-        e = { error: error };
-      } finally {
-        try {
-          if (r && !r.done && (m = i['return']))
-            m.call(i);
-        } finally {
-          if (e)
-            throw e.error;
-        }
-      }
-      return ar;
-    }
-    function __spread() {
-      for (var ar = [], i = 0; i < arguments.length; i++)
-        ar = ar.concat(__read(arguments[i]));
-      return ar;
-    }
-    function __await(v) {
-      return this instanceof __await ? (this.v = v, this) : new __await(v);
-    }
-    function __asyncGenerator(thisArg, _arguments, generator) {
-      if (!Symbol.asyncIterator)
-        throw new TypeError('Symbol.asyncIterator is not defined.');
-      var g = generator.apply(thisArg, _arguments || []), i, q = [];
-      return i = {}, verb('next'), verb('throw'), verb('return'), i[Symbol.asyncIterator] = function () {
-        return this;
-      }, i;
-      function verb(n) {
-        if (g[n])
-          i[n] = function (v) {
-            return new Promise(function (a, b) {
-              q.push([
-                n,
-                v,
-                a,
-                b
-              ]) > 1 || resume(n, v);
-            });
-          };
-      }
-      function resume(n, v) {
-        try {
-          step(g[n](v));
-        } catch (e) {
-          settle(q[0][3], e);
-        }
-      }
-      function step(r) {
-        r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
-      }
-      function fulfill(value) {
-        resume('next', value);
-      }
-      function reject(value) {
-        resume('throw', value);
-      }
-      function settle(f, v) {
-        if (f(v), q.shift(), q.length)
-          resume(q[0][0], q[0][1]);
-      }
-    }
-    function __asyncDelegator(o) {
-      var i, p;
-      return i = {}, verb('next'), verb('throw', function (e) {
-        throw e;
-      }), verb('return'), i[Symbol.iterator] = function () {
-        return this;
-      }, i;
-      function verb(n, f) {
-        i[n] = o[n] ? function (v) {
-          return (p = !p) ? {
-            value: __await(o[n](v)),
-            done: n === 'return'
-          } : f ? f(v) : v;
-        } : f;
-      }
-    }
-    function __asyncValues(o) {
-      if (!Symbol.asyncIterator)
-        throw new TypeError('Symbol.asyncIterator is not defined.');
-      var m = o[Symbol.asyncIterator], i;
-      return m ? m.call(o) : (o = typeof __values === 'function' ? __values(o) : o[Symbol.iterator](), i = {}, verb('next'), verb('throw'), verb('return'), i[Symbol.asyncIterator] = function () {
-        return this;
-      }, i);
-      function verb(n) {
-        i[n] = o[n] && function (v) {
-          return new Promise(function (resolve, reject) {
-            v = o[n](v), settle(resolve, reject, v.done, v.value);
-          });
-        };
-      }
-      function settle(resolve, reject, d, v) {
-        Promise.resolve(v).then(function (v) {
-          resolve({
-            value: v,
-            done: d
-          });
-        }, reject);
-      }
-    }
-    function __makeTemplateObject(cooked, raw) {
-      if (Object.defineProperty) {
-        Object.defineProperty(cooked, 'raw', { value: raw });
-      } else {
-        cooked.raw = raw;
-      }
-      return cooked;
-    }
-    function __importStar(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null)
-        for (var k in mod)
-          if (Object.hasOwnProperty.call(mod, k))
-            result[k] = mod[k];
-      result.default = mod;
-      return result;
-    }
-    function __importDefault(mod) {
-      return mod && mod.__esModule ? mod : { default: mod };
-    }
-
-    var tslib_1 = /*#__PURE__*/Object.freeze({
-        __extends: __extends,
-        get __assign () { return __assign; },
-        __rest: __rest,
-        __decorate: __decorate,
-        __param: __param,
-        __metadata: __metadata,
-        __awaiter: __awaiter,
-        __generator: __generator,
-        __exportStar: __exportStar,
-        __values: __values,
-        __read: __read,
-        __spread: __spread,
-        __await: __await,
-        __asyncGenerator: __asyncGenerator,
-        __asyncDelegator: __asyncDelegator,
-        __asyncValues: __asyncValues,
-        __makeTemplateObject: __makeTemplateObject,
-        __importStar: __importStar,
-        __importDefault: __importDefault
-    });
 
     var noop = function () {
-    };
-    var noarg = function (f) {
-      return function () {
-        return f();
-      };
     };
     var compose = function (fa, fb) {
       return function () {
@@ -390,9 +52,6 @@ var mobile = (function (domGlobals) {
     };
     var identity = function (x) {
       return x;
-    };
-    var tripleEquals = function (a, b) {
-      return a === b;
     };
     function curry(fn) {
       var initialArgs = [];
@@ -425,27 +84,8 @@ var mobile = (function (domGlobals) {
     var apply = function (f) {
       return f();
     };
-    var call = function (f) {
-      f();
-    };
     var never = constant(false);
     var always = constant(true);
-
-    var Fun = /*#__PURE__*/Object.freeze({
-        noop: noop,
-        noarg: noarg,
-        compose: compose,
-        constant: constant,
-        identity: identity,
-        tripleEquals: tripleEquals,
-        curry: curry,
-        not: not,
-        die: die,
-        apply: apply,
-        call: call,
-        never: never,
-        always: always
-    });
 
     var never$1 = never;
     var always$1 = always;
@@ -602,18 +242,6 @@ var mobile = (function (domGlobals) {
       });
       return r;
     };
-    var bifilter = function (obj, pred) {
-      var t = {};
-      var f = {};
-      each(obj, function (x, i) {
-        var branch = pred(x, i) ? t : f;
-        branch[i] = x;
-      });
-      return {
-        t: t,
-        f: f
-      };
-    };
     var mapToArray = function (obj, f) {
       var r = [];
       each(obj, function (value, name) {
@@ -621,46 +249,9 @@ var mobile = (function (domGlobals) {
       });
       return r;
     };
-    var find = function (obj, pred) {
-      var props = keys(obj);
-      for (var k = 0, len = props.length; k < len; k++) {
-        var i = props[k];
-        var x = obj[i];
-        if (pred(x, i, obj)) {
-          return Option.some(x);
-        }
-      }
-      return Option.none();
-    };
-    var values = function (obj) {
-      return mapToArray(obj, function (v) {
-        return v;
-      });
-    };
-    var size = function (obj) {
-      return keys(obj).length;
-    };
-    var get = function (obj, key) {
-      return has(obj, key) ? Option.from(obj[key]) : Option.none();
-    };
     var has = function (obj, key) {
       return hasOwnProperty.call(obj, key);
     };
-
-    var Obj = /*#__PURE__*/Object.freeze({
-        keys: keys,
-        hasOwnProperty: hasOwnProperty,
-        each: each,
-        map: map,
-        tupleMap: tupleMap,
-        bifilter: bifilter,
-        mapToArray: mapToArray,
-        find: find,
-        values: values,
-        size: size,
-        get: get,
-        has: has
-    });
 
     var touchstart = constant('touchstart');
     var touchmove = constant('touchmove');
@@ -701,7 +292,7 @@ var mobile = (function (domGlobals) {
       }
       return undefined;
     };
-    var find$1 = function (regexes, agent) {
+    var find = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
       if (!r)
         return {
@@ -717,7 +308,7 @@ var mobile = (function (domGlobals) {
       var cleanedAgent = String(agent).toLowerCase();
       if (versionRegexes.length === 0)
         return unknown();
-      return find$1(versionRegexes, cleanedAgent);
+      return find(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
       return nu(0, 0);
@@ -846,9 +437,9 @@ var mobile = (function (domGlobals) {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -860,22 +451,9 @@ var mobile = (function (domGlobals) {
     var isString = isType('string');
     var isObject = isType('object');
     var isArray = isType('array');
-    var isNull = isType('null');
     var isBoolean = isType('boolean');
-    var isUndefined = isType('undefined');
     var isFunction = isType('function');
     var isNumber = isType('number');
-
-    var Type = /*#__PURE__*/Object.freeze({
-        isString: isString,
-        isObject: isObject,
-        isArray: isArray,
-        isNull: isNull,
-        isBoolean: isBoolean,
-        isUndefined: isUndefined,
-        isFunction: isFunction,
-        isNumber: isNumber
-    });
 
     var slice = Array.prototype.slice;
     var rawIndexOf = function () {
@@ -888,30 +466,11 @@ var mobile = (function (domGlobals) {
       };
       return pIndexOf === undefined ? slowIndex : fastIndex;
     }();
-    var indexOf = function (xs, x) {
-      var r = rawIndexOf(xs, x);
-      return r === -1 ? Option.none() : Option.some(r);
-    };
     var contains = function (xs, x) {
       return rawIndexOf(xs, x) > -1;
     };
     var exists = function (xs, pred) {
       return findIndex(xs, pred).isSome();
-    };
-    var range = function (num, f) {
-      var r = [];
-      for (var i = 0; i < num; i++) {
-        r.push(f(i));
-      }
-      return r;
-    };
-    var chunk = function (array, size) {
-      var r = [];
-      for (var i = 0; i < array.length; i += size) {
-        var s = slice.call(array, i, i + size);
-        r.push(s);
-      }
-      return r;
     };
     var map$1 = function (xs, f) {
       var len = xs.length;
@@ -934,19 +493,6 @@ var mobile = (function (domGlobals) {
         f(x, i, xs);
       }
     };
-    var partition = function (xs, pred) {
-      var pass = [];
-      var fail = [];
-      for (var i = 0, len = xs.length; i < len; i++) {
-        var x = xs[i];
-        var arr = pred(x, i, xs) ? pass : fail;
-        arr.push(x);
-      }
-      return {
-        pass: pass,
-        fail: fail
-      };
-    };
     var filter = function (xs, pred) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; i++) {
@@ -956,29 +502,6 @@ var mobile = (function (domGlobals) {
         }
       }
       return r;
-    };
-    var groupBy = function (xs, f) {
-      if (xs.length === 0) {
-        return [];
-      } else {
-        var wasType = f(xs[0]);
-        var r = [];
-        var group = [];
-        for (var i = 0, len = xs.length; i < len; i++) {
-          var x = xs[i];
-          var type = f(x);
-          if (type !== wasType) {
-            r.push(group);
-            group = [];
-          }
-          wasType = type;
-          group.push(x);
-        }
-        if (group.length !== 0) {
-          r.push(group);
-        }
-        return r;
-      }
     };
     var foldr = function (xs, f, acc) {
       eachr(xs, function (x) {
@@ -992,7 +515,7 @@ var mobile = (function (domGlobals) {
       });
       return acc;
     };
-    var find$2 = function (xs, pred) {
+    var find$1 = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
         if (pred(x, i, xs)) {
@@ -1041,11 +564,6 @@ var mobile = (function (domGlobals) {
       }
       return true;
     };
-    var equal = function (a1, a2) {
-      return a1.length === a2.length && forall(a1, function (x, i) {
-        return x === a2[i];
-      });
-    };
     var reverse = function (xs) {
       var r = slice.call(xs, 0);
       r.reverse();
@@ -1056,65 +574,16 @@ var mobile = (function (domGlobals) {
         return !contains(a2, x);
       });
     };
-    var mapToObject = function (xs, f) {
-      var r = {};
-      for (var i = 0, len = xs.length; i < len; i++) {
-        var x = xs[i];
-        r[String(x)] = f(x, i);
-      }
-      return r;
-    };
     var pure = function (x) {
       return [x];
-    };
-    var sort = function (xs, comparator) {
-      var copy = slice.call(xs, 0);
-      copy.sort(comparator);
-      return copy;
-    };
-    var head = function (xs) {
-      return xs.length === 0 ? Option.none() : Option.some(xs[0]);
-    };
-    var last = function (xs) {
-      return xs.length === 0 ? Option.none() : Option.some(xs[xs.length - 1]);
     };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
 
-    var Arr = /*#__PURE__*/Object.freeze({
-        indexOf: indexOf,
-        contains: contains,
-        exists: exists,
-        range: range,
-        chunk: chunk,
-        map: map$1,
-        each: each$1,
-        eachr: eachr,
-        partition: partition,
-        filter: filter,
-        groupBy: groupBy,
-        foldr: foldr,
-        foldl: foldl,
-        find: find$2,
-        findIndex: findIndex,
-        flatten: flatten,
-        bind: bind,
-        forall: forall,
-        equal: equal,
-        reverse: reverse,
-        difference: difference,
-        mapToObject: mapToObject,
-        pure: pure,
-        sort: sort,
-        head: head,
-        last: last,
-        from: from$1
-    });
-
     var detect$1 = function (candidates, userAgent) {
       var agent = String(userAgent).toLowerCase();
-      return find$2(candidates, function (candidate) {
+      return find$1(candidates, function (candidate) {
         return candidate.search(agent);
       });
     };
@@ -1394,30 +863,13 @@ var mobile = (function (domGlobals) {
     var type = function (element) {
       return element.dom().nodeType;
     };
-    var value = function (element) {
-      return element.dom().nodeValue;
-    };
     var isType$1 = function (t) {
       return function (element) {
         return type(element) === t;
       };
     };
-    var isComment = function (element) {
-      return type(element) === COMMENT || name(element) === '#comment';
-    };
     var isElement = isType$1(ELEMENT);
     var isText = isType$1(TEXT);
-    var isDocument = isType$1(DOCUMENT);
-
-    var Node = /*#__PURE__*/Object.freeze({
-        name: name,
-        type: type,
-        value: value,
-        isElement: isElement,
-        isText: isText,
-        isDocument: isDocument,
-        isComment: isComment
-    });
 
     var inBody = function (element) {
       var dom = isText(element) ? element.dom().parentNode : element.dom();
@@ -1455,14 +907,14 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    var sort$1 = function (arr) {
+    var sort = function (arr) {
       return arr.slice(0).sort();
     };
     var reqMessage = function (required, keys) {
-      throw new Error('All required keys (' + sort$1(required).join(', ') + ') were not specified. Specified keys were: ' + sort$1(keys).join(', ') + '.');
+      throw new Error('All required keys (' + sort(required).join(', ') + ') were not specified. Specified keys were: ' + sort(keys).join(', ') + '.');
     };
     var unsuppMessage = function (unsupported) {
-      throw new Error('Unsupported keys for object: ' + sort$1(unsupported).join(', '));
+      throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
     };
     var validateStrArr = function (label, array) {
       if (!isArray(array))
@@ -1473,8 +925,8 @@ var mobile = (function (domGlobals) {
       });
     };
     var checkDupes = function (everything) {
-      var sorted = sort$1(everything);
-      var dupe = find$2(sorted, function (s, i) {
+      var sorted = sort(everything);
+      var dupe = find$1(sorted, function (s, i) {
         return i < sorted.length - 1 && s === sorted[i + 1];
       });
       dupe.each(function (d) {
@@ -1549,7 +1001,7 @@ var mobile = (function (domGlobals) {
     var documentPositionContainedBy = function (a, b) {
       return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
     };
-    var Node$1 = {
+    var Node = {
       documentPositionPreceding: documentPositionPreceding,
       documentPositionContainedBy: documentPositionContainedBy
     };
@@ -1593,13 +1045,18 @@ var mobile = (function (domGlobals) {
       return d1 === d2 ? false : d1.contains(d2);
     };
     var ieContains = function (e1, e2) {
-      return Node$1.documentPositionContainedBy(e1.dom(), e2.dom());
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
     };
     var browser = PlatformDetection$1.detect().browser;
     var contains$2 = browser.isIE() ? ieContains : regularContains;
 
     var owner = function (element) {
       return Element.fromDom(element.dom().ownerDocument);
+    };
+    var defaultView = function (element) {
+      var el = element.dom();
+      var defView = el.ownerDocument.defaultView;
+      return Element.fromDom(defView);
     };
     var parent = function (element) {
       var dom = element.dom();
@@ -1760,21 +1217,21 @@ var mobile = (function (domGlobals) {
       remove(guiSystem.element());
     };
 
-    var value$1 = function (o) {
+    var value = function (o) {
       var is = function (v) {
         return o === v;
       };
       var or = function (opt) {
-        return value$1(o);
+        return value(o);
       };
       var orThunk = function (f) {
-        return value$1(o);
+        return value(o);
       };
       var map = function (f) {
-        return value$1(f(o));
+        return value(f(o));
       };
       var mapError = function (f) {
-        return value$1(o);
+        return value(o);
       };
       var each = function (f) {
         f(o);
@@ -1860,10 +1317,10 @@ var mobile = (function (domGlobals) {
     var fromOption = function (opt, err) {
       return opt.fold(function () {
         return error(err);
-      }, value$1);
+      }, value);
     };
     var Result = {
-      value: value$1,
+      value: value,
       error: error,
       fromOption: fromOption
     };
@@ -2048,7 +1505,7 @@ var mobile = (function (domGlobals) {
         ]
       }
     ]);
-    var partition$1 = function (results) {
+    var partition = function (results) {
       var errors = [];
       var values = [];
       each$1(results, function (result) {
@@ -2089,7 +1546,7 @@ var mobile = (function (domGlobals) {
       return compose(Result.error, flatten)(errors);
     };
     var consolidate = function (objs, base) {
-      var partitions = partition$1(objs);
+      var partitions = partition(objs);
       return partitions.errors.length > 0 ? mergeErrors(partitions.errors) : mergeValues(partitions.values, base);
     };
     var hasKey$1 = function (obj, key) {
@@ -2104,7 +1561,7 @@ var mobile = (function (domGlobals) {
     var fold = function (res, onError, onValue) {
       return res.stype === SimpleResultType.Error ? onError(res.serror) : onValue(res.svalue);
     };
-    var partition$2 = function (results) {
+    var partition$1 = function (results) {
       var values = [];
       var errors = [];
       each$1(results, function (obj) {
@@ -2175,7 +1632,7 @@ var mobile = (function (domGlobals) {
       fromResult: fromResult,
       toResult: toResult,
       svalue: svalue,
-      partition: partition$2,
+      partition: partition$1,
       serror: serror,
       bind: bind$1,
       bindError: bindError,
@@ -2382,7 +1839,7 @@ var mobile = (function (domGlobals) {
       });
       return ResultCombine.consolidateObj(results, {});
     };
-    var value$2 = function (validator) {
+    var value$1 = function (validator) {
       var extract = function (path, strength, val) {
         return SimpleResult.bindError(validator(val, strength), function (err) {
           return custom(path, err);
@@ -2476,7 +1933,7 @@ var mobile = (function (domGlobals) {
     };
     var setOf = function (validator, prop) {
       var validateKeys = function (path, keys) {
-        return arrOf(value$2(validator)).extract(path, identity, keys);
+        return arrOf(value$1(validator)).extract(path, identity, keys);
       };
       var extract = function (path, strength, o) {
         var keys$1 = keys(o);
@@ -2500,7 +1957,7 @@ var mobile = (function (domGlobals) {
         toDsl: toDsl
       };
     };
-    var anyValue = constant(value$2(SimpleResult.svalue));
+    var anyValue = constant(value$1(SimpleResult.svalue));
     var state = adt$1.state;
     var field = adt$1.field;
 
@@ -2534,9 +1991,9 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    var _anyValue = value$2(SimpleResult.svalue);
+    var _anyValue = value$1(SimpleResult.svalue);
     var valueOf = function (validator) {
-      return value$2(function (v) {
+      return value$1(function (v) {
         return validator(v).fold(SimpleResult.serror, SimpleResult.svalue);
       });
     };
@@ -2573,7 +2030,7 @@ var mobile = (function (domGlobals) {
     };
     var anyValue$1 = constant(_anyValue);
     var typedValue = function (validator, expectedType) {
-      return value$2(function (a) {
+      return value$1(function (a) {
         var actualType = typeof a;
         return validator(a) ? SimpleResult.svalue(a) : SimpleResult.serror('Expected type: ' + expectedType + ' but got: ' + actualType);
       });
@@ -2590,7 +2047,7 @@ var mobile = (function (domGlobals) {
       return strictOf(key, functionProcessor);
     };
     var forbid = function (key, message) {
-      return field(key, key, asOption(), value$2(function (v) {
+      return field(key, key, asOption(), value$1(function (v) {
         return SimpleResult.serror('The field: ' + key + ' is forbidden. ' + message);
       }));
     };
@@ -2712,19 +2169,6 @@ var mobile = (function (domGlobals) {
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
     };
-    var sibling = function (scope, predicate) {
-      var element = scope.dom();
-      if (!element.parentNode) {
-        return Option.none();
-      }
-      return child$1(Element.fromDom(element.parentNode), function (x) {
-        return !eq(scope, x) && predicate(x);
-      });
-    };
-    var child$1 = function (scope, predicate) {
-      var result = find$2(scope.dom().childNodes, compose(predicate, Element.fromDom));
-      return result.map(Element.fromDom);
-    };
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
@@ -2761,16 +2205,6 @@ var mobile = (function (domGlobals) {
       return {
         key: name,
         value: nu$4({ can: predicate })
-      };
-    };
-    var preventDefault = function (name) {
-      return {
-        key: name,
-        value: nu$4({
-          run: function (component, simulatedEvent) {
-            simulatedEvent.event().prevent();
-          }
-        })
       };
     };
     var run = function (name, handler) {
@@ -2819,20 +2253,6 @@ var mobile = (function (domGlobals) {
       var uid = detail.partUids[partName];
       return redirectToUid(name, uid);
     };
-    var runWithTarget = function (name, f) {
-      return run(name, function (component, simulatedEvent) {
-        var ev = simulatedEvent.event();
-        var target = component.getSystem().getByDom(ev.target()).fold(function () {
-          var closest = closest$1(ev.target(), function (el) {
-            return component.getSystem().getByDom(el).toOption();
-          }, constant(false));
-          return closest.getOr(component);
-        }, function (c) {
-          return c;
-        });
-        f(component, target, simulatedEvent);
-      });
-    };
     var cutter = function (name) {
       return run(name, function (component, simulatedEvent) {
         simulatedEvent.cut();
@@ -2850,25 +2270,6 @@ var mobile = (function (domGlobals) {
     var runOnDetached = runOnSourceName(detachedFromDom());
     var runOnInit = runOnSourceName(systemInit());
     var runOnExecute = runOnName(execute());
-
-    var AlloyEvents = /*#__PURE__*/Object.freeze({
-        derive: derive,
-        run: run,
-        preventDefault: preventDefault,
-        runActionExtra: runActionExtra,
-        runOnAttached: runOnAttached,
-        runOnDetached: runOnDetached,
-        runOnSource: runOnSource,
-        runOnInit: runOnInit,
-        runOnExecute: runOnExecute,
-        redirectToUid: redirectToUid,
-        redirectToPart: redirectToPart,
-        runWithTarget: runWithTarget,
-        abort: abort,
-        can: can,
-        cutter: cutter,
-        stopper: stopper
-    });
 
     var markAsBehaviourApi = function (f, apiName, apiFunction) {
       var delegate = apiFunction.toString();
@@ -3070,44 +2471,6 @@ var mobile = (function (domGlobals) {
       return createModes(choose$1(value.branchKey, value.branches), value.name, value.active, value.apis, value.extra, value.state);
     };
     var revoke = constant(undefined);
-    var noActive = constant({});
-    var noApis = constant({});
-    var noExtra = constant({});
-
-    var Behaviour = /*#__PURE__*/Object.freeze({
-        derive: derive$1,
-        revoke: revoke,
-        noActive: noActive,
-        noApis: noApis,
-        noExtra: noExtra,
-        create: create$1,
-        createModes: createModes$1
-    });
-
-    function Toggler (turnOff, turnOn, initial) {
-      var active = initial || false;
-      var on = function () {
-        turnOn();
-        active = true;
-      };
-      var off = function () {
-        turnOff();
-        active = false;
-      };
-      var toggle = function () {
-        var f = active ? off : on;
-        f();
-      };
-      var isOn = function () {
-        return active;
-      };
-      return {
-        on: on,
-        off: off,
-        toggle: toggle,
-        isOn: isOn
-      };
-    }
 
     var rawSet = function (dom, key, value) {
       if (isString(value) || isBoolean(value) || isNumber(value)) {
@@ -3126,12 +2489,9 @@ var mobile = (function (domGlobals) {
         rawSet(dom, k, v);
       });
     };
-    var get$1 = function (element, key) {
+    var get = function (element, key) {
       var v = element.dom().getAttribute(key);
       return v === null ? undefined : v;
-    };
-    var getOpt = function (element, key) {
-      return Option.from(get$1(element, key));
     };
     var has$1 = function (element, key) {
       var dom = element.dom();
@@ -3140,44 +2500,9 @@ var mobile = (function (domGlobals) {
     var remove$1 = function (element, key) {
       element.dom().removeAttribute(key);
     };
-    var hasNone = function (element) {
-      var attrs = element.dom().attributes;
-      return attrs === undefined || attrs === null || attrs.length === 0;
-    };
-    var clone = function (element) {
-      return foldl(element.dom().attributes, function (acc, attr) {
-        acc[attr.name] = attr.value;
-        return acc;
-      }, {});
-    };
-    var transferOne = function (source, destination, attr) {
-      if (has$1(source, attr) && !has$1(destination, attr)) {
-        set(destination, attr, get$1(source, attr));
-      }
-    };
-    var transfer = function (source, destination, attrs) {
-      if (!isElement(source) || !isElement(destination)) {
-        return;
-      }
-      each$1(attrs, function (attr) {
-        transferOne(source, destination, attr);
-      });
-    };
-
-    var Attr = /*#__PURE__*/Object.freeze({
-        clone: clone,
-        set: set,
-        setAll: setAll,
-        get: get$1,
-        getOpt: getOpt,
-        has: has$1,
-        remove: remove$1,
-        hasNone: hasNone,
-        transfer: transfer
-    });
 
     var read$1 = function (element, attr) {
-      var value = get$1(element, attr);
+      var value = get(element, attr);
       return value === undefined || value === '' ? [] : value.split(' ');
     };
     var add = function (element, attr, id) {
@@ -3201,7 +2526,7 @@ var mobile = (function (domGlobals) {
     var supports = function (element) {
       return element.dom().classList !== undefined;
     };
-    var get$2 = function (element) {
+    var get$1 = function (element) {
       return read$1(element, 'class');
     };
     var add$1 = function (element, clazz) {
@@ -3210,21 +2535,6 @@ var mobile = (function (domGlobals) {
     var remove$3 = function (element, clazz) {
       return remove$2(element, 'class', clazz);
     };
-    var toggle = function (element, clazz) {
-      if (contains(get$2(element), clazz)) {
-        return remove$3(element, clazz);
-      } else {
-        return add$1(element, clazz);
-      }
-    };
-
-    var ClassList = /*#__PURE__*/Object.freeze({
-        get: get$2,
-        add: add$1,
-        remove: remove$3,
-        toggle: toggle,
-        supports: supports
-    });
 
     var add$2 = function (element, clazz) {
       if (supports(element)) {
@@ -3234,7 +2544,7 @@ var mobile = (function (domGlobals) {
       }
     };
     var cleanClass = function (element) {
-      var classList = supports(element) ? element.dom().classList : get$2(element);
+      var classList = supports(element) ? element.dom().classList : get$1(element);
       if (classList.length === 0) {
         remove$1(element, 'class');
       }
@@ -3248,39 +2558,9 @@ var mobile = (function (domGlobals) {
       }
       cleanClass(element);
     };
-    var toggle$1 = function (element, clazz) {
-      return supports(element) ? element.dom().classList.toggle(clazz) : toggle(element, clazz);
-    };
-    var toggler = function (element, clazz) {
-      var hasClasslist = supports(element);
-      var classList = element.dom().classList;
-      var off = function () {
-        if (hasClasslist) {
-          classList.remove(clazz);
-        } else {
-          remove$3(element, clazz);
-        }
-      };
-      var on = function () {
-        if (hasClasslist) {
-          classList.add(clazz);
-        } else {
-          add$1(element, clazz);
-        }
-      };
-      return Toggler(off, on, has$2(element, clazz));
-    };
     var has$2 = function (element, clazz) {
       return supports(element) && element.dom().classList.contains(clazz);
     };
-
-    var Class = /*#__PURE__*/Object.freeze({
-        add: add$2,
-        remove: remove$4,
-        toggle: toggle$1,
-        toggler: toggler,
-        has: has$2
-    });
 
     var swap = function (element, addCls, removeCls) {
       remove$4(element, removeCls);
@@ -3400,7 +2680,7 @@ var mobile = (function (domGlobals) {
       return children(Element.fromDom(div));
     };
 
-    var get$3 = function (element) {
+    var get$2 = function (element) {
       return element.dom().innerHTML;
     };
     var set$1 = function (element, content) {
@@ -3416,14 +2696,14 @@ var mobile = (function (domGlobals) {
       var container = Element.fromTag('div');
       var clone = Element.fromDom(element.dom().cloneNode(true));
       append(container, clone);
-      return get$3(container);
+      return get$2(container);
     };
 
-    var clone$1 = function (original, isDeep) {
+    var clone = function (original, isDeep) {
       return Element.fromDom(original.dom().cloneNode(isDeep));
     };
     var shallow$1 = function (original) {
-      return clone$1(original, false);
+      return clone(original, false);
     };
 
     var getHtml = function (element) {
@@ -3477,33 +2757,6 @@ var mobile = (function (domGlobals) {
       }
       return Option.none();
     };
-    var liftN = function (arr, f) {
-      var r = [];
-      for (var i = 0; i < arr.length; i++) {
-        var x = arr[i];
-        if (x.isSome()) {
-          r.push(x.getOrDie());
-        } else {
-          return Option.none();
-        }
-      }
-      return Option.some(f.apply(null, r));
-    };
-    function lift() {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
-      var f = args.pop();
-      return liftN(args, f);
-    }
-
-    var Options = /*#__PURE__*/Object.freeze({
-        cat: cat,
-        findMap: findMap,
-        liftN: liftN,
-        lift: lift
-    });
 
     var unknown$3 = 'unknown';
     var EventConfiguration;
@@ -3608,7 +2861,7 @@ var mobile = (function (domGlobals) {
       var err = new Error();
       if (err.stack !== undefined) {
         var lines = err.stack.split('\n');
-        return find$2(lines, function (line) {
+        return find$1(lines, function (line) {
           return line.indexOf('alloy') > 0 && !exists(path$1, function (p) {
             return line.indexOf(p) > -1;
           });
@@ -3710,7 +2963,7 @@ var mobile = (function (domGlobals) {
         }
       });
     };
-    var toggle$2 = function (component, toggleConfig, toggleState) {
+    var toggle = function (component, toggleConfig, toggleState) {
       set$2(component, toggleConfig, toggleState, !toggleState.get());
     };
     var on = function (component, toggleConfig, toggleState) {
@@ -3736,7 +2989,7 @@ var mobile = (function (domGlobals) {
 
     var ToggleApis = /*#__PURE__*/Object.freeze({
         onLoad: onLoad,
-        toggle: toggle$2,
+        toggle: toggle,
         isOn: isOn,
         on: on,
         off: off,
@@ -3747,7 +3000,7 @@ var mobile = (function (domGlobals) {
       return nu$5({});
     };
     var events$1 = function (toggleConfig, toggleState) {
-      var execute = executeEvent(toggleConfig, toggleState, toggle$2);
+      var execute = executeEvent(toggleConfig, toggleState, toggle);
       var load = loadEvent(toggleConfig, toggleState, onLoad);
       return derive(flatten([
         toggleConfig.toggleOnExecute ? [execute] : [],
@@ -3937,7 +3190,7 @@ var mobile = (function (domGlobals) {
     });
 
     var isSupported = function (dom) {
-      return dom.style !== undefined;
+      return dom.style !== undefined && isFunction(dom.style.getPropertyValue);
     };
 
     var internalSet = function (dom, property, value) {
@@ -3964,17 +3217,7 @@ var mobile = (function (domGlobals) {
         internalSet(dom, k, v);
       });
     };
-    var setOptions = function (element, css) {
-      var dom = element.dom();
-      each(css, function (v, k) {
-        v.fold(function () {
-          internalRemove(dom, k);
-        }, function (value) {
-          internalSet(dom, k, value);
-        });
-      });
-    };
-    var get$4 = function (element, property) {
+    var get$3 = function (element, property) {
       var dom = element.dom();
       var styles = domGlobals.window.getComputedStyle(dom);
       var r = styles.getPropertyValue(property);
@@ -3991,77 +3234,16 @@ var mobile = (function (domGlobals) {
         return r.length > 0;
       });
     };
-    var getAllRaw = function (element) {
-      var css = {};
-      var dom = element.dom();
-      if (isSupported(dom)) {
-        for (var i = 0; i < dom.style.length; i++) {
-          var ruleName = dom.style.item(i);
-          css[ruleName] = dom.style[ruleName];
-        }
-      }
-      return css;
-    };
-    var isValidValue = function (tag, property, value) {
-      var element = Element.fromTag(tag);
-      set$3(element, property, value);
-      var style = getRaw(element, property);
-      return style.isSome();
-    };
     var remove$5 = function (element, property) {
       var dom = element.dom();
       internalRemove(dom, property);
-      if (has$1(element, 'style') && trim(get$1(element, 'style')) === '') {
+      if (has$1(element, 'style') && trim(get(element, 'style')) === '') {
         remove$1(element, 'style');
-      }
-    };
-    var preserve = function (element, f) {
-      var oldStyles = get$1(element, 'style');
-      var result = f(element);
-      var restore = oldStyles === undefined ? remove$1 : set;
-      restore(element, 'style', oldStyles);
-      return result;
-    };
-    var copy = function (source, target) {
-      var sourceDom = source.dom();
-      var targetDom = target.dom();
-      if (isSupported(sourceDom) && isSupported(targetDom)) {
-        targetDom.style.cssText = sourceDom.style.cssText;
       }
     };
     var reflow = function (e) {
       return e.dom().offsetWidth;
     };
-    var transferOne$1 = function (source, destination, style) {
-      getRaw(source, style).each(function (value) {
-        if (getRaw(destination, style).isNone()) {
-          set$3(destination, style, value);
-        }
-      });
-    };
-    var transfer$1 = function (source, destination, styles) {
-      if (!isElement(source) || !isElement(destination)) {
-        return;
-      }
-      each$1(styles, function (style) {
-        transferOne$1(source, destination, style);
-      });
-    };
-
-    var Css = /*#__PURE__*/Object.freeze({
-        copy: copy,
-        set: set$3,
-        preserve: preserve,
-        setAll: setAll$1,
-        setOptions: setOptions,
-        remove: remove$5,
-        get: get$4,
-        getRaw: getRaw,
-        getAllRaw: getAllRaw,
-        isValidValue: isValidValue,
-        reflow: reflow,
-        transfer: transfer$1
-    });
 
     function Dimension (name, getOffset) {
       var set = function (element, h) {
@@ -4076,7 +3258,7 @@ var mobile = (function (domGlobals) {
       var get = function (element) {
         var r = getOffset(element);
         if (r <= 0 || r === null) {
-          var css = get$4(element, name);
+          var css = get$3(element, name);
           return parseFloat(css) || 0;
         }
         return r;
@@ -4084,7 +3266,7 @@ var mobile = (function (domGlobals) {
       var getOuter = get;
       var aggregate = function (element, properties) {
         return foldl(properties, function (acc, property) {
-          var val = get$4(element, property);
+          var val = get$3(element, property);
           var value = val === undefined ? 0 : parseInt(val, 10);
           return isNaN(value) ? acc : acc + value;
         }, 0);
@@ -4107,7 +3289,7 @@ var mobile = (function (domGlobals) {
       var dom = element.dom();
       return inBody(element) ? dom.getBoundingClientRect().height : dom.offsetHeight;
     });
-    var get$5 = function (element) {
+    var get$4 = function (element) {
       return api.get(element);
     };
 
@@ -4116,9 +3298,6 @@ var mobile = (function (domGlobals) {
     };
     var siblings$1 = function (scope, predicate) {
       return filter(siblings(scope), predicate);
-    };
-    var children$1 = function (scope, predicate) {
-      return filter(children(scope), predicate);
     };
 
     var all$2 = function (selector) {
@@ -4134,22 +3313,9 @@ var mobile = (function (domGlobals) {
         return is(e, selector);
       });
     };
-    var children$2 = function (scope, selector) {
-      return children$1(scope, function (e) {
-        return is(e, selector);
-      });
-    };
     var descendants = function (scope, selector) {
       return all(selector, scope);
     };
-
-    var SelectorFilter = /*#__PURE__*/Object.freeze({
-        all: all$2,
-        ancestors: ancestors$1,
-        siblings: siblings$2,
-        children: children$2,
-        descendants: descendants
-    });
 
     var first = function (selector) {
       return one(selector);
@@ -4159,31 +3325,12 @@ var mobile = (function (domGlobals) {
         return is(e, selector);
       }, isRoot);
     };
-    var sibling$1 = function (scope, selector) {
-      return sibling(scope, function (e) {
-        return is(e, selector);
-      });
-    };
-    var child$2 = function (scope, selector) {
-      return child$1(scope, function (e) {
-        return is(e, selector);
-      });
-    };
     var descendant$1 = function (scope, selector) {
       return one(selector, scope);
     };
     var closest$2 = function (scope, selector, isRoot) {
       return ClosestOrAncestor(is, ancestor$1, scope, selector, isRoot);
     };
-
-    var SelectorFind = /*#__PURE__*/Object.freeze({
-        first: first,
-        ancestor: ancestor$1,
-        sibling: sibling$1,
-        child: child$2,
-        descendant: descendant$1,
-        closest: closest$2
-    });
 
     var BACKSPACE = function () {
       return [8];
@@ -4216,20 +3363,20 @@ var mobile = (function (domGlobals) {
     var cyclePrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
       var after = reverse(values.slice(index + 1));
-      return find$2(before.concat(after), predicate);
+      return find$1(before.concat(after), predicate);
     };
     var tryPrev = function (values, index, predicate) {
       var before = reverse(values.slice(0, index));
-      return find$2(before, predicate);
+      return find$1(before, predicate);
     };
     var cycleNext = function (values, index, predicate) {
       var before = values.slice(0, index);
       var after = values.slice(index + 1);
-      return find$2(after.concat(before), predicate);
+      return find$1(after.concat(before), predicate);
     };
     var tryNext = function (values, index, predicate) {
       var after = values.slice(index + 1);
-      return find$2(after, predicate);
+      return find$1(after, predicate);
     };
 
     var inSet = function (keys) {
@@ -4245,12 +3392,6 @@ var mobile = (function (domGlobals) {
         });
       };
     };
-    var is$1 = function (key) {
-      return function (event) {
-        var raw = event.raw();
-        return raw.which === key;
-      };
-    };
     var isShift = function (event) {
       var raw = event.raw();
       return raw.shiftKey === true;
@@ -4261,12 +3402,6 @@ var mobile = (function (domGlobals) {
     };
     var isNotShift = not(isShift);
 
-    var basic = function (key, action) {
-      return {
-        matches: is$1(key),
-        classification: action
-      };
-    };
     var rule = function (matches, action) {
       return {
         matches: matches,
@@ -4274,19 +3409,13 @@ var mobile = (function (domGlobals) {
       };
     };
     var choose$2 = function (transitions, event) {
-      var transition = find$2(transitions, function (t) {
+      var transition = find$1(transitions, function (t) {
         return t.matches(event);
       });
       return transition.map(function (t) {
         return t.classification;
       });
     };
-
-    var KeyRules = /*#__PURE__*/Object.freeze({
-        basic: basic,
-        rule: rule,
-        choose: choose$2
-    });
 
     var cycleBy = function (value, delta, min, max) {
       var r = value + delta;
@@ -4337,12 +3466,12 @@ var mobile = (function (domGlobals) {
       }
     };
     var highlightFirst = function (component, hConfig, hState) {
-      getFirst(component, hConfig, hState).each(function (firstComp) {
+      getFirst(component, hConfig).each(function (firstComp) {
         highlight$1(component, hConfig, hState, firstComp);
       });
     };
     var highlightLast = function (component, hConfig, hState) {
-      getLast(component, hConfig, hState).each(function (lastComp) {
+      getLast(component, hConfig).each(function (lastComp) {
         highlight$1(component, hConfig, hState, lastComp);
       });
     };
@@ -4354,8 +3483,8 @@ var mobile = (function (domGlobals) {
       });
     };
     var highlightBy = function (component, hConfig, hState, predicate) {
-      var candidates = getCandidates(component, hConfig, hState);
-      var targetComp = find$2(candidates, predicate);
+      var candidates = getCandidates(component, hConfig);
+      var targetComp = find$1(candidates, predicate);
       targetComp.each(function (c) {
         highlight$1(component, hConfig, hState, c);
       });
@@ -4568,7 +3697,7 @@ var mobile = (function (domGlobals) {
         var target = tabbingConfig.visibilitySelector.bind(function (sel) {
           return closest$2(element, sel);
         }).getOr(element);
-        return get$5(target) > 0;
+        return get$4(target) > 0;
       };
       var findInitial = function (component, tabbingConfig) {
         var tabstops = descendants(component.element(), tabbingConfig.selector);
@@ -4650,7 +3779,7 @@ var mobile = (function (domGlobals) {
     var CyclicType = create$2(state$1('cyclic', constant(true)));
 
     var inside = function (target) {
-      return name(target) === 'input' && get$1(target, 'type') !== 'radio' || name(target) === 'textarea';
+      return name(target) === 'input' && get(target, 'type') !== 'radio' || name(target) === 'textarea';
     };
 
     var doDefaultExecute = function (component, simulatedEvent, focused) {
@@ -4741,7 +3870,7 @@ var mobile = (function (domGlobals) {
       };
     };
     var getDirection = function (element) {
-      return get$4(element, 'direction') === 'rtl' ? 'rtl' : 'ltr';
+      return get$3(element, 'direction') === 'rtl' ? 'rtl' : 'ltr';
     };
 
     var useH = function (movement) {
@@ -4798,8 +3927,7 @@ var mobile = (function (domGlobals) {
     };
 
     var locateVisible = function (container, current, selector) {
-      var filter = isVisible;
-      return locateIn(container, current, selector, filter);
+      return locateIn(container, current, selector);
     };
     var locateIn = function (container, current, selector, filter$1) {
       var predicate = curry(eq, current);
@@ -4919,7 +4047,7 @@ var mobile = (function (domGlobals) {
 
     var horizontal = function (container, selector, current, delta) {
       var isDisabledButton = function (candidate) {
-        return name(candidate) === 'button' && get$1(candidate, 'disabled') === 'disabled';
+        return name(candidate) === 'button' && get(candidate, 'disabled') === 'disabled';
       };
       var tryCycle = function (initial, index, candidates) {
         var newIndex = cycleBy(index, delta, 0, candidates.length - 1);
@@ -5267,7 +4395,7 @@ var mobile = (function (domGlobals) {
         return forbid(f.name(), 'Cannot configure ' + f.name() + ' for ' + name);
       }).concat([state$1('dump', identity)]));
     };
-    var get$6 = function (data) {
+    var get$5 = function (data) {
       return data.dump;
     };
     var augment = function (data, original) {
@@ -5276,15 +4404,8 @@ var mobile = (function (domGlobals) {
     var SketchBehaviours = {
       field: field$1,
       augment: augment,
-      get: get$6
+      get: get$5
     };
-
-    var SketchBehaviours$1 = /*#__PURE__*/Object.freeze({
-        SketchBehaviours: SketchBehaviours,
-        field: field$1,
-        get: get$6,
-        augment: augment
-    });
 
     var _placeholder = 'placeholder';
     var adt$2 = Adt.generate([
@@ -5301,9 +4422,6 @@ var mobile = (function (domGlobals) {
         ]
       }
     ]);
-    var isSubstitute = function (uiType) {
-      return contains([_placeholder], uiType);
-    };
     var subPlaceholder = function (owner, detail, compSpec, placeholders) {
       if (owner.exists(function (o) {
           return o !== compSpec.owner;
@@ -5381,27 +4499,9 @@ var mobile = (function (domGlobals) {
       });
       return outcome;
     };
-    var singleReplace = function (detail, p) {
-      var replacement = p;
-      return replacement.fold(function (req, valueThunk) {
-        return [valueThunk(detail)];
-      }, function (req, valuesThunk) {
-        return valuesThunk(detail);
-      });
-    };
     var single = adt$2.single;
     var multiple = adt$2.multiple;
     var placeholder = constant(_placeholder);
-
-    var UiSubstitutes = /*#__PURE__*/Object.freeze({
-        single: single,
-        multiple: multiple,
-        isSubstitute: isSubstitute,
-        placeholder: placeholder,
-        substituteAll: substituteAll,
-        substitutePlaces: substitutePlaces,
-        singleReplace: singleReplace
-    });
 
     var unique = 0;
     var generate$1 = function (prefix) {
@@ -5562,32 +4662,11 @@ var mobile = (function (domGlobals) {
     var getPartOrDie = function (component, detail, partKey) {
       return getPart(component, detail, partKey).getOrDie('Could not find part: ' + partKey);
     };
-    var getParts = function (component, detail, partKeys) {
-      var r = {};
-      var uids = detail.partUids;
-      var system = component.getSystem();
-      each$1(partKeys, function (pk) {
-        r[pk] = system.getByUid(uids[pk]);
-      });
-      return map(r, constant);
-    };
     var getAllParts = function (component, detail) {
       var system = component.getSystem();
       return map(detail.partUids, function (pUid, k) {
         return constant(system.getByUid(pUid));
       });
-    };
-    var getAllPartNames = function (detail) {
-      return keys(detail.partUids);
-    };
-    var getPartsOrDie = function (component, detail, partKeys) {
-      var r = {};
-      var uids = detail.partUids;
-      var system = component.getSystem();
-      each$1(partKeys, function (pk) {
-        r[pk] = system.getByUid(uids[pk]).getOrDie();
-      });
-      return map(r, constant);
     };
     var defaultUids = function (baseUid, partTypes) {
       var partNames = names(partTypes);
@@ -5603,23 +4682,6 @@ var mobile = (function (domGlobals) {
         return defaultUids(spec.uid, partTypes);
       }), anyValue$1());
     };
-
-    var AlloyParts = /*#__PURE__*/Object.freeze({
-        generate: generate$2,
-        generateOne: generateOne,
-        schemas: schemas,
-        names: names,
-        substitutes: substitutes,
-        components: components,
-        defaultUids: defaultUids,
-        defaultUidsSchema: defaultUidsSchema,
-        getAllParts: getAllParts,
-        getAllPartNames: getAllPartNames,
-        getPart: getPart,
-        getPartOrDie: getPartOrDie,
-        getParts: getParts,
-        getPartsOrDie: getPartsOrDie
-    });
 
     var premadeTag = generate$1('alloy-premade');
     var premade = function (comp) {
@@ -5637,12 +4699,6 @@ var mobile = (function (domGlobals) {
         return f.apply(undefined, [component.getApis()].concat([component].concat(rest)));
       }, f);
     };
-
-    var GuiTypes = /*#__PURE__*/Object.freeze({
-        makeApi: makeApi,
-        premade: premade,
-        getPremade: getPremade
-    });
 
     var prefix$1 = constant('alloy-id-');
     var idAttr = constant('data-alloy-id');
@@ -5679,7 +4735,7 @@ var mobile = (function (domGlobals) {
       ]).concat(partUidsSchemas);
     };
     var asRawOrDie$1 = function (label, schema, spec, partSchemas, partUidsSchemas) {
-      var baseS = base(label, partSchemas, partUidsSchemas, spec);
+      var baseS = base(label, partSchemas, partUidsSchemas);
       return asRawOrDie(label + ' [SpecSchema]', objOfOnly(baseS.concat(schema)), spec);
     };
 
@@ -5853,7 +4909,7 @@ var mobile = (function (domGlobals) {
       var children$1 = children(elem);
       var attrs = getAttrs(elem);
       var classes = getClasses(elem);
-      var contents = children$1.length === 0 ? {} : { innerHtml: get$3(elem) };
+      var contents = children$1.length === 0 ? {} : { innerHtml: get$2(elem) };
       return __assign({
         tag: name(elem),
         classes: classes,
@@ -6381,7 +5437,7 @@ var mobile = (function (domGlobals) {
     var set$4 = function (element, h) {
       api$1.set(element, h);
     };
-    var get$7 = function (element) {
+    var get$6 = function (element) {
       return api$1.get(element);
     };
 
@@ -6410,14 +5466,14 @@ var mobile = (function (domGlobals) {
     var max1Y = function (detail) {
       return detail.model.maxY + 1;
     };
-    var range$1 = function (detail, max, min) {
+    var range = function (detail, max, min) {
       return max(detail) - min(detail);
     };
     var xRange = function (detail) {
-      return range$1(detail, maxX, minX);
+      return range(detail, maxX, minX);
     };
     var yRange = function (detail) {
-      return range$1(detail, maxY, minY);
+      return range(detail, maxY, minY);
     };
     var halfX = function (detail) {
       return xRange(detail) / 2;
@@ -6648,7 +5704,7 @@ var mobile = (function (domGlobals) {
     var setPositionFromValue = function (slider, thumb, detail, edges) {
       var value = currentValue(detail);
       var pos = findPositionOfValue(slider, edges.getSpectrum(slider), value.x(), edges.getLeftEdge(slider), edges.getRightEdge(slider), detail);
-      var thumbRadius = get$7(thumb.element()) / 2;
+      var thumbRadius = get$6(thumb.element()) / 2;
       set$3(thumb.element(), 'left', pos - thumbRadius + 'px');
     };
     var onLeft = handleMovement(-1);
@@ -6770,7 +5826,7 @@ var mobile = (function (domGlobals) {
     var setPositionFromValue$1 = function (slider, thumb, detail, edges) {
       var value = currentValue(detail);
       var pos = findPositionOfValue$1(slider, edges.getSpectrum(slider), value.y(), edges.getTopEdge(slider), edges.getBottomEdge(slider), detail);
-      var thumbRadius = get$5(thumb.element()) / 2;
+      var thumbRadius = get$4(thumb.element()) / 2;
       set$3(thumb.element(), 'top', pos - thumbRadius + 'px');
     };
     var onLeft$1 = Option.none;
@@ -6850,8 +5906,8 @@ var mobile = (function (domGlobals) {
       var value = currentValue(detail);
       var xPos = findPositionOfValue(slider, edges.getSpectrum(slider), value.x(), edges.getLeftEdge(slider), edges.getRightEdge(slider), detail);
       var yPos = findPositionOfValue$1(slider, edges.getSpectrum(slider), value.y(), edges.getTopEdge(slider), edges.getBottomEdge(slider), detail);
-      var thumbXRadius = get$7(thumb.element()) / 2;
-      var thumbYRadius = get$5(thumb.element()) / 2;
+      var thumbXRadius = get$6(thumb.element()) / 2;
+      var thumbYRadius = get$4(thumb.element()) / 2;
       set$3(thumb.element(), 'left', xPos - thumbXRadius + 'px');
       set$3(thumb.element(), 'top', yPos - thumbYRadius + 'px');
     };
@@ -7265,7 +6321,7 @@ var mobile = (function (domGlobals) {
           return getRaw(elem, 'font-size');
         });
         return inline.getOrThunk(function () {
-          return get$4(start, 'font-size');
+          return get$3(start, 'font-size');
         });
       }).getOr('');
     };
@@ -7277,7 +6333,7 @@ var mobile = (function (domGlobals) {
         return eq(root, e);
       };
       var elemSize = getRawOrComputed(isRoot, elem);
-      return find$2(candidates, function (size) {
+      return find$1(candidates, function (size) {
         return elemSize === size;
       }).getOr(defaultSize);
     };
@@ -7287,7 +6343,7 @@ var mobile = (function (domGlobals) {
         editor.execCommand('fontSize', false, value);
       }
     };
-    var get$8 = function (editor) {
+    var get$7 = function (editor) {
       var size = getSize(editor);
       return sizeToIndex(size).getOr(defaultIndex);
     };
@@ -7298,7 +6354,7 @@ var mobile = (function (domGlobals) {
     };
     var FontSizes = {
       candidates: constant(candidates),
-      get: get$8,
+      get: get$7,
       apply: apply$1
     };
 
@@ -7349,10 +6405,6 @@ var mobile = (function (domGlobals) {
         asSpec: asSpec
       };
     };
-
-    var Memento = /*#__PURE__*/Object.freeze({
-        record: record
-    });
 
     function FileReader () {
       var f = Global$1.getOrDie('FileReader');
@@ -7533,10 +6585,10 @@ var mobile = (function (domGlobals) {
       };
       return Promise;
     };
-    var Promise$1 = window.Promise ? window.Promise : promise();
+    var Promise = window.Promise ? window.Promise : promise();
 
     function blobToDataUri(blob) {
-      return new Promise$1(function (resolve) {
+      return new Promise(function (resolve) {
         var reader = FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
@@ -7604,7 +6656,7 @@ var mobile = (function (domGlobals) {
       });
     };
 
-    var get$9 = function (element) {
+    var get$8 = function (element) {
       return element.dom().textContent;
     };
     var set$5 = function (element, value) {
@@ -7628,10 +6680,10 @@ var mobile = (function (domGlobals) {
       };
     };
     var fromLink = function (link) {
-      var text = get$9(link);
-      var url = get$1(link, 'href');
-      var title = get$1(link, 'title');
-      var target = get$1(link, 'target');
+      var text = get$8(link);
+      var url = get(link, 'href');
+      var title = get(link, 'title');
+      var target = get(link, 'target');
       return {
         url: defaultToEmpty(url),
         text: text !== url ? defaultToEmpty(text) : '',
@@ -7648,8 +6700,8 @@ var mobile = (function (domGlobals) {
       });
     };
     var wasSimple = function (link) {
-      var prevHref = get$1(link, 'href');
-      var prevText = get$9(link);
+      var prevHref = get(link, 'href');
+      var prevText = get$8(link);
       return prevHref === prevText;
     };
     var getTextToApply = function (link, url, info) {
@@ -7703,13 +6755,13 @@ var mobile = (function (domGlobals) {
     };
 
     var platform$1 = PlatformDetection$1.detect();
-    var preserve$1 = function (f, editor) {
+    var preserve = function (f, editor) {
       var rng = editor.selection.getRng();
       f();
       editor.selection.setRng(rng);
     };
     var forAndroid = function (editor, f) {
-      var wrapper = platform$1.os.isAndroid() ? preserve$1 : apply;
+      var wrapper = platform$1.os.isAndroid() ? preserve : apply;
       wrapper(f, editor);
     };
     var RangePreserver = { forAndroid: forAndroid };
@@ -7761,7 +6813,7 @@ var mobile = (function (domGlobals) {
           attributes: __assign({ role: 'presentation' }, attributes)
         }, domWithoutAttributes),
         components: detail.components,
-        behaviours: get$6(detail.containerBehaviours),
+        behaviours: get$5(detail.containerBehaviours),
         events: detail.events,
         domModification: detail.domModification,
         eventOrder: detail.eventOrder
@@ -7811,7 +6863,7 @@ var mobile = (function (domGlobals) {
       ]
     });
 
-    var get$a = function (element) {
+    var get$9 = function (element) {
       return element.dom().value;
     };
     var set$6 = function (element, value) {
@@ -7840,7 +6892,7 @@ var mobile = (function (domGlobals) {
       return derive$1([Focusing.config({
           onFocus: detail.selectOnFocus === false ? noop : function (component) {
             var input = component.element();
-            var value = get$a(input);
+            var value = get$9(input);
             input.dom().setSelectionRange(0, value.length);
           }
         })]);
@@ -7851,10 +6903,10 @@ var mobile = (function (domGlobals) {
             mode: 'manual',
             initialValue: detail.data.getOr(undefined),
             getValue: function (input) {
-              return get$a(input.element());
+              return get$9(input.element());
             },
             setValue: function (input, data) {
-              var current = get$a(input.element());
+              var current = get$9(input.element());
               if (current !== data) {
                 set$6(input.element(), data);
               }
@@ -7978,7 +7030,7 @@ var mobile = (function (domGlobals) {
     ];
     var onLoad$5 = function (component, disableConfig, disableState) {
       if (disableConfig.disabled) {
-        disable(component, disableConfig, disableState);
+        disable(component, disableConfig);
       }
     };
     var hasNative = function (component) {
@@ -7994,7 +7046,7 @@ var mobile = (function (domGlobals) {
       remove$1(component.element(), 'disabled');
     };
     var ariaIsDisabled = function (component) {
-      return get$1(component.element(), 'aria-disabled') === 'true';
+      return get(component.element(), 'aria-disabled') === 'true';
     };
     var ariaDisable = function (component) {
       set(component.element(), 'aria-disabled', 'true');
@@ -8165,7 +7217,7 @@ var mobile = (function (domGlobals) {
         run: run
       };
     };
-    var value$3 = function () {
+    var value$2 = function () {
       var subject = Cell(Option.none());
       var clear = function () {
         subject.set(Option.none());
@@ -8244,7 +7296,7 @@ var mobile = (function (domGlobals) {
         strict$1('getInitialValue'),
         state$1('state', function () {
           return {
-            dialogSwipeState: value$3(),
+            dialogSwipeState: value$2(),
             currentScreen: Cell(0)
           };
         })
@@ -8273,7 +7325,7 @@ var mobile = (function (domGlobals) {
           if (spec$1.state.currentScreen.get() + direction >= 0 && spec$1.state.currentScreen.get() + direction < screens.length) {
             getRaw(parent, 'left').each(function (left) {
               var currentLeft = parseInt(left, 10);
-              var w = get$7(screens[0]);
+              var w = get$6(screens[0]);
               set$3(parent, 'left', currentLeft - direction * w + 'px');
             });
             spec$1.state.currentScreen.set(spec$1.state.currentScreen.get() + direction);
@@ -9396,7 +8448,7 @@ var mobile = (function (domGlobals) {
       factory: make$2
     });
 
-    var preserve$2 = function (f, container) {
+    var preserve$1 = function (f, container) {
       var ownerDoc = owner(container);
       var refocus = active(ownerDoc).bind(function (focused) {
         var hasFocus = function (elem) {
@@ -9417,7 +8469,7 @@ var mobile = (function (domGlobals) {
 
     var set$8 = function (component, replaceConfig, replaceState, data) {
       detachChildren(component);
-      preserve$2(function () {
+      preserve$1(function () {
         var children = map$1(data, component.getSystem().build);
         each$1(children, function (l) {
           attach(component, l);
@@ -9435,8 +8487,8 @@ var mobile = (function (domGlobals) {
       insert(component, replaceConfig, prepend, prependee);
     };
     var remove$7 = function (component, replaceConfig, replaceState, removee) {
-      var children = contents(component, replaceConfig);
-      var foundChild = find$2(children, function (child) {
+      var children = contents(component);
+      var foundChild = find$1(children, function (child) {
         return eq(removee.element(), child.element());
       });
       foundChild.each(detach);
@@ -9445,7 +8497,7 @@ var mobile = (function (domGlobals) {
       return component.components();
     };
     var replaceAt = function (component, replaceConfig, replaceState, replaceeIndex, replacer) {
-      var children = contents(component, replaceConfig);
+      var children = contents(component);
       return Option.from(children[replaceeIndex]).map(function (replacee) {
         remove$7(component, replaceConfig, replaceState, replacee);
         replacer.each(function (r) {
@@ -9457,7 +8509,7 @@ var mobile = (function (domGlobals) {
       });
     };
     var replaceBy = function (component, replaceConfig, replaceState, replaceePred, replacer) {
-      var children = contents(component, replaceConfig);
+      var children = contents(component);
       return findIndex(children, replaceePred).bind(function (replaceeIndex) {
         return replaceAt(component, replaceConfig, replaceState, replaceeIndex, replacer);
       });
@@ -9615,7 +8667,7 @@ var mobile = (function (domGlobals) {
       var layeredState = LayeredState.init();
       var setup = function (container) {
         var componentMap = buildMenus(container, detail.data.primary, detail.data.menus);
-        var directory = toDirectory(container);
+        var directory = toDirectory();
         layeredState.setContents(detail.data.primary, componentMap, detail.data.expansions, directory);
         return layeredState.getPrimary();
       };
@@ -9658,7 +8710,7 @@ var mobile = (function (domGlobals) {
           var r = {};
           var items = descendants(container.element(), '.' + detail.markers.item);
           var parentItems = filter(items, function (i) {
-            return get$1(i, 'aria-haspopup') === 'true';
+            return get(i, 'aria-haspopup') === 'true';
           });
           each$1(parentItems, function (i) {
             container.getSystem().getByDom(i).each(function (itemComp) {
@@ -9937,7 +8989,7 @@ var mobile = (function (domGlobals) {
       });
     };
     var getTransition = function (comp, transConfig, transState) {
-      var route = getCurrentRoute(comp, transConfig, transState);
+      var route = getCurrentRoute(comp, transConfig);
       return route.bind(function (r) {
         return getTransitionOf(comp, transConfig, transState, r);
       });
@@ -9961,32 +9013,32 @@ var mobile = (function (domGlobals) {
     };
     var getNewRoute = function (comp, transConfig, transState, destination) {
       return {
-        start: get$1(comp.element(), transConfig.stateAttr),
+        start: get(comp.element(), transConfig.stateAttr),
         destination: destination
       };
     };
     var getCurrentRoute = function (comp, transConfig, transState) {
       var el = comp.element();
       return has$1(el, transConfig.destinationAttr) ? Option.some({
-        start: get$1(comp.element(), transConfig.stateAttr),
-        destination: get$1(comp.element(), transConfig.destinationAttr)
+        start: get(comp.element(), transConfig.stateAttr),
+        destination: get(comp.element(), transConfig.destinationAttr)
       }) : Option.none();
     };
     var jumpTo = function (comp, transConfig, transState, destination) {
       disableTransition(comp, transConfig, transState);
-      if (has$1(comp.element(), transConfig.stateAttr) && get$1(comp.element(), transConfig.stateAttr) !== destination) {
+      if (has$1(comp.element(), transConfig.stateAttr) && get(comp.element(), transConfig.stateAttr) !== destination) {
         transConfig.onFinish(comp, destination);
       }
       set(comp.element(), transConfig.stateAttr, destination);
     };
     var fasttrack = function (comp, transConfig, transState, destination) {
       if (has$1(comp.element(), transConfig.destinationAttr)) {
-        set(comp.element(), transConfig.stateAttr, get$1(comp.element(), transConfig.destinationAttr));
+        set(comp.element(), transConfig.stateAttr, get(comp.element(), transConfig.destinationAttr));
         remove$1(comp.element(), transConfig.destinationAttr);
       }
     };
     var progressTo = function (comp, transConfig, transState, destination) {
-      fasttrack(comp, transConfig, transState, destination);
+      fasttrack(comp, transConfig);
       var route = getNewRoute(comp, transConfig, transState, destination);
       getTransitionOf(comp, transConfig, transState, route).fold(function () {
         jumpTo(comp, transConfig, transState, destination);
@@ -9999,7 +9051,7 @@ var mobile = (function (domGlobals) {
     };
     var getState$1 = function (comp, transConfig, transState) {
       var e = comp.element();
-      return has$1(e, transConfig.stateAttr) ? Option.some(get$1(e, transConfig.stateAttr)) : Option.none();
+      return has$1(e, transConfig.stateAttr) ? Option.some(get(e, transConfig.stateAttr)) : Option.none();
     };
 
     var TransitionApis = /*#__PURE__*/Object.freeze({
@@ -10015,7 +9067,7 @@ var mobile = (function (domGlobals) {
       return derive([
         run(transitionend(), function (component, simulatedEvent) {
           var raw = simulatedEvent.event().raw();
-          getCurrentRoute(component, transConfig, transState).each(function (route) {
+          getCurrentRoute(component, transConfig).each(function (route) {
             findRoute(component, transConfig, transState, route).each(function (rInfo) {
               rInfo.transition.each(function (rTransition) {
                 if (raw.propertyName === rTransition.property) {
@@ -10262,12 +9314,12 @@ var mobile = (function (domGlobals) {
           return Option.none();
         },
         onOpenMenu: function (container, menu) {
-          var w = get$7(container.element());
+          var w = get$6(container.element());
           set$4(menu.element(), w);
           Transitioning.jumpTo(menu, 'current');
         },
         onOpenSubmenu: function (container, item, submenu) {
-          var w = get$7(container.element());
+          var w = get$6(container.element());
           var menu = ancestor$1(item.element(), '[role="menu"]').getOrDie('hacky');
           var menuComp = container.getSystem().getByDom(menu).getOrDie();
           set$4(submenu.element(), w);
@@ -10602,13 +9654,13 @@ var mobile = (function (domGlobals) {
 
     var INTERVAL = 50;
     var INSURANCE = 1000 / INTERVAL;
-    var get$b = function (outerWindow) {
+    var get$a = function (outerWindow) {
       var isPortrait = outerWindow.matchMedia('(orientation: portrait)').matches;
       return { isPortrait: constant(isPortrait) };
     };
     var getActualWidth = function (outerWindow) {
       var isIos = PlatformDetection$1.detect().os.isiOS();
-      var isPortrait = get$b(outerWindow).isPortrait();
+      var isPortrait = get$a(outerWindow).isPortrait();
       return isIos && !isPortrait ? outerWindow.screen.height : outerWindow.screen.width;
     };
     var onChange = function (outerWindow, listeners) {
@@ -10616,7 +9668,7 @@ var mobile = (function (domGlobals) {
       var poller = null;
       var change = function () {
         global$3.clearInterval(poller);
-        var orientation = get$b(outerWindow);
+        var orientation = get$a(outerWindow);
         listeners.onChange(orientation);
         onAdjustment(function () {
           listeners.onReady(orientation);
@@ -10647,7 +9699,7 @@ var mobile = (function (domGlobals) {
       };
     };
     var Orientation = {
-      get: get$b,
+      get: get$a,
       onChange: onChange,
       getActualWidth: getActualWidth
     };
@@ -10838,7 +9890,7 @@ var mobile = (function (domGlobals) {
     var AndroidEvents = { initEvents: initEvents };
 
     var safeParse = function (element, attribute) {
-      var parsed = parseInt(get$1(element, attribute), 10);
+      var parsed = parseInt(get(element, attribute), 10);
       return isNaN(parsed) ? 0 : parsed;
     };
     var DataAttributes = { safeParse: safeParse };
@@ -10876,7 +9928,7 @@ var mobile = (function (domGlobals) {
     }
 
     var api$3 = NodeValue(isText, 'text');
-    var get$c = function (element) {
+    var get$b = function (element) {
       return api$3.get(element);
     };
     var getOption = function (element) {
@@ -10905,6 +9957,9 @@ var mobile = (function (domGlobals) {
       return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
     };
 
+    var create$3 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var SimRange = { create: create$3 };
+
     var adt$4 = Adt.generate([
       { before: ['element'] },
       {
@@ -10932,7 +9987,7 @@ var mobile = (function (domGlobals) {
       getStart: getStart
     };
 
-    var type$1 = Adt.generate([
+    var adt$5 = Adt.generate([
       { domRange: ['rng'] },
       {
         relative: [
@@ -10949,21 +10004,37 @@ var mobile = (function (domGlobals) {
         ]
       }
     ]);
-    var range$2 = Immutable('start', 'soffset', 'finish', 'foffset');
-    var relative = type$1.relative;
-    var exact = type$1.exact;
-
-    var makeRange = function (start, soffset, finish, foffset) {
-      var doc = owner(start);
-      var rng = doc.dom().createRange();
-      rng.setStart(start.dom(), soffset);
-      rng.setEnd(finish.dom(), foffset);
-      return rng;
+    var exactFromRange = function (simRange) {
+      return adt$5.exact(simRange.start(), simRange.soffset(), simRange.finish(), simRange.foffset());
     };
-    var after$2 = function (start, soffset, finish, foffset) {
-      var r = makeRange(start, soffset, finish, foffset);
-      var same = eq(start, finish) && soffset === foffset;
-      return r.collapsed && !same;
+    var getStart$1 = function (selection) {
+      return selection.match({
+        domRange: function (rng) {
+          return Element.fromDom(rng.startContainer);
+        },
+        relative: function (startSitu, finishSitu) {
+          return Situ.getStart(startSitu);
+        },
+        exact: function (start, soffset, finish, foffset) {
+          return start;
+        }
+      });
+    };
+    var domRange = adt$5.domRange;
+    var relative = adt$5.relative;
+    var exact = adt$5.exact;
+    var getWin = function (selection) {
+      var start = getStart$1(selection);
+      return defaultView(start);
+    };
+    var range$1 = SimRange.create;
+    var Selection = {
+      domRange: domRange,
+      relative: relative,
+      exact: exact,
+      exactFromRange: exactFromRange,
+      getWin: getWin,
+      range: range$1
     };
 
     var setStart = function (rng, situ) {
@@ -11012,7 +10083,7 @@ var mobile = (function (domGlobals) {
       return rect.width > 0 || rect.height > 0 ? Option.some(rect).map(toRect) : Option.none();
     };
 
-    var adt$5 = Adt.generate([
+    var adt$6 = Adt.generate([
       {
         ltr: [
           'start',
@@ -11070,12 +10141,12 @@ var mobile = (function (domGlobals) {
           return rev.collapsed === false;
         });
         return reversed.map(function (rev) {
-          return adt$5.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
+          return adt$6.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
         }).getOrThunk(function () {
-          return fromRange(win, adt$5.ltr, rng);
+          return fromRange(win, adt$6.ltr, rng);
         });
       } else {
-        return fromRange(win, adt$5.ltr, rng);
+        return fromRange(win, adt$6.ltr, rng);
       }
     };
     var diagnose = function (win, selection) {
@@ -11135,7 +10206,7 @@ var mobile = (function (domGlobals) {
         var r = rangeForOffset(o);
         return r.getBoundingClientRect();
       };
-      var length = get$c(textnode).length;
+      var length = get$b(textnode).length;
       var offset = searchForPoint(rectForOffset, x, y, rect.right, length);
       return rangeForOffset(offset);
     };
@@ -11150,10 +10221,6 @@ var mobile = (function (domGlobals) {
         return locateOffset(doc, node, x, y, rect);
       });
     };
-
-    var TextPoint = /*#__PURE__*/Object.freeze({
-        locate: locate$1
-    });
 
     var searchInChildren = function (doc, node, x, y) {
       var r = doc.dom().createRange();
@@ -11179,7 +10246,7 @@ var mobile = (function (domGlobals) {
     var first$1 = function (element) {
       return descendant(element, isCursorPosition);
     };
-    var last$1 = function (element) {
+    var last = function (element) {
       return descendantRtl(element, isCursorPosition);
     };
     var descendantRtl = function (scope, predicate) {
@@ -11216,7 +10283,7 @@ var mobile = (function (domGlobals) {
       cursorRange.selectNode(node.dom());
       var rect = cursorRange.getBoundingClientRect();
       var collapseDirection = getCollapseDirection(rect, x);
-      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$1 : last$1;
+      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$1 : last;
       return f(node).map(function (target) {
         return createCollapsedNode(doc, target, collapseDirection);
       });
@@ -11279,7 +10346,20 @@ var mobile = (function (domGlobals) {
     var preprocessExact = function (start, soffset, finish, foffset) {
       var startSitu = beforeSpecial(start, soffset);
       var finishSitu = beforeSpecial(finish, foffset);
-      return relative(startSitu, finishSitu);
+      return Selection.relative(startSitu, finishSitu);
+    };
+
+    var makeRange = function (start, soffset, finish, foffset) {
+      var doc = owner(start);
+      var rng = doc.dom().createRange();
+      rng.setStart(start.dom(), soffset);
+      rng.setEnd(finish.dom(), foffset);
+      return rng;
+    };
+    var after$2 = function (start, soffset, finish, foffset) {
+      var r = makeRange(start, soffset, finish, foffset);
+      var same = eq(start, finish) && soffset === foffset;
+      return r.collapsed && !same;
     };
 
     var doSetNativeRange = function (win, rng) {
@@ -11325,7 +10405,7 @@ var mobile = (function (domGlobals) {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range$2(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(SimRange.create(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
@@ -11333,16 +10413,16 @@ var mobile = (function (domGlobals) {
     var doGetExact = function (selection) {
       var anchor = Element.fromDom(selection.anchorNode);
       var focus = Element.fromDom(selection.focusNode);
-      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range$2(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
+      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(SimRange.create(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var getExact = function (win) {
       return Option.from(win.getSelection()).filter(function (sel) {
         return sel.rangeCount > 0;
       }).bind(doGetExact);
     };
-    var get$d = function (win) {
+    var get$c = function (win) {
       return getExact(win).map(function (range) {
-        return exact(range.start(), range.soffset(), range.finish(), range.foffset());
+        return Selection.exact(range.start(), range.soffset(), range.finish(), range.foffset());
       });
     };
     var getFirstRect$1 = function (win, selection) {
@@ -11381,7 +10461,7 @@ var mobile = (function (domGlobals) {
       } else {
         var start_1 = Element.fromDom(range.startContainer);
         return parent(start_1).bind(function (parent) {
-          var selection = exact(start_1, range.startOffset, parent, getEnd(parent));
+          var selection = Selection.exact(start_1, range.startOffset, parent, getEnd(parent));
           var optRect = getFirstRect$1(range.startContainer.ownerDocument.defaultView, selection);
           return optRect.map(collapsedRect).map(pure);
         }).getOr([]);
@@ -11533,7 +10613,7 @@ var mobile = (function (domGlobals) {
             var html = Element.fromDom(doc.dom().documentElement);
             var getCursorBox = editor.getCursorBox.getOrThunk(function () {
               return function () {
-                return get$d(win).bind(function (sel) {
+                return get$c(win).bind(function (sel) {
                   return getFirstRect$1(win, sel).orThunk(function () {
                     return tryFallbackBox(win);
                   });
@@ -11592,7 +10672,7 @@ var mobile = (function (domGlobals) {
     var bgFallback = 'background-color:rgb(255,255,255)!important;';
     var isAndroid = PlatformDetection$1.detect().os.isAndroid();
     var matchColor = function (editorBody) {
-      var color = get$4(editorBody, 'background-color');
+      var color = get$3(editorBody, 'background-color');
       return color !== undefined && color !== '' ? 'background-color:' + color + '!important' : bgFallback;
     };
     var clobberStyles = function (container, editorBody) {
@@ -11602,7 +10682,7 @@ var mobile = (function (domGlobals) {
       };
       var clobber = function (clobberStyle) {
         return function (element) {
-          var styles = get$1(element, 'style');
+          var styles = get(element, 'style');
           var backup = styles === undefined ? 'no-styles' : styles.trim();
           if (backup === clobberStyle) {
             return;
@@ -11623,7 +10703,7 @@ var mobile = (function (domGlobals) {
     var restoreStyles = function () {
       var clobberedEls = all$2('[' + attr + ']');
       each$1(clobberedEls, function (element) {
-        var restore = get$1(element, attr);
+        var restore = get(element, attr);
         if (restore !== 'no-styles') {
           set(element, 'style', restore);
         } else {
@@ -11646,7 +10726,7 @@ var mobile = (function (domGlobals) {
         return meta;
       };
       var element = first('meta[name="viewport"]').getOrThunk(nu);
-      var backup = get$1(element, 'content');
+      var backup = get(element, 'content');
       var maximize = function () {
         set(element, 'content', 'width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0');
       };
@@ -11664,7 +10744,7 @@ var mobile = (function (domGlobals) {
     };
     var MetaViewport = { tag: tag };
 
-    var create$3 = function (platform, mask) {
+    var create$4 = function (platform, mask) {
       var meta = MetaViewport.tag();
       var androidApi = api$2();
       var androidEvents = api$2();
@@ -11695,37 +10775,8 @@ var mobile = (function (domGlobals) {
         exit: exit
       };
     };
-    var AndroidMode = { create: create$3 };
+    var AndroidMode = { create: create$4 };
 
-    var adaptable = function (fn, rate) {
-      var timer = null;
-      var args = null;
-      var cancel = function () {
-        if (timer !== null) {
-          domGlobals.clearTimeout(timer);
-          timer = null;
-          args = null;
-        }
-      };
-      var throttle = function () {
-        var newArgs = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          newArgs[_i] = arguments[_i];
-        }
-        args = newArgs;
-        if (timer === null) {
-          timer = domGlobals.setTimeout(function () {
-            fn.apply(null, args);
-            timer = null;
-            args = null;
-          }, rate);
-        }
-      };
-      return {
-        cancel: cancel,
-        throttle: throttle
-      };
-    };
     var first$2 = function (fn, rate) {
       var timer = null;
       var cancel = function () {
@@ -11751,7 +10802,7 @@ var mobile = (function (domGlobals) {
         throttle: throttle
       };
     };
-    var last$2 = function (fn, rate) {
+    var last$1 = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -11776,12 +10827,6 @@ var mobile = (function (domGlobals) {
         throttle: throttle
       };
     };
-
-    var Throttler = /*#__PURE__*/Object.freeze({
-        adaptable: adaptable,
-        first: first$2,
-        last: last$2
-    });
 
     var sketch$9 = function (onView, translate) {
       var memIcon = record(Container.sketch({
@@ -11983,7 +11028,7 @@ var mobile = (function (domGlobals) {
       set(container, dataHorizontal, 'true');
     };
     var hasScroll = function (container) {
-      return get$1(container, dataHorizontal) === 'true' ? hasHorizontalScroll(container) : hasVerticalScroll(container);
+      return get(container, dataHorizontal) === 'true' ? hasHorizontalScroll(container) : hasVerticalScroll(container);
     };
     var exclusive = function (scope, selector) {
       return bind$3(scope, 'touchmove', function (event) {
@@ -12206,7 +11251,7 @@ var mobile = (function (domGlobals) {
     };
     var immediateShrink = function (component, slideConfig, slideState) {
       if (slideState.isExpanded()) {
-        doImmediateShrink(component, slideConfig, slideState, Option.none());
+        doImmediateShrink(component, slideConfig, slideState);
       }
     };
     var hasGrown = function (component, slideConfig, slideState) {
@@ -12224,7 +11269,7 @@ var mobile = (function (domGlobals) {
       return has$2(root, slideConfig.shrinkingClass) === true;
     };
     var isTransitioning = function (component, slideConfig, slideState) {
-      return isGrowing(component, slideConfig, slideState) === true || isShrinking(component, slideConfig, slideState) === true;
+      return isGrowing(component, slideConfig) === true || isShrinking(component, slideConfig) === true;
     };
     var toggleGrow = function (component, slideConfig, slideState) {
       var f = slideState.isExpanded() ? doStartSmartShrink : doStartGrow;
@@ -12289,13 +11334,13 @@ var mobile = (function (domGlobals) {
         width: [
           output('property', 'width'),
           output('getDimension', function (elem) {
-            return get$7(elem) + 'px';
+            return get$6(elem) + 'px';
           })
         ],
         height: [
           output('property', 'height'),
           output('getDimension', function (elem) {
-            return get$5(elem) + 'px';
+            return get$4(elem) + 'px';
           })
         ]
       }))
@@ -12552,7 +11597,7 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    var adt$6 = Adt.generate([
+    var adt$7 = Adt.generate([
       { stopped: [] },
       { resume: ['element'] },
       { complete: [] }
@@ -12562,24 +11607,24 @@ var mobile = (function (domGlobals) {
       var simulatedEvent = fromSource(rawEvent, source);
       return handler.fold(function () {
         logger.logEventNoHandlers(eventType, target);
-        return adt$6.complete();
+        return adt$7.complete();
       }, function (handlerInfo) {
         var descHandler = handlerInfo.descHandler();
         var eventHandler = getCurried(descHandler);
         eventHandler(simulatedEvent);
         if (simulatedEvent.isStopped()) {
           logger.logEventStopped(eventType, handlerInfo.element(), descHandler.purpose());
-          return adt$6.stopped();
+          return adt$7.stopped();
         } else if (simulatedEvent.isCut()) {
           logger.logEventCut(eventType, handlerInfo.element(), descHandler.purpose());
-          return adt$6.complete();
+          return adt$7.complete();
         } else {
           return parent(handlerInfo.element()).fold(function () {
             logger.logNoParent(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.complete();
+            return adt$7.complete();
           }, function (parent) {
             logger.logEventResponse(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.resume(parent);
+            return adt$7.resume(parent);
           });
         }
       });
@@ -13080,7 +12125,7 @@ var mobile = (function (domGlobals) {
         });
       };
       var reposition = function () {
-        var toolbarHeight = get$5(toolstrip);
+        var toolbarHeight = get$4(toolstrip);
         iosApi.run(function (api) {
           api.setViewportOffset(toolbarHeight);
         });
@@ -13103,7 +12148,7 @@ var mobile = (function (domGlobals) {
         });
       };
       var tapping = TappingEvent.monitor(editorApi);
-      var refreshThrottle = last$2(refreshView, 300);
+      var refreshThrottle = last$1(refreshView, 300);
       var listeners = [
         editorApi.onKeyup(clearAndRefresh),
         editorApi.onNodeChanged(refreshIosSelection),
@@ -13332,7 +12377,7 @@ var mobile = (function (domGlobals) {
         return Option.some(value - amount);
       }
     };
-    var create$4 = function () {
+    var create$5 = function () {
       var interval = null;
       var animate = function (getCurrent, destination, amount, increment, doFinish, rate) {
         var finished = false;
@@ -13365,7 +12410,7 @@ var mobile = (function (domGlobals) {
       return { animate: animate };
     };
     var SmoothAnimation = {
-      create: create$4,
+      create: create$5,
       adjust: adjust
     };
 
@@ -13441,13 +12486,13 @@ var mobile = (function (domGlobals) {
     };
     var getGreenzone = function (socket, dropup) {
       var outerWindow = owner(socket).dom().defaultView;
-      var viewportHeight = get$5(socket) + get$5(dropup);
+      var viewportHeight = get$4(socket) + get$4(dropup);
       var acc = accountableKeyboardHeight(outerWindow);
       return viewportHeight - acc;
     };
     var updatePadding = function (contentBody, socket, dropup) {
       var greenzoneHeight = getGreenzone(socket, dropup);
-      var deltaHeight = get$5(socket) + get$5(dropup) - greenzoneHeight;
+      var deltaHeight = get$4(socket) + get$4(dropup) - greenzoneHeight;
       set$3(contentBody, 'padding-bottom', deltaHeight + 'px');
     };
     var DeviceZones = {
@@ -13478,7 +12523,7 @@ var mobile = (function (domGlobals) {
       return DataAttributes.safeParse(element, yFixedData);
     };
     var getYFixedProperty = function (element) {
-      return get$1(element, yFixedProperty);
+      return get(element, yFixedProperty);
     };
     var getLastWindowSize = function (element) {
       return DataAttributes.safeParse(element, windowSizeData);
@@ -13492,7 +12537,7 @@ var mobile = (function (domGlobals) {
     };
     var classify = function (element) {
       var offsetY = getYFixedData(element);
-      var classifier = get$1(element, yScrollingData) === 'true' ? classifyScrolling : classifyFixed;
+      var classifier = get(element, yScrollingData) === 'true' ? classifyScrolling : classifyFixed;
       return classifier(element, offsetY);
     };
     var findFixtures = function (container) {
@@ -13500,7 +12545,7 @@ var mobile = (function (domGlobals) {
       return map$1(candidates, classify);
     };
     var takeoverToolbar = function (toolbar) {
-      var oldToolbarStyle = get$1(toolbar, 'style');
+      var oldToolbarStyle = get(toolbar, 'style');
       setAll$1(toolbar, {
         position: 'absolute',
         top: '0px'
@@ -13515,7 +12560,7 @@ var mobile = (function (domGlobals) {
       return { restore: restore };
     };
     var takeoverViewport = function (toolbarHeight, height, viewport) {
-      var oldViewportStyle = get$1(viewport, 'style');
+      var oldViewportStyle = get(viewport, 'style');
       Scrollable.register(viewport);
       setAll$1(viewport, {
         position: 'absolute',
@@ -13536,7 +12581,7 @@ var mobile = (function (domGlobals) {
       return { restore: restore };
     };
     var takeoverDropup = function (dropup, toolbarHeight, viewportHeight) {
-      var oldDropupStyle = get$1(dropup, 'style');
+      var oldDropupStyle = get(dropup, 'style');
       setAll$1(dropup, {
         position: 'absolute',
         bottom: '0px'
@@ -13559,11 +12604,11 @@ var mobile = (function (domGlobals) {
     var takeover$1 = function (viewport, contentBody, toolbar, dropup) {
       var outerWindow = owner(viewport).dom().defaultView;
       var toolbarSetup = takeoverToolbar(toolbar);
-      var toolbarHeight = get$5(toolbar);
-      var dropupHeight = get$5(dropup);
+      var toolbarHeight = get$4(toolbar);
+      var dropupHeight = get$4(dropup);
       var viewportHeight = deriveViewportHeight(viewport, toolbarHeight, dropupHeight);
       var viewportSetup = takeoverViewport(toolbarHeight, viewportHeight, viewport);
-      var dropupSetup = takeoverDropup(dropup, toolbarHeight, viewportHeight);
+      var dropupSetup = takeoverDropup(dropup);
       var isActive = true;
       var restore = function () {
         isActive = false;
@@ -13578,8 +12623,8 @@ var mobile = (function (domGlobals) {
       };
       var refresh = function () {
         if (isActive) {
-          var newToolbarHeight = get$5(toolbar);
-          var dropupHeight_1 = get$5(dropup);
+          var newToolbarHeight = get$4(toolbar);
+          var dropupHeight_1 = get$4(dropup);
           var newHeight = deriveViewportHeight(viewport, newToolbarHeight, dropupHeight_1);
           set(viewport, yFixedData, newToolbarHeight + 'px');
           set$3(viewport, 'height', newHeight + 'px');
@@ -13792,7 +12837,7 @@ var mobile = (function (domGlobals) {
           }) : Option.none();
         });
       };
-      var scrollThrottle = last$2(function () {
+      var scrollThrottle = last$1(function () {
         scroller.idle(function () {
           IosUpdates.updatePositions(container, outerWindow.pageYOffset).get(function () {
             var extraScroll = scrollBounds();
@@ -13896,10 +12941,10 @@ var mobile = (function (domGlobals) {
     };
     var IosSetup = { setup: setup$3 };
 
-    var create$5 = function (platform, mask) {
+    var create$6 = function (platform, mask) {
       var meta = MetaViewport.tag();
-      var priorState = value$3();
-      var scrollEvents = value$3();
+      var priorState = value$2();
+      var scrollEvents = value$2();
       var iosApi = api$2();
       var iosEvents = api$2();
       var enter = function () {
@@ -13997,7 +13042,7 @@ var mobile = (function (domGlobals) {
         exit: exit
       };
     };
-    var IosMode = { create: create$5 };
+    var IosMode = { create: create$6 };
 
     var produce$1 = function (raw) {
       var mobile = asRawOrDie('Getting IosWebapp schema', MobileSchema, raw);
@@ -14264,7 +13309,7 @@ var mobile = (function (domGlobals) {
               setReadOnly(dynamicGroup, readOnlyGroups, mainGroups, ro);
             },
             readOnlyOnInit: function () {
-              return readOnlyOnInit(editor);
+              return readOnlyOnInit();
             }
           });
           var hideDropup = function () {
@@ -14346,11 +13391,10 @@ var mobile = (function (domGlobals) {
         renderUI: renderUI
       };
     };
-    global$1.add('mobile', renderMobileTheme);
     function Theme () {
+      global$1.add('mobile', renderMobileTheme);
     }
 
-    return Theme;
+    Theme();
 
 }(window));
-})();

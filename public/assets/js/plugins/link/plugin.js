@@ -4,10 +4,9 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.7 (2019-06-05)
+ * Version: 5.0.11 (2019-07-04)
  */
-(function () {
-var link = (function (domGlobals) {
+(function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -257,9 +256,9 @@ var link = (function (domGlobals) {
       if (x === null)
         return 'null';
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
         return 'string';
       return t;
     };
@@ -892,8 +891,17 @@ var link = (function (domGlobals) {
         } else {
           callback(Option.from(linkList));
         }
-      }).map(function (opt) {
-        return opt.bind(ListOptions.sanitizeWith(extractor));
+      }).map(function (optItems) {
+        return optItems.bind(ListOptions.sanitizeWith(extractor)).map(function (items) {
+          if (items.length > 0) {
+            return [{
+                text: 'None',
+                value: ''
+              }].concat(items);
+          } else {
+            return items;
+          }
+        });
       });
     };
     var LinkListOptions = { getLinks: getLinks };
@@ -1366,19 +1374,18 @@ var link = (function (domGlobals) {
       setupContextToolbars: setupContextToolbars
     };
 
-    global.add('link', function (editor) {
-      Controls.setupButtons(editor);
-      Controls.setupMenuItems(editor);
-      Controls.setupContextMenu(editor);
-      Controls.setupContextToolbars(editor);
-      Actions.setupGotoLinks(editor);
-      Commands.register(editor);
-      Keyboard.setup(editor);
-    });
     function Plugin () {
+      global.add('link', function (editor) {
+        Controls.setupButtons(editor);
+        Controls.setupMenuItems(editor);
+        Controls.setupContextMenu(editor);
+        Controls.setupContextToolbars(editor);
+        Actions.setupGotoLinks(editor);
+        Commands.register(editor);
+        Keyboard.setup(editor);
+      });
     }
 
-    return Plugin;
+    Plugin();
 
 }(window));
-})();
