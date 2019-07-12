@@ -9,6 +9,7 @@ use App\Models\Settings;
 use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\UserRequest;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
@@ -96,7 +97,7 @@ class ApiV2Controller extends BasePageController
             'Total' => $relData[0]->_totalrows ?? 0,
             'ApiRequests' => UserRequest::getApiRequests($user->id),
             'ApiLimit' => $user->role->apirequests,
-            'Grabs' => $user->grabs,
+            'Grabs' => UserDownload::getDownloadRequests($user->id),
             'DownloadLimit' => $user->role->downloadrequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
@@ -109,6 +110,7 @@ class ApiV2Controller extends BasePageController
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
+     * @throws \Throwable
      */
     public function apiSearch(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -157,7 +159,7 @@ class ApiV2Controller extends BasePageController
             'Total' => $relData[0]->_totalrows ?? 0,
             'ApiRequests' => UserRequest::getApiRequests($user->id),
             'ApiLimit' => $user->role->apirequests,
-            'Grabs' => $user->grabs,
+            'Grabs' => UserDownload::getDownloadRequests($user->id),
             'DownloadLimit' => $user->role->downloadrequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
@@ -170,6 +172,7 @@ class ApiV2Controller extends BasePageController
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
+     * @throws \Throwable
      */
     public function tv(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -231,7 +234,7 @@ class ApiV2Controller extends BasePageController
             'Total' => $relData[0]->_totalrows ?? 0,
             'ApiRequests' => UserRequest::getApiRequests($user->id),
             'ApiLimit' => $user->role->apirequests,
-            'Grabs' => $user->grabs,
+            'Grabs' => UserDownload::getDownloadRequests($user->id),
             'DownloadLimit' => $user->role->downloadrequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];

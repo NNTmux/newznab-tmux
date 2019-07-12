@@ -7,6 +7,7 @@ use App\Models\Category;
 use Blacklight\http\RSS;
 use App\Models\UserRequest;
 use Illuminate\Support\Arr;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
 
 class RssController extends BasePageController
@@ -235,7 +236,7 @@ class RssController extends BasePageController
                 'apilimit'    => $maxRequests,
                 'requests' => $usedRequests,
                 'downloadlimit' => $maxDownloads,
-                'grabs' => $res->grabs,
+                'grabs' => UserDownload::getDownloadRequests($uid),
             ];
 
         return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];

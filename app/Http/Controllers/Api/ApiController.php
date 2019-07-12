@@ -8,6 +8,7 @@ use Blacklight\http\API;
 use Blacklight\Releases;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
+use App\Models\UserDownload;
 use Illuminate\Http\Request;
 use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
@@ -114,7 +115,7 @@ class ApiController extends BasePageController
         $params['apilimit'] = $maxRequests;
         $params['requests'] = $apiRequests;
         $params['downloadlimit'] = $maxDownloads;
-        $params['grabs'] = $res->grabs;
+        $params['grabs'] = UserDownload::getDownloadRequests($uid);
 
         switch ($function) {
            // Search releases.
