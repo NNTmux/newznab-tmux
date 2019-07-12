@@ -2746,16 +2746,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "03cfd34e84a83e537df1d640d196193e69c229b4"
+                "reference": "f65d71bb2f2d14442b76c7d34ffe3854776ae6ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/03cfd34e84a83e537df1d640d196193e69c229b4",
-                "reference": "03cfd34e84a83e537df1d640d196193e69c229b4",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/f65d71bb2f2d14442b76c7d34ffe3854776ae6ef",
+                "reference": "f65d71bb2f2d14442b76c7d34ffe3854776ae6ef",
                 "shasum": ""
             },
             "require": {
@@ -2811,7 +2811,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-07-02T15:31:06+00:00"
+            "time": "2019-07-11T21:11:11+00:00"
         },
         {
             "name": "laravel/scout",
@@ -2880,16 +2880,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v2.0.5",
+            "version": "v2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "a3f15809dd1de4759d44c159e99b9474d8b83e94"
+                "reference": "61b415ea2401fe659ee35fa809908628aa08bf07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/a3f15809dd1de4759d44c159e99b9474d8b83e94",
-                "reference": "a3f15809dd1de4759d44c159e99b9474d8b83e94",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/61b415ea2401fe659ee35fa809908628aa08bf07",
+                "reference": "61b415ea2401fe659ee35fa809908628aa08bf07",
                 "shasum": ""
             },
             "require": {
@@ -2938,7 +2938,7 @@
                 "laravel",
                 "monitoring"
             ],
-            "time": "2019-06-03T11:40:15+00:00"
+            "time": "2019-07-12T06:52:24+00:00"
         },
         {
             "name": "laravel/tinker",
