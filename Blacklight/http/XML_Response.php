@@ -345,6 +345,8 @@ class XML_Response
         $this->xml->startElement($this->namespace.':response');
         $this->xml->writeAttribute('offset', $this->offset);
         $this->xml->writeAttribute('total', $this->releases[0]->_totalrows ?? 0);
+        $this->xml->writeAttribute('grabs', $this->parameters['grabs']);
+        $this->xml->writeAttribute('limit', $this->parameters['limit']);
         $this->xml->endElement();
     }
 

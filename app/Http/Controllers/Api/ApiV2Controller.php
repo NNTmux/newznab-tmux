@@ -94,6 +94,8 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
+            'Grabs' => UserRequest::getApiRequests($user->id),
+            'Limit' => $user->role->apirequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
@@ -151,6 +153,8 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
+            'Grabs' => UserRequest::getApiRequests($user->id),
+            'Limit' => $user->role->apirequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
@@ -221,6 +225,8 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
+            'Grabs' => UserRequest::getApiRequests($user->id),
+            'Limit' => $user->role->apirequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 

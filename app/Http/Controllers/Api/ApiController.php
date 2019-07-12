@@ -110,6 +110,8 @@ class ApiController extends BasePageController
         $params['del'] = $request->has('del') && (int) $request->input('del') === 1 ? '1' : '0';
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
+        $params['limit'] = $maxRequests;
+        $params['grabs'] = $apiRequests;
 
         switch ($function) {
            // Search releases.

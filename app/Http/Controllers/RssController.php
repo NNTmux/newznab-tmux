@@ -213,12 +213,13 @@ class RssController extends BasePageController
         $uid = $res['id'];
         $rssToken = $res['api_token'];
         $maxRequests = $res->role->apirequests;
+        $usedRequests = UserRequest::getApiRequests($uid);
 
         if ($res->hasRole('Disabled')) {
             return response()->json(['error' => 'Your account is disabled'], 403);
         }
 
-        if (UserRequest::getApiRequests($uid) > $maxRequests) {
+        if ($usedRequests > $maxRequests) {
             return response()->json(['error' => 'You have reached your daily limit for API requests!'], 403);
         } else {
             UserRequest::addApiRequest($rssToken, $request->getRequestUri());
@@ -230,6 +231,8 @@ class RssController extends BasePageController
                 'extended' => 1,
                 'uid'      => $uid,
                 'token'    => $rssToken,
+                'limit'    => $maxRequests,
+                'grabs'    => $usedRequests,
             ];
 
         return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];
