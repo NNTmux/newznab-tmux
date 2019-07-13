@@ -113,7 +113,7 @@ class ApiController extends BasePageController
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
         $params['apilimit'] = $maxRequests;
-        $params['requests'] = $apiRequests;
+        $params['requests'] = $apiRequests ?? 0;
         $params['downloadlimit'] = $maxDownloads;
         $params['grabs'] = UserDownload::getDownloadRequests($uid);
 

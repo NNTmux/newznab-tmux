@@ -1,3 +1,5 @@
+2019-07-13 DariusIII
+	* Chg: Fix $apiRequests variable for capabilities check
 2019-07-12 DariusIII
 	* Chg: Add grab and limit to APIv1, APIv2 and RSS responses
 	* Chg: Update used web components
