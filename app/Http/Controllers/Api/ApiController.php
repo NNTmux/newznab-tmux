@@ -65,7 +65,7 @@ class ApiController extends BasePageController
 
         $uid = $apiKey = '';
         $res = $catExclusions = [];
-        $maxRequests = 0;
+        $maxRequests = $apiRequests = $maxDownloads = $grabs = 0;
 
         // Page is accessible only by the apikey
 
@@ -94,6 +94,7 @@ class ApiController extends BasePageController
         if ($uid !== '') {
             event(new UserAccessedApi($res));
             $apiRequests = UserRequest::getApiRequests($uid);
+            $grabs = UserDownload::getDownloadRequests($uid);
             if ($apiRequests > $maxRequests) {
                 Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');
             }
@@ -113,9 +114,9 @@ class ApiController extends BasePageController
         $params['uid'] = $uid;
         $params['token'] = $apiKey;
         $params['apilimit'] = $maxRequests;
-        $params['requests'] = $apiRequests ?? 0;
+        $params['requests'] = $apiRequests;
         $params['downloadlimit'] = $maxDownloads;
-        $params['grabs'] = UserDownload::getDownloadRequests($uid);
+        $params['grabs'] = $grabs;
 
         switch ($function) {
            // Search releases.
