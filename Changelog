@@ -1,3 +1,5 @@
+2019-07-14 DariusIII
+	* Chg: Update nesbot/carbon to latest version
 2019-07-13 DariusIII
 	* Chg: Fix $apiRequests variable for capabilities check
 2019-07-12 DariusIII
