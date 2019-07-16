@@ -719,7 +719,7 @@ class Categorize
      */
     public function isXxxClipHD(): bool
     {
-        if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG))/i', $this->releaseName)) {
+        if (preg_match('/^[\w\-.]+(\d{2}\.\d{2}\.\d{2}).+(720|1080)+[\w\-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH|YAPG|TRASHBIN))/i', $this->releaseName)) {
             $this->tmpCat = Category::XXX_CLIPHD;
             $this->tmpTag[] = Category::TAG_XXX_CLIPHD;
 
