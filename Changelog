@@ -1,4 +1,5 @@
 2019-07-16 DariusIII
+	* Fix: Fix adding of new 8 digit imdbid movies in admin movie add
 	* Chg: Categorize TRASHBIN releases into XXX HDClips category
 2019-07-14 DariusIII
 	* Chg: Update nesbot/carbon to latest version
