@@ -1,4 +1,5 @@
 2019-07-17 DariusIII
+	* Chg: Update nesbot/carbon (2.21.0 => 2.21.2)
 	* Chg: NNTmux now requires PHP 7.3 minimum
 	* Chg: Update laravel/framework (v5.8.28 => v5.8.29)
 	* Chg: Update APIv1 and RSS xml responses and APIv2 json output for api and grab limits
