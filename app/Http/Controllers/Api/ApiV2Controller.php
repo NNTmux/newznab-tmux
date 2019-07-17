@@ -157,10 +157,10 @@ class ApiV2Controller extends BasePageController
 
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'ApiRequests' => UserRequest::getApiRequests($user->id),
-            'ApiLimit' => $user->role->apirequests,
-            'Grabs' => UserDownload::getDownloadRequests($user->id),
-            'DownloadLimit' => $user->role->downloadrequests,
+            'apiCurrent' => UserRequest::getApiRequests($user->id),
+            'apiMax' => $user->role->apirequests,
+            'grabCurrent' => UserDownload::getDownloadRequests($user->id),
+            'grabMax' => $user->role->downloadrequests,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 

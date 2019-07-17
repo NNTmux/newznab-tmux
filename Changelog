@@ -1,3 +1,5 @@
+2019-07-17 DariusIII
+	* Chg: Update APIv1 and RSS xml responses and APIv2 json output for api and grab limits
 2019-07-16 DariusIII
 	* Fix: Fix adding of new 8 digit imdbid movies in admin movie add
 	* Chg: Categorize TRASHBIN releases into XXX HDClips category

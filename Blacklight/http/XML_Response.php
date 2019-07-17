@@ -179,6 +179,7 @@ class XML_Response
         $this->includeMetaInfo();
         $this->includeImage();
         $this->includeTotalRows();
+        $this->includeLimits();
         $this->includeReleases();
         $this->xml->endElement(); // End channel
         $this->xml->endElement(); // End RSS
@@ -345,10 +346,16 @@ class XML_Response
         $this->xml->startElement($this->namespace.':response');
         $this->xml->writeAttribute('offset', $this->offset);
         $this->xml->writeAttribute('total', $this->releases[0]->_totalrows ?? 0);
-        $this->xml->writeAttribute('requests', $this->parameters['requests']);
-        $this->xml->writeAttribute('apilimit', $this->parameters['apilimit']);
-        $this->xml->writeAttribute('grabs', $this->parameters['grabs']);
-        $this->xml->writeAttribute('downloadlimit', $this->parameters['downloadlimit']);
+        $this->xml->endElement();
+    }
+
+    public function includeLimits(): void
+    {
+        $this->xml->startElement($this->namespace.':apilimits');
+        $this->xml->writeAttribute('apiCurrent', $this->parameters['requests']);
+        $this->xml->writeAttribute('apiMax', $this->parameters['apilimit']);
+        $this->xml->writeAttribute('grabCurrent', $this->parameters['grabs']);
+        $this->xml->writeAttribute('grabMax', $this->parameters['downloadlimit']);
         $this->xml->endElement();
     }
 
