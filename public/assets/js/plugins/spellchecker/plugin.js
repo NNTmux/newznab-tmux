@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.11 (2019-07-04)
+ * Version: 5.0.12 (2019-07-18)
  */
 (function (domGlobals) {
     'use strict';
@@ -586,29 +586,18 @@
     };
     var Commands = { register: register };
 
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-    var shallow = function (old, nu) {
-      return nu;
-    };
-    var baseMerge = function (merger) {
-      return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
-          objects[i] = arguments[i];
-        if (objects.length === 0)
-          throw new Error('Can\'t merge zero objects');
-        var ret = {};
-        for (var j = 0; j < objects.length; j++) {
-          var curObject = objects[j];
-          for (var key in curObject)
-            if (hasOwnProperty.call(curObject, key)) {
-              ret[key] = merger(ret[key], curObject[key]);
-            }
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+              t[p] = s[p];
         }
-        return ret;
+        return t;
       };
+      return __assign.apply(this, arguments);
     };
-    var merge = baseMerge(shallow);
 
     var spellcheckerEvents = 'SpellcheckStart SpellcheckEnd';
     var buildMenuItems = function (listName, languageValues) {
@@ -650,29 +639,30 @@
           };
         }
       };
-      var getSplitButtonArgs = function () {
-        return {
-          type: 'splitbutton',
-          menu: languageMenuItems,
-          select: function (value) {
-            return value === currentLanguageState.get();
-          },
-          fetch: function (callback) {
-            var items = global$1.map(languageMenuItems, function (languageItem) {
-              return {
-                type: 'choiceitem',
-                value: languageItem.data,
-                text: languageItem.text
-              };
-            });
-            callback(items);
-          },
-          onItemAction: function (splitButtonApi, value) {
-            currentLanguageState.set(value);
-          }
-        };
-      };
-      editor.ui.registry.addButton('spellchecker', merge(buttonArgs, languageMenuItems.length > 1 ? getSplitButtonArgs() : { type: 'togglebutton' }));
+      var splitButtonArgs = __assign({}, buttonArgs, {
+        type: 'splitbutton',
+        select: function (value) {
+          return value === currentLanguageState.get();
+        },
+        fetch: function (callback) {
+          var items = global$1.map(languageMenuItems, function (languageItem) {
+            return {
+              type: 'choiceitem',
+              value: languageItem.data,
+              text: languageItem.text
+            };
+          });
+          callback(items);
+        },
+        onItemAction: function (splitButtonApi, value) {
+          currentLanguageState.set(value);
+        }
+      });
+      if (languageMenuItems.length > 1) {
+        editor.ui.registry.addSplitButton('spellchecker', splitButtonArgs);
+      } else {
+        editor.ui.registry.addToggleButton('spellchecker', buttonArgs);
+      }
       editor.ui.registry.addToggleMenuItem('spellchecker', {
         text: 'Spellcheck',
         onSetup: function (menuApi) {

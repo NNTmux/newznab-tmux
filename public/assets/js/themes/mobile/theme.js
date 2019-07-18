@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.11 (2019-07-04)
+ * Version: 5.0.12 (2019-07-18)
  */
 (function (domGlobals) {
     'use strict';
@@ -141,8 +141,9 @@
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -287,18 +288,20 @@
     var firstMatch = function (regexes, s) {
       for (var i = 0; i < regexes.length; i++) {
         var x = regexes[i];
-        if (x.test(s))
+        if (x.test(s)) {
           return x;
+        }
       }
       return undefined;
     };
     var find = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
-      if (!r)
+      if (!r) {
         return {
           major: 0,
           minor: 0
         };
+      }
       var group = function (i) {
         return Number(agent.replace(r, '$' + i));
       };
@@ -306,8 +309,9 @@
     };
     var detect = function (versionRegexes, agent) {
       var cleanedAgent = String(agent).toLowerCase();
-      if (versionRegexes.length === 0)
+      if (versionRegexes.length === 0) {
         return unknown();
+      }
       return find(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
@@ -434,13 +438,16 @@
     };
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -545,8 +552,9 @@
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
-        if (!Array.prototype.isPrototypeOf(xs[i]))
+        if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
         push.apply(r, xs[i]);
       }
       return r;
@@ -611,10 +619,12 @@
     };
 
     var checkRange = function (str, substr, start) {
-      if (substr === '')
+      if (substr === '') {
         return true;
-      if (str.length < substr.length)
+      }
+      if (str.length < substr.length) {
         return false;
+      }
       var x = str.substr(start, start + substr.length);
       return x === substr;
     };
@@ -649,8 +659,7 @@
         name: 'Edge',
         versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
         search: function (uastring) {
-          var monstrosity = contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
-          return monstrosity;
+          return contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
         }
       },
       {
@@ -917,11 +926,13 @@
       throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
     };
     var validateStrArr = function (label, array) {
-      if (!isArray(array))
+      if (!isArray(array)) {
         throw new Error('The ' + label + ' fields must be an array. Was: ' + array + '.');
+      }
       each$1(array, function (a) {
-        if (!isString(a))
+        if (!isString(a)) {
           throw new Error('The value ' + a + ' in the ' + label + ' fields was not a string.');
+        }
       });
     };
     var checkDupes = function (everything) {
@@ -936,8 +947,9 @@
 
     var MixedBag = function (required, optional) {
       var everything = required.concat(optional);
-      if (everything.length === 0)
+      if (everything.length === 0) {
         throw new Error('You must specify at least one required or optional field.');
+      }
       validateStrArr('required', required);
       validateStrArr('optional', optional);
       checkDupes(everything);
@@ -946,13 +958,15 @@
         var allReqd = forall(required, function (req) {
           return contains(keys$1, req);
         });
-        if (!allReqd)
+        if (!allReqd) {
           reqMessage(required, keys$1);
+        }
         var unsupported = filter(keys$1, function (key) {
           return !contains(everything, key);
         });
-        if (unsupported.length > 0)
+        if (unsupported.length > 0) {
           unsuppMessage(unsupported);
+        }
         var r = {};
         each$1(required, function (req) {
           r[req] = constant(obj[req]);
@@ -968,8 +982,9 @@
 
     var path = function (parts, scope) {
       var o = scope !== undefined && scope !== null ? scope : Global;
-      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i)
+      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i) {
         o = o[parts[i]];
+      }
       return o;
     };
     var resolve = function (p, scope) {
@@ -982,8 +997,9 @@
     };
     var getOrDie = function (name, scope) {
       var actual = unsafe(name, scope);
-      if (actual === undefined || actual === null)
-        throw name + ' not available on this browser';
+      if (actual === undefined || actual === null) {
+        throw new Error(name + ' not available on this browser');
+      }
       return actual;
     };
     var Global$1 = { getOrDie: getOrDie };
@@ -1355,8 +1371,9 @@
             throw new Error('Wrong number of arguments to case ' + key + '. Expected ' + value.length + ' (' + value + '), got ' + argLength);
           }
           var args = new Array(argLength);
-          for (var i = 0; i < args.length; i++)
+          for (var i = 0; i < args.length; i++) {
             args[i] = arguments[i];
+          }
           var match = function (branches) {
             var branchKeys = keys(branches);
             if (constructors.length !== branchKeys.length) {
@@ -1365,8 +1382,9 @@
             var allReqd = forall(constructors, function (reqKey) {
               return contains(branchKeys, reqKey);
             });
-            if (!allReqd)
+            if (!allReqd) {
               throw new Error('Not all branches were specified when using match. Specified: ' + branchKeys.join(', ') + '\nRequired: ' + constructors.join(', '));
+            }
             return branches[key].apply(null, args);
           };
           return {
@@ -1403,17 +1421,20 @@
     var baseMerge = function (merger) {
       return function () {
         var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
+        for (var i = 0; i < objects.length; i++) {
           objects[i] = arguments[i];
-        if (objects.length === 0)
+        }
+        if (objects.length === 0) {
           throw new Error('Can\'t merge zero objects');
+        }
         var ret = {};
         for (var j = 0; j < objects.length; j++) {
           var curObject = objects[j];
-          for (var key in curObject)
+          for (var key in curObject) {
             if (hasOwnProperty$1.call(curObject, key)) {
               ret[key] = merger(ret[key], curObject[key]);
             }
+          }
         }
         return ret;
       };
@@ -3927,9 +3948,6 @@
     };
 
     var locateVisible = function (container, current, selector) {
-      return locateIn(container, current, selector);
-    };
-    var locateIn = function (container, current, selector, filter$1) {
       var predicate = curry(eq, current);
       var candidates = descendants(container, selector);
       var visible = filter(candidates, isVisible);
@@ -5327,6 +5345,16 @@
       state: RepresentState
     });
 
+    var api$1 = Dimension('width', function (element) {
+      return element.dom().offsetWidth;
+    });
+    var set$4 = function (element, h) {
+      api$1.set(element, h);
+    };
+    var get$6 = function (element) {
+      return api$1.get(element);
+    };
+
     var r = function (left, top) {
       var translate = function (x, y) {
         return r(left + x, top + y);
@@ -5355,90 +5383,6 @@
           return Position(me.clientX, me.clientY);
         }) : Option.none();
       }
-    };
-
-    var reduceBy = function (value, min, max, step) {
-      if (value < min) {
-        return value;
-      } else if (value > max) {
-        return max;
-      } else if (value === min) {
-        return min - 1;
-      } else {
-        return Math.max(min, value - step);
-      }
-    };
-    var increaseBy = function (value, min, max, step) {
-      if (value > max) {
-        return value;
-      } else if (value < min) {
-        return min;
-      } else if (value === max) {
-        return max + 1;
-      } else {
-        return Math.min(max, value + step);
-      }
-    };
-    var capValue = function (value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    };
-    var snapValueOf = function (value, min, max, step, snapStart) {
-      return snapStart.fold(function () {
-        var initValue = value - min;
-        var extraValue = Math.round(initValue / step) * step;
-        return capValue(min + extraValue, min - 1, max + 1);
-      }, function (start) {
-        var remainder = (value - start) % step;
-        var adjustment = Math.round(remainder / step);
-        var rawSteps = Math.floor((value - start) / step);
-        var maxSteps = Math.floor((max - start) / step);
-        var numSteps = Math.min(maxSteps, rawSteps + adjustment);
-        var r = start + numSteps * step;
-        return Math.max(start, r);
-      });
-    };
-    var findOffsetOf = function (value, min, max) {
-      return Math.min(max, Math.max(value, min)) - min;
-    };
-    var findValueOf = function (args) {
-      var min = args.min, max = args.max, range = args.range, value = args.value, step = args.step, snap = args.snap, snapStart = args.snapStart, rounded = args.rounded, hasMinEdge = args.hasMinEdge, hasMaxEdge = args.hasMaxEdge, minBound = args.minBound, maxBound = args.maxBound, screenRange = args.screenRange;
-      var capMin = hasMinEdge ? min - 1 : min;
-      var capMax = hasMaxEdge ? max + 1 : max;
-      if (value < minBound) {
-        return capMin;
-      } else if (value > maxBound) {
-        return capMax;
-      } else {
-        var offset = findOffsetOf(value, minBound, maxBound);
-        var newValue = capValue(offset / screenRange * range + min, capMin, capMax);
-        if (snap && newValue >= min && newValue <= max) {
-          return snapValueOf(newValue, min, max, step, snapStart);
-        } else if (rounded) {
-          return Math.round(newValue);
-        } else {
-          return newValue;
-        }
-      }
-    };
-    var findOffsetOfValue = function (args) {
-      var min = args.min, max = args.max, range = args.range, value = args.value, hasMinEdge = args.hasMinEdge, hasMaxEdge = args.hasMaxEdge, maxBound = args.maxBound, maxOffset = args.maxOffset, centerMinEdge = args.centerMinEdge, centerMaxEdge = args.centerMaxEdge;
-      if (value < min) {
-        return hasMinEdge ? 0 : centerMinEdge;
-      } else if (value > max) {
-        return hasMaxEdge ? maxBound : centerMaxEdge;
-      } else {
-        return (value - min) / range * maxOffset;
-      }
-    };
-
-    var api$1 = Dimension('width', function (element) {
-      return element.dom().offsetWidth;
-    });
-    var set$4 = function (element, h) {
-      api$1.set(element, h);
-    };
-    var get$6 = function (element) {
-      return api$1.get(element);
     };
 
     var t = 'top', r$1 = 'right', b = 'bottom', l = 'left';
@@ -5562,6 +5506,80 @@
     };
     var setToLEdgeXY = function (edge, detail) {
       fireSliderChange(edge, xyValue(min1X(detail), halfY(detail)));
+    };
+
+    var reduceBy = function (value, min, max, step) {
+      if (value < min) {
+        return value;
+      } else if (value > max) {
+        return max;
+      } else if (value === min) {
+        return min - 1;
+      } else {
+        return Math.max(min, value - step);
+      }
+    };
+    var increaseBy = function (value, min, max, step) {
+      if (value > max) {
+        return value;
+      } else if (value < min) {
+        return min;
+      } else if (value === max) {
+        return max + 1;
+      } else {
+        return Math.min(max, value + step);
+      }
+    };
+    var capValue = function (value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    };
+    var snapValueOf = function (value, min, max, step, snapStart) {
+      return snapStart.fold(function () {
+        var initValue = value - min;
+        var extraValue = Math.round(initValue / step) * step;
+        return capValue(min + extraValue, min - 1, max + 1);
+      }, function (start) {
+        var remainder = (value - start) % step;
+        var adjustment = Math.round(remainder / step);
+        var rawSteps = Math.floor((value - start) / step);
+        var maxSteps = Math.floor((max - start) / step);
+        var numSteps = Math.min(maxSteps, rawSteps + adjustment);
+        var r = start + numSteps * step;
+        return Math.max(start, r);
+      });
+    };
+    var findOffsetOf = function (value, min, max) {
+      return Math.min(max, Math.max(value, min)) - min;
+    };
+    var findValueOf = function (args) {
+      var min = args.min, max = args.max, range = args.range, value = args.value, step = args.step, snap = args.snap, snapStart = args.snapStart, rounded = args.rounded, hasMinEdge = args.hasMinEdge, hasMaxEdge = args.hasMaxEdge, minBound = args.minBound, maxBound = args.maxBound, screenRange = args.screenRange;
+      var capMin = hasMinEdge ? min - 1 : min;
+      var capMax = hasMaxEdge ? max + 1 : max;
+      if (value < minBound) {
+        return capMin;
+      } else if (value > maxBound) {
+        return capMax;
+      } else {
+        var offset = findOffsetOf(value, minBound, maxBound);
+        var newValue = capValue(offset / screenRange * range + min, capMin, capMax);
+        if (snap && newValue >= min && newValue <= max) {
+          return snapValueOf(newValue, min, max, step, snapStart);
+        } else if (rounded) {
+          return Math.round(newValue);
+        } else {
+          return newValue;
+        }
+      }
+    };
+    var findOffsetOfValue = function (args) {
+      var min = args.min, max = args.max, range = args.range, value = args.value, hasMinEdge = args.hasMinEdge, hasMaxEdge = args.hasMaxEdge, maxBound = args.maxBound, maxOffset = args.maxOffset, centerMinEdge = args.centerMinEdge, centerMaxEdge = args.centerMaxEdge;
+      if (value < min) {
+        return hasMinEdge ? 0 : centerMinEdge;
+      } else if (value > max) {
+        return hasMaxEdge ? maxBound : centerMaxEdge;
+      } else {
+        return (value - min) / range * maxOffset;
+      }
     };
 
     var top = 'top', right = 'right', bottom = 'bottom', left = 'left', width = 'width', height = 'height';
@@ -7026,7 +7044,8 @@
     var nativeDisabled = [
       'input',
       'button',
-      'textarea'
+      'textarea',
+      'select'
     ];
     var onLoad$5 = function (component, disableConfig, disableState) {
       if (disableConfig.disabled) {
@@ -7060,6 +7079,7 @@
       });
       var f = hasNative(component) ? nativeDisable : ariaDisable;
       f(component);
+      disableConfig.onDisabled(component);
     };
     var enable = function (component, disableConfig, disableState) {
       disableConfig.disableClass.each(function (disableClass) {
@@ -7067,6 +7087,7 @@
       });
       var f = hasNative(component) ? nativeEnable : ariaEnable;
       f(component);
+      disableConfig.onEnabled(component);
     };
     var isDisabled = function (component) {
       return hasNative(component) ? nativeIsDisabled(component) : ariaIsDisabled(component);
@@ -7103,7 +7124,9 @@
 
     var DisableSchema = [
       defaulted$1('disabled', false),
-      option('disableClass')
+      option('disableClass'),
+      onHandler('onDisabled'),
+      onHandler('onEnabled')
     ];
 
     var Disabling = create$1({
@@ -7149,10 +7172,10 @@
     };
     var make = function (detail, components, spec) {
       return {
-        'uid': detail.uid,
-        'dom': detail.dom,
-        'components': components,
-        'behaviours': augment(detail.formBehaviours, [Representing.config({
+        uid: detail.uid,
+        dom: detail.dom,
+        components: components,
+        behaviours: augment(detail.formBehaviours, [Representing.config({
             store: {
               mode: 'manual',
               getValue: function (form) {
@@ -7175,7 +7198,7 @@
               }
             }
           })]),
-        'apis': {
+        apis: {
           getField: function (form, key) {
             return getPart(form, detail, key).bind(Composing.getCurrent);
           }
@@ -10815,8 +10838,9 @@
         for (var _i = 0; _i < arguments.length; _i++) {
           args[_i] = arguments[_i];
         }
-        if (timer !== null)
+        if (timer !== null) {
           domGlobals.clearTimeout(timer);
+        }
         timer = domGlobals.setTimeout(function () {
           fn.apply(null, args);
           timer = null;
@@ -10988,10 +11012,10 @@
 
     var factory$5 = function (detail, components, spec, _externals) {
       return {
-        'uid': detail.uid,
-        'dom': detail.dom,
-        'components': components,
-        'behaviours': augment(detail.tgroupBehaviours, [Keying.config({
+        uid: detail.uid,
+        dom: detail.dom,
+        components: components,
+        behaviours: augment(detail.tgroupBehaviours, [Keying.config({
             mode: 'flow',
             selector: detail.markers.itemSelector
           })]),
@@ -12258,10 +12282,11 @@
         });
       };
       var get = function (nCallback) {
-        if (isReady())
+        if (isReady()) {
           call(nCallback);
-        else
+        } else {
           callbacks.push(nCallback);
+        }
       };
       var set = function (x) {
         data = Option.some(x);

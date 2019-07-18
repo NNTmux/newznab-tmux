@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.11 (2019-07-04)
+ * Version: 5.0.12 (2019-07-18)
  */
 (function (domGlobals) {
     'use strict';
@@ -97,8 +97,9 @@
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
@@ -173,13 +174,16 @@
     };
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -187,6 +191,7 @@
         return typeOf(value) === type;
       };
     };
+    var isArray = isType('array');
     var isFunction = isType('function');
 
     var slice = Array.prototype.slice;
@@ -218,8 +223,9 @@
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
-        if (!Array.prototype.isPrototypeOf(xs[i]))
+        if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
         push.apply(r, xs[i]);
       }
       return r;
@@ -232,7 +238,7 @@
       return slice.call(x);
     };
 
-    var isArray = global$1.isArray;
+    var isArray$1 = global$1.isArray;
     var UserDefined = 'User Defined';
     var getDefaultCharMap = function () {
       return [
@@ -1427,11 +1433,11 @@
     };
     var charmapFilter = function (charmap) {
       return global$1.grep(charmap, function (item) {
-        return isArray(item) && item.length === 2;
+        return isArray$1(item) && item.length === 2;
       });
     };
     var getCharsFromSetting = function (settingValue) {
-      if (isArray(settingValue)) {
+      if (isArray$1(settingValue)) {
         return [].concat(charmapFilter(settingValue));
       }
       if (typeof settingValue === 'function') {
@@ -1519,8 +1525,9 @@
         for (var _i = 0; _i < arguments.length; _i++) {
           args[_i] = arguments[_i];
         }
-        if (timer !== null)
+        if (timer !== null) {
           domGlobals.clearTimeout(timer);
+        }
         timer = domGlobals.setTimeout(function () {
           fn.apply(null, args);
           timer = null;

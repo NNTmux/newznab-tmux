@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.11 (2019-07-04)
+ * Version: 5.0.12 (2019-07-18)
  */
 (function () {
     'use strict';
@@ -398,6 +398,11 @@
           unwrap(nodes[i]);
         }
       }
+      currentSearchState.set(__assign({}, searchState, {
+        index: -1,
+        count: 0,
+        text: ''
+      }));
       if (startContainer && endContainer) {
         var rng = editor.dom.createRng();
         rng.setStart(startContainer, 0);
@@ -407,13 +412,6 @@
         }
         return rng;
       }
-      currentSearchState.set({
-        index: -1,
-        count: 0,
-        text: '',
-        matchCase: false,
-        wholeWord: false
-      });
     };
     var hasNext = function (editor, currentSearchState) {
       return currentSearchState.get().count > 1;
@@ -510,19 +508,23 @@
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array'))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String'))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -543,9 +545,9 @@
       return slice.call(x);
     };
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.I18n');
-
     var open = function (editor, currentSearchState) {
+      var matchcase = Cell(currentSearchState.get().matchCase);
+      var wholewords = Cell(currentSearchState.get().wholeWord);
       editor.undoManager.add();
       var selectedText = global$1.trim(editor.selection.getContent({ format: 'text' }));
       function updateButtonStates(api) {
@@ -581,10 +583,10 @@
           reset(api);
           return;
         }
-        if (last.text === data.findtext && last.matchCase === data.matchcase && last.wholeWord === data.wholewords) {
+        if (last.text === data.findtext && last.matchCase === matchcase.get() && last.wholeWord === wholewords.get()) {
           next(editor, currentSearchState);
         } else {
-          var count = find(editor, currentSearchState, data.findtext, data.matchcase, data.wholewords);
+          var count = find(editor, currentSearchState, data.findtext, matchcase.get(), wholewords.get());
           if (count <= 0) {
             notFoundAlert(api);
           }
@@ -594,80 +596,92 @@
       };
       var initialData = {
         findtext: selectedText,
-        replacetext: '',
-        matchcase: false,
-        wholewords: false
+        replacetext: ''
       };
-      editor.windowManager.open({
+      var spec = {
         title: 'Find and Replace',
         size: 'normal',
         body: {
           type: 'panel',
           items: [
             {
-              type: 'input',
-              name: 'findtext',
-              label: 'Find'
+              type: 'bar',
+              items: [
+                {
+                  type: 'input',
+                  name: 'findtext',
+                  placeholder: 'Find',
+                  maximized: true
+                },
+                {
+                  type: 'button',
+                  name: 'prev',
+                  text: 'Previous',
+                  icon: 'action-prev',
+                  disabled: true,
+                  borderless: true
+                },
+                {
+                  type: 'button',
+                  name: 'next',
+                  text: 'Next',
+                  icon: 'action-next',
+                  disabled: true,
+                  borderless: true
+                }
+              ]
             },
             {
               type: 'input',
               name: 'replacetext',
-              label: 'Replace with'
-            },
-            {
-              type: 'grid',
-              columns: 2,
-              items: [
-                {
-                  type: 'checkbox',
-                  name: 'matchcase',
-                  label: 'Match case'
-                },
-                {
-                  type: 'checkbox',
-                  name: 'wholewords',
-                  label: 'Find whole words only'
-                }
-              ]
+              placeholder: 'Replace with'
             }
           ]
         },
         buttons: [
           {
+            type: 'menu',
+            name: 'options',
+            icon: 'preferences',
+            tooltip: 'Preferences',
+            align: 'start',
+            fetch: function (done) {
+              done([
+                {
+                  type: 'togglemenuitem',
+                  text: 'Match case',
+                  onAction: function (api) {
+                    matchcase.set(!matchcase.get());
+                  },
+                  active: matchcase.get()
+                },
+                {
+                  type: 'togglemenuitem',
+                  text: 'Find whole words only',
+                  onAction: function (api) {
+                    wholewords.set(!wholewords.get());
+                  },
+                  active: wholewords.get()
+                }
+              ]);
+            }
+          },
+          {
             type: 'custom',
             name: 'find',
             text: 'Find',
-            align: 'start',
             primary: true
           },
           {
             type: 'custom',
             name: 'replace',
             text: 'Replace',
-            align: 'start',
             disabled: true
           },
           {
             type: 'custom',
             name: 'replaceall',
             text: 'Replace All',
-            align: 'start',
-            disabled: true
-          },
-          {
-            type: 'custom',
-            name: 'prev',
-            text: 'Previous',
-            align: 'end',
-            icon: global$2.isRtl() ? 'arrow-right' : 'arrow-left',
-            disabled: true
-          },
-          {
-            type: 'custom',
-            name: 'next',
-            text: 'Next',
-            align: 'end',
-            icon: global$2.isRtl() ? 'arrow-left' : 'arrow-right',
             disabled: true
           }
         ],
@@ -712,7 +726,8 @@
           done(editor, currentSearchState);
           editor.undoManager.add();
         }
-      });
+      };
+      editor.windowManager.open(spec, { inline: 'toolbar' });
     };
     var Dialog = { open: open };
 
