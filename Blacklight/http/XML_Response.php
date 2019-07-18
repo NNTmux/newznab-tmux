@@ -352,10 +352,10 @@ class XML_Response
     public function includeLimits(): void
     {
         $this->xml->startElement($this->namespace.':apilimits');
-        $this->xml->writeAttribute('apiCurrent', $this->parameters['requests']);
-        $this->xml->writeAttribute('apiMax', $this->parameters['apilimit']);
-        $this->xml->writeAttribute('grabCurrent', $this->parameters['grabs']);
-        $this->xml->writeAttribute('grabMax', $this->parameters['downloadlimit']);
+        $this->xml->writeAttribute('apicurrent', $this->parameters['requests']);
+        $this->xml->writeAttribute('apimax', $this->parameters['apilimit']);
+        $this->xml->writeAttribute('grabcurrent', $this->parameters['grabs']);
+        $this->xml->writeAttribute('grabmax', $this->parameters['downloadlimit']);
         $this->xml->endElement();
     }
 
