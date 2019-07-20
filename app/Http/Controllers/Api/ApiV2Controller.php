@@ -11,6 +11,7 @@ use Blacklight\Releases;
 use App\Models\UserRequest;
 use App\Models\UserDownload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Events\UserAccessedApi;
 use Blacklight\utility\Utility;
 use App\Transformers\ApiTransformer;
@@ -93,12 +94,19 @@ class ApiV2Controller extends BasePageController
             $tags
         );
 
+        $time = UserRequest::whereUsersId($user->id)->min('timestamp');
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'ApiRequests' => UserRequest::getApiRequests($user->id),
-            'ApiLimit' => $user->role->apirequests,
-            'Grabs' => UserDownload::getDownloadRequests($user->id),
-            'DownloadLimit' => $user->role->downloadrequests,
+            'apiCurrent' => UserRequest::getApiRequests($user->id),
+            'apiMax' => $user->role->apirequests,
+            'grabCurrent' => UserDownload::getDownloadRequests($user->id),
+            'grabMax' => $user->role->downloadrequests,
+            'apiOldestTime' => $apiOldestTime,
+            'grabOldestTime' => $oldestGrabTime,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
@@ -155,12 +163,19 @@ class ApiV2Controller extends BasePageController
             );
         }
 
+        $time = UserRequest::whereUsersId($user->id)->min('timestamp');
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
             'apiCurrent' => UserRequest::getApiRequests($user->id),
             'apiMax' => $user->role->apirequests,
             'grabCurrent' => UserDownload::getDownloadRequests($user->id),
             'grabMax' => $user->role->downloadrequests,
+            'apiOldestTime' => $apiOldestTime,
+            'grabOldestTime' => $oldestGrabTime,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
@@ -230,12 +245,19 @@ class ApiV2Controller extends BasePageController
             $tags
         );
 
+        $time = UserRequest::whereUsersId($user->id)->min('timestamp');
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
+
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'ApiRequests' => UserRequest::getApiRequests($user->id),
-            'ApiLimit' => $user->role->apirequests,
-            'Grabs' => UserDownload::getDownloadRequests($user->id),
-            'DownloadLimit' => $user->role->downloadrequests,
+            'apiCurrent' => UserRequest::getApiRequests($user->id),
+            'apiMax' => $user->role->apirequests,
+            'grabCurrent' => UserDownload::getDownloadRequests($user->id),
+            'grabMax' => $user->role->downloadrequests,
+            'apiOldestTime' => $apiOldestTime,
+            'grabOldestTime' => $oldestGrabTime,
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 

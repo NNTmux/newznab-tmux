@@ -356,6 +356,12 @@ class XML_Response
         $this->xml->writeAttribute('apimax', $this->parameters['apilimit']);
         $this->xml->writeAttribute('grabcurrent', $this->parameters['grabs']);
         $this->xml->writeAttribute('grabmax', $this->parameters['downloadlimit']);
+        if (! empty($this->parameters['oldestapi'])) {
+            $this->xml->writeAttribute('apioldesttime', $this->parameters['oldestapi']);
+        }
+        if (! empty($this->parameters['oldestgrab'])) {
+            $this->xml->writeAttribute('graboldesttime', $this->parameters['oldestgrab']);
+        }
         $this->xml->endElement();
     }
 

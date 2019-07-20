@@ -9,6 +9,7 @@ use App\Models\UserRequest;
 use Illuminate\Support\Arr;
 use App\Models\UserDownload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class RssController extends BasePageController
 {
@@ -216,6 +217,10 @@ class RssController extends BasePageController
         $maxRequests = $res->role->apirequests;
         $maxDownloads = $res->role->downloadrequests;
         $usedRequests = UserRequest::getApiRequests($uid);
+        $time = UserRequest::whereUsersId($uid)->min('timestamp');
+        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc822String() : '';
+        $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
+        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc822String() : '';
 
         if ($res->hasRole('Disabled')) {
             return response()->json(['error' => 'Your account is disabled'], 403);
@@ -237,6 +242,8 @@ class RssController extends BasePageController
                 'requests' => $usedRequests,
                 'downloadlimit' => $maxDownloads,
                 'grabs' => UserDownload::getDownloadRequests($uid),
+                'oldestapi' => $apiOldestTime,
+                'oldestgrab' => $oldestGrabTime,
             ];
 
         return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];
