@@ -5673,16 +5673,16 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "6f02f6980d235cf4aaef7f577c27a3ccdc564601"
+                "reference": "c46ec31cc227db0aee3cdaac8b8b06550a93072c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/6f02f6980d235cf4aaef7f577c27a3ccdc564601",
-                "reference": "6f02f6980d235cf4aaef7f577c27a3ccdc564601",
+                "url": "https://api.github.com/repos/spatie/async/zipball/c46ec31cc227db0aee3cdaac8b8b06550a93072c",
+                "reference": "c46ec31cc227db0aee3cdaac8b8b06550a93072c",
                 "shasum": ""
             },
             "require": {
@@ -5715,9 +5715,9 @@
             "authors": [
                 {
                     "name": "Brent Roose",
+                    "role": "Developer",
                     "email": "brent@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
+                    "homepage": "https://spatie.be"
                 }
             ],
             "description": "Asynchronous and parallel PHP with the PCNTL extension",
@@ -5726,7 +5726,7 @@
                 "async",
                 "spatie"
             ],
-            "time": "2019-05-17T06:49:02+00:00"
+            "time": "2019-07-22T06:47:20+00:00"
         },
         {
             "name": "spatie/fractalistic",
