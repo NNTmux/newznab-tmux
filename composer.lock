@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a6818f464a209bafe68554b05a963cee",
+    "content-hash": "344580b9adfd4f74a476559fa23a6823",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -8791,6 +8791,126 @@
             "time": "2018-10-04T07:22:24+00:00"
         },
         {
+            "name": "captainhook/captainhook",
+            "version": "4.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CaptainHookPhp/captainhook.git",
+                "reference": "08139dedb95adc5c3a557ca5519e26f17aec6a49"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/08139dedb95adc5c3a557ca5519e26f17aec6a49",
+                "reference": "08139dedb95adc5c3a557ca5519e26f17aec6a49",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-simplexml": "*",
+                "ext-spl": "*",
+                "php": "^7.1",
+                "sebastianfeldmann/cli": "^3.0",
+                "sebastianfeldmann/git": "^2.2",
+                "symfony/console": ">=2.7"
+            },
+            "replace": {
+                "sebastianfeldmann/captainhook": "*"
+            },
+            "require-dev": {
+                "composer/composer": "~1",
+                "phpunit/phpunit": "^7.0"
+            },
+            "bin": [
+                "captainhook",
+                "captainhook-run"
+            ],
+            "type": "library",
+            "extra": {
+                "captainhook-config": "captainhook.json",
+                "captainhook-git-dir": ".git",
+                "branch-alias": {
+                    "dev-master": "4.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CaptainHook\\App\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "PHP git hook manager",
+            "homepage": "https://github.com/captainhookphp/captainhook",
+            "keywords": [
+                "commit-msg",
+                "git",
+                "hooks",
+                "pre-commit",
+                "pre-push",
+                "prepare-commit-msg"
+            ],
+            "time": "2019-07-15T21:15:26+00:00"
+        },
+        {
+            "name": "captainhook/plugin-composer",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CaptainHookPhp/plugin-composer.git",
+                "reference": "61b6c505e0e6855e7ad653f9efe0ae81304340e0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/61b6c505e0e6855e7ad653f9efe0ae81304340e0",
+                "reference": "61b6c505e0e6855e7ad653f9efe0ae81304340e0",
+                "shasum": ""
+            },
+            "require": {
+                "captainhook/captainhook": "^4.0",
+                "composer-plugin-api": "^1.1",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "composer/composer": "*"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "CaptainHook\\Plugin\\Composer\\ComposerPlugin",
+                "branch-alias": {
+                    "dev-fluffy_hedgehog": "5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CaptainHook\\Plugin\\Composer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Heigl",
+                    "email": "andreas@heigl.org"
+                },
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "Composer-Plugin handling your git-hooks",
+            "time": "2019-01-10T19:29:52+00:00"
+        },
+        {
             "name": "composer/composer",
             "version": "1.8.6",
             "source": {
@@ -12102,6 +12222,99 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
+        },
+        {
+            "name": "sebastianfeldmann/cli",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianfeldmann/cli.git",
+                "reference": "fbd21f4d2b7978cd7e79432726070dd2ee04cce5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/fbd21f4d2b7978cd7e79432726070dd2ee04cce5",
+                "reference": "fbd21f4d2b7978cd7e79432726070dd2ee04cce5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SebastianFeldmann\\Cli\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "PHP cli helper classes",
+            "homepage": "https://github.com/sebastianfeldmann/cli",
+            "keywords": [
+                "cli"
+            ],
+            "time": "2019-06-17T22:31:05+00:00"
+        },
+        {
+            "name": "sebastianfeldmann/git",
+            "version": "2.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianfeldmann/git.git",
+                "reference": "cc6190a13827b14307d2ba8595e720d6df883486"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianfeldmann/git/zipball/cc6190a13827b14307d2ba8595e720d6df883486",
+                "reference": "cc6190a13827b14307d2ba8595e720d6df883486",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.1",
+                "sebastianfeldmann/cli": "^3.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SebastianFeldmann\\Git\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Feldmann",
+                    "email": "sf@sebastian-feldmann.info"
+                }
+            ],
+            "description": "PHP git wrapper",
+            "homepage": "https://github.com/sebastianfeldmann/git",
+            "keywords": [
+                "git"
+            ],
+            "time": "2019-06-12T23:35:18+00:00"
         },
         {
             "name": "seld/jsonlint",

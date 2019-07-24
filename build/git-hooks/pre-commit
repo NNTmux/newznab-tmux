@@ -1,64 +1,15 @@
-#!/usr/bin/env bash
-#version=10
-#
-# The hook should
-# exit with non-zero status after issuing an appropriate message if
-# it wants to stop the commit.
-#
-# To enable this hook, rename this file to "pre-commit".
+#!/usr/bin/env php
+<?php
+$autoLoader = __DIR__ . '/../../vendor/autoload.php';
 
-if git rev-parse --verify HEAD >/dev/null 2>&1
-then
-	AGAINST=HEAD
-else
-	# Initial commit: diff against an empty tree object
-	AGAINST=4b825dc642cb6eb9a060e54bf8d69288fbee4904
-fi
+if (!file_exists($autoLoader)) {
+    fwrite(STDERR, 'Composer autoload.php could not be found');
+    exit(1);
+}
+require $autoLoader;
+$config = realpath(__DIR__ . '/../../captainhook.json');
+$app    = new CaptainHook\App\Console\Application\Hook();
+$app->setHook('pre-commit');
+$app->setConfigFile($config);
+$app->run();
 
-#####################################################################################################
-
-EXIT_STATUS=0
-
-NNTMUX=`pwd`
-HOOK_DIR=/build/git-hooks
-GIT=/.git/hooks
-PC=/pre-commit
-
-# Strip off the current directory path if we are run from in the git-hooks directory.
-PROJECT=${NNTMUX%${HOOK_DIR}}
-HOOKS=${PROJECT}${HOOK_DIR}
-FILE_LIST=${HOOKS}/git_hook_list.txt
-
-# stash any unstaged changes
-# git stash -q --keep-index
-
-if [ -e ${FILE_LIST} ]
-then
-	rm ${FILE_LIST}
-fi
-touch ${FILE_LIST}
-
-for FILE in `git diff-index --cached --name-only --diff-filter=AM ${AGAINST}`
-do
-    echo ${PROJECT}/${FILE} >> ${FILE_LIST}
-done
-
-EXIT_STATUS=$?
-
-if [ -e ${FILE_LIST} ]
-then
-	rm ${FILE_LIST}
-fi
-
-if [ ${EXIT_STATUS} -gt 0 ]
-then
-	exit ${EXIT_STATUS}
-fi
-
-# If there are whitespace errors, print the offending file names and fail.
-#exec git diff-index --check --cached ${AGAINST} --
-# Remove trailing white-space in commits.
-${HOOKS}/white-space-removal
-
-# unstash the saved stuff
-# git stash pop -q

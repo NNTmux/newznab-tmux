@@ -160,6 +160,8 @@
     "barryvdh/laravel-debugbar": "^3.1",
     "barryvdh/laravel-ide-helper": "^2.4",
     "beyondcode/laravel-dump-server": "^1.0",
+    "captainhook/captainhook": "^4.4",
+    "captainhook/plugin-composer": "^4.0",
     "filp/whoops": "~2.0",
     "friendsofphp/php-cs-fixer": "^2.14",
     "fzaninotto/faker": "~1.4",
@@ -186,8 +188,7 @@
     ],
     "post-update-cmd": [
       "Blacklight\\build\\ComposerScripts::postUpdate",
-      "@php artisan ide-helper:generate --ansi",
-      "@php artisan ide-helper:meta --ansi"
+      "@php artisan ide-helper:generate --ansi"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
