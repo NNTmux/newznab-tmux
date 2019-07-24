@@ -32,8 +32,14 @@
         ]
     },
     "prepare-commit-msg": {
-        "enabled": false,
-        "actions": []
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Prepare",
+                "options": [],
+                "conditions": []
+            }
+        ]
     },
     "post-commit": {
         "enabled": false,
