@@ -58,7 +58,7 @@
                 "options": {},
                 "conditions": [
                     {
-                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChange\\Any",
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
                         "args": [
                             ["composer.json", "composer.lock"]
                         ]
@@ -75,7 +75,7 @@
                 "options": {},
                 "conditions": [
                     {
-                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChange\\Any",
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
                         "args": [
                             ["composer.json", "composer.lock"]
                         ]
