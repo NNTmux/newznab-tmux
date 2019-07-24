@@ -25,6 +25,11 @@
                 "conditions": []
             },
             {
+                "action": "\\CaptainHook\\App\\Hook\\Composer\\Action\\CheckLockFile",
+                "options": [],
+                "conditions": []
+            },
+            {
                 "action": "vendor/bin/php-cs-fixer fix",
                 "options": [],
                 "conditions": []
@@ -46,11 +51,37 @@
         "actions": []
     },
     "post-merge": {
-        "enabled": false,
-        "actions": []
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer install",
+                "options": {},
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChange\\Any",
+                        "args": [
+                            ["composer.json", "composer.lock"]
+                        ]
+                    }
+                ]
+            }
+        ]
     },
     "post-checkout": {
-        "enabled": false,
-        "actions": []
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer install",
+                "options": {},
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChange\\Any",
+                        "args": [
+                            ["composer.json", "composer.lock"]
+                        ]
+                    }
+                ]
+            }
+        ]
     }
 }
