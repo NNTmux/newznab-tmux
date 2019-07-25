@@ -1,3 +1,5 @@
+2019-07-25 DariusIII
+	* Chg: Update phpunit/php-token-stream (3.0.2 => 3.1.0)
 2019-07-24 DariusIII
 	* Chg: Add captainhook/captainhook for dev work
 2019-07-22 DariusIII
