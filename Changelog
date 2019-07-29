@@ -1,4 +1,5 @@
 2019-07-29 DariusIII
+	* Chg: Update used components to their latest versions
 	* Chg: Update simfony components
 2019-07-25 DariusIII
 	* Chg: Update phpunit/php-token-stream (3.0.2 => 3.1.0)
