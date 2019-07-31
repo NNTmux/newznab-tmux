@@ -7,9 +7,9 @@ use App\Models\Binary;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
