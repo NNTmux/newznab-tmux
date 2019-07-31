@@ -9,6 +9,7 @@ use App\Models\Settings;
 use App\Models\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -106,7 +107,7 @@ class NZB
         $nzbSplitLevel = (int) Settings::settingValue('..nzbsplitlevel');
         $this->nzbSplitLevel = $nzbSplitLevel ?? 1;
         $this->siteNzbPath = (string) Settings::settingValue('..nzbpath');
-        if (! ends_with($this->siteNzbPath, '/')) {
+        if (! Str::endsWith($this->siteNzbPath, '/')) {
             $this->siteNzbPath .= '/';
         }
         $this->_nzbCommentString = sprintf(

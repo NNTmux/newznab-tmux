@@ -147,7 +147,7 @@ class ProfileController extends BasePageController
                 break;
             case 'submit':
 
-                if ($request->has('saburl') && ! ends_with($request->input('saburl'), '/') && trim($request->input('saburl')) !== '') {
+                if ($request->has('saburl') && ! Str::endsWith($request->input('saburl'), '/') && trim($request->input('saburl')) !== '') {
                     $request->merge(['saburl' => $request->input('saburl').'/']);
                 }
 
