@@ -1,3 +1,5 @@
+2019-08-01 DariusIII
+	* Chg: Update nesbot/carbon (2.21.3 => 2.22.0)
 2019-07-31 DariusIII
 	* Chg: Replace ends_with function with Str:endsWith()
 	* Chg: Update laravel/framework (v5.8.29 => v5.8.30) and rest of the used components to their latest version
