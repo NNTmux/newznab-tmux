@@ -476,16 +476,16 @@
         },
         {
             "name": "composer/ca-bundle",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/ca-bundle.git",
-                "reference": "ec2e24d4fa6a0d50d423794a56605ecec3401b85"
+                "reference": "f26a67e397be0e5c00d7c52ec7b5010098e15ce5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/ec2e24d4fa6a0d50d423794a56605ecec3401b85",
-                "reference": "ec2e24d4fa6a0d50d423794a56605ecec3401b85",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/f26a67e397be0e5c00d7c52ec7b5010098e15ce5",
+                "reference": "f26a67e397be0e5c00d7c52ec7b5010098e15ce5",
                 "shasum": ""
             },
             "require": {
@@ -528,7 +528,7 @@
                 "ssl",
                 "tls"
             ],
-            "time": "2019-08-01T07:52:17+00:00"
+            "time": "2019-08-02T09:05:43+00:00"
         },
         {
             "name": "czproject/git-php",
@@ -5675,16 +5675,16 @@
         },
         {
             "name": "spatie/async",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/async.git",
-                "reference": "c46ec31cc227db0aee3cdaac8b8b06550a93072c"
+                "reference": "5ac27b358058d88ae74e53e590c4c89bccc6630e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/c46ec31cc227db0aee3cdaac8b8b06550a93072c",
-                "reference": "c46ec31cc227db0aee3cdaac8b8b06550a93072c",
+                "url": "https://api.github.com/repos/spatie/async/zipball/5ac27b358058d88ae74e53e590c4c89bccc6630e",
+                "reference": "5ac27b358058d88ae74e53e590c4c89bccc6630e",
                 "shasum": ""
             },
             "require": {
@@ -5728,7 +5728,7 @@
                 "async",
                 "spatie"
             ],
-            "time": "2019-07-22T06:47:20+00:00"
+            "time": "2019-08-02T08:06:36+00:00"
         },
         {
             "name": "spatie/fractalistic",
@@ -8794,16 +8794,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "4.4.3",
+            "version": "4.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/captainhook.git",
-                "reference": "5fde1a723cf042060b1be6c6dcd0c6def578fec1"
+                "reference": "e9bdc5ac9f9ac7c28fdacc72a8a536278715f29f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/5fde1a723cf042060b1be6c6dcd0c6def578fec1",
-                "reference": "5fde1a723cf042060b1be6c6dcd0c6def578fec1",
+                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/e9bdc5ac9f9ac7c28fdacc72a8a536278715f29f",
+                "reference": "e9bdc5ac9f9ac7c28fdacc72a8a536278715f29f",
                 "shasum": ""
             },
             "require": {
@@ -8859,7 +8859,7 @@
                 "pre-push",
                 "prepare-commit-msg"
             ],
-            "time": "2019-08-01T16:01:34+00:00"
+            "time": "2019-08-02T08:42:18+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -8914,16 +8914,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "1.8.6",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "19b5f66a0e233eb944f134df34091fe1c5dfcc11"
+                "reference": "314aa57fdcfc942065996f59fb73a8b3f74f3fa5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/19b5f66a0e233eb944f134df34091fe1c5dfcc11",
-                "reference": "19b5f66a0e233eb944f134df34091fe1c5dfcc11",
+                "url": "https://api.github.com/repos/composer/composer/zipball/314aa57fdcfc942065996f59fb73a8b3f74f3fa5",
+                "reference": "314aa57fdcfc942065996f59fb73a8b3f74f3fa5",
                 "shasum": ""
             },
             "require": {
@@ -8959,7 +8959,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8-dev"
+                    "dev-master": "1.9-dev"
                 }
             },
             "autoload": {
@@ -8983,14 +8983,14 @@
                     "homepage": "http://seld.be"
                 }
             ],
-            "description": "Composer helps you declare, manage and install dependencies of PHP projects, ensuring you have the right stack everywhere.",
+            "description": "Composer helps you declare, manage and install dependencies of PHP projects. It ensures you have the right stack everywhere.",
             "homepage": "https://getcomposer.org/",
             "keywords": [
                 "autoload",
                 "dependency",
                 "package"
             ],
-            "time": "2019-06-11T13:03:06+00:00"
+            "time": "2019-08-02T18:55:33+00:00"
         },
         {
             "name": "composer/semver",
@@ -10519,26 +10519,26 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.3.17",
+            "version": "v0.3.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "a123a601a7796aa6f7793e87feb91a8affc95a80"
+                "reference": "53ba36f7ef35804a8512e120f4f7c546ab33fb72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/a123a601a7796aa6f7793e87feb91a8affc95a80",
-                "reference": "a123a601a7796aa6f7793e87feb91a8affc95a80",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/53ba36f7ef35804a8512e120f4f7c546ab33fb72",
+                "reference": "53ba36f7ef35804a8512e120f4f7c546ab33fb72",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "5.6.*|5.7.*|5.8.*",
-                "illuminate/container": "5.6.*|5.7.*|5.8.*",
-                "illuminate/contracts": "5.6.*|5.7.*|5.8.*",
-                "illuminate/database": "5.6.*|5.7.*|5.8.*",
-                "illuminate/http": "5.6.*|5.7.*|5.8.*",
-                "illuminate/pipeline": "5.6.*|5.7.*|5.8.*",
-                "illuminate/support": "5.6.*|5.7.*|5.8.*",
+                "illuminate/console": "5.6.*|5.7.*|5.8.*|^6.0",
+                "illuminate/container": "5.6.*|5.7.*|5.8.*|^6.0",
+                "illuminate/contracts": "5.6.*|5.7.*|5.8.*|^6.0",
+                "illuminate/database": "5.6.*|5.7.*|5.8.*|^6.0",
+                "illuminate/http": "5.6.*|5.7.*|5.8.*|^6.0",
+                "illuminate/pipeline": "5.6.*|5.7.*|5.8.*|^6.0",
+                "illuminate/support": "5.6.*|5.7.*|5.8.*|^6.0",
                 "mockery/mockery": "^1.0|0.9.*",
                 "orchestra/testbench": "^3.6",
                 "php": "^7.1.3",
@@ -10582,7 +10582,7 @@
                 "php",
                 "static analysis"
             ],
-            "time": "2019-05-29T12:53:31+00:00"
+            "time": "2019-08-04T13:15:39+00:00"
         },
         {
             "name": "ocramius/package-versions",
@@ -10687,16 +10687,16 @@
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v3.8.5",
+            "version": "v3.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "b81c24ef1036cb1f8ff0ca711535cea3f0281848"
+                "reference": "fbdca0c5106ebf6d060c7f1fbdbbeeb3f4a5a725"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/b81c24ef1036cb1f8ff0ca711535cea3f0281848",
-                "reference": "b81c24ef1036cb1f8ff0ca711535cea3f0281848",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/fbdca0c5106ebf6d060c7f1fbdbbeeb3f4a5a725",
+                "reference": "fbdca0c5106ebf6d060c7f1fbdbbeeb3f4a5a725",
                 "shasum": ""
             },
             "require": {
@@ -10748,7 +10748,7 @@
                 "orchestral",
                 "testing"
             ],
-            "time": "2019-06-10T08:29:56+00:00"
+            "time": "2019-08-04T02:31:04+00:00"
         },
         {
             "name": "phar-io/manifest",
