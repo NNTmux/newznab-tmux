@@ -8,7 +8,7 @@
 		<div class="row" style="position:relative;margin-bottom:5px;">
             <div class="col-md-4">
             {{Form::open(['name' => 'groupsearch', 'style' => 'margin-bottom:5px;'])}}
-                {{Form::label('grouopname', 'Group')}}
+                {{Form::label('groupname', 'Group')}}
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
 				&nbsp;&nbsp;
 				<input class="btn btn-success" type="submit" value="Go"/>
@@ -85,7 +85,7 @@
         <div class="row" style="position:relative;margin-bottom:5px;">
             <div class="col-md-4">
                 {{Form::open(['name' => 'groupsearch', 'style' => 'margin-bottom:5px;'])}}
-                {{Form::label('grouopname', 'Group')}}
+                {{Form::label('groupname', 'Group')}}
                 <input id="groupname" type="text" name="groupname" value="{$groupname}" size="15"/>
                 &nbsp;&nbsp;
                 <input class="btn btn-success" type="submit" value="Go"/>

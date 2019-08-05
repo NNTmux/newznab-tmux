@@ -400,13 +400,13 @@ class User extends Authenticatable
             $users = self::query()->whereDate('rolechangedate', '=', $value)->get();
             $days = $now->diffInDays($value);
             foreach ($users as $user) {
-                SendAccountWillExpireEmail::dispatch($user, $days);
+                SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
             }
         }
         foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
             $expired->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
             $expired->syncRoles('User');
-            SendAccountExpiredEmail::dispatch($expired);
+            SendAccountExpiredEmail::dispatch($expired)->onQueue('emails');
         }
     }
 
@@ -881,10 +881,10 @@ class User extends Authenticatable
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
         $token = \Token::randomString(40);
-        $url = $serverUrl.'register?invitecode='.$token;
+        $url = $serverUrl.'/register?invitecode='.$token;
 
         Invitation::addInvite($uid, $token);
-        SendInviteEmail::dispatch($emailTo, $uid, $url);
+        SendInviteEmail::dispatch($emailTo, $uid, $url)->onQueue('emails');
 
         return $url;
     }
@@ -896,6 +896,7 @@ class User extends Authenticatable
      * limits to apply.
      *
      * @param int $days
+     * @throws \Exception
      */
     public static function pruneRequestHistory($days = 0): void
     {

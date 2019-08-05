@@ -207,6 +207,10 @@ Route::group(['middleware' => ['isVerified', 'fw-block-blacklisted']], function 
     Route::get('nzbvortex', 'QueueController@nzbvortex');
 
     Route::post('nzbvortex', 'QueueController@nzbvortex');
+
+    Route::get('ajax_profile', 'AjaxController@profile');
+
+    Route::post('ajax_profile', 'AjaxController@profile');
 });
 
 Route::get('forum-delete/{id}', 'ForumController@destroy')->middleware('role:Admin');

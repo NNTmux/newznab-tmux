@@ -183,7 +183,6 @@
                                                                     <div style="display:none;" id="divInvite">
                                                                         {{Form::open(['id' => 'frmSendInvite', 'method' => 'get'])}}
                                                                         {{Form::label('txtInvite', 'Email')}}
-                                                                        {{Form::text(['id' => txtInvite])}}
                                                                         {{Form::text('txtInvite', null, ['id' => 'txtInvite'])}}
                                                                         {{Form::submit('Send')}}
                                                                         {{Form::close()}}
