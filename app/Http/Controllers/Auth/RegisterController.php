@@ -87,7 +87,6 @@ class RegisterController extends Controller
             $inviteCode = $request->input('invitecode');
         }
 
-
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
