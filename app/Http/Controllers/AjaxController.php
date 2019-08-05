@@ -14,12 +14,12 @@ class AjaxController extends BasePageController
             $emailTo = $request->input('emailto');
             $ret = User::sendInvite(url('/'), $this->userdata->id, $emailTo);
             if (! $ret) {
-                print 'Invite not sent.';
+                echo 'Invite not sent.';
             } else {
-                print 'Invite sent. Alternatively paste them following link to register - ' . $ret;
+                echo 'Invite sent. Alternatively paste them following link to register - '.$ret;
             }
         } else {
-            print 'Invite not sent.';
+            echo 'Invite not sent.';
         }
     }
 }
