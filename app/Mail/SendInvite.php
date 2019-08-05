@@ -41,6 +41,6 @@ class SendInvite extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Invite received')->view('emails.sendinvite')->with(['invite' => $this->invite, 'username' => $this->user->username, 'site' => Settings::settingValue('site.main.title'), 'email' => $this->user->email]);
+        return $this->from(Settings::settingValue('site.main.email'))->subject('Invite received')->view('emails.sendinvite')->with(['invite' => $this->invite, 'username' => $this->user['username'], 'site' => Settings::settingValue('site.main.title'), 'email' => $this->user['email']]);
     }
 }

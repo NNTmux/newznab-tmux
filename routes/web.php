@@ -17,6 +17,8 @@ Route::group(['middleware' => ['fw-block-blacklisted']], function () {
     Route::get('/', 'ContentController@show');
 
     Route::get('register', 'Auth\RegisterController@showRegistrationForm');
+    Route::post('register', 'Auth\RegisterController@showRegistrationForm');
+    Route::get('register', 'Auth\RegisterController@register');
     Route::post('register', 'Auth\RegisterController@register');
 
     Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');

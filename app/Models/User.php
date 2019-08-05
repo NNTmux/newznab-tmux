@@ -882,9 +882,10 @@ class User extends Authenticatable
     {
         $token = \Token::randomString(40);
         $url = $serverUrl.'/register?invitecode='.$token;
+        $user = self::find($uid);
 
         Invitation::addInvite($uid, $token);
-        SendInviteEmail::dispatch($emailTo, $uid, $url)->onQueue('emails');
+        SendInviteEmail::dispatch($emailTo, $user, $url)->onQueue('emails');
 
         return $url;
     }

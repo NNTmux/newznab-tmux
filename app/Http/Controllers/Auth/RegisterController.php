@@ -75,12 +75,18 @@ class RegisterController extends Controller
     /**
      * @param \Illuminate\Http\Request $request
      *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
      * @throws \Illuminate\Validation\ValidationException
      */
     public function register(Request $request)
     {
         $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
         $showRegister = 1;
+
+        if ($request->has('invitecode')) {
+            $inviteCode = $request->input('invitecode');
+        }
+
 
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
@@ -115,9 +121,6 @@ class RegisterController extends Controller
                     $password = $request->input('password');
                     $confirmPassword = $request->input('password_confirmation');
                     $email = $request->input('email');
-                    if ($request->has('invitecode')) {
-                        $inviteCode = $request->input('invitecode');
-                    }
 
                         // Get the default user role.
                         $userDefault = Role::query()->where('isdefault', '=', 1)->first();
@@ -134,6 +137,7 @@ class RegisterController extends Controller
                                 break;
                             }
                         }
+
                         if (! empty($error)) {
                             return $this->showRegistrationForm($error);
                         }
@@ -154,7 +158,6 @@ class RegisterController extends Controller
 
                     break;
                 case 'view': {
-                    $inviteCode = $request->input('invitecode') ?? null;
                     if ($inviteCode !== null) {
                         // See if it is a valid invite.
                         $invite = Invitation::getInvite($inviteCode);
@@ -181,20 +184,21 @@ class RegisterController extends Controller
             ]
         );
 
-        return $this->showRegistrationForm($error);
+        return $this->showRegistrationForm($error, $inviteCode);
     }
 
     /**
      * @param string $error
+     * @param string $inviteCode
      */
-    public function showRegistrationForm($error = '')
+    public function showRegistrationForm($error = '', $inviteCode = '')
     {
         $showRegister = 1;
         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
             $error = 'Registrations are currently disabled.';
             $showRegister = 0;
         }
-        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+        if (empty($inviteCode) && ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE)) {
             $error = 'Registrations are currently invite only.';
             $showRegister = 0;
         }
