@@ -116,7 +116,7 @@ return [
         'production' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['default', 'emails', 'newreg', 'welcomeemails'],
+                'queue' => ['default', 'emails', 'newreg', 'welcomeemails', 'contactemail', 'deleted'],
                 'balance' => 'auto',
                 'processes' => 10,
                 'tries' => 3,
@@ -126,7 +126,7 @@ return [
         'local' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['default', 'emails', 'newreg', 'welcomeemails'],
+                'queue' => ['default', 'emails', 'newreg', 'welcomeemails', 'contactemail', 'deleted'],
                 'balance' => 'auto',
                 'processes' => 3,
                 'tries' => 3,
