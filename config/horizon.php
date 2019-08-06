@@ -99,7 +99,7 @@ return [
     |
     */
 
-    'memory_limit' => 64,
+    'memory_limit' => 1024,
 
     /*
     |--------------------------------------------------------------------------
@@ -116,7 +116,7 @@ return [
         'production' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['default'],
+                'queue' => ['default', 'emails', 'newreg', 'welcomeemails'],
                 'balance' => 'auto',
                 'processes' => 10,
                 'tries' => 3,
@@ -126,7 +126,7 @@ return [
         'local' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['default'],
+                'queue' => ['default', 'emails', 'newreg', 'welcomeemails'],
                 'balance' => 'auto',
                 'processes' => 3,
                 'tries' => 3,
