@@ -107,13 +107,6 @@ class RegisterController extends Controller
             return $this->showRegistrationForm($request, $error);
         }
 
-        /*if (empty($inviteCode) && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
-            $error = 'Registrations are currently invite only.';
-            $showRegister = 0;
-
-            return $this->showRegistrationForm($request, $error, $showRegister);
-        }*/
-
         $action = $request->input('action') ?? 'view';
 
         switch ($action) {
@@ -200,6 +193,8 @@ class RegisterController extends Controller
         } elseif ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
             $error = 'Registrations are currently closed.';
             $showRegister = 0;
+        } else {
+            $showRegister = 1;
         }
 
         app('smarty.view')->assign('showregister', $showRegister);
