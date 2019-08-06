@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     /*
@@ -24,5 +25,5 @@ return [
     | Invitation Model
     |--------------------------------------------------------------------------
     */
-    'InvitationModel' => 'Junaidnasir\Larainvite\Models\LaraInviteModel'
+    'InvitationModel' => 'Junaidnasir\Larainvite\Models\LaraInviteModel',
 ];

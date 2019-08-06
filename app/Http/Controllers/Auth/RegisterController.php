@@ -5,19 +5,19 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\Invitation;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
-use Illuminate\Validation\ValidationException;
-use Junaidnasir\Larainvite\Facades\Invite;
+use Illuminate\Routing\Redirector;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Junaidnasir\Larainvite\Facades\Invite;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Validation\ValidationException;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 
 class RegisterController extends Controller
@@ -114,7 +114,6 @@ class RegisterController extends Controller
             return $this->showRegistrationForm($request, $error, $showRegister);
         }*/
 
-
         $action = $request->input('action') ?? 'view';
 
         switch ($action) {
@@ -131,8 +130,7 @@ class RegisterController extends Controller
                         return $this->showRegistrationForm($request, $error);
                     }
 
-                if( Invite::isAllowed($inviteCode,$email) || Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_INVITE ){
-
+                if (Invite::isAllowed($inviteCode, $email) || Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
                     $user = $this->create(
                         [
                             'username' => $userName,
@@ -147,7 +145,6 @@ class RegisterController extends Controller
                     Invite::consume($inviteCode);
 
                     return $this->registered($request, $user) ?: redirect($this->redirectPath());
-
                 }
                 break;
             case 'view': {
