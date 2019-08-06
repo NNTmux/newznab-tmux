@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SendInviteEmail;
 use Illuminate\Support\Carbon;
+use Junaidnasir\Larainvite\Facades\Invite;
+use Junaidnasir\Larainvite\InviteTrait;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\SendAccountExpiredEmail;
@@ -20,6 +22,7 @@ use Jrean\UserVerification\Traits\UserVerification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
+ * App\Models\User.
  * App\Models\User.
  *
  * @property int $id
@@ -116,7 +119,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable, UserVerification, HasRoles;
+    use Notifiable, UserVerification, HasRoles, InviteTrait;
 
     public const ERR_SIGNUP_BADUNAME = -1;
     public const ERR_SIGNUP_BADPASS = -2;
@@ -880,9 +883,9 @@ class User extends Authenticatable
      */
     public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $token = \Token::randomString(40);
-        $url = $serverUrl.'/register?invitecode='.$token;
         $user = self::find($uid);
+        $token = Invite::invite($emailTo, $user->id);
+        $url = $serverUrl.'/register?invitecode='.$token;
 
         Invitation::addInvite($uid, $token);
         SendInviteEmail::dispatch($emailTo, $user, $url)->onQueue('emails');

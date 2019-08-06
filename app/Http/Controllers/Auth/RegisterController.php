@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\Invitation;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Blacklight\utility\Utility;
+use Illuminate\Validation\ValidationException;
+use Junaidnasir\Larainvite\Facades\Invite;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Password;
@@ -50,9 +54,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
+     * @param array $data
      * @return \App\Models\User
      */
     protected function create(array $data): User
@@ -73,14 +75,14 @@ class RegisterController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
-     * @throws \Illuminate\Validation\ValidationException
+     * @return RedirectResponse|Redirector|void
+     * @throws ValidationException
      */
     public function register(Request $request)
     {
-        $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
+        $error = $userName = $password = $confirmPassword = $email = $inviteCode = '';
         $showRegister = 1;
 
         if ($request->has('invitecode')) {
@@ -102,73 +104,61 @@ class RegisterController extends Controller
         if ($validator->fails()) {
             $error = implode('', Arr::collapse($validator->errors()->toArray()));
 
-            return $this->showRegistrationForm($error);
+            return $this->showRegistrationForm($request, $error);
         }
 
-        if (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! $request->has('invitecode') || empty($request->input('invitecode')))) {
+        /*if (empty($inviteCode) && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             $error = 'Registrations are currently invite only.';
+            $showRegister = 0;
 
-            return $this->showRegistrationForm($error);
-        }
+            return $this->showRegistrationForm($request, $error, $showRegister);
+        }*/
 
-        if ($showRegister === 1) {
-            $action = $request->input('action') ?? 'view';
 
-            switch ($action) {
-                case 'submit':
-                    $userName = $request->input('username');
-                    $password = $request->input('password');
-                    $confirmPassword = $request->input('password_confirmation');
-                    $email = $request->input('email');
+        $action = $request->input('action') ?? 'view';
 
-                        // Get the default user role.
-                        $userDefault = Role::query()->where('isdefault', '=', 1)->first();
+        switch ($action) {
+            case 'submit':
+                $userName = $request->input('username');
+                $password = $request->input('password');
+                $confirmPassword = $request->input('password_confirmation');
+                $email = $request->input('email');
 
-                        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
-                            if ($inviteCode === '') {
-                                $error = 'Sorry, the invite code is old or has been used.';
-                                break;
-                            }
+                    // Get the default user role.
+                    $userDefault = Role::query()->where('isdefault', '=', 1)->first();
 
-                            $invitedBy = User::checkAndUseInvite($inviteCode);
-                            if ($invitedBy < 0) {
-                                $error = 'Sorry, the invite code is old or has been used.';
-                                break;
-                            }
-                        }
+                    if (! empty($error)) {
+                        return $this->showRegistrationForm($request, $error);
+                    }
 
-                        if (! empty($error)) {
-                            return $this->showRegistrationForm($error);
-                        }
+                if( Invite::isAllowed($inviteCode,$email) || Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_INVITE ){
 
-                        $user = $this->create(
-                            [
-                                'username' => $userName,
-                                'password' => $password,
-                                'email' => $email,
-                                'host' => $request->ip(),
-                                'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
-                                'notes' => '',
-                                'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
-                            ]
-                        );
+                    $user = $this->create(
+                        [
+                            'username' => $userName,
+                            'password' => $password,
+                            'email' => $email,
+                            'host' => $request->ip(),
+                            'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
+                            'notes' => '',
+                            'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
+                        ]
+                    );
+                    Invite::consume($inviteCode);
 
                     return $this->registered($request, $user) ?: redirect($this->redirectPath());
 
-                    break;
-                case 'view': {
-                    if ($inviteCode !== null) {
-                        // See if it is a valid invite.
-                        $invite = Invitation::getInvite($inviteCode);
-                        if (! $invite) {
-                            $error = sprintf('Bad or invite code older than %d days.', Invitation::DEFAULT_INVITE_EXPIRY_DAYS);
-                            $showRegister = 0;
-                        } else {
-                            $inviteCode = $invite['guid'];
-                        }
-                    }
-                    break;
                 }
+                break;
+            case 'view': {
+                // See if it is a valid invite.
+                if (($inviteCode !== null) && ! Invite::isValid($inviteCode)) {
+                    $error = 'Invalid invitation token!';
+                    $showRegister = 0;
+                } else {
+                    $showRegister = 1;
+                }
+                break;
             }
         }
         app('smarty.view')->assign(
@@ -178,29 +168,43 @@ class RegisterController extends Controller
                 'password_confirmation'   => Utility::htmlfmt($confirmPassword),
                 'email'             => Utility::htmlfmt($email),
                 'invitecode'        => Utility::htmlfmt($inviteCode),
-                'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
                 'showregister'      => $showRegister,
             ]
         );
 
-        return $this->showRegistrationForm($error, $inviteCode);
+        return $this->showRegistrationForm($request, $error, $showRegister);
     }
 
     /**
+     * @param Request $request
      * @param string $error
-     * @param string $inviteCode
+     * @param int $showRegister
      */
-    public function showRegistrationForm($error = '', $inviteCode = '')
+    public function showRegistrationForm(Request $request, $error = '', $showRegister = 0)
     {
-        $showRegister = 1;
-        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
-            $error = 'Registrations are currently disabled.';
+        $inviteCode = '';
+        if ($request->has('invitecode')) {
+            $inviteCode = $request->input('invitecode');
+        }
+
+        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+            if (! empty($inviteCode)) {
+                if (Invite::isValid($inviteCode)) {
+                    $error = '';
+                    $showRegister = 1;
+                } else {
+                    $error = 'Invalid or expired invitation token!';
+                    $showRegister = 0;
+                }
+            } else {
+                $error = 'Registrations are currently invite only.';
+                $showRegister = 0;
+            }
+        } elseif ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
+            $error = 'Registrations are currently closed.';
             $showRegister = 0;
         }
-        if (empty($inviteCode) && ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE)) {
-            $error = 'Registrations are currently invite only.';
-            $showRegister = 0;
-        }
+
         app('smarty.view')->assign('showregister', $showRegister);
         app('smarty.view')->assign('error', $error);
         $theme = Settings::settingValue('site.main.style');

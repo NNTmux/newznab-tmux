@@ -118,6 +118,7 @@
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "jrean/laravel-user-verification": "^7.0",
+    "junaidnasir/larainvite": "^2.0",
     "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.8.*",
     "laravel/horizon": "^3.0",

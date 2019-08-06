@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "344580b9adfd4f74a476559fa23a6823",
+    "content-hash": "0bd9521e4ebcd3b3d9969024ea5941f7",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -2473,6 +2473,64 @@
                 "user verification"
             ],
             "time": "2019-03-01T04:24:17+00:00"
+        },
+        {
+            "name": "junaidnasir/larainvite",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/junaidnasir/larainvite.git",
+                "reference": "6d079f6cc598bd2057e8c5974f8026b622fa6329"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/junaidnasir/larainvite/zipball/6d079f6cc598bd2057e8c5974f8026b622fa6329",
+                "reference": "6d079f6cc598bd2057e8c5974f8026b622fa6329",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^5.1",
+                "illuminate/events": "^5.1",
+                "illuminate/support": "^5.1",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Junaidnasir\\Larainvite\\LaraInviteServiceProvider"
+                    ],
+                    "aliases": {
+                        "Invite": "Junaidnasir\\Larainvite\\Facades\\Invite"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Junaidnasir\\Larainvite\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Junaid Nasir",
+                    "email": "contact@junaidnasir.com"
+                }
+            ],
+            "description": "Laravel Invitation package, existing users can invite others by email",
+            "homepage": "https://github.com/junaidnasir/larainvite",
+            "keywords": [
+                "Invite",
+                "invitations",
+                "laravel"
+            ],
+            "time": "2019-04-24T11:57:28+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",

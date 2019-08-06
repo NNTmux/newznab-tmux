@@ -41,7 +41,7 @@ class UserServiceObserver
             SendWelcomeEmail::dispatch($user)->onQueue('welcomeemails');
             UserVerification::generate($user);
 
-            UserVerification::send($user, 'User email verification required');
+            UserVerification::send($user, 'User email verification required', Settings::settingValue('site.main.email'));
         }
     }
 
