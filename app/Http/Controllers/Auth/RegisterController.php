@@ -201,6 +201,9 @@ class RegisterController extends Controller
         } elseif ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
             $error = 'Registrations are currently closed.';
             $showRegister = 0;
+        } elseif ($request->has('invitecode')) {
+            $error = 'Registration is open, you don\'t need the invite code to register.';
+            $showRegister = 0;
         } else {
             $showRegister = 1;
         }
