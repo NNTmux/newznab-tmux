@@ -17,7 +17,7 @@ class CreateInvitationUserTable extends Migration
             $table->string('code')->index();
             $table->string('email');
             $table->BigInteger('user_id')->unsigned();
-            $table->enum('status', ['pending', 'successful','canceled','expired'])->default('pending');
+            $table->enum('status', ['pending', 'successful', 'canceled', 'expired'])->default('pending');
             $table->datetime('valid_till');
             $table->timestamps();
         });
