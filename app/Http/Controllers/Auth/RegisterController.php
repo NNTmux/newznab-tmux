@@ -44,6 +44,11 @@ class RegisterController extends Controller
     protected $redirectTo = '/';
 
     /**
+     * @var string
+     */
+    private $inviteCodeQuery;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
@@ -87,6 +92,7 @@ class RegisterController extends Controller
 
         if ($request->has('invitecode')) {
             $inviteCode = $request->input('invitecode');
+            $this->inviteCodeQuery = '&invitecode='.$inviteCode;
         }
 
         $validator = Validator::make($request->all(), [
@@ -158,6 +164,7 @@ class RegisterController extends Controller
                 'password_confirmation'   => Utility::htmlfmt($confirmPassword),
                 'email'             => Utility::htmlfmt($email),
                 'invitecode'        => Utility::htmlfmt($inviteCode),
+                'invite_code_query' => Utility::htmlfmt($this->inviteCodeQuery),
                 'showregister'      => $showRegister,
             ]
         );
@@ -175,6 +182,7 @@ class RegisterController extends Controller
         $inviteCode = '';
         if ($request->has('invitecode')) {
             $inviteCode = $request->input('invitecode');
+            $this->inviteCodeQuery = '&invitecode='.$inviteCode;
         }
 
         if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
@@ -199,6 +207,7 @@ class RegisterController extends Controller
 
         app('smarty.view')->assign('showregister', $showRegister);
         app('smarty.view')->assign('error', $error);
+        app('smarty.view')->assign('invite_code_query', $this->inviteCodeQuery);
         $theme = Settings::settingValue('site.main.style');
 
         $nocaptcha = env('NOCAPTCHA_ENABLED');

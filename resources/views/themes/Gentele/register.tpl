@@ -15,7 +15,7 @@
 			</div>
 			<div class="register-box-body">
 				<p class="login-box-msg">Register a new membership</p>
-                {{Form::open(['url' => "register?action=submit"])}}
+                {{Form::open(['url' => "register?action=submit{$invite_code_query}"])}}
 					<div class="form-group has-feedback">
 						<input autocomplete="off" id="username" name="username" value="{$username}" type="text"
 							   class="form-control" placeholder="Username"/>
