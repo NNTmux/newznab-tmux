@@ -4,12 +4,28 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.12 (2019-07-18)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    var getKeyboardSpaces = function (editor) {
+      var spaces = editor.getParam('nonbreaking_force_tab', 0);
+      if (typeof spaces === 'boolean') {
+        return spaces === true ? 3 : 0;
+      } else {
+        return spaces;
+      }
+    };
+    var wrapNbsps = function (editor) {
+      return editor.getParam('nonbreaking_wrap', true, 'boolean');
+    };
+    var Settings = {
+      getKeyboardSpaces: getKeyboardSpaces,
+      wrapNbsps: wrapNbsps
+    };
 
     var stringRepeat = function (string, repeats) {
       var str = '';
@@ -22,9 +38,17 @@
       return editor.plugins.visualchars ? editor.plugins.visualchars.isEnabled() : false;
     };
     var insertNbsp = function (editor, times) {
-      var nbsp = isVisualCharsEnabled(editor) ? '<span class="mce-nbsp">&nbsp;</span>' : '&nbsp;';
-      editor.insertContent(stringRepeat(nbsp, times));
-      editor.dom.setAttrib(editor.dom.select('span.mce-nbsp'), 'data-mce-bogus', '1');
+      var classes = function () {
+        return isVisualCharsEnabled(editor) ? 'mce-nbsp-wrap mce-nbsp' : 'mce-nbsp-wrap';
+      };
+      var nbspSpan = function () {
+        return '<span class="' + classes() + '" contenteditable="false">' + stringRepeat('&nbsp;', times) + '</span>';
+      };
+      var shouldWrap = Settings.wrapNbsps(editor);
+      var html = shouldWrap || editor.plugins.visualchars ? nbspSpan() : stringRepeat('&nbsp;', times);
+      editor.undoManager.transact(function () {
+        return editor.insertContent(html);
+      });
     };
     var Actions = { insertNbsp: insertNbsp };
 
@@ -36,16 +60,6 @@
     var Commands = { register: register };
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
-
-    var getKeyboardSpaces = function (editor) {
-      var spaces = editor.getParam('nonbreaking_force_tab', 0);
-      if (typeof spaces === 'boolean') {
-        return spaces === true ? 3 : 0;
-      } else {
-        return spaces;
-      }
-    };
-    var Settings = { getKeyboardSpaces: getKeyboardSpaces };
 
     var setup = function (editor) {
       var spaces = Settings.getKeyboardSpaces(editor);

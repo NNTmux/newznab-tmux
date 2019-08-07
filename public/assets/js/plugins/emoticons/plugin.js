@@ -4,26 +4,16 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.12 (2019-07-18)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function (domGlobals) {
     'use strict';
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-    var noop = function () {
-    };
     var constant = function (value) {
       return function () {
         return value;
-      };
-    };
-    var identity = function (x) {
-      return x;
-    };
-    var die = function (msg) {
-      return function () {
-        throw new Error(msg);
       };
     };
     var never = constant(false);
@@ -307,10 +297,35 @@
       editor.insertContent(ch);
     };
 
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var shallow = function (old, nu) {
+      return nu;
+    };
+    var baseMerge = function (merger) {
+      return function () {
+        var objects = new Array(arguments.length);
+        for (var i = 0; i < objects.length; i++) {
+          objects[i] = arguments[i];
+        }
+        if (objects.length === 0) {
+          throw new Error('Can\'t merge zero objects');
+        }
+        var ret = {};
+        for (var j = 0; j < objects.length; j++) {
+          var curObject = objects[j];
+          for (var key in curObject) {
+            if (hasOwnProperty.call(curObject, key)) {
+              ret[key] = merger(ret[key], curObject[key]);
+            }
+          }
+        }
+        return ret;
+      };
+    };
+    var merge = baseMerge(shallow);
 
     var keys = Object.keys;
-    var hasOwnProperty = Object.hasOwnProperty;
+    var hasOwnProperty$1 = Object.hasOwnProperty;
     var each = function (obj, f) {
       var props = keys(obj);
       for (var k = 0, len = props.length; k < len; k++) {
@@ -336,158 +351,28 @@
       return r;
     };
     var has = function (obj, key) {
-      return hasOwnProperty.call(obj, key);
+      return hasOwnProperty$1.call(obj, key);
     };
 
-    var value = function (o) {
-      var is = function (v) {
-        return o === v;
-      };
-      var or = function (opt) {
-        return value(o);
-      };
-      var orThunk = function (f) {
-        return value(o);
-      };
-      var map = function (f) {
-        return value(f(o));
-      };
-      var mapError = function (f) {
-        return value(o);
-      };
-      var each = function (f) {
-        f(o);
-      };
-      var bind = function (f) {
-        return f(o);
-      };
-      var fold = function (_, onValue) {
-        return onValue(o);
-      };
-      var exists = function (f) {
-        return f(o);
-      };
-      var forall = function (f) {
-        return f(o);
-      };
-      var toOption = function () {
-        return Option.some(o);
-      };
-      return {
-        is: is,
-        isValue: always,
-        isError: never,
-        getOr: constant(o),
-        getOrThunk: constant(o),
-        getOrDie: constant(o),
-        or: or,
-        orThunk: orThunk,
-        fold: fold,
-        map: map,
-        mapError: mapError,
-        each: each,
-        bind: bind,
-        exists: exists,
-        forall: forall,
-        toOption: toOption
-      };
-    };
-    var error = function (message) {
-      var getOrThunk = function (f) {
-        return f();
-      };
-      var getOrDie = function () {
-        return die(String(message))();
-      };
-      var or = function (opt) {
-        return opt;
-      };
-      var orThunk = function (f) {
-        return f();
-      };
-      var map = function (f) {
-        return error(message);
-      };
-      var mapError = function (f) {
-        return error(f(message));
-      };
-      var bind = function (f) {
-        return error(message);
-      };
-      var fold = function (onError, _) {
-        return onError(message);
-      };
-      return {
-        is: never,
-        isValue: never,
-        isError: always,
-        getOr: identity,
-        getOrThunk: getOrThunk,
-        getOrDie: getOrDie,
-        or: or,
-        orThunk: orThunk,
-        fold: fold,
-        map: map,
-        mapError: mapError,
-        each: noop,
-        bind: bind,
-        exists: never,
-        forall: always,
-        toOption: Option.none
-      };
-    };
-    var fromOption = function (opt, err) {
-      return opt.fold(function () {
-        return error(err);
-      }, value);
-    };
-    var Result = {
-      value: value,
-      error: error,
-      fromOption: fromOption
-    };
+    var global$1 = tinymce.util.Tools.resolve('tinymce.Resource');
 
-    var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
-    var shallow = function (old, nu) {
-      return nu;
-    };
-    var baseMerge = function (merger) {
-      return function () {
-        var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++) {
-          objects[i] = arguments[i];
-        }
-        if (objects.length === 0) {
-          throw new Error('Can\'t merge zero objects');
-        }
-        var ret = {};
-        for (var j = 0; j < objects.length; j++) {
-          var curObject = objects[j];
-          for (var key in curObject) {
-            if (hasOwnProperty$1.call(curObject, key)) {
-              ret[key] = merger(ret[key], curObject[key]);
-            }
-          }
-        }
-        return ret;
-      };
-    };
-    var merge = baseMerge(shallow);
+    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Delay');
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.dom.ScriptLoader');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Promise');
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Promise');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.util.Delay');
-
+    var DEFAULT_ID = 'tinymce.plugins.emoticons';
     var getEmoticonDatabaseUrl = function (editor, pluginUrl) {
       return editor.getParam('emoticons_database_url', pluginUrl + '/js/emojis' + editor.suffix + '.js');
+    };
+    var getEmoticonDatabaseId = function (editor) {
+      return editor.getParam('emoticons_database_id', DEFAULT_ID, 'string');
     };
     var getAppendedEmoticons = function (editor) {
       return editor.getParam('emoticons_append', {}, 'object');
     };
     var Settings = {
       getEmoticonDatabaseUrl: getEmoticonDatabaseUrl,
+      getEmoticonDatabaseId: getEmoticonDatabaseId,
       getAppendedEmoticons: getAppendedEmoticons
     };
 
@@ -503,16 +388,6 @@
       flags: 'Flags',
       user: 'User Defined'
     };
-    var GLOBAL_NAME = 'emoticons_plugin_database';
-    var extractGlobal = function (url) {
-      if (Global.tinymce[GLOBAL_NAME]) {
-        var result = Result.value(Global.tinymce[GLOBAL_NAME]);
-        delete Global.tinymce[GLOBAL_NAME];
-        return result;
-      } else {
-        return Result.error('URL ' + url + ' did not contain the expected format for emoticons');
-      }
-    };
     var translateCategory = function (categories, name) {
       return has(categories, name) ? categories[name] : name;
     };
@@ -525,7 +400,7 @@
         }, value);
       });
     };
-    var initDatabase = function (editor, databaseUrl) {
+    var initDatabase = function (editor, databaseUrl, databaseId) {
       var categories = Cell(Option.none());
       var all = Cell(Option.none());
       var processEmojis = function (emojis) {
@@ -546,16 +421,13 @@
         all.set(Option.some(everything));
       };
       editor.on('init', function () {
-        global$1.ScriptLoader.loadScript(databaseUrl, function () {
-          extractGlobal(databaseUrl).fold(function (err) {
-            domGlobals.console.log(err);
-            categories.set(Option.some({}));
-            all.set(Option.some([]));
-          }, function (emojis) {
-            var userEmojis = getUserDefinedEmoticons(editor);
-            processEmojis(merge(emojis, userEmojis));
-          });
-        }, function () {
+        global$1.load(databaseId, databaseUrl).then(function (emojis) {
+          var userEmojis = getUserDefinedEmoticons(editor);
+          processEmojis(merge(emojis, userEmojis));
+        }, function (err) {
+          domGlobals.console.log('Failed to load emoticons: ' + err);
+          categories.set(Option.some({}));
+          all.set(Option.some([]));
         });
       });
       var listCategory = function (category) {
@@ -574,19 +446,19 @@
       };
       var waitForLoad = function () {
         if (hasLoaded()) {
-          return global$2.resolve(true);
+          return global$3.resolve(true);
         } else {
-          return new global$2(function (resolve, reject) {
+          return new global$3(function (resolve, reject) {
             var numRetries = 3;
-            var interval = global$3.setInterval(function () {
+            var interval = global$2.setInterval(function () {
               if (hasLoaded()) {
-                global$3.clearInterval(interval);
+                global$2.clearInterval(interval);
                 resolve(true);
               } else {
                 numRetries--;
                 if (numRetries < 0) {
                   domGlobals.console.log('Could not load emojis from url: ' + databaseUrl);
-                  global$3.clearInterval(interval);
+                  global$2.clearInterval(interval);
                   reject(false);
                 }
               }
@@ -727,7 +599,8 @@
     function Plugin () {
       global.add('emoticons', function (editor, pluginUrl) {
         var databaseUrl = Settings.getEmoticonDatabaseUrl(editor, pluginUrl);
-        var database = initDatabase(editor, databaseUrl);
+        var databaseId = Settings.getEmoticonDatabaseId(editor);
+        var database = initDatabase(editor, databaseUrl, databaseId);
         Buttons.register(editor, database);
         init(editor, database);
       });

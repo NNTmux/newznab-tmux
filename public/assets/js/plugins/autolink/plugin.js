@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.12 (2019-07-18)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
     'use strict';
@@ -17,7 +17,7 @@
       return editor.getParam('autolink_pattern', /^(https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.|(?:mailto:)?[A-Z0-9._%+\-]+@)(.+)$/i);
     };
     var getDefaultLinkTarget = function (editor) {
-      return editor.getParam('default_link_target', '');
+      return editor.getParam('default_link_target', false);
     };
     var Settings = {
       getAutoLinkPattern: getAutoLinkPattern,
@@ -136,7 +136,7 @@
         bookmark = editor.selection.getBookmark();
         editor.selection.setRng(rng);
         editor.execCommand('createlink', false, matches[1] + matches[2]);
-        if (defaultLinkTarget) {
+        if (defaultLinkTarget !== false) {
           editor.dom.setAttrib(editor.selection.getNode(), 'target', defaultLinkTarget);
         }
         editor.selection.moveToBookmark(bookmark);

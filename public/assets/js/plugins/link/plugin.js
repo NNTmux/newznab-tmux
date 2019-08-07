@@ -4,87 +4,90 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.12 (2019-07-18)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function (domGlobals) {
     'use strict';
 
-    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+    var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
+    var global$2 = tinymce.util.Tools.resolve('tinymce.util.VK');
 
-    var assumeExternalTargets = function (editorSettings) {
-      var externalTargets = editorSettings.link_assume_external_targets;
-      if (typeof externalTargets === 'boolean' && externalTargets) {
+    var typeOf = function (x) {
+      if (x === null) {
+        return 'null';
+      }
+      var t = typeof x;
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
+        return 'array';
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
+        return 'string';
+      }
+      return t;
+    };
+    var isType = function (type) {
+      return function (value) {
+        return typeOf(value) === type;
+      };
+    };
+    var isString = isType('string');
+    var isArray = isType('array');
+    var isBoolean = isType('boolean');
+    var isFunction = isType('function');
+
+    var assumeExternalTargets = function (editor) {
+      var externalTargets = editor.getParam('link_assume_external_targets', false);
+      if (isBoolean(externalTargets) && externalTargets) {
         return 1;
-      } else if (typeof externalTargets === 'string' && (externalTargets === 'http' || externalTargets === 'https')) {
+      } else if (isString(externalTargets) && (externalTargets === 'http' || externalTargets === 'https')) {
         return externalTargets;
       }
       return 0;
     };
-    var hasContextToolbar = function (editorSettings) {
-      return typeof editorSettings.link_context_toolbar === 'boolean' ? editorSettings.link_context_toolbar : false;
+    var hasContextToolbar = function (editor) {
+      return editor.getParam('link_context_toolbar', false, 'boolean');
     };
-    var getLinkList = function (editorSettings) {
-      return editorSettings.link_list;
+    var getLinkList = function (editor) {
+      return editor.getParam('link_list');
     };
-    var hasDefaultLinkTarget = function (editorSettings) {
-      return typeof editorSettings.default_link_target === 'string';
+    var getDefaultLinkTarget = function (editor) {
+      return editor.getParam('default_link_target');
     };
-    var useQuickLink = function (editorSettings) {
-      return editorSettings.link_quicklink === true;
+    var getTargetList = function (editor) {
+      return editor.getParam('target_list', true);
     };
-    var getDefaultLinkTarget = function (editorSettings) {
-      return editorSettings.default_link_target;
+    var getRelList = function (editor) {
+      return editor.getParam('rel_list', [], 'array');
     };
-    var getTargetList = function (editorSettings) {
-      return editorSettings.target_list;
+    var getLinkClassList = function (editor) {
+      return editor.getParam('link_class_list', [], 'array');
     };
-    var setTargetList = function (editor, list) {
-      editor.settings.target_list = list;
+    var shouldShowLinkTitle = function (editor) {
+      return editor.getParam('link_title', true, 'boolean');
     };
-    var shouldShowTargetList = function (editorSettings) {
-      return getTargetList(editorSettings) !== false;
+    var allowUnsafeLinkTarget = function (editor) {
+      return editor.getParam('allow_unsafe_link_target', false, 'boolean');
     };
-    var getRelList = function (editorSettings) {
-      return editorSettings.rel_list;
-    };
-    var hasRelList = function (editorSettings) {
-      return getRelList(editorSettings) !== undefined;
-    };
-    var getLinkClassList = function (editorSettings) {
-      return editorSettings.link_class_list;
-    };
-    var hasLinkClassList = function (editorSettings) {
-      return getLinkClassList(editorSettings) !== undefined;
-    };
-    var shouldShowLinkTitle = function (editorSettings) {
-      return editorSettings.link_title !== false;
-    };
-    var allowUnsafeLinkTarget = function (editorSettings) {
-      return typeof editorSettings.allow_unsafe_link_target === 'boolean' ? editorSettings.allow_unsafe_link_target : false;
+    var useQuickLink = function (editor) {
+      return editor.getParam('link_quicklink', false, 'boolean');
     };
     var Settings = {
       assumeExternalTargets: assumeExternalTargets,
       hasContextToolbar: hasContextToolbar,
       getLinkList: getLinkList,
-      hasDefaultLinkTarget: hasDefaultLinkTarget,
       getDefaultLinkTarget: getDefaultLinkTarget,
       getTargetList: getTargetList,
-      setTargetList: setTargetList,
-      shouldShowTargetList: shouldShowTargetList,
       getRelList: getRelList,
-      hasRelList: hasRelList,
       getLinkClassList: getLinkClassList,
-      hasLinkClassList: hasLinkClassList,
       shouldShowLinkTitle: shouldShowLinkTitle,
       allowUnsafeLinkTarget: allowUnsafeLinkTarget,
       useQuickLink: useQuickLink
     };
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-    var global$3 = tinymce.util.Tools.resolve('tinymce.Env');
+    var global$4 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var appendClickRemove = function (link, evt) {
       domGlobals.document.body.appendChild(link);
@@ -92,7 +95,7 @@
       domGlobals.document.body.removeChild(link);
     };
     var open = function (url) {
-      if (!global$3.ie || global$3.ie > 10) {
+      if (!global$4.ie || global$4.ie > 10) {
         var link = domGlobals.document.createElement('a');
         link.target = '_blank';
         link.href = url;
@@ -106,7 +109,7 @@
           win.opener = null;
           var doc = win.document;
           doc.open();
-          doc.write('<meta http-equiv="refresh" content="0; url=' + global$2.DOM.encode(url) + '">');
+          doc.write('<meta http-equiv="refresh" content="0; url=' + global$3.DOM.encode(url) + '">');
           doc.close();
         }
       }
@@ -253,28 +256,6 @@
       from: from
     };
 
-    var typeOf = function (x) {
-      if (x === null) {
-        return 'null';
-      }
-      var t = typeof x;
-      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
-        return 'array';
-      }
-      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
-        return 'string';
-      }
-      return t;
-    };
-    var isType = function (type) {
-      return function (value) {
-        return typeOf(value) === type;
-      };
-    };
-    var isString = isType('string');
-    var isArray = isType('array');
-    var isFunction = isType('function');
-
     var slice = Array.prototype.slice;
     var rawIndexOf = function () {
       var pIndexOf = Array.prototype.indexOf;
@@ -337,7 +318,7 @@
       return slice.call(x);
     };
 
-    var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+    var global$5 = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
     var hasProtocol = function (url) {
       return /^\w+:/i.test(url);
@@ -350,7 +331,7 @@
       var rules = ['noopener'];
       var rels = rel ? rel.split(/\s+/) : [];
       var toString = function (rels) {
-        return global$4.trim(rels.sort().join(' '));
+        return global$5.trim(rels.sort().join(' '));
       };
       var addTargetRules = function (rels) {
         rels = removeTargetRules(rels);
@@ -358,7 +339,7 @@
       };
       var removeTargetRules = function (rels) {
         return rels.filter(function (val) {
-          return global$4.inArray(rules, val) === -1;
+          return global$5.inArray(rules, val) === -1;
         });
       };
       var newRels = isUnsafe ? addTargetRules(rels) : removeTargetRules(rels);
@@ -383,7 +364,7 @@
       return elm && elm.nodeName === 'A' && !!elm.href;
     };
     var hasLinks = function (elements) {
-      return global$4.grep(elements, isLink).length > 0;
+      return global$5.grep(elements, isLink).length > 0;
     };
     var isOnlyTextSelected = function (html) {
       if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
@@ -440,11 +421,14 @@
         var selectedElm = editor.selection.getNode();
         var anchorElm = getAnchorElement(editor, selectedElm);
         var linkAttrs = getLinkAttrs(data);
-        if (!Settings.hasRelList(editor.settings) && Settings.allowUnsafeLinkTarget(editor.settings) === false) {
+        if (!(Settings.getRelList(editor).length > 0) && Settings.allowUnsafeLinkTarget(editor) === false) {
           var newRel = applyRelTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
           linkAttrs.rel = newRel ? newRel : null;
         }
-        linkAttrs.href = handleExternalTargets(linkAttrs.href, Settings.assumeExternalTargets(editor.settings));
+        if (Option.from(linkAttrs.target).isNone()) {
+          linkAttrs.target = Settings.getDefaultLinkTarget(editor);
+        }
+        linkAttrs.href = handleExternalTargets(linkAttrs.href, Settings.assumeExternalTargets(editor));
         if (data.href === attachState.href) {
           attachState.attach();
         }
@@ -526,7 +510,7 @@
     };
     var sanitizeList = function (list, extractValue) {
       var out = [];
-      global$4.each(list, function (item) {
+      global$5.each(list, function (item) {
         var text = isString(item.text) ? item.text : isString(item.title) ? item.title : '';
         if (item.menu !== undefined) ; else {
           var value = extractValue(item);
@@ -667,6 +651,503 @@
       return __assign.apply(this, arguments);
     };
 
+    var exports$1 = {}, module = { exports: exports$1 };
+    (function (define, exports, module, require) {
+      (function (f) {
+        if (typeof exports === 'object' && typeof module !== 'undefined') {
+          module.exports = f();
+        } else if (typeof define === 'function' && define.amd) {
+          define([], f);
+        } else {
+          var g;
+          if (typeof window !== 'undefined') {
+            g = window;
+          } else if (typeof global !== 'undefined') {
+            g = global;
+          } else if (typeof self !== 'undefined') {
+            g = self;
+          } else {
+            g = this;
+          }
+          g.EphoxContactWrapper = f();
+        }
+      }(function () {
+        return function () {
+          function r(e, n, t) {
+            function o(i, f) {
+              if (!n[i]) {
+                if (!e[i]) {
+                  var c = 'function' == typeof require && require;
+                  if (!f && c)
+                    return c(i, !0);
+                  if (u)
+                    return u(i, !0);
+                  var a = new Error('Cannot find module \'' + i + '\'');
+                  throw a.code = 'MODULE_NOT_FOUND', a;
+                }
+                var p = n[i] = { exports: {} };
+                e[i][0].call(p.exports, function (r) {
+                  var n = e[i][1][r];
+                  return o(n || r);
+                }, p, p.exports, r, e, n, t);
+              }
+              return n[i].exports;
+            }
+            for (var u = 'function' == typeof require && require, i = 0; i < t.length; i++)
+              o(t[i]);
+            return o;
+          }
+          return r;
+        }()({
+          1: [
+            function (require, module, exports) {
+              var process = module.exports = {};
+              var cachedSetTimeout;
+              var cachedClearTimeout;
+              function defaultSetTimout() {
+                throw new Error('setTimeout has not been defined');
+              }
+              function defaultClearTimeout() {
+                throw new Error('clearTimeout has not been defined');
+              }
+              (function () {
+                try {
+                  if (typeof setTimeout === 'function') {
+                    cachedSetTimeout = setTimeout;
+                  } else {
+                    cachedSetTimeout = defaultSetTimout;
+                  }
+                } catch (e) {
+                  cachedSetTimeout = defaultSetTimout;
+                }
+                try {
+                  if (typeof clearTimeout === 'function') {
+                    cachedClearTimeout = clearTimeout;
+                  } else {
+                    cachedClearTimeout = defaultClearTimeout;
+                  }
+                } catch (e) {
+                  cachedClearTimeout = defaultClearTimeout;
+                }
+              }());
+              function runTimeout(fun) {
+                if (cachedSetTimeout === setTimeout) {
+                  return setTimeout(fun, 0);
+                }
+                if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+                  cachedSetTimeout = setTimeout;
+                  return setTimeout(fun, 0);
+                }
+                try {
+                  return cachedSetTimeout(fun, 0);
+                } catch (e) {
+                  try {
+                    return cachedSetTimeout.call(null, fun, 0);
+                  } catch (e) {
+                    return cachedSetTimeout.call(this, fun, 0);
+                  }
+                }
+              }
+              function runClearTimeout(marker) {
+                if (cachedClearTimeout === clearTimeout) {
+                  return clearTimeout(marker);
+                }
+                if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+                  cachedClearTimeout = clearTimeout;
+                  return clearTimeout(marker);
+                }
+                try {
+                  return cachedClearTimeout(marker);
+                } catch (e) {
+                  try {
+                    return cachedClearTimeout.call(null, marker);
+                  } catch (e) {
+                    return cachedClearTimeout.call(this, marker);
+                  }
+                }
+              }
+              var queue = [];
+              var draining = false;
+              var currentQueue;
+              var queueIndex = -1;
+              function cleanUpNextTick() {
+                if (!draining || !currentQueue) {
+                  return;
+                }
+                draining = false;
+                if (currentQueue.length) {
+                  queue = currentQueue.concat(queue);
+                } else {
+                  queueIndex = -1;
+                }
+                if (queue.length) {
+                  drainQueue();
+                }
+              }
+              function drainQueue() {
+                if (draining) {
+                  return;
+                }
+                var timeout = runTimeout(cleanUpNextTick);
+                draining = true;
+                var len = queue.length;
+                while (len) {
+                  currentQueue = queue;
+                  queue = [];
+                  while (++queueIndex < len) {
+                    if (currentQueue) {
+                      currentQueue[queueIndex].run();
+                    }
+                  }
+                  queueIndex = -1;
+                  len = queue.length;
+                }
+                currentQueue = null;
+                draining = false;
+                runClearTimeout(timeout);
+              }
+              process.nextTick = function (fun) {
+                var args = new Array(arguments.length - 1);
+                if (arguments.length > 1) {
+                  for (var i = 1; i < arguments.length; i++) {
+                    args[i - 1] = arguments[i];
+                  }
+                }
+                queue.push(new Item(fun, args));
+                if (queue.length === 1 && !draining) {
+                  runTimeout(drainQueue);
+                }
+              };
+              function Item(fun, array) {
+                this.fun = fun;
+                this.array = array;
+              }
+              Item.prototype.run = function () {
+                this.fun.apply(null, this.array);
+              };
+              process.title = 'browser';
+              process.browser = true;
+              process.env = {};
+              process.argv = [];
+              process.version = '';
+              process.versions = {};
+              function noop() {
+              }
+              process.on = noop;
+              process.addListener = noop;
+              process.once = noop;
+              process.off = noop;
+              process.removeListener = noop;
+              process.removeAllListeners = noop;
+              process.emit = noop;
+              process.prependListener = noop;
+              process.prependOnceListener = noop;
+              process.listeners = function (name) {
+                return [];
+              };
+              process.binding = function (name) {
+                throw new Error('process.binding is not supported');
+              };
+              process.cwd = function () {
+                return '/';
+              };
+              process.chdir = function (dir) {
+                throw new Error('process.chdir is not supported');
+              };
+              process.umask = function () {
+                return 0;
+              };
+            },
+            {}
+          ],
+          2: [
+            function (require, module, exports) {
+              (function (setImmediate) {
+                (function (root) {
+                  var setTimeoutFunc = setTimeout;
+                  function noop() {
+                  }
+                  function bind(fn, thisArg) {
+                    return function () {
+                      fn.apply(thisArg, arguments);
+                    };
+                  }
+                  function Promise(fn) {
+                    if (typeof this !== 'object')
+                      throw new TypeError('Promises must be constructed via new');
+                    if (typeof fn !== 'function')
+                      throw new TypeError('not a function');
+                    this._state = 0;
+                    this._handled = false;
+                    this._value = undefined;
+                    this._deferreds = [];
+                    doResolve(fn, this);
+                  }
+                  function handle(self, deferred) {
+                    while (self._state === 3) {
+                      self = self._value;
+                    }
+                    if (self._state === 0) {
+                      self._deferreds.push(deferred);
+                      return;
+                    }
+                    self._handled = true;
+                    Promise._immediateFn(function () {
+                      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+                      if (cb === null) {
+                        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+                        return;
+                      }
+                      var ret;
+                      try {
+                        ret = cb(self._value);
+                      } catch (e) {
+                        reject(deferred.promise, e);
+                        return;
+                      }
+                      resolve(deferred.promise, ret);
+                    });
+                  }
+                  function resolve(self, newValue) {
+                    try {
+                      if (newValue === self)
+                        throw new TypeError('A promise cannot be resolved with itself.');
+                      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+                        var then = newValue.then;
+                        if (newValue instanceof Promise) {
+                          self._state = 3;
+                          self._value = newValue;
+                          finale(self);
+                          return;
+                        } else if (typeof then === 'function') {
+                          doResolve(bind(then, newValue), self);
+                          return;
+                        }
+                      }
+                      self._state = 1;
+                      self._value = newValue;
+                      finale(self);
+                    } catch (e) {
+                      reject(self, e);
+                    }
+                  }
+                  function reject(self, newValue) {
+                    self._state = 2;
+                    self._value = newValue;
+                    finale(self);
+                  }
+                  function finale(self) {
+                    if (self._state === 2 && self._deferreds.length === 0) {
+                      Promise._immediateFn(function () {
+                        if (!self._handled) {
+                          Promise._unhandledRejectionFn(self._value);
+                        }
+                      });
+                    }
+                    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+                      handle(self, self._deferreds[i]);
+                    }
+                    self._deferreds = null;
+                  }
+                  function Handler(onFulfilled, onRejected, promise) {
+                    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+                    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+                    this.promise = promise;
+                  }
+                  function doResolve(fn, self) {
+                    var done = false;
+                    try {
+                      fn(function (value) {
+                        if (done)
+                          return;
+                        done = true;
+                        resolve(self, value);
+                      }, function (reason) {
+                        if (done)
+                          return;
+                        done = true;
+                        reject(self, reason);
+                      });
+                    } catch (ex) {
+                      if (done)
+                        return;
+                      done = true;
+                      reject(self, ex);
+                    }
+                  }
+                  Promise.prototype['catch'] = function (onRejected) {
+                    return this.then(null, onRejected);
+                  };
+                  Promise.prototype.then = function (onFulfilled, onRejected) {
+                    var prom = new this.constructor(noop);
+                    handle(this, new Handler(onFulfilled, onRejected, prom));
+                    return prom;
+                  };
+                  Promise.all = function (arr) {
+                    var args = Array.prototype.slice.call(arr);
+                    return new Promise(function (resolve, reject) {
+                      if (args.length === 0)
+                        return resolve([]);
+                      var remaining = args.length;
+                      function res(i, val) {
+                        try {
+                          if (val && (typeof val === 'object' || typeof val === 'function')) {
+                            var then = val.then;
+                            if (typeof then === 'function') {
+                              then.call(val, function (val) {
+                                res(i, val);
+                              }, reject);
+                              return;
+                            }
+                          }
+                          args[i] = val;
+                          if (--remaining === 0) {
+                            resolve(args);
+                          }
+                        } catch (ex) {
+                          reject(ex);
+                        }
+                      }
+                      for (var i = 0; i < args.length; i++) {
+                        res(i, args[i]);
+                      }
+                    });
+                  };
+                  Promise.resolve = function (value) {
+                    if (value && typeof value === 'object' && value.constructor === Promise) {
+                      return value;
+                    }
+                    return new Promise(function (resolve) {
+                      resolve(value);
+                    });
+                  };
+                  Promise.reject = function (value) {
+                    return new Promise(function (resolve, reject) {
+                      reject(value);
+                    });
+                  };
+                  Promise.race = function (values) {
+                    return new Promise(function (resolve, reject) {
+                      for (var i = 0, len = values.length; i < len; i++) {
+                        values[i].then(resolve, reject);
+                      }
+                    });
+                  };
+                  Promise._immediateFn = typeof setImmediate === 'function' ? function (fn) {
+                    setImmediate(fn);
+                  } : function (fn) {
+                    setTimeoutFunc(fn, 0);
+                  };
+                  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+                    if (typeof console !== 'undefined' && console) {
+                      console.warn('Possible Unhandled Promise Rejection:', err);
+                    }
+                  };
+                  Promise._setImmediateFn = function _setImmediateFn(fn) {
+                    Promise._immediateFn = fn;
+                  };
+                  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+                    Promise._unhandledRejectionFn = fn;
+                  };
+                  if (typeof module !== 'undefined' && module.exports) {
+                    module.exports = Promise;
+                  } else if (!root.Promise) {
+                    root.Promise = Promise;
+                  }
+                }(this));
+              }.call(this, require('timers').setImmediate));
+            },
+            { 'timers': 3 }
+          ],
+          3: [
+            function (require, module, exports) {
+              (function (setImmediate, clearImmediate) {
+                var nextTick = require('process/browser.js').nextTick;
+                var apply = Function.prototype.apply;
+                var slice = Array.prototype.slice;
+                var immediateIds = {};
+                var nextImmediateId = 0;
+                exports.setTimeout = function () {
+                  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+                };
+                exports.setInterval = function () {
+                  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+                };
+                exports.clearTimeout = exports.clearInterval = function (timeout) {
+                  timeout.close();
+                };
+                function Timeout(id, clearFn) {
+                  this._id = id;
+                  this._clearFn = clearFn;
+                }
+                Timeout.prototype.unref = Timeout.prototype.ref = function () {
+                };
+                Timeout.prototype.close = function () {
+                  this._clearFn.call(window, this._id);
+                };
+                exports.enroll = function (item, msecs) {
+                  clearTimeout(item._idleTimeoutId);
+                  item._idleTimeout = msecs;
+                };
+                exports.unenroll = function (item) {
+                  clearTimeout(item._idleTimeoutId);
+                  item._idleTimeout = -1;
+                };
+                exports._unrefActive = exports.active = function (item) {
+                  clearTimeout(item._idleTimeoutId);
+                  var msecs = item._idleTimeout;
+                  if (msecs >= 0) {
+                    item._idleTimeoutId = setTimeout(function onTimeout() {
+                      if (item._onTimeout)
+                        item._onTimeout();
+                    }, msecs);
+                  }
+                };
+                exports.setImmediate = typeof setImmediate === 'function' ? setImmediate : function (fn) {
+                  var id = nextImmediateId++;
+                  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+                  immediateIds[id] = true;
+                  nextTick(function onNextTick() {
+                    if (immediateIds[id]) {
+                      if (args) {
+                        fn.apply(null, args);
+                      } else {
+                        fn.call(null);
+                      }
+                      exports.clearImmediate(id);
+                    }
+                  });
+                  return id;
+                };
+                exports.clearImmediate = typeof clearImmediate === 'function' ? clearImmediate : function (id) {
+                  delete immediateIds[id];
+                };
+              }.call(this, require('timers').setImmediate, require('timers').clearImmediate));
+            },
+            {
+              'process/browser.js': 1,
+              'timers': 3
+            }
+          ],
+          4: [
+            function (require, module, exports) {
+              var promisePolyfill = require('promise-polyfill');
+              var Global = function () {
+                if (typeof window !== 'undefined') {
+                  return window;
+                } else {
+                  return Function('return this;')();
+                }
+              }();
+              module.exports = { boltExport: Global.Promise || promisePolyfill };
+            },
+            { 'promise-polyfill': 2 }
+          ]
+        }, {}, [4])(4);
+      }));
+    }(undefined, exports$1, module, undefined));
+    var Promise = module.exports.boltExport;
+
     var nu = function (baseFn) {
       var data = Option.none();
       var callbacks = [];
@@ -719,42 +1200,31 @@
       pure: pure
     };
 
-    var bounce = function (f) {
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        var me = this;
-        domGlobals.setTimeout(function () {
-          f.apply(me, args);
-        }, 0);
-      };
+    var errorReporter = function (err) {
+      domGlobals.setTimeout(function () {
+        throw err;
+      }, 0);
     };
-
-    var nu$1 = function (baseFn) {
+    var make = function (run) {
       var get = function (callback) {
-        baseFn(bounce(callback));
+        run().then(callback, errorReporter);
       };
       var map = function (fab) {
-        return nu$1(function (callback) {
-          get(function (a) {
-            var value = fab(a);
-            callback(value);
-          });
+        return make(function () {
+          return run().then(fab);
         });
       };
       var bind = function (aFutureB) {
-        return nu$1(function (callback) {
-          get(function (a) {
-            aFutureB(a).get(callback);
+        return make(function () {
+          return run().then(function (v) {
+            return aFutureB(v).toPromise();
           });
         });
       };
       var anonBind = function (futureB) {
-        return nu$1(function (callback) {
-          get(function (a) {
-            futureB.get(callback);
+        return make(function () {
+          return run().then(function () {
+            return futureB.toPromise();
           });
         });
       };
@@ -763,25 +1233,32 @@
       };
       var toCached = function () {
         var cache = null;
-        return nu$1(function (callback) {
+        return make(function () {
           if (cache === null) {
-            cache = toLazy();
+            cache = run();
           }
-          cache.get(callback);
+          return cache;
         });
       };
+      var toPromise = run;
       return {
         map: map,
         bind: bind,
         anonBind: anonBind,
         toLazy: toLazy,
         toCached: toCached,
+        toPromise: toPromise,
         get: get
       };
     };
+    var nu$1 = function (baseFn) {
+      return make(function () {
+        return new Promise(baseFn);
+      });
+    };
     var pure$1 = function (a) {
-      return nu$1(function (callback) {
-        callback(a);
+      return make(function () {
+        return Promise.resolve(a);
       });
     };
     var Future = {
@@ -789,11 +1266,11 @@
       pure: pure$1
     };
 
-    var global$5 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+    var global$6 = tinymce.util.Tools.resolve('tinymce.util.Delay');
 
     var delayedConfirm = function (editor, message, callback) {
       var rng = editor.selection.getRng();
-      global$5.setEditorTimeout(editor, function () {
+      global$6.setEditorTimeout(editor, function () {
         editor.windowManager.confirm(message, function (state) {
           editor.selection.setRng(rng);
           callback(state);
@@ -857,15 +1334,15 @@
     var AnchorListOptions = { getAnchors: getAnchors };
 
     var getClasses = function (editor) {
-      if (Settings.hasLinkClassList(editor.settings)) {
-        var list = Settings.getLinkClassList(editor.settings);
+      var list = Settings.getLinkClassList(editor);
+      if (list.length > 0) {
         return ListOptions.sanitize(list);
       }
       return Option.none();
     };
     var ClassListOptions = { getClasses: getClasses };
 
-    var global$6 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+    var global$7 = tinymce.util.Tools.resolve('tinymce.util.XHR');
 
     var parseJson = function (text) {
       try {
@@ -878,10 +1355,10 @@
       var extractor = function (item) {
         return editor.convertURL(item.value || item.url, 'href');
       };
-      var linkList = Settings.getLinkList(editor.settings);
+      var linkList = Settings.getLinkList(editor);
       return Future.nu(function (callback) {
-        if (typeof linkList === 'string') {
-          global$6.send({
+        if (isString(linkList)) {
+          global$7.send({
             url: linkList,
             success: function (text) {
               return callback(parseJson(text));
@@ -890,7 +1367,7 @@
               return callback(Option.none());
             }
           });
-        } else if (typeof linkList === 'function') {
+        } else if (isFunction(linkList)) {
           linkList(function (output) {
             return callback(Option.some(output));
           });
@@ -913,10 +1390,10 @@
     var LinkListOptions = { getLinks: getLinks };
 
     var getRels = function (editor, initialTarget) {
-      if (Settings.hasRelList(editor.settings)) {
-        var list = Settings.getRelList(editor.settings);
+      var list = Settings.getRelList(editor);
+      if (list.length > 0) {
         var isTargetBlank_1 = initialTarget.is('_blank');
-        var enforceSafe = Settings.allowUnsafeLinkTarget(editor.settings) === false;
+        var enforceSafe = Settings.allowUnsafeLinkTarget(editor) === false;
         var safeRelExtractor = function (item) {
           return Utils.applyRelTargetRules(ListOptions.getValue(item), isTargetBlank_1);
         };
@@ -938,13 +1415,15 @@
       }
     ];
     var getTargets = function (editor) {
-      if (Settings.shouldShowTargetList(editor.settings)) {
-        var list = Settings.getTargetList(editor.settings);
+      var list = Settings.getTargetList(editor);
+      if (isArray(list)) {
         return ListOptions.sanitize(list).orThunk(function () {
           return Option.some(fallbacks);
         });
+      } else if (list === false) {
+        return Option.none();
       }
-      return Option.none();
+      return Option.some(fallbacks);
     };
     var TargetOptions = { getTargets: getTargets };
 
@@ -952,10 +1431,10 @@
       var val = dom.getAttrib(elem, name);
       return val !== null && val.length > 0 ? Option.some(val) : Option.none();
     };
-    var extractFromAnchor = function (editor, settings, anchor, selection) {
+    var extractFromAnchor = function (editor, anchor) {
       var dom = editor.dom;
-      var onlyText = Utils.isOnlyTextSelected(selection.getContent());
-      var text = onlyText ? Option.some(Utils.getAnchorText(selection, anchor)) : Option.none();
+      var onlyText = Utils.isOnlyTextSelected(editor.selection.getContent());
+      var text = onlyText ? Option.some(Utils.getAnchorText(editor.selection, anchor)) : Option.none();
       var url = anchor ? Option.some(dom.getAttrib(anchor, 'href')) : Option.none();
       var target = anchor ? Option.from(dom.getAttrib(anchor, 'target')) : Option.none();
       var rel = nonEmptyAttr(dom, anchor, 'rel');
@@ -970,9 +1449,9 @@
         linkClass: linkClass
       };
     };
-    var collect = function (editor, settings, linkNode) {
+    var collect = function (editor, linkNode) {
       return LinkListOptions.getLinks(editor).map(function (links) {
-        var anchor = extractFromAnchor(editor, settings, linkNode, editor.selection);
+        var anchor = extractFromAnchor(editor, linkNode);
         return {
           anchor: anchor,
           catalogs: {
@@ -983,7 +1462,7 @@
             link: links
           },
           optNode: Option.from(linkNode),
-          flags: { titleEnabled: Settings.shouldShowLinkTitle(settings) }
+          flags: { titleEnabled: Settings.shouldShowLinkTitle(editor) }
         };
       });
     };
@@ -1022,9 +1501,8 @@
       };
     };
     var collectData = function (editor) {
-      var settings = editor.settings;
       var anchorNode = Utils.getAnchorElement(editor);
-      return DialogInfo.collect(editor, settings, anchorNode);
+      return DialogInfo.collect(editor, anchorNode);
     };
     var getInitialData = function (info, defaultTarget) {
       return {
@@ -1050,7 +1528,7 @@
         linkClass: info.anchor.linkClass.getOr('')
       };
     };
-    var makeDialog = function (settings, onSubmit, editorSettings) {
+    var makeDialog = function (settings, onSubmit, editor) {
       var urlInput = [{
           name: 'url',
           type: 'urlinput',
@@ -1069,7 +1547,7 @@
           type: 'input',
           label: 'Title'
         }] : [];
-      var defaultTarget = Settings.hasDefaultLinkTarget(editorSettings) ? Option.some(Settings.getDefaultLinkTarget(editorSettings)) : Option.none();
+      var defaultTarget = Option.from(Settings.getDefaultLinkTarget(editor));
       var initialData = getInitialData(settings, defaultTarget);
       var dialogDelta = DialogChanges.init(initialData, settings);
       var catalogs = settings.catalogs;
@@ -1118,8 +1596,8 @@
     var open$1 = function (editor) {
       var data = collectData(editor);
       data.map(function (info) {
-        var onSubmit = handleSubmit(editor, info, Settings.assumeExternalTargets(editor.settings));
-        return makeDialog(info, onSubmit, editor.settings);
+        var onSubmit = handleSubmit(editor, info, Settings.assumeExternalTargets(editor));
+        return makeDialog(info, onSubmit, editor);
       }).get(function (spec) {
         editor.windowManager.open(spec);
       });
@@ -1161,7 +1639,7 @@
     var leftClickedOnAHref = function (editor) {
       return function (elm) {
         var sel, rng, node;
-        if (Settings.hasContextToolbar(editor.settings) && Utils.isLink(elm)) {
+        if (Settings.hasContextToolbar(editor) && Utils.isLink(elm)) {
           sel = editor.selection;
           rng = sel.getRng();
           node = rng.startContainer;
@@ -1175,7 +1653,7 @@
     var setupGotoLinks = function (editor) {
       editor.on('click', function (e) {
         var link = getLink(editor, e.target);
-        if (link && global$1.metaKeyPressed(e)) {
+        if (link && global$2.metaKeyPressed(e)) {
           e.preventDefault();
           gotoLink(editor, link);
         }
@@ -1222,7 +1700,7 @@
 
     var register = function (editor) {
       editor.addCommand('mceLink', function () {
-        if (Settings.useQuickLink(editor.settings)) {
+        if (Settings.useQuickLink(editor)) {
           editor.fire('contexttoolbar-show', { toolbarKey: 'quicklink' });
         } else {
           Actions.openDialog(editor)();
@@ -1304,7 +1782,7 @@
         },
         label: 'Link',
         predicate: function (node) {
-          return !!Utils.getAnchorElement(editor, node) && Settings.hasContextToolbar(editor.settings);
+          return !!Utils.getAnchorElement(editor, node) && Settings.hasContextToolbar(editor);
         },
         initValue: function () {
           var elm = Utils.getAnchorElement(editor);
@@ -1381,7 +1859,7 @@
     };
 
     function Plugin () {
-      global.add('link', function (editor) {
+      global$1.add('link', function (editor) {
         Controls.setupButtons(editor);
         Controls.setupMenuItems(editor);
         Controls.setupContextMenu(editor);

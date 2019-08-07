@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
-        "@fortawesome/fontawesome-free": "^5.10.0",
+        "@fortawesome/fontawesome-free": "^5.10.1",
         "animate.css": "^3.7.2",
         "autosize": "^4.0.2",
         "bootstrap": "^4.3.1",
@@ -44,6 +44,6 @@
         "normalize.css": "^8.0.1",
         "pace-js": "^1.0.2",
         "pnotify": "^4.0.0",
-        "tinymce": "^5.0.12"
+        "tinymce": "^5.0.13"
     }
 }

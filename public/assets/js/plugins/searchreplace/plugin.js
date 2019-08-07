@@ -4,7 +4,7 @@
  * For LGPL see License.txt in the project root for license information.
  * For commercial licenses see https://www.tiny.cloud/
  *
- * Version: 5.0.12 (2019-07-18)
+ * Version: 5.0.13 (2019-08-06)
  */
 (function () {
     'use strict';
@@ -513,6 +513,76 @@
       }
       return me;
     }();
+    var some = function (a) {
+      var constant_a = function () {
+        return a;
+      };
+      var self = function () {
+        return me;
+      };
+      var map = function (f) {
+        return some(f(a));
+      };
+      var bind = function (f) {
+        return f(a);
+      };
+      var me = {
+        fold: function (n, s) {
+          return s(a);
+        },
+        is: function (v) {
+          return a === v;
+        },
+        isSome: always$1,
+        isNone: never$1,
+        getOr: constant_a,
+        getOrThunk: constant_a,
+        getOrDie: constant_a,
+        getOrNull: constant_a,
+        getOrUndefined: constant_a,
+        or: self,
+        orThunk: self,
+        map: map,
+        ap: function (optfab) {
+          return optfab.fold(none, function (fab) {
+            return some(fab(a));
+          });
+        },
+        each: function (f) {
+          f(a);
+        },
+        bind: bind,
+        flatten: constant_a,
+        exists: bind,
+        forall: bind,
+        filter: function (f) {
+          return f(a) ? me : NONE;
+        },
+        equals: function (o) {
+          return o.is(a);
+        },
+        equals_: function (o, elementEq) {
+          return o.fold(never$1, function (b) {
+            return elementEq(a, b);
+          });
+        },
+        toArray: function () {
+          return [a];
+        },
+        toString: function () {
+          return 'some(' + a + ')';
+        }
+      };
+      return me;
+    };
+    var from = function (value) {
+      return value === null || value === undefined ? NONE : some(value);
+    };
+    var Option = {
+      some: some,
+      none: none,
+      from: from
+    };
 
     var typeOf = function (x) {
       if (x === null) {
@@ -541,11 +611,34 @@
         f(x, i, xs);
       }
     };
-    var from = isFunction(Array.from) ? Array.from : function (x) {
+    var from$1 = isFunction(Array.from) ? Array.from : function (x) {
       return slice.call(x);
     };
 
+    var value = function () {
+      var subject = Cell(Option.none());
+      var clear = function () {
+        subject.set(Option.none());
+      };
+      var set = function (s) {
+        subject.set(Option.some(s));
+      };
+      var on = function (f) {
+        subject.get().each(f);
+      };
+      var isSet = function () {
+        return subject.get().isSome();
+      };
+      return {
+        clear: clear,
+        set: set,
+        isSet: isSet,
+        on: on
+      };
+    };
+
     var open = function (editor, currentSearchState) {
+      var dialogApi = value();
       var matchcase = Cell(currentSearchState.get().matchCase);
       var wholewords = Cell(currentSearchState.get().wholeWord);
       editor.undoManager.add();
@@ -652,6 +745,9 @@
                   text: 'Match case',
                   onAction: function (api) {
                     matchcase.set(!matchcase.get());
+                    dialogApi.on(function (dApi) {
+                      return dApi.focus('options');
+                    });
                   },
                   active: matchcase.get()
                 },
@@ -660,6 +756,9 @@
                   text: 'Find whole words only',
                   onAction: function (api) {
                     wholewords.set(!wholewords.get());
+                    dialogApi.on(function (dApi) {
+                      return dApi.focus('options');
+                    });
                   },
                   active: wholewords.get()
                 }
@@ -727,7 +826,7 @@
           editor.undoManager.add();
         }
       };
-      editor.windowManager.open(spec, { inline: 'toolbar' });
+      dialogApi.set(editor.windowManager.open(spec, { inline: 'toolbar' }));
     };
     var Dialog = { open: open };
 
