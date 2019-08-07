@@ -9,6 +9,7 @@ use App\Events\UserLoggedIn;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -109,6 +110,9 @@ class LoginController extends Controller
     public function showLoginForm($error = '', $notice = '')
     {
         $theme = Settings::settingValue('site.main.style');
+        if (! empty(Session::get('info'))) {
+            $notice = Session::get('info');
+        }
         app('smarty.view')->assign(['error' => $error, 'notice' => $notice, 'username' => '', 'rememberme' => '']);
 
         $meta_title = 'Login';
@@ -131,6 +135,6 @@ class LoginController extends Controller
         $request->session()->flush();
         $request->session()->regenerate();
 
-        return redirect('/login');
+        return redirect('/login')->with('info', 'You have been logged out successfully');
     }
 }
