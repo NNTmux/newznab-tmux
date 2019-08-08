@@ -93,7 +93,7 @@
 													{if $m@first}
 													<a href="{{url("/Movies?imdb={$result->imdbid}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if isset($result->cover) && $result->cover == 1}{{url("/covers/movies/{$result->imdbid}-cover.jpg")}}{else}{{assets("/assets/images/no-cover.png")}}{/if}"
+																src="{if isset($result->cover) && $result->cover == 1}{{url("/covers/movies/{$result->imdbid}-cover.jpg")}}{else}{{asset("/assets/images/no-cover.png")}}{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
 															<i class="fa fa-exclamation-circle" style="color: red"
