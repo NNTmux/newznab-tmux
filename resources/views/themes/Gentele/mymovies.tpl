@@ -2,7 +2,7 @@
 	<h2>My > <strong>Movies</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 			/ My Movies
 		</ol>
 	</div>

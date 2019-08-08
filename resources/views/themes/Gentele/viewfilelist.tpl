@@ -27,7 +27,7 @@
 					{assign var="completion" value=0|number_format:1}
 				{/if}
 				<td><img title=".{$file.ext}" alt="{$file.ext}"
-						 src="{$smarty.const.WWW_ASSETS}/images/fileicons/{$icon}.png"/></td>
+						 src="{asset("/assets/images/fileicons/{$icon}.png")}}"/></td>
 				<td class="less right">{if $completion < 100}<span class="warning">{$completion}
 						%</span>{else}{$completion}%{/if}</td>
 				<td class="less right">{$file.size|filesize}</td>

@@ -2,7 +2,7 @@
 	<h2>View > <strong>XXX Movie</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+			<li><a href="{{url("{$site->home_link}")}}">Home</a></li>
 			/ View XXX
 		</ol>
 	</div>
@@ -19,7 +19,7 @@
 					{else}
 						<img class="float-right" style="margin-right:50px; max-height:278px;"
 							 alt="{$result->title|escape:"htmlall"} Logo"
-							 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
+							 src="{{asset("/images/nomoviecover.jpg")}}"/>
 					{/if}
 					<span class="h1" style="display:inline;">{$result->title|escape:"htmlall"}</span>
 					<h4>{if $result->genre != ''}{$result->genre|replace:"|":" / "}{/if}</h4>

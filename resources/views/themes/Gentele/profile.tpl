@@ -3,7 +3,7 @@
 
     <div class="breadcrumb-wrapper">
         <ol class="breadcrumb">
-            <li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+            <li><a href="{{url("{$site->home_link}")}}">Home</a></li>
             / Profile / {$user.username|escape:"htmlall"}
         </ol>
     </div>
@@ -141,8 +141,8 @@
                                                         <tr>
                                                             <th title="Not public">API/RSS Key</th>
                                                             <td>
-                                                                <a href="{$smarty.const.WWW_TOP}rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}">{$user.api_token}</a>
-                                                                <a href="{$smarty.const.WWW_TOP}profileedit?action=newapikey"
+                                                                <a href="{{url("/rss/full-feed?dl=1&amp;i={$user.id}&amp;api_token={$user.api_token}")}}">{$user.api_token}</a>
+                                                                <a href="{{url("profileedit?action=newapikey")}}"
                                                                    class="badge badge-danger">GENERATE NEW
                                                                     KEY</a>
                                                             </td>
@@ -247,12 +247,12 @@
                             </ul>
                         </div>
                         {if isset($isadmin) || !$publicview}
-                            <a class="btn btn-success" href="{$smarty.const.WWW_TOP}profileedit">Edit
+                            <a class="btn btn-success" href="{{route("profileedit")}}">Edit
                                 Profile</a>
                         {/if}
                         {if !isset($isadmin)}
                             <a class="btn btn-warning confirm_action"
-                               href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
+                               href="{{url("profile_delete?id={$user.id}")}}">Delete your account</a>
                         {/if}
                     </div>
                 </div>

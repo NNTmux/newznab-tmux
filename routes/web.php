@@ -17,10 +17,10 @@ Route::group(['middleware' => ['fw-block-blacklisted']], function () {
     Route::get('/', 'ContentController@show');
 
     Route::get('register', 'Auth\RegisterController@showregistrationForm');
-    Route::post('register', 'Auth\RegisterController@register');
+    Route::post('register', 'Auth\RegisterController@register')->name('register');
 
-    Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
-    Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm');
+    Route::get('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
+    Route::post('forgottenpassword', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('forgottenpassword');
 });
 
 Route::get('terms-and-conditions', 'TermsController@terms');

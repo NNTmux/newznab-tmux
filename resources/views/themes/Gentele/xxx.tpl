@@ -2,9 +2,9 @@
 	>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/  {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->parent->title}">{$catname->parent->title}</a>{else}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{/if}
-			/ {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{else}All{/if}
+			<li><a href="{{url({$site->home_link})}}">Home</a></li>
+			/  {if !empty({$catname->parent->title})}<a href="{{url("browse/{$catname->parent->title}")}}">{$catname->parent->title}</a>{else}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{/if}
+			/ {if !empty({$catname->parent->title})}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{else}All{/if}
 		</ol>
 	</div>
 </div>
@@ -21,7 +21,7 @@
 						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/XXX/{$categorytitle}">List</a><br/>
+										href="{{url("/browse/XXX/{$categorytitle}")}}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
@@ -88,9 +88,9 @@
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
 													{foreach $msplits as $m}
 													{if $m@first}
-													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
+													<a href="{{url("XXX?id={$result->id}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg{else}{{asset("/images/no-cover.png")}}")}}{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
@@ -103,7 +103,7 @@
 															name="viewade{$result->title}"
 															title="View AdultdvdEmpire page"
 													><img
-																src="{$smarty.const.WWW_ASSETS}/images/icons/ade.png"
+																src="{{asset("/assets/images/icons/ade.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "adm"}
@@ -113,7 +113,7 @@
 															name="viewadm{$result->title}"
 															title="View AdultDVDMarketplace page"
 													><img
-																src="{$smarty.const.WWW_ASSETS}/images/icons/adm.png"
+																src="{{asset("/assets/images/icons/adm.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "aebn"}
@@ -122,7 +122,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewaebn{$result->title}"
 															title="View AEBN page"
-													><img src="{$smarty.const.WWW_ASSETS}/images/icons/aebn.png"
+													><img src="{{asset("/assets/images/icons/aebn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "hotm"}
@@ -131,7 +131,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewhm{$result->title}"
 															title="View HotMovies page"
-													><img src="{$smarty.const.WWW_ASSETS}/images/icons/hotmovies.png"
+													><img src="{{asset("/assets/images/icons/hotmovies.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "pop"}
@@ -140,15 +140,15 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewpop{$result->id}"
 															title="View Popporn page"
-													><img src="{$smarty.const.WWW_ASSETS}/images/icons/popporn.png"
+													><img src="{{asset("/assets/images/icons/popporn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+															href="{{url("/nfo/{$mguid[$m@index]}")}}"
 															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->grp_release_grpname}"
+													   href="{{url("/browse/group?g={$result->grp_release_grpname}")}}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
 													<span class="btn btn-light btn-xs"
@@ -161,7 +161,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{{url("/XXX?id={$result->id}")}}">{$result->title|escape:"htmlall"}</a></span>
 
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tr>
@@ -185,18 +185,18 @@
 																<div class="release-subtitle">{if $result->actors != ''}Cast: {$result->actors}, {/if}</div>
 																<br>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																			href="{{url("/details/{$mguid[$m@index]}")}}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
-																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
@@ -256,9 +256,9 @@
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
                                                     {foreach $msplits as $m}
                                                     {if $m@first}
-													<a href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}"><img
+													<a href="{{url("/XXX?id={$result->id}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if $result->cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result->id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg{else}{{asset("/assets/images/no-cover.png")}}")}}{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
@@ -271,7 +271,7 @@
 															name="viewade{$result->title}"
 															title="View AdultdvdEmpire page"
 													><img
-																src="{$smarty.const.WWW_ASSETS}/images/icons/ade.png"
+																src="{{asset("/assets/images/icons/ade.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "adm"}
@@ -281,7 +281,7 @@
 															name="viewadm{$result->title}"
 															title="View AdultDVDMarketplace page"
 													><img
-																src="{$smarty.const.WWW_ASSETS}/images/icons/adm.png"
+																src="{{asset("/assets/images/icons/adm.png")}}"
 																width="100"></a>
 													{/if}
 													{if $result->classused == "aebn"}
@@ -290,7 +290,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewaebn{$result->title}"
 															title="View AEBN page"
-													><img src="{$smarty.const.WWW_ASSETS}/images/icons/aebn.png"
+													><img src="{{asset("/assets/images/icons/aebn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "hotm"}
@@ -299,7 +299,7 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewhm{$result->title}"
 															title="View HotMovies page"
-													><img src="{$smarty.const.WWW_ASSETS}/images/icons/hotmovies.png"
+													><img src="{{asset("/assets/images/icons/hotmovies.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $result->classused == "pop"}
@@ -308,15 +308,15 @@
 															href="{$site->dereferrer_link}{$result->directurl}"
 															name="viewpop{$result->id}"
 															title="View Popporn page"
-													><img src="{$smarty.const.WWW_ASSETS}/images/icons/popporn.png"
+													><img src="{{asset("/assets/images/icons/popporn.png")}}"
 														  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+															href="{{url)"nfo/{$mguid[$m@index]}")}}"
 															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->grp_release_grpname}"
+													   href="{{url("/browse/group?g={$result->grp_release_grpname}")}}"
 													   title="Browse releases in {$result->grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
 													<span class="btn btn-light btn-xs"
@@ -329,7 +329,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/XXX?id={$result->id}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{{url("/XXX?id={$result->id}")}}">{$result->title|escape:"htmlall"}</a></span>
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tr>
 															<td id="guid{$mguid[$m@index]}">
@@ -352,18 +352,18 @@
 																<div class="release-subtitle">{if $result->actors != ''}Cast: {$result->actors}, {/if}</div>
 																<br>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																			href="{{url("/details/{$mguid[$m@index]}")}}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
-																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
@@ -409,7 +409,7 @@
 						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/XXX/{$categorytitle}">List</a><br/>
+										href="{{url("/browse/XXX/{$categorytitle}")}}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"

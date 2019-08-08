@@ -58,7 +58,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $book.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" alt=""/>
+							 src="{{url("/covers/book/{$book.id}.jpg")}}" alt=""/>
 					{/if}
 				</td>
 			</tr>
