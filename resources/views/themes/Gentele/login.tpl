@@ -41,8 +41,8 @@
 				</div>
 			{{Form::close()}}
 
-			<a href="{$smarty.const.WWW_TOP}/forgottenpassword" class="text-center">I forgot my password</a><br>
-			<a href="{$smarty.const.WWW_TOP}/register" class="text-center">Register a new membership</a>
+			<a href="{{route('forgottenpassword')}}" class="text-center">I forgot my password</a><br>
+			<a href="{{route('register')}}" class="text-center">Register a new membership</a>
 		</div>
 	</div>
 </div>

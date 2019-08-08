@@ -13,19 +13,19 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li class="dropdown-item">
-                                    <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">TV</a>
+                                    <a href="{{url("/browse/{$parentcat.title}")}}">TV</a>
                                 </li>
                                 <hr>
                                 <li class="dropdown-item">
-                                    <a href="{$smarty.const.WWW_TOP}/series">TV Series</a>
+                                    <a href="{{route('series')}}">TV Series</a>
                                 </li>
                                 <li class="dropdown-item">
-                                    <a href="{$smarty.const.WWW_TOP}/animelist">Anime Series</a>
+                                    <a href="{{route('animelist')}}">Anime Series</a>
                                 </li>
                                 <hr>
                                 {foreach $parentcat.categories as $subcat}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/TV/{$subcat.title}">{$subcat.title}</a>
+                                        <a href="{{url("/browse/TV/{$subcat.title}")}}">{$subcat.title}</a>
                                     </li>
                                 {/foreach}
                             </ul>
@@ -41,26 +41,28 @@
                             <ul class="dropdown-menu">
                                 {if $userdata.movieview == "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/{$parentcat.title}")}}">{$parentcat.title}</a>
                                     </li>
                                 {elseif $userdata.movieview != "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}")}}>{$parentcat.title}</a>
                                     </li>
                                 {/if}
                                 <hr>
-                                <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/mymovies">My Movies</a></li>
+                                    <li class="dropdown-item">
+                                        <a href="{{route('mymovies')}}">My Movies</a>
+                                    </li>
                                 <hr>
                                 {if $userdata.movieview == "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {elseif $userdata.movieview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
@@ -77,22 +79,25 @@
                             </a>
                             <ul class="dropdown-menu">
                                 {if $userdata.consoleview == "1"}
-                                    <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
+                                    <li class="dropdown-item">
+                                        <a href="{{url("/{$parentcat.title}")}}">{$parentcat.title}</a>
+                                    </li>
                                 {elseif $userdata.consoleview != "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a>
                                     </li>
                                 {/if}
                                 <hr>
                                 {if $userdata.consoleview == "1"}
                                     {foreach $parentcat.categories as $subcat}
-                                        <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                        <li class="dropdown-item">
+                                            <a href="{{url("/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {elseif $userdata.consoleview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}>{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
@@ -109,10 +114,10 @@
                             </a>
                             <ul class="dropdown-menu">
                                 {if $userdata.gameview == "1"}
-                                    <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+                                    <li class="dropdown-item"><a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a></li>
                                 {elseif $userdata.gameview != "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a>
                                     </li>
                                 {/if}
                                 <hr>
@@ -120,18 +125,18 @@
                                     {foreach $parentcat.categories as $subcat}
                                         {if $subcat.id == {$catClass::PC_GAMES}}
                                             <li class="dropdown-item">
-                                                <a href="{$smarty.const.WWW_TOP}/{$subcat.title}">{$subcat.title}</a>
+                                                <a href="{{url("/{$subcat.title}")}}">{$subcat.title}</a>
                                             </li>
                                         {else}
                                             <li class="dropdown-item">
-                                                <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                                <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                             </li>
                                         {/if}
                                     {/foreach}
                                 {elseif $userdata.gameview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
@@ -148,22 +153,22 @@
                             </a>
                             <ul class="dropdown-menu">
                                 {if $userdata.musicview == "1"}
-                                    <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
+                                    <li class="dropdown-item"><a href="{{url("/{$parentcat.title}")}}">{$parentcat.title}</a></li>
                                 {elseif $userdata.musicview != "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a>
                                     </li>
                                 {/if}
                                 <hr>
                                 {if $userdata.musicview == "1"}
                                     {foreach $parentcat.categories as $subcat}
-                                        <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                        <li class="dropdown-item"><a href="{{url("/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {elseif $userdata.musicview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
@@ -180,22 +185,22 @@
                             </a>
                             <ul class="dropdown-menu">
                                 {if $userdata.bookview == "1"}
-                                    <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
+                                    <li class="dropdown-item"><a href="{{url("/{$parentcat.title}")}}">{$parentcat.title}</a></li>
                                 {elseif $userdata.bookview != "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a>
                                     </li>
                                 {/if}
                                 <hr>
                                 {if $userdata.bookview == "1"}
                                     {foreach $parentcat.categories as $subcat}
-                                        <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                        <li class="dropdown-item"><a href="{{url("/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {elseif $userdata.bookview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
@@ -212,10 +217,10 @@
                             </a>
                             <ul class="dropdown-menu">
                                 {if $userdata.xxxview == "1"}
-                                    <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/{$parentcat.title}">{$parentcat.title}</a></li>
+                                    <li class="dropdown-item"><a href="{{url("/{$parentcat.title}")}}">{$parentcat.title}</a></li>
                                 {elseif $userdata.xxxview != "1"}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a>
                                     </li>
                                 {/if}
                                 <hr>
@@ -223,18 +228,18 @@
                                     {foreach $parentcat.categories as $subcat}
                                         {if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WEBDL} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
                                             <li class="dropdown-item">
-                                                <a href="{$smarty.const.WWW_TOP}/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                                <a href="{{url("/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                             </li>
                                         {else}
                                             <li class="dropdown-item">
-                                                <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                                <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                             </li>
                                         {/if}
                                     {/foreach}
                                 {elseif $userdata.xxxview != "1"}
                                     {foreach $parentcat.categories as $subcat}
                                         <li class="dropdown-item">
-                                            <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                            <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                         </li>
                                     {/foreach}
                                 {/if}
@@ -249,10 +254,10 @@
                                data-delay="30">
                                 <i class="fa fa-bolt"></i> Other</a>
                             <ul class="dropdown-menu">
-                                <li class="dropdown-item"><a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}">{$parentcat.title}</a></li>
+                                <li class="dropdown-item"><a href="{{url("/browse/{$parentcat.title}")}}">{$parentcat.title}</a></li>
                                 {foreach $parentcat.categories as $subcat}
                                     <li class="dropdown-item">
-                                        <a href="{$smarty.const.WWW_TOP}/browse/{$parentcat.title}/{$subcat.title}">{$subcat.title}</a>
+                                        <a href="{{url("/browse/{$parentcat.title}/{$subcat.title}")}}">{$subcat.title}</a>
                                     </li>
                                 {/foreach}
                             </ul>
@@ -294,32 +299,32 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/cart/index"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
+                        <a href="{{url("/cart/index")}}"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
                     </li>
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-list-alt"></i> My Queue</a>
+                        <a href="{{route('queue')}}"><i class="fa fa-list-alt"></i> My Queue</a>
                     </li>
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i> My Movies</a>
+                        <a href="{{route('mymovies')}}"><i class="fa fa-film"></i> My Movies</a>
                     </li>
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a>
+                        <a href="{{route('myshows')}}"><i class="fa fa-television"></i> My Shows</a>
                     </li>
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
+                        <a href="{{route('profileedit')}}"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
                     </li>
                     {if isset($isadmin)}
                         <li class="dropdown-item">
-                            <a href="{$smarty.const.WWW_TOP}/admin/index"><i class="fa fa-cogs fa-spin"></i> Admin</a>
+                            <a href="{{url("/admin/index")}}"><i class="fa fa-cogs fa-spin"></i> Admin</a>
                         </li>
                     {/if}
                     <hr>
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-primary btn-outline-info"><i class="fa fa-user"></i> Profile</a>
+                        <a href="{{route('profile')}}" class="btn btn-primary btn-outline-info"><i class="fa fa-user"></i> Profile</a>
                     </li>
                     <hr>
                     <li class="dropdown-item">
-                        <a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-primary btn-outline-info"><i class="fa fa-unlock-alt"></i> Sign out</a>
+                        <a href="{{route('logout')}}" class="btn btn-primary btn-outline-info"><i class="fa fa-unlock-alt"></i> Sign out</a>
                     </li>
                     {/if}
                 </ul>

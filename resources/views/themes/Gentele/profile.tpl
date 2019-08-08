@@ -152,7 +152,7 @@
                                                             <td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}
                                                                     <br/>
                                                                 {/if}{if isset($isadmin)}<a
-                                                                    href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes"
+                                                                    href="{{url("/admin/user-edit.php?id={$user.id}#notes")}}"
                                                                     class="badge badge-info">Add/Edit</a>{/if}</td>
                                                         </tr>
                                                     {/if}
@@ -196,7 +196,7 @@
                                                                 {if $privileged || !$privateprofiles}
                                                                     <td>
                                                                         <a title="View {$userinvitedby.username}'s profile"
-                                                                           href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a>
+                                                                           href="{{url("/profile?name={$userinvitedby.username}")}}">{$userinvitedby.username}</a>
                                                                     </td>
                                                                 {else}
                                                                     <td>
@@ -233,7 +233,7 @@
                                                                 <td width="80"
                                                                     title="{$download.timestamp}">{$download.timestamp|date_format}</td>
                                                                 <td>{if $download->release->guid == ""}n/a{else}<a
-                                                                        href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
+                                                                        href="{{url("/details/{$download->release->guid}")}}">{$download->release->searchname}</a>{/if}
                                                                 </td>
                                                             </tr>
                                                         {/foreach}

@@ -15,7 +15,7 @@
 		<a href="{$serverURL|escape:"htmlall"}">{$serverURL|escape:"htmlall"}</a>.
 		<br/>
 		{if {{App\Models\Settings::settingValue('apps.sabnzbplus.integrationtype')}} == 2 || $user.queuetype == 2}Edit your queue settings in
-			<a href="{$smarty.const.WWW_TOP}/profileedit">your profile</a>
+			<a href="{{route('profileedit')}}">your profile</a>
 			.{/if}
 	</p>
 	<div class="sab_queue"></div>

@@ -11,9 +11,9 @@
 	<div class="alert alert-info">
 		Using 'My Movies' you can search for movies, and add them to a wishlist. If the movie
 		becomes available it will be added to an <strong><a
-					href="{$smarty.const.WWW_TOP}/rss/mymovies?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}">RSS
+					href="{{url("/rss/mymovies?dl=1&amp;i={$userdata.id}&amp;api_token={$userdata.api_token}")}}">RSS
 				Feed</a></strong> you can use to automatically download. You can <strong><a
-					href="{$smarty.const.WWW_TOP}/mymovies">Manage Your Movie
+					href="{{route('mymovies')}}">Manage Your Movie
 				List</a></strong> or to remove old items.
 	</div>
 	<div class="well well-sm">
@@ -31,7 +31,7 @@
 						<td class="mid" style="width:140px">
 							<div class="movcover">
 								<img class="shadow img img-polaroid"
-									 src="{$smarty.const.WWW_TOP}/covers/movies/{if $movie.cover == 1}{$movie.imdbid}-cover.jpg{else}no-cover.jpg{/if}"
+									 src="{{url("/covers/movies/{if $movie.cover == 1}{$movie.imdbid}-cover.jpg{else}no-cover.jpg{/if}")}}"
 									 width="120" border="0" alt="{$movie.title|escape:"htmlall"}"/>
 								<div class="movextra">
 									<div style="text-align: center;">
@@ -44,7 +44,7 @@
 						</td>
 						<td>
 							<h4><a title="View Movie"
-								   href="{$smarty.const.WWW_TOP}/Movies?imdb={$movie.imdbid}">{$movie.title|escape:"htmlall"}
+								   href="{{url("/Movies?imdb={$movie.imdbid}")}}">{$movie.title|escape:"htmlall"}
 									({$movie.year})</a></h4>
 							{if isset($movie.tagline) && $movie.tagline != ''}<b>{$movie.tagline}</b><br/>{/if}
 							{if isset($movie.plot) && $movie.plot != ''}{$movie.plot}<br/><br/>{/if}
@@ -67,10 +67,10 @@
 						<td class="mid" style="width:100px;">
 							<div class="btn-group">
 								<a class="btn btn-mini btn-warning mymovies"
-								   href="{$smarty.const.WWW_TOP}/mymovies?id=edit&imdb={$movie.imdbid}" rel="edit"
+								   href="{{url("/mymovies?id=edit&imdb={$movie.imdbid}")}}" rel="edit"
 								   name="movies{$movie.imdbid}" title="Edit Categories">Edit</a>&nbsp;&nbsp;
 								<a class="btn btn-mini btn-danger mymovies"
-								   href="{$smarty.const.WWW_TOP}/mymovies?id=delete&imdb={$movie.imdbid}" rel="remove"
+								   href="{{url("/mymovies?id=delete&imdb={$movie.imdbid}")}}" rel="remove"
 								   name="movies{$movie.imdbid}" title="Remove from My Movies">Remove</a>
 							</div>
 						</td>

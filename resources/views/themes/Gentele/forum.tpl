@@ -18,9 +18,9 @@
 			{foreach $results as $result}
 				<tr class="{cycle values=",alt"}" id="guid{$result.id}">
 					<td style="cursor:pointer;" class="item"
-						onclick="document.location='{$smarty.const.WWW_TOP}/forumpost/{$result.id}';">
+						onclick="document.location='{{url("/forumpost/{$result.id}';")}}>
 						<a title="View post" class="title"
-						   href="{$smarty.const.WWW_TOP}/forumpost/{$result.id}">{$result.subject|escape:"htmlall"|truncate:100:'...':true:true}</a>
+						   href="{{url("/forumpost/{$result.id}")}}">{$result.subject|escape:"htmlall"|truncate:100:'...':true:true}</a>
 						<div class="hint">
 							{$result.message|truncate:200:'...':false:false}
 						</div>
@@ -35,7 +35,7 @@
 					</td>
 					<td>
 						<a title="View profile"
-						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5>
+						   href="{{url("/profile/?name={$result.username}")}}"><h5>
 								<strong>{$result.username}</strong></h5></a>
 						{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
 							<span class="btn btn-success btn-xs">{$result.rolename}</span>
@@ -51,7 +51,7 @@
 						<div class="hint">({$result.created_at|timeago})</div>
 					</td>
 					<td>
-						<a href="{$smarty.const.WWW_TOP}/forumpost/{$result.id}#last"
+						<a href="{{url("/forumpost/{$result.id}#last")}}"
 						   title="{$result.updated_at}">{$result.updated_at|date_format}</a>
 						<div class="hint">({$result.updated_at|timeago})</div>
 					</td>
@@ -60,17 +60,17 @@
 						{if isset($isadmin)}
 							<div>
 								<a class="confirm_action btn btn-sm btn-danger"
-								   href="{$smarty.const.WWW_TOP}/topic_delete?id={$result.id}"
+								   href="{{url("/topic_delete?id={$result.id}")}}"
 								   title="Delete Topic">Delete Topic</a>
 							</div>
 							<div>
 								{if $result.locked == 0}
 									<a class="confirm_action btn btn-sm btn-danger"
-									   href="{$smarty.const.WWW_TOP}/forum?lock={$result.id}"
+									   href="{{url("/forum?lock={$result.id}")}}"
 									   title="Lock Topic">Lock Topic</a>
 								{else}
 									<a class="confirm_action btn btn-sm btn-danger"
-									   href="{$smarty.const.WWW_TOP}/forum?unlock={$result.id}"
+									   href="{{url("/forum?unlock={$result.id}")}}"
 									   title="Unlock Topic">Unlock Topic</a>
 								{/if}
 							</div>

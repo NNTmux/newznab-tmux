@@ -9,7 +9,7 @@
 		</div>
 	</div>
 	<h4>
-		<a href="{$smarty.const.WWW_TOP}/details/{$rel.guid}">{$rel.searchname|escape:'htmlall'}</a>
+		<a href="{{url("/details/{$rel.guid}")}}">{$rel.searchname|escape:'htmlall'}</a>
 	</h4>
 {/if}
 <pre id="nfo">{$nfo.nfoUTF|magicurl:$site->dereferrer_link}</pre>

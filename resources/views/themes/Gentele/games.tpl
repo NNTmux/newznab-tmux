@@ -1,13 +1,10 @@
-<div class="header"
-	>
+<div class="header">
 	<div class="breadcrumb-wrapper">
-		<div class="breadcrumb-wrapper">
-			<ol class="breadcrumb">
-				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-				/  {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->parent->title}">{$catname->parent->title}</a>{else}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{/if}
-				/ {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{else}All{/if}
-			</ol>
-		</div>
+		<ol class="breadcrumb">
+			<li><a href="{{url({$site->home_link})}}">Home</a></li>
+			/  {if !empty({$catname->parent->title})}<a href="{{url("browse/{$catname->parent->title}")}}">{$catname->parent->title}</a>{else}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{/if}
+			/ {if !empty({$catname->parent->title})}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{else}All{/if}
+		</ol>
 	</div>
 </div>
 <div class="card card-header">
@@ -23,7 +20,7 @@
 							<div class="col-md-4">
 								<div class="nzb_multi_operations">
 									View: <strong>Covers</strong> | <a
-											href="{$smarty.const.WWW_TOP}/browse/Games/{$categorytitle}">List</a><br/>
+											href="{{url("/browse/Games/{$categorytitle}")}}">List</a><br/>
 									With Selected:
 									<div class="btn-group">
 										<input type="button"
@@ -73,8 +70,8 @@
 											<div class="row">
 												<div class="col-md-2 small-gutter-left">
 													<a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">
-														<img src="{$smarty.const.WWW_TOP}/covers/games/{if $result->cover == 1}{$result->gamesinfo_id}.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+													   href="{{url("/details/{$result->guid}")}}>
+														<img src="{{url("/covers/games/{if $result->cover == 1}{$result->gamesinfo_id}.jpg{else}{{url("/images/no-cover.png")}}{/if}")}}"
 															 class="img-fluid rounded"
 															 width="140" border="0"
 															 alt="{$result->title|escape:"htmlall"}"/>{if !empty($result->failed)}
@@ -103,12 +100,12 @@
                                                         title="View IGDB page">
                                                             IGDB</a>{/if}
 													{if $result->nfoid > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$result->guid}"
+														href="{{url("/nfo/{$result->guid}")}}"
 														title="View NFO" class="modal_nfo badge badge-info"
 														rel="nfo">
 															NFO</a>{/if}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$result->group_name}"
+													   href="{{url("/browse/group?g={$result->group_name}")}}"
 													   title="Browse releases in {$result->group_name|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($result->failed)}
 														<span class="btn btn-light btn-xs"
@@ -121,7 +118,7 @@
 												</div>
 												<div class="col-md-10 small-gutter-left">
 													<h4><a title="View details"
-														   href="{$smarty.const.WWW_TOP}/details/{$result->guid}">{$result->title|escape:"htmlall"}</a>
+														   href="{{url("/details/{$result->guid}")}}">{$result->title|escape:"htmlall"}</a>
 													</h4>
 													<table class="data table table-responsive">
 														<tr>
@@ -137,7 +134,7 @@
 																	ago</span>
 																{if isset($isadmin)}<a
 																	class="badge badge-warning"
-																	href="{$smarty.const.WWW_TOP}/admin/release-edit?id={$result->guid}"
+																	href="{{url("/admin/release-edit?id={$result->guid}")}}"
 																	title="Edit release">
 																		Edit</a>{/if}
 																<br/>
@@ -169,13 +166,13 @@
 																<div>
 																	<a role="button"
 																	   class="btn btn-light btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$result->guid}"><i
+																	   href="{{url("/getnzb?id={$result->guid}")}}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$result->grabs}
 																			Grab{if $result->grabs != 1}s{/if}</span></a>
 																	<a role="button"
 																	   class="btn btn-light btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/details/{$result->guid}/#comments"><i
+																	   href="{{url("/details/{$result->guid}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$result->comments}
 																			Comment{if $result->comments != 1}s{/if}</span></a>
@@ -230,7 +227,7 @@
 							<div class="col-md-4">
 								<div class="nzb_multi_operations">
 									View: <strong>Covers</strong> | <a
-											href="{$smarty.const.WWW_TOP}/browse/Games/{$categorytitle}">List</a><br/>
+											href="{{url("/browse/Games/{$categorytitle}")}}">List</a><br/>
 									Check all: <input type="checkbox" class="square-all"/>
 									<br/>
 									With Selected:

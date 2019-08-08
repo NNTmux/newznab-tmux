@@ -5,7 +5,7 @@
 	{literal}
 	<script>
         /* <![CDATA[ */
-        var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+        var WWW_TOP = "{/literal}{{url("/")}}{literal}";
         var SERVERROOT = "{/literal}{$serverroot}{literal}";
         var UID = "{/literal}{if Auth::check()}{$userdata.id}{else}{/if}{literal}";
         var RSSTOKEN = "{/literal}{if Auth::check()}{$userdata.api_token}{else}{/if}{literal}";
@@ -17,7 +17,7 @@
 	<meta name="csrf-token" content="{{csrf_token()}}">
 
 	<title>{$meta_title}{if $meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-	{{Html::style("{$smarty.const.WWW_ASSETS}/css/all-css.css")}}
+	{{Html::style("{{asset('/assets/css/all-css.css')}}")}}
 
 </head>
 <body class="nav-md">
@@ -34,12 +34,12 @@
 				{if Auth::check()}
 					<div class="profile">
 						<div class="profile_pic">
-							<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png" alt="User Image"
+							<img src="{{asset('/assets/images/userimage.png')}}" alt="User Image"
 								 class="img-circle profile_img">
 						</div>
 						<div class="profile_info">
 							<span>Welcome,</span>
-							<h2>{$userdata.username}</h2>
+							<h2>{{Auth::user()->username}}</h2>
 						</div>
 					</div>
 				{/if}
@@ -62,52 +62,52 @@
 							</a>
 							<div id='submenu1' class="collapse sidebar-submenu">
 								{if $userdata->hasPermissionTo('view console') == true && $userdata->hasDirectPermission('view console') == true}
-									<a href="{$smarty.const.WWW_TOP}/Console" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('Console')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-gamepad"></span>
 										<span class="menu-collapsed">Console</span>
 									</a>
 								{/if}
 								{if $userdata->hasPermissionTo('view movies') == true && $userdata->hasDirectPermission('view movies') == true}
-									<a href="{$smarty.const.WWW_TOP}/Movies" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('Movies')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-film"></span>
 										<span class="menu-collapsed">Movies</span>
 									</a>
 								{/if}
 								{if $userdata->hasPermissionTo('view audio') == true && $userdata->hasDirectPermission('view audio') == true}
-									<a href="{$smarty.const.WWW_TOP}/Audio" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('Audio')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-music"></span>
 										<span class="menu-collapsed">Audio</span>
 									</a>
 								{/if}
 								{if $userdata->hasPermissionTo('view pc') == true && $userdata->hasDirectPermission('view pc') == true}
-									<a href="{$smarty.const.WWW_TOP}/Games" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('Games')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-gamepad"></span>
 										<span class="menu-collapsed">Games</span>
 									</a>
 								{/if}
 								{if $userdata->hasPermissionTo('view tv') == true && $userdata->hasDirectPermission('view tv') == true}
-									<a href="{$smarty.const.WWW_TOP}/series" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('series')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-television"></span>
 										<span class="menu-collapsed">TV</span>
 									</a>
 								{/if}
 								{if $userdata->hasPermissionTo('view adult') == true && $userdata->hasDirectPermission('view adult') == true}
-									<a href="{$smarty.const.WWW_TOP}/XXX" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('XXX')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-venus-mars"></span>
 										<span class="menu-collapsed">Adult</span>
 									</a>
 								{/if}
 								{if $userdata->hasPermissionTo('view books') == true && $userdata->hasDirectPermission('view books') == true}
-									<a href="{$smarty.const.WWW_TOP}/Books" class="list-group-item list-group-item-action bg-dark text-white">
+									<a href="{{route('Books')}}" class="list-group-item list-group-item-action bg-dark text-white">
 										<span class="fa fa-book-open"></span>
 										<span class="menu-collapsed">Books</span>
 									</a>
 								{/if}
-								<a href="{$smarty.const.WWW_TOP}/browse/All" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{url('browse/All')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-list-ul"></span>
 									<span class="menu-collapsed">Browse All Releases</span>
 								</a>
-								<a href="{$smarty.const.WWW_TOP}/browsegroup" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{route('browsegroup')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-layer-group"></span>
 									<span class="menu-collapsed">Browse Groups</span>
 								</a>
@@ -121,27 +121,27 @@
 							</a>
 							<!-- Submenu content -->
 							<div id='submenu2' class="collapse sidebar-submenu">
-								<a href="{$smarty.const.WWW_TOP}/forum" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{route('forum')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-forumbee"></span>
 									<span class="menu-collapsed">Forum</span>
 								</a>
-								<a href="{$smarty.const.WWW_TOP}/search" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{route('search')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-searchengin"></span>
 									<span class="menu-collapsed">Search</span>
 								</a>
-                                <a href="{$smarty.const.WWW_TOP}/search?search_type=adv" class="list-group-item list-group-item-action bg-dark text-white">
+                                <a href="{{url('search?search_type=adv')}}'" class="list-group-item list-group-item-action bg-dark text-white">
                                     <span class="fa fa-searchengin"></span>
                                     <span class="menu-collapsed">Advanced Search</span>
                                 </a>
-								<a href="{$smarty.const.WWW_TOP}/rsshelp" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{route('rsshelp')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-rss-square"></span>
 									<span class="menu-collapsed">RSS Feeds</span>
 								</a>
-								<a href="{$smarty.const.WWW_TOP}/apihelp" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{route('apihelp')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-hire-a-helper"></span>
 									<span class="menu-collapsed">API</span>
 								</a>
-								<a href="{$smarty.const.WWW_TOP}/apiv2help" class="list-group-item list-group-item-action bg-dark text-white">
+								<a href="{{route('apiv2help')}}" class="list-group-item list-group-item-action bg-dark text-white">
 									<span class="fa fa-hire-a-helper"></span>
 									<span class="menu-collapsed">API V2</span>
 								</a>
@@ -152,12 +152,12 @@
 								<span>Sign Out</span>
 							</a>
 						{else}
-							<a href="{$smarty.const.WWW_TOP}/login" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+							<a href="{{route('login')}}" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
 								<span class="fa fa-lock mr-3"></span>
 								<span>Sign In</span>
 							</a>
 						{/if}
-						<a href="{$smarty.const.WWW_TOP}/contact-us" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
+						<a href="{{route('contact-us')}}" class="bg-transparent list-group-item list-group-item-action flex-column align-items-start text-white">
 							<span class="fa fa-envelope-open-text mr-3"></span>
 							<span>Contact</span>
 						</a>
@@ -176,6 +176,12 @@
 		{/if}
 		<!-- /top navigation -->
 
+		{if Session::has('success')}
+			<div class="flash">
+				{{Session::flash('success') }}
+			</div>
+		{/if}
+
 		<!-- page content -->
 		<div class="right_col" role="main">
 			<div class="clearfix"></div>
@@ -192,7 +198,7 @@
 <!-- footer content -->
 <footer>
 	<div class="copyright-info">
-		<strong>Copyright &copy; {$smarty.now|date_format:"%Y"}
+		<strong>Copyright &copy; {{Illuminate\Support\Carbon::now()->year}}
 			<a href="https://github.com/NNTmux/newznab-tmux">NNTmux</a> <i
 					class="fab fa-github-alt"></i>.</strong> This software is
 		open source, released under the GPL license, proudly powered by <i class="fab fa-laravel"></i>
@@ -203,7 +209,7 @@
 <!-- /footer content -->
 
 <!-- jQuery 3.3.0 -->
-{{Html::script("{$smarty.const.WWW_ASSETS}/js/all-js.js")}}
+{{Html::script("{{asset("/assets/js/all-js.js")}}")}}
 
 
 <script>

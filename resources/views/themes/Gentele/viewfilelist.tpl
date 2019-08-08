@@ -1,7 +1,7 @@
 <div class="well well-sm">
 	<h1>{$title}</h1>
 	<h2>For
-		<a href="{$smarty.const.WWW_TOP}/details/{$rel.guid}">{$rel.searchname|escape:'htmlall'}</a>
+		<a href="{{url("/details/{$rel.guid}")}}">{$rel.searchname|escape:'htmlall'}</a>
 	</h2>
 	<table class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>

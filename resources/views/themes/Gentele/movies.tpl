@@ -1,10 +1,9 @@
-<div class="header"
-	>
+<div class="header">
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/  {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->parent->title}">{$catname->parent->title}</a>{else}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{/if}
-			/ {if !empty({$catname->parent->title})}<a href="{$smarty.const.WWW_TOP}/browse/{$catname->title}">{$catname->title}</a>{else}All{/if}
+			<li><a href="{{url({$site->home_link})}}">Home</a></li>
+			/  {if !empty({$catname->parent->title})}<a href="{{url("browse/{$catname->parent->title}")}}">{$catname->parent->title}</a>{else}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{/if}
+			/ {if !empty({$catname->parent->title})}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{else}All{/if}
 		</ol>
 	</div>
 </div>
@@ -21,7 +20,7 @@
                             {{Form::open(['id' => 'nzb_multi_operations_form', 'method' => 'get'])}}
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a><br/>
+										href="{{url("/browse/Movies/{$categorytitle}")}}">List</a><br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
@@ -92,9 +91,9 @@
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
 													{foreach $msplits as $m}
 													{if $m@first}
-													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
+													<a href="{{url("/Movies?imdb={$result->imdbid}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if isset($result->cover) && $result->cover == 1}{{url("/covers/movies/{$result->imdbid}-cover.jpg")}}{else}{{assets("/assets/images/no-cover.png")}}{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
 															<i class="fa fa-exclamation-circle" style="color: red"
@@ -114,17 +113,17 @@
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+															href="{{url("/nfo/{$mguid[$m@index]}")}}"
 															title="View NFO" class="modal_nfo badge badge-info"
 															rel="nfo">NFO</a>{/if}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
+													   href="{{url("/browse/group?g={$mgrp[$m@index]}")}}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
+													<a class="badge badge-info" href="{{url("/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{{url("/Movies?imdb={$result->imdbid}")}}">{$result->title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result->genre != ''}
 															<b>Genre: </b>
 															{$result->genre}, {/if}</div>
@@ -153,18 +152,18 @@
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																			href="{{url("/details/{$mguid[$m@index]}")}}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
-																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
@@ -237,9 +236,9 @@
 													{assign var="mhaspreview" value=","|explode:$result->grp_haspreview}
 													{foreach $msplits as $m}
 													{if $m@first}
-													<a href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}"><img
+													<a href="{{url("/Movies?imdb={$result->imdbid}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if isset($result->cover) && $result->cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result->imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
+																src="{if isset($result->cover) && $result->cover == 1}{{url("/covers/movies/{$result->imdbid}-cover.jpg")}}{else}{{url("/images/no-cover.png")}}{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
 															<i class="fa fa-exclamation-circle" style="color: red"
@@ -259,17 +258,17 @@
                                                            name="tmdb{$result->tmdbid}" title="View TheMovieDB page">TMDB</a>
                                                     {/if}
 													{if $mnfo[$m@index] > 0}<span><a
-																href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+																href="{{url("/nfo/{$mguid[$m@index]}")}}"
 																title="View NFO" class="modal_nfo badge badge-info">NFO</a>
 														</span>{/if}
 													<a class="badge badge-info"
-													   href="{$smarty.const.WWW_TOP}/browse/group?g={$mgrp[$m@index]}"
+													   href="{{url("/browse/group?g={$mgrp[$m@index]}")}}"
 													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-													<a class="badge badge-info" href="{$smarty.const.WWW_TOP}/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
+													<a class="badge badge-info" href="{{url("/mymovies?id=add&imdb={$result->imdbid}&from={$smarty.server.REQUEST_URI|escape:"url"}")}}" rel="add" name="movies{$result->imdbid}" title="Add to My Movies">Add</a>
 												</div>
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/Movies?imdb={$result->imdbid}">{$result->title|escape:"htmlall"}</a></span>
+																							   href="{{url("/Movies?imdb={$result->imdbid}")}}">{$result->title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result->genre != ''}
 															<b>Genre: </b>
 															{$result->genre}, {/if}</div>
@@ -298,18 +297,18 @@
 																	ago</span>
 																<br/><br/><br/>
 																<div class="release-name text-muted"><a
-																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																			href="{{url("/details/{$mguid[$m@index]}")}}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
 																<div>
 																	<a role="button" class="btn btn-light btn-xs"
 																	   data-toggle="tooltip" data-placement="top" title
 																	   data-original-title="Download NZB"
-																	   href="{$smarty.const.WWW_TOP}/getnzb?id={$mguid[$m@index]}"><i
+																	   href="{{url("/getnzb?id={$mguid[$m@index]}")}}"><i
 																				class="fa fa-cloud-download"></i><span
 																				class="badge"> {$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																	<a role="button" class="btn btn-light btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																	   href="{{url("/details/{$mguid[$m@index]}/#comments")}}"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
@@ -365,7 +364,7 @@
 						<div class="col-md-4">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse/Movies/{$categorytitle}">List</a>
+										href="{{url("/browse/Movies/{$categorytitle}")}}">List</a>
 								<br/>
 								With Selected:
 								<div class="btn-group">

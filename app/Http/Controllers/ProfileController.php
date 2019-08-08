@@ -272,7 +272,7 @@ class ProfileController extends BasePageController
                         UserVerification::send($this->userdata, 'User email verification required');
                     }
 
-                    return redirect('profile');
+                    return redirect('profile')->with('success', 'Profile changes saved');
                 }
                 break;
 
