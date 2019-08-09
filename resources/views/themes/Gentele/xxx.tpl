@@ -1,10 +1,9 @@
-<div class="header"
-	>
+<div class="header">
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{{url({$site->home_link})}}">Home</a></li>
-			/  {if !empty({$catname->parent->title})}<a href="{{url("browse/{$catname->parent->title}")}}">{$catname->parent->title}</a>{else}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{/if}
-			/ {if !empty({$catname->parent->title})}<a href="{{url("/browse/{$catname->title}")}}>{$catname->title}</a>{else}All{/if}
+			/  {if !empty({$catname->parent->title})}<a href="{{url("browse/{$catname->parent->title}")}}">{$catname->parent->title}</a>{else}<a href="{{url("/browse/{$catname->title}")}}">{$catname->title}</a>{/if}
+			/ {if !empty({$catname->parent->title})}<a href="{{url("/browse/{$catname->title}")}}">{$catname->title}</a>{else}All{/if}
 		</ol>
 	</div>
 </div>
@@ -312,7 +311,7 @@
 														  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
-															href="{{url)"nfo/{$mguid[$m@index]}")}}"
+															href="{{url("nfo/{$mguid[$m@index]}")}}"
 															title="View NFO" class="badge badge-info"
 															rel="nfo">NFO</a>{/if}
 													<a class="badge badge-info"
