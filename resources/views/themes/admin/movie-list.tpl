@@ -20,13 +20,13 @@
 					<td class="less"><a href="http://www.themoviedb.org/movie/{$movie->tmdbid}"
 										title="View in TMDb">{$movie->tmdbid}</a></td>
 					<td><a title="Edit"
-						   href="{$smarty.const.WWW_TOP}/admin/movie-edit?id={$movie->imdbid}">{$movie->title}
+						   href="{{url("/admin/movie-edit?id={$movie->imdbid}")}}">{$movie->title}
 							({$movie->year})</a></td>
 					<td class="less">{$movie->cover}</td>
 					<td class="less">{$movie->backdrop}</td>
 					<td class="less">{$movie->created_at|date_format}</td>
 					<td class="less"><a title="Update"
-										href="{$smarty.const.WWW_TOP}/admin/movie-add?id={$movie->imdbid}&amp;update=1">Update</a>
+										href="{{url("/admin/movie-add?id={$movie->imdbid}&amp;update=1")}}">Update</a>
 					</td>
 				</tr>
 			{/foreach}

@@ -4,7 +4,7 @@
             <a title="Home" href="{{url("{$site->home_link}")}}"><small>HOME</small></a>
         </li>
         <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <a title="Admin Home" href="{url("/admin/index")}}"><small>ADMIN HOME</small></a>
+            <a title="Admin Home" href="{{url("/admin/index")}}"><small>ADMIN HOME</small></a>
         </li>
         <li class="bg-transparent list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
             <small>ADMIN FUNCTIONS</small>

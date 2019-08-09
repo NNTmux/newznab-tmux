@@ -1,6 +1,6 @@
 <div class="card card-body">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/content-list"><i class="fa fa-arrow-left"></i> Go
+	<a class="btn btn-success" href="{{url("/admin/content-list")}}"><i class="fa fa-arrow-left"></i> Go
 		back</a>
 	<form action="content-add?action=submit" method="post">
 		{{csrf_field()}}

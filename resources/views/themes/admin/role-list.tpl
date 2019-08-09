@@ -20,7 +20,7 @@
 
 		{foreach $userroles as $role}
 			<tr class="{cycle values=",alt"}">
-				<td><a href="{$smarty.const.WWW_TOP}/admin/role-edit?id={$role.id}">{$role.name}</a></td>
+				<td><a href="{{url("/admin/role-edit?id={$role.id}")}}">{$role.name}</a></td>
 				<td>{$role.apirequests}</td>
                 <td>{$role.rate_limit}</td>
 				<td>{$role.downloadrequests}</td>
@@ -30,8 +30,8 @@
 				<td>{$role.donation}</td>
 				<td>{$role.addyears}</td>
 				<td>{if $role.isdefault=="1"}Yes{else}No{/if}</td>
-				<td><a href="{$smarty.const.WWW_TOP}/admin/role-edit?id={$role.id}">edit</a>&nbsp;{if !in_array($role.name, ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'])}<a
-					class="confirm_action" href="{$smarty.const.WWW_TOP}/admin/role-delete?id={$role.id}">
+				<td><a href="{{url("/admin/role-edit?id={$role.id}")}}">edit</a>&nbsp;{if !in_array($role.name, ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'])}<a
+					class="confirm_action" href="{{url("/admin/role-delete?id={$role.id}")}}">
 						delete</a>{/if}
 				</td>
 			</tr>

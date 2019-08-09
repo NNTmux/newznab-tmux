@@ -16,7 +16,7 @@
 				<tr class="{cycle values=",alt"}">
 					<td class="less">{$console->id}</td>
 					<td><a title="Edit"
-						   href="{$smarty.const.WWW_TOP}/admin/console-edit?id={$console->id}">{$console->title}</a></td>
+						   href="{{url("/admin/console-edit?id={$console->id}")}}">{$console->title}</a></td>
 					<td>{$console->platform}</td>
 					<td>{$console->created_at|date_format}</td>
 				</tr>

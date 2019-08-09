@@ -1,7 +1,7 @@
 <div class="card card-body">
     <h1>{$title}</h1>
 
-    <a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/role-list"><i class="fa fa-arrow-left"></i> Go
+    <a class="btn btn-success" href="{{url("/admin/role-list")}}"><i class="fa fa-arrow-left"></i> Go
         back</a>
     {{Form::open(['url' => 'admin/role-add?action=submit', 'method' => 'post'])}}
 

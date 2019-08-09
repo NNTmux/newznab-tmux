@@ -32,31 +32,27 @@
 		The feeds include additional attributes to help provide better filtering in your Nzb client, such as size, group
 		and
 		categorisation. If you want to chain multiple categories together or do more advanced searching, use the <a
-				href="{$smarty.const.WWW_TOP}/apihelp">api</a>, which returns its data in an rss compatible format.
+				href="{{url("/apihelp")}}">api</a>, which returns its data in an rss compatible format.
 	</p>
 	<h2>Available Feeds</h2>
 	<h3>General</h3>
 	<ul style="text-align: left;">
 		<li>
 			Full site feed<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-				/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}</a>
+			<a href="{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}>{{url("/rss/full-feed?dl=1&amp;api_token={$userdata.api_token}")}}</a>
             <br>You can define limit and num parameters, which will decide how much items to show and what offset to use (default values: limit 100 and offset 0).
 		</li>
 		<li>
-			<a href="{$smarty.const.WWW_TOP}/cart/index">My cart</a> feed<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/cart?dl=1&amp;api_token={$userdata.api_token}&amp;del=1">{$smarty.const.WWW_TOP}
-				/rss/cart?dl=1&amp;api_token={$userdata.api_token}&amp;del=1</a>
+			<a href="{{url("/cart/index")}}">My cart</a> feed<br/>
+			<a href="{{url("/rss/cart?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}">{{url("/rss/cart?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}</a>
 		</li>
 		<li>
-			<a href="{$smarty.const.WWW_TOP}/myshows">My shows</a> feed<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/myshows?dl=1&amp;api_token={$userdata.api_token}&amp;del=1">{$smarty.const.WWW_TOP}
-				rss/myshows?dl=1&amp;api_token={$userdata.api_token}&amp;del=1</a>
+			<a href="{{url("/myshows")}}">My shows</a> feed<br/>
+			<a href="{{url("/rss/myshows?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}">{{url("/rss/myshows?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}</a>
 		</li>
 		<li>
-			<a href="{$smarty.const.WWW_TOP}/mymovies">My movies</a> feed<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/mymovies?dl=1&amp;api_token={$userdata.api_token}&amp;del=1">{$smarty.const.WWW_TOP}
-				/rss/mymovies?dl=1&amp;api_token={$userdata.api_token}&amp;del=1</a>
+			<a href="{{url("/mymovies")}}">My movies</a> feed<br/>
+			<a href="{{url("/rss/mymovies?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}">{{url("/rss/mymovies?dl=1&amp;api_token={$userdata.api_token}&amp;del=1")}}</a>
 		</li>
 	</ul>
 	<h3>Parent Category</h3>
@@ -64,8 +60,7 @@
 		{foreach $parentcategorylist as $category}
 			<li>
 				{$category.title} feed <br/>
-				<a href="{$smarty.const.WWW_TOP}/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-					/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}</a>
+				<a href="{{url("/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}")}}"</a>
 			</li>
 		{/foreach}
 	</ul>
@@ -75,8 +70,7 @@
             {if !empty($category.title)}
 			    <li>
                     {$category.title} feed <br/>
-				    <a href="{$smarty.const.WWW_TOP}/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-					/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}</a>
+				    <a href="{{url("/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/category?id={$category.id}&amp;dl=1&amp;api_token={$userdata.api_token}")}}"</a>
 			    </li>
             {/if}
 		{/foreach}
@@ -85,27 +79,22 @@
 	<ul style="text-align: left;">
 		<li>
 			Multiple categories separated by comma.<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/category?id={$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-				/rss/category?id={$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1
-				&amp;api_token={$userdata.api_token}</a>
+			<a href="{{url("/rss/category?id={$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/category?id={$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;api_token={$userdata.api_token}")}}</a>
 		</li>
 	</ul>
 	<h2>Additional Feeds</h2>
 	<ul style="text-align: left;">
 		<li>
 			Tv Series (Use the TVRage ID)<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/full-feed?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-				/rss/full-feedc?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}</a>
+			<a href="{{url("/rss/full-feed?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/full-feedc?show={$show}&amp;dl=1&amp;api_token={$userdata.api_token}")}}</a>
 		</li>
 		<li>
 			Tv Series aired in last seven days (Using the Video ID and airdate)<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/full-feed?show={$show}&amp;airdate=7&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-				/rss/full-feed?show={$show}&amp;airdate=7&amp;dl=1&amp;api_token={$userdata.api_token}</a>
+			<a href="{{url("/rss/full-feed?show={$show}&amp;airdate=7&amp;dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/full-feed?show={$show}&amp;airdate=7&amp;dl=1&amp;api_token={$userdata.api_token}")}}"</a>
 		</li>
 		<li>
 			Anime Feed (Use the AniDB ID)<br/>
-			<a href="{$smarty.const.WWW_TOP}/rss/full-feed?anidb={$anidb}&amp;dl=1&amp;api_token={$userdata.api_token}">{$smarty.const.WWW_TOP}
-				/rss/full-feed?anidb={$anidb}&amp;dl=1&amp;api_token={$userdata.api_token}</a>
+			<a href="{{url("/rss/full-feed?anidb={$anidb}&amp;dl=1&amp;api_token={$userdata.api_token}")}}">{{url("/rss/full-feed?anidb={$anidb}&amp;dl=1&amp;api_token={$userdata.api_token}")}}</a>
 		</li>
 	</ul>
 </div>

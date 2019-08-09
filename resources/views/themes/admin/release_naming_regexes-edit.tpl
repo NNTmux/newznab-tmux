@@ -3,7 +3,7 @@
 	{if isset($error) && $error != ''}
 		<div class="error">{$error}</div>
 	{/if}
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/release_naming_regexes-list"><i
+	<a class="btn btn-success" href="{{url("/admin/release_naming_regexes-list")}}"><i
 				class="fa fa-arrow-left"></i> Go back</a>
 	<form action="release_naming_regexes-edit?action=submit" method="POST">
 		{{csrf_field()}}

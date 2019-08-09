@@ -11,27 +11,27 @@
     <h3>Available Functions</h3>
     <dl>
         <dt>Capabilities <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/capabilities">capabilities</a></span></dt>
+                    href="{{url("/api/v2/capabilities")}}">capabilities</a></span></dt>
         <dd>Reports the capabilities of the server. Includes information about the server name, available search
             categories and version number of the nntmux being used.<br>Capabilities do not require any
             credentials in order to be retrieved.
         </dd>
         <br>
-        <dt>Search <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api/v2/search?id=linux&amp;api_token={$userdata.api_token}">search?id=linux</a></span>
+        <dt>Search <span style="font-family:courier;"><a href="{{url("/api/v2/search?id=linux&amp;api_token={$userdata.api_token}")}}">search?id=linux</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query. You can also filter by site category by including a comma separated
             list of categories as follows <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/search?cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">search?cat={$catClass::GAME_ROOT}
+                    href="{{url("/api/v2/search?cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}")}}">search?cat={$catClass::GAME_ROOT}
                     ,{$catClass::MOVIE_ROOT}</a></span>.
         </dd>
         <br>
         <dt>TV <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/tv?id=law%20and%20order&amp;season=7&amp;ep=12&amp;api_token={$userdata.api_token}">tv?id=law and order&amp;season=7&amp;ep=12</a></span>
+                    href="{{url("/api/v2/tv?id=law%20and%20order&amp;season=7&amp;ep=12&amp;api_token={$userdata.api_token}")}}">tv?id=law and order&amp;season=7&amp;ep=12</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query, category, tvrageid, season or episode.
             You can also filter by site category by including a comma separated list of categories as follows:
             <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/tv?rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}">tv?cat={$catClass::GAME_ROOT}
+                    href="{{url("/api/v2/tv?rid=2204&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}&amp;api_token={$userdata.api_token}")}}">tv?cat={$catClass::GAME_ROOT}
                     ,{$catClass::MOVIE_ROOT}</a></span>.
         </dd>
         <dd>
@@ -41,28 +41,28 @@
         </dd>
         <br>
         <dt>Movies by IMDb <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/movies?imdbid=1418646&amp;api_token={$userdata.api_token}">movies?imdbid=1418646</a></span>
+                    href="{{url("/api/v2/movies?imdbid=1418646&amp;api_token={$userdata.api_token}")}}">movies?imdbid=1418646</a></span>
         </dt>
         <dt>Movies by TMDb <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/movies?tmdbid=43418&amp;api_token={$userdata.api_token}">movies?tmdbid=43418</a></span>
+                    href="{{url("/api/v2/movies?tmdbid=43418&amp;api_token={$userdata.api_token}")}}">movies?tmdbid=43418</a></span>
         </dt>
         <dt>Movies by TraktTV <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/movies?traktid=29200&amp;api_token={$userdata.api_token}">movies?traktid=29200</a></span>
+                    href="{{url("/api/v2/movies?traktid=29200&amp;api_token={$userdata.api_token}")}}">movies?traktid=29200</a></span>
         </dt>
         <dd>Returns a list of nzbs matching a query, an imdbid, tmdbid or traktid and optionally a category. Filter by
             site category by including a comma separated list of categories as follows <span
                 style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;api_token={$userdata.api_token}">movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
+                    href="{{url("/api/v2/movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD},{$catClass::MOVIE_HD}&amp;api_token={$userdata.api_token}")}}">movies?imdbid=1418646&amp;cat={$catClass::MOVIE_SD}
                     ,{$catClass::MOVIE_HD}</a></span>.
         </dd>
         <br>
         <dt>Details <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/details?id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}">details?id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+                    href="{{url("/api/v2/details?id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}")}}">details?id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
         </dt>
         <dd>Returns detailed information about an nzb.</dd>
         <br>
         <dt>Get <span style="font-family:courier;"><a
-                    href="{$smarty.const.WWW_TOP}/api/v2/getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}">getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
+                    href="{{url("/api/v2/getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda&amp;api_token={$userdata.api_token}")}}">getnzb?id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
         </dt>
         <dd>Downloads the nzb file associated with an Id.</dd>
     </dl>

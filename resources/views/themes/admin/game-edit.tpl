@@ -1,6 +1,6 @@
 <div class="card card-body">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/game-list"><i class="fa fa-arrow-left"></i> Go
+	<a class="btn btn-success" href="{{url("/admin/game-list")}}"><i class="fa fa-arrow-left"></i> Go
 		back</a>
 	<form enctype="multipart/form-data" action="game-edit?action=submit" method="post">
 		{{csrf_field()}}
@@ -70,7 +70,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $game.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" alt=""/>
+							 src="{{url("/covers/games/{$game.id}.jpg")}}" alt=""/>
 					{/if}
 				</td>
 			</tr>

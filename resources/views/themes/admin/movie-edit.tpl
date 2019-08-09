@@ -1,6 +1,6 @@
 <div class="card card-body">
 	<h1>{$title}</h1>
-	<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/admin/movie-list"><i class="fa fa-arrow-left"></i> Go
+	<a class="btn btn-success" href="{{url("/admin/movie-list")}}"><i class="fa fa-arrow-left"></i> Go
 		back</a>
 	<form enctype="multipart/form-data" action="movie-edit?action=submit" method="post">
 		{{csrf_field()}}
@@ -92,7 +92,7 @@
 					<input type="file" id="cover" name="cover"/>
 					{if $movie.cover == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" alt=""/>
+							 src="{{url("/covers/movies/{$movie.imdbid}-cover.jpg")}}" alt=""/>
 					{/if}
 				</td>
 			</tr>
@@ -103,7 +103,7 @@
 					<input type="file" name="backdrop"/>
 					{if $movie.backdrop == 1}
 						<img style="max-width:200px; display:block;"
-							 src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-backdrop.jpg" alt=""/>
+							 src="{{url("/covers/movies/{$movie.imdbid}-backdrop.jpg")}}" alt=""/>
 					{/if}
 				</td>
 			</tr>
