@@ -2,6 +2,11 @@
 <html>
 
 <head>
+	<script>
+		var WWW_TOP = "{$smarty.const.WWW_TOP}";
+		var SERVERROOT = "{$serverroot}";
+		var UID = "{if Auth::check()}{Auth::id()}{else}{/if}";
+	</script>
 	<!-- Meta, title, CSS, favicons, etc. -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
