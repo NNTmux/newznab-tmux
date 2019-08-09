@@ -2,16 +2,6 @@
 <html lang="{{App::getLocale()}}">
 
 <head>
-	{literal}
-	<script>
-        /* <![CDATA[ */
-        var WWW_TOP = "{/literal}{{url("/")}}{literal}";
-        var SERVERROOT = "{/literal}{$serverroot}{literal}";
-        var UID = "{/literal}{if Auth::check()}{$userdata.id}{else}{/if}{literal}";
-        var RSSTOKEN = "{/literal}{if Auth::check()}{$userdata.api_token}{else}{/if}{literal}";
-        /* ]]> */
-	</script>
-	{/literal}
 	<meta charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{csrf_token()}}">
@@ -176,17 +166,12 @@
 		{/if}
 		<!-- /top navigation -->
 
-		{if Session::has('success')}
-			<div class="flash">
-				{{Session::flash('success') }}
-			</div>
-		{/if}
-
 		<!-- page content -->
 		<div class="right_col" role="main">
 			<div class="clearfix"></div>
 			<div class="row">
 				<div class="col-md-12 col-sm-12 col-12">
+					{$notification}
 					{$content}
 					<div class="clearfix"></div>
 				</div>

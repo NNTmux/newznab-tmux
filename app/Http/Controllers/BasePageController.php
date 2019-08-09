@@ -300,6 +300,8 @@ class BasePageController extends Controller
         }
         $header_menu = $this->smarty->fetch('headermenu.tpl');
         $this->smarty->assign('header_menu', $header_menu);
+        $notification = $this->smarty->fetch('notification.tpl');
+        $this->smarty->assign('notification', $notification);
     }
 
     /**

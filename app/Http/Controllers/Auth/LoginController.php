@@ -87,7 +87,7 @@ class LoginController extends Controller
 
                     Auth::logoutOtherDevices($request->input('password'));
 
-                    return redirect()->intended($this->redirectPath())->with('success', 'You have been logged in');
+                    return redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
                 }
 
                 $error = 'Username/email and password combination used does not match our records!';
@@ -110,9 +110,6 @@ class LoginController extends Controller
     public function showLoginForm($error = '', $notice = '')
     {
         $theme = Settings::settingValue('site.main.style');
-        if (! empty(Session::get('info'))) {
-            $notice = Session::get('info');
-        }
         app('smarty.view')->assign(['error' => $error, 'notice' => $notice, 'username' => '', 'rememberme' => '']);
 
         $meta_title = 'Login';

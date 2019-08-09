@@ -357,6 +357,6 @@ class ProfileController extends BasePageController
             return redirect('profile');
         }
 
-        return view('errors.badboy')->with('Message', 'Dont try to delete another user account!');
+        return view('errors.badboy')->with('warning', 'Dont try to delete another user account!');
     }
 }
