@@ -89,7 +89,7 @@
 													{if $m@first}
 													<a href="{{url("XXX?id={$result->id}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg{else}{{asset("/images/no-cover.png")}}")}}{/if}"
+																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg")}}{else}{{asset("/images/no-cover.png")}}"{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
@@ -257,7 +257,7 @@
                                                     {if $m@first}
 													<a href="{{url("/XXX?id={$result->id}")}}"><img
 																class="cover shadow img-fluid rounded"
-																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg{else}{{asset("/assets/images/no-cover.png")}}")}}{/if}"
+																src="{if $result->cover == 1}{{url("/covers/xxx/{$result->id}-cover.jpg")}}{else}{{asset("/assets/images/no-cover.png")}}"{/if}"
 																width="140" border="0"
 																alt="{$result->title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
