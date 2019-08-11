@@ -1198,13 +1198,13 @@ class Movie
                 if ($movieUpdated === false) {
                     $imdbSearch = new TitleSearch($this->config);
                     foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
-                        if (!empty($imdbTitle->orig_title())) {
+                        if (! empty($imdbTitle->orig_title())) {
                             similar_text($imdbTitle->orig_title(), $this->currentTitle, $percent);
                             if ($percent >= self::MATCH_PERCENT) {
                                 similar_text($this->currentYear, $imdbTitle->year(), $percent);
                                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                                     $getIMDBid = $imdbTitle->imdbid();
-                                    $imdbID = $this->doMovieUpdate('tt' . $getIMDBid, 'IMDb', $arr['id']);
+                                    $imdbID = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $arr['id']);
                                     if ($imdbID !== false) {
                                         $movieUpdated = true;
                                     }
