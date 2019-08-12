@@ -791,7 +791,7 @@ class Movie
      */
     public function fetchTMDBProperties($imdbId, $text = false)
     {
-        $lookupId = $text === false && \strlen($imdbId) === 7 ? 'tt'.$imdbId : $imdbId;
+        $lookupId = $text === false && (\strlen($imdbId) === 7 || strlen($imdbId) === 8) ? 'tt'.$imdbId : $imdbId;
 
         try {
             $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
@@ -906,7 +906,7 @@ class Movie
         $result = new Title($imdbId, $this->config);
         if (! empty($result->orig_title())) {
             similar_text($this->currentTitle, $result->orig_title(), $percent);
-            if ($percent > self::MATCH_PERCENT) {
+            if ($percent >= self::MATCH_PERCENT) {
                 similar_text($this->currentYear, $result->year(), $percent);
                 if ($percent >= self::YEAR_MATCH_PERCENT) {
                     $ret = [
@@ -951,7 +951,7 @@ class Movie
             $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
             if ($resp !== false) {
                 similar_text($this->currentTitle, $resp['title'], $percent);
-                if ($percent > self::MATCH_PERCENT) {
+                if ($percent >= self::MATCH_PERCENT) {
                     similar_text($this->currentYear, $resp['year'], $percent);
                     if ($percent >= self::YEAR_MATCH_PERCENT) {
                         $ret = [];
@@ -999,7 +999,7 @@ class Movie
 
             if (\is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
                 similar_text($this->currentTitle, $resp->data->Title, $percent);
-                if ($percent > self::MATCH_PERCENT) {
+                if ($percent >= self::MATCH_PERCENT) {
                     similar_text($this->currentYear, $resp->data->Year, $percent);
                     if ($percent >= self::YEAR_MATCH_PERCENT) {
                         $ret = [
@@ -1056,7 +1056,7 @@ class Movie
 
         if ($movie !== false) {
             similar_text($this->currentTitle, $iTunesMovie->getName(), $percent);
-            if ($percent > self::MATCH_PERCENT) {
+            if ($percent >= self::MATCH_PERCENT) {
                 $movie = [
                     'title' => $iTunesMovie->getName(),
                     'director' => $iTunesMovie->getDirector() ?? '',
@@ -1254,7 +1254,7 @@ class Movie
                         foreach ($data['results'] as $result) {
                             if (! empty($result['id'])) {
                                 similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
-                                if ($percent > 80) {
+                                if ($percent >= self::YEAR_MATCH_PERCENT) {
                                     $ret = $this->fetchTMDBProperties($result['id'], true);
                                     if ($ret !== false && ! empty($ret['imdbid'])) {
                                         $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
