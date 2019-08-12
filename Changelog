@@ -1,4 +1,5 @@
 2019-08-12 DariusIII
+	* Chg: Update javascript and tpls
 	* Chg: Slightly improve movie matching
 	* Fix: Fix game covers 
 	* Chg: Update rtconner/laravel-tagging (3.2.2 => 3.2.3)

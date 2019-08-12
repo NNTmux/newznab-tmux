@@ -56,7 +56,7 @@
             </div>
         </a>
         <div id='submenu4' class="collapse sidebar-submenu">
-            <a href="{{url("dmin/group-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
+            <a href="{{url("admin/group-list")}}" class="list-group-item list-group-item-action bg-dark text-white">
             <span class="menu-collapsed">View Groups</span>
             </a>
             <a href="{{url("/admin/group-edit")}}" class="list-group-item list-group-item-action bg-dark text-white">

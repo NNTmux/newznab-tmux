@@ -3,8 +3,6 @@
 
 <head>
 	<script>
-		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
 		var UID = "{if Auth::check()}{Auth::id()}{else}{/if}";
 	</script>
 	<meta charset=utf-8">
