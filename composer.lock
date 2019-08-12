@@ -5518,21 +5518,21 @@
         },
         {
             "name": "rtconner/laravel-tagging",
-            "version": "3.2.2",
+            "version": "3.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtconner/laravel-tagging.git",
-                "reference": "5c115443721c2c4bb38099234d08555c5ff52bc7"
+                "reference": "2e60145343edc9d6e3e48551ca6fc3ad8be87eb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/5c115443721c2c4bb38099234d08555c5ff52bc7",
-                "reference": "5c115443721c2c4bb38099234d08555c5ff52bc7",
+                "url": "https://api.github.com/repos/rtconner/laravel-tagging/zipball/2e60145343edc9d6e3e48551ca6fc3ad8be87eb6",
+                "reference": "2e60145343edc9d6e3e48551ca6fc3ad8be87eb6",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^5.0",
-                "illuminate/support": "^5.0",
+                "illuminate/database": ">= 5.0",
+                "illuminate/support": ">= 5.0",
                 "php": ">= 7.0"
             },
             "require-dev": {
@@ -5576,7 +5576,7 @@
                 "tagging",
                 "tags"
             ],
-            "time": "2019-07-06T13:39:53+00:00"
+            "time": "2019-08-12T00:27:27+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
