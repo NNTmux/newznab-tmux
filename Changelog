@@ -1,5 +1,6 @@
 2019-08-12 DariusIII
-	* CHg: Update rtconner/laravel-tagging (3.2.2 => 3.2.3)
+	* Fix: Fix game covers 
+	* Chg: Update rtconner/laravel-tagging (3.2.2 => 3.2.3)
 2019-08-11 DariusIII
 	* Chg: Add year check in processMovieReleases function to help better movie matching
 2019-08-09 DariusIII

@@ -69,8 +69,7 @@
 										<div class="card-body">
 											<div class="row">
 												<div class="col-md-2 small-gutter-left">
-													<a title="View details"
-													   href="{{url("/details/{$result->guid}")}}>
+													<a title="View details" href="{{url("/details/{$result->guid}")}}">
 														<img src="{if $result->cover == 1}{{url("/covers/games/{$result->gamesinfo_id}.jpg")}}{else}{{asset("/assets/images/no-cover.png")}}{/if}"
 															 class="img-fluid rounded"
 															 width="140" border="0"
