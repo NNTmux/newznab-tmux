@@ -1287,13 +1287,6 @@ function mymovie_add(imdbID, btn) {
     return false;
 }
 
-//reset users api counts
-function resetapireq(uid, type) {
-    $.post(base_url + 'ajax_resetusergrabs-admin?id=' + uid + '&action=' + type, function(
-        resp
-    ) {});
-}
-
 function getNzbGetQueue() {
     $.ajax({
         url: 'queuedata?type=nzbget&id=' + $.now(),

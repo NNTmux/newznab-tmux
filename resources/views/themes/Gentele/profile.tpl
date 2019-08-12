@@ -101,21 +101,19 @@
                                                     <tr>
                                                         <th>API Hits last 24 hours</th>
                                                         <td>
-                                                            <span id="uatd">{$apirequests}</span> {if isset($isadmin) && $apirequests > 0}
-                                                            <a
-                                                                onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
-                                                                href="#" class="badge badge-danger">
-                                                                    Reset</a>{/if}</td>
+                                                            <span>
+                                                                {$apirequests}
+                                                            </span>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Downloads last 24 hours</th>
-                                                        <td><span id="ugrtd">{$grabstoday}</span> /</span>
+                                                        <td>
+                                                            <span>
+                                                                {$grabstoday}
+                                                            </span> /
                                                             {$user->role->downloadrequests}
-                                                            {if isset($isadmin) && $grabstoday > 0}
-                                                                <a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
-                                                                   href="#" class="badge badge-danger">
-                                                                    Reset</a>
-                                                            {/if}</td>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Downloads Total</th>
