@@ -1,3 +1,5 @@
+2019-08-13 DariusIII
+	* Chg: Update nikic/php-parser (v4.2.2 => v4.2.3)
 2019-08-12 DariusIII
 	* Fix: Fix bad crosspost check query
 	* Chg: Remove api and download hits reset functionality
