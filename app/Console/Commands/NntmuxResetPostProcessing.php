@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Category;
 use App\Models\Release;
+use App\Models\Category;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Illuminate\Console\Command;
-use function GuzzleHttp\Psr7\str;
 
 class NntmuxResetPostProcessing extends Command
 {
@@ -23,7 +22,7 @@ class NntmuxResetPostProcessing extends Command
         'adult',
         'misc',
         'anime',
-        'nfo'
+        'nfo',
     ];
     /**
      * The name and signature of the console command.
@@ -92,9 +91,9 @@ class NntmuxResetPostProcessing extends Command
                             'nfostatus' => -1,
                         ]
                     );
-                    $this->consoleTools->overWritePrimary('Resetting Releases:  ' . $this->consoleTools->percentString(++$affected, $total));
+                    $this->consoleTools->overWritePrimary('Resetting Releases:  '.$this->consoleTools->percentString(++$affected, $total));
                 }
-            } else{
+            } else {
                 $this->colorCli->header('No releases to reset');
             }
         } else {
@@ -133,7 +132,7 @@ class NntmuxResetPostProcessing extends Command
                             break;
                         case 'game':
                             $this->colorCli->header('Resetting all PC Games postprocessing');
-                            $qry = Release::query()->whereIn('gamesinfo_id', [-2,0])->where('categories_id', '=', Category::PC_GAMES)->get();
+                            $qry = Release::query()->whereIn('gamesinfo_id', [-2, 0])->where('categories_id', '=', Category::PC_GAMES)->get();
                             $total = $qry->count();
                             $conCount = 0;
                             foreach ($qry as $releases) {
