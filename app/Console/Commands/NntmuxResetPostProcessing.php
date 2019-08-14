@@ -131,7 +131,6 @@ class NntmuxResetPostProcessing extends Command
         }
     }
 
-
     private function resetConsole(): void
     {
         $qry = Release::query()->whereNotNull('consoleinfo_id')->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->get();
@@ -143,9 +142,9 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'consoleinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting console releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting console releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' consoleinfo_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' consoleinfo_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -163,9 +162,9 @@ class NntmuxResetPostProcessing extends Command
                         'movieinfo_id' => null,
                         'imdbid' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting Movie releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting Movie releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' movieinfo_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' movieinfo_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -182,9 +181,9 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'gamesinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting PC GAME releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting PC GAME releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' gamesinfo_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' gamesinfo_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -201,9 +200,9 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'bookinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting book releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting book releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' bookinfo_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' bookinfo_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -220,9 +219,9 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'musicinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting music releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting music releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' musicinfo_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' musicinfo_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -239,9 +238,9 @@ class NntmuxResetPostProcessing extends Command
                     [
                         'xxxinfo_id' => null,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting xxx releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting xxx releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' xxxinfo_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' xxxinfo_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -259,9 +258,9 @@ class NntmuxResetPostProcessing extends Command
                         'videos_id' => 0,
                         'tv_episodes_id' => 0,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting tv releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting tv releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' video_id\'s reset.');
+            $this->colorCli->header(number_format($conCount).' video_id\'s reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
@@ -283,9 +282,9 @@ class NntmuxResetPostProcessing extends Command
                         'audiostatus' => 0,
                         'nfostatus' => -1,
                     ]);
-                $this->consoleTools->overWritePrimary('Resetting misc releases:  ' . $this->consoleTools->percentString(++$conCount, $total));
+                $this->consoleTools->overWritePrimary('Resetting misc releases:  '.$this->consoleTools->percentString(++$conCount, $total));
             }
-            $this->colorCli->header(number_format($conCount) . ' misc releases reset.');
+            $this->colorCli->header(number_format($conCount).' misc releases reset.');
         } else {
             $this->colorCli->header('No releases to reset');
         }
