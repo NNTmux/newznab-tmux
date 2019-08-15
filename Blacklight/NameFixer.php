@@ -1092,13 +1092,13 @@ class NameFixer
         $colorCLI = new ColorCLI();
         echo PHP_EOL;
 
-        $colorCLI->headerOver('New name:     ').$colorCLI->primaryOver($data['new_name']).
-            $colorCLI->headerOver('Old name:     ').$colorCLI->primaryOver($data['old_name']).
-            $colorCLI->headerOver('New category: ').$colorCLI->primaryOver($data['new_category']).
-            $colorCLI->headerOver('Old category: ').$colorCLI->primaryOver($data['old_category']).
-            $colorCLI->headerOver('Group:        ').$colorCLI->primaryOver($data['group']).
-            $colorCLI->headerOver('Releases ID:   ').$colorCLI->primaryOver($data['releases_id']).
-            $colorCLI->headerOver('Method:       ').$colorCLI->primaryOver($data['method']);
+        $colorCLI->header('New name:     ').$colorCLI->primaryOver($data['new_name']).
+            $colorCLI->header('Old name:     ').$colorCLI->primaryOver($data['old_name']).
+            $colorCLI->header('New category: ').$colorCLI->primaryOver($data['new_category']).
+            $colorCLI->header('Old category: ').$colorCLI->primaryOver($data['old_category']).
+            $colorCLI->header('Group:        ').$colorCLI->primaryOver($data['group']).
+            $colorCLI->header('Releases ID:   ').$colorCLI->primaryOver($data['releases_id']).
+            $colorCLI->header('Method:       ').$colorCLI->primaryOver($data['method']);
     }
 
     /**
