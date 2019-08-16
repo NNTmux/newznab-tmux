@@ -1,3 +1,5 @@
+2019-08-16 DariusIII
+	* Fix: Fix bad order of variables in PostProcess class
 2019-08-15 DariusIII
 	* Chg: Add install_composer shell script to install latest version of composer
 2019-08-14 DariusIII

@@ -170,8 +170,8 @@ class Releases extends Release
      */
     public function showPasswords(): ?string
     {
-        $setting = (int) Settings::settingValue('..showpasswordedrelease');
-        $setting = $setting ?? 10;
+        $show = (int) Settings::settingValue('..showpasswordedrelease');
+        $setting = $show ?? 10;
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 
