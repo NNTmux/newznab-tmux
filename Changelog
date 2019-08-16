@@ -1,4 +1,5 @@
 2019-08-16 DariusIII
+	* Chg: Add misc/testing/DB/mark_as_passworded.php script
 	* Chg: Set release as passworded if files inside archives are passworded
 	* Chg: Update tinyMCE config
 	* Fix: Fix opening existing forum posts
