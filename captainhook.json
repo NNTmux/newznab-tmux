@@ -5,7 +5,7 @@
             {
                 "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Beams",
                 "options": {
-                    "subjectLength": 50,
+                    "subjectLength": 200,
                     "bodyLineLength": 72
                 },
                 "conditions": []
